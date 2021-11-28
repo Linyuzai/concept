@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group 'com.github.linyuzai'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter:2.5.6'
+    compileOnly project(':concept-download:concept-download-core')
+    compileOnly project(':concept-download:concept-download-aop')
+    compileOnly project(':concept-download:concept-download-web-servlet')
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

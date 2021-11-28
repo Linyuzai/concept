@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.github.linyuzai.download.autoconfigure.DownloadConceptAopAutoConfiguration,\
+com.github.linyuzai.download.autoconfigure.DownloadConceptServletAutoConfiguration,\
+com.github.linyuzai.download.autoconfigure.DownloadConceptAutoConfiguration
