@@ -9,4 +9,5 @@ include 'concept-download:concept-download-web-servlet'
 findProject(':concept-download:concept-download-web-servlet')?.name = 'concept-download-web-servlet'
 include 'concept-download:concept-download-spring-boot-starter'
 findProject(':concept-download:concept-download-spring-boot-starter')?.name = 'concept-download-spring-boot-starter'
+include 'sample'
 

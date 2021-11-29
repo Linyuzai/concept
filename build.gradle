@@ -10,10 +10,27 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
 }
 
 test {
     useJUnitPlatform()
+}
+
+allprojects {
+    ext {
+        set('springBootVersion', "2.6.0")
+    }
+    ext {
+        set('springDependencyManagementVersion', "1.0.11.RELEASE")
+    }
+    ext {
+        set('springCloudVersion', "2021.0.0-RC1")
+    }
+    ext {
+        set('lombokVersion', "1.18.22")
+    }
+    ext {
+        set('junitJupiterVersion', "5.8.1")
+    }
 }
