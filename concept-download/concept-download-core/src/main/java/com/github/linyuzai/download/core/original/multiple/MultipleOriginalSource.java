@@ -1,7 +1,7 @@
-package com.github.linyuzai.download.core.source.multiple;
+package com.github.linyuzai.download.core.original.multiple;
 
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.source.DownloadSource;
+import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import lombok.AllArgsConstructor;
 
@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @AllArgsConstructor
-public class MultipleDownloadSource implements DownloadSource {
+public class MultipleOriginalSource implements OriginalSource {
 
-    private Collection<DownloadSource> sources;
+    private Collection<OriginalSource> sources;
 
     @Override
     public String getName() {
@@ -39,7 +39,7 @@ public class MultipleDownloadSource implements DownloadSource {
     @Override
     public long getLength() {
         long length = 0;
-        for (DownloadSource source : sources) {
+        for (OriginalSource source : sources) {
             length += source.getLength();
         }
         return length;
@@ -47,14 +47,14 @@ public class MultipleDownloadSource implements DownloadSource {
 
     @Override
     public void load() throws IOException {
-        for (DownloadSource source : sources) {
+        for (OriginalSource source : sources) {
             source.load();
         }
     }
 
     @Override
     public boolean isAsyncLoad() {
-        for (DownloadSource source : sources) {
+        for (OriginalSource source : sources) {
             if (source.isAsyncLoad()) {
                 return true;
             }
@@ -64,15 +64,15 @@ public class MultipleDownloadSource implements DownloadSource {
 
     @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
-        for (DownloadSource source : sources) {
+        for (OriginalSource source : sources) {
             source.write(os, range, writer, handler);
         }
     }
 
     @Override
-    public Collection<DownloadSource> flatten(Predicate<DownloadSource> predicate) {
-        List<DownloadSource> all = new ArrayList<>();
-        for (DownloadSource source : sources) {
+    public Collection<OriginalSource> flatten(Predicate<OriginalSource> predicate) {
+        List<OriginalSource> all = new ArrayList<>();
+        for (OriginalSource source : sources) {
             all.addAll(source.flatten(predicate));
         }
         return all;

@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.loader;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.source.DownloadSource;
+import com.github.linyuzai.download.core.original.OriginalSource;
 import lombok.*;
 
 import java.io.IOException;
@@ -13,22 +13,22 @@ import java.util.concurrent.CountDownLatch;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class ParallelDownloadSourceLoader implements DownloadSourceLoader {
+public abstract class ParallelOriginalSourceLoader implements OriginalSourceLoader {
 
     @Getter
     @Setter
     private boolean serialOnSingleSource = true;
 
     @Override
-    public void load(DownloadSource source, DownloadContext context) throws IOException {
-        Collection<DownloadSource> sources = source.flatten();
+    public void load(OriginalSource source, DownloadContext context) throws IOException {
+        Collection<OriginalSource> sources = source.flatten();
         if (sources.size() <= 1 && serialOnSingleSource) {
             source.load();
             return;
         }
-        Collection<DownloadSource> parallelSources = new ArrayList<>();
-        Collection<DownloadSource> serialSources = new ArrayList<>();
-        for (DownloadSource s : sources) {
+        Collection<OriginalSource> parallelSources = new ArrayList<>();
+        Collection<OriginalSource> serialSources = new ArrayList<>();
+        for (OriginalSource s : sources) {
             if (s.isAsyncLoad()) {
                 parallelSources.add(s);
             } else {
@@ -39,16 +39,16 @@ public abstract class ParallelDownloadSourceLoader implements DownloadSourceLoad
             parallelLoad(parallelSources, context);
         }
         if (!serialSources.isEmpty()) {
-            for (DownloadSource serialSource : serialSources) {
+            for (OriginalSource serialSource : serialSources) {
                 serialSource.load();
             }
         }
     }
 
-    public void parallelLoad(Collection<DownloadSource> sources, DownloadContext context) {
+    public void parallelLoad(Collection<OriginalSource> sources, DownloadContext context) {
         CountDownLatch latch = new CountDownLatch(sources.size());
         List<Throwable> throwableList = Collections.synchronizedList(new ArrayList<>());
-        for (DownloadSource source : sources) {
+        for (OriginalSource source : sources) {
             execute(() -> {
                 try {
                     source.load();

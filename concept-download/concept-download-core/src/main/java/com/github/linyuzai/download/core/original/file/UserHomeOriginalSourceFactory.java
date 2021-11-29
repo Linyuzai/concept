@@ -1,13 +1,13 @@
-package com.github.linyuzai.download.core.source.file;
+package com.github.linyuzai.download.core.original.file;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.source.DownloadSource;
-import com.github.linyuzai.download.core.source.prefix.PrefixDownloadSourceFactory;
+import com.github.linyuzai.download.core.original.OriginalSource;
+import com.github.linyuzai.download.core.original.prefix.PrefixOriginalSourceFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
 
-public class UserHomeDownloadSourceFactory extends PrefixDownloadSourceFactory {
+public class UserHomeOriginalSourceFactory extends PrefixOriginalSourceFactory {
 
     public static final String[] PREFIXES = new String[]{
             "user.home:",
@@ -19,10 +19,10 @@ public class UserHomeDownloadSourceFactory extends PrefixDownloadSourceFactory {
     public static final String USER_HOME = System.getProperty("user.home");
 
     @Override
-    public DownloadSource create(Object source, DownloadContext context) {
+    public OriginalSource create(Object source, DownloadContext context) {
         String path = getContent((String) source);
         Charset charset = context.getOptions().getCharset();
-        return new FileDownloadSource.Builder()
+        return new FileOriginalSource.Builder()
                 .file(new File(USER_HOME, path))
                 .charset(charset)
                 .build();

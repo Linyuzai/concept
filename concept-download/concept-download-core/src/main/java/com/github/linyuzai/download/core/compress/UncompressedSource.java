@@ -1,18 +1,17 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.source.DownloadSource;
+import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 @AllArgsConstructor
 public class UncompressedSource implements CompressedSource {
 
-    private DownloadSource source;
+    private OriginalSource source;
 
     private SourceWriter writer;
 

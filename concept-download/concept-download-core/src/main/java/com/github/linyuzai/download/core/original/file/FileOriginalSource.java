@@ -1,7 +1,7 @@
-package com.github.linyuzai.download.core.source.file;
+package com.github.linyuzai.download.core.original.file;
 
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.source.AbstractDownloadSource;
+import com.github.linyuzai.download.core.original.AbstractOriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import lombok.NonNull;
 
@@ -12,14 +12,14 @@ import java.nio.charset.Charset;
  * 文件下载源
  * 该下载源持有一个文件对象，可能是文件，可能是目录
  */
-public class FileDownloadSource extends AbstractDownloadSource {
+public class FileOriginalSource extends AbstractOriginalSource {
 
     /**
      * 持有的文件
      */
     private final File file;
 
-    private FileDownloadSource(@NonNull File file, String name, Charset charset, boolean asyncLoad) {
+    private FileOriginalSource(@NonNull File file, String name, Charset charset, boolean asyncLoad) {
         this.file = file;
         if (name == null || name.isEmpty()) {
             setName(file.getName());
@@ -91,7 +91,7 @@ public class FileDownloadSource extends AbstractDownloadSource {
 
                     @Override
                     public Charset getCharset() {
-                        return FileDownloadSource.this.getCharset();
+                        return FileOriginalSource.this.getCharset();
                     }
 
                     @Override
@@ -124,7 +124,7 @@ public class FileDownloadSource extends AbstractDownloadSource {
 
                         @Override
                         public Charset getCharset() {
-                            return FileDownloadSource.this.getCharset();
+                            return FileOriginalSource.this.getCharset();
                         }
 
                         @Override
@@ -173,8 +173,8 @@ public class FileDownloadSource extends AbstractDownloadSource {
             return this;
         }
 
-        public FileDownloadSource build() {
-            return new FileDownloadSource(file, name, charset, asyncLoad);
+        public FileOriginalSource build() {
+            return new FileOriginalSource(file, name, charset, asyncLoad);
         }
     }
 }

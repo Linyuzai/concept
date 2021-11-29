@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.autoconfigure.info.DownloadConceptInfo;
 import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
@@ -9,27 +8,25 @@ import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
-import com.github.linyuzai.download.core.loader.DownloadSourceLoader;
+import com.github.linyuzai.download.core.loader.OriginalSourceLoader;
 import com.github.linyuzai.download.core.loader.LoadSourceInterceptor;
-import com.github.linyuzai.download.core.loader.SerialDownloadSourceLoader;
+import com.github.linyuzai.download.core.loader.SerialOriginalSourceLoader;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import com.github.linyuzai.download.core.request.ProvideRequestInterceptor;
 import com.github.linyuzai.download.core.response.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.ProvideResponseInterceptor;
 import com.github.linyuzai.download.core.response.WriteResponseInterceptor;
-import com.github.linyuzai.download.core.source.DownloadSourceFactory;
-import com.github.linyuzai.download.core.source.PrepareSourceInterceptor;
-import com.github.linyuzai.download.core.source.file.FileDownloadSourceFactory;
-import com.github.linyuzai.download.core.source.file.FilePathDownloadSourceFactory;
-import com.github.linyuzai.download.core.source.file.UserHomeDownloadSourceFactory;
-import com.github.linyuzai.download.core.source.multiple.ArrayDownloadSourceFactory;
-import com.github.linyuzai.download.core.source.multiple.CollectionDownloadSourceFactory;
-import com.github.linyuzai.download.core.source.original.OriginalDownloadSourceFactory;
+import com.github.linyuzai.download.core.original.OriginalSourceFactory;
+import com.github.linyuzai.download.core.original.PrepareSourceInterceptor;
+import com.github.linyuzai.download.core.original.file.FileOriginalSourceFactory;
+import com.github.linyuzai.download.core.original.file.FilePathOriginalSourceFactory;
+import com.github.linyuzai.download.core.original.file.UserHomeOriginalSourceFactory;
+import com.github.linyuzai.download.core.original.multiple.ArrayOriginalSourceFactory;
+import com.github.linyuzai.download.core.original.multiple.CollectionOriginalSourceFactory;
+import com.github.linyuzai.download.core.original.direct.DirectOriginalSourceFactory;
 import com.github.linyuzai.download.core.writer.BufferedSourceWriter;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import com.github.linyuzai.download.core.writer.SourceWriterInterceptor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -75,55 +72,55 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CollectionDownloadSourceFactory collectionDownloadSourceFactory() {
-        return new CollectionDownloadSourceFactory();
+    public CollectionOriginalSourceFactory collectionOriginalSourceFactory() {
+        return new CollectionOriginalSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ArrayDownloadSourceFactory arrayDownloadSourceFactory() {
-        return new ArrayDownloadSourceFactory();
+    public ArrayOriginalSourceFactory arrayOriginalSourceFactory() {
+        return new ArrayOriginalSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public OriginalDownloadSourceFactory originalDownloadSourceFactory() {
-        return new OriginalDownloadSourceFactory();
+    public DirectOriginalSourceFactory directOriginalSourceFactory() {
+        return new DirectOriginalSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public FileDownloadSourceFactory fileDownloadSourceFactory() {
-        return new FileDownloadSourceFactory();
+    public FileOriginalSourceFactory fileOriginalSourceFactory() {
+        return new FileOriginalSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public FilePathDownloadSourceFactory filePathDownloadSourceFactory() {
-        return new FilePathDownloadSourceFactory();
+    public FilePathOriginalSourceFactory filePathOriginalSourceFactory() {
+        return new FilePathOriginalSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public UserHomeDownloadSourceFactory userHomeDownloadSourceFactory() {
-        return new UserHomeDownloadSourceFactory();
+    public UserHomeOriginalSourceFactory userHomeOriginalSourceFactory() {
+        return new UserHomeOriginalSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public PrepareSourceInterceptor prepareSourceInterceptor(List<DownloadSourceFactory> factories) {
+    public PrepareSourceInterceptor prepareSourceInterceptor(List<OriginalSourceFactory> factories) {
         return new PrepareSourceInterceptor(factories);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public DownloadSourceLoader downloadSourceLoader() {
-        return new SerialDownloadSourceLoader();
+    public OriginalSourceLoader originalSourceLoader() {
+        return new SerialOriginalSourceLoader();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadSourceInterceptor loadSourceInterceptor(DownloadSourceLoader loader) {
+    public LoadSourceInterceptor loadSourceInterceptor(OriginalSourceLoader loader) {
         return new LoadSourceInterceptor(loader);
     }
 

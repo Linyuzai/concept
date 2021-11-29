@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 @AllArgsConstructor
-public class ExecutorDownloadSourceLoader extends ParallelDownloadSourceLoader {
+public class ExecutorOriginalSourceLoader extends ParallelOriginalSourceLoader {
 
     @Getter
     @Setter

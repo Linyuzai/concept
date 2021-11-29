@@ -1,12 +1,12 @@
-package com.github.linyuzai.download.core.source.prefix;
+package com.github.linyuzai.download.core.original.prefix;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.source.DownloadSourceFactory;
+import com.github.linyuzai.download.core.original.OriginalSourceFactory;
 
 /**
  * 基于字符串前缀匹配的加载器
  */
-public abstract class PrefixDownloadSourceFactory implements DownloadSourceFactory {
+public abstract class PrefixOriginalSourceFactory implements OriginalSourceFactory {
 
     /**
      * String类型并且前缀匹配的才能加载

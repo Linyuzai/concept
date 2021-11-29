@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.source;
+package com.github.linyuzai.download.core.original;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
@@ -17,11 +17,11 @@ public class PrepareSourceInterceptor implements DownloadInterceptor {
     /**
      * 下载源加载器
      */
-    private final List<DownloadSourceFactory> factories;
+    private final List<OriginalSourceFactory> factories;
 
-    public PrepareSourceInterceptor(@NonNull List<DownloadSourceFactory> factories) {
+    public PrepareSourceInterceptor(@NonNull List<OriginalSourceFactory> factories) {
         this.factories = factories;
-        this.factories.sort(Comparator.comparingInt(DownloadSourceFactory::getOrder));
+        this.factories.sort(Comparator.comparingInt(OriginalSourceFactory::getOrder));
     }
 
     /**
@@ -33,8 +33,8 @@ public class PrepareSourceInterceptor implements DownloadInterceptor {
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         Object source = context.getOptions().getSource();
-        context.set(DownloadSourceFactory.class, factories);
-        context.set(DownloadSource.class, DownloadSourceUtils.create(source, context, factories));
+        context.set(OriginalSourceFactory.class, factories);
+        context.set(OriginalSource.class, OriginalSourceUtils.create(source, context, factories));
         chain.next(context);
     }
 

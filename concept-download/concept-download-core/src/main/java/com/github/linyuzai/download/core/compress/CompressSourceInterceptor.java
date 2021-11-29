@@ -3,7 +3,7 @@ package com.github.linyuzai.download.core.compress;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
-import com.github.linyuzai.download.core.source.DownloadSource;
+import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import lombok.AllArgsConstructor;
 
@@ -18,10 +18,10 @@ public class CompressSourceInterceptor implements DownloadInterceptor {
 
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
-        DownloadSource source = context.get(DownloadSource.class);
+        OriginalSource source = context.get(OriginalSource.class);
         boolean skipCompressOnSingleSource = context.getOptions().isSkipCompressOnSingleSource();
         boolean compressEnabled = context.getOptions().isCompressEnabled();
-        Collection<DownloadSource> sources = source.flatten();
+        Collection<OriginalSource> sources = source.flatten();
         boolean shouldCompress = true;
         if (compressEnabled) {
             if (sources.size() <= 1) {

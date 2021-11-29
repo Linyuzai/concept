@@ -1,6 +1,7 @@
-package com.github.linyuzai.download.core.source;
+package com.github.linyuzai.download.core.original;
 
 import com.github.linyuzai.download.core.range.Range;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 
 import java.io.IOException;
@@ -14,9 +15,7 @@ import java.util.function.Predicate;
 /**
  * 下载源
  */
-public interface DownloadSource {
-
-    String getName();
+public interface OriginalSource extends Source {
 
     Charset getCharset();
 
@@ -38,16 +37,15 @@ public interface DownloadSource {
     /**
      * 遍历下载源中所有的数据
      *
-     * @param reader 回调所有的数据流
      * @throws IOException
      */
     void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException;
 
-    default Collection<DownloadSource> flatten() {
-        return flatten(downloadSource -> true);
+    default Collection<OriginalSource> flatten() {
+        return flatten(source -> true);
     }
 
-    default Collection<DownloadSource> flatten(Predicate<DownloadSource> predicate) {
+    default Collection<OriginalSource> flatten(Predicate<OriginalSource> predicate) {
         if (predicate.test(this)) {
             return Collections.singletonList(this);
         } else {
@@ -63,7 +61,6 @@ public interface DownloadSource {
         /**
          * 每次读到都会回调
          *
-         * @param readable 数据路径
          * @throws IOException
          */
         default void handle(Target target) throws IOException {
