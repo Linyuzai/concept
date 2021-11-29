@@ -12,9 +12,9 @@ import java.util.Collection;
 import java.util.List;
 
 @AllArgsConstructor
-public class CompressSourceInterceptor implements DownloadInterceptor {
+public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
 
-    private List<SourceCompressor> compressors;
+    private List<OriginalSourceCompressor> compressors;
 
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
@@ -31,7 +31,7 @@ public class CompressSourceInterceptor implements DownloadInterceptor {
             }
         } else {
             if (sources.size() > 1) {
-                throw new SourceCompressException("Enable compress to download multi-source");
+                throw new OriginalSourceCompressException("Enable compress to download multi-source");
             } else {
                 shouldCompress = false;
             }
@@ -42,9 +42,9 @@ public class CompressSourceInterceptor implements DownloadInterceptor {
             String compressFormat = context.getOptions().getCompressFormat();
             String finalFormat = (compressFormat == null || compressFormat.isEmpty()) ?
                     CompressFormat.ZIP : compressFormat;
-            SourceCompressor compressor = getSourceCompressor(finalFormat, context);
+            OriginalSourceCompressor compressor = getSourceCompressor(finalFormat, context);
             if (compressor == null) {
-                throw new SourceCompressException("No SourceCompressor support: " + finalFormat);
+                throw new OriginalSourceCompressException("No SourceCompressor support: " + finalFormat);
             }
             compressedSource = compressor.compress(source, context);
         } else {
@@ -54,8 +54,8 @@ public class CompressSourceInterceptor implements DownloadInterceptor {
         chain.next(context);
     }
 
-    public SourceCompressor getSourceCompressor(String format, DownloadContext context) {
-        for (SourceCompressor compressor : compressors) {
+    public OriginalSourceCompressor getSourceCompressor(String format, DownloadContext context) {
+        for (OriginalSourceCompressor compressor : compressors) {
             if (compressor.support(format, context)) {
                 return compressor;
             }

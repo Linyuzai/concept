@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 
 @AllArgsConstructor
-public class LoadSourceInterceptor implements DownloadInterceptor {
+public class LoadOriginalSourceInterceptor implements DownloadInterceptor {
 
     private OriginalSourceLoader loader;
 

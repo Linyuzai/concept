@@ -3,12 +3,12 @@ package com.github.linyuzai.download.core.compress.zip;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.compress.SourceCompressor;
+import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
 import com.github.linyuzai.download.core.original.OriginalSource;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ZipSourceCompressor implements SourceCompressor {
+public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
 
     private String cachePath;
 

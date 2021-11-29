@@ -1,15 +1,15 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
-import com.github.linyuzai.download.core.compress.SourceCompressor;
-import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
+import com.github.linyuzai.download.core.compress.CompressOriginalSourceInterceptor;
+import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
+import com.github.linyuzai.download.core.compress.zip.ZipOriginalSourceCompressor;
 import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.loader.OriginalSourceLoader;
-import com.github.linyuzai.download.core.loader.LoadSourceInterceptor;
+import com.github.linyuzai.download.core.loader.LoadOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.loader.SerialOriginalSourceLoader;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import com.github.linyuzai.download.core.request.ProvideRequestInterceptor;
@@ -17,7 +17,7 @@ import com.github.linyuzai.download.core.response.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.ProvideResponseInterceptor;
 import com.github.linyuzai.download.core.response.WriteResponseInterceptor;
 import com.github.linyuzai.download.core.original.OriginalSourceFactory;
-import com.github.linyuzai.download.core.original.PrepareSourceInterceptor;
+import com.github.linyuzai.download.core.original.CreateOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.original.file.FileOriginalSourceFactory;
 import com.github.linyuzai.download.core.original.file.FilePathOriginalSourceFactory;
 import com.github.linyuzai.download.core.original.file.UserHomeOriginalSourceFactory;
@@ -108,8 +108,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PrepareSourceInterceptor prepareSourceInterceptor(List<OriginalSourceFactory> factories) {
-        return new PrepareSourceInterceptor(factories);
+    public CreateOriginalSourceInterceptor createOriginalSourceInterceptor(List<OriginalSourceFactory> factories) {
+        return new CreateOriginalSourceInterceptor(factories);
     }
 
     @Bean
@@ -120,21 +120,21 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadSourceInterceptor loadSourceInterceptor(OriginalSourceLoader loader) {
-        return new LoadSourceInterceptor(loader);
+    public LoadOriginalSourceInterceptor loadOriginalSourceInterceptor(OriginalSourceLoader loader) {
+        return new LoadOriginalSourceInterceptor(loader);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ZipSourceCompressor zipSourceCompressor() {
+    public ZipOriginalSourceCompressor zipOriginalSourceCompressor() {
         //MultipartConfigElement
-        return new ZipSourceCompressor("/Users/tanghanzheng/IdeaProjects/Github/cache");
+        return new ZipOriginalSourceCompressor("/Users/tanghanzheng/IdeaProjects/Github/cache");
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CompressSourceInterceptor compressSourceInterceptor(List<SourceCompressor> compressors) {
-        return new CompressSourceInterceptor(compressors);
+    public CompressOriginalSourceInterceptor compressOriginalSourceInterceptor(List<OriginalSourceCompressor> compressors) {
+        return new CompressOriginalSourceInterceptor(compressors);
     }
 
     @Bean

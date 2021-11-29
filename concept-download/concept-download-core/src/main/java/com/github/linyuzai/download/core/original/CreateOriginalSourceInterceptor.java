@@ -12,14 +12,14 @@ import java.util.List;
 /**
  * 下载源处理拦截器
  */
-public class PrepareSourceInterceptor implements DownloadInterceptor {
+public class CreateOriginalSourceInterceptor implements DownloadInterceptor {
 
     /**
      * 下载源加载器
      */
     private final List<OriginalSourceFactory> factories;
 
-    public PrepareSourceInterceptor(@NonNull List<OriginalSourceFactory> factories) {
+    public CreateOriginalSourceInterceptor(@NonNull List<OriginalSourceFactory> factories) {
         this.factories = factories;
         this.factories.sort(Comparator.comparingInt(OriginalSourceFactory::getOrder));
     }
