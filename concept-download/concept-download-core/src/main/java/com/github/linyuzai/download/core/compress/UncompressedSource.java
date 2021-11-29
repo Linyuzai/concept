@@ -13,8 +13,6 @@ public class UncompressedSource implements CompressedSource {
 
     private OriginalSource source;
 
-    private SourceWriter writer;
-
     @Override
     public String getName() {
         return source.getName();

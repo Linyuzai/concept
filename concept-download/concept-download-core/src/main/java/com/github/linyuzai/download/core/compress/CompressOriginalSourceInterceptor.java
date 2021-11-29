@@ -36,7 +36,6 @@ public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
                 shouldCompress = false;
             }
         }
-        SourceWriter writer = context.get(SourceWriter.class);
         CompressedSource compressedSource;
         if (shouldCompress) {
             String compressFormat = context.getOptions().getCompressFormat();
@@ -48,7 +47,7 @@ public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
             }
             compressedSource = compressor.compress(source, context);
         } else {
-            compressedSource = new UncompressedSource(sources.iterator().next(), writer);
+            compressedSource = new UncompressedSource(sources.iterator().next());
         }
         context.set(CompressedSource.class, compressedSource);
         chain.next(context);
