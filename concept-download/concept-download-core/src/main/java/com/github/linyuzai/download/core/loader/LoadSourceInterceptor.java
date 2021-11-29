@@ -17,6 +17,7 @@ public class LoadSourceInterceptor implements DownloadInterceptor {
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         DownloadSource source = context.get(DownloadSource.class);
         loader.load(source,context);
+        chain.next(context);
     }
 
     @Override

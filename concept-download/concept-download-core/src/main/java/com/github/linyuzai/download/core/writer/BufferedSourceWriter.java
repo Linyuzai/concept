@@ -22,15 +22,12 @@ public class BufferedSourceWriter implements SourceWriter {
                 os.write(bytes, 0, len);
             }
         } else {
-            try (InputStreamReader isr = new InputStreamReader(is, charset);
-                 BufferedReader br = new BufferedReader(isr, bufferSize);
-                 OutputStreamWriter osw = new OutputStreamWriter(os);
-                 BufferedWriter bw = new BufferedWriter(osw, bufferSize)) {
-                int len;
-                char[] chars = new char[bufferSize];
-                while ((len = br.read(chars)) > 0) {
-                    bw.write(chars, 0, len);
-                }
+            InputStreamReader isr = new InputStreamReader(is, charset);
+            OutputStreamWriter osw = new OutputStreamWriter(os, charset);
+            int len;
+            char[] chars = new char[bufferSize];
+            while ((len = isr.read(chars)) > 0) {
+                osw.write(chars, 0, len);
             }
         }
     }

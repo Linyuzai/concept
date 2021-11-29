@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.autoconfigure;
 
+import com.github.linyuzai.download.autoconfigure.info.DownloadConceptInfo;
 import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
@@ -27,6 +28,8 @@ import com.github.linyuzai.download.core.source.original.OriginalDownloadSourceF
 import com.github.linyuzai.download.core.writer.BufferedSourceWriter;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import com.github.linyuzai.download.core.writer.SourceWriterInterceptor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +37,11 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-//MultipartConfigElement
 @Configuration
 @AutoConfigureAfter(DownloadConceptServletAutoConfiguration.class)
 public class DownloadConceptAutoConfiguration {
+
+    //private static final Log logger = LogFactory.getLog(DownloadConceptAutoConfiguration.class);
 
     @Bean
     @ConditionalOnMissingBean
@@ -126,7 +130,8 @@ public class DownloadConceptAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ZipSourceCompressor zipSourceCompressor() {
-        return new ZipSourceCompressor(null);
+        //MultipartConfigElement
+        return new ZipSourceCompressor("/Users/tanghanzheng/IdeaProjects/Github/cache");
     }
 
     @Bean

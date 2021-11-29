@@ -59,7 +59,7 @@ public class FileDownloadSource extends AbstractDownloadSource {
     @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
         if (range == null) {
-            write0(os, range, writer, handler, file, file.getName(), true);
+            write0(os, null, writer, handler, file, file.getName(), true);
         } else {
             if (file.isFile()) {
                 write0(os, range, writer, handler, file, file.getName(), true);
@@ -153,8 +153,6 @@ public class FileDownloadSource extends AbstractDownloadSource {
 
         private boolean asyncLoad;
 
-        private SourceWriter writer;
-
         public Builder file(File file) {
             this.file = file;
             return this;
@@ -172,11 +170,6 @@ public class FileDownloadSource extends AbstractDownloadSource {
 
         public Builder asyncLoad(boolean asyncLoad) {
             this.asyncLoad = asyncLoad;
-            return this;
-        }
-
-        public Builder writer(SourceWriter writer) {
-            this.writer = writer;
             return this;
         }
 

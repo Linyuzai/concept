@@ -7,6 +7,8 @@ import lombok.Getter;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 @Getter
 @AllArgsConstructor
@@ -26,7 +28,13 @@ public class ServletDownloadResponse implements DownloadResponse {
 
     @Override
     public void setFilename(String filename) {
-
+        String encodeFilename = null;
+        try {
+            encodeFilename = URLEncoder.encode(filename, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
     }
 
     @Override

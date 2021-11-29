@@ -2,7 +2,10 @@ package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.aop.advice.DownloadConceptAdvice;
 import com.github.linyuzai.download.aop.advice.DownloadConceptAdvisor;
+import com.github.linyuzai.download.autoconfigure.info.DownloadConceptInfo;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +16,11 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(DownloadConceptAutoConfiguration.class)
 public class DownloadConceptAopAutoConfiguration {
 
-    @Bean
-    public DownloadConceptAdvice downloadConceptAdvice(DownloadConcept downloadConcept) {
-        return new DownloadConceptAdvice(downloadConcept);
-    }
+    //private static final Log logger = LogFactory.getLog(DownloadConceptAopAutoConfiguration.class);
 
     @Bean
-    public DownloadConceptAdvisor downloadConceptAdvisor(DownloadConceptAdvice advice) {
-        return new DownloadConceptAdvisor(advice);
+    public DownloadConceptAdvisor downloadConceptAdvisor(DownloadConcept downloadConcept) {
+        //logger.info(DownloadConceptInfo.wrapper("aop"));
+        return new DownloadConceptAdvisor(new DownloadConceptAdvice(downloadConcept));
     }
 }

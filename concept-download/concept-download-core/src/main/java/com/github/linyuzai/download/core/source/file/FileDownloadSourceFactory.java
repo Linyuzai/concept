@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.source.DownloadSource;
 import com.github.linyuzai.download.core.source.DownloadSourceFactory;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 /**
  * 文件数据加载器
@@ -30,6 +31,10 @@ public class FileDownloadSourceFactory implements DownloadSourceFactory {
      */
     @Override
     public DownloadSource create(Object source, DownloadContext context) {
-        return new FileDownloadSource.Builder().file((File) source).build();
+        Charset charset = context.getOptions().getCharset();
+        return new FileDownloadSource.Builder()
+                .file((File) source)
+                .charset(charset)
+                .build();
     }
 }

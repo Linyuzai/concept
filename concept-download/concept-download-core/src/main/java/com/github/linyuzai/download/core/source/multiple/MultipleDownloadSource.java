@@ -1,11 +1,13 @@
 package com.github.linyuzai.download.core.source.multiple;
 
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.range.RangeReadException;
 import com.github.linyuzai.download.core.source.DownloadSource;
+import com.github.linyuzai.download.core.writer.SourceWriter;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +28,7 @@ public class MultipleDownloadSource implements DownloadSource {
     }
 
     @Override
-    public String getCharset() {
+    public Charset getCharset() {
         if (sources.size() == 1) {
             return sources.iterator().next().getCharset();
         } else {
@@ -61,9 +63,9 @@ public class MultipleDownloadSource implements DownloadSource {
     }
 
     @Override
-    public void read(Reader reader) throws IOException {
+    public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
         for (DownloadSource source : sources) {
-            source.read(reader);
+            source.write(os, range, writer, handler);
         }
     }
 

@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.source.DownloadSource;
 import com.github.linyuzai.download.core.source.prefix.PrefixDownloadSourceFactory;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 public class FilePathDownloadSourceFactory extends PrefixDownloadSourceFactory {
 
@@ -13,7 +14,11 @@ public class FilePathDownloadSourceFactory extends PrefixDownloadSourceFactory {
     @Override
     public DownloadSource create(Object source, DownloadContext context) {
         String path = getContent((String) source);
-        return new FileDownloadSource.Builder().file(new File(path)).build();
+        Charset charset = context.getOptions().getCharset();
+        return new FileDownloadSource.Builder()
+                .file(new File(path))
+                .charset(charset)
+                .build();
     }
 
     @Override
