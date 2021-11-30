@@ -3,26 +3,15 @@ package com.github.linyuzai.download.core.original;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * 下载源处理拦截器
  */
+@AllArgsConstructor
 public class CreateOriginalSourceInterceptor implements DownloadInterceptor {
-
-    /**
-     * 下载源加载器
-     */
-    private final List<OriginalSourceFactory> factories;
-
-    public CreateOriginalSourceInterceptor(@NonNull List<OriginalSourceFactory> factories) {
-        this.factories = factories;
-        this.factories.sort(Comparator.comparingInt(OriginalSourceFactory::getOrder));
-    }
 
     /**
      * 将所有需要下载的数据对象转换为下载源
@@ -33,8 +22,9 @@ public class CreateOriginalSourceInterceptor implements DownloadInterceptor {
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         Object source = context.getOptions().getSource();
-        context.set(OriginalSourceFactory.class, factories);
-        context.set(OriginalSource.class, OriginalSourceUtils.create(source, context, factories));
+        OriginalSourceFactoryAdapter adapter = context.get(OriginalSourceFactoryAdapter.class);
+        OriginalSourceFactory factory = adapter.getOriginalSourceFactory(source, context);
+        context.set(OriginalSource.class, factory.create(source, context));
         chain.next(context);
     }
 

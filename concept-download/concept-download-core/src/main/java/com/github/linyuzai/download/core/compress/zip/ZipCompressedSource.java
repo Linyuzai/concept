@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.original.OriginalSource;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 
 import java.io.*;
@@ -54,19 +55,37 @@ public class ZipCompressedSource implements CompressedSource {
                 writer.write(fis, os, range, null);
             }
         } else {
-            try (ZipOutputStream zos = new ZipOutputStream(os)) {
-                write(zos, range, writer);
-            }
+            ZipOutputStream zos = new ZipOutputStream(os);
+            write(zos, range, writer);
         }
         //throw new UnsupportedOperationException("Zip with no cache is not support range");
     }
 
+    @Override
+    public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
+        if (cacheEnabled) {
+            String name = getName();
+            File file = new File(cachePath, name == null ? "null." + CompressFormat.ZIP : name);
+            try (FileOutputStream fos = new FileOutputStream(file);
+                 ZipOutputStream zos = new ZipOutputStream(fos)) {
+                source.write(zos, range, writer, handler);
+            }
+            try (FileInputStream fis = new FileInputStream(file)) {
+                writer.write(fis, os, range, null);
+            }
+        } else {
+            try (ZipOutputStream zos = new ZipOutputStream(os)) {
+                source.write(zos, range, writer, handler);
+            }
+        }
+    }
+
     protected void write(ZipOutputStream zos, Range range, SourceWriter writer) throws IOException {
-        source.write(zos, range, writer, new OriginalSource.WriteHandler() {
+        source.write(zos, range, writer, new Source.WriteHandler() {
             @Override
-            public void handle(OriginalSource.Target target) throws IOException {
+            public void handle(Source.Target target) throws IOException {
                 zos.putNextEntry(new ZipEntry(target.getPath()));
-                OriginalSource.WriteHandler.super.handle(target);
+                Source.WriteHandler.super.handle(target);
                 zos.closeEntry();
             }
         });
