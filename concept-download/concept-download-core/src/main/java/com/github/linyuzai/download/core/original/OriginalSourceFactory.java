@@ -1,8 +1,9 @@
 package com.github.linyuzai.download.core.original;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.order.OrderProvider;
 
-public interface OriginalSourceFactory {
+public interface OriginalSourceFactory extends OrderProvider {
 
     /**
      * 是否能加载
@@ -21,8 +22,4 @@ public interface OriginalSourceFactory {
      * @return 下载源
      */
     OriginalSource create(Object source, DownloadContext context);
-
-    default int getOrder() {
-        return 0;
-    }
 }

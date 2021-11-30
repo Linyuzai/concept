@@ -44,6 +44,6 @@ public class InitializeContextInterceptor implements DownloadInterceptor {
 
     @Override
     public int getOrder() {
-        return ORDER_PROVIDE_REQUEST;
+        return ORDER_INITIALIZE_CONTEXT;
     }
 }

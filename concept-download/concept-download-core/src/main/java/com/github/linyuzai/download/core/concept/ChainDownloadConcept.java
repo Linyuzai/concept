@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChainImpl;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.download.core.order.OrderProvider;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class ChainDownloadConcept implements DownloadConcept {
     public ChainDownloadConcept(DownloadContextFactory contextFactory, List<DownloadInterceptor> interceptors) {
         this.contextFactory = contextFactory;
         this.interceptors = interceptors;
-        this.interceptors.sort(Comparator.comparingInt(DownloadInterceptor::getOrder));
+        this.interceptors.sort(Comparator.comparingInt(OrderProvider::getOrder));
     }
 
     /**

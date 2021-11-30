@@ -1,6 +1,9 @@
 package com.github.linyuzai.download.core.writer;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.range.Range;
+import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -9,9 +12,14 @@ import java.nio.charset.Charset;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class BufferedSourceWriter implements SourceWriter {
+public class BufferedOriginalSourceWriter implements SourceWriter {
 
     private int bufferSize = 1024;
+
+    @Override
+    public boolean support(Source source, DownloadContext context) {
+        return source instanceof OriginalSource;
+    }
 
     @Override
     public void write(InputStream is, OutputStream os, Range range, Charset charset) throws IOException {
@@ -30,5 +38,10 @@ public class BufferedSourceWriter implements SourceWriter {
                 osw.write(chars, 0, len);
             }
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return ORDER_ORIGINAL_SOURCE;
     }
 }

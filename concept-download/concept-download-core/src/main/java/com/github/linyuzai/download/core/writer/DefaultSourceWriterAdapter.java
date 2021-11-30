@@ -1,17 +1,22 @@
 package com.github.linyuzai.download.core.writer;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.source.Source;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
 public class DefaultSourceWriterAdapter implements SourceWriterAdapter {
 
     private final List<SourceWriter> writers;
+
+    public DefaultSourceWriterAdapter(List<SourceWriter> writers) {
+        this.writers = writers;
+        this.writers.sort(Comparator.comparingInt(OrderProvider::getOrder));
+    }
 
     @Override
     public SourceWriter getSourceWriter(Source source, DownloadContext context) {

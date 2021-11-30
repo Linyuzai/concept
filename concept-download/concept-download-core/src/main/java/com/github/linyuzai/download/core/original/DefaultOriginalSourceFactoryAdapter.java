@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.original;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.order.OrderProvider;
 
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +12,7 @@ public class DefaultOriginalSourceFactoryAdapter implements OriginalSourceFactor
 
     public DefaultOriginalSourceFactoryAdapter(List<OriginalSourceFactory> factories) {
         this.factories = factories;
-        this.factories.sort(Comparator.comparingInt(OriginalSourceFactory::getOrder));
+        this.factories.sort(Comparator.comparingInt(OrderProvider::getOrder));
     }
 
     @Override
