@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
+import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.context.InitializeContextInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.loader.OriginalSourceLoader;
@@ -107,13 +108,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public InitializeContextInterceptor initializeContextInterceptor(DownloadRequestProvider downloadRequestProvider,
-                                                                     DownloadResponseProvider downloadResponseProvider,
-                                                                     SourceWriterAdapter sourceWriterAdapter,
-                                                                     OriginalSourceFactoryAdapter originalSourceFactoryAdapter) {
-        return new InitializeContextInterceptor(
-                downloadRequestProvider, downloadResponseProvider,
-                sourceWriterAdapter, originalSourceFactoryAdapter);
+    public InitializeContextInterceptor initializeContextInterceptor(List<DownloadContextInitializer> initializers) {
+        return new InitializeContextInterceptor(initializers);
     }
 
     @Bean

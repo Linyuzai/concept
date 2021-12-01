@@ -15,7 +15,7 @@ public interface SourceWriter extends OrderProvider {
     int ORDER_ORIGINAL_SOURCE = 0;
     int ORDER_COMPRESSED_SOURCE = 100;
 
-    boolean support(Source source, DownloadContext context);
+    boolean support(Source source, Range range, Charset charset, DownloadContext context);
 
     void write(InputStream is, OutputStream os, Range range, Charset charset) throws IOException;
 }

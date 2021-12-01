@@ -31,7 +31,7 @@ public class WriteResponseInterceptor implements DownloadInterceptor {
         }
         Range range = context.get(Range.class);
         SourceWriterAdapter writerAdapter = context.get(SourceWriterAdapter.class);
-        SourceWriter writer = writerAdapter.getSourceWriter(source, context);
+        SourceWriter writer = writerAdapter.getSourceWriter(source, range, source.getCharset(), context);
         source.write(response.getOutputStream(), range, writer);
         chain.next(context);
     }

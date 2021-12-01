@@ -17,7 +17,7 @@ public class BufferedOriginalSourceWriter implements SourceWriter {
     private int bufferSize = 1024;
 
     @Override
-    public boolean support(Source source, DownloadContext context) {
+    public boolean support(Source source, Range range, Charset charset, DownloadContext context) {
         return source instanceof OriginalSource;
     }
 

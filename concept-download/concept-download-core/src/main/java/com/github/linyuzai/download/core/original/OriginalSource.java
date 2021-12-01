@@ -13,10 +13,6 @@ import java.util.function.Predicate;
  */
 public interface OriginalSource extends Source {
 
-    Charset getCharset();
-
-    long getLength();
-
     void load() throws IOException;
 
     boolean isAsyncLoad();

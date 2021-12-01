@@ -13,11 +13,15 @@ public interface Source {
 
     String getName();
 
+    Charset getCharset();
+
+    long getLength();
+
     default void write(OutputStream os, Range range, SourceWriter writer) throws IOException {
-        write(os, range, writer, new OriginalSource.WriteHandler() {
+        write(os, range, writer, new Source.WriteHandler() {
             @Override
-            public void handle(OriginalSource.Target target) throws IOException {
-                OriginalSource.WriteHandler.super.handle(target);
+            public void handle(Source.Target target) throws IOException {
+                Source.WriteHandler.super.handle(target);
             }
         });
     }

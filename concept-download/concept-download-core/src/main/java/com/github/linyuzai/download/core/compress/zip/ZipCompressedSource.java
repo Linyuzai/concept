@@ -8,6 +8,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -40,6 +41,16 @@ public class ZipCompressedSource implements CompressedSource {
         } else {
             return name.substring(0, lastIndexOf) + "." + CompressFormat.ZIP;
         }
+    }
+
+    @Override
+    public Charset getCharset() {
+        return source.getCharset();
+    }
+
+    @Override
+    public long getLength() {
+        return source.getLength();
     }
 
     @Override

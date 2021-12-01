@@ -28,13 +28,12 @@ public class ServletDownloadResponse implements DownloadResponse {
 
     @Override
     public void setFilename(String filename) {
-        String encodeFilename = null;
         try {
-            encodeFilename = URLEncoder.encode(filename, "UTF-8");
+            String encodeFilename = URLEncoder.encode(filename, "UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
     }
 
     @Override
