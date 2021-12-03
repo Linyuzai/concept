@@ -47,6 +47,7 @@ public class DownloadConceptAdvice implements MethodInterceptor {
                 //.compressKeepStruct(annotation.compressKeepStruct())
                 .compressCacheEnabled(annotation.compressCacheEnabled())
                 .compressCacheGroup(annotation.compressCacheGroup())
+                .compressCacheName(annotation.compressCacheName())
                 .deleteCompressCache(annotation.deleteCompressCache())
                 .charset(annotation.charset().isEmpty() ? null : Charset.forName(annotation.charset()))
                 .args(arguments)

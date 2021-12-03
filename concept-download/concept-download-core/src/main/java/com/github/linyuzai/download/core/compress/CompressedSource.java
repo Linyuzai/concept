@@ -4,4 +4,5 @@ import com.github.linyuzai.download.core.source.Source;
 
 public interface CompressedSource extends Source {
 
+    String NAME = "compress";
 }

@@ -1,8 +1,6 @@
 package com.github.linyuzai.download.core.writer;
 
-import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
@@ -15,13 +13,13 @@ import java.nio.charset.Charset;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class ASourceWriter implements SourceWriter {
+public class DefaultSourceWriter implements SourceWriter {
 
     private int bufferSize = 1024 * 1024;
 
     @Override
-    public boolean support(Source source, Range range, Charset charset, DownloadContext context) {
-        return charset == null || range == null && source.getLength() <= bufferSize;
+    public boolean support(Source source, Range range, DownloadContext context) {
+        return source.getCharset() == null || range == null && source.getLength() <= bufferSize;
     }
 
     @Override

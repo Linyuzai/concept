@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -26,13 +27,26 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
     @Override
     public CompressedSource compress(OriginalSource source, SourceWriter writer, String cachePath, boolean delete, DownloadContext context) throws IOException {
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
+        String cacheName = context.getOptions().getCompressCacheName();
+        String finalCacheName;
+        if (cacheName == null || cacheName.isEmpty()) {
+            finalCacheName = CompressedSource.NAME + CompressFormat.ZIP_SUFFIX;
+        } else {
+            if (cacheName.endsWith(CompressFormat.ZIP_SUFFIX)) {
+                finalCacheName = cacheName;
+            } else {
+                finalCacheName = cacheName + CompressFormat.ZIP_SUFFIX;
+            }
+        }
         if (cacheEnable) {
-            File file = new File(cachePath, "compress.zip");
+            File file = new File(cachePath, finalCacheName);
             if (file.exists()) {
                 return new ZipFileCompressedSource(file);
             }
+            Charset charset = source.getCharset();
             try (FileOutputStream fos = new FileOutputStream(file);
-                 ZipOutputStream zos = new ZipOutputStream(fos)) {
+                 ZipOutputStream zos = charset == null ?
+                         new ZipOutputStream(fos) : new ZipOutputStream(fos, charset)) {
                 source.write(zos, null, writer, new Source.WriteHandler() {
                     @Override
                     public void handle(OriginalSource.Target target) throws IOException {
@@ -44,7 +58,7 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
             }
             return new ZipFileCompressedSource(file);
         } else {
-            return new ZipCompressedSource(source);
+            return new ZipCompressedSource(source, finalCacheName);
         }
     }
 }

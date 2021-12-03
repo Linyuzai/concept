@@ -1,50 +1,49 @@
 package com.github.linyuzai.download.core.compress.zip;
 
+import com.github.linyuzai.download.core.compress.AbstractCompressedSource;
 import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
-import lombok.AllArgsConstructor;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@AllArgsConstructor
-public class ZipCompressedSource implements CompressedSource {
+public class ZipCompressedSource extends AbstractCompressedSource {
 
     private final OriginalSource source;
 
-    @Override
-    public String getName() {
+    public ZipCompressedSource(OriginalSource source, String name) {
+        this.source = source;
+        if (name == null || name.isEmpty()) {
+            setName(getName0());
+        } else {
+            setName(name);
+        }
+        setCharset(source.getCharset());
+        setLength(source.getLength());
+    }
+
+    public String getName0() {
         String name = source.getName();
         if (name == null) {
             return null;
         }
-        int lastIndexOf = name.lastIndexOf(".");
+        int lastIndexOf = name.lastIndexOf(CompressFormat.DOT);
         if (lastIndexOf == -1) {
-            return name + "." + CompressFormat.ZIP;
+            return name + CompressFormat.ZIP_SUFFIX;
         } else {
-            return name.substring(0, lastIndexOf) + "." + CompressFormat.ZIP;
+            return name.substring(0, lastIndexOf) + CompressFormat.ZIP_SUFFIX;
         }
     }
 
     @Override
-    public Charset getCharset() {
-        return source.getCharset();
-    }
-
-    @Override
-    public long getLength() {
-        return source.getLength();
-    }
-
-    @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
-        ZipOutputStream zos = new ZipOutputStream(os);
+        Charset charset = source.getCharset();
+        ZipOutputStream zos = charset == null ? new ZipOutputStream(os) : new ZipOutputStream(os, charset);
         source.write(zos, range, writer, handler);
     }
 

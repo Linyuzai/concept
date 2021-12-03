@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.aop.annotation;
 
 import com.github.linyuzai.download.core.compress.CompressFormat;
+import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 
 import java.lang.annotation.*;
@@ -54,6 +55,8 @@ public @interface Download {
     boolean compressCacheEnabled() default true;
 
     String compressCacheGroup() default "";
+
+    String compressCacheName() default CompressedSource.NAME;
 
     boolean deleteCompressCache() default false;
 

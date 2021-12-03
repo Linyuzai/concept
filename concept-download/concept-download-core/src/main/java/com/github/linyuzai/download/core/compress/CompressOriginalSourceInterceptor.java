@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
 import com.github.linyuzai.download.core.original.OriginalSource;
@@ -48,7 +49,7 @@ public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
             }
         } else {
             if (sources.size() > 1) {
-                throw new OriginalSourceCompressException("Enable compress to download multi-source");
+                throw new DownloadException("Enable compress to download multi-source");
             }
         }
         chain.next(context);

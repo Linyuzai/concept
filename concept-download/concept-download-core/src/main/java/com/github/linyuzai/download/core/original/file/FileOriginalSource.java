@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.original.file;
 
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.original.AbstractOriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
@@ -27,12 +28,8 @@ public class FileOriginalSource extends AbstractOriginalSource {
             setName(name);
         }
         setCharset(charset);
+        setLength(length0(file));
         setAsyncLoad(asyncLoad);
-    }
-
-    @Override
-    public long getLength() {
-        return length0(file);
     }
 
     private long length0(File file) {
@@ -64,7 +61,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
             if (file.isFile()) {
                 write0(os, range, writer, handler, file, file.getName(), true);
             } else {
-                //TODO throw new
+                throw new DownloadException("Range not support: " + file.getAbsolutePath());
             }
         }
     }

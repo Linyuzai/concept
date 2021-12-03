@@ -75,6 +75,8 @@ public class DownloadOptions {
      */
     String compressCacheGroup;
 
+    String compressCacheName;
+
     /**
      * 是否删除压缩文件
      * 如果压缩文件每次的内容都不一样需要删除，防止存在缓存而不会再次压缩

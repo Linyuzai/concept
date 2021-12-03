@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.writer;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
@@ -27,7 +28,7 @@ public class DefaultSourceWriterAdapter implements SourceWriterAdapter, Download
                 return writer;
             }
         }
-        throw new SourceWriterException("No SourceWriter support: " + source);
+        throw new DownloadException("No SourceWriter support: " + source);
     }
 
     @Override
