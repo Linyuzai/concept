@@ -9,10 +9,7 @@ import com.github.linyuzai.download.core.compress.OriginalSourceCompressorAdapte
 import com.github.linyuzai.download.core.compress.zip.ZipOriginalSourceCompressor;
 import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
-import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
-import com.github.linyuzai.download.core.context.DownloadContextFactory;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.context.InitializeContextInterceptor;
+import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.loader.OriginalSourceLoader;
 import com.github.linyuzai.download.core.loader.LoadOriginalSourceInterceptor;
@@ -166,6 +163,12 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public WriteResponseInterceptor writeResponseInterceptor() {
         return new WriteResponseInterceptor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DestroyContextInterceptor destroyContextInterceptor(List<DownloadContextDestroyer> destroyers) {
+        return new DestroyContextInterceptor(destroyers);
     }
 
     @Bean

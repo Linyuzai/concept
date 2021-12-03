@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.compress.zip;
 
+import com.github.linyuzai.download.core.cache.CacheableSource;
 import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.original.file.FileOriginalSource;
 import com.github.linyuzai.download.core.range.Range;
@@ -10,7 +11,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 
 @AllArgsConstructor
-public class ZipFileCompressedSource implements CompressedSource {
+public class ZipFileCompressedSource implements CompressedSource, CacheableSource {
 
     private final File file;
 
@@ -33,5 +34,10 @@ public class ZipFileCompressedSource implements CompressedSource {
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
         FileOriginalSource source = new FileOriginalSource.Builder().file(file).build();
         source.write(os, range, writer, handler);
+    }
+
+    @Override
+    public void deleteCache() {
+        boolean delete = file.delete();
     }
 }
