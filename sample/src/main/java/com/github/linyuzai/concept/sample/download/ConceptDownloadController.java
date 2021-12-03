@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/concept-download")
 public class ConceptDownloadController {
 
-    @Download(sources = {
+    @Download(original = {
             "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt"},
-            skipCompressOnSingleSource = false,
+            skipCompressOnSingle = false,
             charset = "UTF-8")
     @GetMapping("static-by-annotation")
     public void downloadStaticByAnnotation() {

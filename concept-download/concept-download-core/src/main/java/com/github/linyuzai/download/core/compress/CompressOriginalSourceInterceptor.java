@@ -1,65 +1,57 @@
 package com.github.linyuzai.download.core.compress;
 
+import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
 import com.github.linyuzai.download.core.original.OriginalSource;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
+import com.github.linyuzai.download.core.writer.SourceWriterAdapter;
 import lombok.AllArgsConstructor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 @AllArgsConstructor
 public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
 
-    private List<OriginalSourceCompressor> compressors;
+    private DownloadCacheLocation cacheLocation;
 
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         OriginalSource source = context.get(OriginalSource.class);
-        boolean skipCompressOnSingleSource = context.getOptions().isSkipCompressOnSingleSource();
+        context.set(Source.class, source);
         boolean compressEnabled = context.getOptions().isCompressEnabled();
         Collection<OriginalSource> sources = source.flatten();
-        boolean shouldCompress = true;
         if (compressEnabled) {
-            if (sources.size() <= 1) {
-                if (skipCompressOnSingleSource) {
-                    shouldCompress = false;
-                }
+            boolean skipCompressOnSingleSource = context.getOptions().isSkipCompressOnSingle();
+            if (sources.size() != 1 || !skipCompressOnSingleSource) {
+                String compressFormat = context.getOptions().getCompressFormat();
+                String finalFormat = (compressFormat == null || compressFormat.isEmpty()) ?
+                        CompressFormat.ZIP : compressFormat;
+                OriginalSourceCompressorAdapter compressorAdapter =
+                        context.get(OriginalSourceCompressorAdapter.class);
+                OriginalSourceCompressor compressor =
+                        compressorAdapter.getOriginalSourceCompressor(finalFormat, context);
+                String path = cacheLocation.getPath();
+                String group = context.getOptions().getCompressCacheGroup();
+                File dir = (group == null || group.isEmpty()) ? new File(path) : new File(path, group);
+                boolean mkdirs = dir.mkdirs();
+                SourceWriterAdapter writerAdapter = context.get(SourceWriterAdapter.class);
+                SourceWriter writer = writerAdapter.getSourceWriter(source, null, context);
+                boolean delete = context.getOptions().isDeleteCompressCache();
+                CompressedSource compressedSource = compressor
+                        .compress(source, writer, dir.getAbsolutePath(), delete, context);
+                context.set(Source.class, compressedSource);
             }
         } else {
             if (sources.size() > 1) {
                 throw new OriginalSourceCompressException("Enable compress to download multi-source");
-            } else {
-                shouldCompress = false;
             }
         }
-        CompressedSource compressedSource;
-        if (shouldCompress) {
-            String compressFormat = context.getOptions().getCompressFormat();
-            String finalFormat = (compressFormat == null || compressFormat.isEmpty()) ?
-                    CompressFormat.ZIP : compressFormat;
-            OriginalSourceCompressor compressor = getSourceCompressor(finalFormat, context);
-            if (compressor == null) {
-                throw new OriginalSourceCompressException("No SourceCompressor support: " + finalFormat);
-            }
-            compressedSource = compressor.compress(source, context);
-        } else {
-            compressedSource = new UncompressedSource(sources.iterator().next());
-        }
-        context.set(CompressedSource.class, compressedSource);
         chain.next(context);
-    }
-
-    public OriginalSourceCompressor getSourceCompressor(String format, DownloadContext context) {
-        for (OriginalSourceCompressor compressor : compressors) {
-            if (compressor.support(format, context)) {
-                return compressor;
-            }
-        }
-        return null;
     }
 
     @Override

@@ -30,21 +30,24 @@ public class DownloadConceptAdvice implements MethodInterceptor {
             return (DownloadOptions) returnValue;
         } else {
             if (returnValue == null) {
-                builder.source(annotation.sources());
+                builder.original(annotation.original());
             } else {
-                builder.source(returnValue);
+                builder.original(returnValue);
             }
         }
 
         return builder
-                .sourceCacheEnabled(annotation.sourceCacheEnabled())
+                .originalCacheEnabled(annotation.originalCacheEnabled())
+                .originalCacheGroup(annotation.originalCacheGroup())
                 .filename(annotation.filename())
                 .contentType(annotation.contentType())
                 .compressEnabled(annotation.compressEnabled())
                 .compressFormat(annotation.compressFormat())
+                .skipCompressOnSingle(annotation.skipCompressOnSingle())
                 //.compressKeepStruct(annotation.compressKeepStruct())
                 .compressCacheEnabled(annotation.compressCacheEnabled())
-                .skipCompressOnSingleSource(annotation.skipCompressOnSingleSource())
+                .compressCacheGroup(annotation.compressCacheGroup())
+                .deleteCompressCache(annotation.deleteCompressCache())
                 .charset(annotation.charset().isEmpty() ? null : Charset.forName(annotation.charset()))
                 .args(arguments)
                 .extra(annotation.extra())

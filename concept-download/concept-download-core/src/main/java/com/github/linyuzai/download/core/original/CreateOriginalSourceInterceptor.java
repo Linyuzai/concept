@@ -21,7 +21,7 @@ public class CreateOriginalSourceInterceptor implements DownloadInterceptor {
      */
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
-        Object source = context.getOptions().getSource();
+        Object source = context.getOptions().getOriginal();
         OriginalSourceFactoryAdapter adapter = context.get(OriginalSourceFactoryAdapter.class);
         OriginalSourceFactory factory = adapter.getOriginalSourceFactory(source, context);
         context.set(OriginalSource.class, factory.create(source, context));

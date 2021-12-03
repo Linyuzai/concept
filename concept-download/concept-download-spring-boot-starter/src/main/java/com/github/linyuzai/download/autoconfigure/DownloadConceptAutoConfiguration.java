@@ -1,7 +1,10 @@
 package com.github.linyuzai.download.autoconfigure;
 
+import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.compress.CompressOriginalSourceInterceptor;
+import com.github.linyuzai.download.core.compress.DefaultOriginalSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
+import com.github.linyuzai.download.core.compress.OriginalSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipOriginalSourceCompressor;
 import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
@@ -108,6 +111,20 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public ZipOriginalSourceCompressor zipOriginalSourceCompressor() {
+        //MultipartConfigElement
+        //"/Users/tanghanzheng/IdeaProjects/Github/cache"
+        return new ZipOriginalSourceCompressor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OriginalSourceCompressorAdapter originalSourceCompressorAdapter(List<OriginalSourceCompressor> compressors) {
+        return new DefaultOriginalSourceCompressorAdapter(compressors);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public InitializeContextInterceptor initializeContextInterceptor(List<DownloadContextInitializer> initializers) {
         return new InitializeContextInterceptor(initializers);
     }
@@ -132,15 +149,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ZipOriginalSourceCompressor zipOriginalSourceCompressor() {
-        //MultipartConfigElement
-        return new ZipOriginalSourceCompressor("/Users/tanghanzheng/IdeaProjects/Github/cache");
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public CompressOriginalSourceInterceptor compressOriginalSourceInterceptor(List<OriginalSourceCompressor> compressors) {
-        return new CompressOriginalSourceInterceptor(compressors);
+    public CompressOriginalSourceInterceptor compressOriginalSourceInterceptor(DownloadCacheLocation cacheLocation) {
+        return new CompressOriginalSourceInterceptor(cacheLocation);
     }
 
     @Bean

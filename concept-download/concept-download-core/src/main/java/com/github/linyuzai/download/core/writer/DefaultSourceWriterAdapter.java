@@ -7,7 +7,6 @@ import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
-import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,9 +21,9 @@ public class DefaultSourceWriterAdapter implements SourceWriterAdapter, Download
     }
 
     @Override
-    public SourceWriter getSourceWriter(Source source, Range range, Charset charset, DownloadContext context) {
+    public SourceWriter getSourceWriter(Source source, Range range, DownloadContext context) {
         for (SourceWriter writer : writers) {
-            if (writer.support(source, range, charset, context)) {
+            if (writer.support(source, range, context)) {
                 return writer;
             }
         }

@@ -8,5 +8,5 @@ import java.nio.charset.Charset;
 
 public interface SourceWriterAdapter {
 
-    SourceWriter getSourceWriter(Source source, Range range, Charset charset, DownloadContext context);
+    SourceWriter getSourceWriter(Source source, Range range, DownloadContext context);
 }

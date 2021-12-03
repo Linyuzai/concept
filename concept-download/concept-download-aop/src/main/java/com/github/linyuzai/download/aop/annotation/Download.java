@@ -11,12 +11,14 @@ import java.nio.charset.Charset;
 @Documented
 public @interface Download {
 
-    String[] sources() default {};
+    String[] original() default {};
 
     /**
      * 下载是数据对象缓存
      */
-    boolean sourceCacheEnabled() default true;
+    boolean originalCacheEnabled() default true;
+
+    String originalCacheGroup() default "";
 
     /**
      * 下载显示的文件名称
@@ -36,6 +38,12 @@ public @interface Download {
     String compressFormat() default CompressFormat.ZIP;
 
     /**
+     *
+     * @return
+     */
+    boolean skipCompressOnSingle() default true;
+
+    /**
      * 压缩目录时是否保持之前的结构
      */
     //boolean compressKeepStruct() default true;
@@ -45,7 +53,9 @@ public @interface Download {
      */
     boolean compressCacheEnabled() default true;
 
-    boolean skipCompressOnSingleSource() default true;
+    String compressCacheGroup() default "";
+
+    boolean deleteCompressCache() default false;
 
     String charset() default "";
 
