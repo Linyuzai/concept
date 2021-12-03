@@ -5,7 +5,6 @@ import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 
 import java.lang.annotation.*;
-import java.nio.charset.Charset;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -39,7 +38,6 @@ public @interface Download {
     String compressFormat() default CompressFormat.ZIP;
 
     /**
-     *
      * @return
      */
     boolean skipCompressOnSingle() default true;
@@ -61,6 +59,8 @@ public @interface Download {
     boolean deleteCompressCache() default false;
 
     String charset() default "";
+
+    String[] headers() default {};
 
     /**
      * 额外数据
