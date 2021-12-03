@@ -11,19 +11,19 @@ import java.io.File;
 @RequestMapping("/concept-download")
 public class ConceptDownloadController {
 
-    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt")
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt")
     @GetMapping("one")
     public void downloadOne() {
 
     }
 
-    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt", skipCompressOnSingle = false)
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt", skipCompressOnSingle = false)
     @GetMapping("one-zip")
     public void downloadOneZip() {
 
     }
 
-    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt", charset = "UTF-8")
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt", charset = "GBK")
     @GetMapping("one-charset")
     public void downloadOneCharset() {
 
@@ -45,7 +45,7 @@ public class ConceptDownloadController {
 
     @Download(original = {
             "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt",
-            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README2.txt"},
+            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt"},
             charset = "UTF-8")
     @GetMapping("two-charset")
     public void downloadTwoCharset() {

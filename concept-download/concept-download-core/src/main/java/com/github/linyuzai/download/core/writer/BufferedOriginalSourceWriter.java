@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.writer;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
@@ -14,11 +13,12 @@ import java.nio.charset.Charset;
 @NoArgsConstructor
 public class BufferedOriginalSourceWriter implements SourceWriter {
 
-    private int bufferSize = 1024;
+    private int bufferSize = 1024 * 1024;
 
     @Override
     public boolean support(Source source, Range range, DownloadContext context) {
-        return source instanceof OriginalSource;
+        //return source instanceof OriginalSource;
+        return true;
     }
 
     @Override
@@ -31,13 +31,24 @@ public class BufferedOriginalSourceWriter implements SourceWriter {
             }
         } else {
             InputStreamReader isr = new InputStreamReader(is, charset);
-            OutputStreamWriter osw = new OutputStreamWriter(os, charset);
+            BufferedReader br = new BufferedReader(isr, bufferSize);
             int len;
             char[] chars = new char[bufferSize];
-            while ((len = isr.read(chars)) > 0) {
-                osw.write(chars, 0, len);
+            char[] result = new char[0];
+            while ((len = br.read(chars)) > 0) {
+                result = concat(result, chars, len);
             }
+            String string = new String(result);
+            byte[] bytes = string.getBytes(charset);
+            os.write(bytes);
         }
+    }
+
+    private char[] concat(char[] current, char[] append, int length) {
+        char[] newChars = new char[current.length + length];
+        System.arraycopy(current, 0, newChars, 0, current.length);
+        System.arraycopy(append, 0, newChars, current.length, length);
+        return newChars;
     }
 
     @Override

@@ -70,8 +70,8 @@ public class DownloadConceptAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public SourceWriterAdapter sourceWriterAdapter(List<SourceWriter> writers) {
+    @ConditionalOnMissingBean(SourceWriterAdapter.class)
+    public DefaultSourceWriterAdapter sourceWriterAdapter(List<SourceWriter> writers) {
         return new DefaultSourceWriterAdapter(writers);
     }
 
@@ -112,8 +112,8 @@ public class DownloadConceptAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public OriginalSourceFactoryAdapter originalSourceFactoryAdapter(List<OriginalSourceFactory> factories) {
+    @ConditionalOnMissingBean(OriginalSourceFactoryAdapter.class)
+    public DefaultOriginalSourceFactoryAdapter originalSourceFactoryAdapter(List<OriginalSourceFactory> factories) {
         return new DefaultOriginalSourceFactoryAdapter(factories);
     }
 
@@ -124,8 +124,8 @@ public class DownloadConceptAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public OriginalSourceCompressorAdapter originalSourceCompressorAdapter(List<OriginalSourceCompressor> compressors) {
+    @ConditionalOnMissingBean(OriginalSourceCompressorAdapter.class)
+    public DefaultOriginalSourceCompressorAdapter originalSourceCompressorAdapter(List<OriginalSourceCompressor> compressors) {
         return new DefaultOriginalSourceCompressorAdapter(compressors);
     }
 

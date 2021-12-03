@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.io.*;
 import java.nio.charset.Charset;
 
+@Deprecated
 @AllArgsConstructor
 @NoArgsConstructor
 public class BufferedCompressedSourceWriter implements SourceWriter {

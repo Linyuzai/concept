@@ -11,11 +11,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+@Deprecated
 @AllArgsConstructor
 @NoArgsConstructor
 public class DefaultSourceWriter implements SourceWriter {
 
-    private int bufferSize = 1024 * 1024;
+    private int bufferSize = 1;
 
     @Override
     public boolean support(Source source, Range range, DownloadContext context) {
