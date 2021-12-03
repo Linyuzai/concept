@@ -11,19 +11,18 @@ import java.nio.charset.Charset;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class BufferedOriginalSourceWriter implements SourceWriter {
+public class BufferedSourceWriter implements SourceWriter {
 
     private int bufferSize = 1024 * 1024;
 
     @Override
     public boolean support(Source source, Range range, DownloadContext context) {
-        //return source instanceof OriginalSource;
         return true;
     }
 
     @Override
-    public void write(InputStream is, OutputStream os, Range range, Charset charset) throws IOException {
-        if (charset == null) {
+    public void write(InputStream is, OutputStream os, Range range, Charset charset, long length) throws IOException {
+        if (charset == null || length > 0 && bufferSize >= length) {
             int len;
             byte[] bytes = new byte[bufferSize];
             while ((len = is.read(bytes)) > 0) {
@@ -49,10 +48,5 @@ public class BufferedOriginalSourceWriter implements SourceWriter {
         System.arraycopy(current, 0, newChars, 0, current.length);
         System.arraycopy(append, 0, newChars, current.length, length);
         return newChars;
-    }
-
-    @Override
-    public int getOrder() {
-        return ORDER_ORIGINAL_SOURCE;
     }
 }

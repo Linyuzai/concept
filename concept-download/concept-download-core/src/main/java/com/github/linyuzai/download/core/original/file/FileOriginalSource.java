@@ -93,7 +93,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
 
                     @Override
                     public void write() throws IOException {
-                        writer.write(getInputStream(), os, range, getCharset());
+                        writer.write(getInputStream(), os, range, getCharset(), file.length());
                     }
                 };
                 handler.handle(target);

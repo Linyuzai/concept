@@ -53,20 +53,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DefaultSourceWriter defaultSourceWriter() {
-        return new DefaultSourceWriter();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public BufferedOriginalSourceWriter bufferedOriginalSourceWriter() {
-        return new BufferedOriginalSourceWriter();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public BufferedCompressedSourceWriter bufferedCompressedSourceWriter() {
-        return new BufferedCompressedSourceWriter();
+    public BufferedSourceWriter bufferedSourceWriter() {
+        return new BufferedSourceWriter();
     }
 
     @Bean

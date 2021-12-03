@@ -12,11 +12,7 @@ import java.nio.charset.Charset;
 
 public interface SourceWriter extends OrderProvider {
 
-    int ORDER_DEFAULT = 0;
-    int ORDER_ORIGINAL_SOURCE = 100;
-    int ORDER_COMPRESSED_SOURCE = 200;
-
     boolean support(Source source, Range range, DownloadContext context);
 
-    void write(InputStream is, OutputStream os, Range range, Charset charset) throws IOException;
+    void write(InputStream is, OutputStream os, Range range, Charset charset, long length) throws IOException;
 }
