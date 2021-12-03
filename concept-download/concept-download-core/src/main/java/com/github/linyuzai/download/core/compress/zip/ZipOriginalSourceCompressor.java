@@ -73,6 +73,7 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor, Do
         CacheableSource cache = context.get(CacheableSource.class);
         if (cache != null) {
             cache.deleteCache();
+            context.remove(CacheableSource.class);
         }
     }
 }

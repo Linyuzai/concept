@@ -20,6 +20,7 @@ public class DestroyContextInterceptor implements DownloadInterceptor {
             destroyer.destroy(context);
         }
         chain.next(context);
+        context.destroy();
     }
 
     @Override

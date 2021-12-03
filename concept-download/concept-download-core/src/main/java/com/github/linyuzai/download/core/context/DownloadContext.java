@@ -34,4 +34,12 @@ public class DownloadContext {
     public boolean contains(Object key) {
         return map.containsKey(key);
     }
+
+    public void remove(Object key) {
+        map.remove(key);
+    }
+
+    public void destroy() {
+        map.clear();
+    }
 }
