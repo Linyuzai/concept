@@ -11,7 +11,7 @@ import java.io.IOException;
 public interface DownloadInterceptor extends OrderProvider {
 
     int ORDER_INITIALIZE_CONTEXT = 0;
-    int ORDER_SOURCE_PREPARE = 100;
+    int ORDER_CREATE_SOURCE = 100;
     int ORDER_LOAD_SOURCE = 200;
     int ORDER_COMPRESS_SOURCE = 300;
     int ORDER_WRITE_RESPONSE = 400;

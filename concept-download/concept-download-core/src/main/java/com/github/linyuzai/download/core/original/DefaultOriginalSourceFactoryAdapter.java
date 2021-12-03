@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.original;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.order.OrderProvider;
 
 import java.util.Comparator;
@@ -23,7 +24,7 @@ public class DefaultOriginalSourceFactoryAdapter implements OriginalSourceFactor
                 return factory;
             }
         }
-        throw new OriginalSourceException("No OriginalSourceFactory support: " + source);
+        throw new DownloadException("No OriginalSourceFactory support: " + source);
     }
 
     @Override

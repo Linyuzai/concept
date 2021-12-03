@@ -30,4 +30,9 @@ public class DefaultSourceWriter implements SourceWriter {
             os.write(bytes, 0, len);
         }
     }
+
+    @Override
+    public int getOrder() {
+        return ORDER_DEFAULT;
+    }
 }

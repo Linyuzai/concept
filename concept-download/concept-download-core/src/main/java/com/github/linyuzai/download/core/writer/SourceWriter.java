@@ -12,8 +12,9 @@ import java.nio.charset.Charset;
 
 public interface SourceWriter extends OrderProvider {
 
-    int ORDER_ORIGINAL_SOURCE = 0;
-    int ORDER_COMPRESSED_SOURCE = 100;
+    int ORDER_DEFAULT = 0;
+    int ORDER_ORIGINAL_SOURCE = 100;
+    int ORDER_COMPRESSED_SOURCE = 200;
 
     boolean support(Source source, Range range, DownloadContext context);
 

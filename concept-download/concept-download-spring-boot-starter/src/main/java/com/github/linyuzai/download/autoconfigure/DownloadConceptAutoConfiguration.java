@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
+import com.github.linyuzai.download.core.cache.UserHomeDownloadCacheLocation;
 import com.github.linyuzai.download.core.compress.CompressOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.compress.DefaultOriginalSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
@@ -18,8 +19,6 @@ import com.github.linyuzai.download.core.loader.LoadOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.loader.SerialOriginalSourceLoader;
 import com.github.linyuzai.download.core.original.DefaultOriginalSourceFactoryAdapter;
 import com.github.linyuzai.download.core.original.OriginalSourceFactoryAdapter;
-import com.github.linyuzai.download.core.request.DownloadRequestProvider;
-import com.github.linyuzai.download.core.response.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.WriteResponseInterceptor;
 import com.github.linyuzai.download.core.original.OriginalSourceFactory;
 import com.github.linyuzai.download.core.original.CreateOriginalSourceInterceptor;
@@ -45,8 +44,20 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public DownloadCacheLocation downloadCacheLocation() {
+        return new UserHomeDownloadCacheLocation();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public DownloadContextFactory downloadContextFactory() {
         return new DefaultDownloadContextFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DefaultSourceWriter defaultSourceWriter() {
+        return new DefaultSourceWriter();
     }
 
     @Bean
@@ -112,8 +123,6 @@ public class DownloadConceptAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ZipOriginalSourceCompressor zipOriginalSourceCompressor() {
-        //MultipartConfigElement
-        //"/Users/tanghanzheng/IdeaProjects/Github/cache"
         return new ZipOriginalSourceCompressor();
     }
 

@@ -30,6 +30,6 @@ public class CreateOriginalSourceInterceptor implements DownloadInterceptor {
 
     @Override
     public int getOrder() {
-        return ORDER_SOURCE_PREPARE;
+        return ORDER_CREATE_SOURCE;
     }
 }
