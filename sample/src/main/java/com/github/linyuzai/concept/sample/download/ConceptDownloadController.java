@@ -5,16 +5,50 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+
 @RestController
 @RequestMapping("/concept-download")
 public class ConceptDownloadController {
 
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt")
+    @GetMapping("one")
+    public void downloadOne() {
+
+    }
+
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt", skipCompressOnSingle = false)
+    @GetMapping("one-zip")
+    public void downloadOneZip() {
+
+    }
+
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt", charset = "UTF-8")
+    @GetMapping("one-charset")
+    public void downloadOneCharset() {
+
+    }
+
+    @Download
+    @GetMapping("dynamic")
+    public File downloadDynamic() {
+        return new File("/Users/tanghanzheng/Downloads/java虚拟机3/README.txt");
+    }
+
     @Download(original = {
-            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt"},
-            skipCompressOnSingle = false,
+            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt",
+            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README2.txt"})
+    @GetMapping("two")
+    public void downloadTwo() {
+
+    }
+
+    @Download(original = {
+            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt",
+            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README2.txt"},
             charset = "UTF-8")
-    @GetMapping("static-by-annotation")
-    public void downloadStaticByAnnotation() {
-        //带编码的压缩
+    @GetMapping("two-charset")
+    public void downloadTwoCharset() {
+
     }
 }
