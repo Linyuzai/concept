@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.servlet.request;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.request.DownloadRequest;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import org.springframework.web.context.request.RequestAttributes;
@@ -10,7 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class ServletDownloadRequestProvider implements DownloadRequestProvider, DownloadContextInitializer {
+public class ServletDownloadRequestProvider implements DownloadRequestProvider {
 
     @Override
     public DownloadRequest getRequest(DownloadContext context) {
@@ -38,11 +37,5 @@ public class ServletDownloadRequestProvider implements DownloadRequestProvider, 
             return null;
         }
         return ((ServletRequestAttributes) attributes).getRequest();
-    }
-
-    @Override
-    public void initialize(DownloadContext context) {
-        DownloadRequest request = getRequest(context);
-        context.set(DownloadRequest.class, request);
     }
 }

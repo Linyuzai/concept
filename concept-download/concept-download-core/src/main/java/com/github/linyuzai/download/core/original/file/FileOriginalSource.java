@@ -20,16 +20,20 @@ public class FileOriginalSource extends AbstractOriginalSource {
      */
     private final File file;
 
-    private FileOriginalSource(@NonNull File file, String name, Charset charset, boolean asyncLoad) {
+    private FileOriginalSource(@NonNull File file, Charset charset, boolean asyncLoad) {
         this.file = file;
-        if (name == null || name.isEmpty()) {
-            setName(file.getName());
-        } else {
-            setName(name);
-        }
         setCharset(charset);
-        setLength(length0(file));
         setAsyncLoad(asyncLoad);
+    }
+
+    @Override
+    public String getName() {
+        return file.getName();
+    }
+
+    @Override
+    public long getLength() {
+        return length0(file);
     }
 
     private long length0(File file) {
@@ -56,10 +60,10 @@ public class FileOriginalSource extends AbstractOriginalSource {
     @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
         if (range == null) {
-            write0(os, null, writer, handler, file, file.getName(), true);
+            write0(os, null, writer, handler, file, getName(), true);
         } else {
             if (file.isFile()) {
-                write0(os, range, writer, handler, file, file.getName(), true);
+                write0(os, range, writer, handler, file, getName(), true);
             } else {
                 throw new DownloadException("Range not support: " + file.getAbsolutePath());
             }
@@ -78,7 +82,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
 
                     @Override
                     public String getName() {
-                        return file.getName();
+                        return FileOriginalSource.this.getName();
                     }
 
                     @Override
@@ -111,7 +115,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
 
                         @Override
                         public String getName() {
-                            return file.getName();
+                            return FileOriginalSource.this.getName();
                         }
 
                         @Override
@@ -144,19 +148,12 @@ public class FileOriginalSource extends AbstractOriginalSource {
 
         private File file;
 
-        private String name;
-
         private Charset charset;
 
         private boolean asyncLoad;
 
         public Builder file(File file) {
             this.file = file;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
             return this;
         }
 
@@ -171,7 +168,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
         }
 
         public FileOriginalSource build() {
-            return new FileOriginalSource(file, name, charset, asyncLoad);
+            return new FileOriginalSource(file, charset, asyncLoad);
         }
     }
 }

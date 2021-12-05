@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.original.prefix.PrefixOriginalSourceFac
 import java.io.File;
 import java.nio.charset.Charset;
 
-public class FilePathOriginalSourceFactory extends PrefixOriginalSourceFactory {
+public class FilePrefixOriginalSourceFactory extends PrefixOriginalSourceFactory {
 
     public static final String[] PREFIXES = new String[]{"file:"};
 

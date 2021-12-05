@@ -16,11 +16,13 @@ import com.github.linyuzai.download.core.loader.LoadOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.loader.SerialOriginalSourceLoader;
 import com.github.linyuzai.download.core.original.DefaultOriginalSourceFactoryAdapter;
 import com.github.linyuzai.download.core.original.OriginalSourceFactoryAdapter;
+import com.github.linyuzai.download.core.request.DownloadRequestProvider;
+import com.github.linyuzai.download.core.response.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.WriteResponseInterceptor;
 import com.github.linyuzai.download.core.original.OriginalSourceFactory;
 import com.github.linyuzai.download.core.original.CreateOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.original.file.FileOriginalSourceFactory;
-import com.github.linyuzai.download.core.original.file.FilePathOriginalSourceFactory;
+import com.github.linyuzai.download.core.original.file.FilePrefixOriginalSourceFactory;
 import com.github.linyuzai.download.core.original.file.UserHomeOriginalSourceFactory;
 import com.github.linyuzai.download.core.original.multiple.ArrayOriginalSourceFactory;
 import com.github.linyuzai.download.core.original.multiple.CollectionOriginalSourceFactory;
@@ -87,8 +89,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public FilePathOriginalSourceFactory filePathOriginalSourceFactory() {
-        return new FilePathOriginalSourceFactory();
+    public FilePrefixOriginalSourceFactory filePathOriginalSourceFactory() {
+        return new FilePrefixOriginalSourceFactory();
     }
 
     @Bean
@@ -148,8 +150,10 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public WriteResponseInterceptor writeResponseInterceptor(SourceWriterAdapter adapter) {
-        return new WriteResponseInterceptor(adapter);
+    public WriteResponseInterceptor writeResponseInterceptor(SourceWriterAdapter adapter,
+                                                             DownloadRequestProvider requestProvider,
+                                                             DownloadResponseProvider responseProvider) {
+        return new WriteResponseInterceptor(adapter, requestProvider, responseProvider);
     }
 
     @Bean

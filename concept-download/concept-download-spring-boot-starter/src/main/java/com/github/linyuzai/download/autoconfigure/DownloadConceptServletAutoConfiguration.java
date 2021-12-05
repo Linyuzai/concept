@@ -18,16 +18,16 @@ public class DownloadConceptServletAutoConfiguration {
     //private static final Log logger = LogFactory.getLog(DownloadConceptServletAutoConfiguration.class);
 
     @Bean
-    @ConditionalOnMissingBean(DownloadRequestProvider.class)
+    @ConditionalOnMissingBean
     @ConditionalOnClass(name = "javax.servlet.http.HttpServletRequest")
-    public ServletDownloadRequestProvider downloadRequestProvider() {
+    public DownloadRequestProvider downloadRequestProvider() {
         return new ServletDownloadRequestProvider();
     }
 
     @Bean
-    @ConditionalOnMissingBean(DownloadResponseProvider.class)
+    @ConditionalOnMissingBean
     @ConditionalOnClass(name = "javax.servlet.http.HttpServletResponse")
-    public ServletDownloadResponseProvider downloadResponseProvider() {
+    public DownloadResponseProvider downloadResponseProvider() {
         return new ServletDownloadResponseProvider();
     }
 }
