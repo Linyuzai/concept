@@ -1,11 +1,9 @@
 package com.github.linyuzai.download.core.compress.zip;
 
-import com.github.linyuzai.download.core.cache.CacheableSource;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.CompressedSource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
-import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
@@ -19,7 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @AllArgsConstructor
-public class ZipOriginalSourceCompressor implements OriginalSourceCompressor, DownloadContextDestroyer {
+public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
 
     @Override
     public boolean support(String format, DownloadContext context) {
@@ -27,7 +25,7 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor, Do
     }
 
     @Override
-    public CompressedSource compress(OriginalSource source, SourceWriter writer, String cachePath, boolean delete, DownloadContext context) throws IOException {
+    public CompressedSource compress(OriginalSource source, SourceWriter writer, String cachePath, DownloadContext context) throws IOException {
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
         String cacheName = context.getOptions().getCompressCacheName();
         String finalCacheName;
@@ -43,9 +41,7 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor, Do
         if (cacheEnable) {
             File file = new File(cachePath, finalCacheName);
             if (file.exists()) {
-                ZipFileCompressedSource exist = new ZipFileCompressedSource(file);
-                context.set(CacheableSource.class, exist);
-                return exist;
+                return new ZipFileCompressedSource(file);
             }
             Charset charset = source.getCharset();
             try (FileOutputStream fos = new FileOutputStream(file);
@@ -60,20 +56,9 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor, Do
                     }
                 });
             }
-            ZipFileCompressedSource newCache = new ZipFileCompressedSource(file);
-            context.set(CacheableSource.class, newCache);
             return new ZipFileCompressedSource(file);
         } else {
             return new ZipCompressedSource(source, finalCacheName);
-        }
-    }
-
-    @Override
-    public void destroy(DownloadContext context) {
-        CacheableSource cache = context.get(CacheableSource.class);
-        if (cache != null) {
-            cache.deleteCache();
-            context.remove(CacheableSource.class);
         }
     }
 }

@@ -58,8 +58,8 @@ public class DownloadConceptAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SourceWriterAdapter.class)
-    public DefaultSourceWriterAdapter sourceWriterAdapter(List<SourceWriter> writers) {
+    @ConditionalOnMissingBean
+    public SourceWriterAdapter sourceWriterAdapter(List<SourceWriter> writers) {
         return new DefaultSourceWriterAdapter(writers);
     }
 
@@ -100,8 +100,8 @@ public class DownloadConceptAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(OriginalSourceFactoryAdapter.class)
-    public DefaultOriginalSourceFactoryAdapter originalSourceFactoryAdapter(List<OriginalSourceFactory> factories) {
+    @ConditionalOnMissingBean
+    public OriginalSourceFactoryAdapter originalSourceFactoryAdapter(List<OriginalSourceFactory> factories) {
         return new DefaultOriginalSourceFactoryAdapter(factories);
     }
 
@@ -112,8 +112,8 @@ public class DownloadConceptAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(OriginalSourceCompressorAdapter.class)
-    public DefaultOriginalSourceCompressorAdapter originalSourceCompressorAdapter(List<OriginalSourceCompressor> compressors) {
+    @ConditionalOnMissingBean
+    public OriginalSourceCompressorAdapter originalSourceCompressorAdapter(List<OriginalSourceCompressor> compressors) {
         return new DefaultOriginalSourceCompressorAdapter(compressors);
     }
 
@@ -125,8 +125,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CreateOriginalSourceInterceptor createOriginalSourceInterceptor() {
-        return new CreateOriginalSourceInterceptor();
+    public CreateOriginalSourceInterceptor createOriginalSourceInterceptor(OriginalSourceFactoryAdapter adapter) {
+        return new CreateOriginalSourceInterceptor(adapter);
     }
 
     @Bean
@@ -143,14 +143,15 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CompressOriginalSourceInterceptor compressOriginalSourceInterceptor(DownloadCacheLocation cacheLocation) {
-        return new CompressOriginalSourceInterceptor(cacheLocation);
+    public CompressOriginalSourceInterceptor compressOriginalSourceInterceptor(OriginalSourceCompressorAdapter adapter,
+                                                                               DownloadCacheLocation cacheLocation) {
+        return new CompressOriginalSourceInterceptor(adapter, cacheLocation);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public WriteResponseInterceptor writeResponseInterceptor() {
-        return new WriteResponseInterceptor();
+    public WriteResponseInterceptor writeResponseInterceptor(SourceWriterAdapter adapter) {
+        return new WriteResponseInterceptor(adapter);
     }
 
     @Bean

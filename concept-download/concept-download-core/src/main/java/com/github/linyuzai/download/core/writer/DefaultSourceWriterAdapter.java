@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.writer;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.range.Range;
@@ -12,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Getter
-public class DefaultSourceWriterAdapter implements SourceWriterAdapter, DownloadContextInitializer {
+public class DefaultSourceWriterAdapter implements SourceWriterAdapter {
 
     private final List<SourceWriter> writers;
 
@@ -29,10 +28,5 @@ public class DefaultSourceWriterAdapter implements SourceWriterAdapter, Download
             }
         }
         throw new DownloadException("No SourceWriter support: " + source);
-    }
-
-    @Override
-    public void initialize(DownloadContext context) {
-        context.set(SourceWriterAdapter.class, this);
     }
 }

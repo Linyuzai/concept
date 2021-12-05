@@ -39,6 +39,7 @@ public class DownloadConceptAdvice implements MethodInterceptor {
         return builder
                 .originalCacheEnabled(annotation.originalCacheEnabled())
                 .originalCacheGroup(annotation.originalCacheGroup())
+                .deleteOriginalCache(annotation.deleteOriginalCache())
                 .filename(annotation.filename())
                 .contentType(annotation.contentType())
                 .compressEnabled(annotation.compressEnabled())

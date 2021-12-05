@@ -2,16 +2,21 @@ package com.github.linyuzai.download.core.response;
 
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import com.github.linyuzai.download.core.writer.SourceWriterAdapter;
+import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 
-public class WriteResponseInterceptor implements DownloadInterceptor {
+@AllArgsConstructor
+public class WriteResponseInterceptor implements DownloadInterceptor, DownloadContextInitializer {
+
+    private SourceWriterAdapter sourceWriterAdapter;
 
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
@@ -30,10 +35,14 @@ public class WriteResponseInterceptor implements DownloadInterceptor {
             response.setContentType(contentType);
         }
         Range range = context.get(Range.class);
-        SourceWriterAdapter writerAdapter = context.get(SourceWriterAdapter.class);
-        SourceWriter writer = writerAdapter.getSourceWriter(source, range, context);
+        SourceWriter writer = sourceWriterAdapter.getSourceWriter(source, range, context);
         source.write(response.getOutputStream(), range, writer);
         chain.next(context);
+    }
+
+    @Override
+    public void initialize(DownloadContext context) {
+        context.set(SourceWriterAdapter.class, sourceWriterAdapter);
     }
 
     @Override

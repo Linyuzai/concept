@@ -30,6 +30,8 @@ public class DownloadOptions {
      */
     String originalCacheGroup;
 
+    boolean deleteOriginalCache;
+
     /**
      * 下载显示的文件名称，在浏览器上下载下来显示的名称
      */

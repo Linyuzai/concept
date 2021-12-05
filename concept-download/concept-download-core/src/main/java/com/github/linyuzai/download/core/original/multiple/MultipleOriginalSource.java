@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.original.multiple;
 
+import com.github.linyuzai.download.core.cache.CacheableSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @AllArgsConstructor
-public class MultipleOriginalSource implements OriginalSource {
+public class MultipleOriginalSource implements OriginalSource, CacheableSource {
 
     private Collection<OriginalSource> sources;
 
@@ -76,5 +77,14 @@ public class MultipleOriginalSource implements OriginalSource {
             all.addAll(source.flatten(predicate));
         }
         return all;
+    }
+
+    @Override
+    public void deleteCache() {
+        for (OriginalSource source : sources) {
+            if (source instanceof CacheableSource) {
+                ((CacheableSource) source).deleteCache();
+            }
+        }
     }
 }

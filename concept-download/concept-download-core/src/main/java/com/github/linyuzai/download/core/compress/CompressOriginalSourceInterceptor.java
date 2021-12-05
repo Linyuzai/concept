@@ -1,7 +1,10 @@
 package com.github.linyuzai.download.core.compress;
 
+import com.github.linyuzai.download.core.cache.CacheableSource;
 import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
+import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
@@ -16,7 +19,9 @@ import java.io.IOException;
 import java.util.Collection;
 
 @AllArgsConstructor
-public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
+public class CompressOriginalSourceInterceptor implements DownloadInterceptor, DownloadContextInitializer, DownloadContextDestroyer {
+
+    private OriginalSourceCompressorAdapter originalSourceCompressorAdapter;
 
     private DownloadCacheLocation cacheLocation;
 
@@ -32,19 +37,16 @@ public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
                 String compressFormat = context.getOptions().getCompressFormat();
                 String finalFormat = (compressFormat == null || compressFormat.isEmpty()) ?
                         CompressFormat.ZIP : compressFormat;
-                OriginalSourceCompressorAdapter compressorAdapter =
-                        context.get(OriginalSourceCompressorAdapter.class);
                 OriginalSourceCompressor compressor =
-                        compressorAdapter.getOriginalSourceCompressor(finalFormat, context);
+                        originalSourceCompressorAdapter.getOriginalSourceCompressor(finalFormat, context);
                 String path = cacheLocation.getPath();
                 String group = context.getOptions().getCompressCacheGroup();
                 File dir = (group == null || group.isEmpty()) ? new File(path) : new File(path, group);
                 boolean mkdirs = dir.mkdirs();
                 SourceWriterAdapter writerAdapter = context.get(SourceWriterAdapter.class);
                 SourceWriter writer = writerAdapter.getSourceWriter(source, null, context);
-                boolean delete = context.getOptions().isDeleteCompressCache();
                 CompressedSource compressedSource = compressor
-                        .compress(source, writer, dir.getAbsolutePath(), delete, context);
+                        .compress(source, writer, dir.getAbsolutePath(), context);
                 context.set(Source.class, compressedSource);
             }
         } else {
@@ -53,6 +55,22 @@ public class CompressOriginalSourceInterceptor implements DownloadInterceptor {
             }
         }
         chain.next(context);
+    }
+
+    @Override
+    public void initialize(DownloadContext context) {
+        context.set(OriginalSourceCompressorAdapter.class, originalSourceCompressorAdapter);
+    }
+
+    @Override
+    public void destroy(DownloadContext context) {
+        boolean delete = context.getOptions().isDeleteCompressCache();
+        if (delete) {
+            Source source = context.get(Source.class);
+            if (source instanceof CacheableSource) {
+                ((CacheableSource) source).deleteCache();
+            }
+        }
     }
 
     @Override

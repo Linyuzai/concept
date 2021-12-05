@@ -20,6 +20,8 @@ public @interface Download {
 
     String originalCacheGroup() default "";
 
+    boolean deleteOriginalCache() default false;
+
     /**
      * 下载显示的文件名称
      */

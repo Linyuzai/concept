@@ -11,5 +11,5 @@ public interface OriginalSourceCompressor extends OrderProvider {
 
     boolean support(String format, DownloadContext context);
 
-    CompressedSource compress(OriginalSource source, SourceWriter writer, String cachePath, boolean delete, DownloadContext context) throws IOException;
+    CompressedSource compress(OriginalSource source, SourceWriter writer, String cachePath, DownloadContext context) throws IOException;
 }
