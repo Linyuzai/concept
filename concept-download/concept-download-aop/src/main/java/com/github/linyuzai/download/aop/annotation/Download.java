@@ -40,7 +40,7 @@ public @interface Download {
     String compressFormat() default CompressFormat.ZIP;
 
     /**
-     * @return
+     *
      */
     boolean skipCompressOnSingle() default true;
 

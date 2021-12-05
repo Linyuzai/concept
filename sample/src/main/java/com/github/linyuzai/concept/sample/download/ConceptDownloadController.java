@@ -37,7 +37,7 @@ public class ConceptDownloadController {
 
     @Download(original = {
             "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt",
-            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README2.txt"})
+            "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt"})
     @GetMapping("two")
     public void downloadTwo() {
 

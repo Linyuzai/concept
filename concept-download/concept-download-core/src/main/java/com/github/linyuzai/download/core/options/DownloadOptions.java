@@ -1,13 +1,17 @@
 package com.github.linyuzai.download.core.options;
 
+import com.github.linyuzai.download.core.compress.CompressFormat;
+import com.github.linyuzai.download.core.compress.CompressedSource;
+import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.Builder;
 import lombok.Value;
 
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Map;
 
 @Value
-@Builder(builderClassName = "Builder")
+@Builder(builderClassName = "Builder", toBuilder = true)
 public class DownloadOptions {
 
     /**
@@ -20,7 +24,8 @@ public class DownloadOptions {
      * 主要用于一些需要网络IO操作，如http等数据源的缓存
      * 本地文件没有缓存的概念，或者说文件本身就是缓存
      */
-    boolean originalCacheEnabled;
+    @lombok.Builder.Default
+    boolean originalCacheEnabled = true;
 
     /**
      * 原始数据对象的缓存目录分组
@@ -40,23 +45,27 @@ public class DownloadOptions {
     /**
      * Content-Type Header
      */
-    String contentType;
+    @lombok.Builder.Default
+    String contentType = ContentType.OCTET_STREAM;
 
     /**
      * 是否开启压缩
      */
-    boolean compressEnabled;
+    @lombok.Builder.Default
+    boolean compressEnabled = true;
 
     /**
      * 压缩格式
      */
-    String compressFormat;
+    @lombok.Builder.Default
+    String compressFormat = CompressFormat.ZIP;
 
     /**
      * 当只有一个数据源是否跳过，不进行压缩
      * 单个文件目录也会压缩
      */
-    boolean skipCompressOnSingle;
+    @lombok.Builder.Default
+    boolean skipCompressOnSingle = true;
 
     /**
      * 压缩目录时是否保持之前的结构
@@ -69,7 +78,8 @@ public class DownloadOptions {
      * 否则，讲直接写入输出流
      * 如果文件小可以不开启
      */
-    boolean compressCacheEnabled;
+    @lombok.Builder.Default
+    boolean compressCacheEnabled = true;
 
     /**
      * 压缩文件的缓存目录分组
@@ -77,7 +87,8 @@ public class DownloadOptions {
      */
     String compressCacheGroup;
 
-    String compressCacheName;
+    @lombok.Builder.Default
+    String compressCacheName = CompressedSource.NAME;
 
     /**
      * 是否删除压缩文件
@@ -90,6 +101,8 @@ public class DownloadOptions {
      */
     Charset charset;
 
+    Map<String, String> headers;
+
     /**
      * 提供支持任意Request的接口
      */
@@ -101,12 +114,12 @@ public class DownloadOptions {
     Object response;
 
     /**
-     * 内部使用参数，自定义数据请使用 {@link DownloadOptions#extra}
-     */
-    Object args;
-
-    /**
      * 额外数据
      */
     Object extra;
+
+    /**
+     * 内部使用参数，自定义数据请使用 {@link DownloadOptions#extra}
+     */
+    Object args;
 }
