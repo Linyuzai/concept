@@ -73,7 +73,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
     protected void write0(OutputStream os, Range range, SourceWriter writer, WriteHandler handler, File file, String path, boolean keepStruct) throws IOException {
         if (file.isFile()) {
             try (FileInputStream fis = new FileInputStream(file)) {
-                Target target = new Target() {
+                Part part = new Part() {
 
                     @Override
                     public InputStream getInputStream() throws IOException {
@@ -100,13 +100,13 @@ public class FileOriginalSource extends AbstractOriginalSource {
                         writer.write(getInputStream(), os, range, getCharset(), file.length());
                     }
                 };
-                handler.handle(target);
+                handler.handle(part);
             }
         } else {
             File[] files = file.listFiles();
             if (files == null || files.length == 0) {
                 if (keepStruct) {
-                    Target target = new Target() {
+                    Part part = new Part() {
 
                         @Override
                         public InputStream getInputStream() throws IOException {
@@ -133,7 +133,7 @@ public class FileOriginalSource extends AbstractOriginalSource {
 
                         }
                     };
-                    handler.handle(target);
+                    handler.handle(part);
                 }
             } else {
                 for (File f : files) {

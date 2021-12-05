@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 
@@ -20,8 +19,8 @@ public interface Source {
     default void write(OutputStream os, Range range, SourceWriter writer) throws IOException {
         write(os, range, writer, new Source.WriteHandler() {
             @Override
-            public void handle(Source.Target target) throws IOException {
-                Source.WriteHandler.super.handle(target);
+            public void handle(Part part) throws IOException {
+                Source.WriteHandler.super.handle(part);
             }
         });
     }
@@ -43,12 +42,12 @@ public interface Source {
          *
          * @throws IOException
          */
-        default void handle(OriginalSource.Target target) throws IOException {
-            target.write();
+        default void handle(Part part) throws IOException {
+            part.write();
         }
     }
 
-    interface Target {
+    interface Part {
 
         InputStream getInputStream() throws IOException;
 

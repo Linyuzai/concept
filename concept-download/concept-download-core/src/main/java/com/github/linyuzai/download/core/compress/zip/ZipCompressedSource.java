@@ -50,9 +50,9 @@ public class ZipCompressedSource extends AbstractCompressedSource {
     protected void write(ZipOutputStream zos, Range range, SourceWriter writer) throws IOException {
         source.write(zos, range, writer, new Source.WriteHandler() {
             @Override
-            public void handle(Source.Target target) throws IOException {
-                zos.putNextEntry(new ZipEntry(target.getPath()));
-                Source.WriteHandler.super.handle(target);
+            public void handle(Part part) throws IOException {
+                zos.putNextEntry(new ZipEntry(part.getPath()));
+                Source.WriteHandler.super.handle(part);
                 zos.closeEntry();
             }
         });

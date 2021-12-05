@@ -28,6 +28,9 @@ allprojects {
         set('springCloudVersion', "2021.0.0-RC1")
     }
     ext {
+        set('okhttpVersion', "4.9.3")
+    }
+    ext {
         set('lombokVersion', "1.18.22")
     }
     ext {

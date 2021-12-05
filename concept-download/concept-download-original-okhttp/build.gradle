@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'com.github.linyuzai'
+version '1.0.0'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+    compileOnly project(':concept-download:concept-download-core')
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}

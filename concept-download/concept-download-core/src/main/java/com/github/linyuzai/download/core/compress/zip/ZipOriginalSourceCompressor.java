@@ -49,9 +49,9 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
                          new ZipOutputStream(fos) : new ZipOutputStream(fos, charset)) {
                 source.write(zos, null, writer, new Source.WriteHandler() {
                     @Override
-                    public void handle(OriginalSource.Target target) throws IOException {
-                        zos.putNextEntry(new ZipEntry(target.getPath()));
-                        Source.WriteHandler.super.handle(target);
+                    public void handle(Source.Part part) throws IOException {
+                        zos.putNextEntry(new ZipEntry(part.getPath()));
+                        Source.WriteHandler.super.handle(part);
                         zos.closeEntry();
                     }
                 });

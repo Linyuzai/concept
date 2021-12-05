@@ -41,7 +41,7 @@ public class ClassPathResourceOriginalSource extends AbstractOriginalSource {
     @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
         try (InputStream is = resource.getInputStream()) {
-            Target target = new Target() {
+            Part part = new Part() {
 
                 @Override
                 public InputStream getInputStream() throws IOException {
@@ -68,7 +68,7 @@ public class ClassPathResourceOriginalSource extends AbstractOriginalSource {
                     writer.write(getInputStream(), os, range, getCharset(), ClassPathResourceOriginalSource.this.getLength());
                 }
             };
-            handler.handle(target);
+            handler.handle(part);
         }
     }
 
