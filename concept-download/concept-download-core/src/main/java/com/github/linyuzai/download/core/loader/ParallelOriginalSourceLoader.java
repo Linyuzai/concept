@@ -17,12 +17,12 @@ public abstract class ParallelOriginalSourceLoader implements OriginalSourceLoad
 
     @Getter
     @Setter
-    private boolean serialOnSingleSource = true;
+    private boolean serialOnSingle = true;
 
     @Override
     public void load(OriginalSource source, DownloadContext context) throws IOException {
         Collection<OriginalSource> sources = source.flatten();
-        if (sources.size() <= 1 && serialOnSingleSource) {
+        if (sources.size() <= 1 && serialOnSingle) {
             source.load();
             return;
         }

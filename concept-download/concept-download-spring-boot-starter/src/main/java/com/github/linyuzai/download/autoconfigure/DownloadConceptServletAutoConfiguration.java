@@ -4,12 +4,14 @@ import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import com.github.linyuzai.download.core.response.DownloadResponseProvider;
 import com.github.linyuzai.download.servlet.request.ServletDownloadRequestProvider;
 import com.github.linyuzai.download.servlet.response.ServletDownloadResponseProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({ServletDownloadRequestProvider.class, ServletDownloadResponseProvider.class})
 public class DownloadConceptServletAutoConfiguration {
 

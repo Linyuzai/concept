@@ -26,7 +26,6 @@ import com.github.linyuzai.download.core.original.multiple.ArrayOriginalSourceFa
 import com.github.linyuzai.download.core.original.multiple.CollectionOriginalSourceFactory;
 import com.github.linyuzai.download.core.original.direct.DirectOriginalSourceFactory;
 import com.github.linyuzai.download.core.writer.*;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-@AutoConfigureAfter(DownloadConceptServletAutoConfiguration.class)
 public class DownloadConceptAutoConfiguration {
 
     //private static final Log logger = LogFactory.getLog(DownloadConceptAutoConfiguration.class);

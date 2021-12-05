@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnClass({DownloadConceptAdvice.class, DownloadConceptAdvisor.class})
 @AutoConfigureAfter(DownloadConceptAutoConfiguration.class)
+@ConditionalOnClass({DownloadConceptAdvice.class, DownloadConceptAdvisor.class})
 public class DownloadConceptAopAutoConfiguration {
 
     //private static final Log logger = LogFactory.getLog(DownloadConceptAopAutoConfiguration.class);
