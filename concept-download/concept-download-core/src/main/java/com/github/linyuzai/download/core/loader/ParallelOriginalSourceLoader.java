@@ -23,7 +23,7 @@ public abstract class ParallelOriginalSourceLoader implements OriginalSourceLoad
     public void load(OriginalSource source, DownloadContext context) throws IOException {
         Collection<OriginalSource> sources = source.flatten();
         if (sources.size() <= 1 && serialOnSingle) {
-            source.load();
+            source.load(context);
             return;
         }
         Collection<OriginalSource> parallelSources = new ArrayList<>();
@@ -40,7 +40,7 @@ public abstract class ParallelOriginalSourceLoader implements OriginalSourceLoad
         }
         if (!serialSources.isEmpty()) {
             for (OriginalSource serialSource : serialSources) {
-                serialSource.load();
+                serialSource.load(context);
             }
         }
     }
@@ -51,7 +51,7 @@ public abstract class ParallelOriginalSourceLoader implements OriginalSourceLoad
         for (OriginalSource source : sources) {
             execute(() -> {
                 try {
-                    source.load();
+                    source.load(context);
                 } catch (IOException e) {
                     throwableList.add(e);
                 } finally {

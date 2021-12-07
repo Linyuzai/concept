@@ -34,11 +34,6 @@ public class ClassPathResourceOriginalSource extends AbstractOriginalSource {
     }
 
     @Override
-    public void load() throws IOException {
-
-    }
-
-    @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
         try (InputStream is = resource.getInputStream()) {
             Part part = new Part() {

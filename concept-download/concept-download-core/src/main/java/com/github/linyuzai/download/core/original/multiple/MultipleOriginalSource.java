@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.original.multiple;
 
 import com.github.linyuzai.download.core.cache.AbstractCacheableSource;
 import com.github.linyuzai.download.core.cache.CacheableSource;
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.original.OriginalSource;
 import com.github.linyuzai.download.core.writer.SourceWriter;
@@ -89,9 +90,9 @@ public class MultipleOriginalSource extends AbstractCacheableSource implements O
     }
 
     @Override
-    public void load() throws IOException {
+    public void load(DownloadContext context) throws IOException {
         for (OriginalSource source : sources) {
-            source.load();
+            source.load(context);
         }
     }
 

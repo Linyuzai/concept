@@ -17,7 +17,7 @@ public class ConceptDownloadController {
 
     }
 
-    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt", skipCompressOnSingle = false)
+    @Download(original = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README_GBK.txt", compressOnSingle = true)
     @GetMapping("one-zip")
     public void downloadOneZip() {
 

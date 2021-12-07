@@ -12,11 +12,11 @@ import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipCompressedSource extends AbstractCompressedSource {
+public class ZipMemoryCompressedSource extends AbstractCompressedSource {
 
     private final OriginalSource source;
 
-    public ZipCompressedSource(OriginalSource source, String name) {
+    public ZipMemoryCompressedSource(OriginalSource source, String name) {
         this.source = source;
         if (name == null || name.isEmpty()) {
             setName(getName0());

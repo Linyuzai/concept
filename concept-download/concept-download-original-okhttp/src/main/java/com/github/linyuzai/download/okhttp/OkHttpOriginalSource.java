@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.okhttp;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.original.AbstractOriginalSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.SourceWriter;
@@ -44,12 +45,15 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
     }
 
     @Override
-    public void load() throws IOException {
+    public void load(DownloadContext context) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
         Response response = client.newCall(request).execute();
         body = response.body();
+        if (isCacheEnabled()) {
+
+        }
     }
 
     @Override

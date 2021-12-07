@@ -9,6 +9,6 @@ public class SerialOriginalSourceLoader implements OriginalSourceLoader {
 
     @Override
     public void load(OriginalSource source, DownloadContext context) throws IOException {
-        source.load();
+        source.load(context);
     }
 }

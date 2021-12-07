@@ -66,7 +66,7 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
             }
             return new ZipFileCompressedSource(file);
         } else {
-            return new ZipCompressedSource(source, finalCacheName);
+            return new ZipMemoryCompressedSource(source, finalCacheName);
         }
     }
 }
