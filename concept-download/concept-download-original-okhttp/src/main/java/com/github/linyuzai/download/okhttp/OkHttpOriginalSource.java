@@ -1,17 +1,17 @@
 package com.github.linyuzai.download.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.original.AbstractOriginalSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.SourceWriter;
+import com.github.linyuzai.download.core.writer.SourceWriterAdapter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 
 public class OkHttpOriginalSource extends AbstractOriginalSource {
@@ -22,7 +22,12 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
 
     private ResponseBody body;
 
-    public OkHttpOriginalSource(OkHttpClient client, String url, String name, Charset charset, boolean asyncLoad) {
+    private File cache;
+
+    public OkHttpOriginalSource(OkHttpClient client, String url,
+                                String name, Charset charset,
+                                boolean asyncLoad, boolean cacheEnabled,
+                                String cachePath) {
         this.client = client;
         this.url = url;
         if (name == null || name.isEmpty()) {
@@ -32,11 +37,17 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
         }
         setCharset(charset);
         setAsyncLoad(asyncLoad);
+        setCacheEnabled(cacheEnabled);
+        setCachePath(cachePath);
     }
 
     @Override
     public long getLength() {
-        return body == null ? 0L : body.contentLength();
+        if (cache != null) {
+            return cache.length();
+        } else {
+            return body == null ? 0L : body.contentLength();
+        }
     }
 
     @Override
@@ -52,16 +63,47 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
         Response response = client.newCall(request).execute();
         body = response.body();
         if (isCacheEnabled()) {
+            String cachePath = getCachePath();
+            if (cachePath == null) {
+                throw new DownloadException("Cache path is null");
+            }
+            File dir = new File(cachePath);
+            if (!dir.exists()) {
+                boolean mkdirs = dir.mkdirs();
+            }
+            cache = new File(dir, getName());
+            SourceWriterAdapter writerAdapter = context.get(SourceWriterAdapter.class);
+            SourceWriter writer = writerAdapter.getSourceWriter(this, null, context);
+            try (InputStream is = body.byteStream();
+                 FileOutputStream fos = new FileOutputStream(cache)) {
+                writer.write(is, fos, null, getCharset(), getLength());
+            }
+        }
+    }
 
+    @Override
+    public void deleteCache() {
+        if (cache != null) {
+            boolean delete = cache.delete();
         }
     }
 
     @Override
     public void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException {
-        if (body == null) {
-            return;
+        InputStream inputStream;
+        if (isCacheEnabled()) {
+            if (cache == null) {
+                return;
+            }
+            inputStream = new FileInputStream(cache);
+        } else {
+            if (body == null) {
+                return;
+            }
+            inputStream = body.byteStream();
         }
-        try (InputStream is = body.byteStream()) {
+
+        try (InputStream is = inputStream) {
             Part part = new Part() {
 
                 @Override
@@ -90,6 +132,27 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
                 }
             };
             handler.handle(part);
+        }
+    }
+
+    public static class Builder {
+
+        private OkHttpClient client;
+
+        private String url;
+
+        private String name;
+
+        private Charset charset;
+
+        private boolean asyncLoad = true;
+
+        private boolean cacheEnabled = true;
+
+        private String cachePath;
+
+        public OkHttpOriginalSource build() {
+            return new OkHttpOriginalSource(client, url, name, charset, asyncLoad, cacheEnabled, cachePath);
         }
     }
 }
