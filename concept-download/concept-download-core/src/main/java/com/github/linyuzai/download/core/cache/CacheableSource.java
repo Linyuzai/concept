@@ -4,5 +4,11 @@ import com.github.linyuzai.download.core.source.Source;
 
 public interface CacheableSource extends Source {
 
-    void deleteCache();
+    boolean isCacheEnabled();
+
+    String getCachePath();
+
+    default void deleteCache() {
+
+    }
 }

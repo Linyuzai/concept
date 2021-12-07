@@ -1,9 +1,9 @@
 package com.github.linyuzai.download.core.original;
 
-import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.cache.CacheableSource;
+import com.github.linyuzai.download.core.loader.LoadableSource;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
@@ -11,11 +11,9 @@ import java.util.function.Predicate;
 /**
  * 下载源
  */
-public interface OriginalSource extends Source {
+public interface OriginalSource extends CacheableSource, LoadableSource {
 
-    void load() throws IOException;
-
-    boolean isAsyncLoad();
+    boolean isSingle();
 
     default Collection<OriginalSource> flatten() {
         return flatten(source -> true);

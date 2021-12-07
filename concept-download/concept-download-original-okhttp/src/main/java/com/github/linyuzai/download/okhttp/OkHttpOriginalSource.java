@@ -39,6 +39,11 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
     }
 
     @Override
+    public boolean isSingle() {
+        return true;
+    }
+
+    @Override
     public void load() throws IOException {
         Request request = new Request.Builder()
                 .url(url)

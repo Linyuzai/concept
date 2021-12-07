@@ -42,8 +42,8 @@ public class CreateOriginalSourceInterceptor implements DownloadInterceptor, Dow
         boolean delete = context.getOptions().isDeleteOriginalCache();
         if (delete) {
             OriginalSource source = context.get(OriginalSource.class);
-            if (source instanceof CacheableSource) {
-                ((CacheableSource) source).deleteCache();
+            if (source != null) {
+                source.deleteCache();
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.github.linyuzai.download.core.compress;
 
-import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.cache.CacheableSource;
 
-public interface CompressedSource extends Source {
+public interface CompressedSource extends CacheableSource {
 
     String NAME = "compress";
 }

@@ -72,6 +72,11 @@ public class ClassPathResourceOriginalSource extends AbstractOriginalSource {
         }
     }
 
+    @Override
+    public boolean isSingle() {
+        return true;
+    }
+
     public static class Builder {
 
         private ClassPathResource resource;

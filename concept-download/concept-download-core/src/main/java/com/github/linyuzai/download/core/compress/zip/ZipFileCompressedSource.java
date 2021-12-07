@@ -1,17 +1,15 @@
 package com.github.linyuzai.download.core.compress.zip;
 
-import com.github.linyuzai.download.core.cache.CacheableSource;
-import com.github.linyuzai.download.core.compress.CompressedSource;
+import com.github.linyuzai.download.core.compress.AbstractCompressedSource;
 import com.github.linyuzai.download.core.original.file.FileOriginalSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.SourceWriter;
 import lombok.AllArgsConstructor;
 
 import java.io.*;
-import java.nio.charset.Charset;
 
 @AllArgsConstructor
-public class ZipFileCompressedSource implements CompressedSource, CacheableSource {
+public class ZipFileCompressedSource extends AbstractCompressedSource {
 
     private final File file;
 
@@ -21,13 +19,38 @@ public class ZipFileCompressedSource implements CompressedSource, CacheableSourc
     }
 
     @Override
-    public Charset getCharset() {
-        return null;
+    public void setName(String name) {
+
     }
 
     @Override
     public long getLength() {
         return file.length();
+    }
+
+    @Override
+    public void setLength(long length) {
+
+    }
+
+    @Override
+    public boolean isCacheEnabled() {
+        return true;
+    }
+
+    @Override
+    public void setCacheEnabled(boolean cacheEnabled) {
+
+    }
+
+    @Override
+    public String getCachePath() {
+        return file.getParent();
+    }
+
+    @Override
+    public void setCachePath(String cachePath) {
+
     }
 
     @Override

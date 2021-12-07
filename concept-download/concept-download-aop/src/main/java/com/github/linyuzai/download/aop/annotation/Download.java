@@ -32,8 +32,6 @@ public @interface Download {
      */
     String contentType() default ContentType.OCTET_STREAM;
 
-    boolean compressEnabled() default true;
-
     /**
      * 压缩格式
      */
@@ -42,7 +40,7 @@ public @interface Download {
     /**
      *
      */
-    boolean skipCompressOnSingle() default true;
+    boolean compressOnSingle() default false;
 
     /**
      * 压缩目录时是否保持之前的结构

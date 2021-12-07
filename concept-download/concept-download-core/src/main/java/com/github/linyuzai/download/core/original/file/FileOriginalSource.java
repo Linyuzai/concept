@@ -36,6 +36,11 @@ public class FileOriginalSource extends AbstractOriginalSource {
         return length0(file);
     }
 
+    @Override
+    public boolean isSingle() {
+        return file.isFile();
+    }
+
     private long length0(File file) {
         if (file.isFile()) {
             return file.length();
@@ -50,11 +55,6 @@ public class FileOriginalSource extends AbstractOriginalSource {
             }
             return length;
         }
-    }
-
-    @Override
-    public void load() throws IOException {
-
     }
 
     @Override

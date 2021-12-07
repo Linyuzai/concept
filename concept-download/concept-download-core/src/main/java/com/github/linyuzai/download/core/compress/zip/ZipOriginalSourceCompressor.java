@@ -30,7 +30,11 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
         String cacheName = context.getOptions().getCompressCacheName();
         String finalCacheName;
         if (cacheName == null || cacheName.isEmpty()) {
-            finalCacheName = CompressedSource.NAME + CompressFormat.ZIP_SUFFIX;
+            if (source.isSingle()) {
+                finalCacheName = source.getName();
+            } else {
+                finalCacheName = CompressedSource.NAME + CompressFormat.ZIP_SUFFIX;
+            }
         } else {
             if (cacheName.endsWith(CompressFormat.ZIP_SUFFIX)) {
                 finalCacheName = cacheName;
@@ -39,7 +43,11 @@ public class ZipOriginalSourceCompressor implements OriginalSourceCompressor {
             }
         }
         if (cacheEnable) {
-            File file = new File(cachePath, finalCacheName);
+            File dir = new File(cachePath);
+            if (!dir.exists()) {
+                boolean mkdirs = dir.mkdirs();
+            }
+            File file = new File(dir, finalCacheName);
             if (file.exists()) {
                 return new ZipFileCompressedSource(file);
             }

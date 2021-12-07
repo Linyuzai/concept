@@ -9,9 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-@Deprecated
 @AllArgsConstructor
-public class UncompressedSource implements CompressedSource {
+public class UncompressedSource extends AbstractCompressedSource {
 
     private OriginalSource source;
 

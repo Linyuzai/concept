@@ -49,12 +49,6 @@ public class DownloadOptions {
     String contentType = ContentType.OCTET_STREAM;
 
     /**
-     * 是否开启压缩
-     */
-    @lombok.Builder.Default
-    boolean compressEnabled = true;
-
-    /**
      * 压缩格式
      */
     @lombok.Builder.Default
@@ -64,8 +58,7 @@ public class DownloadOptions {
      * 当只有一个数据源是否跳过，不进行压缩
      * 单个文件目录也会压缩
      */
-    @lombok.Builder.Default
-    boolean skipCompressOnSingle = true;
+    boolean compressOnSingle;
 
     /**
      * 压缩目录时是否保持之前的结构

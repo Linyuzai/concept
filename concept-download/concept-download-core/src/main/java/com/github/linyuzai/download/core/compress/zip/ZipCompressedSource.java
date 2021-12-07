@@ -27,6 +27,26 @@ public class ZipCompressedSource extends AbstractCompressedSource {
         setLength(source.getLength());
     }
 
+    @Override
+    public boolean isCacheEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setCacheEnabled(boolean cacheEnabled) {
+
+    }
+
+    @Override
+    public String getCachePath() {
+        return null;
+    }
+
+    @Override
+    public void setCachePath(String cachePath) {
+
+    }
+
     public String getName0() {
         String name = source.getName();
         if (name == null) {

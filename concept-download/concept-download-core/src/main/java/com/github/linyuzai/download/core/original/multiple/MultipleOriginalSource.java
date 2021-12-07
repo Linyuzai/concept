@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.original.multiple;
 
+import com.github.linyuzai.download.core.cache.AbstractCacheableSource;
 import com.github.linyuzai.download.core.cache.CacheableSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.original.OriginalSource;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @AllArgsConstructor
-public class MultipleOriginalSource implements OriginalSource, CacheableSource {
+public class MultipleOriginalSource extends AbstractCacheableSource implements OriginalSource {
 
     private Collection<OriginalSource> sources;
 
@@ -44,6 +45,47 @@ public class MultipleOriginalSource implements OriginalSource, CacheableSource {
             length += source.getLength();
         }
         return length;
+    }
+
+    @Override
+    public boolean isCacheEnabled() {
+        for (OriginalSource source : sources) {
+            if (source.isCacheEnabled()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void setCacheEnabled(boolean cacheEnabled) {
+
+    }
+
+    @Override
+    public String getCachePath() {
+        return null;
+    }
+
+    @Override
+    public void setCachePath(String cachePath) {
+
+    }
+
+    @Override
+    public boolean isSingle() {
+        Boolean single = null;
+        for (OriginalSource source : sources) {
+            if (single == null) {
+                single = source.isSingle();
+                if (!single) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -81,10 +123,6 @@ public class MultipleOriginalSource implements OriginalSource, CacheableSource {
 
     @Override
     public void deleteCache() {
-        for (OriginalSource source : sources) {
-            if (source instanceof CacheableSource) {
-                ((CacheableSource) source).deleteCache();
-            }
-        }
+        sources.forEach(CacheableSource::deleteCache);
     }
 }
