@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
-import com.github.linyuzai.download.core.cache.UserHomeDownloadCacheLocation;
 import com.github.linyuzai.download.core.compress.CompressOriginalSourceInterceptor;
 import com.github.linyuzai.download.core.compress.DefaultOriginalSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
@@ -38,12 +37,6 @@ import java.util.List;
 public class DownloadConceptAutoConfiguration {
 
     //private static final Log logger = LogFactory.getLog(DownloadConceptAutoConfiguration.class);
-
-    @Bean
-    @ConditionalOnMissingBean
-    public DownloadCacheLocation downloadCacheLocation() {
-        return new UserHomeDownloadCacheLocation();
-    }
 
     @Bean
     @ConditionalOnMissingBean

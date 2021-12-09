@@ -151,7 +151,51 @@ public class OkHttpOriginalSource extends AbstractOriginalSource {
 
         private String cachePath;
 
+        public Builder client(OkHttpClient client) {
+            this.client = client;
+            return this;
+        }
+
+        public Builder url(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder charset(Charset charset) {
+            this.charset = charset;
+            return this;
+        }
+
+        public Builder asyncLoad(boolean asyncLoad) {
+            this.asyncLoad = asyncLoad;
+            return this;
+        }
+
+        public Builder cacheEnabled(boolean cacheEnabled) {
+            this.cacheEnabled = cacheEnabled;
+            return this;
+        }
+
+        public Builder cachePath(String cachePath) {
+            this.cachePath = cachePath;
+            return this;
+        }
+
         public OkHttpOriginalSource build() {
+            if (client == null) {
+                throw new DownloadException("OkHttpClient is null");
+            }
+            if (url == null || url.isEmpty()) {
+                throw new DownloadException("Url is null or empty");
+            }
+            if (cacheEnabled && (cachePath == null || cachePath.isEmpty())) {
+                throw new DownloadException("Cache path is null or empty");
+            }
             return new OkHttpOriginalSource(client, url, name, charset, asyncLoad, cacheEnabled, cachePath);
         }
     }

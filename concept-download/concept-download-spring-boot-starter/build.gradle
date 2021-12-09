@@ -16,6 +16,7 @@ dependencies {
     compileOnly project(':concept-download:concept-download-aop')
     compileOnly project(':concept-download:concept-download-web-servlet')
     compileOnly project(':concept-download:concept-download-original-classpath')
+    compileOnly project(':concept-download:concept-download-original-okhttp')
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
