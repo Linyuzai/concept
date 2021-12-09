@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 @AllArgsConstructor
-public class ExecutorOriginalSourceLoader extends ParallelOriginalSourceLoader {
+public class ExecutorOriginalSourceLoader extends ConcurrentOriginalSourceLoader {
 
     @Getter
     @Setter
@@ -17,7 +17,6 @@ public class ExecutorOriginalSourceLoader extends ParallelOriginalSourceLoader {
     @Override
     public void execute(Runnable runnable) {
         executor.execute(runnable);
-
     }
 
     public void shutdown() {

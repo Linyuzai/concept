@@ -1,0 +1,25 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "${kotlinVersion}"
+    id 'java'
+}
+
+group 'com.github.linyuzai'
+version '1.0.0'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly project(':concept-download:concept-download-core')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}

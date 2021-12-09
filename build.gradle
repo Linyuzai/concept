@@ -28,6 +28,12 @@ allprojects {
         set('springCloudVersion', "2021.0.0-RC1")
     }
     ext {
+        set('kotlinVersion', "1.5.10")
+    }
+    ext {
+        set('coroutinesVersion', "1.5.0")
+    }
+    ext {
         set('okhttpVersion', "4.9.3")
     }
     ext {

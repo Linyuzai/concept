@@ -45,34 +45,5 @@ public abstract class ParallelOriginalSourceLoader implements OriginalSourceLoad
         }
     }
 
-    public void parallelLoad(Collection<OriginalSource> sources, DownloadContext context) {
-        CountDownLatch latch = new CountDownLatch(sources.size());
-        List<Throwable> throwableList = Collections.synchronizedList(new ArrayList<>());
-        for (OriginalSource source : sources) {
-            execute(() -> {
-                try {
-                    source.load(context);
-                } catch (IOException e) {
-                    throwableList.add(e);
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            throwableList.add(e);
-        }
-        if (!throwableList.isEmpty()) {
-            handleThrowableList(throwableList, context);
-        }
-    }
-
-    @SneakyThrows
-    public void handleThrowableList(Collection<Throwable> throwableList, DownloadContext context) {
-        throw throwableList.iterator().next();
-    }
-
-    public abstract void execute(Runnable runnable);
+    public abstract void parallelLoad(Collection<OriginalSource> sources, DownloadContext context);
 }
