@@ -1,17 +1,12 @@
 package com.github.linyuzai.download.core.source;
 
+import com.github.linyuzai.download.core.concept.DownloadMetadata;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.nio.charset.Charset;
-
 @Getter
 @Setter
-public abstract class AbstractSource implements Source {
+public abstract class AbstractSource extends DownloadMetadata implements Source {
 
-    private String name;
-
-    private Charset charset;
-
-    private long length;
+    private boolean asyncLoad;
 }

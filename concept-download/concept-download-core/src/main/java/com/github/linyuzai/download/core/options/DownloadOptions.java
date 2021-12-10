@@ -1,13 +1,12 @@
 package com.github.linyuzai.download.core.options;
 
 import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.compress.CompressedSource;
+import com.github.linyuzai.download.core.compress.Compressible;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.Builder;
 import lombok.Value;
 
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Map;
 
 @Value
@@ -17,7 +16,7 @@ public class DownloadOptions {
     /**
      * 需要下载是原始数据对象
      */
-    Object original;
+    Object source;
 
     /**
      * 原始数据对象是否开启缓存
@@ -25,7 +24,7 @@ public class DownloadOptions {
      * 本地文件没有缓存的概念，或者说文件本身就是缓存
      */
     @lombok.Builder.Default
-    boolean originalCacheEnabled = true;
+    boolean sourceCacheEnabled = true;
 
     /**
      * 原始数据对象的缓存目录分组
@@ -33,9 +32,9 @@ public class DownloadOptions {
      * 则最终缓存文件会存储在/home/download/cache/images目录下
      * 方便根据不同业务指定不同的缓存文件夹，防止文件重名等问题
      */
-    String originalCacheGroup;
+    String sourceCacheGroup;
 
-    boolean deleteOriginalCache;
+    boolean deleteSourceCache;
 
     /**
      * 下载显示的文件名称，在浏览器上下载下来显示的名称
@@ -76,12 +75,12 @@ public class DownloadOptions {
 
     /**
      * 压缩文件的缓存目录分组
-     * 同 {@link DownloadOptions#originalCacheGroup}
+     * 同 {@link DownloadOptions#sourceCacheGroup}
      */
     String compressCacheGroup;
 
     @lombok.Builder.Default
-    String compressCacheName = CompressedSource.NAME;
+    String compressCacheName = Compressible.NAME;
 
     /**
      * 是否删除压缩文件

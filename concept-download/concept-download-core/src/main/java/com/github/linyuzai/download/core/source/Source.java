@@ -1,63 +1,28 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.writer.SourceWriter;
+import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.loader.Loadable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Predicate;
 
-public interface Source {
+/**
+ * 下载源
+ */
+public interface Source extends Downloadable, Loadable {
 
-    String getName();
+    boolean isSingle();
 
-    Charset getCharset();
-
-    long getLength();
-
-    default void write(OutputStream os, Range range, SourceWriter writer) throws IOException {
-        write(os, range, writer, new Source.WriteHandler() {
-            @Override
-            public void handle(Part part) throws IOException {
-                Source.WriteHandler.super.handle(part);
-            }
-        });
+    default Collection<Source> flatten() {
+        return flatten(source -> true);
     }
 
-    /**
-     * 遍历下载源中所有的数据
-     *
-     * @throws IOException
-     */
-    void write(OutputStream os, Range range, SourceWriter writer, WriteHandler handler) throws IOException;
-
-    /**
-     * 读取下载源数据的读取器
-     */
-    interface WriteHandler {
-
-        /**
-         * 每次读到都会回调
-         *
-         * @throws IOException
-         */
-        default void handle(Part part) throws IOException {
-            part.write();
+    default Collection<Source> flatten(Predicate<Source> predicate) {
+        if (predicate.test(this)) {
+            return Collections.singletonList(this);
+        } else {
+            return Collections.emptyList();
         }
-    }
-
-    interface Part {
-
-        InputStream getInputStream() throws IOException;
-
-        String getName();
-
-        String getPath();
-
-        Charset getCharset();
-
-        void write() throws IOException;
-
     }
 }

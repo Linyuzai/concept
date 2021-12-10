@@ -1,0 +1,25 @@
+package com.github.linyuzai.download.classpath;
+
+import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.source.SourceFactory;
+import org.springframework.core.io.ClassPathResource;
+
+import java.nio.charset.Charset;
+
+public class ClassPathResourceSourceFactory implements SourceFactory {
+
+    @Override
+    public boolean support(Object source, DownloadContext context) {
+        return source instanceof ClassPathResource;
+    }
+
+    @Override
+    public Source create(Object source, DownloadContext context) {
+        Charset charset = context.getOptions().getCharset();
+        return new ClassPathResourceSource.Builder()
+                .resource((ClassPathResource) source)
+                .charset(charset)
+                .build();
+    }
+}

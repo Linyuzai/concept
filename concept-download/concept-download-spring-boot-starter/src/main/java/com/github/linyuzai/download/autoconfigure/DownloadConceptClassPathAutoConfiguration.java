@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.classpath.ClassPathPrefixOriginalSourceFactory;
-import com.github.linyuzai.download.classpath.ClassPathResourceOriginalSourceFactory;
+import com.github.linyuzai.download.classpath.ClassPathPrefixSourceFactory;
+import com.github.linyuzai.download.classpath.ClassPathResourceSourceFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -11,20 +11,20 @@ import org.springframework.core.io.ClassPathResource;
 
 @Configuration
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
-@ConditionalOnClass({ClassPathResourceOriginalSourceFactory.class, ClassPathPrefixOriginalSourceFactory.class})
+@ConditionalOnClass({ClassPathResourceSourceFactory.class, ClassPathPrefixSourceFactory.class})
 public class DownloadConceptClassPathAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnClass(ClassPathResource.class)
-    public ClassPathResourceOriginalSourceFactory classPathResourceOriginalSourceFactory() {
-        return new ClassPathResourceOriginalSourceFactory();
+    public ClassPathResourceSourceFactory classPathResourceOriginalSourceFactory() {
+        return new ClassPathResourceSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnClass(ClassPathResource.class)
-    public ClassPathPrefixOriginalSourceFactory classPathPrefixOriginalSourceFactory() {
-        return new ClassPathPrefixOriginalSourceFactory();
+    public ClassPathPrefixSourceFactory classPathPrefixOriginalSourceFactory() {
+        return new ClassPathPrefixSourceFactory();
     }
 }

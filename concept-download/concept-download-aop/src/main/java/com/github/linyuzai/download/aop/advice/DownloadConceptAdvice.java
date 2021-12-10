@@ -33,16 +33,16 @@ public class DownloadConceptAdvice implements MethodInterceptor {
             return (DownloadOptions) returnValue;
         } else {
             if (returnValue == null) {
-                builder.original(annotation.original());
+                builder.source(annotation.source());
             } else {
-                builder.original(returnValue);
+                builder.source(returnValue);
             }
         }
 
         return builder
-                .originalCacheEnabled(annotation.originalCacheEnabled())
-                .originalCacheGroup(annotation.originalCacheGroup())
-                .deleteOriginalCache(annotation.deleteOriginalCache())
+                .sourceCacheEnabled(annotation.sourceCacheEnabled())
+                .sourceCacheGroup(annotation.sourceCacheGroup())
+                .deleteSourceCache(annotation.deleteSourceCache())
                 .filename(annotation.filename())
                 .contentType(annotation.contentType())
                 .compressFormat(annotation.compressFormat())

@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.aop.annotation;
 
 import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.compress.CompressedSource;
+import com.github.linyuzai.download.core.compress.Compressible;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 
 import java.lang.annotation.*;
@@ -11,16 +11,16 @@ import java.lang.annotation.*;
 @Documented
 public @interface Download {
 
-    String[] original() default {};
+    String[] source() default {};
 
     /**
      * 下载是数据对象缓存
      */
-    boolean originalCacheEnabled() default true;
+    boolean sourceCacheEnabled() default true;
 
-    String originalCacheGroup() default "";
+    String sourceCacheGroup() default "";
 
-    boolean deleteOriginalCache() default false;
+    boolean deleteSourceCache() default false;
 
     /**
      * 下载显示的文件名称
@@ -54,7 +54,7 @@ public @interface Download {
 
     String compressCacheGroup() default "";
 
-    String compressCacheName() default CompressedSource.NAME;
+    String compressCacheName() default Compressible.NAME;
 
     boolean deleteCompressCache() default false;
 

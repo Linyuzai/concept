@@ -1,31 +1,31 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
-import com.github.linyuzai.download.core.compress.CompressOriginalSourceInterceptor;
-import com.github.linyuzai.download.core.compress.DefaultOriginalSourceCompressorAdapter;
-import com.github.linyuzai.download.core.compress.OriginalSourceCompressor;
-import com.github.linyuzai.download.core.compress.OriginalSourceCompressorAdapter;
-import com.github.linyuzai.download.core.compress.zip.ZipOriginalSourceCompressor;
+import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
+import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
+import com.github.linyuzai.download.core.compress.SourceCompressor;
+import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
+import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
-import com.github.linyuzai.download.core.loader.OriginalSourceLoader;
-import com.github.linyuzai.download.core.loader.LoadOriginalSourceInterceptor;
-import com.github.linyuzai.download.core.loader.SerialOriginalSourceLoader;
-import com.github.linyuzai.download.core.original.DefaultOriginalSourceFactoryAdapter;
-import com.github.linyuzai.download.core.original.OriginalSourceFactoryAdapter;
+import com.github.linyuzai.download.core.loader.SourceLoader;
+import com.github.linyuzai.download.core.loader.LoadSourceInterceptor;
+import com.github.linyuzai.download.core.loader.SerialSourceLoader;
+import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
+import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import com.github.linyuzai.download.core.response.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.WriteResponseInterceptor;
-import com.github.linyuzai.download.core.original.OriginalSourceFactory;
-import com.github.linyuzai.download.core.original.CreateOriginalSourceInterceptor;
-import com.github.linyuzai.download.core.original.file.FileOriginalSourceFactory;
-import com.github.linyuzai.download.core.original.file.FilePrefixOriginalSourceFactory;
-import com.github.linyuzai.download.core.original.file.UserHomeOriginalSourceFactory;
-import com.github.linyuzai.download.core.original.multiple.ArrayOriginalSourceFactory;
-import com.github.linyuzai.download.core.original.multiple.CollectionOriginalSourceFactory;
-import com.github.linyuzai.download.core.original.direct.DirectOriginalSourceFactory;
+import com.github.linyuzai.download.core.source.SourceFactory;
+import com.github.linyuzai.download.core.source.CreateSourceInterceptor;
+import com.github.linyuzai.download.core.source.file.FileSourceFactory;
+import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
+import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
+import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
+import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
+import com.github.linyuzai.download.core.source.direct.DirectSourceFactory;
 import com.github.linyuzai.download.core.writer.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -46,68 +46,68 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BufferedSourceWriter bufferedSourceWriter() {
-        return new BufferedSourceWriter();
+    public BufferedDownloadWriter bufferedDownloadWriter() {
+        return new BufferedDownloadWriter();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public SourceWriterAdapter sourceWriterAdapter(List<SourceWriter> writers) {
-        return new DefaultSourceWriterAdapter(writers);
+    public DownloadWriterAdapter downloadWriterAdapter(List<DownloadWriter> writers) {
+        return new DefaultDownloadWriterAdapter(writers);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CollectionOriginalSourceFactory collectionOriginalSourceFactory() {
-        return new CollectionOriginalSourceFactory();
+    public CollectionSourceFactory collectionSourceFactory() {
+        return new CollectionSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ArrayOriginalSourceFactory arrayOriginalSourceFactory() {
-        return new ArrayOriginalSourceFactory();
+    public ArraySourceFactory arraySourceFactory() {
+        return new ArraySourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public DirectOriginalSourceFactory directOriginalSourceFactory() {
-        return new DirectOriginalSourceFactory();
+    public DirectSourceFactory directSourceFactory() {
+        return new DirectSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public FileOriginalSourceFactory fileOriginalSourceFactory() {
-        return new FileOriginalSourceFactory();
+    public FileSourceFactory fileSourceFactory() {
+        return new FileSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public FilePrefixOriginalSourceFactory filePathOriginalSourceFactory() {
-        return new FilePrefixOriginalSourceFactory();
+    public FilePrefixSourceFactory filePrefixSourceFactory() {
+        return new FilePrefixSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public UserHomeOriginalSourceFactory userHomeOriginalSourceFactory() {
-        return new UserHomeOriginalSourceFactory();
+    public UserHomeSourceFactory userHomeSourceFactory() {
+        return new UserHomeSourceFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public OriginalSourceFactoryAdapter originalSourceFactoryAdapter(List<OriginalSourceFactory> factories) {
-        return new DefaultOriginalSourceFactoryAdapter(factories);
+    public SourceFactoryAdapter sourceFactoryAdapter(List<SourceFactory> factories) {
+        return new DefaultSourceFactoryAdapter(factories);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ZipOriginalSourceCompressor zipOriginalSourceCompressor() {
-        return new ZipOriginalSourceCompressor();
+    public ZipSourceCompressor zipSourceCompressor() {
+        return new ZipSourceCompressor();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public OriginalSourceCompressorAdapter originalSourceCompressorAdapter(List<OriginalSourceCompressor> compressors) {
-        return new DefaultOriginalSourceCompressorAdapter(compressors);
+    public SourceCompressorAdapter sourceCompressorAdapter(List<SourceCompressor> compressors) {
+        return new DefaultSourceCompressorAdapter(compressors);
     }
 
     @Bean
@@ -118,32 +118,32 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CreateOriginalSourceInterceptor createOriginalSourceInterceptor(OriginalSourceFactoryAdapter adapter) {
-        return new CreateOriginalSourceInterceptor(adapter);
+    public CreateSourceInterceptor createSourceInterceptor(SourceFactoryAdapter adapter) {
+        return new CreateSourceInterceptor(adapter);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public OriginalSourceLoader originalSourceLoader() {
-        return new SerialOriginalSourceLoader();
+    public SourceLoader sourceLoader() {
+        return new SerialSourceLoader();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadOriginalSourceInterceptor loadOriginalSourceInterceptor(OriginalSourceLoader loader) {
-        return new LoadOriginalSourceInterceptor(loader);
+    public LoadSourceInterceptor loadSourceInterceptor(SourceLoader loader) {
+        return new LoadSourceInterceptor(loader);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CompressOriginalSourceInterceptor compressOriginalSourceInterceptor(OriginalSourceCompressorAdapter adapter,
-                                                                               DownloadCacheLocation cacheLocation) {
-        return new CompressOriginalSourceInterceptor(adapter, cacheLocation);
+    public CompressSourceInterceptor compressSourceInterceptor(SourceCompressorAdapter adapter,
+                                                                       DownloadCacheLocation cacheLocation) {
+        return new CompressSourceInterceptor(adapter, cacheLocation);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public WriteResponseInterceptor writeResponseInterceptor(SourceWriterAdapter adapter,
+    public WriteResponseInterceptor writeResponseInterceptor(DownloadWriterAdapter adapter,
                                                              DownloadRequestProvider requestProvider,
                                                              DownloadResponseProvider responseProvider) {
         return new WriteResponseInterceptor(adapter, requestProvider, responseProvider);
