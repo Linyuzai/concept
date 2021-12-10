@@ -1,0 +1,62 @@
+package com.github.linyuzai.download.core.configuration;
+
+import com.github.linyuzai.download.core.compress.CompressFormat;
+import com.github.linyuzai.download.core.compress.Compressible;
+import com.github.linyuzai.download.core.contenttype.ContentType;
+import lombok.Data;
+
+import java.util.Map;
+
+@Data
+public class DownloadConfiguration {
+
+    private ResponseConfiguration response = new ResponseConfiguration();
+
+    private SourceConfiguration source = new SourceConfiguration();
+
+    private CompressConfiguration compress = new CompressConfiguration();
+
+    @Data
+    public static class SourceConfiguration {
+
+        private CacheConfiguration cache = new CacheConfiguration();
+
+        @Data
+        public static class CacheConfiguration {
+
+            private boolean enabled;
+
+            private String group;
+
+            private boolean delete;
+        }
+    }
+
+    @Data
+    public static class CompressConfiguration {
+
+        private String format = CompressFormat.ZIP;
+
+        private CacheConfiguration cache = new CacheConfiguration();
+
+        @Data
+        public static class CacheConfiguration {
+
+            private boolean enabled;
+
+            private String group;
+
+            private String name = Compressible.NAME;
+
+            boolean delete;
+        }
+    }
+
+    @Data
+    public static class ResponseConfiguration {
+
+        private String contentType = ContentType.OCTET_STREAM;
+
+        private Map<String, String> headers;
+    }
+}
