@@ -54,7 +54,7 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
 
     @Override
     public void destroy(DownloadContext context) {
-        boolean delete = context.getOptions().isDeleteCompressCache();
+        boolean delete = context.getOptions().isCompressCacheDelete();
         if (delete) {
             Compressible compressible = context.get(Compressible.class);
             if (compressible != null) {

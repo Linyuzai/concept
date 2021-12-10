@@ -1,6 +1,8 @@
 package com.github.linyuzai.download.aop.advice;
 
+import com.github.linyuzai.download.aop.annotation.CompressCache;
 import com.github.linyuzai.download.aop.annotation.Download;
+import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadOptions;
@@ -8,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,43 +23,61 @@ public class DownloadConceptAdvice implements MethodInterceptor {
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Object returnValue = invocation.proceed();
-        Download annotation = invocation.getMethod().getAnnotation(Download.class);
+        Method method = invocation.getMethod();
+        Download download = method.getAnnotation(Download.class);
+        SourceCache sourceCache = method.getAnnotation(SourceCache.class);
+        CompressCache compressCache = method.getAnnotation(CompressCache.class);
         Object[] arguments = invocation.getArguments();
-        DownloadOptions options = buildOptions(annotation, arguments, returnValue);
+        DownloadOptions options = buildOptions(download, sourceCache, compressCache, arguments, returnValue);
         downloadConcept.download(options);
         return null;
     }
 
-    public DownloadOptions buildOptions(Download annotation, Object[] arguments, Object returnValue) {
+    public DownloadOptions buildOptions(Download download,
+                                        SourceCache sourceCache,
+                                        CompressCache compressCache,
+                                        Object[] arguments,
+                                        Object returnValue) {
+
         DownloadOptions.Builder builder = DownloadOptions.builder();
         if (returnValue instanceof DownloadOptions) {
             return (DownloadOptions) returnValue;
         } else {
             if (returnValue == null) {
-                builder.source(annotation.source());
+                builder.source(download.source());
             } else {
                 builder.source(returnValue);
             }
         }
 
-        return builder
-                .sourceCacheEnabled(annotation.sourceCacheEnabled())
-                .sourceCacheGroup(annotation.sourceCacheGroup())
-                .deleteSourceCache(annotation.deleteSourceCache())
-                .filename(annotation.filename())
-                .contentType(annotation.contentType())
-                .compressFormat(annotation.compressFormat())
-                .compressOnSingle(annotation.compressOnSingle())
-                //.compressKeepStruct(annotation.compressKeepStruct())
-                .compressCacheEnabled(annotation.compressCacheEnabled())
-                .compressCacheGroup(annotation.compressCacheGroup())
-                .compressCacheName(annotation.compressCacheName())
-                .deleteCompressCache(annotation.deleteCompressCache())
-                .charset(toCharset(annotation.charset()))
-                .headers(toHeaders(annotation.headers()))
-                .extra(annotation.extra())
-                .args(arguments)
-                .build();
+        builder.args(arguments);
+
+        builder.filename(download.filename())
+                .contentType(download.contentType())
+                .compressFormat(download.compressFormat())
+                .forceCompress(download.forceCompress())
+                .charset(toCharset(download.charset()))
+                .headers(toHeaders(download.headers()))
+                .extra(download.extra());
+
+        if (sourceCache == null) {
+
+        } else {
+            builder.sourceCacheEnabled(sourceCache.enabled())
+                    .sourceCacheGroup(sourceCache.group())
+                    .sourceCacheDelete(sourceCache.delete());
+        }
+
+        if (compressCache == null) {
+
+        } else {
+            builder.compressCacheEnabled(compressCache.enabled())
+                    .compressCacheGroup(compressCache.group())
+                    .compressCacheName(compressCache.name())
+                    .compressCacheDelete(compressCache.delete());
+        }
+
+        return builder.build();
     }
 
     private Charset toCharset(String charset) {

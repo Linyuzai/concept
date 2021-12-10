@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.autoconfigure;
 
+import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptProperties;
 import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
 import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
@@ -28,12 +29,14 @@ import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory
 import com.github.linyuzai.download.core.source.direct.DirectSourceFactory;
 import com.github.linyuzai.download.core.writer.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
 @Configuration
+@EnableConfigurationProperties(DownloadConceptProperties.class)
 public class DownloadConceptAutoConfiguration {
 
     //private static final Log logger = LogFactory.getLog(DownloadConceptAutoConfiguration.class);

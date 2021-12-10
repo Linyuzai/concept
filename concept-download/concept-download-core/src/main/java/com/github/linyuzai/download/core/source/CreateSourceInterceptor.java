@@ -38,7 +38,7 @@ public class CreateSourceInterceptor implements DownloadInterceptor, DownloadCon
 
     @Override
     public void destroy(DownloadContext context) {
-        boolean delete = context.getOptions().isDeleteSourceCache();
+        boolean delete = context.getOptions().isSourceCacheDelete();
         if (delete) {
             Source source = context.get(Source.class);
             if (source != null) {

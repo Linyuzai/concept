@@ -27,6 +27,6 @@ public class DefaultDownloadWriterAdapter implements DownloadWriterAdapter {
                 return writer;
             }
         }
-        throw new DownloadException("No SourceWriter support: " + downloadable);
+        throw new DownloadException("No DownloadWriter support: " + downloadable);
     }
 }

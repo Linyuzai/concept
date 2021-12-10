@@ -34,7 +34,7 @@ public class DownloadOptions {
      */
     String sourceCacheGroup;
 
-    boolean deleteSourceCache;
+    boolean sourceCacheDelete;
 
     /**
      * 下载显示的文件名称，在浏览器上下载下来显示的名称
@@ -57,7 +57,7 @@ public class DownloadOptions {
      * 当只有一个数据源是否跳过，不进行压缩
      * 单个文件目录也会压缩
      */
-    boolean compressOnSingle;
+    boolean forceCompress;
 
     /**
      * 压缩目录时是否保持之前的结构
@@ -86,7 +86,7 @@ public class DownloadOptions {
      * 是否删除压缩文件
      * 如果压缩文件每次的内容都不一样需要删除，防止存在缓存而不会再次压缩
      */
-    boolean deleteCompressCache;
+    boolean compressCacheDelete;
 
     /**
      * 如果指定了编码，会使用字符流的方式读写
