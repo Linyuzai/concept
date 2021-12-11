@@ -1,8 +1,5 @@
 package com.github.linyuzai.download.aop.annotation;
 
-import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.contenttype.ContentType;
-
 import java.lang.annotation.*;
 
 @Target(ElementType.METHOD)
@@ -20,22 +17,17 @@ public @interface Download {
     /**
      * Content-Type Header
      */
-    String contentType() default ContentType.OCTET_STREAM;
+    String contentType() default "";
 
     /**
      * 压缩格式
      */
-    String compressFormat() default CompressFormat.ZIP;
+    String compressFormat() default "";
 
     /**
      *
      */
     boolean forceCompress() default false;
-
-    /**
-     * 压缩目录时是否保持之前的结构
-     */
-    //boolean compressKeepStruct() default true;
 
     String charset() default "";
 

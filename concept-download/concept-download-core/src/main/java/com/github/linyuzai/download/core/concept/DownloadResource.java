@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 
 @Getter
 @Setter
-public abstract class DownloadMetadata implements Downloadable {
+public abstract class DownloadResource implements Downloadable {
 
     private String name;
 
