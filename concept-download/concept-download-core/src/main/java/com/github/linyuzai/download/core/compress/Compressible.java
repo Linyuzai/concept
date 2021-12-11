@@ -4,5 +4,4 @@ import com.github.linyuzai.download.core.concept.Downloadable;
 
 public interface Compressible extends Downloadable {
 
-    String NAME = "compress";
 }

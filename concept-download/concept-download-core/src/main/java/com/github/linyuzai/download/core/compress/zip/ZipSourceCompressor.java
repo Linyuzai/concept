@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -33,7 +34,7 @@ public class ZipSourceCompressor implements SourceCompressor {
             if (source.isSingle()) {
                 finalCacheName = source.getName();
             } else {
-                finalCacheName = Compressible.NAME + CompressFormat.ZIP_SUFFIX;
+                finalCacheName = getDefaultName(context) + CompressFormat.ZIP_SUFFIX;
             }
         } else {
             if (cacheName.endsWith(CompressFormat.ZIP_SUFFIX)) {
@@ -68,5 +69,10 @@ public class ZipSourceCompressor implements SourceCompressor {
         } else {
             return new ZipMemoryCompressible(source, finalCacheName);
         }
+    }
+
+    private String getDefaultName(DownloadContext context) {
+        Method method = context.getOptions().getDownloadMethod().getMethod();
+        return method.getDeclaringClass().getSimpleName() + "_" + method.getName();
     }
 }

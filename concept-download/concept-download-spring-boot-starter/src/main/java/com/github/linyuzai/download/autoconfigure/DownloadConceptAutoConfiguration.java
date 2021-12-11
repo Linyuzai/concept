@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptProperties;
-import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
 import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
@@ -9,6 +8,8 @@ import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
+import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
+import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
 import com.github.linyuzai.download.core.loader.SourceLoader;
@@ -139,9 +140,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CompressSourceInterceptor compressSourceInterceptor(SourceCompressorAdapter adapter,
-                                                                       DownloadCacheLocation cacheLocation) {
-        return new CompressSourceInterceptor(adapter, cacheLocation);
+    public CompressSourceInterceptor compressSourceInterceptor(SourceCompressorAdapter adapter) {
+        return new CompressSourceInterceptor(adapter);
     }
 
     @Bean
@@ -160,7 +160,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DownloadConcept downloadConcept(DownloadContextFactory factory, List<DownloadInterceptor> interceptors) {
-        return new ChainDownloadConcept(factory, interceptors);
+    public DownloadConcept downloadConcept(DownloadConfiguration configuration, List<DownloadConfigurer> configurers,
+                                           DownloadContextFactory factory, List<DownloadInterceptor> interceptors) {
+        return new ChainDownloadConcept(configuration, configurers, factory, interceptors);
     }
 }

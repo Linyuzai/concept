@@ -14,8 +14,8 @@ public class ServletDownloadRequestProvider implements DownloadRequestProvider {
     @Override
     public DownloadRequest getRequest(DownloadContext context) {
         Object req = context.getOptions().getRequest();
-        Object[] args = (Object[]) context.getOptions().getArgs();
-        HttpServletRequest request = getHttpServletRequest(req, args);
+        Object[] parameters =  context.getOptions().getDownloadMethod().getParameters();
+        HttpServletRequest request = getHttpServletRequest(req, parameters);
         if (request == null) {
             throw new NullPointerException("HttpServletRequest not found");
         } else {
@@ -23,13 +23,13 @@ public class ServletDownloadRequestProvider implements DownloadRequestProvider {
         }
     }
 
-    protected HttpServletRequest getHttpServletRequest(Object request, Object[] args) {
+    protected HttpServletRequest getHttpServletRequest(Object request, Object[] parameters) {
         if (request instanceof HttpServletRequest) {
             return (HttpServletRequest) request;
         }
-        for (Object arg : args) {
-            if (arg instanceof HttpServletRequest) {
-                return (HttpServletRequest) arg;
+        for (Object parameter : parameters) {
+            if (parameter instanceof HttpServletRequest) {
+                return (HttpServletRequest) parameter;
             }
         }
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();

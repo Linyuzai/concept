@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.okhttp;
 
-import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
@@ -9,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
-import java.io.File;
 import java.nio.charset.Charset;
 
 @Getter
@@ -21,10 +19,8 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
 
     private OkHttpClient client;
 
-    private DownloadCacheLocation cacheLocation;
-
-    public OkHttpSourceFactory(DownloadCacheLocation cacheLocation) {
-        this(new OkHttpClient(), cacheLocation);
+    public OkHttpSourceFactory() {
+        this(new OkHttpClient());
     }
 
     @Override
@@ -32,16 +28,14 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
         String url = (String) source;
         Charset charset = context.getOptions().getCharset();
         boolean cacheEnabled = context.getOptions().isSourceCacheEnabled();
-        String path = cacheLocation.getPath();
-        String group = context.getOptions().getSourceCacheGroup();
-        File cacheDir = (group == null || group.isEmpty()) ? new File(path) : new File(path, group);
+        String cachePath = context.getOptions().getSourceCachePath();
         return new OkHttpSource.Builder()
                 .client(client)
                 .url(url)
                 .asyncLoad(true)
                 .charset(charset)
                 .cacheEnabled(cacheEnabled)
-                .cachePath(cacheDir.getAbsolutePath())
+                .cachePath(cachePath)
                 .build();
     }
 

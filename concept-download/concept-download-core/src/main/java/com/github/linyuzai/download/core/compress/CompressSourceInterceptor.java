@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.core.compress;
 
-import com.github.linyuzai.download.core.cache.DownloadCacheLocation;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
@@ -11,7 +10,6 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 
-import java.io.File;
 import java.io.IOException;
 
 @AllArgsConstructor
@@ -19,15 +17,13 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
 
     private SourceCompressorAdapter sourceCompressorAdapter;
 
-    private DownloadCacheLocation cacheLocation;
-
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         Source source = context.get(Source.class);
         Compressible compressibleSource;
         boolean single = source.isSingle();
-        boolean compressOnSingle = context.getOptions().isCompressOnSingle();
-        if (single && !compressOnSingle) {
+        boolean forceCompress = context.getOptions().isForceCompress();
+        if (single && !forceCompress) {
             compressibleSource = new Uncompressed(source);
         } else {
             String compressFormat = context.getOptions().getCompressFormat();
@@ -35,13 +31,10 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
                     CompressFormat.ZIP : compressFormat;
             SourceCompressor compressor =
                     sourceCompressorAdapter.getCompressor(finalFormat, context);
-            String path = cacheLocation.getPath();
-            String group = context.getOptions().getCompressCacheGroup();
-            File cacheDir = (group == null || group.isEmpty()) ? new File(path) : new File(path, group);
+            String cachePath = context.getOptions().getCompressCachePath();
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, null, context);
-            compressibleSource = compressor
-                    .compress(source, writer, cacheDir.getAbsolutePath(), context);
+            compressibleSource = compressor.compress(source, writer, cachePath, context);
         }
         context.set(Compressible.class, compressibleSource);
         chain.next(context);

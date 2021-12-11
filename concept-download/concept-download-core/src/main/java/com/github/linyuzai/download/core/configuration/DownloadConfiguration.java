@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.configuration;
 
+import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.Compressible;
 import com.github.linyuzai.download.core.contenttype.ContentType;
@@ -26,7 +27,7 @@ public class DownloadConfiguration {
 
             private boolean enabled;
 
-            private String group;
+            private String path = Cacheable.PATH;
 
             private boolean delete;
         }
@@ -44,9 +45,7 @@ public class DownloadConfiguration {
 
             private boolean enabled;
 
-            private String group;
-
-            private String name = Compressible.NAME;
+            private String path = Cacheable.PATH;
 
             boolean delete;
         }

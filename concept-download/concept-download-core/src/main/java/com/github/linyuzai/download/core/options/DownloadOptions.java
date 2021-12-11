@@ -1,8 +1,6 @@
 package com.github.linyuzai.download.core.options;
 
-import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.compress.Compressible;
-import com.github.linyuzai.download.core.contenttype.ContentType;
+import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import lombok.Builder;
 import lombok.Value;
 
@@ -23,8 +21,7 @@ public class DownloadOptions {
      * 主要用于一些需要网络IO操作，如http等数据源的缓存
      * 本地文件没有缓存的概念，或者说文件本身就是缓存
      */
-    @lombok.Builder.Default
-    boolean sourceCacheEnabled = true;
+    boolean sourceCacheEnabled;
 
     /**
      * 原始数据对象的缓存目录分组
@@ -32,7 +29,7 @@ public class DownloadOptions {
      * 则最终缓存文件会存储在/home/download/cache/images目录下
      * 方便根据不同业务指定不同的缓存文件夹，防止文件重名等问题
      */
-    String sourceCacheGroup;
+    String sourceCachePath;
 
     boolean sourceCacheDelete;
 
@@ -44,14 +41,12 @@ public class DownloadOptions {
     /**
      * Content-Type Header
      */
-    @lombok.Builder.Default
-    String contentType = ContentType.OCTET_STREAM;
+    String contentType;
 
     /**
      * 压缩格式
      */
-    @lombok.Builder.Default
-    String compressFormat = CompressFormat.ZIP;
+    String compressFormat;
 
     /**
      * 当只有一个数据源是否跳过，不进行压缩
@@ -60,27 +55,20 @@ public class DownloadOptions {
     boolean forceCompress;
 
     /**
-     * 压缩目录时是否保持之前的结构
-     */
-    //boolean compressKeepStruct;
-
-    /**
      * 是否开启压缩文件缓存
      * 开启后，将会先在本地生成一个压缩文件
      * 否则，讲直接写入输出流
      * 如果文件小可以不开启
      */
-    @lombok.Builder.Default
-    boolean compressCacheEnabled = true;
+    boolean compressCacheEnabled;
 
     /**
      * 压缩文件的缓存目录分组
-     * 同 {@link DownloadOptions#sourceCacheGroup}
+     * 同 {@link DownloadOptions#sourceCachePath}
      */
-    String compressCacheGroup;
+    String compressCachePath;
 
-    @lombok.Builder.Default
-    String compressCacheName = Compressible.NAME;
+    String compressCacheName;
 
     /**
      * 是否删除压缩文件
@@ -110,8 +98,19 @@ public class DownloadOptions {
      */
     Object extra;
 
-    /**
-     * 内部使用参数，自定义数据请使用 {@link DownloadOptions#extra}
-     */
-    Object args;
+    DownloadMethod downloadMethod;
+
+    public static DownloadOptions from(DownloadConfiguration configuration) {
+        return new DownloadOptions.Builder()
+                .contentType(configuration.getResponse().getContentType())
+                .headers(configuration.getResponse().getHeaders())
+                .sourceCacheEnabled(configuration.getSource().getCache().isEnabled())
+                .sourceCachePath(configuration.getSource().getCache().getPath())
+                .sourceCacheDelete(configuration.getSource().getCache().isDelete())
+                .compressFormat(configuration.getCompress().getFormat())
+                .compressCacheEnabled(configuration.getCompress().getCache().isEnabled())
+                .compressCachePath(configuration.getCompress().getCache().getPath())
+                .compressCacheDelete(configuration.getCompress().getCache().isDelete())
+                .build();
+    }
 }
