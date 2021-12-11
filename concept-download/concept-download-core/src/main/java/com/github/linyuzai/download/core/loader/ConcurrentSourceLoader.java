@@ -11,9 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-@AllArgsConstructor
 @NoArgsConstructor
 public abstract class ConcurrentSourceLoader extends ParallelSourceLoader {
+
+    public ConcurrentSourceLoader(boolean serialOnSingle) {
+        super(serialOnSingle);
+    }
 
     @Override
     public void parallelLoad(Collection<Source> sources, DownloadContext context) {
