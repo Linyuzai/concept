@@ -71,7 +71,7 @@ public class DownloadConceptAdvice implements MethodInterceptor {
                 .extra(download.extra());
 
         if (sourceCache == null) {
-            DownloadConfiguration.SourceConfiguration.CacheConfiguration cache =
+            DownloadConfiguration.CacheConfiguration cache =
                     configuration.getSource().getCache();
             builder.sourceCacheEnabled(cache.isEnabled())
                     .sourceCachePath(cache.getPath())
@@ -83,7 +83,7 @@ public class DownloadConceptAdvice implements MethodInterceptor {
         }
 
         if (compressCache == null) {
-            DownloadConfiguration.CompressConfiguration.CacheConfiguration cache =
+            DownloadConfiguration.CacheConfiguration cache =
                     configuration.getCompress().getCache();
             builder.compressCacheEnabled(cache.isEnabled())
                     .compressCachePath(cache.getPath())

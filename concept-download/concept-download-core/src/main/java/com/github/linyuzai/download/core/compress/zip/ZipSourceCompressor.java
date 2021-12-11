@@ -29,18 +29,18 @@ public class ZipSourceCompressor implements SourceCompressor {
     public Compressible compress(Source source, DownloadWriter writer, String cachePath, DownloadContext context) throws IOException {
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
         String cacheName = context.getOptions().getCompressCacheName();
-        String finalCacheName;
+        String cacheNameToUse;
         if (cacheName == null || cacheName.isEmpty()) {
             if (source.isSingle()) {
-                finalCacheName = source.getName();
+                cacheNameToUse = source.getName();
             } else {
-                finalCacheName = getDefaultName(context) + CompressFormat.ZIP_SUFFIX;
+                cacheNameToUse = getDefaultName(context) + CompressFormat.ZIP_SUFFIX;
             }
         } else {
             if (cacheName.endsWith(CompressFormat.ZIP_SUFFIX)) {
-                finalCacheName = cacheName;
+                cacheNameToUse = cacheName;
             } else {
-                finalCacheName = cacheName + CompressFormat.ZIP_SUFFIX;
+                cacheNameToUse = cacheName + CompressFormat.ZIP_SUFFIX;
             }
         }
         if (cacheEnable) {
@@ -48,7 +48,7 @@ public class ZipSourceCompressor implements SourceCompressor {
             if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
             }
-            File file = new File(dir, finalCacheName);
+            File file = new File(dir, cacheNameToUse);
             if (file.exists()) {
                 return new ZipFileCompressible(file);
             }
@@ -67,7 +67,7 @@ public class ZipSourceCompressor implements SourceCompressor {
             }
             return new ZipFileCompressible(file);
         } else {
-            return new ZipMemoryCompressible(source, finalCacheName);
+            return new ZipMemoryCompressible(source, cacheNameToUse);
         }
     }
 

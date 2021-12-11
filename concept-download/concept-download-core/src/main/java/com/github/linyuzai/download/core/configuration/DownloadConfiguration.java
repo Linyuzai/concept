@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.configuration;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.compress.Compressible;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.Data;
 
@@ -18,19 +17,17 @@ public class DownloadConfiguration {
     private CompressConfiguration compress = new CompressConfiguration();
 
     @Data
+    public static class ResponseConfiguration {
+
+        private String contentType = ContentType.OCTET_STREAM;
+
+        private Map<String, String> headers;
+    }
+
+    @Data
     public static class SourceConfiguration {
 
         private CacheConfiguration cache = new CacheConfiguration();
-
-        @Data
-        public static class CacheConfiguration {
-
-            private boolean enabled;
-
-            private String path = Cacheable.PATH;
-
-            private boolean delete;
-        }
     }
 
     @Data
@@ -39,23 +36,15 @@ public class DownloadConfiguration {
         private String format = CompressFormat.ZIP;
 
         private CacheConfiguration cache = new CacheConfiguration();
-
-        @Data
-        public static class CacheConfiguration {
-
-            private boolean enabled;
-
-            private String path = Cacheable.PATH;
-
-            boolean delete;
-        }
     }
 
     @Data
-    public static class ResponseConfiguration {
+    public static class CacheConfiguration {
 
-        private String contentType = ContentType.OCTET_STREAM;
+        private boolean enabled;
 
-        private Map<String, String> headers;
+        private String path = Cacheable.PATH;
+
+        private boolean delete;
     }
 }

@@ -27,10 +27,10 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
             compressibleSource = new Uncompressed(source);
         } else {
             String compressFormat = context.getOptions().getCompressFormat();
-            String finalFormat = (compressFormat == null || compressFormat.isEmpty()) ?
+            String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
                     CompressFormat.ZIP : compressFormat;
             SourceCompressor compressor =
-                    sourceCompressorAdapter.getCompressor(finalFormat, context);
+                    sourceCompressorAdapter.getCompressor(formatToUse, context);
             String cachePath = context.getOptions().getCompressCachePath();
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, null, context);

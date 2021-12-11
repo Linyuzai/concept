@@ -44,6 +44,22 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public DownloadConfiguration downloadConfiguration(DownloadConceptProperties properties) {
+        DownloadConfiguration configuration = new DownloadConfiguration();
+        configuration.getResponse().setContentType(properties.getResponse().getContentType());
+        configuration.getResponse().setHeaders(properties.getResponse().getHeaders());
+        configuration.getSource().getCache().setEnabled(properties.getSource().getCache().isEnabled());
+        configuration.getSource().getCache().setPath(properties.getSource().getCache().getPath());
+        configuration.getSource().getCache().setDelete(properties.getSource().getCache().isDelete());
+        configuration.getCompress().setFormat(properties.getCompress().getFormat());
+        configuration.getCompress().getCache().setEnabled(properties.getCompress().getCache().isEnabled());
+        configuration.getCompress().getCache().setPath(properties.getCompress().getCache().getPath());
+        configuration.getCompress().getCache().setDelete(properties.getCompress().getCache().isDelete());
+        return configuration;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public DownloadContextFactory downloadContextFactory() {
         return new DefaultDownloadContextFactory();
     }
@@ -162,6 +178,7 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadConcept downloadConcept(DownloadConfiguration configuration, List<DownloadConfigurer> configurers,
                                            DownloadContextFactory factory, List<DownloadInterceptor> interceptors) {
-        return new ChainDownloadConcept(configuration, configurers, factory, interceptors);
+        configurers.forEach(it -> it.configure(configuration));
+        return new ChainDownloadConcept(configuration, factory, interceptors);
     }
 }

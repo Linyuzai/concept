@@ -30,16 +30,6 @@ public class DownloadConceptProperties {
     public static class SourceProperties {
 
         private CacheProperties cache = new CacheProperties();
-
-        @Data
-        public static class CacheProperties {
-
-            private boolean enabled;
-
-            private String path = Cacheable.PATH;
-
-            private boolean delete;
-        }
     }
 
     @Data
@@ -48,15 +38,15 @@ public class DownloadConceptProperties {
         private String format = CompressFormat.ZIP;
 
         private CacheProperties cache = new CacheProperties();
+    }
 
-        @Data
-        public static class CacheProperties {
+    @Data
+    public static class CacheProperties {
 
-            private boolean enabled;
+        private boolean enabled;
 
-            private String path = Cacheable.PATH;
+        private String path = Cacheable.PATH;
 
-            boolean delete;
-        }
+        private boolean delete;
     }
 }
