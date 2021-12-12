@@ -22,6 +22,9 @@ repositories {
 dependencies {
     implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-aop', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-source-classpath', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-source-okhttp', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-loader-coroutines', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-web-servlet', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
