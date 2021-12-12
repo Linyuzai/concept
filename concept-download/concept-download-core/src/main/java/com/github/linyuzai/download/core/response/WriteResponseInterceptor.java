@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.response;
 
+import com.github.linyuzai.download.core.compress.Compressible;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
@@ -28,10 +29,10 @@ public class WriteResponseInterceptor implements DownloadInterceptor, DownloadCo
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         DownloadResponse response = context.get(DownloadResponse.class);
-        Downloadable downloadable = context.get(Downloadable.class);
+        Compressible compressible = context.get(Compressible.class);
         String filename = context.getOptions().getFilename();
         if (filename == null || filename.isEmpty()) {
-            response.setFilename(downloadable.getName());
+            response.setFilename(compressible.getName());
         } else {
             response.setFilename(filename);
         }
@@ -46,8 +47,8 @@ public class WriteResponseInterceptor implements DownloadInterceptor, DownloadCo
             response.setHeaders(headers);
         }
         Range range = context.get(Range.class);
-        DownloadWriter writer = downloadWriterAdapter.getWriter(downloadable, range, context);
-        downloadable.write(response.getOutputStream(), range, writer);
+        DownloadWriter writer = downloadWriterAdapter.getWriter(compressible, range, context);
+        compressible.write(response.getOutputStream(), range, writer);
         chain.next(context);
     }
 

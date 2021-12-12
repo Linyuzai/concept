@@ -1,15 +1,16 @@
-package com.github.linyuzai.download.core.compress.zip;
+package com.github.linyuzai.download.core.compress;
 
-import com.github.linyuzai.download.core.compress.Compressed;
-import com.github.linyuzai.download.core.source.file.FileSource;
 import com.github.linyuzai.download.core.range.Range;
+import com.github.linyuzai.download.core.source.file.FileSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 @AllArgsConstructor
-public class ZipFileCompressible extends Compressed {
+public class LocalFileCompressed extends Compressed {
 
     private final File file;
 
@@ -19,18 +20,8 @@ public class ZipFileCompressible extends Compressed {
     }
 
     @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
     public long getLength() {
         return file.length();
-    }
-
-    @Override
-    public void setLength(long length) {
-
     }
 
     @Override
@@ -39,18 +30,8 @@ public class ZipFileCompressible extends Compressed {
     }
 
     @Override
-    public void setCacheEnabled(boolean cacheEnabled) {
-
-    }
-
-    @Override
     public String getCachePath() {
         return file.getParent();
-    }
-
-    @Override
-    public void setCachePath(String cachePath) {
-
     }
 
     @Override
