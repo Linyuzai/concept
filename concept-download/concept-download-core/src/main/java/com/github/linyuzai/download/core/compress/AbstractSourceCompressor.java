@@ -21,14 +21,14 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
             if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
             }
-            File file = new File(dir, cacheName);
-            if (file.exists()) {
-                return new LocalFileCompressed(file);
+            File cache = new File(dir, cacheName);
+            if (cache.exists()) {
+                return new LocalFileCompressed(cache);
             }
 
-            FileOutputStream fos = new FileOutputStream(file);
+            FileOutputStream fos = new FileOutputStream(cache);
             doCompress(source, fos, writer);
-            return new LocalFileCompressed(file);
+            return new LocalFileCompressed(cache);
         } else {
             InMemoryCompressed compressed = new InMemoryCompressed(source, writer, this);
             compressed.setName(cacheName);

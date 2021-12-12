@@ -2,10 +2,7 @@ package com.github.linyuzai.download.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.source.AbstractSource;
-import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.loader.AbstractLoadableSource;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -14,15 +11,11 @@ import okhttp3.ResponseBody;
 import java.io.*;
 import java.nio.charset.Charset;
 
-public class OkHttpSource extends AbstractSource {
+public class OkHttpSource extends AbstractLoadableSource {
 
     private final OkHttpClient client;
 
     private final String url;
-
-    private ResponseBody body;
-
-    private File cache;
 
     public OkHttpSource(OkHttpClient client, String url,
                         String name, Charset charset,
@@ -43,11 +36,7 @@ public class OkHttpSource extends AbstractSource {
 
     @Override
     public long getLength() {
-        if (cache != null) {
-            return cache.length();
-        } else {
-            return body == null ? 0L : body.contentLength();
-        }
+        return 0;
     }
 
     @Override
@@ -56,83 +45,16 @@ public class OkHttpSource extends AbstractSource {
     }
 
     @Override
-    public void load(DownloadContext context) throws IOException {
+    public InputStream doLoad(DownloadContext context) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
         Response response = client.newCall(request).execute();
-        body = response.body();
-        if (isCacheEnabled()) {
-            String cachePath = getCachePath();
-            if (cachePath == null) {
-                throw new DownloadException("Cache path is null");
-            }
-            File dir = new File(cachePath);
-            if (!dir.exists()) {
-                boolean mkdirs = dir.mkdirs();
-            }
-            cache = new File(dir, getName());
-            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-            try (InputStream is = body.byteStream();
-                 FileOutputStream fos = new FileOutputStream(cache)) {
-                writer.write(is, fos, null, getCharset(), getLength());
-            }
+        ResponseBody body = response.body();
+        if (body == null) {
+            throw new DownloadException("Body is null");
         }
-    }
-
-    @Override
-    public void deleteCache() {
-        if (cache != null) {
-            boolean delete = cache.delete();
-        }
-    }
-
-    @Override
-    public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
-        InputStream inputStream;
-        if (isCacheEnabled()) {
-            if (cache == null) {
-                return;
-            }
-            inputStream = new FileInputStream(cache);
-        } else {
-            if (body == null) {
-                return;
-            }
-            inputStream = body.byteStream();
-        }
-
-        try (InputStream is = inputStream) {
-            Part part = new Part() {
-
-                @Override
-                public InputStream getInputStream() throws IOException {
-                    return is;
-                }
-
-                @Override
-                public String getName() {
-                    return OkHttpSource.this.getName();
-                }
-
-                @Override
-                public String getPath() {
-                    return OkHttpSource.this.getName();
-                }
-
-                @Override
-                public Charset getCharset() {
-                    return OkHttpSource.this.getCharset();
-                }
-
-                @Override
-                public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), OkHttpSource.this.getLength());
-                }
-            };
-            handler.handle(part);
-        }
+        return body.byteStream();
     }
 
     public static class Builder {
