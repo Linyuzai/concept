@@ -19,10 +19,6 @@ public abstract class ParallelSourceLoader implements SourceLoader {
     @Override
     public void load(Source source, DownloadContext context) throws IOException {
         Collection<Source> sources = source.flatten();
-        if (sources.size() <= 1 && serialOnSingle) {
-            source.load(context);
-            return;
-        }
         Collection<Source> parallelSources = new ArrayList<>();
         Collection<Source> serialSources = new ArrayList<>();
         for (Source s : sources) {
@@ -33,7 +29,13 @@ public abstract class ParallelSourceLoader implements SourceLoader {
             }
         }
         if (!parallelSources.isEmpty()) {
-            parallelLoad(parallelSources, context);
+            if (parallelSources.size() == 1 && serialOnSingle) {
+                for (Source parallelSource : parallelSources) {
+                    parallelSource.load(context);
+                }
+            } else {
+                parallelLoad(parallelSources, context);
+            }
         }
         if (!serialSources.isEmpty()) {
             for (Source serialSource : serialSources) {
