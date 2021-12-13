@@ -8,6 +8,10 @@ public interface Cacheable {
 
     boolean isCacheEnabled();
 
+    default boolean isCacheExisted() {
+        return true;
+    }
+
     String getCachePath();
 
     default void deleteCache() {

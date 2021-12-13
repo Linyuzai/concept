@@ -139,10 +139,18 @@ public class DownloadConceptAdvice implements MethodInterceptor {
     }
 
     private String buildSourceCachePath(SourceCache cache, DownloadConfiguration configuration) {
-        return new File(configuration.getSource().getCache().getPath(), cache.group()).getAbsolutePath();
+        if (cache.group().isEmpty()) {
+            return configuration.getSource().getCache().getPath();
+        } else {
+            return new File(configuration.getSource().getCache().getPath(), cache.group()).getAbsolutePath();
+        }
     }
 
     private String buildCompressPath(CompressCache cache, DownloadConfiguration configuration) {
-        return new File(configuration.getCompress().getCache().getPath(), cache.group()).getAbsolutePath();
+        if (cache.group().isEmpty()) {
+            return configuration.getCompress().getCache().getPath();
+        } else {
+            return new File(configuration.getCompress().getCache().getPath(), cache.group()).getAbsolutePath();
+        }
     }
 }

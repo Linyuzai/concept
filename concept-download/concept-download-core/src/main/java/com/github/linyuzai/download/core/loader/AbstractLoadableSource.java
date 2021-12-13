@@ -16,9 +16,20 @@ import java.nio.charset.Charset;
 @Setter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
-    private boolean asyncLoad;
-
     private InputStream inputStream;
+
+    public boolean isAsyncLoad() {
+        boolean asyncLoad = super.isAsyncLoad();
+        if (asyncLoad && isCacheEnabled() && isCacheExisted()) {
+            return false;
+        }
+        return asyncLoad;
+    }
+
+    @Override
+    public boolean isCacheExisted() {
+        return new File(getCachePath(), getName()).exists();
+    }
 
     @Override
     public void load(DownloadContext context) throws IOException {

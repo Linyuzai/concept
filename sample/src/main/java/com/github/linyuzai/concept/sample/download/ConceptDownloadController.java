@@ -16,76 +16,76 @@ import java.util.List;
 @RequestMapping("/concept-download")
 public class ConceptDownloadController {
 
-    @Download(source = "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt")
+    @Download(source = "file:/Users/Shared/README.txt")
     @GetMapping("/s1")
     public void s1() {
-
     }
 
     @Download
     @GetMapping("/s2")
     public String s2() {
-        return "file:/Users/tanghanzheng/Downloads/java虚拟机3/README.txt";
+        return "file:/Users/Shared/README.txt";
     }
 
     @Download
     @GetMapping("/s3")
     public File s3() {
-        return new File("/Users/tanghanzheng/Downloads/java虚拟机3/README.txt");
+        return new File("/Users/Shared/README.txt");
     }
 
-    @Download(source = "user.home:/Downloads/java虚拟机3/README.txt")
+    @Download(source = "user.home:/Public/README.txt")
     @GetMapping("/s4")
     public void s4() {
-
     }
 
     @Download
     @GetMapping("/s5")
     public String s5() {
-        return "user.home:/Downloads/java虚拟机3/README.txt";
+        return "user.home:/Public/README.txt";
     }
 
-    @Download(source = "classpath:/Downloads/java虚拟机3/README.txt")
+    @Download(source = "classpath:/download/README.txt")
     @GetMapping("/s6")
     public void s6() {
-
     }
 
     @Download
     @GetMapping("/s7")
     public String s7() {
-        return "classpath:/Downloads/java虚拟机3/README.txt";
+        return "classpath:/download/README.txt";
     }
 
     @Download
     @GetMapping("/s8")
     public ClassPathResource s8() {
-        return new ClassPathResource("");
+        return new ClassPathResource("/download/README.txt");
     }
 
-    @Download(source = "http://127.0.0.1:8080")
+    @Download(source = "http://127.0.0.1:8080/concept-download/README.txt")
     @GetMapping("/s9")
     public void s9() {
-
     }
 
     @Download
     @GetMapping("/s10")
     public String s10() {
-        return "http://127.0.0.1:8080";
+        return "http://127.0.0.1:8080/concept-download/README.txt";
     }
 
-    @Download(source = "classpath:/aa", filename = "aa", charset = "GBK", forceCompress = true)
+    @Download(source = "classpath:/download/README_GBK.txt",
+            filename = "readme.txt",
+            charset = "GBK",
+            forceCompress = true)
     @GetMapping("/s11")
     public void s11() {
-
     }
 
-    @Download(source = {"classpath:aaa", "http://127.0.0.1:8080"}, filename = "压缩包12.zip")
+    @Download(source = {
+            "classpath:/download/README.txt",
+            "http://127.0.0.1:8080/concept-download/README.txt"},
+            filename = "压缩包12.zip")
     @GetMapping("/s12")
     public void s12() {
-
     }
 
     @Download(filename = "压缩包13.zip")
@@ -111,5 +111,10 @@ public class ConceptDownloadController {
     @GetMapping("/s15")
     public String[] s15() {
         return new String[]{};
+    }
+
+    @Download(source = "classpath:/download/README.txt")
+    @GetMapping("/README.txt")
+    public void readme() {
     }
 }
