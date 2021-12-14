@@ -3,6 +3,8 @@ package com.github.linyuzai.concept.sample.download;
 import com.github.linyuzai.download.aop.annotation.CompressCache;
 import com.github.linyuzai.download.aop.annotation.Download;
 import com.github.linyuzai.download.aop.annotation.SourceCache;
+import com.github.linyuzai.download.core.options.DownloadOptions;
+import com.github.linyuzai.download.core.response.FileResponse;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -121,6 +123,14 @@ public class ConceptDownloadController {
                 "http://127.0.0.1:8080/concept-download/image.jpg",
                 "http://127.0.0.1:8080/concept-download/video.mp4"
         };
+    }
+
+    @Download(source = "classpath:/download/README.txt")
+    @GetMapping("/s17")
+    public DownloadOptions.Rewriter s17() {
+        return options -> options.toBuilder()
+                .response(new FileResponse(null))
+                .build();
     }
 
     @Download(source = "classpath:/download/text.txt", contentType = "text/plain")

@@ -54,12 +54,11 @@ public class DownloadConceptAdvice implements MethodInterceptor {
 
         if (returnValue instanceof DownloadOptions) {
             return (DownloadOptions) returnValue;
+        }
+        if (returnValue == null || returnValue instanceof DownloadOptions.Rewriter) {
+            builder.source(download.source());
         } else {
-            if (returnValue == null) {
-                builder.source(download.source());
-            } else {
-                builder.source(returnValue);
-            }
+            builder.source(returnValue);
         }
 
         builder.filename(download.filename())
@@ -95,7 +94,13 @@ public class DownloadConceptAdvice implements MethodInterceptor {
                     .compressCacheDelete(compressCache.delete());
         }
 
-        return builder.build();
+        DownloadOptions options = builder.build();
+
+        if (returnValue instanceof DownloadOptions.Rewriter) {
+            return ((DownloadOptions.Rewriter) returnValue).rewrite(options);
+        } else {
+            return options;
+        }
     }
 
     private String buildContentType(Download download, DownloadConfiguration configuration) {

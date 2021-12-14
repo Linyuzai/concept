@@ -12,9 +12,7 @@ import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
-import com.github.linyuzai.download.core.loader.SourceLoader;
-import com.github.linyuzai.download.core.loader.LoadSourceInterceptor;
-import com.github.linyuzai.download.core.loader.SerialSourceLoader;
+import com.github.linyuzai.download.core.loader.*;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
@@ -150,8 +148,14 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadSourceInterceptor loadSourceInterceptor(SourceLoader loader) {
-        return new LoadSourceInterceptor(loader);
+    public LoadExceptionHandler loadExceptionHandler() {
+        return new RethrowLoadedExceptionHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LoadSourceInterceptor loadSourceInterceptor(SourceLoader loader, LoadExceptionHandler handler) {
+        return new LoadSourceInterceptor(loader, handler);
     }
 
     @Bean

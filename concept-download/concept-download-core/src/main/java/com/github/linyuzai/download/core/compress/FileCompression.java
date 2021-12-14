@@ -1,45 +1,47 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.source.file.FileSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 @AllArgsConstructor
-public class InMemoryCompressed extends Compressed {
+public class FileCompression extends AbstractCompression {
 
-    private final Source source;
-
-    private final DownloadWriter writer;
-
-    private final AbstractSourceCompressor compressor;
+    private final File file;
 
     @Override
-    public Charset getCharset() {
-        return null;
+    public String getName() {
+        return file.getName();
     }
 
     @Override
     public long getLength() {
-        return 0;
+        return file.length();
     }
 
     @Override
     public boolean isCacheEnabled() {
-        return false;
+        return true;
     }
 
     @Override
     public String getCachePath() {
-        return null;
+        return file.getParent();
     }
 
     @Override
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
-        compressor.doCompress(source, os, this.writer);
+        FileSource source = new FileSource.Builder().file(file).build();
+        source.write(os, range, writer, handler);
+    }
+
+    @Override
+    public void deleteCache() {
+        boolean delete = file.delete();
     }
 }

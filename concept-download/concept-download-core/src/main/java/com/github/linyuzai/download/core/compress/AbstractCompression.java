@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class Compressed extends DownloadResource implements Compressible {
+public abstract class AbstractCompression extends DownloadResource implements Compression {
 
 }

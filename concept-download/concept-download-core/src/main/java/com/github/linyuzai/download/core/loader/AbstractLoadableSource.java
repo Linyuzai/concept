@@ -58,7 +58,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 inputStream = doLoad(context);
             }
         } catch (Throwable e) {
-            SourceLoader.ExceptionHandler handler = context.get(SourceLoader.ExceptionHandler.class);
+            LoadExceptionHandler handler = context.get(LoadExceptionHandler.class);
             LoadSourceException exception = new LoadSourceException(this, e);
             handler.onLoading(exception);
             Collection<LoadSourceException> exceptions = context.get(LoadSourceException.class);

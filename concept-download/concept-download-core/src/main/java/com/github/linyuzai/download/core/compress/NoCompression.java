@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 @AllArgsConstructor
-public class Uncompressed extends Compressed {
+public class NoCompression extends AbstractCompression {
 
     private Source source;
 

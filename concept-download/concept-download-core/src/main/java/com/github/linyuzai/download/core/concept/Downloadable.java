@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.concept;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
+import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 
@@ -13,7 +14,7 @@ import java.nio.charset.Charset;
  * 可下载的对象 / An object can download
  *
  * @see com.github.linyuzai.download.core.source.Source
- * @see com.github.linyuzai.download.core.compress.Compressible
+ * @see Compression
  */
 public interface Downloadable extends Cacheable {
 

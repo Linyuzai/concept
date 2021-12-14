@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.source.inputstream;
 
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
-import com.github.linyuzai.download.core.source.file.FileSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 

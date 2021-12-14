@@ -10,10 +10,4 @@ public interface SourceLoader {
 
     void load(Source source, DownloadContext context) throws IOException;
 
-    interface ExceptionHandler {
-
-        void onLoading(LoadSourceException e);
-
-        void onLoaded(Collection<LoadSourceException> exceptions);
-    }
 }

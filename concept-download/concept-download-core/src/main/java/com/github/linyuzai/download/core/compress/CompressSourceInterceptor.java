@@ -20,11 +20,11 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         Source source = context.get(Source.class);
-        Compressible compressibleSource;
+        Compression compression;
         boolean single = source.isSingle();
         boolean forceCompress = context.getOptions().isForceCompress();
         if (single && !forceCompress) {
-            compressibleSource = new Uncompressed(source);
+            compression = new NoCompression(source);
         } else {
             String compressFormat = context.getOptions().getCompressFormat();
             String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
@@ -33,9 +33,9 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
             String cachePath = context.getOptions().getCompressCachePath();
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, null, context);
-            compressibleSource = compressor.compress(source, writer, cachePath, context);
+            compression = compressor.compress(source, writer, cachePath, context);
         }
-        context.set(Compressible.class, compressibleSource);
+        context.set(Compression.class, compression);
         chain.next(context);
     }
 
@@ -48,9 +48,9 @@ public class CompressSourceInterceptor implements DownloadInterceptor, DownloadC
     public void destroy(DownloadContext context) {
         boolean delete = context.getOptions().isCompressCacheDelete();
         if (delete) {
-            Compressible compressible = context.get(Compressible.class);
-            if (compressible != null) {
-                compressible.deleteCache();
+            Compression compression = context.get(Compression.class);
+            if (compression != null) {
+                compression.deleteCache();
             }
         }
     }

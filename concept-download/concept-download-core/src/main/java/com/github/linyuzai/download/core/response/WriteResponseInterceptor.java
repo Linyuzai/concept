@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.response;
 
-import com.github.linyuzai.download.core.compress.Compressible;
+import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
@@ -9,7 +9,6 @@ import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.request.DownloadRequest;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
-import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
@@ -29,10 +28,10 @@ public class WriteResponseInterceptor implements DownloadInterceptor, DownloadCo
     @Override
     public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
         DownloadResponse response = context.get(DownloadResponse.class);
-        Compressible compressible = context.get(Compressible.class);
+        Compression compression = context.get(Compression.class);
         String filename = context.getOptions().getFilename();
         if (filename == null || filename.isEmpty()) {
-            response.setFilename(compressible.getName());
+            response.setFilename(compression.getName());
         } else {
             response.setFilename(filename);
         }
@@ -47,8 +46,8 @@ public class WriteResponseInterceptor implements DownloadInterceptor, DownloadCo
             response.setHeaders(headers);
         }
         Range range = context.get(Range.class);
-        DownloadWriter writer = downloadWriterAdapter.getWriter(compressible, range, context);
-        compressible.write(response.getOutputStream(), range, writer);
+        DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
+        compression.write(response.getOutputStream(), range, writer);
         chain.next(context);
     }
 

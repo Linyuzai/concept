@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 @AllArgsConstructor
-public class LocalFileResponse implements DownloadResponse {
+public class FileResponse implements DownloadResponse {
 
     private File file;
 

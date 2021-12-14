@@ -113,4 +113,9 @@ public class DownloadOptions {
                 .compressCacheDelete(configuration.getCompress().getCache().isDelete())
                 .build();
     }
+
+    public interface Rewriter {
+
+        DownloadOptions rewrite(DownloadOptions options);
+    }
 }

@@ -29,8 +29,8 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @throws IOException
      */
     @Override
-    public Compressible compress(Source source, DownloadWriter writer, String cachePath, DownloadContext context) throws IOException {
-        Compressible result;
+    public Compression compress(Source source, DownloadWriter writer, String cachePath, DownloadContext context) throws IOException {
+        Compression result;
         String cacheName = getCacheName(source, context);
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
         if (cacheEnable) {
@@ -40,15 +40,15 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
             }
             File cache = new File(dir, cacheName);
             if (cache.exists()) {
-                result = new LocalFileCompressed(cache);
+                result = new FileCompression(cache);
             } else {
                 FileOutputStream fos = new FileOutputStream(cache);
                 doCompress(source, fos, writer);
-                result = new LocalFileCompressed(cache);
+                result = new FileCompression(cache);
             }
 
         } else {
-            InMemoryCompressed compressed = new InMemoryCompressed(source, writer, this);
+            MemoryCompression compressed = new MemoryCompression(source, writer, this);
             compressed.setName(cacheName);
             result = compressed;
         }
