@@ -8,7 +8,7 @@ import java.io.IOException;
 public class SerialSourceLoader implements SourceLoader {
 
     @Override
-    public void load(Source source, DownloadContext context) throws IOException {
+    public void load(Source source, DownloadContext context) {
         source.load(context);
     }
 }

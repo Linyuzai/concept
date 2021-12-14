@@ -4,8 +4,16 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public interface SourceLoader {
 
     void load(Source source, DownloadContext context) throws IOException;
+
+    interface ExceptionHandler {
+
+        void onLoading(LoadSourceException e);
+
+        void onLoaded(Collection<LoadSourceException> exceptions);
+    }
 }

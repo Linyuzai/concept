@@ -14,18 +14,35 @@ import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * 使用ZIP压缩的压缩器 / Compressor using zip compression
+ */
 @AllArgsConstructor
 public class ZipSourceCompressor extends AbstractSourceCompressor {
 
+    /**
+     * 支持ZIP格式 / Support ZIP format
+     *
+     * @param format  压缩格式 / Compression format
+     * @param context 下载上下文 / Context of download
+     * @return 是否支持该压缩格式 / If support this compressed format
+     */
     @Override
     public boolean support(String format, DownloadContext context) {
         return CompressFormat.ZIP.equals(format);
     }
 
+    /**
+     * 执行压缩 / Perform compression
+     *
+     * @param source 被压缩的对象 / Object to compress
+     * @param os     写入的输出流 / Output stream to write
+     * @param writer 写入执行器 / Executor of writing
+     * @throws IOException I/O exception
+     */
     @Override
     public void doCompress(Source source, OutputStream os, DownloadWriter writer) throws IOException {
-        Charset charset = source.getCharset();
-        try (ZipOutputStream zos = charset == null ? new ZipOutputStream(os) : new ZipOutputStream(os, charset)) {
+        try (ZipOutputStream zos = newZipOutputStream(source, os)) {
             source.write(zos, null, writer, new Downloadable.WriteHandler() {
                 @Override
                 public void handle(Downloadable.Part part) throws IOException {
@@ -37,6 +54,17 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
         }
     }
 
+    /**
+     * 新建一个ZipOutputStream / new a ZipOutputStream
+     * {@link ZipOutputStream#ZipOutputStream(OutputStream, Charset)}
+     */
+    public ZipOutputStream newZipOutputStream(Source source, OutputStream os) {
+        return new ZipOutputStream(os);
+    }
+
+    /**
+     * @return .zip后缀 / Use suffix .zip
+     */
     @Override
     public String getSuffix() {
         return CompressFormat.ZIP_SUFFIX;

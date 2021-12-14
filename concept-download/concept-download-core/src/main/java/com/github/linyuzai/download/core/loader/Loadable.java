@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public interface Loadable extends Downloadable {
 
-    default void load(DownloadContext context) throws IOException {
+    default void load(DownloadContext context) {
 
     }
 

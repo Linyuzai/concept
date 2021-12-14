@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * 暂时未用到，目前不支持 / Not used at the moment, not supported at present
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Range {
@@ -38,7 +41,7 @@ public class Range {
         if (start < 0 && end < 0) {
             throw new IllegalArgumentException("start < 0 & end < 0");
         }
-        if (end >= 0 && start > end){
+        if (end >= 0 && start > end) {
             throw new IllegalArgumentException("start > end");
         }
         return new Range(start, end);

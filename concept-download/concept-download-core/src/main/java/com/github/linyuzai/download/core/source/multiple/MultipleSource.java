@@ -90,7 +90,7 @@ public class MultipleSource extends AbstractSource implements Source {
     }
 
     @Override
-    public void load(DownloadContext context) throws IOException {
+    public void load(DownloadContext context) {
         for (Source source : sources) {
             source.load(context);
         }

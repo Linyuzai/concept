@@ -4,7 +4,6 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -17,7 +16,7 @@ public abstract class ParallelSourceLoader implements SourceLoader {
     private boolean serialOnSingle = true;
 
     @Override
-    public void load(Source source, DownloadContext context) throws IOException {
+    public void load(Source source, DownloadContext context) {
         Collection<Source> sources = source.flatten();
         Collection<Source> parallelSources = new ArrayList<>();
         Collection<Source> serialSources = new ArrayList<>();

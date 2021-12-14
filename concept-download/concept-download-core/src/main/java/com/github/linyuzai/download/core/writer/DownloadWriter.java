@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+/**
+ * 具体操作字节或字符的处理类 / Handler to handle bytes or chars
+ */
 public interface DownloadWriter extends OrderProvider {
 
     boolean support(Downloadable downloadable, Range range, DownloadContext context);
