@@ -43,14 +43,13 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 boolean mkdirs = dir.mkdirs();
             }
             File cache = new File(dir, getName());
-            if (cache.exists()) {
-                return;
-            }
-            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-            try (InputStream is = doLoad(context);
-                 FileOutputStream fos = new FileOutputStream(cache)) {
-                writer.write(is, fos, null, getCharset(), getLength());
+            if (!cache.exists()) {
+                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+                try (InputStream is = doLoad(context);
+                     FileOutputStream fos = new FileOutputStream(cache)) {
+                    writer.write(is, fos, null, getCharset(), getLength());
+                }
             }
             inputStream = new FileInputStream(cache);
         } else {

@@ -24,7 +24,19 @@ public class OkHttpSource extends AbstractLoadableSource {
         this.client = client;
         this.url = url;
         if (name == null || name.isEmpty()) {
-            //TODO
+            String path;
+            if (url.contains("?")) {
+                path = url.split("\\?")[0];
+            } else {
+                path = url;
+            }
+            int index = path.lastIndexOf("/");
+            String substring = path.substring(index + 1);
+            if (substring.isEmpty()) {
+                setName("NoNameOkHttpSource");
+            } else {
+                setName(substring);
+            }
         } else {
             setName(name);
         }

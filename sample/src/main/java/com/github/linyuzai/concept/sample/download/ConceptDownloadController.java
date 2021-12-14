@@ -61,7 +61,7 @@ public class ConceptDownloadController {
         return new ClassPathResource("/download/README.txt");
     }
 
-    @Download(source = "http://127.0.0.1:8080/concept-download/README.txt")
+    @Download(source = "http://127.0.0.1:8080/concept-download/text.txt?a=1&b=2")
     @GetMapping("/s9")
     public void s9() {
     }
@@ -69,52 +69,72 @@ public class ConceptDownloadController {
     @Download
     @GetMapping("/s10")
     public String s10() {
-        return "http://127.0.0.1:8080/concept-download/README.txt";
+        return "http://127.0.0.1:8080/concept-download/text.txt";
     }
 
-    @Download(source = "classpath:/download/README_GBK.txt",
-            filename = "readme.txt",
-            charset = "GBK",
-            forceCompress = true)
+    @Download(source = "classpath:/download/README.txt", forceCompress = true)
     @GetMapping("/s11")
     public void s11() {
     }
 
-    @Download(source = {
-            "classpath:/download/README.txt",
-            "http://127.0.0.1:8080/concept-download/README.txt"},
-            filename = "压缩包12.zip")
+    @Download(source = "classpath:/download/README_GBK.txt",
+            filename = "readme.zip",
+            charset = "GBK",
+            forceCompress = true)
     @GetMapping("/s12")
     public void s12() {
     }
 
-    @Download(filename = "压缩包13.zip")
+    @Download(source = {
+            "classpath:/download/text.txt",
+            "http://127.0.0.1:8080/concept-download/image.jpg",
+            "http://127.0.0.1:8080/concept-download/video.mp4"},
+            filename = "压缩包13.zip")
     @GetMapping("/s13")
-    public List<Object> s13() {
-        List<Object> list = new ArrayList<>();
-        list.add(new File(""));
-        list.add(new ClassPathResource(""));
-        list.add("http://127.0.0.1:8080");
-        return list;
+    public void s13() {
     }
 
     @Download(filename = "压缩包14.zip")
-    @CompressCache(group = "s14", name = "s14.zip", delete = true)
     @GetMapping("/s14")
     public List<Object> s14() {
-        return s13();
+        List<Object> list = new ArrayList<>();
+        list.add(new File("/Users/Shared/README.txt"));
+        list.add(new ClassPathResource("/download/image.jpg"));
+        list.add("http://127.0.0.1:8080/concept-download/video.mp4");
+        return list;
     }
 
     @Download(filename = "压缩包15.zip")
-    @SourceCache(group = "s15")
     @CompressCache(group = "s15", name = "s15.zip", delete = true)
     @GetMapping("/s15")
-    public String[] s15() {
-        return new String[]{};
+    public List<Object> s15() {
+        return s14();
     }
 
-    @Download(source = "classpath:/download/README.txt")
-    @GetMapping("/README.txt")
+    @Download(filename = "压缩包16.zip")
+    @SourceCache(group = "s16")
+    @CompressCache(group = "s16", name = "s16.zip")
+    @GetMapping("/s16")
+    public String[] s16() {
+        return new String[]{
+                "http://127.0.0.1:8080/concept-download/text.txt",
+                "http://127.0.0.1:8080/concept-download/image.jpg",
+                "http://127.0.0.1:8080/concept-download/video.mp4"
+        };
+    }
+
+    @Download(source = "classpath:/download/text.txt", contentType = "text/plain")
+    @GetMapping("/text.txt")
     public void readme() {
+    }
+
+    @Download(source = "classpath:/download/image.jpg", contentType = "image/jpeg")
+    @GetMapping("/image.jpg")
+    public void image() {
+    }
+
+    @Download(source = "classpath:/download/video.mp4", contentType = "video/mpeg4")
+    @GetMapping("/video.mp4")
+    public void video() {
     }
 }

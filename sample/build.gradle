@@ -30,6 +30,7 @@ dependencies {
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     //implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

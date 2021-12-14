@@ -43,7 +43,13 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
         String suffix = getSuffix();
         if (cacheName == null || cacheName.isEmpty()) {
             if (source.isSingle()) {
-                return source.getName();
+                String sourceName = source.getName();
+                int index = sourceName.lastIndexOf(CompressFormat.DOT);
+                if (index == -1) {
+                    return sourceName + suffix;
+                } else {
+                    return sourceName.substring(0, index) + suffix;
+                }
             } else {
                 return getDefaultName(context) + suffix;
             }
