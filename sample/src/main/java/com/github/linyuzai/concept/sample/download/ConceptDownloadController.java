@@ -4,10 +4,8 @@ import com.github.linyuzai.download.aop.annotation.CompressCache;
 import com.github.linyuzai.download.aop.annotation.Download;
 import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.handler.DownloadHandlerInterceptor;
+import com.github.linyuzai.download.core.handler.StandardDownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import com.github.linyuzai.download.core.response.FileResponse;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -131,11 +129,20 @@ public class ConceptDownloadController {
     @Download(source = "classpath:/download/README.txt")
     @GetMapping("/s17")
     public DownloadOptions.Rewriter s17() {
-        return options -> options.toBuilder()
-                .interceptor((handler, context) -> {
+        return new DownloadOptions.Rewriter() {
+            @Override
+            public DownloadOptions rewrite(DownloadOptions options) {
+                return options.toBuilder()
+                        .interceptor(new StandardDownloadHandlerInterceptor() {
 
-                })
-                .build();
+                            @Override
+                            public void onResponseWritten(DownloadContext context) {
+                                System.out.println("下载完成！");
+                            }
+                        })
+                        .build();
+            }
+        };
     }
 
     @Download(source = "classpath:/download/text.txt", contentType = "text/plain")
