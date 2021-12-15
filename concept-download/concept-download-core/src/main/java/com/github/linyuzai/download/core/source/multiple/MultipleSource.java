@@ -59,18 +59,8 @@ public class MultipleSource extends AbstractSource implements Source {
     }
 
     @Override
-    public void setCacheEnabled(boolean cacheEnabled) {
-
-    }
-
-    @Override
     public String getCachePath() {
         return null;
-    }
-
-    @Override
-    public void setCachePath(String cachePath) {
-
     }
 
     @Override
