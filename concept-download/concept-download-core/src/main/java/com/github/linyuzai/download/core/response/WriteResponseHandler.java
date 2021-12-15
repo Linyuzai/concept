@@ -4,8 +4,8 @@ import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.request.DownloadRequest;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @AllArgsConstructor
-public class WriteResponseInterceptor implements DownloadInterceptor, DownloadContextInitializer {
+public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
 
     private DownloadWriterAdapter downloadWriterAdapter;
 
@@ -26,7 +26,7 @@ public class WriteResponseInterceptor implements DownloadInterceptor, DownloadCo
     private DownloadResponseProvider downloadResponseProvider;
 
     @Override
-    public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
+    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         DownloadResponse response = context.get(DownloadResponse.class);
         Compression compression = context.get(Compression.class);
         String filename = context.getOptions().getFilename();

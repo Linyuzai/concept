@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.interceptor;
+package com.github.linyuzai.download.core.handler;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * 下载拦截器
  */
-public interface DownloadInterceptor extends OrderProvider {
+public interface DownloadHandler extends OrderProvider {
 
     int ORDER_INITIALIZE_CONTEXT = Integer.MIN_VALUE + 1;
     int ORDER_CREATE_SOURCE = 0;
@@ -23,5 +23,5 @@ public interface DownloadInterceptor extends OrderProvider {
      * @param context 下载上下文
      * @param chain   下载链
      */
-    void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException;
+    void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException;
 }

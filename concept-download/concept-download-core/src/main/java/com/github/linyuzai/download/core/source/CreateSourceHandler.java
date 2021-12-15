@@ -3,8 +3,8 @@ package com.github.linyuzai.download.core.source;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.io.IOException;
  * 下载源处理拦截器
  */
 @AllArgsConstructor
-public class CreateSourceInterceptor implements DownloadInterceptor, DownloadContextInitializer, DownloadContextDestroyer {
+public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     private SourceFactoryAdapter sourceFactoryAdapter;
 
@@ -24,7 +24,7 @@ public class CreateSourceInterceptor implements DownloadInterceptor, DownloadCon
      * @param chain   下载链
      */
     @Override
-    public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
+    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         Object source = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getOriginalSourceFactory(source, context);
         context.set(Source.class, factory.create(source, context));

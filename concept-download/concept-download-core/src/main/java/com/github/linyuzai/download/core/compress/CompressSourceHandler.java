@@ -3,8 +3,8 @@ package com.github.linyuzai.download.core.compress;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptorChain;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
@@ -13,12 +13,12 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 
 @AllArgsConstructor
-public class CompressSourceInterceptor implements DownloadInterceptor, DownloadContextInitializer, DownloadContextDestroyer {
+public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     private SourceCompressorAdapter sourceCompressorAdapter;
 
     @Override
-    public void intercept(DownloadContext context, DownloadInterceptorChain chain) throws IOException {
+    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         Source source = context.get(Source.class);
         Compression compression;
         boolean single = source.isSingle();

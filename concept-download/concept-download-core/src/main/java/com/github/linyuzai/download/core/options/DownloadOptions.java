@@ -1,10 +1,12 @@
 package com.github.linyuzai.download.core.options;
 
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
+import com.github.linyuzai.download.core.handler.DownloadHandlerInterceptor;
 import lombok.Builder;
 import lombok.Value;
 
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Map;
 
 @Value
@@ -99,6 +101,8 @@ public class DownloadOptions {
     Object extra;
 
     DownloadMethod downloadMethod;
+
+    DownloadHandlerInterceptor interceptor;
 
     public static DownloadOptions from(DownloadConfiguration configuration) {
         return new DownloadOptions.Builder()

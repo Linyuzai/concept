@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptProperties;
-import com.github.linyuzai.download.core.compress.CompressSourceInterceptor;
+import com.github.linyuzai.download.core.compress.CompressSourceHandler;
 import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
@@ -11,15 +11,15 @@ import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.context.*;
-import com.github.linyuzai.download.core.interceptor.DownloadInterceptor;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.loader.*;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import com.github.linyuzai.download.core.response.DownloadResponseProvider;
-import com.github.linyuzai.download.core.response.WriteResponseInterceptor;
+import com.github.linyuzai.download.core.response.WriteResponseHandler;
 import com.github.linyuzai.download.core.source.SourceFactory;
-import com.github.linyuzai.download.core.source.CreateSourceInterceptor;
+import com.github.linyuzai.download.core.source.CreateSourceHandler;
 import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
@@ -130,14 +130,14 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public InitializeContextInterceptor initializeContextInterceptor(List<DownloadContextInitializer> initializers) {
-        return new InitializeContextInterceptor(initializers);
+    public InitializeContextHandler initializeContextHandler(List<DownloadContextInitializer> initializers) {
+        return new InitializeContextHandler(initializers);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CreateSourceInterceptor createSourceInterceptor(SourceFactoryAdapter adapter) {
-        return new CreateSourceInterceptor(adapter);
+    public CreateSourceHandler createSourceHandler(SourceFactoryAdapter adapter) {
+        return new CreateSourceHandler(adapter);
     }
 
     @Bean
@@ -154,35 +154,35 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadSourceInterceptor loadSourceInterceptor(SourceLoader loader, LoadExceptionHandler handler) {
-        return new LoadSourceInterceptor(loader, handler);
+    public LoadSourceHandler loadSourceHandler(SourceLoader loader, LoadExceptionHandler handler) {
+        return new LoadSourceHandler(loader, handler);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CompressSourceInterceptor compressSourceInterceptor(SourceCompressorAdapter adapter) {
-        return new CompressSourceInterceptor(adapter);
+    public CompressSourceHandler compressSourceHandler(SourceCompressorAdapter adapter) {
+        return new CompressSourceHandler(adapter);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public WriteResponseInterceptor writeResponseInterceptor(DownloadWriterAdapter adapter,
-                                                             DownloadRequestProvider requestProvider,
-                                                             DownloadResponseProvider responseProvider) {
-        return new WriteResponseInterceptor(adapter, requestProvider, responseProvider);
+    public WriteResponseHandler writeResponseHandler(DownloadWriterAdapter adapter,
+                                                         DownloadRequestProvider requestProvider,
+                                                         DownloadResponseProvider responseProvider) {
+        return new WriteResponseHandler(adapter, requestProvider, responseProvider);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public DestroyContextInterceptor destroyContextInterceptor(List<DownloadContextDestroyer> destroyers) {
-        return new DestroyContextInterceptor(destroyers);
+    public DestroyContextHandler destroyContextHandler(List<DownloadContextDestroyer> destroyers) {
+        return new DestroyContextHandler(destroyers);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public DownloadConcept downloadConcept(DownloadConfiguration configuration, List<DownloadConfigurer> configurers,
-                                           DownloadContextFactory factory, List<DownloadInterceptor> interceptors) {
+                                           DownloadContextFactory factory, List<DownloadHandler> handlers) {
         configurers.forEach(it -> it.configure(configuration));
-        return new ChainDownloadConcept(configuration, factory, interceptors);
+        return new ChainDownloadConcept(configuration, factory, handlers);
     }
 }

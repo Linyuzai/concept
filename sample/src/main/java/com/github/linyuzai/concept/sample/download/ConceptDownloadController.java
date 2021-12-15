@@ -3,6 +3,9 @@ package com.github.linyuzai.concept.sample.download;
 import com.github.linyuzai.download.aop.annotation.CompressCache;
 import com.github.linyuzai.download.aop.annotation.Download;
 import com.github.linyuzai.download.aop.annotation.SourceCache;
+import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.response.FileResponse;
 import org.springframework.core.io.ClassPathResource;
@@ -129,7 +132,9 @@ public class ConceptDownloadController {
     @GetMapping("/s17")
     public DownloadOptions.Rewriter s17() {
         return options -> options.toBuilder()
-                .response(new FileResponse(null))
+                .interceptor((handler, context) -> {
+
+                })
                 .build();
     }
 
