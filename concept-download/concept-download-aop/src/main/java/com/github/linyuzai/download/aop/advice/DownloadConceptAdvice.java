@@ -62,6 +62,7 @@ public class DownloadConceptAdvice implements MethodInterceptor {
         }
 
         builder.filename(download.filename())
+                .inline(download.inline())
                 .contentType(buildContentType(download, configuration))
                 .compressFormat(buildCompressFormat(download, configuration))
                 .forceCompress(download.forceCompress())

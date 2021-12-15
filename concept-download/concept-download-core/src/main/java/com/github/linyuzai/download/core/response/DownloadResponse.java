@@ -1,7 +1,10 @@
 package com.github.linyuzai.download.core.response;
 
+import lombok.SneakyThrows;
+
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Map;
 
 public interface DownloadResponse {
@@ -10,7 +13,15 @@ public interface DownloadResponse {
 
     void setStatusCode(int statusCode);
 
-    void setFilename(String filename);
+    @SneakyThrows
+    default void setFilename(String filename) {
+        String encodeFilename = URLEncoder.encode(filename, "UTF-8");
+        setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
+    }
+
+    default void setInline() {
+        setHeader("Content-Disposition", "inline");
+    }
 
     void setContentType(String contentType);
 

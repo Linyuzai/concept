@@ -3,13 +3,10 @@ package com.github.linyuzai.download.servlet.response;
 import com.github.linyuzai.download.core.response.DownloadResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 @Getter
 @AllArgsConstructor
@@ -25,13 +22,6 @@ public class ServletDownloadResponse implements DownloadResponse {
     @Override
     public void setStatusCode(int statusCode) {
         response.setStatus(statusCode);
-    }
-
-    @SneakyThrows
-    @Override
-    public void setFilename(String filename) {
-        String encodeFilename = URLEncoder.encode(filename, "UTF-8");
-        response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
     }
 
     @Override

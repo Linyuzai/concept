@@ -11,4 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 public class ServletDownloadRequest implements DownloadRequest {
 
     private HttpServletRequest request;
+
+    @Override
+    public String getHeader(String name) {
+        return request.getHeader(name);
+    }
 }

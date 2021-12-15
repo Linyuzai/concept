@@ -145,17 +145,17 @@ public class ConceptDownloadController {
         };
     }
 
-    @Download(source = "classpath:/download/text.txt", contentType = "text/plain")
+    @Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")
     @GetMapping("/text.txt")
     public void readme() {
     }
 
-    @Download(source = "classpath:/download/image.jpg", contentType = "image/jpeg")
+    @Download(source = "classpath:/download/image.jpg", inline = true, contentType = "image/jpeg")
     @GetMapping("/image.jpg")
     public void image() {
     }
 
-    @Download(source = "classpath:/download/video.mp4", contentType = "video/mpeg4")
+    @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mpeg4")
     @GetMapping("/video.mp4")
     public void video() {
     }

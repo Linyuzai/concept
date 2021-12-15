@@ -9,6 +9,8 @@ public @interface Download {
 
     String[] source() default {};
 
+    boolean inline() default false;
+
     /**
      * 下载显示的文件名称
      */

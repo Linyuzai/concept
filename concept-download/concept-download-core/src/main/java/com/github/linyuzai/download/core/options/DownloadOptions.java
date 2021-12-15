@@ -40,6 +40,8 @@ public class DownloadOptions {
      */
     String filename;
 
+    boolean inline;
+
     /**
      * Content-Type Header
      */

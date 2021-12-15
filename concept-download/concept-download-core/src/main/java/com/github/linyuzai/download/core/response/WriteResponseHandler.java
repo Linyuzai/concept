@@ -29,11 +29,17 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
     public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         DownloadResponse response = context.get(DownloadResponse.class);
         Compression compression = context.get(Compression.class);
-        String filename = context.getOptions().getFilename();
-        if (filename == null || filename.isEmpty()) {
-            response.setFilename(compression.getName());
+        boolean inline = context.getOptions().isInline();
+        if (inline) {
+            response.setInline();
+
         } else {
-            response.setFilename(filename);
+            String filename = context.getOptions().getFilename();
+            if (filename == null || filename.isEmpty()) {
+                response.setFilename(compression.getName());
+            } else {
+                response.setFilename(filename);
+            }
         }
         String contentType = context.getOptions().getContentType();
         if (contentType == null || contentType.isEmpty()) {
