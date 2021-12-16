@@ -4,7 +4,7 @@ import com.github.linyuzai.download.core.compress.CompressSourceHandler;
 import com.github.linyuzai.download.core.context.DestroyContextHandler;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.InitializeContextHandler;
-import com.github.linyuzai.download.core.loader.LoadSourceHandler;
+import com.github.linyuzai.download.core.load.LoadSourceHandler;
 import com.github.linyuzai.download.core.response.WriteResponseHandler;
 import com.github.linyuzai.download.core.source.CreateSourceHandler;
 

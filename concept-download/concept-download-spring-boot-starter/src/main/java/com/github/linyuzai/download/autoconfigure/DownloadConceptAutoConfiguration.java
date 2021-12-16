@@ -12,7 +12,7 @@ import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.loader.*;
+import com.github.linyuzai.download.core.load.*;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
@@ -59,7 +59,7 @@ public class DownloadConceptAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public DownloadContextFactory downloadContextFactory() {
-        return new DefaultDownloadContextFactory();
+        return new MapDownloadContextFactory();
     }
 
     @Bean
@@ -142,20 +142,28 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SourceLoader sourceLoader() {
-        return new SerialSourceLoader();
+    public SourceLoaderInvoker sourceLoaderInvoker() {
+        return new SerialSourceLoaderInvoker();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadExceptionHandler loadExceptionHandler() {
-        return new RethrowLoadedExceptionHandler();
+    public SourceLoadExceptionHandler sourceLoadExceptionHandler() {
+        return new RethrowLoadedSourceLoadExceptionHandler();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadSourceHandler loadSourceHandler(SourceLoader loader, LoadExceptionHandler handler) {
-        return new LoadSourceHandler(loader, handler);
+    public SourceLoaderFactory sourceLoaderFactory(SourceLoadExceptionHandler handler) {
+        return new ExceptionHandledSourceLoaderFactory(handler);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LoadSourceHandler loadSourceHandler(SourceLoaderInvoker invoker,
+                                               SourceLoaderFactory factory,
+                                               SourceLoadExceptionHandler handler) {
+        return new LoadSourceHandler(invoker, factory, handler);
     }
 
     @Bean
@@ -167,8 +175,8 @@ public class DownloadConceptAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public WriteResponseHandler writeResponseHandler(DownloadWriterAdapter adapter,
-                                                         DownloadRequestProvider requestProvider,
-                                                         DownloadResponseProvider responseProvider) {
+                                                     DownloadRequestProvider requestProvider,
+                                                     DownloadResponseProvider responseProvider) {
         return new WriteResponseHandler(adapter, requestProvider, responseProvider);
     }
 

@@ -3,7 +3,6 @@ package com.github.linyuzai.download.core.source.multiple;
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @AllArgsConstructor
-public class MultipleSource extends AbstractSource implements Source {
+public class MultipleSource implements Source {
 
     private Collection<Source> sources;
 
@@ -80,7 +79,7 @@ public class MultipleSource extends AbstractSource implements Source {
     }
 
     @Override
-    public void load(DownloadContext context) {
+    public void load(DownloadContext context) throws IOException {
         for (Source source : sources) {
             source.load(context);
         }

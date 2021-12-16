@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.source;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
-import com.github.linyuzai.download.core.loader.Loadable;
+import com.github.linyuzai.download.core.load.Loadable;
 
 import java.util.Collection;
 import java.util.Collections;

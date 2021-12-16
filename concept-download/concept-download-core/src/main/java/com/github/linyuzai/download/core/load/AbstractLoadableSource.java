@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.loader;
+package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
@@ -54,36 +54,28 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * @param context 下载上下文 / Context of download
      */
     @Override
-    public void load(DownloadContext context) {
-        try {
-            if (isCacheEnabled()) {
-                String cachePath = getCachePath();
-                if (cachePath == null) {
-                    throw new DownloadException("Cache path is null");
-                }
-                File dir = new File(cachePath);
-                if (!dir.exists()) {
-                    boolean mkdirs = dir.mkdirs();
-                }
-                File cache = new File(dir, getName());
-                if (!cache.exists()) {
-                    DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-                    DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-                    try (InputStream is = doLoad(context);
-                         FileOutputStream fos = new FileOutputStream(cache)) {
-                        writer.write(is, fos, null, getCharset(), getLength());
-                    }
-                }
-                inputStream = new FileInputStream(cache);
-            } else {
-                inputStream = doLoad(context);
+    public void load(DownloadContext context) throws IOException {
+        if (isCacheEnabled()) {
+            String cachePath = getCachePath();
+            if (cachePath == null) {
+                throw new DownloadException("Cache path is null");
             }
-        } catch (Throwable e) {
-            LoadExceptionHandler handler = context.get(LoadExceptionHandler.class);
-            LoadSourceException exception = new LoadSourceException(this, e);
-            handler.onLoading(exception);
-            Collection<LoadSourceException> exceptions = context.get(LoadSourceException.class);
-            exceptions.add(exception);
+            File dir = new File(cachePath);
+            if (!dir.exists()) {
+                boolean mkdirs = dir.mkdirs();
+            }
+            File cache = new File(dir, getName());
+            if (!cache.exists()) {
+                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+                try (InputStream is = doLoad(context);
+                     FileOutputStream fos = new FileOutputStream(cache)) {
+                    writer.write(is, fos, null, getCharset(), getLength());
+                }
+            }
+            inputStream = new FileInputStream(cache);
+        } else {
+            inputStream = doLoad(context);
         }
     }
 

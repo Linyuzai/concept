@@ -2,7 +2,7 @@ package com.github.linyuzai.download.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.loader.AbstractLoadableSource;
+import com.github.linyuzai.download.core.load.AbstractLoadableSource;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.loader;
+package com.github.linyuzai.download.core.load;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 @AllArgsConstructor
-public class ExecutorSourceLoader extends ConcurrentSourceLoader {
+public class ExecutorSourceLoaderInvoker extends ConcurrentSourceLoaderInvoker {
 
     @Getter
     @Setter

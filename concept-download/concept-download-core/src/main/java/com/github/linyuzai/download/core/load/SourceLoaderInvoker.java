@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.loader;
+package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * 下载源加载器
  */
-public interface SourceLoader {
+public interface SourceLoaderInvoker {
 
     /**
      * 加载资源 / Load resource
@@ -18,5 +18,5 @@ public interface SourceLoader {
      * @param context 下载上下文 / Context of download
      * @throws IOException I/O exception
      */
-    void load(Source source, DownloadContext context) throws IOException;
+    Collection<LoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException;
 }
