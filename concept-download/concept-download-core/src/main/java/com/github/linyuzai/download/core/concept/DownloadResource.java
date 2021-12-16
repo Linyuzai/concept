@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.nio.charset.Charset;
 
+/**
+ * 抽象的下载资源 / Abstract download resource
+ */
 @Getter
 @Setter
 public abstract class DownloadResource implements Downloadable {

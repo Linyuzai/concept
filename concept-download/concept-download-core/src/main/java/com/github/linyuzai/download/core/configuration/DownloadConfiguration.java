@@ -7,6 +7,10 @@ import lombok.Data;
 
 import java.util.Map;
 
+/**
+ * 下载配置 / Configuration of download
+ * 全局默认配置 / Global default configuration
+ */
 @Data
 public class DownloadConfiguration {
 

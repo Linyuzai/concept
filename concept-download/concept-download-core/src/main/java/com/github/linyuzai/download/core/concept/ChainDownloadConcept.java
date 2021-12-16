@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * 基于链式拦截的下载执行器
+ * 基于链式处理的下载接口实现 / Implementation of download interface based on chain of handler
  */
 @Getter
 public class ChainDownloadConcept implements DownloadConcept {
@@ -24,11 +24,13 @@ public class ChainDownloadConcept implements DownloadConcept {
 
     private final DownloadContextFactory contextFactory;
 
-    /**
-     * 拦截器
-     */
     private final List<DownloadHandler> handlers;
 
+    /**
+     * @param configuration  下载配置 / Download configuration
+     * @param contextFactory 上下文工厂 / Factory of download context
+     * @param handlers       处理器列表 / List of handlers
+     */
     public ChainDownloadConcept(DownloadConfiguration configuration,
                                 DownloadContextFactory contextFactory,
                                 List<DownloadHandler> handlers) {
@@ -38,6 +40,14 @@ public class ChainDownloadConcept implements DownloadConcept {
         this.handlers.sort(Comparator.comparingInt(OrderProvider::getOrder));
     }
 
+    /**
+     * 通过下载配置获得一个下载参数 / Obtain a download parameter through the download configuration
+     * 通过下载上下文工厂创建一个下载上下文 / Create a download context through the factory
+     * 执行下载处理链 / Execute download handler chain
+     *
+     * @param function 可以通过下载配置来返回一个下载参数 / return an options from the configuration
+     * @throws IOException I/O exception
+     */
     @Override
     public void download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException {
         DownloadOptions options = function.apply(configuration);
