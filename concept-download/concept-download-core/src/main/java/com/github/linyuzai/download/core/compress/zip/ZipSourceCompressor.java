@@ -33,7 +33,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     }
 
     /**
-     * 执行压缩 / Perform compression
+     * 执行zip压缩 / Perform zip compression
      *
      * @param source 被压缩的对象 / Object to compress
      * @param os     写入的输出流 / Output stream to write
