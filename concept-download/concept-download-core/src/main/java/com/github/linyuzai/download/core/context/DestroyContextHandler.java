@@ -31,8 +31,8 @@ public class DestroyContextHandler implements DownloadHandler {
         for (DownloadContextDestroyer destroyer : destroyers) {
             destroyer.destroy(context);
         }
-        chain.next(context);
         context.destroy();
+        chain.next(context);
     }
 
     @Override

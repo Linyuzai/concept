@@ -6,7 +6,7 @@ import com.github.linyuzai.download.core.order.OrderProvider;
 import java.io.IOException;
 
 /**
- * 下载处理器
+ * 下载处理器 / Handler to download
  */
 public interface DownloadHandler extends OrderProvider {
 
