@@ -21,8 +21,11 @@ public abstract class ConcurrentSourceLoader extends ParallelSourceLoader {
         CountDownLatch latch = new CountDownLatch(sources.size());
         for (Source source : sources) {
             execute(() -> {
-                source.load(context);
-                latch.countDown();
+                try {
+                    source.load(context);
+                } finally {
+                    latch.countDown();
+                }
             });
         }
         latch.await();

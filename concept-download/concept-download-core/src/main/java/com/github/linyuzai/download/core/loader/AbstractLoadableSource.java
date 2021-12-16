@@ -13,12 +13,23 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Collection;
 
+/**
+ * 需要预加载资源的抽象类 / Abstract classes that require preloaded resources
+ * 需要注意数据流只能使用一次 / Note that stream can only be used once
+ */
 @Getter
 @Setter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
     private InputStream inputStream;
 
+    /**
+     * 如果需要异步加载 / If asynchronous loading is required
+     * 在启用缓存并存在缓存的情况下 / With cache enabled and cache present
+     * 直接同步加载本地缓存 / Loading local cache synchronous
+     *
+     * @return 是否异步加载 / If async load
+     */
     public boolean isAsyncLoad() {
         boolean asyncLoad = super.isAsyncLoad();
         if (asyncLoad && isCacheEnabled() && isCacheExisted()) {
@@ -27,11 +38,21 @@ public abstract class AbstractLoadableSource extends AbstractSource {
         return asyncLoad;
     }
 
+    /**
+     * @return 本地文件是否存在
+     */
     @Override
     public boolean isCacheExisted() {
         return new File(getCachePath(), getName()).exists();
     }
 
+    /**
+     * 不启用缓存，则直接加载 / If caching is not enabled, load directly
+     * 启用缓存并缓存存在，则使用缓存 / Cache is used if cache is enabled and exists
+     * 启用缓存并缓存不存在，则加载到缓存并使用缓存 / Load into cache and use cache if cache is enabled and cache does not exist,
+     *
+     * @param context 下载上下文 / Context of download
+     */
     @Override
     public void load(DownloadContext context) {
         try {
@@ -66,6 +87,15 @@ public abstract class AbstractLoadableSource extends AbstractSource {
         }
     }
 
+    /**
+     * 直接使用加载的资源或缓存的资源写入 / Write directly using loaded resources or cached resources
+     *
+     * @param os      写入数据的输出流 / Output stream to write
+     * @param range   写入的范围 / Range of writing
+     * @param writer  具体操作字节或字符的处理类 / Handler to handle bytes or chars
+     * @param handler 可对每一部分进行单独写入操作 / Do write for each part {@link Part}
+     * @throws IOException I/O exception
+     */
     @Override
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
         if (inputStream == null) {
@@ -103,6 +133,9 @@ public abstract class AbstractLoadableSource extends AbstractSource {
         }
     }
 
+    /**
+     * 如果缓存
+     */
     @Override
     public void deleteCache() {
         if (isCacheEnabled()) {

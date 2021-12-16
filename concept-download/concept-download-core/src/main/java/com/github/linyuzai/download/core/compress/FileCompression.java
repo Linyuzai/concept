@@ -57,6 +57,8 @@ public class FileCompression extends AbstractCompression {
      */
     @Override
     public void deleteCache() {
-        boolean delete = file.delete();
+        if (isCacheEnabled() && isCacheExisted()) {
+            boolean delete = file.delete();
+        }
     }
 }
