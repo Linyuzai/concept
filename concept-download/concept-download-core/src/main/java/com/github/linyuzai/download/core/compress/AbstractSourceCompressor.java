@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.options.DownloadMethod;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 
 /**
+ * 抽象的Source压缩器 / Abstract class of source compressor
  * 进行了统一的缓存处理 / Unified cache processing
  */
 public abstract class AbstractSourceCompressor implements SourceCompressor {
@@ -25,8 +27,8 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @param writer    {@link DownloadWriter}
      * @param cachePath 缓存路径 / The path of cache
      * @param context   Context of download
-     * @return
-     * @throws IOException
+     * @return An specific compression
+     * @throws IOException I/O exception
      */
     @Override
     public Compression compress(Source source, DownloadWriter writer, String cachePath, DownloadContext context) throws IOException {
@@ -89,10 +91,27 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
         }
     }
 
+    /**
+     * 如果没有指定名称并且有多个下载项 / If no name is specified and there are multiple downloads
+     * 尝试使用调用的类名加方法名作为名称 / Try using the class sample name and the method name as the name
+     * 或者使用默认的固定名称'CompressPackage' / Or use the default fixed name 'CompressPackage'
+     * 需要注意默认的固定名称可能会导致误判缓存存在 / Note that the default fixed name may lead to misjudgment that the cache exists
+     *
+     * @param context Context of download
+     * @return 默认的名称 / Default name
+     */
     public String getDefaultName(DownloadContext context) {
-        Method method = context.getOptions().getDownloadMethod().getMethod();
-        return method.getDeclaringClass().getSimpleName() + "_" + method.getName();
+        DownloadMethod downloadMethod = context.getOptions().getDownloadMethod();
+        if (downloadMethod == null) {
+            return "CompressPackage";
+        } else {
+            Method method = downloadMethod.getMethod();
+            return method.getDeclaringClass().getSimpleName() + "_" + method.getName();
+        }
     }
 
+    /**
+     * @return 压缩包的后缀 / Suffix of the compressed package
+     */
     public abstract String getSuffix();
 }

@@ -6,7 +6,7 @@ import com.github.linyuzai.download.core.order.OrderProvider;
 import java.io.IOException;
 
 /**
- * 下载拦截器
+ * 下载处理器
  */
 public interface DownloadHandler extends OrderProvider {
 
@@ -18,10 +18,10 @@ public interface DownloadHandler extends OrderProvider {
     int ORDER_DESTROY_CONTEXT = Integer.MAX_VALUE - 1;
 
     /**
-     * 拦截回调
+     * 执行处理 / Do handle
      *
-     * @param context 下载上下文
-     * @param chain   下载链
+     * @param context 下载上下文 / Context of download
+     * @param chain   处理链 / Chain of handler
      */
     void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException;
 }

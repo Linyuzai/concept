@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * 文件压缩 / File compression
+ */
 @AllArgsConstructor
 public class FileCompression extends AbstractCompression {
 
@@ -34,12 +37,24 @@ public class FileCompression extends AbstractCompression {
         return file.getParent();
     }
 
+    /**
+     * 通过文件下载源写数据 / Write data through file download source {@link FileSource}
+     *
+     * @param os      写入数据的输出流 / Output stream to write
+     * @param range   写入的范围 / Range of writing
+     * @param writer  具体操作字节或字符的处理类 / Handler to handle bytes or chars
+     * @param handler 可对每一部分进行单独写入操作 / Do write for each part {@link Part}
+     * @throws IOException I/O exception
+     */
     @Override
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
         FileSource source = new FileSource.Builder().file(file).build();
         source.write(os, range, writer, handler);
     }
 
+    /**
+     * 删除文件 / Delete file
+     */
     @Override
     public void deleteCache() {
         boolean delete = file.delete();

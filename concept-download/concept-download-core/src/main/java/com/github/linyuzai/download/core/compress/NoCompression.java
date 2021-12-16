@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+/**
+ * 不压缩 / No compression
+ * 对于不压缩的下载操作提供统一的压缩实现类 / Provide a unified compression implementation class for uncompressed download operations
+ */
 @AllArgsConstructor
 public class NoCompression extends AbstractCompression {
 
