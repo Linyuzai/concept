@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+/**
+ * 持有一个输入流的下载源 / Source holds an input stream
+ */
 @AllArgsConstructor
 public class InputStreamSource extends AbstractSource {
 

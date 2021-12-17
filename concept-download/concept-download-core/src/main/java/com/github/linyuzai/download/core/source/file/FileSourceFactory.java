@@ -8,16 +8,16 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 /**
- * 文件数据加载器
+ * 文件对象的工厂 / Factory for file object
  */
 public class FileSourceFactory implements SourceFactory {
 
     /**
-     * 支持需要下载的数据对象是File类型
+     * 支持文件对象 / File object supported
      *
-     * @param source  需要下载的数据对象
-     * @param context 下载上下文
-     * @return 是否能加载
+     * @param source  需要下载的数据对象 / Object to download
+     * @param context 下载上下文 / Context of download
+     * @return 是否支持 / If supported
      */
     @Override
     public boolean support(Object source, DownloadContext context) {
@@ -25,9 +25,11 @@ public class FileSourceFactory implements SourceFactory {
     }
 
     /**
-     * @param source  需要下载的数据对象
-     * @param context 下载上下文
-     * @return {@link FileSource}
+     * Use {@link FileSource}
+     *
+     * @param source  需要下载的数据对象 / Object to download
+     * @param context 下载上下文 / Context of download
+     * @return 下载源 / Source {@link FileSource}
      */
     @Override
     public Source create(Object source, DownloadContext context) {

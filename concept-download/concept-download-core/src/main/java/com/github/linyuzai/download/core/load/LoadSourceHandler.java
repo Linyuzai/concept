@@ -37,7 +37,7 @@ public class LoadSourceHandler implements DownloadHandler {
     public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         Source source = context.get(Source.class);
         Collection<SourceLoader> loaders = new ArrayList<>();
-        Collection<Source> sources = source.flatten();
+        Collection<Source> sources = source.list();
         for (Source s : sources) {
             SourceLoader loader = sourceLoaderFactory.create(s, context);
             loaders.add(loader);

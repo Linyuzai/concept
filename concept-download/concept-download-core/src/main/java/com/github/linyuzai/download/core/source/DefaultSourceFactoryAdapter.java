@@ -18,7 +18,7 @@ public class DefaultSourceFactoryAdapter implements SourceFactoryAdapter, Downlo
     }
 
     @Override
-    public SourceFactory getOriginalSourceFactory(Object source, DownloadContext context) {
+    public SourceFactory getFactory(Object source, DownloadContext context) {
         for (SourceFactory factory : factories) {
             if (factory.support(source, context)) {
                 return factory;

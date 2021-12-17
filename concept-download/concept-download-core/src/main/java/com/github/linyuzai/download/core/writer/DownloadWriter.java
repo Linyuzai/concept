@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 /**
- * 具体操作字节或字符的处理类 / Handler to handle bytes or chars
+ * 具体操作字节或字符的处理类 / Handler to write bytes or chars
  */
 public interface DownloadWriter extends OrderProvider {
 

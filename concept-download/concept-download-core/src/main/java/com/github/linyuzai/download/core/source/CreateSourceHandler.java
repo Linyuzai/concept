@@ -26,7 +26,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
     @Override
     public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         Object source = context.getOptions().getSource();
-        SourceFactory factory = sourceFactoryAdapter.getOriginalSourceFactory(source, context);
+        SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
         context.set(Source.class, factory.create(source, context));
         chain.next(context);
     }
