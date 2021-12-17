@@ -30,19 +30,15 @@ public class LoadSourceHandler implements DownloadHandler {
             SourceLoader loader = sourceLoaderFactory.create(s, context);
             loaders.add(loader);
         }
-        Collection<LoadResult> results = sourceLoaderInvoker.invoke(loaders, context);
+        Collection<SourceLoadResult> results = sourceLoaderInvoker.invoke(loaders, context);
         List<SourceLoadException> exceptions = results.stream()
-                .filter(LoadResult::hasException)
-                .map(this::toLoadSourceException)
+                .filter(SourceLoadResult::hasException)
+                .map(SourceLoadResult::getException)
                 .collect(Collectors.toList());
         if (!exceptions.isEmpty()) {
             sourceLoadExceptionHandler.onLoaded(exceptions);
         }
         chain.next(context);
-    }
-
-    private SourceLoadException toLoadSourceException(LoadResult result) {
-        return new SourceLoadException(result.getSource(), result.getThrowable());
     }
 
     @Override

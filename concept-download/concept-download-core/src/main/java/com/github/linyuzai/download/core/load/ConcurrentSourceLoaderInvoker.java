@@ -18,13 +18,13 @@ public abstract class ConcurrentSourceLoaderInvoker extends ParallelSourceLoader
 
     @SneakyThrows
     @Override
-    public Collection<LoadResult> parallelInvoke(Collection<SourceLoader> loaders, DownloadContext context) {
+    public Collection<SourceLoadResult> parallelInvoke(Collection<SourceLoader> loaders, DownloadContext context) {
         CountDownLatch latch = new CountDownLatch(loaders.size());
-        Collection<LoadResult> results = Collections.synchronizedList(new ArrayList<>());
+        Collection<SourceLoadResult> results = Collections.synchronizedList(new ArrayList<>());
         for (SourceLoader loader : loaders) {
             execute(() -> {
                 try {
-                    LoadResult result = loader.load(context);
+                    SourceLoadResult result = loader.load(context);
                     results.add(result);
                 } finally {
                     latch.countDown();

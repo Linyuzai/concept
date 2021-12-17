@@ -16,7 +16,7 @@ public abstract class ParallelSourceLoaderInvoker implements SourceLoaderInvoker
     private boolean serialOnSingle = true;
 
     @Override
-    public Collection<LoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException {
+    public Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException {
         Collection<SourceLoader> parallelSourceLoaders = new ArrayList<>();
         Collection<SourceLoader> serialSourceLoaders = new ArrayList<>();
         for (SourceLoader loader : loaders) {
@@ -26,11 +26,11 @@ public abstract class ParallelSourceLoaderInvoker implements SourceLoaderInvoker
                 serialSourceLoaders.add(loader);
             }
         }
-        Collection<LoadResult> results = new ArrayList<>();
+        Collection<SourceLoadResult> results = new ArrayList<>();
         if (!parallelSourceLoaders.isEmpty()) {
             if (parallelSourceLoaders.size() == 1 && serialOnSingle) {
                 for (SourceLoader loader : parallelSourceLoaders) {
-                    LoadResult result = loader.load(context);
+                    SourceLoadResult result = loader.load(context);
                     results.add(result);
                 }
             } else {
@@ -39,12 +39,12 @@ public abstract class ParallelSourceLoaderInvoker implements SourceLoaderInvoker
         }
         if (!serialSourceLoaders.isEmpty()) {
             for (SourceLoader loader : serialSourceLoaders) {
-                LoadResult result = loader.load(context);
+                SourceLoadResult result = loader.load(context);
                 results.add(result);
             }
         }
         return results;
     }
 
-    public abstract Collection<LoadResult> parallelInvoke(Collection<SourceLoader> loaders, DownloadContext context);
+    public abstract Collection<SourceLoadResult> parallelInvoke(Collection<SourceLoader> loaders, DownloadContext context);
 }

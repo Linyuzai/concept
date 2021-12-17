@@ -19,13 +19,14 @@ public class ExceptionHandledSourceLoader implements SourceLoader {
     }
 
     @Override
-    public LoadResult load(DownloadContext context) {
+    public SourceLoadResult load(DownloadContext context) {
         try {
             source.load(context);
-            return new LoadResult(source);
+            return new SourceLoadResult(source);
         } catch (Throwable e) {
-            handler.onLoading(new SourceLoadException(source, e));
-            return new LoadResult(source, e);
+            SourceLoadResult result = new SourceLoadResult(source, e);
+            handler.onLoading(result.getException());
+            return result;
         }
     }
 }

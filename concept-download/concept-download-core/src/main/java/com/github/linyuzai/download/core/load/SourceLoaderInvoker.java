@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.source.Source;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -18,5 +17,5 @@ public interface SourceLoaderInvoker {
      * @param context 下载上下文 / Context of download
      * @throws IOException I/O exception
      */
-    Collection<LoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException;
+    Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException;
 }

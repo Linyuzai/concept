@@ -6,5 +6,5 @@ public interface SourceLoader {
 
     boolean isAsyncLoad();
 
-    LoadResult load(DownloadContext context);
+    SourceLoadResult load(DownloadContext context);
 }
