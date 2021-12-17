@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基于Map下载上下文 / Context of download based on Map
+ * 基于Map的下载上下文 / Context of download based on Map
  */
 public class MapDownloadContext extends AbstractDownloadContext {
 
