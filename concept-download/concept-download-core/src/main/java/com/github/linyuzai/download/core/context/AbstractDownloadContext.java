@@ -4,8 +4,7 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;
 
 /**
- * 下载上下文 / Context of download
- * 在下载操作中提供数据的隔离和共享 / Provides data isolation and sharing during download operations
+ * 持有下载操作参数的下载上下文 / Context of download holding download options
  */
 public abstract class AbstractDownloadContext implements DownloadContext {
 

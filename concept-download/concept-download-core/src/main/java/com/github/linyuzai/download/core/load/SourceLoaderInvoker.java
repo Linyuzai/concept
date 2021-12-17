@@ -6,15 +6,16 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * 下载源加载器
+ * 下载源加载器的调用器 / Invoker to invoke SourceLoader
  */
 public interface SourceLoaderInvoker {
 
     /**
-     * 加载资源 / Load resource
+     * 调用加载器 / Invoke loader
      *
-     * @param source  需要加载的下载源 / Source need load
+     * @param loaders 加载器 / Loaders
      * @param context 下载上下文 / Context of download
+     * @return 加载结果 / Results of loadings
      * @throws IOException I/O exception
      */
     Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException;

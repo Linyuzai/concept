@@ -11,7 +11,6 @@ import lombok.Setter;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Collection;
 
 /**
  * 需要预加载资源的抽象类 / Abstract classes that require preloaded resources
@@ -138,5 +137,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
         }
     }
 
+    /**
+     * 加载输入流 / Load input stream
+     *
+     * @param context 下载上下文 / Context of download
+     * @return 输入流 / Input stream
+     * @throws IOException I/O exception
+     */
     public abstract InputStream doLoad(DownloadContext context) throws IOException;
 }

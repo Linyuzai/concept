@@ -12,15 +12,27 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 加载处理器 / A handler to process loads
+ */
 @AllArgsConstructor
 public class LoadSourceHandler implements DownloadHandler {
 
-    private SourceLoaderInvoker sourceLoaderInvoker;
-
     private SourceLoaderFactory sourceLoaderFactory;
+
+    private SourceLoaderInvoker sourceLoaderInvoker;
 
     private SourceLoadExceptionHandler sourceLoadExceptionHandler;
 
+    /**
+     * 将所有的Source封装成对应的加载器 / Encapsulate all sources into corresponding loaders
+     * 使用Invoker调用加载器 / Invoking the loader using invoker
+     * 处理加载异常 / Handle load exception
+     *
+     * @param context 下载上下文 / Context of download
+     * @param chain   处理链 / Chain of handler
+     * @throws IOException I/O exception
+     */
     @Override
     public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
         Source source = context.get(Source.class);

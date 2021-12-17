@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 
 /**
  * 默认的下载上下文工厂 / Default factory
+ *
  */
 public class MapDownloadContextFactory implements DownloadContextFactory {
 

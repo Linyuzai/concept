@@ -160,10 +160,10 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LoadSourceHandler loadSourceHandler(SourceLoaderInvoker invoker,
-                                               SourceLoaderFactory factory,
+    public LoadSourceHandler loadSourceHandler(SourceLoaderFactory factory,
+                                               SourceLoaderInvoker invoker,
                                                SourceLoadExceptionHandler handler) {
-        return new LoadSourceHandler(invoker, factory, handler);
+        return new LoadSourceHandler(factory, invoker, handler);
     }
 
     @Bean

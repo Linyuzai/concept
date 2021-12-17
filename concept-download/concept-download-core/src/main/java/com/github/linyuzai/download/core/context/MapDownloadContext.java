@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 下载上下文 / Context of download
- * 在下载操作中提供数据的隔离和共享 / Provides data isolation and sharing during download operations
+ * 基于Map下载上下文 / Context of download based on Map
  */
 public class MapDownloadContext extends AbstractDownloadContext {
 
@@ -15,6 +14,7 @@ public class MapDownloadContext extends AbstractDownloadContext {
 
     /**
      * 上下文依赖一个下载操作的参数 / Context depend on a download options
+     * 默认基于HashMap / The default is based on HashMap
      *
      * @param options 下载操作参数 / Options of download
      */
@@ -22,6 +22,12 @@ public class MapDownloadContext extends AbstractDownloadContext {
         this(options, new HashMap<>());
     }
 
+    /**
+     * 上下文依赖一个下载操作的参数和一个Map对象 / Context depend on a download options and a Map
+     *
+     * @param options 下载操作参数 / Options of download
+     * @param map     基于的Map对象 / Map object to based
+     */
     public MapDownloadContext(DownloadOptions options, Map<Object, Object> map) {
         super(options);
         this.map = map;

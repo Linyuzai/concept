@@ -4,6 +4,9 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
+/**
+ * 加载异常 / Loading exception
+ */
 public class SourceLoadException extends DownloadException {
 
     @Getter
