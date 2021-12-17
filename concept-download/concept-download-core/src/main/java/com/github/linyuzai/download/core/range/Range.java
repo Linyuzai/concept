@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
+ * 指定资源的范围 / Specify the range of the resource
  * 暂时未用到，目前不支持 / Not used at the moment, not supported at present
  */
 @Getter
