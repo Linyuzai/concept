@@ -7,11 +7,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * 文件响应 / File response
+ * 可将结果输出到文件 / The results can be output to a file
+ */
 @AllArgsConstructor
 public class FileResponse implements DownloadResponse {
 
     private File file;
 
+    /**
+     * 使用文件输出流 / Use output stream of file {@link FileOutputStream}
+     *
+     * @return 文件输出流 / Output stream of file
+     * @throws IOException I/O exception
+     */
     @Override
     public OutputStream getOutputStream() throws IOException {
         return new FileOutputStream(file);

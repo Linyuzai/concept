@@ -25,7 +25,7 @@ import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
-import com.github.linyuzai.download.core.source.direct.DirectSourceFactory;
+import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
 import com.github.linyuzai.download.core.writer.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -88,8 +88,8 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DirectSourceFactory directSourceFactory() {
-        return new DirectSourceFactory();
+    public SelfSourceFactory directSourceFactory() {
+        return new SelfSourceFactory();
     }
 
     @Bean
