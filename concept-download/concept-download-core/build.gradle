@@ -20,3 +20,5 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+apply from: '../publish.gradle'
