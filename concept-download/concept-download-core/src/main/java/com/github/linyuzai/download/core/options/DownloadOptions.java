@@ -29,10 +29,7 @@ public class DownloadOptions {
     boolean sourceCacheEnabled;
 
     /**
-     * 原始数据对象的缓存目录分组 / Cache directory grouping of original source
-     * 如用户指定缓存目录为/home/download/cache，该属性配置images / If the user specifies the cache directory as /home/download/cache, this attribute configures images
-     * 则最终缓存文件会存储在/home/download/cache/images目录下 / The final cache file will be stored in the /home/download/cache/images
-     * 方便根据不同业务指定不同的缓存文件夹，防止文件重名等问题 / It is convenient to specify different cache folders according to different businesses to prevent file name duplication and other problems
+     * 原始数据对象的缓存目录 / Cache directory of original source
      */
     String sourceCachePath;
 
@@ -77,7 +74,7 @@ public class DownloadOptions {
     boolean compressCacheEnabled;
 
     /**
-     * 压缩文件的缓存目录分组 / Cache directory grouping of compressed files
+     * 压缩文件的缓存目录 / Cache directory of compressed files
      * 同 {@link DownloadOptions#sourceCachePath} / Same as {@link DownloadOptions#sourceCachePath}
      */
     String compressCachePath;
