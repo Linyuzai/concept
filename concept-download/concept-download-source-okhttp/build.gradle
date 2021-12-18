@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+    compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     compileOnly project(':concept-download:concept-download-core')
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -22,3 +22,5 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+apply from: '../publish.gradle'
