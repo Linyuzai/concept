@@ -8,6 +8,9 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.nio.charset.Charset;
 
+/**
+ * ClassPath前缀 'classpath:' 的工厂 / Factory for class path prefix 'classpath:'
+ */
 public class ClassPathPrefixSourceFactory extends PrefixSourceFactory {
 
     public static final String[] PREFIXES = new String[]{"classpath:"};

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 数组类型的下载源工厂 / Factory of array
+ * 支持数组类型的工厂 / Factory support array
  */
 public class ArraySourceFactory implements SourceFactory {
 

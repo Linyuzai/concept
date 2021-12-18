@@ -7,6 +7,9 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.nio.charset.Charset;
 
+/**
+ * 支持 {@link ClassPathResource} 对象的工厂 / Factory support {@link ClassPathResource}
+ */
 public class ClassPathResourceSourceFactory implements SourceFactory {
 
     @Override

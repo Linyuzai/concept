@@ -11,6 +11,9 @@ import okhttp3.ResponseBody;
 
 import java.io.*;
 
+/**
+ * 使用OkHttp加载资源 / Use OkHttp to load source
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class OkHttpSource extends AbstractLoadableSource {
@@ -22,6 +25,12 @@ public class OkHttpSource extends AbstractLoadableSource {
     @NonNull
     protected final String url;
 
+    /**
+     * 如果没有指定名称 / If no name is specified
+     * 将截取url最后一段作为名称 / Take the last paragraph of the intercepted URL as the name
+     *
+     * @return 名称 / Name
+     */
     @Override
     public String getName() {
         String name = super.getName();
@@ -41,6 +50,11 @@ public class OkHttpSource extends AbstractLoadableSource {
         return super.getName();
     }
 
+    /**
+     * 返回0 / return 0
+     *
+     * @return 0
+     */
     @Override
     public long getLength() {
         return 0;

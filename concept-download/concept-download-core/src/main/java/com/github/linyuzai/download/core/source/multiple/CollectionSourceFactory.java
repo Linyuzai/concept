@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 集合类型的下载源工厂 / Factory of collection
+ * 支持集合类型的工厂 / Factory support collection
  */
 public class CollectionSourceFactory implements SourceFactory {
 

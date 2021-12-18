@@ -8,7 +8,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 /**
- * 文件对象的工厂 / Factory for file object
+ * 支持文件对象的工厂 / Factory support file object
  */
 public class FileSourceFactory implements SourceFactory {
 

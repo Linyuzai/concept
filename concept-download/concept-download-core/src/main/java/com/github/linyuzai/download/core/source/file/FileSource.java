@@ -24,6 +24,7 @@ public class FileSource extends AbstractSource {
     protected final File file;
 
     /**
+     * 如果没有指定名称 / If no name is specified
      * 返回文件名称 / Return file name
      *
      * @return 名称 / Name

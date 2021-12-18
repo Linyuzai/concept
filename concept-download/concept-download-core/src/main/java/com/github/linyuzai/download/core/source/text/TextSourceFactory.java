@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.source.SourceFactory;
 import java.nio.charset.Charset;
 
 /**
- * 文本类型的下载源工厂 / Factory of text
+ * 支持文本类型的下载源工厂 / Factory support text
  */
 public class TextSourceFactory implements SourceFactory {
 

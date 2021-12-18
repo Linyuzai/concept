@@ -8,16 +8,15 @@ import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import java.io.File;
 
 /**
- * 用户目录的工厂 / Factory for user home
+ * 用户目录前缀 'user.home:' 的工厂 / Factory for user home prefix 'user.home:'
+ * 也支持 'user_home:' 或 'user-home:' / Also 'user_home:' or 'user-home:'
  */
 public class UserHomeSourceFactory extends PrefixSourceFactory {
 
     public static final String[] PREFIXES = new String[]{
             "user.home:",
             "user_home:",
-            "user-home:",
-            "userHome:",
-            "userhome:"};
+            "user-home:"};
 
     public static final String USER_HOME = System.getProperty("user.home");
 

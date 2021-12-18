@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.source.SourceFactory;
 import java.io.InputStream;
 
 /**
- * 输入流类型的下载源工厂 / Factory of input stream
+ * 支持输入流类型的工厂 / Factory support input stream
  */
 public class InputStreamSourceFactory implements SourceFactory {
 

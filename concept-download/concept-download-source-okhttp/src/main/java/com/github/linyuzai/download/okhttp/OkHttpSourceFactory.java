@@ -10,6 +10,9 @@ import okhttp3.OkHttpClient;
 
 import java.nio.charset.Charset;
 
+/**
+ * 匹配http前缀，使用OkHttp加载的下载源的工厂 / The factory of the source witch match the HTTP prefix and use okhttp to load
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,6 +26,13 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
         this(new OkHttpClient());
     }
 
+    /**
+     * Use {@link OkHttpSource}
+     *
+     * @param source  需要下载的数据对象 / Object to download
+     * @param context 下载上下文 / Context of download
+     * @return 下载源 / Source {@link OkHttpSource}
+     */
     @Override
     public Source create(Object source, DownloadContext context) {
         String url = (String) source;
