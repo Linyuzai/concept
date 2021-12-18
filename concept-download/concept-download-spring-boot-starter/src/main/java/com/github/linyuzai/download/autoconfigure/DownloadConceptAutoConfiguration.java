@@ -36,11 +36,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * 基础组件的配置 / Configuration of basic components
+ */
 @Configuration
 @EnableConfigurationProperties(DownloadConceptProperties.class)
 public class DownloadConceptAutoConfiguration {
-
-    //private static final Log logger = LogFactory.getLog(DownloadConceptAutoConfiguration.class);
 
     @Bean
     @ConditionalOnMissingBean

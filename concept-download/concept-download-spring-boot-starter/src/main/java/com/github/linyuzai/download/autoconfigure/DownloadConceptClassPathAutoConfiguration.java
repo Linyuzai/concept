@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * ClassPath的配置 / Configuration of class path
+ */
 @Configuration
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({ClassPathResourceSourceFactory.class, ClassPathPrefixSourceFactory.class})

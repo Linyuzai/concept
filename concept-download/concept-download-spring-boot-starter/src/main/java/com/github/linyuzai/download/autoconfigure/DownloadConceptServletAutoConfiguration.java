@@ -10,12 +10,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Servlet的配置 / Configuration of servlet
+ */
 @Configuration
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({ServletDownloadRequestProvider.class, ServletDownloadResponseProvider.class})
 public class DownloadConceptServletAutoConfiguration {
-
-    //private static final Log logger = LogFactory.getLog(DownloadConceptServletAutoConfiguration.class);
 
     @Bean
     @ConditionalOnMissingBean

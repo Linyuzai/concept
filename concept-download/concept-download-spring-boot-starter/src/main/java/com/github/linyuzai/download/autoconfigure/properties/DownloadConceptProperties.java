@@ -21,8 +21,14 @@ public class DownloadConceptProperties {
     @Data
     public static class ResponseProperties {
 
+        /**
+         * Content-Type Header
+         */
         private String contentType = ContentType.OCTET_STREAM;
 
+        /**
+         * 额外的响应头 / Additional response headers
+         */
         private Map<String, String> headers;
     }
 
@@ -35,6 +41,9 @@ public class DownloadConceptProperties {
     @Data
     public static class CompressProperties {
 
+        /**
+         * 压缩格式 / Compression format
+         */
         private String format = CompressFormat.ZIP;
 
         private CacheProperties cache = new CacheProperties();
@@ -43,10 +52,19 @@ public class DownloadConceptProperties {
     @Data
     public static class CacheProperties {
 
+        /**
+         * 是否开启缓存 / If cache is enabled
+         */
         private boolean enabled;
 
+        /**
+         * 缓存地址 / Path of cache
+         */
         private String path = Cacheable.PATH;
 
+        /**
+         * 下载结束后缓存是否删除 / If delete cache after downloading
+         */
         private boolean delete;
     }
 }

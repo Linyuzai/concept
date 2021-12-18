@@ -8,12 +8,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * AOP配置 / Configuration of AOP
+ */
 @Configuration
 @AutoConfigureAfter(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({DownloadConceptAdvice.class, DownloadConceptAdvisor.class})
 public class DownloadConceptAopAutoConfiguration {
-
-    //private static final Log logger = LogFactory.getLog(DownloadConceptAopAutoConfiguration.class);
 
     @Bean
     public DownloadConceptAdvisor downloadConceptAdvisor(DownloadConcept downloadConcept) {

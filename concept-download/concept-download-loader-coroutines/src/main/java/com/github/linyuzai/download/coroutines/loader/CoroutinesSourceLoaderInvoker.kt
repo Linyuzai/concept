@@ -9,6 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
+/**
+ * 使用协程的调用器 / Coroutines loader invoker
+ */
 class CoroutinesSourceLoaderInvoker : ParallelSourceLoaderInvoker() {
 
     override fun parallelInvoke(loaders: Collection<SourceLoader>, context: DownloadContext): Collection<SourceLoadResult> {

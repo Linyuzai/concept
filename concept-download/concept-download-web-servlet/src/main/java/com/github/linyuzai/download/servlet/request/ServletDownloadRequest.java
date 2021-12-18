@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * HttpServletRequest实现 / implementations by HttpServletRequest
+ */
 @Getter
 @AllArgsConstructor
 public class ServletDownloadRequest implements DownloadRequest {

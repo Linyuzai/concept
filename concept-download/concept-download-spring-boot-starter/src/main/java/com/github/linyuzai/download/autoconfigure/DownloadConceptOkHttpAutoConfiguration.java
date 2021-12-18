@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * OkHttp的配置 / Configuration of OkHttp
+ */
 @Configuration
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass(OkHttpSourceFactory.class)

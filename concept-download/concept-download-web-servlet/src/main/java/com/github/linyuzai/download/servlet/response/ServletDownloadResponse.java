@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * HHttpServletResponse实现 / implementations by HttpServletResponse
+ */
 @Getter
 @AllArgsConstructor
 public class ServletDownloadResponse implements DownloadResponse {
