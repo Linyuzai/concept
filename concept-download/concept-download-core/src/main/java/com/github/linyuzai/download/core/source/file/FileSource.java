@@ -4,6 +4,9 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.io.*;
@@ -13,15 +16,12 @@ import java.nio.charset.Charset;
  * 文件下载源 / A source that holds a file
  * 该下载源持有一个文件对象，可能是文件，可能是目录 / The source holds a file object, which may be a file or a directory
  */
+@Getter
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileSource extends AbstractSource {
 
-    private final File file;
-
-    private FileSource(@NonNull File file, Charset charset, boolean asyncLoad) {
-        this.file = file;
-        setCharset(charset);
-        setAsyncLoad(asyncLoad);
-    }
+    @NonNull
+    protected final File file;
 
     /**
      * 返回文件名称 / Return file name
@@ -30,7 +30,12 @@ public class FileSource extends AbstractSource {
      */
     @Override
     public String getName() {
-        return file.getName();
+        String name = super.getName();
+        if (name == null || name.isEmpty()) {
+            return file.getName();
+        } else {
+            return name;
+        }
     }
 
     /**
@@ -173,31 +178,17 @@ public class FileSource extends AbstractSource {
         }
     }
 
-    public static class Builder {
+    public static class Builder extends AbstractSource.Builder<FileSource, Builder> {
 
         private File file;
-
-        private Charset charset;
-
-        private boolean asyncLoad;
 
         public Builder file(File file) {
             this.file = file;
             return this;
         }
 
-        public Builder charset(Charset charset) {
-            this.charset = charset;
-            return this;
-        }
-
-        public Builder asyncLoad(boolean asyncLoad) {
-            this.asyncLoad = asyncLoad;
-            return this;
-        }
-
         public FileSource build() {
-            return new FileSource(file, charset, asyncLoad);
+            return super.build(new FileSource(file));
         }
     }
 }

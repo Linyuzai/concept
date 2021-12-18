@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.source.inputstream;
+package com.github.linyuzai.download.core.source.text;
 
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
@@ -6,29 +6,32 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 
-/**
- * 持有一个输入流的下载源 / Source holds an input stream
- */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class InputStreamSource extends AbstractSource {
+public class TextSource extends AbstractSource {
 
-    protected InputStream inputStream;
+    @NonNull
+    protected String text;
 
     @Override
     public long getLength() {
-        return 0;
+        return getBytes().length;
+    }
+
+    public byte[] getBytes() {
+        Charset charset = getCharset();
+        return charset == null ? text.getBytes() : text.getBytes(charset);
     }
 
     @Override
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
-        try (InputStream is = inputStream) {
+        byte[] bytes = getBytes();
+        try (InputStream is = new ByteArrayInputStream(bytes)) {
             Part part = new Part() {
 
                 @Override
@@ -38,22 +41,22 @@ public class InputStreamSource extends AbstractSource {
 
                 @Override
                 public String getName() {
-                    return InputStreamSource.this.getName();
+                    return TextSource.this.getName();
                 }
 
                 @Override
                 public String getPath() {
-                    return InputStreamSource.this.getName();
+                    return TextSource.this.getName();
                 }
 
                 @Override
                 public Charset getCharset() {
-                    return InputStreamSource.this.getCharset();
+                    return TextSource.this.getCharset();
                 }
 
                 @Override
                 public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), 0);
+                    writer.write(getInputStream(), os, range, getCharset(), bytes.length);
                 }
             };
             handler.handle(part);
@@ -65,17 +68,17 @@ public class InputStreamSource extends AbstractSource {
         return true;
     }
 
-    public static class Builder extends AbstractSource.Builder<InputStreamSource, Builder> {
+    public static class Builder extends AbstractSource.Builder<TextSource, Builder> {
 
-        private InputStream inputStream;
+        private String text;
 
-        public Builder inputStream(InputStream inputStream) {
-            this.inputStream = inputStream;
+        public Builder text(String text) {
+            this.text = text;
             return this;
         }
 
-        public InputStreamSource build() {
-            return super.build(new InputStreamSource(inputStream));
+        public TextSource build() {
+            return super.build(new TextSource(text));
         }
     }
 }

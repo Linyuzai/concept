@@ -6,6 +6,7 @@ import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,6 +19,7 @@ import java.util.function.Predicate;
 /**
  * 持有数据源集合的数据源 / A source that holds a collection of sources
  */
+@Getter
 @AllArgsConstructor
 public class MultipleSource implements Source {
 

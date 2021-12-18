@@ -12,13 +12,51 @@ import java.nio.charset.Charset;
 @Setter
 public abstract class DownloadResource implements Downloadable {
 
-    private String name;
+    protected String name;
 
-    private Charset charset;
+    protected Charset charset;
 
-    private long length;
+    protected boolean cacheEnabled;
 
-    private boolean cacheEnabled;
+    protected String cachePath;
 
-    private String cachePath;
+    @SuppressWarnings("unchecked")
+    public static class Builder<T extends DownloadResource, B extends Builder<T, B>> {
+
+        protected String name;
+
+        protected Charset charset;
+
+        protected boolean cacheEnabled;
+
+        protected String cachePath;
+
+        public B name(String name) {
+            this.name = name;
+            return (B) this;
+        }
+
+        public B charset(Charset charset) {
+            this.charset = charset;
+            return (B) this;
+        }
+
+        public B cacheEnabled(boolean cacheEnabled) {
+            this.cacheEnabled = cacheEnabled;
+            return (B) this;
+        }
+
+        public B cachePath(String cachePath) {
+            this.cachePath = cachePath;
+            return (B) this;
+        }
+
+        protected T build(T target) {
+            target.setName(name);
+            target.setCharset(charset);
+            target.setCacheEnabled(cacheEnabled);
+            target.setCachePath(cachePath);
+            return target;
+        }
+    }
 }

@@ -3,8 +3,7 @@ package com.github.linyuzai.download.classpath;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
-import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.*;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -12,19 +11,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+@Getter
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ClassPathResourceSource extends AbstractSource {
 
-    private final ClassPathResource resource;
-
-    private ClassPathResourceSource(@NonNull ClassPathResource resource, Charset charset, boolean asyncLoad) {
-        this.resource = resource;
-        setCharset(charset);
-        setAsyncLoad(asyncLoad);
-    }
+    @NonNull
+    protected final ClassPathResource resource;
 
     @Override
     public String getName() {
-        return resource.getFilename();
+        String name = super.getName();
+        if (name == null || name.isEmpty()) {
+            return resource.getFilename();
+        } else {
+            return name;
+        }
     }
 
     @SneakyThrows
@@ -72,31 +73,17 @@ public class ClassPathResourceSource extends AbstractSource {
         return true;
     }
 
-    public static class Builder {
+    public static class Builder extends AbstractSource.Builder<ClassPathResourceSource, Builder> {
 
         private ClassPathResource resource;
-
-        private Charset charset;
-
-        private boolean asyncLoad;
 
         public Builder resource(ClassPathResource resource) {
             this.resource = resource;
             return this;
         }
 
-        public Builder charset(Charset charset) {
-            this.charset = charset;
-            return this;
-        }
-
-        public Builder asyncLoad(boolean asyncLoad) {
-            this.asyncLoad = asyncLoad;
-            return this;
-        }
-
         public ClassPathResourceSource build() {
-            return new ClassPathResourceSource(resource, charset, asyncLoad);
+            return super.build(new ClassPathResourceSource(resource));
         }
     }
 }

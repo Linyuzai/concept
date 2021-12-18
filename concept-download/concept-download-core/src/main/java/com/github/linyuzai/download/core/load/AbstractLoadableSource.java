@@ -7,7 +7,6 @@ import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -17,10 +16,9 @@ import java.nio.charset.Charset;
  * 需要注意数据流只能使用一次 / Note that stream can only be used once
  */
 @Getter
-@Setter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
-    private InputStream inputStream;
+    protected InputStream inputStream;
 
     /**
      * 如果需要异步加载 / If asynchronous loading is required
@@ -145,4 +143,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * @throws IOException I/O exception
      */
     public abstract InputStream doLoad(DownloadContext context) throws IOException;
+
+    public static class Builder<T extends AbstractLoadableSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
+
+        @Override
+        protected T build(T target) {
+            return super.build(target);
+        }
+    }
 }

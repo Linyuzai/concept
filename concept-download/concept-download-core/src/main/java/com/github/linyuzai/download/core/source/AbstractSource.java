@@ -11,5 +11,22 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractSource extends DownloadResource implements Source {
 
-    private boolean asyncLoad;
+    protected boolean asyncLoad;
+
+    @SuppressWarnings("unchecked")
+    public static class Builder<T extends AbstractSource, B extends Builder<T, B>> extends DownloadResource.Builder<T, B> {
+
+        protected boolean asyncLoad;
+
+        public B asyncLoad(boolean asyncLoad) {
+            this.asyncLoad = asyncLoad;
+            return (B) this;
+        }
+
+        @Override
+        protected T build(T target) {
+            target.setAsyncLoad(asyncLoad);
+            return super.build(target);
+        }
+    }
 }
