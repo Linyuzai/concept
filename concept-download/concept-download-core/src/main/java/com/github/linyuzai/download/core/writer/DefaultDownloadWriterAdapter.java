@@ -10,6 +10,9 @@ import lombok.Getter;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * 默认的写入器的适配器 / Adapter of writer by default
+ */
 @Getter
 public class DefaultDownloadWriterAdapter implements DownloadWriterAdapter {
 

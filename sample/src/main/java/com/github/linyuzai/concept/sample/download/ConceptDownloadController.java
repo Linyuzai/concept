@@ -66,42 +66,48 @@ public class ConceptDownloadController {
         return new ClassPathResource("/download/README.txt");
     }
 
-    @Download(source = "http://127.0.0.1:8080/concept-download/text.txt?a=1&b=2")
+    @Download(filename = "s9.txt")
     @GetMapping("/s9")
-    public void s9() {
+    public String s9() {
+        return "任意的文本将会直接作为文本文件处理";
+    }
+
+    @Download(source = "http://127.0.0.1:8080/concept-download/text.txt?a=1&b=2")
+    @GetMapping("/s10")
+    public void s10() {
     }
 
     @Download
-    @GetMapping("/s10")
-    public String s10() {
+    @GetMapping("/s11")
+    public String s11() {
         return "http://127.0.0.1:8080/concept-download/text.txt";
     }
 
     @Download(source = "classpath:/download/README.txt", forceCompress = true)
-    @GetMapping("/s11")
-    public void s11() {
+    @GetMapping("/s12")
+    public void s12() {
     }
 
     @Download(source = "classpath:/download/README_GBK.txt",
             filename = "readme.zip",
             charset = "GBK",
             forceCompress = true)
-    @GetMapping("/s12")
-    public void s12() {
+    @GetMapping("/s13")
+    public void s13() {
     }
 
     @Download(source = {
             "classpath:/download/text.txt",
             "http://127.0.0.1:8080/concept-download/image.jpg",
             "http://127.0.0.1:8080/concept-download/video.mp4"},
-            filename = "压缩包13.zip")
-    @GetMapping("/s13")
-    public void s13() {
+            filename = "压缩包14.zip")
+    @GetMapping("/s14")
+    public void s14() {
     }
 
-    @Download(filename = "压缩包14.zip")
-    @GetMapping("/s14")
-    public List<Object> s14() {
+    @Download(filename = "压缩包15.zip")
+    @GetMapping("/s15")
+    public List<Object> s15() {
         List<Object> list = new ArrayList<>();
         list.add(new File("/Users/Shared/README.txt"));
         list.add(new ClassPathResource("/download/image.jpg"));
@@ -110,17 +116,17 @@ public class ConceptDownloadController {
     }
 
     @Download(filename = "压缩包15.zip")
-    @CompressCache(group = "s15", name = "s15.zip", delete = true)
-    @GetMapping("/s15")
-    public List<Object> s15() {
-        return s14();
+    @CompressCache(group = "s16", name = "s16.zip", delete = true)
+    @GetMapping("/s16")
+    public List<Object> s16() {
+        return s15();
     }
 
-    @Download(filename = "压缩包16.zip")
-    @SourceCache(group = "s16")
-    @CompressCache(group = "s16", name = "s16.zip")
-    @GetMapping("/s16")
-    public String[] s16() {
+    @Download(filename = "压缩包17.zip")
+    @SourceCache(group = "s17")
+    @CompressCache(group = "s17", name = "s17.zip")
+    @GetMapping("/s17")
+    public String[] s17() {
         return new String[]{
                 "http://127.0.0.1:8080/concept-download/text.txt",
                 "http://127.0.0.1:8080/concept-download/image.jpg",
@@ -129,8 +135,8 @@ public class ConceptDownloadController {
     }
 
     @Download(source = "classpath:/download/README.txt")
-    @GetMapping("/s17")
-    public DownloadOptions.Rewriter s17() {
+    @GetMapping("/s18")
+    public DownloadOptions.Rewriter s18() {
         return new DownloadOptions.Rewriter() {
             @Override
             public DownloadOptions rewrite(DownloadOptions options) {

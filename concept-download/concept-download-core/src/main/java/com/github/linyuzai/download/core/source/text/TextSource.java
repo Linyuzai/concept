@@ -11,6 +11,9 @@ import lombok.NonNull;
 import java.io.*;
 import java.nio.charset.Charset;
 
+/**
+ * 文本下载源 / A source that holds a text
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TextSource extends AbstractSource {
@@ -18,11 +21,17 @@ public class TextSource extends AbstractSource {
     @NonNull
     protected String text;
 
+    /**
+     * @return 获得文本字节数 / Get bytes count of text
+     */
     @Override
     public long getLength() {
         return getBytes().length;
     }
 
+    /**
+     * @return 获得字节数组 / Get the bytes
+     */
     public byte[] getBytes() {
         Charset charset = getCharset();
         return charset == null ? text.getBytes() : text.getBytes(charset);

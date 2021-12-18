@@ -27,6 +27,7 @@ import com.github.linyuzai.download.core.source.inputstream.InputStreamSourceFac
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
 import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
+import com.github.linyuzai.download.core.source.text.TextSourceFactory;
 import com.github.linyuzai.download.core.writer.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -109,6 +110,12 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public UserHomeSourceFactory userHomeSourceFactory() {
         return new UserHomeSourceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TextSourceFactory textSourceFactory() {
+        return new TextSourceFactory();
     }
 
     @Bean

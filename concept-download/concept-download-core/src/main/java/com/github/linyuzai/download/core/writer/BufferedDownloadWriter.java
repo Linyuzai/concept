@@ -9,17 +9,40 @@ import lombok.NoArgsConstructor;
 import java.io.*;
 import java.nio.charset.Charset;
 
+/**
+ * 使用缓冲区的写入器 / Writer using buffer
+ * 默认缓冲区为1M / The default buffer is 1M
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 public class BufferedDownloadWriter implements DownloadWriter {
 
     private int bufferSize = 1024 * 1024;
 
+    /**
+     * 返回true / Return true
+     *
+     * @param downloadable 可下载的资源 / Resource can be downloaded
+     * @param range        写入的范围 / Range of writing
+     * @param context      下载上下文 / Context of download
+     * @return true
+     */
     @Override
     public boolean support(Downloadable downloadable, Range range, DownloadContext context) {
         return true;
     }
 
+    /**
+     * 如果编码为null则使用字节流处理 / Byte stream is used if the charset is null
+     * 如果有编码则使用字符流处理 / Char stream is used if the charset is existed
+     *
+     * @param is      输入流 / Input stream
+     * @param os      输出流 / Output stream
+     * @param range   写入的范围 / Range of writing
+     * @param charset 编码 / Charset
+     * @param length  总字节数，可能为0 / Total bytes count, may be 0
+     * @throws IOException I/O exception
+     */
     @Override
     public void write(InputStream is, OutputStream os, Range range, Charset charset, long length) throws IOException {
         if (charset == null /*|| length > 0 && bufferSize >= length*/) {
