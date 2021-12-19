@@ -4,8 +4,6 @@ import com.github.linyuzai.download.aop.annotation.CompressCache;
 import com.github.linyuzai.download.aop.annotation.Download;
 import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.handler.DownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.handler.StandardDownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import org.springframework.core.io.ClassPathResource;

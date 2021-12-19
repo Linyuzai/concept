@@ -1,0 +1,16 @@
+#concept:
+#  download:
+#    compress:
+#      cache:
+#        enabled: true
+#        path: /
+#        delete: false
+#      format:
+#    response:
+#      content-type:
+#      headers:
+#    source:
+#      cache:
+#        enabled: true
+#        delete: true
+#        path: /s
