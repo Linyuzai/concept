@@ -23,7 +23,7 @@ dependencies {
     //compileOnly project(':concept-download:concept-download-web-servlet')
     //compileOnly project(':concept-download:concept-download-source-classpath')
     compileOnly project(':concept-download:concept-download-source-okhttp')
-    compileOnly project(':concept-download:concept-download-loader-coroutines')
+    compileOnly project(':concept-download:concept-download-load-coroutines')
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
