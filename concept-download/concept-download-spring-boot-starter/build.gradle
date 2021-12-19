@@ -2,8 +2,10 @@ plugins {
     id 'java'
 }
 
+apply from: '../version.gradle'
+
 group 'com.github.linyuzai'
-version '1.0.0'
+version "${conceptDownloadVersion}"
 sourceCompatibility = '1.8'
 
 repositories {
@@ -11,12 +13,17 @@ repositories {
 }
 
 dependencies {
+    compile "com.github.linyuzai:concept-download-core:${conceptDownloadVersion}"
+    compile "com.github.linyuzai:concept-download-aop:${conceptDownloadVersion}"
+    compile "com.github.linyuzai:concept-download-web-servlet:${conceptDownloadVersion}"
+    compile "com.github.linyuzai:concept-download-source-classpath:${conceptDownloadVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
-    compileOnly project(':concept-download:concept-download-core')
-    compileOnly project(':concept-download:concept-download-aop')
-    compileOnly project(':concept-download:concept-download-web-servlet')
-    compileOnly project(':concept-download:concept-download-source-classpath')
+    //compileOnly project(':concept-download:concept-download-core')
+    //compileOnly project(':concept-download:concept-download-aop')
+    //compileOnly project(':concept-download:concept-download-web-servlet')
+    //compileOnly project(':concept-download:concept-download-source-classpath')
     compileOnly project(':concept-download:concept-download-source-okhttp')
+    compileOnly project(':concept-download:concept-download-loader-coroutines')
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
@@ -27,3 +34,5 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+apply from: '../publish.gradle'
