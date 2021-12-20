@@ -19,7 +19,12 @@ public class FileCompression extends AbstractCompression {
 
     @Override
     public String getName() {
-        return file.getName();
+        String name = super.getName();
+        if (name == null || name.isEmpty()) {
+            return file.getName();
+        } else {
+            return name;
+        }
     }
 
     @Override
@@ -30,6 +35,11 @@ public class FileCompression extends AbstractCompression {
     @Override
     public boolean isCacheEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean isCacheExisted() {
+        return file.exists();
     }
 
     @Override

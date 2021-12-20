@@ -7,13 +7,12 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -23,7 +22,8 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class MultipleSource implements Source {
 
-    private Collection<Source> sources;
+    @NonNull
+    private final Collection<Source> sources;
 
     /**
      * 如果集合为空返回null / Returns null if the collection is empty
@@ -49,8 +49,15 @@ public class MultipleSource implements Source {
      */
     @Override
     public Charset getCharset() {
-        if (sources.size() == 1) {
-            return sources.iterator().next().getCharset();
+        Set<Charset> charsets = new HashSet<>();
+        for (Source source : sources) {
+            charsets.add(source.getCharset());
+        }
+        int size = sources.size();
+        if (size == 0) {
+            return null;
+        } else if (size == 1) {
+            return charsets.iterator().next();
         } else {
             return null;
         }

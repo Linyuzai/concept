@@ -22,6 +22,16 @@ public class MemoryCompression extends AbstractCompression {
     private final AbstractSourceCompressor compressor;
 
     @Override
+    public String getName() {
+        String name = super.getName();
+        if (name == null || name.isEmpty()) {
+            return source.getName();
+        } else {
+            return name;
+        }
+    }
+
+    @Override
     public Charset getCharset() {
         return null;
     }
@@ -29,16 +39,6 @@ public class MemoryCompression extends AbstractCompression {
     @Override
     public long getLength() {
         return 0;
-    }
-
-    @Override
-    public boolean isCacheEnabled() {
-        return false;
-    }
-
-    @Override
-    public String getCachePath() {
-        return null;
     }
 
     /**

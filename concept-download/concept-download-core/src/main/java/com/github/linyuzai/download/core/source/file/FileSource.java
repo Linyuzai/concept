@@ -50,17 +50,6 @@ public class FileSource extends AbstractSource {
         return length0(file);
     }
 
-    /**
-     * 如果是文件则返回true / Returns true if it is a file
-     * 如果是文件夹则返回false / False if it is a folder
-     *
-     * @return 是否是单个的 / If single
-     */
-    @Override
-    public boolean isSingle() {
-        return file.isFile();
-    }
-
     private long length0(File file) {
         if (file.isFile()) {
             return file.length();
@@ -75,6 +64,32 @@ public class FileSource extends AbstractSource {
             }
             return length;
         }
+    }
+
+    /**
+     * 如果是文件则返回true / Returns true if it is a file
+     * 如果是文件夹则返回false / False if it is a folder
+     *
+     * @return 是否是单个的 / If single
+     */
+    @Override
+    public boolean isSingle() {
+        return file.isFile();
+    }
+
+    @Override
+    public boolean isCacheEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isCacheExisted() {
+        return file.exists();
+    }
+
+    @Override
+    public String getCachePath() {
+        return file.getParent();
     }
 
     /**
