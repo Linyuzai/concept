@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DownloadHandlerChainImpl implements DownloadHandlerChain {
 
-    private final int index;
+    private int index;
 
     private final List<DownloadHandler> handlers;
 
@@ -26,14 +26,10 @@ public class DownloadHandlerChainImpl implements DownloadHandlerChain {
      */
     @Override
     public void next(DownloadContext context) throws IOException {
-        DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
-        if (interceptor != null && index - 1 >= 0) {
-            interceptor.intercept(handlers.get(index - 1), context);
-        }
         if (index < handlers.size()) {
-            DownloadHandler handler = handlers.get(index);
-            DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);
-            handler.handle(context, chain);
+            DownloadHandler handler = handlers.get(index++);
+            //DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);
+            handler.handle(context, this);
         }
     }
 }

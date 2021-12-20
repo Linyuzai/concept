@@ -77,6 +77,13 @@ public class TextSource extends AbstractSource {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "TextSource{" +
+                "text='" + text + '\'' +
+                '}';
+    }
+
     public static class Builder extends AbstractSource.Builder<TextSource, Builder> {
 
         private String text;

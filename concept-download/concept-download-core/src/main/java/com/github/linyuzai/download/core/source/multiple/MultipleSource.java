@@ -190,4 +190,11 @@ public class MultipleSource implements Source {
     public void deleteCache() {
         sources.forEach(Cacheable::deleteCache);
     }
+
+    @Override
+    public String toString() {
+        return "MultipleSource{" +
+                "sources=" + sources +
+                '}';
+    }
 }

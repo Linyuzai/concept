@@ -4,8 +4,7 @@ import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.request.DownloadRequest;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
@@ -20,7 +19,7 @@ import java.util.Map;
  * 写响应处理器 / A handler to write response
  */
 @AllArgsConstructor
-public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
+public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadContextInitializer {
 
     private DownloadWriterAdapter downloadWriterAdapter;
 
@@ -35,11 +34,10 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      * 设置响应头 / Set response headers
      *
      * @param context 下载上下文 / Context of download
-     * @param chain   处理链 / Chain of handler
      * @throws IOException I/O exception
      */
     @Override
-    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
+    public void doHandle(DownloadContext context) throws IOException {
         DownloadResponse response = context.get(DownloadResponse.class);
         Compression compression = context.get(Compression.class);
         boolean inline = context.getOptions().isInline();
@@ -66,7 +64,6 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         Range range = context.get(Range.class);
         DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
         compression.write(response.getOutputStream(), range, writer);
-        chain.next(context);
     }
 
     /**

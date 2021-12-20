@@ -13,7 +13,7 @@ public class SourceLoadException extends DownloadException {
     private final Source source;
 
     public SourceLoadException(Source source, Throwable cause) {
-        super(cause);
+        super("Fail to load " + source, cause);
         this.source = source;
     }
 }

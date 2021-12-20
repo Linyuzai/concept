@@ -82,6 +82,13 @@ public class ClassPathResourceSource extends AbstractSource {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "ClassPathResourceSource{" +
+                "resource=" + resource +
+                '}';
+    }
+
     public static class Builder extends AbstractSource.Builder<ClassPathResourceSource, Builder> {
 
         private ClassPathResource resource;

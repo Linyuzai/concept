@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.context;
 
+import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
  * 调用所有的上下文初始化器 / Call all initializers {@link DownloadContextInitializer#initialize(DownloadContext)}
  */
 @AllArgsConstructor
-public class InitializeContextHandler implements DownloadHandler {
+public class InitializeContextHandler implements AutomaticDownloadHandler {
 
     @NonNull
     private List<DownloadContextInitializer> initializers;
@@ -23,15 +24,12 @@ public class InitializeContextHandler implements DownloadHandler {
      * 遍历执行所有的上下文初始化器 / Iterate and call all initializers
      *
      * @param context 下载上下文 / Context of download
-     * @param chain   处理链 / Chain of handler
-     * @throws IOException I/O exception
      */
     @Override
-    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
+    public void doHandle(DownloadContext context) {
         for (DownloadContextInitializer initializer : initializers) {
             initializer.initialize(context);
         }
-        chain.next(context);
     }
 
     @Override

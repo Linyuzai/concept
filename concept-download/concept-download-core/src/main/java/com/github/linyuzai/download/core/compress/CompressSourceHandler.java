@@ -3,8 +3,7 @@ package com.github.linyuzai.download.core.compress;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
@@ -21,7 +20,7 @@ import java.io.IOException;
  * 将通过压缩器对下载源进行压缩 / The download source will be compressed by a compressor
  */
 @AllArgsConstructor
-public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
+public class CompressSourceHandler implements AutomaticDownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     private SourceCompressorAdapter sourceCompressorAdapter;
 
@@ -29,11 +28,10 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      * 压缩处理 / Compression processing
      *
      * @param context 下载上下文 / Context of download
-     * @param chain   处理链 / Chain of handler
      * @throws IOException I/O exception
      */
     @Override
-    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
+    public void doHandle(DownloadContext context) throws IOException {
         Source source = context.get(Source.class);
         Compression compression;
         boolean single = source.isSingle();
@@ -51,7 +49,6 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
             compression = compressor.compress(source, writer, cachePath, context);
         }
         context.set(Compression.class, compression);
-        chain.next(context);
     }
 
     /**

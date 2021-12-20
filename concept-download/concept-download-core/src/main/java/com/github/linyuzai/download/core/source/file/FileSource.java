@@ -194,6 +194,13 @@ public class FileSource extends AbstractSource {
         }
     }
 
+    @Override
+    public String toString() {
+        return "FileSource{" +
+                "file=" + file +
+                '}';
+    }
+
     public static class Builder extends AbstractSource.Builder<FileSource, Builder> {
 
         private File file;

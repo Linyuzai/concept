@@ -78,4 +78,11 @@ public class InputStreamSource extends AbstractSource {
             return super.build(new InputStreamSource(inputStream));
         }
     }
+
+    @Override
+    public String toString() {
+        return "InputStreamSource{" +
+                "inputStream=" + inputStream +
+                '}';
+    }
 }

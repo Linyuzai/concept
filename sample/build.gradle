@@ -20,16 +20,16 @@ repositories {
 }
 
 dependencies {
-    compile "com.github.linyuzai:concept-download-spring-boot-starter:1.0.1"
-    compile "com.github.linyuzai:concept-download-source-okhttp:1.0.1"
-    compile "com.github.linyuzai:concept-download-load-coroutines:1.0.1"
-    //implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-aop', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-source-classpath', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-source-okhttp', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-load-coroutines', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-web-servlet', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
+    //compile "com.github.linyuzai:concept-download-spring-boot-starter:1.0.1"
+    //compile "com.github.linyuzai:concept-download-source-okhttp:1.0.1"
+    //compile "com.github.linyuzai:concept-download-load-coroutines:1.0.1"
+    implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-aop', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-source-classpath', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-source-okhttp', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-load-coroutines', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-web-servlet', configuration: 'default')
+    implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
 
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
     implementation 'org.springframework.boot:spring-boot-starter-web'

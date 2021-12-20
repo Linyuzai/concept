@@ -138,12 +138,13 @@ public class ConceptDownloadController {
         return new DownloadOptions.Rewriter() {
             @Override
             public DownloadOptions rewrite(DownloadOptions options) {
+                System.out.println("在这里可以修改本次下载的参数！");
                 return options.toBuilder()
                         .interceptor(new StandardDownloadHandlerInterceptor() {
 
                             @Override
                             public void onResponseWritten(DownloadContext context) {
-                                System.out.println("下载完成！");
+                                System.out.println("在这里可以拦截每个步骤！");
                             }
                         })
                         .build();

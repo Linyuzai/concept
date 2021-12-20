@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.context;
 
+import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
  * 调用所有的上下文销毁器 / Call all destroyers {@link DownloadContextDestroyer#destroy(DownloadContext)}
  */
 @AllArgsConstructor
-public class DestroyContextHandler implements DownloadHandler {
+public class DestroyContextHandler implements AutomaticDownloadHandler {
 
     @NonNull
     private List<DownloadContextDestroyer> destroyers;
@@ -23,16 +24,13 @@ public class DestroyContextHandler implements DownloadHandler {
      * 遍历执行所有的上下文销毁器 / Iterate and call all destroyers
      *
      * @param context 下载上下文 / Context of download
-     * @param chain   处理链 / Chain of handler
-     * @throws IOException I/O exception
      */
     @Override
-    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
+    public void doHandle(DownloadContext context) {
         for (DownloadContextDestroyer destroyer : destroyers) {
             destroyer.destroy(context);
         }
         context.destroy();
-        chain.next(context);
     }
 
     @Override

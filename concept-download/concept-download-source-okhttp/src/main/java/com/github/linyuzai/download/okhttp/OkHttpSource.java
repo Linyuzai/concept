@@ -71,11 +71,39 @@ public class OkHttpSource extends AbstractLoadableSource {
                 .url(url)
                 .build();
         Response response = client.newCall(request).execute();
-        ResponseBody body = response.body();
-        if (body == null) {
-            throw new DownloadException("Body is null");
+        if (isResponseSuccess(response)) {
+            ResponseBody body = response.body();
+            if (body == null) {
+                throw new DownloadException("Body is null");
+            }
+            return body.byteStream();
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append(response.code()).append(";");
+            String message = response.message();
+            if (!message.isEmpty()) {
+                builder.append(message).append(";");
+            }
+            ResponseBody body = response.body();
+            if (body != null) {
+                String s = body.string();
+                if (!s.isEmpty()) {
+                    builder.append(s).append(";");
+                }
+            }
+            throw new DownloadException(builder.toString());
         }
-        return body.byteStream();
+    }
+
+    protected boolean isResponseSuccess(Response response) {
+        return response.code() == 200;
+    }
+
+    @Override
+    public String toString() {
+        return "OkHttpSource{" +
+                "url='" + url + '\'' +
+                '}';
     }
 
     public static class Builder extends AbstractLoadableSource.Builder<OkHttpSource, Builder> {

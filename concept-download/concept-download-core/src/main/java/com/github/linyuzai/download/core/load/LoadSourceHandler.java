@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.source.Source;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  * 加载处理器 / A handler to process loads
  */
 @AllArgsConstructor
-public class LoadSourceHandler implements DownloadHandler {
+public class LoadSourceHandler implements AutomaticDownloadHandler {
 
     private SourceLoaderFactory sourceLoaderFactory;
 
@@ -30,11 +31,10 @@ public class LoadSourceHandler implements DownloadHandler {
      * 处理加载异常 / Handle load exception
      *
      * @param context 下载上下文 / Context of download
-     * @param chain   处理链 / Chain of handler
      * @throws IOException I/O exception
      */
     @Override
-    public void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
+    public void doHandle(DownloadContext context) throws IOException {
         Source source = context.get(Source.class);
         Collection<SourceLoader> loaders = new ArrayList<>();
         Collection<Source> sources = source.list();
@@ -50,7 +50,6 @@ public class LoadSourceHandler implements DownloadHandler {
         if (!exceptions.isEmpty()) {
             sourceLoadExceptionHandler.onLoaded(exceptions);
         }
-        chain.next(context);
     }
 
     @Override
