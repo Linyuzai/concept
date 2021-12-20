@@ -151,6 +151,12 @@ public class ConceptDownloadController {
         };
     }
 
+    @Download
+    @GetMapping("/s19")
+    public File s19() {
+        return new File("/Users/Shared");
+    }
+
     @Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")
     @GetMapping("/text.txt")
     public void readme() {

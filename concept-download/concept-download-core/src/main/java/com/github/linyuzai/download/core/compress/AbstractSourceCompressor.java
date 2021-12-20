@@ -26,7 +26,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @param source    {@link Source}
      * @param writer    {@link DownloadWriter}
      * @param cachePath 缓存路径 / The path of cache
-     * @param context   Context of download
+     * @param context   下载上下文 / Context of download
      * @return An specific compression
      * @throws IOException I/O exception
      */
@@ -41,14 +41,11 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                 boolean mkdirs = dir.mkdirs();
             }
             File cache = new File(dir, cacheName);
-            if (cache.exists()) {
-                result = new FileCompression(cache);
-            } else {
+            if (!cache.exists()) {
                 FileOutputStream fos = new FileOutputStream(cache);
                 doCompress(source, fos, writer);
-                result = new FileCompression(cache);
             }
-
+            result = new FileCompression(cache);
         } else {
             MemoryCompression compressed = new MemoryCompression(source, writer, this);
             compressed.setName(cacheName);
@@ -67,20 +64,30 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      */
     public abstract void doCompress(Source source, OutputStream os, DownloadWriter writer) throws IOException;
 
+    /**
+     * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used
+     * 否则使用Source的名称 / Otherwise, use the name of the source {@link Source#getName()}
+     * 如果对应的名称为空 / If the name is empty
+     * 则使用默认规则生成名称 / The default rule is used to generate the name {@link #getDefaultName(DownloadContext)}
+     *
+     * @param source  被压缩的对象 / Object to compress
+     * @param context 下载上下文 / Context of download
+     * @return 缓存名称 / Name of cache
+     */
     public String getCacheName(Source source, DownloadContext context) {
         String cacheName = context.getOptions().getCompressCacheName();
         String suffix = getSuffix();
         if (cacheName == null || cacheName.isEmpty()) {
-            if (source.isSingle()) {
-                String sourceName = source.getName();
+            String sourceName = source.getName();
+            if (sourceName == null || sourceName.isEmpty()) {
+                return getDefaultName(context) + suffix;
+            } else {
                 int index = sourceName.lastIndexOf(CompressFormat.DOT);
                 if (index == -1) {
                     return sourceName + suffix;
                 } else {
                     return sourceName.substring(0, index) + suffix;
                 }
-            } else {
-                return getDefaultName(context) + suffix;
             }
         } else {
             if (cacheName.endsWith(suffix)) {
@@ -94,7 +101,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
     /**
      * 如果没有指定名称并且有多个下载项 / If no name is specified and there are multiple downloads
      * 尝试使用调用的类名加方法名作为名称 / Try using the class sample name and the method name as the name
-     * 或者使用默认的固定名称'CompressPackage' / Or use the default fixed name 'CompressPackage'
+     * 或者使用默认的固定名称'CompressedPackage' / Or use the default name 'CompressedPackage'
      * 需要注意默认的固定名称可能会导致误判缓存存在 / Note that the default fixed name may lead to misjudgment that the cache exists
      *
      * @param context Context of download
@@ -103,7 +110,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
     public String getDefaultName(DownloadContext context) {
         DownloadMethod downloadMethod = context.getOptions().getDownloadMethod();
         if (downloadMethod == null) {
-            return "CompressPackage";
+            return "CompressedPackage";
         } else {
             Method method = downloadMethod.getMethod();
             return method.getDeclaringClass().getSimpleName() + "_" + method.getName();
