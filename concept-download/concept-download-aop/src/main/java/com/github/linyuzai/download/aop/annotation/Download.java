@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 public @interface Download {
 
     /**
-     * 需要下载是原始数据对象 / Original source to download
+     * 需要下载的原始数据对象 / Original source to download
      */
     String[] source() default {};
 

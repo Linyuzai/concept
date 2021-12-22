@@ -27,17 +27,21 @@ public class MultipleSource implements Source {
 
     /**
      * 如果集合为空返回null / Returns null if the collection is empty
-     * 否则返回第一个的名称 / Otherwise, the name of the first source is returned
+     * 否则返回第一个有名称的数据源的名称 / Otherwise, the name of the first named source is returned
      *
      * @return 名称 / Name
      */
     @Override
     public String getName() {
-        if (sources.isEmpty()) {
-            return null;
-        } else {
-            return sources.iterator().next().getName();
+        if (!sources.isEmpty()) {
+            for (Source source : sources) {
+                String name = source.getName();
+                if (name != null && !name.isEmpty()) {
+                    return name;
+                }
+            }
         }
+        return null;
     }
 
     /**

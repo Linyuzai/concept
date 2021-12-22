@@ -17,9 +17,6 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
 
     @Override
     public void configure(DownloadConfiguration configuration) {
-        configuration.getSource().getCache().setEnabled(true);
-        configuration.getSource().getCache().setPath("/");
-        configuration.getSource().getCache().setDelete(false);
         System.out.println("可以在这里覆盖配置文件的配置！");
     }
 

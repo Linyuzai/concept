@@ -24,8 +24,9 @@ public @interface CompressCache {
     /**
      * 压缩文件名称 / Compressed file name
      * 默认情况下 / By default
-     * 单文件会使用文件名 / A single file will use the file name
-     * 多文件会使用切面的类和方法名或是固定的名称 / Multiple files use class and method names from aop or fixed names
+     * 单下载源会使用该下载源的名名称 / A single source will use the name of the source
+     * 多下载源会使用第一个有名称的下载源的名称 / Multiple sources will use the name of the first source with a name
+     * 否则使用切面的类和方法名或是固定的名称 / Otherwise use class and method name from aop or fixed name
      */
     String name() default "";
 
