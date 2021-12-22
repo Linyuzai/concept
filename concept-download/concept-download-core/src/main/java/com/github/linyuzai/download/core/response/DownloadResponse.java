@@ -34,7 +34,7 @@ public interface DownloadResponse {
      */
     @SneakyThrows
     default void setFilename(String filename) {
-        String encodeFilename = URLEncoder.encode(filename, "UTF-8");
+        String encodeFilename = URLEncoder.encode(String.valueOf(filename), "UTF-8");
         setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
     }
 

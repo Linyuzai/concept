@@ -76,6 +76,6 @@ signing {
 javadoc {
     // 防止本地打开中文乱码
     options.addStringOption("charset", "UTF-8")
-    options.addStringOption('Xdoclint:none', '-quiet')
     options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('Xdoclint:none', '-quiet')
 }

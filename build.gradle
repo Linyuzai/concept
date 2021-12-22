@@ -43,3 +43,27 @@ allprojects {
         set('junitJupiterVersion', "5.8.1")
     }
 }
+
+/*apply from: 'github.gradle'
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: "maven-publish"
+    publishing {
+        repositories {
+            maven {
+                name = "Concept"
+                url = uri("https://maven.pkg.github.com/linyuzai/concept")
+                credentials {
+                    username = githubUsername
+                    password = githubPassword
+                }
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+                from(components.java)
+            }
+        }
+    }
+}*/

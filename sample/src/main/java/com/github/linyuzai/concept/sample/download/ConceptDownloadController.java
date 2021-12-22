@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +115,7 @@ public class ConceptDownloadController {
         return list;
     }
 
-    @Download(filename = "压缩包15.zip")
+    @Download(filename = "压缩包16.zip")
     @CompressCache(group = "s16", name = "s16.zip", delete = true)
     @GetMapping("/s16")
     public List<Object> s16() {
@@ -143,8 +145,27 @@ public class ConceptDownloadController {
                         .interceptor(new StandardDownloadHandlerInterceptor() {
 
                             @Override
+                            public void onContextInitialized(DownloadContext context) {
+                            }
+
+                            @Override
+                            public void onSourceCreated(DownloadContext context) {
+                            }
+
+                            @Override
+                            public void onSourceLoaded(DownloadContext context) {
+                            }
+
+                            @Override
+                            public void onSourceCompressed(DownloadContext context) {
+                            }
+
+                            @Override
                             public void onResponseWritten(DownloadContext context) {
-                                System.out.println("在这里可以拦截每个步骤！");
+                            }
+
+                            @Override
+                            public void onContextDestroyed(DownloadContext context) {
                             }
                         })
                         .build();
@@ -156,6 +177,13 @@ public class ConceptDownloadController {
     @GetMapping("/s19")
     public File s19() {
         return new File("/Users/Shared");
+    }
+
+    @Download
+    @CompressCache(group = "s20")
+    @GetMapping("/s20")
+    public InputStream s20() throws IOException {
+        return new ClassPathResource("/download/README.txt").getInputStream();
     }
 
     @Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")
