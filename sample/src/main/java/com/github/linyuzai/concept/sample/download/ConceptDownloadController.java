@@ -6,6 +6,10 @@ import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.handler.StandardDownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import com.github.linyuzai.download.core.source.reflection.SourceModel;
+import com.github.linyuzai.download.core.source.reflection.SourceName;
+import com.github.linyuzai.download.core.source.reflection.SourceObject;
+import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -199,5 +203,16 @@ public class ConceptDownloadController {
     @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mpeg4")
     @GetMapping("/video.mp4")
     public void video() {
+    }
+
+    @Data
+    @SourceModel
+    public static class BusinessModel {
+
+        @SourceName
+        private String name;
+
+        @SourceObject
+        private String url;
     }
 }

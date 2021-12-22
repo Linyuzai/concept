@@ -20,9 +20,9 @@ repositories {
 }
 
 dependencies {
-    //compile "com.github.linyuzai:concept-download-spring-boot-starter:1.0.1"
-    //compile "com.github.linyuzai:concept-download-source-okhttp:1.0.1"
-    //compile "com.github.linyuzai:concept-download-load-coroutines:1.0.1"
+    /*compile "com.github.linyuzai:concept-download-spring-boot-starter:1.0.3"
+    compile "com.github.linyuzai:concept-download-source-okhttp:1.0.3"
+    compile "com.github.linyuzai:concept-download-load-coroutines:1.0.3"*/
     implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-aop', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-source-classpath', configuration: 'default')
