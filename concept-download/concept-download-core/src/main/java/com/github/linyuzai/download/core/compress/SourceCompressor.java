@@ -26,10 +26,9 @@ public interface SourceCompressor extends OrderProvider {
      *
      * @param source    {@link Source}
      * @param writer    {@link DownloadWriter}
-     * @param cachePath 缓存路径 / The path of cache
      * @param context   Context of download
      * @return An specific compression
      * @throws IOException I/O exception
      */
-    Compression compress(Source source, DownloadWriter writer, String cachePath, DownloadContext context) throws IOException;
+    Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException;
 }

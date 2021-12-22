@@ -1,9 +1,11 @@
 package com.github.linyuzai.download.core.load;
 
+import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
@@ -61,7 +63,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
             }
-            File cache = new File(dir, getName());
+            CacheNameGenerator generator = context.get(CacheNameGenerator.class);
+            String cacheName = generator.generate(this, context);
+            if (cacheName == null || cacheName.isEmpty()) {
+                throw new DownloadException("Cache name is null or empty");
+            }
+            File cache = new File(dir, cacheName);
             if (!cache.exists()) {
                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
@@ -123,7 +130,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     }
 
     /**
-     * 如果缓存
+     * 删除缓存
      */
     @Override
     public void deleteCache() {

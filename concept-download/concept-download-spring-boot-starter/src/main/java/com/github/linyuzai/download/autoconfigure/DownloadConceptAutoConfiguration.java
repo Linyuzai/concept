@@ -1,6 +1,9 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptProperties;
+import com.github.linyuzai.download.core.cache.CacheNameGenerator;
+import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
+import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
 import com.github.linyuzai.download.core.compress.CompressSourceHandler;
 import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
@@ -129,6 +132,18 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public SourceFactoryAdapter sourceFactoryAdapter(List<SourceFactory> factories) {
         return new DefaultSourceFactoryAdapter(factories);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CacheNameGenerator cacheNameGenerator() {
+        return new TimestampCacheNameGenerator();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CacheNameGeneratorInitializer cacheNameGeneratorInitializer(CacheNameGenerator generator) {
+        return new CacheNameGeneratorInitializer(generator);
     }
 
     @Bean

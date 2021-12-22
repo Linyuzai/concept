@@ -43,10 +43,9 @@ public class CompressSourceHandler implements AutomaticDownloadHandler, Download
             String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
                     CompressFormat.ZIP : compressFormat;
             SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
-            String cachePath = context.getOptions().getCompressCachePath();
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, null, context);
-            compression = compressor.compress(source, writer, cachePath, context);
+            compression = compressor.compress(source, writer, context);
         }
         context.set(Compression.class, compression);
     }
