@@ -5,7 +5,6 @@ import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.load.ExecutorSourceLoaderInvoker;
 import com.github.linyuzai.download.core.load.SourceLoadException;
 import com.github.linyuzai.download.core.load.SourceLoadExceptionHandler;
-import com.github.linyuzai.download.core.load.SourceLoaderInvoker;
 import com.github.linyuzai.download.coroutines.loader.CoroutinesSourceLoaderInvoker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,16 +13,14 @@ import java.util.Collection;
 import java.util.concurrent.Executors;
 
 @Configuration
-public class ConceptDownloadConfig {
+public class ConceptDownloadConfig implements DownloadConfigurer {
 
-    @Bean
-    public DownloadConfigurer downloadConfigurer() {
-        return new DownloadConfigurer() {
-            @Override
-            public void configure(DownloadConfiguration configuration) {
-                System.out.println("可以在这里覆盖配置文件的配置！");
-            }
-        };
+    @Override
+    public void configure(DownloadConfiguration configuration) {
+        configuration.getSource().getCache().setEnabled(true);
+        configuration.getSource().getCache().setPath("/");
+        configuration.getSource().getCache().setDelete(false);
+        System.out.println("可以在这里覆盖配置文件的配置！");
     }
 
     @Bean
