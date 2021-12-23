@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version "${kotlinVersion}"
     id 'java'
+    id 'org.jetbrains.dokka' version "${dokkaVersion}"
 }
 
 apply from: '../version.gradle'
@@ -29,4 +30,10 @@ test {
     main.java.srcDirs += 'src/main/kotlin'
 }*/
 
+tasks.dokkaJavadoc.configure {
+    outputDirectory.set(javadoc.destinationDir)
+}
+
 apply from: '../publish.gradle'
+
+publish.dependsOn dokkaJavadoc

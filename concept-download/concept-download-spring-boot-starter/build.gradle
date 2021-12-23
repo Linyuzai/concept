@@ -13,10 +13,11 @@ repositories {
 }
 
 dependencies {
-    //compile "com.github.linyuzai:concept-download-core:${conceptDownloadVersion}"
-    //compile "com.github.linyuzai:concept-download-aop:${conceptDownloadVersion}"
-    //compile "com.github.linyuzai:concept-download-web-servlet:${conceptDownloadVersion}"
-    //compile "com.github.linyuzai:concept-download-source-classpath:${conceptDownloadVersion}"
+    /*compile "com.github.linyuzai:concept-download-core:${conceptDownloadVersion}"
+    compile "com.github.linyuzai:concept-download-aop:${conceptDownloadVersion}"
+    compile "com.github.linyuzai:concept-download-web-servlet:${conceptDownloadVersion}"
+    compile "com.github.linyuzai:concept-download-source-classpath:${conceptDownloadVersion}"
+    */
     compileOnly project(':concept-download:concept-download-core')
     compileOnly project(':concept-download:concept-download-aop')
     compileOnly project(':concept-download:concept-download-web-servlet')

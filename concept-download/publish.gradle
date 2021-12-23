@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
+    from sourceSets.main.allSource
     classifier = 'sources'
 }
 
