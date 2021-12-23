@@ -16,15 +16,20 @@ import java.io.*;
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class OkHttpSource extends AbstractLoadableSource {
 
     @Setter
     @NonNull
     protected OkHttpClient client;
 
-    @NonNull
     protected String url;
+
+    protected Long length;
+
+    protected OkHttpSource(@NonNull OkHttpClient client, @NonNull String url) {
+        this.client = client;
+        this.url = url;
+    }
 
     /**
      * 如果没有指定名称 / If no name is specified
@@ -51,14 +56,9 @@ public class OkHttpSource extends AbstractLoadableSource {
         return super.getName();
     }
 
-    /**
-     * 返回0 / return 0
-     *
-     * @return 0
-     */
     @Override
-    public long getLength() {
-        return 0;
+    public Long getLength() {
+        return length;
     }
 
     @Override
@@ -76,6 +76,10 @@ public class OkHttpSource extends AbstractLoadableSource {
             ResponseBody body = response.body();
             if (body == null) {
                 throw new DownloadException("Body is null");
+            }
+            long l = body.contentLength();
+            if (l != -1) {
+                length = l;
             }
             return body.byteStream();
         } else {

@@ -192,13 +192,17 @@ public class ConceptDownloadController {
     }
 
     @Download
-    @SourceCache(group = "s21")
+    //@SourceCache(group = "s21")
+    @CompressCache(group = "s21", delete = true)
     @GetMapping("/s21")
     public List<BusinessModel> s21() {
         List<BusinessModel> businessModels = new ArrayList<>();
         businessModels.add(new BusinessModel("s21.txt", "http://127.0.0.1:8080/concept-download/text.txt"));
         businessModels.add(new BusinessModel("s21.jpg", "http://127.0.0.1:8080/concept-download/image.jpg"));
         businessModels.add(new BusinessModel("s21.mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
+        for (int i = 0; i < 100; i++) {
+            businessModels.add(new BusinessModel(i + ".mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
+        }
         businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
         businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
         return businessModels;

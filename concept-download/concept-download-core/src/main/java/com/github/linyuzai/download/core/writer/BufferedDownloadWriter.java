@@ -44,7 +44,7 @@ public class BufferedDownloadWriter implements DownloadWriter {
      * @throws IOException I/O exception
      */
     @Override
-    public void write(InputStream is, OutputStream os, Range range, Charset charset, long length) throws IOException {
+    public void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) throws IOException {
         if (charset == null /*|| length > 0 && bufferSize >= length*/) {
             int len;
             byte[] bytes = new byte[bufferSize];

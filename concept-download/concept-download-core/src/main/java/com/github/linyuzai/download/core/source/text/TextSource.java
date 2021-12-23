@@ -23,8 +23,12 @@ public class TextSource extends AbstractSource {
      * @return 获得文本字节数 / Get bytes count of text
      */
     @Override
-    public long getLength() {
-        return getBytes().length;
+    public Long getLength() {
+        return getLength(getBytes());
+    }
+
+    private Long getLength(byte[] bytes) {
+        return Integer.valueOf(bytes.length).longValue();
     }
 
     /**
@@ -63,7 +67,7 @@ public class TextSource extends AbstractSource {
 
                 @Override
                 public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), bytes.length);
+                    writer.write(getInputStream(), os, range, getCharset(), getLength(bytes));
                 }
             };
             handler.handle(part);

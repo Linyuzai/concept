@@ -33,5 +33,5 @@ public interface DownloadWriter extends OrderProvider {
      * @param length  总字节数，可能为0 / Total bytes count, may be 0
      * @throws IOException I/O exception
      */
-    void write(InputStream is, OutputStream os, Range range, Charset charset, long length) throws IOException;
+    void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) throws IOException;
 }

@@ -44,7 +44,7 @@ public class FileSource extends AbstractSource {
      * @return 文件或文件夹大小 / File or folder size
      */
     @Override
-    public long getLength() {
+    public Long getLength() {
         return length0(file);
     }
 

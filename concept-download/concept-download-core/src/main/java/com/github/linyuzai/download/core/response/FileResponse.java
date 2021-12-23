@@ -43,6 +43,11 @@ public class FileResponse implements DownloadResponse {
     }
 
     @Override
+    public void setContentLength(Long contentLength) {
+
+    }
+
+    @Override
     public void setHeader(String name, String value) {
 
     }

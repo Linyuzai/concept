@@ -29,7 +29,7 @@ public class NoCompression extends AbstractCompression {
     }
 
     @Override
-    public long getLength() {
+    public Long getLength() {
         return source.getLength();
     }
 

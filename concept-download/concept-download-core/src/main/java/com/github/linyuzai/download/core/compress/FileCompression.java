@@ -28,7 +28,7 @@ public class FileCompression extends AbstractCompression {
     }
 
     @Override
-    public long getLength() {
+    public Long getLength() {
         return file.length();
     }
 

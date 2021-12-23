@@ -37,8 +37,8 @@ public class MemoryCompression extends AbstractCompression {
     }
 
     @Override
-    public long getLength() {
-        return 0;
+    public Long getLength() {
+        return null;
     }
 
     /**

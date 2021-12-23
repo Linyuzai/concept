@@ -24,8 +24,8 @@ public class InputStreamSource extends AbstractSource {
     protected InputStream inputStream;
 
     @Override
-    public long getLength() {
-        return 0;
+    public Long getLength() {
+        return null;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class InputStreamSource extends AbstractSource {
 
                 @Override
                 public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), 0);
+                    writer.write(getInputStream(), os, range, getCharset(), getLength());
                 }
             };
             handler.handle(part);

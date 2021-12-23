@@ -79,7 +79,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             }
             inputStream = new FileInputStream(cache);
         } else {
-            inputStream = doLoad(context);
+            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+            DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+            InputStream is = doLoad(context);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            writer.write(is, os, null, getCharset(), getLength());
+            this.inputStream = new ByteArrayInputStream(os.toByteArray());
         }
     }
 

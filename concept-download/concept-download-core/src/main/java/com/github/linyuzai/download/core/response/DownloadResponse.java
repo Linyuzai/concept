@@ -52,6 +52,13 @@ public interface DownloadResponse {
      */
     void setContentType(String contentType);
 
+    default void setContentLength(Long contentLength) {
+        if (contentLength != null) {
+            System.out.println(contentLength);
+            setHeader("Content-Length", contentLength.toString());
+        }
+    }
+
     /**
      * 设置响应头 / Set response header
      *

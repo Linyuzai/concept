@@ -57,6 +57,8 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
         } else {
             response.setContentType(contentType);
         }
+        Long length = compression.getLength();
+        response.setContentLength(length);
         Map<String, String> headers = context.getOptions().getHeaders();
         if (headers != null) {
             response.setHeaders(headers);

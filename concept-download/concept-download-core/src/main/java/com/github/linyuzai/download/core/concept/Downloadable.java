@@ -32,7 +32,7 @@ public interface Downloadable extends Cacheable {
     /**
      * @return 字节数 / bytes count
      */
-    long getLength();
+    Long getLength();
 
     /**
      * 写入操作 / write

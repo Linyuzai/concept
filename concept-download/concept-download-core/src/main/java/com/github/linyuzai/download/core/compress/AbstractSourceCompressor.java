@@ -25,9 +25,9 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * 如果启用缓存并且缓存存在，直接使用缓存 / Use the cache directly if caching is enabled and the cache exists
      * 如果启用缓存并且缓存不存在，压缩到本地缓存文件 / Compress to the local cache file if caching is enabled and the cache does not exist
      *
-     * @param source    {@link Source}
-     * @param writer    {@link DownloadWriter}
-     * @param context   下载上下文 / Context of download
+     * @param source  {@link Source}
+     * @param writer  {@link DownloadWriter}
+     * @param context 下载上下文 / Context of download
      * @return An specific compression
      * @throws IOException I/O exception
      */
@@ -70,7 +70,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used
      * 否则使用Source的名称 / Otherwise, use the name of the source {@link Source#getName()}
      * 如果对应的名称为空 / If the name is empty
-     * 则使用默认规则生成名称 / The default rule is used to generate the name {@link #getDefaultName(DownloadContext)}
+     * 否则使用缓存名称生成器生成，默认使用时间戳 / Otherwise, it is generated using the cache name generator, and the timestamp is used by default
      *
      * @param source  被压缩的对象 / Object to compress
      * @param context 下载上下文 / Context of download

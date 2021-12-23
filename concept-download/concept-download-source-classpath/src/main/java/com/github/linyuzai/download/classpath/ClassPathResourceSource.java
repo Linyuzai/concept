@@ -40,8 +40,12 @@ public class ClassPathResourceSource extends AbstractSource {
 
     @SneakyThrows
     @Override
-    public long getLength() {
-        return resource.contentLength();
+    public Long getLength() {
+        long length = resource.contentLength();
+        if (length == -1) {
+            return null;
+        }
+        return length;
     }
 
     @Override

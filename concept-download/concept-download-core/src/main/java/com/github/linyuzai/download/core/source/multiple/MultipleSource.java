@@ -72,10 +72,14 @@ public class MultipleSource implements Source {
      * @return 字节数 / bytes count
      */
     @Override
-    public long getLength() {
+    public Long getLength() {
         long length = 0;
         for (Source source : sources) {
-            length += source.getLength();
+            Long l = source.getLength();
+            if (l == null) {
+                return null;
+            }
+            length += l;
         }
         return length;
     }
