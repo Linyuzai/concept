@@ -15,11 +15,12 @@ import java.nio.charset.Charset;
  * 持有一个 {@link ClassPathResource} 的下载源 / Source holds an {@link ClassPathResource}
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ClassPathResourceSource extends AbstractSource {
 
     @NonNull
-    protected final ClassPathResource resource;
+    protected ClassPathResource resource;
 
     /**
      * 如果没有指定名称 / If no name is specified

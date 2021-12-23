@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.source.reflection;
+package com.github.linyuzai.download.core.source.proxy;
 
 import com.github.linyuzai.download.core.exception.DownloadException;
 import lombok.AccessLevel;
@@ -27,7 +27,7 @@ public class ReflectionTemplate {
             Annotation[] annotations = method.getAnnotations();
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
-                if (annotationType.isAnnotationPresent(SourceReflection.class)) {
+                if (annotationType.isAnnotationPresent(SourceProxy.class)) {
                     int count = method.getParameterCount();
                     if (count == 0) {
                         Method exist = methodMap.get(annotationType);
@@ -48,7 +48,7 @@ public class ReflectionTemplate {
             Annotation[] annotations = field.getAnnotations();
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
-                if (annotationType.isAnnotationPresent(SourceReflection.class)) {
+                if (annotationType.isAnnotationPresent(SourceProxy.class)) {
                     if (methodMap.containsKey(annotationType)) {
                         //ignore
                         continue;
@@ -107,7 +107,7 @@ public class ReflectionTemplate {
 
     protected void mergeSuper(ReflectionTemplate template) {
         for (Map.Entry<Class<? extends Annotation>, Method> entry : template.methodMap.entrySet()) {
-            if (!methodMap.containsKey(entry.getKey())) {
+            if (!methodMap.containsKey(entry.getKey()) && !fieldMap.containsKey(entry.getKey())) {
                 methodMap.put(entry.getKey(), entry.getValue());
             }
         }

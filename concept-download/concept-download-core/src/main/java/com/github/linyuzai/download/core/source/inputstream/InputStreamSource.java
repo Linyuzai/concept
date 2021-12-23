@@ -6,6 +6,7 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.nio.charset.Charset;
  * 持有一个输入流的下载源 / Source holds an input stream
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class InputStreamSource extends AbstractSource {
 

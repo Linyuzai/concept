@@ -3,10 +3,7 @@ package com.github.linyuzai.download.core.source.text;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -15,6 +12,7 @@ import java.nio.charset.Charset;
  * 文本下载源 / A source that holds a text
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TextSource extends AbstractSource {
 

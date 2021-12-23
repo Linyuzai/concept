@@ -15,6 +15,7 @@ import java.io.*;
  * 使用OkHttp加载资源 / Use OkHttp to load source
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class OkHttpSource extends AbstractLoadableSource {
 
@@ -23,7 +24,7 @@ public class OkHttpSource extends AbstractLoadableSource {
     protected OkHttpClient client;
 
     @NonNull
-    protected final String url;
+    protected String url;
 
     /**
      * 如果没有指定名称 / If no name is specified

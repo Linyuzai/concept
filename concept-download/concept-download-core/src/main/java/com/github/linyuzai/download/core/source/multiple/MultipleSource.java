@@ -5,9 +5,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,11 +17,12 @@ import java.util.function.Predicate;
  * 持有数据源集合的数据源 / A source that holds a collection of sources
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class MultipleSource implements Source {
 
     @NonNull
-    private final Collection<Source> sources;
+    protected Collection<Source> sources;
 
     /**
      * 如果集合为空返回null / Returns null if the collection is empty

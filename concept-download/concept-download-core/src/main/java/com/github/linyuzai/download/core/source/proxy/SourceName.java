@@ -1,11 +1,11 @@
-package com.github.linyuzai.download.core.source.reflection;
+package com.github.linyuzai.download.core.source.proxy;
 
 import java.lang.annotation.*;
 
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@SourceReflection
+@SourceProxy
 public @interface SourceName {
 
 }

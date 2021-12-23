@@ -27,7 +27,8 @@ public class CreateSourceHandler implements AutomaticDownloadHandler, DownloadCo
     public void doHandle(DownloadContext context) {
         Object source = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
-        context.set(Source.class, factory.create(source, context));
+        Source sources = factory.create(source, context);
+        context.set(Source.class, sources);
     }
 
     @Override

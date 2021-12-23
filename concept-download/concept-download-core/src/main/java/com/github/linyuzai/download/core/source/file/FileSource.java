@@ -4,10 +4,7 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -17,11 +14,12 @@ import java.nio.charset.Charset;
  * 该下载源持有一个文件对象，可能是文件，可能是目录 / The source holds a file object, which may be a file or a directory
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileSource extends AbstractSource {
 
     @NonNull
-    protected final File file;
+    protected File file;
 
     /**
      * 如果没有指定名称 / If no name is specified
@@ -104,11 +102,12 @@ public class FileSource extends AbstractSource {
      */
     @Override
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
+        String name = getName();
         if (range == null) {
-            write0(os, null, writer, handler, file, getName(), true);
+            write0(os, null, writer, handler, file, name, name, true);
         } else {
             if (file.isFile()) {
-                write0(os, range, writer, handler, file, getName(), true);
+                write0(os, range, writer, handler, file, name, name, true);
             } else {
                 throw new DownloadException("Range not support: " + file.getAbsolutePath());
             }
@@ -120,7 +119,8 @@ public class FileSource extends AbstractSource {
      * 如果是文件夹也会回调 / If it is a folder, it will also be recalled
      * 但是其中的输入流为null / But the input stream is null
      */
-    protected void write0(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler, File file, String path, boolean keepStruct) throws IOException {
+    protected void write0(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler,
+                          File file, String path, String name, boolean keepStruct) throws IOException {
         if (file.isFile()) {
             try (FileInputStream fis = new FileInputStream(file)) {
                 Part part = new Part() {
@@ -132,7 +132,7 @@ public class FileSource extends AbstractSource {
 
                     @Override
                     public String getName() {
-                        return FileSource.this.getName();
+                        return name;
                     }
 
                     @Override
@@ -165,7 +165,7 @@ public class FileSource extends AbstractSource {
 
                         @Override
                         public String getName() {
-                            return FileSource.this.getName();
+                            return name;
                         }
 
                         @Override
@@ -187,8 +187,9 @@ public class FileSource extends AbstractSource {
                 }
             } else {
                 for (File f : files) {
-                    String newPath = keepStruct ? path + File.separator + f.getName() : f.getName();
-                    write0(os, range, writer, handler, f, newPath, keepStruct);
+                    String newName = f.getName();
+                    String newPath = keepStruct ? path + File.separator + newName : newName;
+                    write0(os, range, writer, handler, f, newPath, newName, keepStruct);
                 }
             }
         }

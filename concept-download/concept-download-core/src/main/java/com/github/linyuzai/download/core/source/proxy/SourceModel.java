@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.source.reflection;
+package com.github.linyuzai.download.core.source.proxy;
 
 import java.lang.annotation.*;
 
@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@SourceReflection
+@SourceProxy
 public @interface SourceModel {
 
     boolean superclass() default true;
