@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.reflection;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
@@ -19,7 +18,7 @@ import java.util.function.Predicate;
 @Getter
 public class ReflectionSource implements Source {
 
-    private final ReflectionCache cache;
+    private final ReflectionTemplate template;
 
     private final Object target;
 
@@ -27,23 +26,19 @@ public class ReflectionSource implements Source {
 
     private final Map<Class<? extends Annotation>, Object> valueMap = new HashMap<>();
 
-    public ReflectionSource(ReflectionCache cache, Object target, Source source) {
-        this.cache = cache;
+    public ReflectionSource(ReflectionTemplate template, Object target, Source source) {
+        this.template = template;
         this.target = target;
         this.source = source;
     }
 
-    protected Object reflect(Class<? extends Annotation> clazz) {
-        try {
-            if (valueMap.containsKey(clazz)) {
-                return valueMap.get(clazz);
-            }
-            Object o = cache.reflect(clazz, target);
-            valueMap.put(clazz, o);
-            return o;
-        } catch (ReflectiveOperationException e) {
-            throw new DownloadException(e);
+    public Object reflect(Class<? extends Annotation> clazz) {
+        if (valueMap.containsKey(clazz)) {
+            return valueMap.get(clazz);
         }
+        Object o = template.reflect(clazz, target);
+        valueMap.put(clazz, o);
+        return o;
     }
 
     @Override

@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 处理了异常的 加载器 / Loader which handling exception
+ * 处理了异常的 加载器 / Loader which catches exception
  */
 @Getter
 @AllArgsConstructor
-public class ExceptionHandledSourceLoader implements SourceLoader {
+public class ExceptionCaughtSourceLoader implements SourceLoader {
 
     private Source source;
 

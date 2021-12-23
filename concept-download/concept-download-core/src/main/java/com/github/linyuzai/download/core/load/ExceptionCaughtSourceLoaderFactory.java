@@ -5,10 +5,10 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
 
 /**
- * 处理了异常的 加载器 工厂 / Factory of loader which handled exceptions
+ * 处理了异常的 加载器 工厂 / Factory of loader which catches exceptions
  */
 @AllArgsConstructor
-public class ExceptionHandledSourceLoaderFactory implements SourceLoaderFactory {
+public class ExceptionCaughtSourceLoaderFactory implements SourceLoaderFactory {
 
     private SourceLoadExceptionHandler handler;
 
@@ -21,6 +21,6 @@ public class ExceptionHandledSourceLoaderFactory implements SourceLoaderFactory 
      */
     @Override
     public SourceLoader create(Source source, DownloadContext context) {
-        return new ExceptionHandledSourceLoader(source, handler);
+        return new ExceptionCaughtSourceLoader(source, handler);
     }
 }

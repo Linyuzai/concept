@@ -192,7 +192,7 @@ public class DownloadConceptAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SourceLoaderFactory sourceLoaderFactory(SourceLoadExceptionHandler handler) {
-        return new ExceptionHandledSourceLoaderFactory(handler);
+        return new ExceptionCaughtSourceLoaderFactory(handler);
     }
 
     @Bean

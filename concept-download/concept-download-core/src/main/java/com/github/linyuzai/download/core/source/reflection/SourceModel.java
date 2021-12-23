@@ -9,4 +9,5 @@ import java.lang.annotation.*;
 @SourceReflection
 public @interface SourceModel {
 
+    boolean superclass() default true;
 }
