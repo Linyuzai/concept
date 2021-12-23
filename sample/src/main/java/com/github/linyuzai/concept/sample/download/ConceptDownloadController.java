@@ -199,6 +199,8 @@ public class ConceptDownloadController {
         businessModels.add(new BusinessModel("s21.txt", "http://127.0.0.1:8080/concept-download/text.txt"));
         businessModels.add(new BusinessModel("s21.jpg", "http://127.0.0.1:8080/concept-download/image.jpg"));
         businessModels.add(new BusinessModel("s21.mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
+        businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
+        businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
         return businessModels;
     }
 
@@ -235,7 +237,7 @@ public class ConceptDownloadController {
         private String name;
 
         @SourceObject
-        private String url;
+        private Object source;
     }
 
     @SourceModel(superclass = false)

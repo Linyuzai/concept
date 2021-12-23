@@ -27,10 +27,10 @@ public class ProxySourceFactory implements SourceFactory {
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
         SourceFactory factory = adapter.getFactory(reflect, context);
         Source sourceToProxy = factory.create(reflect, context);
-        Enhancer e = new Enhancer();
-        e.setSuperclass(sourceToProxy.getClass());
-        e.setCallback(new ProxySourceMethodInterceptor(model, template));
-        Source proxy = (Source) e.create();
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(sourceToProxy.getClass());
+        enhancer.setCallback(new ProxySourceMethodInterceptor(model, template));
+        Source proxy = (Source) enhancer.create();
         copySource(sourceToProxy, proxy);
         return proxy;
     }
