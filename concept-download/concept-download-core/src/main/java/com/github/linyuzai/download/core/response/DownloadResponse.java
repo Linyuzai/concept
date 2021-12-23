@@ -54,7 +54,6 @@ public interface DownloadResponse {
 
     default void setContentLength(Long contentLength) {
         if (contentLength != null) {
-            System.out.println(contentLength);
             setHeader("Content-Length", contentLength.toString());
         }
     }
