@@ -26,7 +26,6 @@ import com.github.linyuzai.download.core.source.CreateSourceHandler;
 import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
-import com.github.linyuzai.download.core.source.inputstream.InputStreamSourceFactory;
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
 import com.github.linyuzai.download.core.source.proxy.ProxySourceFactory;
@@ -120,12 +119,6 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public TextSourceFactory textSourceFactory() {
         return new TextSourceFactory();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public InputStreamSourceFactory inputStreamSourceFactory() {
-        return new InputStreamSourceFactory();
     }
 
     @Bean
