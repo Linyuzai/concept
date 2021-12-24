@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.core.source.file;
 
-import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
