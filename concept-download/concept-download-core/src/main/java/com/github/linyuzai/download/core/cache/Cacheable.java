@@ -25,19 +25,23 @@ public interface Cacheable {
     /**
      * @return 是否启用缓存 / If enable cache
      */
-    boolean isCacheEnabled();
+    default boolean isCacheEnabled() {
+        return false;
+    }
 
     /**
      * @return 缓存是否存在 / Cache if existed
      */
     default boolean isCacheExisted() {
-        return true;
+        return false;
     }
 
     /**
      * @return 缓存路径 / The path of cache
      */
-    String getCachePath();
+    default String getCachePath() {
+        return null;
+    }
 
     /**
      * 删除缓存 / Delete the cache

@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.source.file;
 
+import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
@@ -31,10 +32,18 @@ public class FileSource extends AbstractSource {
     public String getName() {
         String name = super.getName();
         if (name == null || name.isEmpty()) {
-            return file.getName();
-        } else {
-            return name;
+            setName(file.getName());
         }
+        return super.getName();
+    }
+
+    @Override
+    public String getContentType() {
+        String contentType = super.getContentType();
+        if (contentType == null || contentType.isEmpty()) {
+            setContentType(ContentType.file(file));
+        }
+        return super.getContentType();
     }
 
     /**

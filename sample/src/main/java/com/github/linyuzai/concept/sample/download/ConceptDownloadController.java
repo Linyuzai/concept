@@ -6,6 +6,7 @@ import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.handler.StandardDownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.proxy.SourceModel;
 import com.github.linyuzai.download.core.source.proxy.SourceName;
 import com.github.linyuzai.download.core.source.proxy.SourceObject;
@@ -192,14 +193,11 @@ public class ConceptDownloadController {
     }
 
     @Download
-    //@SourceCache(group = "s21")
-    @CompressCache(group = "s21", delete = true)
+    @SourceCache(group = "s21")
+    @CompressCache(group = "s21")
     @GetMapping("/s21")
     public List<BusinessModel> s21() {
         List<BusinessModel> businessModels = new ArrayList<>();
-        businessModels.add(new BusinessModel("s21.txt", "http://127.0.0.1:8080/concept-download/text.txt"));
-        businessModels.add(new BusinessModel("s21.jpg", "http://127.0.0.1:8080/concept-download/image.jpg"));
-        businessModels.add(new BusinessModel("s21.mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
         for (int i = 0; i < 100; i++) {
             businessModels.add(new BusinessModel(i + ".mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
         }

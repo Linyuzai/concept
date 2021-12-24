@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.source.text;
 
+import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
@@ -18,6 +19,15 @@ public class TextSource extends AbstractSource {
 
     @NonNull
     protected String text;
+
+    @Override
+    public String getContentType() {
+        String contentType = super.getContentType();
+        if (contentType == null || contentType.isEmpty()) {
+            setContentType(ContentType.Text.PLAIN);
+        }
+        return super.getContentType();
+    }
 
     /**
      * @return 获得文本字节数 / Get bytes count of text

@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.compress.zip;
 
 import com.github.linyuzai.download.core.compress.AbstractSourceCompressor;
 import com.github.linyuzai.download.core.compress.CompressFormat;
+import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.concept.Downloadable;
@@ -68,5 +69,10 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     @Override
     public String getSuffix() {
         return CompressFormat.ZIP_SUFFIX;
+    }
+
+    @Override
+    public String getContentType() {
+        return ContentType.Application.X_ZIP_COMPRESSED;
     }
 }

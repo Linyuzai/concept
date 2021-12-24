@@ -20,13 +20,13 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
         System.out.println("可以在这里覆盖配置文件的配置！");
     }
 
-    @Bean
+    //@Bean
     public CoroutinesSourceLoaderInvoker coroutinesSourceLoaderInvoker() {
         System.out.println("如果需要进行HTTP请求可以使用协程加载！");
         return new CoroutinesSourceLoaderInvoker();
     }
 
-    //@Bean(destroyMethod = "shutdown")
+    @Bean(destroyMethod = "shutdown")
     public ExecutorSourceLoaderInvoker executorSourceLoaderInvoker() {
         System.out.println("如果需要进行HTTP请求可以使用线程池加载！");
         return new ExecutorSourceLoaderInvoker(Executors.newFixedThreadPool(5));

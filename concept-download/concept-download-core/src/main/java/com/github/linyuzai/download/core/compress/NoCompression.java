@@ -14,13 +14,18 @@ import java.nio.charset.Charset;
  * 对于不压缩的下载操作提供统一的压缩实现类 / Provide a unified compression implementation class for uncompressed download operations
  */
 @AllArgsConstructor
-public class NoCompression extends AbstractCompression {
+public class NoCompression implements Compression {
 
-    private Source source;
+    protected Source source;
 
     @Override
     public String getName() {
         return source.getName();
+    }
+
+    @Override
+    public String getContentType() {
+        return source.getContentType();
     }
 
     @Override

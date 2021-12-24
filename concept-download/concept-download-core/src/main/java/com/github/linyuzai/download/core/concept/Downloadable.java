@@ -24,6 +24,8 @@ public interface Downloadable extends Cacheable {
      */
     String getName();
 
+    String getContentType();
+
     /**
      * @return 编码 / charset
      */

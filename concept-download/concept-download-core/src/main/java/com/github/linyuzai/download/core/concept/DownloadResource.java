@@ -14,6 +14,8 @@ public abstract class DownloadResource implements Downloadable {
 
     protected String name;
 
+    protected String contentType;
+
     protected Charset charset;
 
     protected boolean cacheEnabled;
@@ -25,6 +27,8 @@ public abstract class DownloadResource implements Downloadable {
 
         protected String name;
 
+        protected String contentType;
+
         protected Charset charset;
 
         protected boolean cacheEnabled;
@@ -33,6 +37,11 @@ public abstract class DownloadResource implements Downloadable {
 
         public B name(String name) {
             this.name = name;
+            return (B) this;
+        }
+
+        public B contentType(String contentType) {
+            this.contentType = contentType;
             return (B) this;
         }
 
@@ -53,6 +62,7 @@ public abstract class DownloadResource implements Downloadable {
 
         protected T build(T target) {
             target.setName(name);
+            target.setContentType(contentType);
             target.setCharset(charset);
             target.setCacheEnabled(cacheEnabled);
             target.setCachePath(cachePath);

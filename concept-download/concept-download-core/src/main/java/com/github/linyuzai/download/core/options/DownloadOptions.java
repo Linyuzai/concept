@@ -134,7 +134,6 @@ public class DownloadOptions {
 
     public static DownloadOptions from(DownloadConfiguration configuration) {
         return new DownloadOptions.Builder()
-                .contentType(configuration.getResponse().getContentType())
                 .headers(configuration.getResponse().getHeaders())
                 .sourceCacheEnabled(configuration.getSource().getCache().isEnabled())
                 .sourceCachePath(configuration.getSource().getCache().getPath())

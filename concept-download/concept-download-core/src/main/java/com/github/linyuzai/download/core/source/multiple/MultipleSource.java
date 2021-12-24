@@ -32,15 +32,26 @@ public class MultipleSource implements Source {
      */
     @Override
     public String getName() {
-        if (!sources.isEmpty()) {
-            for (Source source : sources) {
-                String name = source.getName();
-                if (name != null && !name.isEmpty()) {
-                    return name;
-                }
+        for (Source source : sources) {
+            String name = source.getName();
+            if (name != null && !name.isEmpty()) {
+                return name;
             }
         }
         return null;
+    }
+
+    @Override
+    public String getContentType() {
+        Set<String> contentTypes = new HashSet<>();
+        for (Source source : sources) {
+            contentTypes.add(source.getContentType());
+        }
+        if (contentTypes.size() == 1) {
+            return contentTypes.iterator().next();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -56,10 +67,7 @@ public class MultipleSource implements Source {
         for (Source source : sources) {
             charsets.add(source.getCharset());
         }
-        int size = sources.size();
-        if (size == 0) {
-            return null;
-        } else if (size == 1) {
+        if (charsets.size() == 1) {
             return charsets.iterator().next();
         } else {
             return null;
@@ -76,7 +84,7 @@ public class MultipleSource implements Source {
         long length = 0;
         for (Source source : sources) {
             Long l = source.getLength();
-            if (l == null) {
+            if (l == null || l < 0) {
                 return null;
             }
             length += l;
@@ -85,28 +93,18 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 只要集合中有一个启用就启用 / Enabled whenever one in the collection is enabled
+     * 集合中的下载源只要有一个异步加载就是异步加载 / As long as there is one source load async in the collection, it is load async
      *
-     * @return 是否启用缓存 / If enable cache
+     * @return 是否异步加载 / If async load
      */
     @Override
-    public boolean isCacheEnabled() {
+    public boolean isAsyncLoad() {
         for (Source source : sources) {
-            if (source.isCacheEnabled()) {
+            if (source.isAsyncLoad()) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * 返回null / Return null
-     *
-     * @return 缓存路径 / The path of cache
-     */
-    @Override
-    public String getCachePath() {
-        return null;
     }
 
     /**
@@ -141,21 +139,6 @@ public class MultipleSource implements Source {
         for (Source source : sources) {
             source.load(context);
         }
-    }
-
-    /**
-     * 集合中的下载源只要有一个异步加载就是异步加载 / As long as there is one source load async in the collection, it is load async
-     *
-     * @return 是否异步加载 / If async load
-     */
-    @Override
-    public boolean isAsyncLoad() {
-        for (Source source : sources) {
-            if (source.isAsyncLoad()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

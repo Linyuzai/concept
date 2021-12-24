@@ -53,7 +53,12 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
         }
         String contentType = context.getOptions().getContentType();
         if (contentType == null || contentType.isEmpty()) {
-            response.setContentType(ContentType.OCTET_STREAM);
+            String compressionContentType = compression.getContentType();
+            if (compressionContentType == null || compressionContentType.isEmpty()) {
+                response.setContentType(ContentType.Application.OCTET_STREAM);
+            } else {
+                response.setContentType(compressionContentType);
+            }
         } else {
             response.setContentType(contentType);
         }

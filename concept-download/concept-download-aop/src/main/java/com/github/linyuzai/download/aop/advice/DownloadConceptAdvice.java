@@ -88,7 +88,7 @@ public class DownloadConceptAdvice implements MethodInterceptor {
 
         builder.filename(download.filename())
                 .inline(download.inline())
-                .contentType(buildContentType(download, configuration))
+                .contentType(download.contentType())
                 .compressFormat(buildCompressFormat(download, configuration))
                 .forceCompress(download.forceCompress())
                 .charset(buildCharset(download))
@@ -126,20 +126,6 @@ public class DownloadConceptAdvice implements MethodInterceptor {
             return ((DownloadOptions.Rewriter) returnValue).rewrite(options);
         } else {
             return options;
-        }
-    }
-
-    /**
-     * @param download      注解 / Annotation
-     * @param configuration 下载配置 / Download configuration
-     * @return Content Type
-     */
-    private String buildContentType(Download download, DownloadConfiguration configuration) {
-        String contentType = download.contentType();
-        if (contentType.isEmpty()) {
-            return configuration.getResponse().getContentType();
-        } else {
-            return contentType;
         }
     }
 

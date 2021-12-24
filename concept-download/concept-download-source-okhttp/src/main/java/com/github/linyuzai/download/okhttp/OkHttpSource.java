@@ -4,10 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.load.AbstractLoadableSource;
 import lombok.*;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import okhttp3.*;
 
 import java.io.*;
 
@@ -76,6 +73,13 @@ public class OkHttpSource extends AbstractLoadableSource {
             ResponseBody body = response.body();
             if (body == null) {
                 throw new DownloadException("Body is null");
+            }
+            String contentType = getContentType();
+            if (contentType == null || contentType.isEmpty()) {
+                MediaType mediaType = body.contentType();
+                if (mediaType != null) {
+                    setContentType(mediaType.toString());
+                }
             }
             long l = body.contentLength();
             if (l != -1) {

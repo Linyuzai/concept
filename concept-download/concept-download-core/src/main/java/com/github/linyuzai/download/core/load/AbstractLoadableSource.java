@@ -1,11 +1,11 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
+import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
-import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
@@ -76,6 +76,10 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                      FileOutputStream fos = new FileOutputStream(cache)) {
                     writer.write(is, fos, null, getCharset(), getLength());
                 }
+            }
+            String contentType = getContentType();
+            if (contentType == null || contentType.isEmpty()) {
+                setContentType(ContentType.file(cache));
             }
             inputStream = new FileInputStream(cache);
         } else {

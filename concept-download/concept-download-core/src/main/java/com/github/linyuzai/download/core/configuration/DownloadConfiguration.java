@@ -23,8 +23,6 @@ public class DownloadConfiguration {
     @Data
     public static class ResponseConfiguration {
 
-        private String contentType = ContentType.OCTET_STREAM;
-
         private Map<String, String> headers;
     }
 

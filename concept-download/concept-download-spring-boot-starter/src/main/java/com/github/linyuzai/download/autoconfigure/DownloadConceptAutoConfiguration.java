@@ -51,7 +51,6 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadConfiguration downloadConfiguration(DownloadConceptProperties properties) {
         DownloadConfiguration configuration = new DownloadConfiguration();
-        configuration.getResponse().setContentType(properties.getResponse().getContentType());
         configuration.getResponse().setHeaders(properties.getResponse().getHeaders());
         configuration.getSource().getCache().setEnabled(properties.getSource().getCache().isEnabled());
         configuration.getSource().getCache().setPath(properties.getSource().getCache().getPath());

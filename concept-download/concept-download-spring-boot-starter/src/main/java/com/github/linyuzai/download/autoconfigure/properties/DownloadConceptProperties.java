@@ -22,11 +22,6 @@ public class DownloadConceptProperties {
     public static class ResponseProperties {
 
         /**
-         * Content-Type Header
-         */
-        private String contentType = ContentType.OCTET_STREAM;
-
-        /**
          * 额外的响应头 / Additional response headers
          */
         private Map<String, String> headers;

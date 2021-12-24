@@ -47,7 +47,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                 FileOutputStream fos = new FileOutputStream(cache);
                 doCompress(source, fos, writer);
             }
-            result = new FileCompression(cache);
+            result = new FileCompression(cache, getContentType());
         } else {
             MemoryCompression compressed = new MemoryCompression(source, writer, this);
             compressed.setName(cacheName);
@@ -105,4 +105,6 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @return 压缩包的后缀 / Suffix of the compressed package
      */
     public abstract String getSuffix();
+
+    public abstract String getContentType();
 }
