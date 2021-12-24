@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.response;
 
 import com.github.linyuzai.download.core.compress.Compression;
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
@@ -13,6 +14,9 @@ import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -70,7 +74,17 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
         }
         Range range = context.get(Range.class);
         DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
-        compression.write(response.getOutputStream(), range, writer);
+        write(response.getOutputStream(), writer, range, compression.getParts());
+    }
+
+    protected void write(OutputStream os, DownloadWriter writer, Range range, Collection<Part> parts) throws IOException {
+        for (Part part : parts) {
+            InputStream inputStream = part.getInputStream();
+            if (inputStream != null) {
+                writer.write(part.getInputStream(), os, range, part.getCharset(), part.getLength());
+            }
+            write(os, writer, range, part.getChildren());
+        }
     }
 
     /**

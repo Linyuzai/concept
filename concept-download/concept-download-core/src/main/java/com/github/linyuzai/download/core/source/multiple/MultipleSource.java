@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.source.multiple;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
@@ -8,6 +9,7 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -23,6 +25,11 @@ public class MultipleSource implements Source {
 
     @NonNull
     protected Collection<Source> sources;
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return null;
+    }
 
     /**
      * 如果集合为空返回null / Returns null if the collection is empty
@@ -141,20 +148,13 @@ public class MultipleSource implements Source {
         }
     }
 
-    /**
-     * 对集合中的所有下载源都执行写入 / Write all sources in the collection
-     *
-     * @param os      写入数据的输出流 / Output stream to write
-     * @param range   写入的范围 / Range of writing
-     * @param writer  具体操作字节或字符的处理类 / Handler to handle bytes or chars
-     * @param handler 可对每一部分进行单独写入操作 / Do write for each part {@link Part}
-     * @throws IOException I/O exception
-     */
     @Override
-    public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
+    public Collection<Part> getParts() {
+        Collection<Part> parts = new ArrayList<>();
         for (Source source : sources) {
-            source.write(os, range, writer, handler);
+            parts.addAll(source.getParts());
         }
+        return parts;
     }
 
     /**

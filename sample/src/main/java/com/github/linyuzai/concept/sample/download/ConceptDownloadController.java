@@ -198,7 +198,7 @@ public class ConceptDownloadController {
     @GetMapping("/s21")
     public List<BusinessModel> s21() {
         List<BusinessModel> businessModels = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             businessModels.add(new BusinessModel(i + ".mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
         }
         businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));

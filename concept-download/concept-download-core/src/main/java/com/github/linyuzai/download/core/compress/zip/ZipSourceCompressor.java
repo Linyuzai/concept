@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.compress.zip;
 
 import com.github.linyuzai.download.core.compress.AbstractSourceCompressor;
 import com.github.linyuzai.download.core.compress.CompressFormat;
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
@@ -10,8 +11,10 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -44,14 +47,20 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     @Override
     public void doCompress(Source source, OutputStream os, DownloadWriter writer) throws IOException {
         try (ZipOutputStream zos = newZipOutputStream(source, os)) {
-            source.write(zos, null, writer, new Downloadable.WriteHandler() {
-                @Override
-                public void handle(Downloadable.Part part) throws IOException {
-                    zos.putNextEntry(new ZipEntry(part.getPath()));
-                    Downloadable.WriteHandler.super.handle(part);
-                    zos.closeEntry();
-                }
-            });
+            Collection<Part> parts = source.getParts();
+            write(zos, writer, parts);
+        }
+    }
+
+    protected void write(ZipOutputStream zos, DownloadWriter writer, Collection<Part> parts) throws IOException {
+        for (Part part : parts) {
+            zos.putNextEntry(new ZipEntry(part.getPath()));
+            InputStream inputStream = part.getInputStream();
+            if (inputStream != null) {
+                writer.write(part.getInputStream(), zos, null, part.getCharset(), part.getLength());
+            }
+            write(zos, writer, part.getChildren());
+            zos.closeEntry();
         }
     }
 

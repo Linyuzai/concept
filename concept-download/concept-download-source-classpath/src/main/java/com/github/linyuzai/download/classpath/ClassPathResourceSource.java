@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.classpath;
 
-import com.github.linyuzai.download.core.concept.AbstractPart;
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
@@ -21,6 +21,11 @@ public class ClassPathResourceSource extends AbstractSource {
 
     @NonNull
     protected ClassPathResource resource;
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return resource.getInputStream();
+    }
 
     /**
      * 如果没有指定名称 / If no name is specified
@@ -46,25 +51,6 @@ public class ClassPathResourceSource extends AbstractSource {
             return null;
         }
         return length;
-    }
-
-    @Override
-    public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
-        try (InputStream is = resource.getInputStream()) {
-            Part part = new AbstractPart(this) {
-
-                @Override
-                public InputStream getInputStream() throws IOException {
-                    return is;
-                }
-
-                @Override
-                public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), getLength());
-                }
-            };
-            handler.handle(part);
-        }
     }
 
     @Override

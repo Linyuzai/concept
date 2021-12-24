@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
-import com.github.linyuzai.download.core.concept.AbstractPart;
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
@@ -91,38 +91,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             InputStream is = doLoad(context);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             writer.write(is, os, null, getCharset(), getLength());
-            this.inputStream = new ByteArrayInputStream(os.toByteArray());
-        }
-    }
-
-    /**
-     * 直接使用加载的资源或缓存的资源写入 / Write directly using loaded resources or cached resources
-     *
-     * @param os      写入数据的输出流 / Output stream to write
-     * @param range   写入的范围 / Range of writing
-     * @param writer  具体操作字节或字符的处理类 / Handler to handle bytes or chars
-     * @param handler 可对每一部分进行单独写入操作 / Do write for each part {@link Part}
-     * @throws IOException I/O exception
-     */
-    @Override
-    public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
-        if (inputStream == null) {
-            return;
-        }
-        try (InputStream is = inputStream) {
-            Part part = new AbstractPart(this) {
-
-                @Override
-                public InputStream getInputStream() throws IOException {
-                    return is;
-                }
-
-                @Override
-                public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), getLength());
-                }
-            };
-            handler.handle(part);
+            inputStream = new ByteArrayInputStream(os.toByteArray());
         }
     }
 

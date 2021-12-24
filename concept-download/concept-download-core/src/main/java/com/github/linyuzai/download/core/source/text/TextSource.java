@@ -1,10 +1,7 @@
 package com.github.linyuzai.download.core.source.text;
 
-import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.contenttype.ContentType;
-import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.*;
 
 import java.io.*;
@@ -15,11 +12,21 @@ import java.nio.charset.Charset;
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TextSource extends AbstractSource {
 
-    @NonNull
     protected String text;
+
+    protected byte[] bytes;
+
+    protected TextSource(@NonNull String text) {
+        this.text = text;
+        this.bytes = getBytes();
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(bytes);
+    }
 
     @Override
     public String getContentType() {
@@ -35,11 +42,7 @@ public class TextSource extends AbstractSource {
      */
     @Override
     public Long getLength() {
-        return getLength(getBytes());
-    }
-
-    private Long getLength(byte[] bytes) {
-        return Integer.valueOf(bytes.length).longValue();
+        return (long) bytes.length;
     }
 
     /**
@@ -48,31 +51,6 @@ public class TextSource extends AbstractSource {
     public byte[] getBytes() {
         Charset charset = getCharset();
         return charset == null ? text.getBytes() : text.getBytes(charset);
-    }
-
-    @Override
-    public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
-        byte[] bytes = getBytes();
-        try (InputStream is = new ByteArrayInputStream(bytes)) {
-            Part part = new AbstractPart(this) {
-
-                @Override
-                public InputStream getInputStream() throws IOException {
-                    return is;
-                }
-
-                @Override
-                public Long getLength() {
-                    return TextSource.this.getLength(bytes);
-                }
-
-                @Override
-                public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), getLength());
-                }
-            };
-            handler.handle(part);
-        }
     }
 
     @Override

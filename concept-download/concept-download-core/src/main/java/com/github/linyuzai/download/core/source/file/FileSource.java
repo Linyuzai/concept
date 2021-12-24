@@ -1,14 +1,13 @@
 package com.github.linyuzai.download.core.source.file;
 
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
-import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.*;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 文件下载源 / A source that holds a file
@@ -21,6 +20,11 @@ public class FileSource extends AbstractSource {
 
     @NonNull
     protected File file;
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return file.isFile() ? new FileInputStream(file) : null;
+    }
 
     /**
      * 如果没有指定名称 / If no name is specified
@@ -99,129 +103,10 @@ public class FileSource extends AbstractSource {
         return file.getParent();
     }
 
-    /**
-     * 如果是文件夹则会递归遍历内部的文件或子文件写入 / If it is a folder, it will recursively traverse the internal file or sub file write
-     * 如果是文件夹则不支持范围指定 / Range assignment is not supported if it is a folder
-     *
-     * @param os      写入数据的输出流 / Output stream to write
-     * @param range   写入的范围 / Range of writing
-     * @param writer  具体操作字节或字符的处理类 / Handler to handle bytes or chars
-     * @param handler 可对每一部分进行单独写入操作 / Do write for each part {@link Part}
-     * @throws IOException I/O exception
-     */
     @Override
-    public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
+    public Collection<Part> getParts() {
         String name = getName();
-        if (range == null) {
-            write0(os, null, writer, handler, file, name, name, true);
-        } else {
-            if (file.isFile()) {
-                write0(os, range, writer, handler, file, name, name, true);
-            } else {
-                throw new DownloadException("Range not support: " + file.getAbsolutePath());
-            }
-        }
-    }
-
-    /**
-     * 使用文件输入流进行递归写入 / Recursive writing using file input stream
-     * 如果是文件夹也会回调 / If it is a folder, it will also be recalled
-     * 但是其中的输入流为null / But the input stream is null
-     */
-    protected void write0(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler,
-                          File file, String path, String name, boolean keepStruct) throws IOException {
-        if (file.isFile()) {
-            try (FileInputStream fis = new FileInputStream(file)) {
-                Part part = new Part() {
-
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        return fis;
-                    }
-
-                    @Override
-                    public String getName() {
-                        return name;
-                    }
-
-                    @Override
-                    public String getPath() {
-                        return path;
-                    }
-
-                    @Override
-                    public String getContentType() {
-                        return ContentType.file(file);
-                    }
-
-                    @Override
-                    public Charset getCharset() {
-                        return null;
-                    }
-
-                    @Override
-                    public Long getLength() {
-                        return file.length();
-                    }
-
-                    @Override
-                    public void write() throws IOException {
-                        writer.write(getInputStream(), os, range, getCharset(), getLength());
-                    }
-                };
-                handler.handle(part);
-            }
-        } else {
-            File[] files = file.listFiles();
-            if (files == null || files.length == 0) {
-                if (keepStruct) {
-                    Part part = new Part() {
-
-                        @Override
-                        public InputStream getInputStream() throws IOException {
-                            return null;
-                        }
-
-                        @Override
-                        public String getName() {
-                            return name;
-                        }
-
-                        @Override
-                        public String getPath() {
-                            return path + File.separator;
-                        }
-
-                        @Override
-                        public String getContentType() {
-                            return null;
-                        }
-
-                        @Override
-                        public Charset getCharset() {
-                            return null;
-                        }
-
-                        @Override
-                        public Long getLength() {
-                            return null;
-                        }
-
-                        @Override
-                        public void write() throws IOException {
-
-                        }
-                    };
-                    handler.handle(part);
-                }
-            } else {
-                for (File f : files) {
-                    String newName = f.getName();
-                    String newPath = keepStruct ? path + File.separator + newName : newName;
-                    write0(os, range, writer, handler, f, newPath, newName, keepStruct);
-                }
-            }
-        }
+        return Collections.singletonList(new FilePart(file, name, name));
     }
 
     @Override
