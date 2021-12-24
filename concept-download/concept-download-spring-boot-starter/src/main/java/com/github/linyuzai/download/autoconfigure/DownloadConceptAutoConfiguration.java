@@ -93,7 +93,7 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SelfSourceFactory directSourceFactory() {
+    public SelfSourceFactory selfSourceFactory() {
         return new SelfSourceFactory();
     }
 
@@ -123,7 +123,7 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ProxySourceFactory reflectionSourceFactory() {
+    public ProxySourceFactory proxySourceFactory() {
         return new ProxySourceFactory();
     }
 
