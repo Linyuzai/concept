@@ -24,6 +24,9 @@ public interface Downloadable extends Cacheable {
      */
     String getName();
 
+    /**
+     * @return Content Type
+     */
     String getContentType();
 
     /**
@@ -102,9 +105,19 @@ public interface Downloadable extends Cacheable {
         String getPath();
 
         /**
+         * @return Content Type
+         */
+        String getContentType();
+
+        /**
          * @return 编码 / charset
          */
         Charset getCharset();
+
+        /**
+         * @return 字节数 / bytes count
+         */
+        Long getLength();
 
         /**
          * 执行写 / Execute write

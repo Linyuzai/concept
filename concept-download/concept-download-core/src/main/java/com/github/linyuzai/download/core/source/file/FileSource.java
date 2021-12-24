@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.source.file;
 
+import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.range.Range;
@@ -150,13 +151,23 @@ public class FileSource extends AbstractSource {
                     }
 
                     @Override
+                    public String getContentType() {
+                        return ContentType.file(file);
+                    }
+
+                    @Override
                     public Charset getCharset() {
-                        return FileSource.this.getCharset();
+                        return null;
+                    }
+
+                    @Override
+                    public Long getLength() {
+                        return file.length();
                     }
 
                     @Override
                     public void write() throws IOException {
-                        writer.write(getInputStream(), os, range, getCharset(), file.length());
+                        writer.write(getInputStream(), os, range, getCharset(), getLength());
                     }
                 };
                 handler.handle(part);
@@ -183,8 +194,18 @@ public class FileSource extends AbstractSource {
                         }
 
                         @Override
+                        public String getContentType() {
+                            return null;
+                        }
+
+                        @Override
                         public Charset getCharset() {
-                            return FileSource.this.getCharset();
+                            return null;
+                        }
+
+                        @Override
+                        public Long getLength() {
+                            return null;
                         }
 
                         @Override

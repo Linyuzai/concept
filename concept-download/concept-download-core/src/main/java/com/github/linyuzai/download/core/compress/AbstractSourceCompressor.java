@@ -33,7 +33,6 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      */
     @Override
     public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
-        Compression result;
         String cachePath = context.getOptions().getCompressCachePath();
         String cacheName = getCacheName(source, context);
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
@@ -47,13 +46,15 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                 FileOutputStream fos = new FileOutputStream(cache);
                 doCompress(source, fos, writer);
             }
-            result = new FileCompression(cache, getContentType());
+            FileCompression compression = new FileCompression(cache);
+            compression.setContentType(getContentType());
+            return compression;
         } else {
-            MemoryCompression compressed = new MemoryCompression(source, writer, this);
-            compressed.setName(cacheName);
-            result = compressed;
+            MemoryCompression compression = new MemoryCompression(source, writer, this);
+            compression.setName(cacheName);
+            compression.setContentType(getContentType());
+            return compression;
         }
-        return result;
     }
 
     /**
@@ -70,34 +71,36 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used
      * 否则使用Source的名称 / Otherwise, use the name of the source {@link Source#getName()}
      * 如果对应的名称为空 / If the name is empty
-     * 否则使用缓存名称生成器生成，默认使用时间戳 / Otherwise, it is generated using the cache name generator, and the timestamp is used by default
+     * 否则使用缓存名称生成器生成 / Otherwise, it is generated using the cache name generator
      *
      * @param source  被压缩的对象 / Object to compress
      * @param context 下载上下文 / Context of download
      * @return 缓存名称 / Name of cache
+     * @see CacheNameGenerator
      */
     public String getCacheName(Source source, DownloadContext context) {
-        String cacheName = context.getOptions().getCompressCacheName();
+        String name = context.getOptions().getCompressCacheName();
         String suffix = getSuffix();
-        if (cacheName == null || cacheName.isEmpty()) {
-            CacheNameGenerator generator = context.get(CacheNameGenerator.class);
-            String newCacheName = generator.generate(source, context);
-            if (newCacheName == null || newCacheName.isEmpty()) {
-                throw new DownloadException("Cache name is null or empty");
-            } else {
-                int index = newCacheName.lastIndexOf(CompressFormat.DOT);
-                if (index == -1) {
-                    return newCacheName + suffix;
-                } else {
-                    return newCacheName.substring(0, index) + suffix;
+        if (name == null || name.isEmpty()) {
+            name = source.getName();
+            if (name == null || name.isEmpty()) {
+                CacheNameGenerator generator = context.get(CacheNameGenerator.class);
+                name = generator.generate(source, context);
+                if (name == null || name.isEmpty()) {
+                    throw new DownloadException("Cache name is null or empty");
                 }
             }
-        } else {
-            if (cacheName.endsWith(suffix)) {
-                return cacheName;
-            } else {
-                return cacheName + suffix;
+            if (name.endsWith(suffix)) {
+                return name;
             }
+            int index = name.lastIndexOf(CompressFormat.DOT);
+            if (index == -1) {
+                return name + suffix;
+            } else {
+                return name.substring(0, index) + suffix;
+            }
+        } else {
+            return name;
         }
     }
 
@@ -106,5 +109,8 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      */
     public abstract String getSuffix();
 
+    /**
+     * @return Content Type
+     */
     public abstract String getContentType();
 }

@@ -71,6 +71,9 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
         return CompressFormat.ZIP_SUFFIX;
     }
 
+    /**
+     * @return application/x-zip-compressed
+     */
     @Override
     public String getContentType() {
         return ContentType.Application.X_ZIP_COMPRESSED;

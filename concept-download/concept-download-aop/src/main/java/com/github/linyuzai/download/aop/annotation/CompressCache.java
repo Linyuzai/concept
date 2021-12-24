@@ -27,7 +27,7 @@ public @interface CompressCache {
      * 压缩文件名称 / Compressed file name
      * 单下载源会使用该下载源的名名称 / A single source will use the name of the source
      * 多下载源会使用第一个有名称的下载源的名称 / Multiple sources will use the name of the first source with a name
-     * 否则使用缓存名称生成器生成，默认使用时间戳 / Otherwise, it is generated using the cache name generator, and the timestamp is used by default
+     * 否则使用缓存名称生成器生成 / Otherwise, it is generated using the cache name generator
      *
      * @see CacheNameGenerator
      */

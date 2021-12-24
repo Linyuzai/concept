@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
+import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
@@ -11,7 +12,6 @@ import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
 
 import java.io.*;
-import java.nio.charset.Charset;
 
 /**
  * 需要预加载资源的抽象类 / Abstract classes that require preloaded resources
@@ -63,12 +63,15 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
             }
-            CacheNameGenerator generator = context.get(CacheNameGenerator.class);
-            String cacheName = generator.generate(this, context);
-            if (cacheName == null || cacheName.isEmpty()) {
-                throw new DownloadException("Cache name is null or empty");
+            String name = getName();
+            if (name == null || name.isEmpty()) {
+                CacheNameGenerator generator = context.get(CacheNameGenerator.class);
+                name = generator.generate(this, context);
+                if (name == null || name.isEmpty()) {
+                    throw new DownloadException("Cache name is null or empty");
+                }
             }
-            File cache = new File(dir, cacheName);
+            File cache = new File(dir, name);
             if (!cache.exists()) {
                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
@@ -107,7 +110,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             return;
         }
         try (InputStream is = inputStream) {
-            Part part = new Part() {
+            Part part = new AbstractPart(this) {
 
                 @Override
                 public InputStream getInputStream() throws IOException {
@@ -115,23 +118,8 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 }
 
                 @Override
-                public String getName() {
-                    return AbstractLoadableSource.this.getName();
-                }
-
-                @Override
-                public String getPath() {
-                    return AbstractLoadableSource.this.getName();
-                }
-
-                @Override
-                public Charset getCharset() {
-                    return AbstractLoadableSource.this.getCharset();
-                }
-
-                @Override
                 public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), AbstractLoadableSource.this.getLength());
+                    writer.write(getInputStream(), os, range, getCharset(), getLength());
                 }
             };
             handler.handle(part);

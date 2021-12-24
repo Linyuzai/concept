@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.classpath;
 
+import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
@@ -9,7 +10,6 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 /**
  * 持有一个 {@link ClassPathResource} 的下载源 / Source holds an {@link ClassPathResource}
@@ -51,7 +51,7 @@ public class ClassPathResourceSource extends AbstractSource {
     @Override
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
         try (InputStream is = resource.getInputStream()) {
-            Part part = new Part() {
+            Part part = new AbstractPart(this) {
 
                 @Override
                 public InputStream getInputStream() throws IOException {
@@ -59,23 +59,8 @@ public class ClassPathResourceSource extends AbstractSource {
                 }
 
                 @Override
-                public String getName() {
-                    return ClassPathResourceSource.this.getName();
-                }
-
-                @Override
-                public String getPath() {
-                    return ClassPathResourceSource.this.getName();
-                }
-
-                @Override
-                public Charset getCharset() {
-                    return ClassPathResourceSource.this.getCharset();
-                }
-
-                @Override
                 public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), ClassPathResourceSource.this.getLength());
+                    writer.write(getInputStream(), os, range, getCharset(), getLength());
                 }
             };
             handler.handle(part);

@@ -18,8 +18,12 @@ public class FileCompression extends AbstractCompression {
 
     protected File file;
 
-    protected String contentType;
-
+    /**
+     * 如果设置了名称则使用设置的名称 / If the name is set, the set name is used
+     * 否则设置为文件名称 / Otherwise, set to file name
+     *
+     * @return 名称 / Name
+     */
     @Override
     public String getName() {
         String name = super.getName();

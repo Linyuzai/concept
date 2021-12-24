@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.source.text;
 
+import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.AbstractSource;
@@ -53,7 +54,7 @@ public class TextSource extends AbstractSource {
     public void write(OutputStream os, Range range, DownloadWriter writer, WriteHandler handler) throws IOException {
         byte[] bytes = getBytes();
         try (InputStream is = new ByteArrayInputStream(bytes)) {
-            Part part = new Part() {
+            Part part = new AbstractPart(this) {
 
                 @Override
                 public InputStream getInputStream() throws IOException {
@@ -61,23 +62,13 @@ public class TextSource extends AbstractSource {
                 }
 
                 @Override
-                public String getName() {
-                    return TextSource.this.getName();
-                }
-
-                @Override
-                public String getPath() {
-                    return TextSource.this.getName();
-                }
-
-                @Override
-                public Charset getCharset() {
-                    return TextSource.this.getCharset();
+                public Long getLength() {
+                    return TextSource.this.getLength(bytes);
                 }
 
                 @Override
                 public void write() throws IOException {
-                    writer.write(getInputStream(), os, range, getCharset(), getLength(bytes));
+                    writer.write(getInputStream(), os, range, getCharset(), getLength());
                 }
             };
             handler.handle(part);
