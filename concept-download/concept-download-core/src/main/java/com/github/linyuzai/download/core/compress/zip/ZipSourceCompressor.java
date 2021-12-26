@@ -6,7 +6,6 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 
@@ -52,6 +51,14 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
         }
     }
 
+    /**
+     * 递归写入所有内容 / Write all parts recursively
+     *
+     * @param zos    压缩的输出流 / Compressed output stream
+     * @param writer 写入执行器 / Executor of writing
+     * @param parts  写入的内容 / Content written
+     * @throws IOException I/O exception
+     */
     protected void write(ZipOutputStream zos, DownloadWriter writer, Collection<Part> parts) throws IOException {
         for (Part part : parts) {
             zos.putNextEntry(new ZipEntry(part.getPath()));

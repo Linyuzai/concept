@@ -44,6 +44,9 @@ public interface Part {
      */
     Long getLength();
 
+    /**
+     * @return 子部分 / Sub parts
+     */
     default Collection<Part> getChildren() {
         return Collections.emptyList();
     }

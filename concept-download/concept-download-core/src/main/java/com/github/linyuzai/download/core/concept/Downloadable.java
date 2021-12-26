@@ -36,6 +36,9 @@ public interface Downloadable extends Part, Cacheable {
      */
     Long getLength();
 
+    /**
+     * @return 所有的部分，如文件夹下的多个文件 / All parts, such as multiple files under a folder
+     */
     default Collection<Part> getParts() {
         return Collections.singletonList(this);
     }
