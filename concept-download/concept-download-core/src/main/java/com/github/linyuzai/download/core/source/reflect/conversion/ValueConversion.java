@@ -3,8 +3,7 @@ package com.github.linyuzai.download.core.source.reflect.conversion;
 import com.github.linyuzai.download.core.exception.DownloadException;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ValueConversion {
@@ -15,33 +14,19 @@ public class ValueConversion {
         return helper;
     }
 
-    private final Map<Class<? extends ValueConvertor>, ValueConvertor> convertorMap = new ConcurrentHashMap<>();
+    private final Collection<ValueConvertor> convertors = new CopyOnWriteArrayList<>();
 
     public void register(ValueConvertor convertor) {
         if (convertor == null) {
             return;
         }
-        convertorMap.put(convertor.getClass(), convertor);
-    }
-
-    public Object convert(Class<? extends ValueConvertor> clazz, Object value) throws Throwable {
-        ValueConvertor convertor = convertorMap.computeIfAbsent(clazz, this::newInstance);
-        return convertor.convert(value);
-    }
-
-    public ValueConvertor newInstance(Class<? extends ValueConvertor> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (Throwable e) {
-            throw new DownloadException(e);
-        }
+        convertors.add(convertor);
     }
 
     public Object convert(Object value, Class<?> type) {
         if (value == null) {
             return null;
         }
-        Collection<ValueConvertor> convertors = convertorMap.values();
         for (ValueConvertor convertor : convertors) {
             if (convertor.support(value, type)) {
                 return convertor.convert(value);

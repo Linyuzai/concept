@@ -69,6 +69,21 @@ public class ReflectionTemplate {
         }
     }
 
+    @Deprecated
+    public static boolean hasAnnotation(Class<? extends Annotation> annotation) {
+        if (annotation == SourceReflection.class) {
+            return true;
+        }
+        Annotation[] annotations = annotation.getAnnotations();
+        for (Annotation a : annotations) {
+            boolean hasAnnotation = hasAnnotation(a.annotationType());
+            if (hasAnnotation) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isReflectSuper(Class<?> clazz) {
         SourceModel annotation = clazz.getAnnotation(SourceModel.class);
         if (annotation == null) {
