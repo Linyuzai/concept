@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.source.reflect;
 
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.source.reflect.conversion.ValueConversion;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -136,7 +137,7 @@ public class ReflectionTemplate {
     }
 
     protected Object convertValue(Object value, Class<?> type) {
-        return value;
+        return ValueConversion.helper().convert(value, type);
     }
 
     protected void mergeSuper(ReflectionTemplate template) {
