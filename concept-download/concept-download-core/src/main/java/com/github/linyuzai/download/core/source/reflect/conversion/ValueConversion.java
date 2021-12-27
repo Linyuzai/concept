@@ -2,13 +2,14 @@ package com.github.linyuzai.download.core.source.reflect.conversion;
 
 import com.github.linyuzai.download.core.exception.DownloadException;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ValueConversion {
 
-    private static final ValueConversion helper = new ValueConversion();
+    private static final ValueConversion helper = new ValueConversion(StringToCharsetValueConvertor.getInstance());
 
     public static ValueConversion helper() {
         return helper;
@@ -16,11 +17,19 @@ public class ValueConversion {
 
     private final Collection<ValueConvertor> convertors = new CopyOnWriteArrayList<>();
 
-    public void register(ValueConvertor convertor) {
-        if (convertor == null) {
-            return;
+    private ValueConversion(ValueConvertor... convertors) {
+        register(convertors);
+    }
+
+    public void register(Collection<? extends ValueConvertor> convertors) {
+        if (convertors == null) {
+            throw new NullPointerException("Value convertors is null");
         }
-        convertors.add(convertor);
+        this.convertors.addAll(convertors);
+    }
+
+    public void register(ValueConvertor... convertors) {
+        register(Arrays.asList(convertors));
     }
 
     public Object convert(Object value, Class<?> type) {
