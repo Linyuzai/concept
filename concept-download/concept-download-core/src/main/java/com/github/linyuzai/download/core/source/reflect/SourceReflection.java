@@ -5,7 +5,6 @@ import java.lang.annotation.*;
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@SourceReflection
 public @interface SourceReflection {
 
     String methodName() default "";

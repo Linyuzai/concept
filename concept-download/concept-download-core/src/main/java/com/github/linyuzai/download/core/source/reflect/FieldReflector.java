@@ -1,21 +1,23 @@
 package com.github.linyuzai.download.core.source.reflect;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
 
 @Getter
-@AllArgsConstructor
 public class FieldReflector implements Reflector {
 
-    private Field field;
+    private final Field field;
+
+    public FieldReflector(Field field) {
+        this.field = field;
+        if (!this.field.isAccessible()) {
+            this.field.setAccessible(true);
+        }
+    }
 
     @Override
     public Object reflect(Object model) throws ReflectiveOperationException {
-        if (!field.isAccessible()) {
-            field.setAccessible(true);
-        }
         return field.get(model);
     }
 }

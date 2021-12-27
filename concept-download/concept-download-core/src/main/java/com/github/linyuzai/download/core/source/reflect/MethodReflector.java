@@ -1,21 +1,23 @@
 package com.github.linyuzai.download.core.source.reflect;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
 
 @Getter
-@AllArgsConstructor
 public class MethodReflector implements Reflector {
 
-    private Method method;
+    private final Method method;
+
+    public MethodReflector(Method method) {
+        this.method = method;
+        if (!this.method.isAccessible()) {
+            this.method.setAccessible(true);
+        }
+    }
 
     @Override
     public Object reflect(Object model) throws ReflectiveOperationException {
-        if (!method.isAccessible()) {
-            method.setAccessible(true);
-        }
         return method.invoke(model);
     }
 }
