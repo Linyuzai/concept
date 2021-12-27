@@ -4,6 +4,10 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 
 import java.io.IOException;
 
+/**
+ * 自动执行调用链 / Auto execute call chain
+ * 支持拦截 / Support interception
+ */
 public interface AutomaticDownloadHandler extends DownloadHandler {
 
     @Override

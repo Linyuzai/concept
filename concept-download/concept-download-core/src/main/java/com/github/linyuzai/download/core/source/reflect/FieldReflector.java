@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.lang.reflect.Field;
 
+/**
+ * 基于属性的反射器 / Field based reflector
+ */
 @Getter
 public class FieldReflector implements Reflector {
 

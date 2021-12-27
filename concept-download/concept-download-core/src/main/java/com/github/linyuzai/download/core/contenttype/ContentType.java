@@ -19,6 +19,12 @@ public class ContentType {
         public static final String PLAIN = "text/plain";
     }
 
+    /**
+     * 获得文件的 Content Type / Get the content type of the file
+     *
+     * @param file 文件 / File
+     * @return Content Type
+     */
     public static String file(File file) {
         try {
             String contentType = Files.probeContentType(file.toPath());

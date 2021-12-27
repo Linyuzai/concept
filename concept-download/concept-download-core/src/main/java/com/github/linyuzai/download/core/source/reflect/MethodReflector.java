@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.lang.reflect.Method;
 
+/**
+ * 基于方法的反射器 / Method based reflector
+ */
 @Getter
 public class MethodReflector implements Reflector {
 

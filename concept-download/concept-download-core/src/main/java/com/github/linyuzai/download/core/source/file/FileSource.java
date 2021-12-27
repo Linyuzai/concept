@@ -103,6 +103,9 @@ public class FileSource extends AbstractSource {
         return file.getParent();
     }
 
+    /**
+     * @return 返回一个文件或整个目录结构 / Returns a file or the entire directory structure
+     */
     @Override
     public Collection<Part> getParts() {
         String name = getName();

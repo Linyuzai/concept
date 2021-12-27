@@ -24,10 +24,10 @@ public interface SourceCompressor extends OrderProvider {
     /**
      * 如果支持对应的格式就会调用该方法执行压缩 / This method will be called to perform compression if the corresponding format is supported
      *
-     * @param source    {@link Source}
-     * @param writer    {@link DownloadWriter}
-     * @param context   Context of download
-     * @return An specific compression
+     * @param source  {@link Source}
+     * @param writer  {@link DownloadWriter}
+     * @param context Context of download
+     * @return 特定的压缩 / An specific compression
      * @throws IOException I/O exception
      */
     Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException;

@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Map;
 
 /**

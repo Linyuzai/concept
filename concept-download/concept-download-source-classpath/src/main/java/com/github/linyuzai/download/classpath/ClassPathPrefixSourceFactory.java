@@ -6,8 +6,6 @@ import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import java.nio.charset.Charset;
-
 /**
  * ClassPath前缀 'classpath:' 的工厂 / Factory for class path prefix 'classpath:'
  */

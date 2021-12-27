@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 处理了异常的 加载器 / Loader which catches exception
+ * 捕获异常的加载器 / Loader which catches exception
  */
 @Getter
 @AllArgsConstructor

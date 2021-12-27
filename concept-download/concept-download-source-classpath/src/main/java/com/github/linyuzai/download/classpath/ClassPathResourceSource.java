@@ -1,15 +1,11 @@
 package com.github.linyuzai.download.classpath;
 
-import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.source.AbstractSource;
-import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.*;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * 持有一个 {@link ClassPathResource} 的下载源 / Source holds an {@link ClassPathResource}

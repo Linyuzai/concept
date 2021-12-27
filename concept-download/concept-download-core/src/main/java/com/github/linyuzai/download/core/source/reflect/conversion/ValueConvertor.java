@@ -4,10 +4,23 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 
 import java.lang.reflect.*;
 
-public interface ValueConvertor<F, T> {
+/**
+ * 值转换器 / Value convertor
+ *
+ * @param <Original> 原始类型 / Original type
+ * @param <Target>   目标类型 / Target type
+ */
+public interface ValueConvertor<Original, Target> {
 
-    T convert(F value);
+    Target convert(Original value);
 
+    /**
+     * 转换器是否支持将值转为对应的类型 / Does the converter support converting value to target type
+     *
+     * @param value 需要转换的值 / Value to convert
+     * @param type  目标类型 / Target type
+     * @return 是否支持 / Is it supported
+     */
     default boolean support(Object value, Class<?> type) {
         ParameterizedType pt = find(getClass());
         if (pt == null) {
@@ -25,7 +38,7 @@ public interface ValueConvertor<F, T> {
         if (toClass == null) {
             return false;
         }
-        if (!toClass.isAssignableFrom(type)) {
+        if (!type.isAssignableFrom(toClass)) {
             return false;
         }
         return true;
@@ -45,6 +58,12 @@ public interface ValueConvertor<F, T> {
         return null;
     }
 
+    /**
+     * 找到指定的泛型接口 / Found the specified generic interface
+     *
+     * @param clazz Class
+     * @return 泛型接口 / generic interface
+     */
     static ParameterizedType find(Class<?> clazz) {
         if (clazz == null) {
             return null;

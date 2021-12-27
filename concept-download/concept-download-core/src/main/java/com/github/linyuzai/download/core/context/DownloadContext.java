@@ -8,6 +8,9 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
  */
 public interface DownloadContext {
 
+    /**
+     * @return 下载参数 / Download options
+     */
     DownloadOptions getOptions();
 
     /**

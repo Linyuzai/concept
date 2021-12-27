@@ -13,7 +13,7 @@ public interface SourceFactory extends OrderProvider {
      *
      * @param source  需要下载的数据对象 / Object to download
      * @param context 下载上下文 / Context of download
-     * @return 是否支持 / If supported
+     * @return 是否支持 / Is it supported
      */
     boolean support(Object source, DownloadContext context);
 

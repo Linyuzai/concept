@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * 文件目录结构支持 / File directory structure support
+ */
 @AllArgsConstructor
 public class FilePart implements Part {
 
@@ -70,5 +73,12 @@ public class FilePart implements Part {
             }
             return parts;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FilePart{" +
+                "file=" + file +
+                '}';
     }
 }

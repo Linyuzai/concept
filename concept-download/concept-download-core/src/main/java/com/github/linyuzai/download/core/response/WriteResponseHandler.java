@@ -35,6 +35,7 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
      * 将压缩后的对象写入输出流 / Writes the compressed object to the output stream
      * 设置inline或文件名 / Set inline or file name
      * 设置ContentType / Set ContentType
+     * 设置ContentLength / Set ContentLength
      * 设置响应头 / Set response headers
      *
      * @param context 下载上下文 / Context of download

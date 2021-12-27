@@ -19,7 +19,7 @@ public interface DownloadWriter extends OrderProvider {
      * @param downloadable 可下载的资源 / Resource can be downloaded
      * @param range        写入的范围 / Range of writing
      * @param context      下载上下文 / Context of download
-     * @return 是否支持 / If supported
+     * @return 是否支持 / Is it supported
      */
     boolean support(Downloadable downloadable, Range range, DownloadContext context);
 

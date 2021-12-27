@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.reflect;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.reflect.conversion.ValueConversion;
+import com.github.linyuzai.download.core.source.reflect.conversion.ValueConvertor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 每个类对应一个反射模版 / Each class corresponds to a reflection template
+ * 包含该类的反射信息 / Contains reflection information for this class
+ */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReflectionTemplate {
 
@@ -21,6 +26,12 @@ public class ReflectionTemplate {
         this(clazz, isReflectSuper(clazz));
     }
 
+    /**
+     * 方法或字段上存在标记了 {@link SourceReflection} 的注解 / Annotation marked {@link SourceReflection} exists on the method or field
+     *
+     * @param clazz        Class
+     * @param reflectSuper 是否反射父类 / Reflect parent class
+     */
     public ReflectionTemplate(Class<?> clazz, boolean reflectSuper) {
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
@@ -92,6 +103,13 @@ public class ReflectionTemplate {
         return annotation.superclass();
     }
 
+    /**
+     * 通过注解获得值 / Get value through annotation
+     *
+     * @param annotation Annotation
+     * @param model      模型 / Model
+     * @return 值 / Value
+     */
     public Object value(Class<? extends Annotation> annotation, Object model) {
         try {
             return reflectorMap.get(annotation).reflect(model);
@@ -100,6 +118,15 @@ public class ReflectionTemplate {
         }
     }
 
+    /**
+     * 将模型的值通过反射设置到下载源 / Set the value of the model to the source through reflection
+     * 如果值类型不匹配则进行值转换 / If the value types do not match, value conversion is performed
+     *
+     * @param model  模型 / model
+     * @param source 下载源 / Source
+     * @see ValueConversion
+     * @see ValueConvertor
+     */
     public void reflect(Object model, Source source) {
         try {
             for (Map.Entry<Class<? extends Annotation>, Reflector> entry : reflectorMap.entrySet()) {

@@ -6,11 +6,13 @@ import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.handler.StandardDownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import com.github.linyuzai.download.core.source.reflect.SourceCharset;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
 import com.github.linyuzai.download.core.source.reflect.SourceName;
 import com.github.linyuzai.download.core.source.reflect.SourceObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -206,11 +208,11 @@ public class ConceptDownloadController {
     }
 
     @Download
-    @SourceCache(group = "s22")
+    //@SourceCache(group = "s22")
     @GetMapping("/s22")
     public List<BusinessModel> s22() {
         List<BusinessModel> businessModels = new ArrayList<>();
-        businessModels.add(new BusinessModelPlus("s21.txt", "http://127.0.0.1:8080/concept-download/text.txt"));
+        businessModels.add(new BusinessModelPlus("s22.txt", "UTF-8", "http://127.0.0.1:8080/concept-download/text.txt"));
         return businessModels;
     }
 
@@ -241,17 +243,16 @@ public class ConceptDownloadController {
         private Object source;
     }
 
-    @SourceModel(superclass = false)
+    @Getter
+    //@SourceModel(superclass = false)
     public static class BusinessModelPlus extends BusinessModel {
 
-        public BusinessModelPlus(String name, String url) {
-            super(name, url);
-        }
+        @SourceCharset
+        private String charsetString;
 
-        @SourceName
-        @Override
-        public String getName() {
-            return "BusinessModelPlus";
+        public BusinessModelPlus(String name, String charsetString, String url) {
+            super(name, url);
+            this.charsetString = charsetString;
         }
     }
 }

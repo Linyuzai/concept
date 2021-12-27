@@ -4,11 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
-import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
-
-import java.io.IOException;
 
 /**
  * 下载源处理拦截器

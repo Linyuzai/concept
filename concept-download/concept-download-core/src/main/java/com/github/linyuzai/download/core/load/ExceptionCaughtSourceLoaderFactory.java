@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
 
 /**
- * 处理了异常的 加载器 工厂 / Factory of loader which catches exceptions
+ * 捕获异常的加载器工厂 / Factory of loader which catches exceptions
  */
 @AllArgsConstructor
 public class ExceptionCaughtSourceLoaderFactory implements SourceLoaderFactory {
