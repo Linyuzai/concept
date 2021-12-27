@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    compile "cglib:cglib:${cglibVersion}"
+    //compile "cglib:cglib:${cglibVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"

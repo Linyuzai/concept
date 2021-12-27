@@ -114,7 +114,10 @@ public class ReflectionTemplate {
                         if (reflect == null) {
                             continue;
                         }
-                        Field field = source.getClass().getDeclaredField(fieldName);
+                        Field field = getReflectField(source.getClass(), fieldName);
+                        if (field == null) {
+                            throw new NoSuchFieldException(fieldName);
+                        }
                         Class<?> type = field.getType();
                         Object value;
                         if (type.isInstance(reflect)) {
@@ -139,7 +142,10 @@ public class ReflectionTemplate {
                     } else {
                         value = convertValue(reflect, parameterType);
                     }
-                    Method method = source.getClass().getDeclaredMethod(methodName, parameterType);
+                    Method method = getReflectMethod(source.getClass(), methodName, parameterType);
+                    if (method == null) {
+                        throw new NoSuchMethodException(methodName);
+                    }
                     if (!method.isAccessible()) {
                         method.setAccessible(true);
                     }
@@ -149,6 +155,30 @@ public class ReflectionTemplate {
         } catch (Throwable e) {
             throw new DownloadException(e);
         }
+    }
+
+    protected Field getReflectField(Class<?> clazz, String name) {
+        Class<?> c = clazz;
+        while (c != null) {
+            try {
+                return c.getDeclaredField(name);
+            } catch (Throwable ignore) {
+            }
+            c = c.getSuperclass();
+        }
+        return null;
+    }
+
+    protected Method getReflectMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
+        Class<?> c = clazz;
+        while (c != null) {
+            try {
+                return c.getDeclaredMethod(name, parameterTypes);
+            } catch (Throwable ignore) {
+            }
+            c = c.getSuperclass();
+        }
+        return null;
     }
 
     protected Object convertValue(Object value, Class<?> type) {
