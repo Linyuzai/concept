@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * 基础组件的配置 / Configuration of basic components
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DownloadConceptProperties.class)
 public class DownloadConceptAutoConfiguration {
 

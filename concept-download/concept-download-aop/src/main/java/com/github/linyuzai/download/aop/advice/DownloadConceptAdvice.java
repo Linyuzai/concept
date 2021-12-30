@@ -8,7 +8,7 @@ import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadMethod;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -21,9 +21,13 @@ import java.util.Map;
 /**
  * 切面方法拦截器 / Interceptor of method on advice
  */
+@NoArgsConstructor
 @AllArgsConstructor
 public class DownloadConceptAdvice implements MethodInterceptor {
 
+    @NonNull
+    @Getter
+    @Setter
     private DownloadConcept downloadConcept;
 
     /**

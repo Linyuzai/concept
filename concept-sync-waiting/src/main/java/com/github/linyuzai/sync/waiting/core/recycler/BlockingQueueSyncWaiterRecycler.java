@@ -25,11 +25,6 @@ public class BlockingQueueSyncWaiterRecycler extends QueueSyncWaiterRecycler {
         this.maxCount = maxCount;
     }
 
-    @Override
-    public void recycle(SyncWaiter waiter) {
-        queue.offer(waiter);
-    }
-
     @SneakyThrows
     @Override
     public SyncWaiter reuse() {

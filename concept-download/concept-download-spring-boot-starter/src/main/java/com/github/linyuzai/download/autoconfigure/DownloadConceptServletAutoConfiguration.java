@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Servlet的配置 / Configuration of servlet
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({ServletDownloadRequestProvider.class, ServletDownloadResponseProvider.class})
 public class DownloadConceptServletAutoConfiguration {

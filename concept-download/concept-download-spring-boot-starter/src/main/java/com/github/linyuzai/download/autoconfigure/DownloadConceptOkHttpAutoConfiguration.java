@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * OkHttp的配置 / Configuration of OkHttp
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass(OkHttpSourceFactory.class)
 public class DownloadConceptOkHttpAutoConfiguration {

@@ -209,7 +209,7 @@ public class ReflectionTemplate {
     }
 
     protected Object convertValue(Object value, Class<?> type) {
-        return ValueConversion.helper().convert(value, type);
+        return ValueConversion.getInstance().convert(value, type);
     }
 
     protected void mergeSuper(ReflectionTemplate template) {

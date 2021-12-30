@@ -1,8 +1,6 @@
 package com.github.linyuzai.sync.waiting.core.concept;
 
-import com.github.linyuzai.sync.waiting.core.container.MapSyncWaiterContainer;
 import com.github.linyuzai.sync.waiting.core.container.SyncWaiterContainer;
-import com.github.linyuzai.sync.waiting.core.recycler.QueueSyncWaiterRecycler;
 import com.github.linyuzai.sync.waiting.core.recycler.SyncWaiterRecycler;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -15,18 +13,6 @@ public abstract class AbstractSyncWaitingConcept implements LockableSyncWaitingC
 
     @NonNull
     protected final SyncWaiterRecycler recycler;
-
-    public AbstractSyncWaitingConcept() {
-        this(new MapSyncWaiterContainer(), new QueueSyncWaiterRecycler());
-    }
-
-    public AbstractSyncWaitingConcept(SyncWaiterContainer container) {
-        this(container, new QueueSyncWaiterRecycler());
-    }
-
-    public AbstractSyncWaitingConcept(SyncWaiterRecycler recycler) {
-        this(new MapSyncWaiterContainer(), recycler);
-    }
 
     @Override
     public boolean isSyncWaiterWaiting(Object key) {

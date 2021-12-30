@@ -12,7 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 /**
  * ClassPath的配置 / Configuration of class path
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({ClassPathResourceSourceFactory.class, ClassPathPrefixSourceFactory.class})
 public class DownloadConceptClassPathAutoConfiguration {

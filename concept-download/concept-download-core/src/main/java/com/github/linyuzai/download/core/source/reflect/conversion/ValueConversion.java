@@ -12,10 +12,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ValueConversion {
 
-    private static final ValueConversion helper = new ValueConversion(StringToCharsetValueConvertor.getInstance());
+    private static final ValueConversion instance = new ValueConversion(StringToCharsetValueConvertor.getInstance());
 
-    public static ValueConversion helper() {
-        return helper;
+    public static ValueConversion getInstance() {
+        return instance;
     }
 
     private final Collection<ValueConvertor> convertors = new CopyOnWriteArrayList<>();
