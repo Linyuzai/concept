@@ -1,10 +1,9 @@
-package com.github.linyuzai.download.servlet.response;
+package com.github.linyuzai.download.web.servlet.response;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.response.DownloadResponse;
 import com.github.linyuzai.download.core.response.DownloadResponseProvider;
-import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;

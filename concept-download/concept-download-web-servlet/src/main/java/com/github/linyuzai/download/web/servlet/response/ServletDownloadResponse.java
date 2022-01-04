@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.servlet.response;
+package com.github.linyuzai.download.web.servlet.response;
 
 import com.github.linyuzai.download.core.response.DownloadResponse;
 import lombok.AllArgsConstructor;

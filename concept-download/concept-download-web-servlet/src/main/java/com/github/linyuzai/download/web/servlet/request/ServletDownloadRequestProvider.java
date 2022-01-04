@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.servlet.request;
+package com.github.linyuzai.download.web.servlet.request;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
