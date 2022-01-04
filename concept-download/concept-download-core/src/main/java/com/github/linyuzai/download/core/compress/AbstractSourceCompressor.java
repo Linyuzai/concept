@@ -6,10 +6,7 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * 抽象的Source压缩器 / Abstract class of source compressor
@@ -48,7 +45,9 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
             compression.setContentType(getContentType());
             return compression;
         } else {
-            MemoryCompression compression = new MemoryCompression(source);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            doCompress(source, os, writer);
+            MemoryCompression compression = new MemoryCompression(os.toByteArray());
             compression.setName(cacheName);
             compression.setContentType(getContentType());
             return compression;

@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.request.DownloadRequest;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -39,10 +40,14 @@ public class ServletDownloadRequestProvider implements DownloadRequestProvider {
     protected HttpServletRequest getHttpServletRequest(Object request, Object[] parameters) {
         if (request instanceof HttpServletRequest) {
             return (HttpServletRequest) request;
+        } else if (request instanceof ServletServerHttpRequest) {
+            return ((ServletServerHttpRequest) request).getServletRequest();
         }
         for (Object parameter : parameters) {
             if (parameter instanceof HttpServletRequest) {
                 return (HttpServletRequest) parameter;
+            } else if (parameter instanceof ServletServerHttpRequest) {
+                return ((ServletServerHttpRequest) parameter).getServletRequest();
             }
         }
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
