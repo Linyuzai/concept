@@ -7,6 +7,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -15,8 +16,9 @@ import java.io.OutputStream;
 import java.util.function.Consumer;
 
 /**
- * HHttpServletResponse实现 / implementations by HttpServletResponse
+ * ServerHttpResponse实现 / implementations by ServerHttpResponse
  */
+@EnableWebFlux
 @Getter
 @AllArgsConstructor
 public class ReactiveDownloadResponse implements DownloadResponse {
@@ -63,17 +65,23 @@ public class ReactiveDownloadResponse implements DownloadResponse {
 
         @Override
         public void write(byte[] b) throws IOException {
-            sink.next(factory.wrap(b));
+            writeSink(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            super.write(b, off, len);
+            byte[] bytes = new byte[len];
+            System.arraycopy(b, off, bytes, 0, len);
+            writeSink(bytes);
         }
 
         @Override
         public void write(int b) throws IOException {
-            sink.next(factory.wrap(new byte[]{(byte) b}));
+            writeSink((byte) b);
+        }
+
+        public void writeSink(byte... bytes) {
+            sink.next(factory.wrap(bytes));
         }
 
         @Override

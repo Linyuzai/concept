@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.request.DownloadRequestProvider;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
- * ServletDownloadRequest提供者 / Provider of ServletDownloadRequest
+ * ReactiveDownloadRequest提供者 / Provider of ReactiveDownloadRequest
  */
 public class ReactiveDownloadRequestProvider implements DownloadRequestProvider {
 

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass(OkHttpSourceFactory.class)
-public class DownloadConceptOkHttpAutoConfiguration {
+public class DownloadConceptSourceOkHttpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean

@@ -10,7 +10,7 @@ import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 
 /**
- * ServletDownloadResponse提供者 / Provider of ServletDownloadResponse
+ * ReactiveDownloadResponse提供者 / Provider of ReactiveDownloadResponse
  */
 @AllArgsConstructor
 public class ReactiveDownloadResponseProvider implements DownloadResponseProvider {

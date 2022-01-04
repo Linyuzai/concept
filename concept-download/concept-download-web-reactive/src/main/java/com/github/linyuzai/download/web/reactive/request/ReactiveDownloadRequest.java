@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
- * HttpServletRequest实现 / implementations by HttpServletRequest
+ * ServerHttpRequest实现 / implementations by ServerHttpRequest
  */
 @Getter
 @AllArgsConstructor

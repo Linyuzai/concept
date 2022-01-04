@@ -15,7 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
 @ConditionalOnClass({ClassPathResourceSourceFactory.class, ClassPathPrefixSourceFactory.class})
-public class DownloadConceptClassPathAutoConfiguration {
+public class DownloadConceptSourceClassPathAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
