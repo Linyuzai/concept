@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -39,7 +41,16 @@ public class ReactiveDownloadResponse implements DownloadResponse {
 
     @Override
     public void setContentType(String contentType) {
-        addHeader("Content-Type", contentType);
+        if (contentType != null) {
+            response.getHeaders().setContentType(MediaType.parseMediaType(contentType));
+        }
+    }
+
+    @Override
+    public void setContentLength(Long contentLength) {
+        if (contentLength != null) {
+            response.getHeaders().setContentLength(contentLength);
+        }
     }
 
     @Override

@@ -29,7 +29,16 @@ public class ServletDownloadResponse implements DownloadResponse {
 
     @Override
     public void setContentType(String contentType) {
-        response.setContentType(contentType);
+        if (contentType != null) {
+            response.setContentType(contentType);
+        }
+    }
+
+    @Override
+    public void setContentLength(Long contentLength) {
+        if (contentLength != null) {
+            response.setContentLengthLong(contentLength);
+        }
     }
 
     @Override
