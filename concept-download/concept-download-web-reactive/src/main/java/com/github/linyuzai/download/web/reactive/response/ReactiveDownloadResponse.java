@@ -7,18 +7,18 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * ServerHttpResponse实现 / implementations by ServerHttpResponse
  */
-@EnableWebFlux
 @Getter
 @AllArgsConstructor
 public class ReactiveDownloadResponse implements DownloadResponse {
@@ -52,7 +52,7 @@ public class ReactiveDownloadResponse implements DownloadResponse {
         response.getHeaders().add(name, value);
     }
 
-    public static class ReactiveOutputStream extends OutputStream implements Consumer<FluxSink<DataBuffer>> {
+    public static class ReactiveOutputStream extends OutputStream implements Supplier<Mono<Void>>, Consumer<FluxSink<DataBuffer>> {
 
         private final DataBufferFactory factory;
 
@@ -60,6 +60,7 @@ public class ReactiveDownloadResponse implements DownloadResponse {
 
         public ReactiveOutputStream(ServerHttpResponse response, DataBufferFactory factory) {
             this.factory = factory;
+            response.beforeCommit(this);
             response.writeWith(Flux.create(this));
         }
 
@@ -85,14 +86,14 @@ public class ReactiveDownloadResponse implements DownloadResponse {
         }
 
         @Override
-        public void accept(FluxSink<DataBuffer> sink) {
-            this.sink = sink;
+        public Mono<Void> get() {
+            sink.complete();
+            return Mono.empty();
         }
 
         @Override
-        public void close() throws IOException {
-            sink.complete();
-            super.close();
+        public void accept(FluxSink<DataBuffer> sink) {
+            this.sink = sink;
         }
     }
 }
