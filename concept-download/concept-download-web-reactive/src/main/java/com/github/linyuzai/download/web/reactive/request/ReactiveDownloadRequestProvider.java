@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.request.DownloadRequest;
 import com.github.linyuzai.download.core.request.DownloadRequestProvider;
+import com.github.linyuzai.download.web.reactive.ReactiveDownloadHolder;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
@@ -40,6 +41,6 @@ public class ReactiveDownloadRequestProvider implements DownloadRequestProvider 
                 return (ServerHttpRequest) parameter;
             }
         }
-        return null;
+        return ReactiveDownloadHolder.getRequest();
     }
 }

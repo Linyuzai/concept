@@ -49,9 +49,10 @@ public class ChainDownloadConcept implements DownloadConcept {
      * @throws IOException I/O exception
      */
     @Override
-    public void download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException {
+    public Object download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException {
         DownloadOptions options = function.apply(configuration);
         DownloadContext context = contextFactory.create(options);
         new DownloadHandlerChainImpl(0, handlers).next(context);
+        return context.getReturnValue();
     }
 }

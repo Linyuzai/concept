@@ -13,6 +13,10 @@ public interface DownloadContext {
      */
     DownloadOptions getOptions();
 
+    Object getReturnValue();
+
+    void setReturnValue(Object returnValue);
+
     /**
      * 在上下文中设置一个键值对 / Set a key-value in the context
      *

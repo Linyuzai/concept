@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.compress.zip;
 
 import com.github.linyuzai.download.core.compress.AbstractSourceCompressor;
 import com.github.linyuzai.download.core.compress.CompressFormat;
+import com.github.linyuzai.download.core.concept.DownloadConsumer;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -46,8 +47,16 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     @Override
     public void doCompress(Source source, OutputStream os, DownloadWriter writer) throws IOException {
         try (ZipOutputStream zos = newZipOutputStream(source, os)) {
-            Collection<Part> parts = source.getParts();
-            write(zos, writer, parts);
+            //Collection<Part> parts = source.getParts();
+            //write(zos, writer, parts);
+            source.write(part -> {
+                zos.putNextEntry(new ZipEntry(part.getPath()));
+                InputStream inputStream = part.getInputStream();
+                if (inputStream != null) {
+                    writer.write(part.getInputStream(), zos, null, part.getCharset(), part.getLength());
+                }
+                zos.closeEntry();
+            });
         }
     }
 
@@ -59,6 +68,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      * @param parts  写入的内容 / Content written
      * @throws IOException I/O exception
      */
+    @Deprecated
     protected void write(ZipOutputStream zos, DownloadWriter writer, Collection<Part> parts) throws IOException {
         for (Part part : parts) {
             zos.putNextEntry(new ZipEntry(part.getPath()));

@@ -4,6 +4,7 @@ import com.github.linyuzai.download.aop.annotation.CompressCache;
 import com.github.linyuzai.download.aop.annotation.Download;
 import com.github.linyuzai.download.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
+import com.github.linyuzai.download.core.concept.ValueContainer;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadMethod;
@@ -12,6 +13,7 @@ import lombok.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import javax.jws.Oneway;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
@@ -39,12 +41,19 @@ public class DownloadConceptAdvice implements MethodInterceptor {
      */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        Object returnValue = invocation.proceed();
+        Object returnValue = unwrapContainer(invocation.proceed());
         Method method = invocation.getMethod();
         Object[] arguments = invocation.getArguments();
-        downloadConcept.download(configuration ->
+        return downloadConcept.download(configuration ->
                 buildOptions(method, arguments, returnValue, configuration));
-        return null;
+    }
+
+    private Object unwrapContainer(Object value) {
+        if (value instanceof ValueContainer) {
+            return ((ValueContainer) value).getValue();
+        } else {
+            return value;
+        }
     }
 
     /**

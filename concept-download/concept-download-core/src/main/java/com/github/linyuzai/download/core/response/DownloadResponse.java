@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.response;
 
+import com.github.linyuzai.download.core.concept.DownloadConsumer;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
@@ -11,6 +12,11 @@ import java.util.Map;
  * 响应，如http / Response, such as http
  */
 public interface DownloadResponse {
+
+    default Object write(DownloadConsumer<OutputStream> consumer) throws IOException {
+        consumer.apply(getOutputStream());
+        return null;
+    }
 
     /**
      * 获得输出流 / Get output stream
@@ -96,5 +102,10 @@ public interface DownloadResponse {
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             addHeader(entry.getKey(), entry.getValue());
         }
+    }
+
+    interface Consumer {
+
+        void consume(OutputStream os) throws IOException;
     }
 }

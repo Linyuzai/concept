@@ -10,13 +10,17 @@ import com.github.linyuzai.download.core.source.reflect.SourceCharset;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
 import com.github.linyuzai.download.core.source.reflect.SourceName;
 import com.github.linyuzai.download.core.source.reflect.SourceObject;
+import com.github.linyuzai.download.web.reactive.MonoValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.IOException;
@@ -197,14 +201,14 @@ public class ConceptDownloadController {
     @SourceCache(group = "s21")
     @CompressCache(group = "s21")
     @GetMapping("/s21")
-    public List<BusinessModel> s21() {
+    public Mono<Void> s21(ServerHttpRequest request, ServerHttpResponse response) {
         List<BusinessModel> businessModels = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             businessModels.add(new BusinessModel(i + ".mp4", "http://127.0.0.1:8080/concept-download/video.mp4"));
         }
         businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
         businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
-        return businessModels;
+        return new MonoValue(businessModels);
     }
 
     @Download

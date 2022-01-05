@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.response;
 
 import com.github.linyuzai.download.core.compress.Compression;
+import com.github.linyuzai.download.core.concept.DownloadConsumer;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 写响应处理器 / A handler to write response
@@ -75,9 +77,21 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
         }
         Range range = context.get(Range.class);
         DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
-        write(response.getOutputStream(), writer, range, compression.getParts());
+
+        //Object returnValue = response.write(os -> write(os, writer, range, compression.getParts()));
+
+        Object returnValue = response.write(os ->
+                compression.write(part -> {
+                    InputStream inputStream = part.getInputStream();
+                    if (inputStream != null) {
+                        writer.write(part.getInputStream(), os, range, part.getCharset(), part.getLength());
+                    }
+                }));
+
+        context.setReturnValue(returnValue);
     }
 
+    @Deprecated
     protected void write(OutputStream os, DownloadWriter writer, Range range, Collection<Part> parts) throws IOException {
         for (Part part : parts) {
             InputStream inputStream = part.getInputStream();
@@ -96,6 +110,8 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
     @Override
     public void initialize(DownloadContext context) {
         context.set(DownloadWriterAdapter.class, downloadWriterAdapter);
+        context.set(DownloadRequestProvider.class, downloadRequestProvider);
+        context.set(DownloadResponseProvider.class, downloadResponseProvider);
         DownloadRequest request = downloadRequestProvider.getRequest(context);
         context.set(DownloadRequest.class, request);
         DownloadResponse response = downloadResponseProvider.getResponse(context);

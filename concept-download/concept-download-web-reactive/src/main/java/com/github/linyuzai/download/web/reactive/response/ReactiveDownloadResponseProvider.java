@@ -4,22 +4,13 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.response.DownloadResponse;
 import com.github.linyuzai.download.core.response.DownloadResponseProvider;
-import lombok.AllArgsConstructor;
-import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import com.github.linyuzai.download.web.reactive.ReactiveDownloadHolder;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 
 /**
  * ReactiveDownloadResponse提供者 / Provider of ReactiveDownloadResponse
  */
-@AllArgsConstructor
 public class ReactiveDownloadResponseProvider implements DownloadResponseProvider {
-
-    private DataBufferFactory factory;
-
-    public ReactiveDownloadResponseProvider() {
-        this(new DefaultDataBufferFactory());
-    }
 
     @Override
     public DownloadResponse getResponse(DownloadContext context) {
@@ -29,7 +20,7 @@ public class ReactiveDownloadResponseProvider implements DownloadResponseProvide
         if (response == null) {
             throw new DownloadException("ServerHttpResponse not found");
         } else {
-            return new ReactiveDownloadResponse(response, factory);
+            return new ReactiveDownloadResponse(response);
         }
     }
 
@@ -50,6 +41,6 @@ public class ReactiveDownloadResponseProvider implements DownloadResponseProvide
                 return (ServerHttpResponse) parameter;
             }
         }
-        return null;
+        return ReactiveDownloadHolder.getResponse();
     }
 }

@@ -17,8 +17,8 @@ public interface DownloadConcept {
      * @param options 下载参数 / Options of download
      * @throws IOException I/O exception
      */
-    default void download(DownloadOptions options) throws IOException {
-        download(downloadConfiguration -> options);
+    default Object download(DownloadOptions options) throws IOException {
+        return download(downloadConfiguration -> options);
     }
 
     /**
@@ -27,5 +27,5 @@ public interface DownloadConcept {
      * @param function 可以通过下载配置来返回一个下载参数 / return an options from the configuration
      * @throws IOException I/O exception
      */
-    void download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException;
+    Object download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException;
 }
