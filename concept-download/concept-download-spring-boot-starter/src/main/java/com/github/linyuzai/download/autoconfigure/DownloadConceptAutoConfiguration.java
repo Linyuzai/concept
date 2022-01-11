@@ -18,14 +18,15 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.load.*;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
-import com.github.linyuzai.download.core.request.DownloadRequestProvider;
-import com.github.linyuzai.download.core.response.DownloadResponseProvider;
+import com.github.linyuzai.download.core.web.DownloadRequestProvider;
+import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.WriteResponseHandler;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.CreateSourceHandler;
 import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
+import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
 import com.github.linyuzai.download.core.source.reflect.ReflectionSourceFactory;
@@ -119,6 +120,12 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public TextSourceFactory textSourceFactory() {
         return new TextSourceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public HttpSourceFactory httpSourceFactory() {
+        return new HttpSourceFactory();
     }
 
     @Bean

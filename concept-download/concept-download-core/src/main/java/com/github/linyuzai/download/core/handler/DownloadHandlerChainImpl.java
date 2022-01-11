@@ -25,7 +25,7 @@ public class DownloadHandlerChainImpl implements DownloadHandlerChain {
      * @throws IOException I/O exception
      */
     @Override
-    public void next(DownloadContext context) throws IOException {
+    public void next(DownloadContext context) {
         if (index < handlers.size()) {
             DownloadHandler handler = handlers.get(index++);
             //DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);

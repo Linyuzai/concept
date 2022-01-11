@@ -8,6 +8,7 @@ import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 
@@ -18,7 +19,7 @@ import java.io.*;
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
-    protected InputStream inputStream;
+    protected Mono<InputStream> inputStream;
 
     /**
      * 如果需要异步加载 / If asynchronous loading is required
@@ -51,7 +52,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * @param context 下载上下文 / Context of download
      */
     @Override
-    public void load(DownloadContext context) throws IOException {
+    public void load(DownloadContext context) {
         if (isCacheEnabled()) {
             String cachePath = getCachePath();
             if (cachePath == null) {
@@ -70,26 +71,35 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 }
             }
             File cache = new File(dir, name);
-            if (!cache.exists()) {
+            inputStream = (cache.exists() ? Mono.just(cache) : doLoad(context).map(it -> {
                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-                try (InputStream is = doLoad(context);
+                try (InputStream is = it;
                      FileOutputStream fos = new FileOutputStream(cache)) {
                     writer.write(is, fos, null, getCharset(), getLength());
+                    return cache;
+                } catch (Throwable e) {
+                    return Mono.error(e);
                 }
-            }
-            String contentType = getContentType();
-            if (contentType == null || contentType.isEmpty()) {
-                setContentType(ContentType.file(cache));
-            }
-            inputStream = new FileInputStream(cache);
+            })).map(it -> {
+                String contentType = getContentType();
+                if (contentType == null || contentType.isEmpty()) {
+                    setContentType(ContentType.file(cache));
+                }
+                try {
+                    return new FileInputStream(cache);
+                } catch (FileNotFoundException e) {
+                    throw new DownloadException(e);
+                }
+            });
         } else {
-            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-            InputStream is = doLoad(context);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            writer.write(is, os, null, getCharset(), getLength());
-            inputStream = new ByteArrayInputStream(os.toByteArray());
+            inputStream = doLoad(context).map(is -> {
+                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                writer.write(is, os, null, getCharset(), getLength());
+                return new ByteArrayInputStream(os.toByteArray());
+            });
         }
     }
 
@@ -111,11 +121,10 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      *
      * @param context 下载上下文 / Context of download
      * @return 输入流 / Input stream
-     * @throws IOException I/O exception
      */
-    public abstract InputStream doLoad(DownloadContext context) throws IOException;
+    public abstract Mono<InputStream> doLoad(DownloadContext context);
 
-    public static class Builder<T extends AbstractLoadableSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
+    public static abstract class Builder<T extends AbstractLoadableSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 
         @Override
         protected T build(T target) {

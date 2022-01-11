@@ -2,6 +2,8 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 
@@ -15,11 +17,11 @@ public class FileCompression extends AbstractCompression {
 
     /**
      * @return 文件输入流 / File input stream
-     * @throws IOException I/O exception
      */
+    @SneakyThrows
     @Override
-    public InputStream getInputStream() throws IOException {
-        return new FileInputStream(file);
+    public Mono<InputStream> getInputStream() {
+        return Mono.just(new FileInputStream(file));
     }
 
     /**

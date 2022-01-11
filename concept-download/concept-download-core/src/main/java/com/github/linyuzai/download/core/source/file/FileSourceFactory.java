@@ -34,7 +34,7 @@ public class FileSourceFactory implements SourceFactory {
     @Override
     public Source create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return new FileSource.Builder()
+        return new FileSource.Builder<>()
                 .file((File) source)
                 .charset(charset)
                 .build();

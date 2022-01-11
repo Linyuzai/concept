@@ -15,7 +15,7 @@ public interface Loadable extends Downloadable {
      *
      * @param context 下载上下文 / Context of download
      */
-    default void load(DownloadContext context) throws IOException {
+    default void load(DownloadContext context) {
 
     }
 

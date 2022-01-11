@@ -1,5 +1,9 @@
 package com.github.linyuzai.download.core.concept;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import reactor.core.publisher.Mono;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -15,7 +19,7 @@ public interface Part {
      * @return 输入流 / Input stream
      * @throws IOException I/O exception
      */
-    InputStream getInputStream() throws IOException;
+    Mono<InputStream> getInputStream();
 
     /**
      * @return 名称 / name
@@ -49,5 +53,18 @@ public interface Part {
      */
     default Collection<Part> getChildren() {
         return Collections.emptyList();
+    }
+
+    default Mono<Holder> toMono() {
+        return getInputStream().map(is -> new Holder(this, is));
+    }
+
+    @Getter
+    @AllArgsConstructor
+    class Holder {
+
+        private Part part;
+
+        private InputStream inputStream;
     }
 }

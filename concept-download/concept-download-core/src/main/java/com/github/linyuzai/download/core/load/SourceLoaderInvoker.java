@@ -18,5 +18,5 @@ public interface SourceLoaderInvoker {
      * @return 加载结果 / Results of loadings
      * @throws IOException I/O exception
      */
-    Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException;
+    Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context);
 }

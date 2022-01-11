@@ -13,6 +13,10 @@ repositories {
 }
 
 dependencies {
+    compile "io.projectreactor:reactor-core:${reactorVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-aop:${springBootVersion}"
     //compile "cglib:cglib:${cglibVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

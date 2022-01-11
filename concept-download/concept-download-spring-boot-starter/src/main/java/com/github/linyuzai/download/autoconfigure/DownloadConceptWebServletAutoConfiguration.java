@@ -1,9 +1,9 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.core.request.DownloadRequestProvider;
-import com.github.linyuzai.download.core.response.DownloadResponseProvider;
-import com.github.linyuzai.download.web.servlet.request.ServletDownloadRequestProvider;
-import com.github.linyuzai.download.web.servlet.response.ServletDownloadResponseProvider;
+import com.github.linyuzai.download.core.web.DownloadRequestProvider;
+import com.github.linyuzai.download.core.web.DownloadResponseProvider;
+import com.github.linyuzai.download.core.web.servlet.ServletDownloadRequestProvider;
+import com.github.linyuzai.download.core.web.servlet.ServletDownloadResponseProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

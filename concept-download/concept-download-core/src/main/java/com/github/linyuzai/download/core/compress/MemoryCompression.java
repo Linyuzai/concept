@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.compress;
 
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,11 +18,10 @@ public class MemoryCompression extends AbstractCompression {
 
     /**
      * @return 字节输入流 / Input stream of bytes
-     * @throws IOException I/O exception
      */
     @Override
-    public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream(bytes);
+    public Mono<InputStream> getInputStream() {
+        return Mono.just(new ByteArrayInputStream(bytes));
     }
 
     @Override

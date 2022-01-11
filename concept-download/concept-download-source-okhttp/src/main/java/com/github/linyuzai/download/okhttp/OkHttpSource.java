@@ -2,74 +2,36 @@ package com.github.linyuzai.download.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.load.AbstractLoadableSource;
+import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.*;
 import okhttp3.*;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 
 /**
  * 使用OkHttp加载资源 / Use OkHttp to load source
  */
+@SuppressWarnings("all")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OkHttpSource extends AbstractLoadableSource {
+public class OkHttpSource extends HttpSource {
 
     @Setter
     @NonNull
     protected OkHttpClient client;
 
-    protected String url;
-
-    protected Long length;
-
-    protected OkHttpSource(@NonNull OkHttpClient client, @NonNull String url) {
-        this.client = client;
-        this.url = url;
-    }
-
-    /**
-     * 如果没有指定名称 / If no name is specified
-     * 将截取url最后一段作为名称 / Take the last paragraph of the intercepted URL as the name
-     *
-     * @return 名称 / Name
-     */
+    @SneakyThrows
     @Override
-    public String getName() {
-        String name = super.getName();
-        if (name == null || name.isEmpty()) {
-            String path;
-            if (url.contains("?")) {
-                path = url.split("\\?")[0];
-            } else {
-                path = url;
-            }
-            int index = path.lastIndexOf("/");
-            String substring = path.substring(index + 1);
-            if (!substring.isEmpty()) {
-                setName(substring);
-            }
+    public Mono<InputStream> doLoad(DownloadContext context) {
+        Request.Builder rb = new Request.Builder();
+        rb.url(url);
+        if (headers != null) {
+            rb.headers(Headers.of(headers));
         }
-        return super.getName();
-    }
-
-    @Override
-    public Long getLength() {
-        return length;
-    }
-
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
-
-    @Override
-    public InputStream doLoad(DownloadContext context) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+        Request request = rb.build();
         Response response = client.newCall(request).execute();
-        if (isResponseSuccess(response)) {
+        if (isResponseSuccess(response.code())) {
             ResponseBody body = response.body();
             if (body == null) {
                 throw new DownloadException("Body is null");
@@ -85,7 +47,7 @@ public class OkHttpSource extends AbstractLoadableSource {
             if (l != -1) {
                 length = l;
             }
-            return body.byteStream();
+            return Mono.just(body.byteStream());
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append(response.code()).append(";");
@@ -104,10 +66,6 @@ public class OkHttpSource extends AbstractLoadableSource {
         }
     }
 
-    protected boolean isResponseSuccess(Response response) {
-        return response.code() == 200;
-    }
-
     @Override
     public String toString() {
         return "OkHttpSource{" +
@@ -115,38 +73,25 @@ public class OkHttpSource extends AbstractLoadableSource {
                 '}';
     }
 
-    public static class Builder extends AbstractLoadableSource.Builder<OkHttpSource, Builder> {
+    @SuppressWarnings("unchecked")
+    public static class Builder<T extends OkHttpSource, B extends Builder<T, B>> extends HttpSource.Builder<T, B> {
 
-        private OkHttpClient client;
+        protected OkHttpClient client;
 
-        private String url;
-
-        public Builder() {
-            asyncLoad = true;
-            cacheEnabled = true;
-        }
-
-        public Builder client(OkHttpClient client) {
+        public B client(OkHttpClient client) {
             this.client = client;
-            return this;
+            return (B) this;
         }
 
-        public Builder url(String url) {
-            this.url = url;
-            return this;
+        @Override
+        protected T build(T target) {
+            target.setClient(client);
+            return super.build(target);
         }
 
-        public OkHttpSource build() {
-            if (client == null) {
-                throw new DownloadException("OkHttpClient is null");
-            }
-            if (url == null || url.isEmpty()) {
-                throw new DownloadException("Url is null or empty");
-            }
-            if (cacheEnabled && (cachePath == null || cachePath.isEmpty())) {
-                throw new DownloadException("Cache path is null or empty");
-            }
-            return super.build(new OkHttpSource(client, url));
+        @Override
+        public T build() {
+            return build((T) new OkHttpSource());
         }
     }
 }

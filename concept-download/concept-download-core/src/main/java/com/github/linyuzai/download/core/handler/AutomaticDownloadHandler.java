@@ -11,7 +11,7 @@ import java.io.IOException;
 public interface AutomaticDownloadHandler extends DownloadHandler {
 
     @Override
-    default void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException {
+    default void handle(DownloadContext context, DownloadHandlerChain chain) {
         doHandle(context);
         DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
         if (interceptor != null) {
@@ -20,5 +20,5 @@ public interface AutomaticDownloadHandler extends DownloadHandler {
         chain.next(context);
     }
 
-    void doHandle(DownloadContext context) throws IOException;
+    void doHandle(DownloadContext context);
 }

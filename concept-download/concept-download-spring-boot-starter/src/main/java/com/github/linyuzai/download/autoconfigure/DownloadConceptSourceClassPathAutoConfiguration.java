@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.classpath.ClassPathPrefixSourceFactory;
-import com.github.linyuzai.download.classpath.ClassPathResourceSourceFactory;
+import com.github.linyuzai.download.core.source.classpath.ClassPathPrefixSourceFactory;
+import com.github.linyuzai.download.core.source.classpath.ClassPathResourceSourceFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

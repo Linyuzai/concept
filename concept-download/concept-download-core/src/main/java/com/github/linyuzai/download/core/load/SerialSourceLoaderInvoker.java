@@ -20,7 +20,7 @@ public class SerialSourceLoaderInvoker implements SourceLoaderInvoker {
      * @throws IOException I/O exception
      */
     @Override
-    public Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) throws IOException {
+    public Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) {
         Collection<SourceLoadResult> results = new ArrayList<>();
         for (SourceLoader loader : loaders) {
             SourceLoadResult result = loader.load(context);

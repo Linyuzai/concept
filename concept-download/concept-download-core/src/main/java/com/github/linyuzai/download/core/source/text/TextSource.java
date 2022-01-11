@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.text;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -14,18 +15,15 @@ import java.nio.charset.Charset;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TextSource extends AbstractSource {
 
+    @NonNull
+    @Setter
     protected String text;
 
     protected byte[] bytes;
 
-    protected TextSource(@NonNull String text) {
-        this.text = text;
-        this.bytes = getBytes();
-    }
-
     @Override
-    public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream(bytes);
+    public Mono<InputStream> getInputStream() {
+        return Mono.just(new ByteArrayInputStream(getBytes()));
     }
 
     @Override
@@ -42,15 +40,18 @@ public class TextSource extends AbstractSource {
      */
     @Override
     public Long getLength() {
-        return (long) bytes.length;
+        return (long) getBytes().length;
     }
 
     /**
      * @return 获得字节数组 / Get the bytes
      */
     public byte[] getBytes() {
-        Charset charset = getCharset();
-        return charset == null ? text.getBytes() : text.getBytes(charset);
+        if (bytes == null) {
+            Charset charset = getCharset();
+            bytes = charset == null ? text.getBytes() : text.getBytes(charset);
+        }
+        return bytes;
     }
 
     @Override
@@ -65,17 +66,25 @@ public class TextSource extends AbstractSource {
                 '}';
     }
 
-    public static class Builder extends AbstractSource.Builder<TextSource, Builder> {
+    @SuppressWarnings("unchecked")
+    public static class Builder<T extends TextSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 
         private String text;
 
-        public Builder text(String text) {
+        public B text(String text) {
             this.text = text;
-            return this;
+            return (B) this;
         }
 
-        public TextSource build() {
-            return super.build(new TextSource(text));
+        @Override
+        protected T build(T target) {
+            target.setText(text);
+            return super.build(target);
+        }
+
+        @Override
+        public T build() {
+            return build((T) new TextSource());
         }
     }
 }

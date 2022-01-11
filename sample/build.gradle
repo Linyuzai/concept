@@ -25,12 +25,8 @@ dependencies {
     compile "com.github.linyuzai:concept-download-load-coroutines:1.1.1"
     */
     implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
-    implementation project(path: ':concept-download:concept-download-aop', configuration: 'default')
-    implementation project(path: ':concept-download:concept-download-source-classpath', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-source-okhttp', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-load-coroutines', configuration: 'default')
-    implementation project(path: ':concept-download:concept-download-web-servlet', configuration: 'default')
-    implementation project(path: ':concept-download:concept-download-web-reactive', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
 
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
@@ -38,6 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+    implementation 'org.apache.httpcomponents:httpclient:4.5.2'
     //implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 
@@ -27,31 +28,43 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @throws IOException I/O exception
      */
     @Override
-    public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
-        String cachePath = context.getOptions().getCompressCachePath();
-        String cacheName = getCacheName(source, context);
-        boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
-        if (cacheEnable) {
-            File dir = new File(cachePath);
-            if (!dir.exists()) {
-                boolean mkdirs = dir.mkdirs();
+    public Mono<Compression> compress(Mono<Source> source, DownloadWriter writer, DownloadContext context) {
+        return source.flatMap(it -> {
+            String cachePath = context.getOptions().getCompressCachePath();
+            String cacheName = getCacheName(it, context);
+            boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
+            if (cacheEnable) {
+                File dir = new File(cachePath);
+                if (!dir.exists()) {
+                    boolean mkdirs = dir.mkdirs();
+                }
+                File cache = new File(dir, cacheName);
+                return Mono.just(cache)
+                        .flatMap(c -> {
+                            if (!c.exists()) {
+                                try (FileOutputStream fos = new FileOutputStream(c)) {
+                                    return doCompress(it, fos, writer).map(any -> c);
+                                } catch (Throwable e) {
+                                    return Mono.error(e);
+                                }
+                            } else {
+                                return Mono.just(c);
+                            }
+                        }).map(c -> {
+                            FileCompression compression = new FileCompression(c);
+                            compression.setContentType(getContentType());
+                            return compression;
+                        });
+            } else {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                return doCompress(it, os, writer).map(any -> {
+                    MemoryCompression compression = new MemoryCompression(os.toByteArray());
+                    compression.setName(cacheName);
+                    compression.setContentType(getContentType());
+                    return compression;
+                });
             }
-            File cache = new File(dir, cacheName);
-            if (!cache.exists()) {
-                FileOutputStream fos = new FileOutputStream(cache);
-                doCompress(source, fos, writer);
-            }
-            FileCompression compression = new FileCompression(cache);
-            compression.setContentType(getContentType());
-            return compression;
-        } else {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            doCompress(source, os, writer);
-            MemoryCompression compression = new MemoryCompression(os.toByteArray());
-            compression.setName(cacheName);
-            compression.setContentType(getContentType());
-            return compression;
-        }
+        });
     }
 
     /**
@@ -60,9 +73,8 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @param source 被压缩的对象 / Object to compress
      * @param os     写入的输出流 / Output stream to write
      * @param writer 写入执行器 / Executor of writing
-     * @throws IOException I/O exception
      */
-    public abstract void doCompress(Source source, OutputStream os, DownloadWriter writer) throws IOException;
+    public abstract Mono<?> doCompress(Source source, OutputStream os, DownloadWriter writer);
 
     /**
      * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used

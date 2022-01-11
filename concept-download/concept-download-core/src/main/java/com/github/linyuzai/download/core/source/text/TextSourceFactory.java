@@ -33,7 +33,7 @@ public class TextSourceFactory implements SourceFactory {
     @Override
     public Source create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return new TextSource.Builder()
+        return new TextSource.Builder<>()
                 .text((String) source)
                 .name("text.txt")
                 .charset(charset)

@@ -1,25 +1,24 @@
 package com.github.linyuzai.download.core.response;
 
 import com.github.linyuzai.download.core.compress.Compression;
-import com.github.linyuzai.download.core.concept.DownloadConsumer;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.request.DownloadRequest;
-import com.github.linyuzai.download.core.request.DownloadRequestProvider;
+import com.github.linyuzai.download.core.web.DownloadRequestProvider;
+import com.github.linyuzai.download.core.web.DownloadResponse;
+import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * 写响应处理器 / A handler to write response
@@ -44,9 +43,28 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
      * @throws IOException I/O exception
      */
     @Override
-    public void doHandle(DownloadContext context) throws IOException {
-        DownloadResponse response = context.get(DownloadResponse.class);
-        Compression compression = context.get(Compression.class);
+    public void doHandle(DownloadContext context) {
+        Mono<Compression> compression = context.get(Compression.class);
+        Range range = context.get(Range.class);
+        Mono<Object> value = compression.flatMap(c -> {
+            DownloadWriter writer = downloadWriterAdapter.getWriter(c, range, context);
+            return downloadResponseProvider.getResponse(context)
+                    .map(response -> applyHeaders(response, c, context))
+                    .map(response -> Flux.fromIterable(c.getParts())
+                            .flatMap(Part::toMono)
+                            .collectList()
+                            .map(holders -> response.write(os -> {
+                                for (Part.Holder holder : holders) {
+                                    Part part = holder.getPart();
+                                    InputStream is = holder.getInputStream();
+                                    writer.write(is, os, range, part.getCharset(), part.getLength());
+                                }
+                            })));
+        });
+        context.setReturnValue(value);
+    }
+
+    private DownloadResponse applyHeaders(DownloadResponse response, Compression compression, DownloadContext context) {
         boolean inline = context.getOptions().isInline();
         if (inline) {
             response.setInline();
@@ -75,31 +93,7 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
         if (headers != null) {
             response.setHeaders(headers);
         }
-        Range range = context.get(Range.class);
-        DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
-
-        //Object returnValue = response.write(os -> write(os, writer, range, compression.getParts()));
-
-        Object returnValue = response.write(os ->
-                compression.write(part -> {
-                    InputStream inputStream = part.getInputStream();
-                    if (inputStream != null) {
-                        writer.write(part.getInputStream(), os, range, part.getCharset(), part.getLength());
-                    }
-                }));
-
-        context.setReturnValue(returnValue);
-    }
-
-    @Deprecated
-    protected void write(OutputStream os, DownloadWriter writer, Range range, Collection<Part> parts) throws IOException {
-        for (Part part : parts) {
-            InputStream inputStream = part.getInputStream();
-            if (inputStream != null) {
-                writer.write(part.getInputStream(), os, range, part.getCharset(), part.getLength());
-            }
-            write(os, writer, range, part.getChildren());
-        }
+        return response;
     }
 
     /**
@@ -112,10 +106,6 @@ public class WriteResponseHandler implements AutomaticDownloadHandler, DownloadC
         context.set(DownloadWriterAdapter.class, downloadWriterAdapter);
         context.set(DownloadRequestProvider.class, downloadRequestProvider);
         context.set(DownloadResponseProvider.class, downloadResponseProvider);
-        DownloadRequest request = downloadRequestProvider.getRequest(context);
-        context.set(DownloadRequest.class, request);
-        DownloadResponse response = downloadResponseProvider.getResponse(context);
-        context.set(DownloadResponse.class, response);
     }
 
     @Override

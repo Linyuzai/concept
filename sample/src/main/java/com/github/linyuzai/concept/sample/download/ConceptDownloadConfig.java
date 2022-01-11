@@ -26,13 +26,13 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
         return new CoroutinesSourceLoaderInvoker();
     }
 
-    @Bean(destroyMethod = "shutdown")
+    //@Bean(destroyMethod = "shutdown")
     public ExecutorSourceLoaderInvoker executorSourceLoaderInvoker() {
         System.out.println("如果需要进行HTTP请求可以使用线程池加载！");
         return new ExecutorSourceLoaderInvoker(Executors.newFixedThreadPool(5));
     }
 
-    @Bean
+    //@Bean
     public SourceLoadExceptionHandler sourceLoadExceptionHandler() {
         System.out.println("可以自定义加载时的异常处理器选择终止程序或只是打印！");
         return new SourceLoadExceptionHandler() {

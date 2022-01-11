@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -28,7 +29,6 @@ public interface SourceCompressor extends OrderProvider {
      * @param writer  {@link DownloadWriter}
      * @param context Context of download
      * @return 特定的压缩 / An specific compression
-     * @throws IOException I/O exception
      */
-    Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException;
+    Mono<Compression> compress(Mono<Source> source, DownloadWriter writer, DownloadContext context);
 }

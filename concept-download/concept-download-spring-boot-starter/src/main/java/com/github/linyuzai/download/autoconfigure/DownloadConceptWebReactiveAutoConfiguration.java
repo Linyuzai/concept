@@ -1,9 +1,10 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.core.request.DownloadRequestProvider;
-import com.github.linyuzai.download.core.response.DownloadResponseProvider;
-import com.github.linyuzai.download.web.reactive.request.ReactiveDownloadRequestProvider;
-import com.github.linyuzai.download.web.reactive.response.ReactiveDownloadResponseProvider;
+import com.github.linyuzai.download.core.web.DownloadRequestProvider;
+import com.github.linyuzai.download.core.web.DownloadResponseProvider;
+import com.github.linyuzai.download.core.source.reactive.WebClientSourceFactory;
+import com.github.linyuzai.download.core.web.reactive.ReactiveDownloadRequestProvider;
+import com.github.linyuzai.download.core.web.reactive.ReactiveDownloadResponseProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -30,5 +31,11 @@ public class DownloadConceptWebReactiveAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadResponseProvider downloadResponseProvider() {
         return new ReactiveDownloadResponseProvider();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public WebClientSourceFactory webClientSourceFactory() {
+        return new WebClientSourceFactory();
     }
 }

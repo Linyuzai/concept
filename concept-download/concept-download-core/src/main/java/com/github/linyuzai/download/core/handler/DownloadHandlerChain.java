@@ -14,5 +14,5 @@ public interface DownloadHandlerChain {
      *
      * @param context 下载上下文 / Context of download
      */
-    void next(DownloadContext context) throws IOException;
+    void next(DownloadContext context);
 }

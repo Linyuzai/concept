@@ -3,10 +3,11 @@ package com.github.linyuzai.download.core.source.file;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -25,9 +26,10 @@ public class FilePart implements Part {
 
     protected String path;
 
+    @SneakyThrows
     @Override
-    public InputStream getInputStream() throws IOException {
-        return file.isFile() ? new FileInputStream(file) : null;
+    public Mono<InputStream> getInputStream() {
+        return file.isFile() ? Mono.just(new FileInputStream(file)) : Mono.empty();
     }
 
     @Override

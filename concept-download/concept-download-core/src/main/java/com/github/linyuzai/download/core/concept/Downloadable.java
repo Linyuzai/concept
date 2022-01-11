@@ -6,6 +6,7 @@ import com.github.linyuzai.download.core.source.Source;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -52,6 +53,15 @@ public interface Downloadable extends Part, Cacheable {
      * @return 所有的部分，如文件夹下的多个文件 / All parts, such as multiple files under a folder
      */
     default Collection<Part> getParts() {
-        return Collections.singletonList(this);
+        Collection<Part> parts = new ArrayList<>();
+        addPart(this, parts);
+        return parts;
+    }
+
+    static void addPart(Part part, Collection<Part> parts) {
+        parts.add(part);
+        for (Part child : part.getChildren()) {
+            addPart(child, parts);
+        }
     }
 }

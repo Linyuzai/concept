@@ -3,14 +3,12 @@ package com.github.linyuzai.download.core.source.multiple;
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.*;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Predicate;
@@ -27,8 +25,8 @@ public class MultipleSource implements Source {
     protected Collection<Source> sources;
 
     @Override
-    public InputStream getInputStream() throws IOException {
-        return null;
+    public Mono<InputStream> getInputStream() {
+        return Mono.empty();
     }
 
     /**
@@ -142,7 +140,7 @@ public class MultipleSource implements Source {
      * @throws IOException I/O exception
      */
     @Override
-    public void load(DownloadContext context) throws IOException {
+    public void load(DownloadContext context) {
         for (Source source : sources) {
             source.load(context);
         }

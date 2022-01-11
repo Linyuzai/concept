@@ -14,7 +14,7 @@ public abstract class AbstractSource extends DownloadResource implements Source 
     protected boolean asyncLoad;
 
     @SuppressWarnings("unchecked")
-    public static class Builder<T extends AbstractSource, B extends Builder<T, B>> extends DownloadResource.Builder<T, B> {
+    public static abstract class Builder<T extends AbstractSource, B extends Builder<T, B>> extends DownloadResource.Builder<T, B> {
 
         protected boolean asyncLoad;
 
@@ -28,5 +28,7 @@ public abstract class AbstractSource extends DownloadResource implements Source 
             target.setAsyncLoad(asyncLoad);
             return super.build(target);
         }
+
+        public abstract T build();
     }
 }

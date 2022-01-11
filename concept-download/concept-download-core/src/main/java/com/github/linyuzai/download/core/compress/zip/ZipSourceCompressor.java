@@ -2,19 +2,19 @@ package com.github.linyuzai.download.core.compress.zip;
 
 import com.github.linyuzai.download.core.compress.AbstractSourceCompressor;
 import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.concept.DownloadConsumer;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -42,43 +42,26 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      * @param source 被压缩的对象 / Object to compress
      * @param os     写入的输出流 / Output stream to write
      * @param writer 写入执行器 / Executor of writing
-     * @throws IOException I/O exception
      */
     @Override
-    public void doCompress(Source source, OutputStream os, DownloadWriter writer) throws IOException {
-        try (ZipOutputStream zos = newZipOutputStream(source, os)) {
-            //Collection<Part> parts = source.getParts();
-            //write(zos, writer, parts);
-            source.write(part -> {
-                zos.putNextEntry(new ZipEntry(part.getPath()));
-                InputStream inputStream = part.getInputStream();
-                if (inputStream != null) {
-                    writer.write(part.getInputStream(), zos, null, part.getCharset(), part.getLength());
-                }
-                zos.closeEntry();
-            });
-        }
-    }
-
-    /**
-     * 递归写入所有内容 / Write all parts recursively
-     *
-     * @param zos    压缩的输出流 / Compressed output stream
-     * @param writer 写入执行器 / Executor of writing
-     * @param parts  写入的内容 / Content written
-     * @throws IOException I/O exception
-     */
-    @Deprecated
-    protected void write(ZipOutputStream zos, DownloadWriter writer, Collection<Part> parts) throws IOException {
-        for (Part part : parts) {
-            zos.putNextEntry(new ZipEntry(part.getPath()));
-            InputStream inputStream = part.getInputStream();
-            if (inputStream != null) {
-                writer.write(part.getInputStream(), zos, null, part.getCharset(), part.getLength());
-            }
-            write(zos, writer, part.getChildren());
-            zos.closeEntry();
-        }
+    public Mono<?> doCompress(Source source, OutputStream os, DownloadWriter writer) {
+        return Flux.fromIterable(source.getParts())
+                .flatMap(Part::toMono)
+                .collectList()
+                .map(holders -> {
+                    try (ZipOutputStream zos = newZipOutputStream(source, os)) {
+                        for (Part.Holder holder : holders) {
+                            Part part = holder.getPart();
+                            InputStream is = holder.getInputStream();
+                            zos.putNextEntry(new ZipEntry(part.getPath()));
+                            writer.write(is, zos, null, part.getCharset(), part.getLength());
+                            zos.closeEntry();
+                        }
+                        return holders;
+                    } catch (Throwable e) {
+                        return Mono.error(e);
+                    }
+                });
     }
 
     /**

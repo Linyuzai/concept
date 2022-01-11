@@ -23,5 +23,5 @@ public interface DownloadHandler extends OrderProvider {
      * @param context 下载上下文 / Context of download
      * @param chain   处理链 / Chain of handler
      */
-    void handle(DownloadContext context, DownloadHandlerChain chain) throws IOException;
+    void handle(DownloadContext context, DownloadHandlerChain chain);
 }

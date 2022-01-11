@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,22 +33,25 @@ public class LoadSourceHandler implements AutomaticDownloadHandler {
      * @throws IOException I/O exception
      */
     @Override
-    public void doHandle(DownloadContext context) throws IOException {
-        Source source = context.get(Source.class);
-        Collection<SourceLoader> loaders = new ArrayList<>();
-        Collection<Source> sources = source.list();
-        for (Source s : sources) {
-            SourceLoader loader = sourceLoaderFactory.create(s, context);
-            loaders.add(loader);
-        }
-        Collection<SourceLoadResult> results = sourceLoaderInvoker.invoke(loaders, context);
-        List<SourceLoadException> exceptions = results.stream()
-                .filter(SourceLoadResult::hasException)
-                .map(SourceLoadResult::getException)
-                .collect(Collectors.toList());
-        if (!exceptions.isEmpty()) {
-            sourceLoadExceptionHandler.onLoaded(exceptions);
-        }
+    public void doHandle(DownloadContext context) {
+        Mono<Source> source = context.get(Source.class);
+        source.map(it -> {
+            Collection<SourceLoader> loaders = new ArrayList<>();
+            Collection<Source> sources = it.list();
+            for (Source s : sources) {
+                SourceLoader loader = sourceLoaderFactory.create(s, context);
+                loaders.add(loader);
+            }
+            Collection<SourceLoadResult> results = sourceLoaderInvoker.invoke(loaders, context);
+            List<SourceLoadException> exceptions = results.stream()
+                    .filter(SourceLoadResult::hasException)
+                    .map(SourceLoadResult::getException)
+                    .collect(Collectors.toList());
+            if (!exceptions.isEmpty()) {
+                sourceLoadExceptionHandler.onLoaded(exceptions);
+            }
+            return it;
+        });
     }
 
     @Override

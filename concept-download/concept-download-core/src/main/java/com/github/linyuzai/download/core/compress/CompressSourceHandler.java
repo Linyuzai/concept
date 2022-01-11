@@ -9,6 +9,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -28,25 +29,26 @@ public class CompressSourceHandler implements AutomaticDownloadHandler, Download
      * 压缩处理 / Compression processing
      *
      * @param context 下载上下文 / Context of download
-     * @throws IOException I/O exception
      */
     @Override
-    public void doHandle(DownloadContext context) throws IOException {
-        Source source = context.get(Source.class);
-        Compression compression;
-        boolean single = source.isSingle();
-        boolean forceCompress = context.getOptions().isForceCompress();
-        if (single && !forceCompress) {
-            compression = new NoCompression(source);
-        } else {
-            String compressFormat = context.getOptions().getCompressFormat();
-            String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
-                    CompressFormat.ZIP : compressFormat;
-            SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
-            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(source, null, context);
-            compression = compressor.compress(source, writer, context);
-        }
+    public void doHandle(DownloadContext context) {
+        Mono<Source> source = context.get(Source.class);
+        Mono<Compression> compression = source.flatMap(it -> {
+            boolean single = it.isSingle();
+            boolean forceCompress = context.getOptions().isForceCompress();
+            if (single && !forceCompress) {
+                return Mono.just(new NoCompression(it));
+            } else {
+                String compressFormat = context.getOptions().getCompressFormat();
+                String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
+                        CompressFormat.ZIP : compressFormat;
+                SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
+                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+                DownloadWriter writer = writerAdapter.getWriter(it, null, context);
+                return compressor.compress(source, writer, context);
+            }
+        });
+
         context.set(Compression.class, compression);
     }
 

@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 
 /**
  * 下载源处理拦截器
@@ -24,7 +25,7 @@ public class CreateSourceHandler implements AutomaticDownloadHandler, DownloadCo
         Object source = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
         Source sources = factory.create(source, context);
-        context.set(Source.class, sources);
+        context.set(Source.class, Mono.just(sources));
     }
 
     @Override

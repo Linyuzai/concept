@@ -1,11 +1,14 @@
 package com.github.linyuzai.download.core.source.file;
 
+import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -15,15 +18,25 @@ import java.util.Collections;
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileSource extends AbstractSource {
 
     @NonNull
+    @Setter
     protected File file;
 
+    private FileInputStream fileInputStream;
+
     @Override
-    public InputStream getInputStream() throws IOException {
-        return file.isFile() ? new FileInputStream(file) : null;
+    public Mono<InputStream> getInputStream() {
+        return file.isFile() ? Mono.just(open()) : Mono.empty();
+    }
+
+    @SneakyThrows
+    private InputStream open() {
+        if (fileInputStream == null) {
+            fileInputStream = new FileInputStream(file);
+        }
+        return fileInputStream;
     }
 
     /**
@@ -109,7 +122,9 @@ public class FileSource extends AbstractSource {
     @Override
     public Collection<Part> getParts() {
         String name = getName();
-        return Collections.singletonList(new FilePart(file, name, name));
+        Collection<Part> parts = new ArrayList<>();
+        Downloadable.addPart(new FilePart(file, name, name), parts);
+        return parts;
     }
 
     @Override
@@ -119,17 +134,25 @@ public class FileSource extends AbstractSource {
                 '}';
     }
 
-    public static class Builder extends AbstractSource.Builder<FileSource, Builder> {
+    @SuppressWarnings("unchecked")
+    public static class Builder<T extends FileSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 
         private File file;
 
-        public Builder file(File file) {
+        public B file(File file) {
             this.file = file;
-            return this;
+            return (B) this;
         }
 
-        public FileSource build() {
-            return super.build(new FileSource(file));
+        @Override
+        protected T build(T target) {
+            target.setFile(file);
+            return super.build(target);
+        }
+
+        @Override
+        public T build() {
+            return build((T) new FileSource());
         }
     }
 }

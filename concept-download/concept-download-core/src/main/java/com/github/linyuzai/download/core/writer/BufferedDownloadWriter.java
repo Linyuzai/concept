@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.concept.Downloadable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -43,8 +44,9 @@ public class BufferedDownloadWriter implements DownloadWriter {
      * @param length  总字节数，可能为0 / Total bytes count, may be 0
      * @throws IOException I/O exception
      */
+    @SneakyThrows
     @Override
-    public void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) throws IOException {
+    public void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) {
         if (charset == null /*|| length > 0 && bufferSize >= length*/) {
             int len;
             byte[] bytes = new byte[bufferSize];

@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.aop.advice.DownloadConceptAdvice;
-import com.github.linyuzai.download.aop.advice.DownloadConceptAdvisor;
+import com.github.linyuzai.download.core.aop.advice.DownloadConceptAdvice;
+import com.github.linyuzai.download.core.aop.advice.DownloadConceptAdvisor;
 import org.springframework.aop.Advisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
