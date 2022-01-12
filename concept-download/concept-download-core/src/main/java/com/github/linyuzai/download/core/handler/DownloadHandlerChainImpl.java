@@ -2,8 +2,8 @@ package com.github.linyuzai.download.core.handler;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -22,14 +22,22 @@ public class DownloadHandlerChainImpl implements DownloadHandlerChain {
      * 执行处理器 / Execute handler
      *
      * @param context 下载上下文 / Context of download
-     * @throws IOException I/O exception
      */
     @Override
-    public void next(DownloadContext context) {
+    public Mono<Void> next(DownloadContext context) {
         if (index < handlers.size()) {
             DownloadHandler handler = handlers.get(index++);
-            //DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);
-            handler.handle(context, this);
+            DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);
+            return handler.handle(context, chain)
+                    .flatMap(it -> {
+                        DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
+                        if (interceptor != null) {
+                            interceptor.intercept(handler, context);
+                        }
+                        return Mono.empty();
+                    });
+        } else {
+            return Mono.empty();
         }
     }
 }

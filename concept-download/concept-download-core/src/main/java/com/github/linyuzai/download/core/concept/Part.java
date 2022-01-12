@@ -19,7 +19,7 @@ public interface Part {
      * @return 输入流 / Input stream
      * @throws IOException I/O exception
      */
-    Mono<InputStream> getInputStream();
+    InputStream getInputStream();
 
     /**
      * @return 名称 / name
@@ -53,10 +53,6 @@ public interface Part {
      */
     default Collection<Part> getChildren() {
         return Collections.emptyList();
-    }
-
-    default Mono<Holder> toMono() {
-        return getInputStream().map(is -> new Holder(this, is));
     }
 
     @Getter

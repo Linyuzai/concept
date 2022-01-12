@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.handler;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -14,5 +15,5 @@ public interface DownloadHandlerChain {
      *
      * @param context 下载上下文 / Context of download
      */
-    void next(DownloadContext context);
+    Mono<Void> next(DownloadContext context);
 }

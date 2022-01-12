@@ -3,7 +3,8 @@ package com.github.linyuzai.download.core.source;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
  * 下载源处理拦截器
  */
 @AllArgsConstructor
-public class CreateSourceHandler implements AutomaticDownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
+public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     private SourceFactoryAdapter sourceFactoryAdapter;
 
@@ -21,11 +22,13 @@ public class CreateSourceHandler implements AutomaticDownloadHandler, DownloadCo
      * @param context 下载上下文
      */
     @Override
-    public void doHandle(DownloadContext context) {
+    public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
         Object source = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
-        Source sources = factory.create(source, context);
-        context.set(Source.class, Mono.just(sources));
+        return factory.create(source, context).flatMap(it -> {
+            context.set(Source.class, it);
+            return chain.next(context);
+        });
     }
 
     @Override

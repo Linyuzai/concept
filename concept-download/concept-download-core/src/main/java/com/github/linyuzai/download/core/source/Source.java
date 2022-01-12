@@ -1,8 +1,10 @@
 package com.github.linyuzai.download.core.source;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.Loadable;
 import com.github.linyuzai.download.core.source.multiple.MultipleSource;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,6 +14,11 @@ import java.util.function.Predicate;
  * 下载的数据源，作为处理的最小单位 / The downloaded data source as the smallest unit of processing
  */
 public interface Source extends Downloadable, Loadable {
+
+    @Override
+    default Mono<Source> load(DownloadContext context) {
+        return Mono.just(this);
+    }
 
     /**
      * 如果对于一个File对象 / If for a file object {@link java.io.File}

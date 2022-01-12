@@ -3,15 +3,14 @@ package com.github.linyuzai.download.core.compress;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
+import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
-
-import java.io.IOException;
 
 /**
  * 压缩处理器 / A handler to process compression
@@ -21,7 +20,7 @@ import java.io.IOException;
  * 将通过压缩器对下载源进行压缩 / The download source will be compressed by a compressor
  */
 @AllArgsConstructor
-public class CompressSourceHandler implements AutomaticDownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
+public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     private SourceCompressorAdapter sourceCompressorAdapter;
 
@@ -31,9 +30,9 @@ public class CompressSourceHandler implements AutomaticDownloadHandler, Download
      * @param context 下载上下文 / Context of download
      */
     @Override
-    public void doHandle(DownloadContext context) {
-        Mono<Source> source = context.get(Source.class);
-        Mono<Compression> compression = source.flatMap(it -> {
+    public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        Source source = context.get(Source.class);
+        return Mono.just(source).flatMap(it -> {
             boolean single = it.isSingle();
             boolean forceCompress = context.getOptions().isForceCompress();
             if (single && !forceCompress) {
@@ -47,9 +46,10 @@ public class CompressSourceHandler implements AutomaticDownloadHandler, Download
                 DownloadWriter writer = writerAdapter.getWriter(it, null, context);
                 return compressor.compress(source, writer, context);
             }
+        }).flatMap(compression -> {
+            context.set(Compression.class, compression);
+            return chain.next(context);
         });
-
-        context.set(Compression.class, compression);
     }
 
     /**

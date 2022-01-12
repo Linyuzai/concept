@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Mono;
 
 /**
  * ClassPath前缀 'classpath:' 的工厂 / Factory for class path prefix 'classpath:'
@@ -16,7 +17,7 @@ public class ClassPathPrefixSourceFactory extends PrefixSourceFactory {
     private final SourceFactory factory = new ClassPathResourceSourceFactory();
 
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         String path = getContent((String) source);
         return factory.create(new ClassPathResource(path), context);
     }

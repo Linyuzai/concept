@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import reactor.core.publisher.Mono;
 
 /**
  * 默认的下载上下文工厂 / Default factory
@@ -15,7 +16,7 @@ public class MapDownloadContextFactory implements DownloadContextFactory {
      * @return 下载上下文 / Context of download
      */
     @Override
-    public DownloadContext create(DownloadOptions options) {
-        return new MapDownloadContext(options);
+    public Mono<DownloadContext> create(DownloadOptions options) {
+        return Mono.just(new MapDownloadContext(options));
     }
 }

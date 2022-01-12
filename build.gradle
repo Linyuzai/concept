@@ -34,7 +34,7 @@ allprojects {
         set('dokkaVersion', "1.6.0")
     }
     ext {
-        set('reactorVersion', "3.4.12")
+        set('reactorVersion', "3.4.1")
     }
     ext {
         set('coroutinesVersion', "1.5.0")

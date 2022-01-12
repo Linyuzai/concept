@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import reactor.core.publisher.Mono;
 
 /**
  * 捕获异常的加载器 / Loader which catches exception
@@ -31,14 +32,16 @@ public class ExceptionCaughtSourceLoader implements SourceLoader {
      * @return 加载结果 / Result of loading
      */
     @Override
-    public SourceLoadResult load(DownloadContext context) {
-        try {
-            source.load(context);
-            return new SourceLoadResult(source);
+    public Mono<SourceLoadResult> load(DownloadContext context) {
+        return source.load(context)
+                .map(SourceLoadResult::new)
+                .onErrorStop();
+        /*try {
+
         } catch (Throwable e) {
             SourceLoadResult result = new SourceLoadResult(source, e);
             handler.onLoading(result.getException());
             return result;
-        }
+        }*/
     }
 }

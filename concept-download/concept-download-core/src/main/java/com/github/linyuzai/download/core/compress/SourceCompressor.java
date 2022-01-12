@@ -30,5 +30,5 @@ public interface SourceCompressor extends OrderProvider {
      * @param context Context of download
      * @return 特定的压缩 / An specific compression
      */
-    Mono<Compression> compress(Mono<Source> source, DownloadWriter writer, DownloadContext context);
+    Mono<Compression> compress(Source source, DownloadWriter writer, DownloadContext context);
 }

@@ -22,8 +22,8 @@ public class TextSource extends AbstractSource {
     protected byte[] bytes;
 
     @Override
-    public Mono<InputStream> getInputStream() {
-        return Mono.just(new ByteArrayInputStream(getBytes()));
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(getBytes());
     }
 
     @Override

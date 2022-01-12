@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.self;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import reactor.core.publisher.Mono;
 
 /**
  * 本身就是下载源的工厂 / Factory of source itself
@@ -29,7 +30,7 @@ public class SelfSourceFactory implements SourceFactory {
      * @return 下载源 / Source
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
-        return (Source) source;
+    public Mono<Source> create(Object source, DownloadContext context) {
+        return Mono.just((Source) source);
     }
 }

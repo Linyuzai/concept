@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.AbstractSource;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.io.*;
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
-    protected Mono<InputStream> inputStream;
+    protected InputStream inputStream;
 
     /**
      * 如果需要异步加载 / If asynchronous loading is required
@@ -52,7 +53,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * @param context 下载上下文 / Context of download
      */
     @Override
-    public void load(DownloadContext context) {
+    public Mono<Source> load(DownloadContext context) {
         if (isCacheEnabled()) {
             String cachePath = getCachePath();
             if (cachePath == null) {
@@ -71,34 +72,47 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 }
             }
             File cache = new File(dir, name);
-            inputStream = (cache.exists() ? Mono.just(cache) : doLoad(context).map(it -> {
-                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-                try (InputStream is = it;
-                     FileOutputStream fos = new FileOutputStream(cache)) {
-                    writer.write(is, fos, null, getCharset(), getLength());
-                    return cache;
-                } catch (Throwable e) {
-                    return Mono.error(e);
+            return Mono.just(cache).flatMap(it -> {
+                if (!it.exists()) {
+                    return doLoad(context)
+                            .map(is -> {
+                                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+                                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+                                try (InputStream inputStream = is;
+                                     FileOutputStream fos = new FileOutputStream(cache)) {
+                                    writer.write(inputStream, fos, null, getCharset(), getLength());
+                                    return it;
+                                } catch (Throwable e) {
+                                    throw new DownloadException(e);
+                                }
+                            });
+                } else {
+                    return Mono.just(it);
                 }
-            })).map(it -> {
+            }).map(f -> {
                 String contentType = getContentType();
                 if (contentType == null || contentType.isEmpty()) {
-                    setContentType(ContentType.file(cache));
+                    setContentType(ContentType.file(f));
                 }
                 try {
-                    return new FileInputStream(cache);
+                    return new FileInputStream(f);
                 } catch (FileNotFoundException e) {
                     throw new DownloadException(e);
                 }
+            }).map(fis -> {
+                inputStream = fis;
+                return this;
             });
         } else {
-            inputStream = doLoad(context).map(is -> {
+            return doLoad(context).map(is -> {
                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 writer.write(is, os, null, getCharset(), getLength());
                 return new ByteArrayInputStream(os.toByteArray());
+            }).map(is -> {
+                inputStream = is;
+                return this;
             });
         }
     }

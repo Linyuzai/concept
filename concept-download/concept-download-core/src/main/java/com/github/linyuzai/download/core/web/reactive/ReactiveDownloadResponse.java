@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +28,7 @@ public class ReactiveDownloadResponse implements DownloadResponse {
     }
 
     @Override
-    public Object write(Consumer<OutputStream> consumer) {
+    public Mono<Void> write(Consumer<OutputStream> consumer) {
         return response.writeWith(Flux.create(fluxSink -> {
             try {
                 consumer.accept(new FluxSinkOutputStream(fluxSink, response));

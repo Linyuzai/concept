@@ -7,8 +7,12 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChainImpl;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.order.OrderProvider;
+import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import reactor.core.publisher.Mono;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -18,25 +22,19 @@ import java.util.function.Function;
  * 基于链式处理的下载接口实现 / Implementation of download interface based on chain of handler
  */
 @Getter
+@AllArgsConstructor
 public class ChainDownloadConcept implements DownloadConcept {
 
     private final DownloadConfiguration configuration;
 
     private final DownloadContextFactory contextFactory;
 
+    private final DownloadScheduler scheduler;
+
     private final List<DownloadHandler> handlers;
 
-    /**
-     * @param configuration  下载配置 / Download configuration
-     * @param contextFactory 上下文工厂 / Factory of download context
-     * @param handlers       处理器列表 / List of handlers
-     */
-    public ChainDownloadConcept(DownloadConfiguration configuration,
-                                DownloadContextFactory contextFactory,
-                                List<DownloadHandler> handlers) {
-        this.configuration = configuration;
-        this.contextFactory = contextFactory;
-        this.handlers = handlers;
+    @PostConstruct
+    public void init() {
         this.handlers.sort(Comparator.comparingInt(OrderProvider::getOrder));
     }
 
@@ -51,8 +49,9 @@ public class ChainDownloadConcept implements DownloadConcept {
     @Override
     public Object download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException {
         DownloadOptions options = function.apply(configuration);
-        DownloadContext context = contextFactory.create(options);
-        new DownloadHandlerChainImpl(0, handlers).next(context);
-        return context.getReturnValue();
+        Mono<DownloadContext> contextMono = contextFactory.create(options);
+        return contextMono
+                .publishOn(scheduler.getScheduler())
+                .flatMap(it -> new DownloadHandlerChainImpl(0, handlers).next(it));
     }
 }

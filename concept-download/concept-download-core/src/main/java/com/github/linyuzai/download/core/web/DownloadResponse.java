@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.web;
 
 import lombok.SneakyThrows;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,7 +14,7 @@ import java.util.function.Consumer;
  */
 public interface DownloadResponse {
 
-    default Object write(Consumer<OutputStream> consumer) {
+    default Mono<Void> write(Consumer<OutputStream> consumer) {
         consumer.accept(getOutputStream());
         return null;
     }

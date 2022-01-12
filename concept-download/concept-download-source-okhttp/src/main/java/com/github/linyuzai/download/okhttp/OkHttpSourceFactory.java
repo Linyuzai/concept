@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
 
@@ -33,19 +34,19 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
      * @return 下载源 / Source {@link OkHttpSource}
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         String url = (String) source;
         Charset charset = context.getOptions().getCharset();
         boolean cacheEnabled = context.getOptions().isSourceCacheEnabled();
         String cachePath = context.getOptions().getSourceCachePath();
-        return new OkHttpSource.Builder<>()
+        return Mono.just(new OkHttpSource.Builder<>()
                 .client(client)
                 .url(url)
                 .asyncLoad(true)
                 .charset(charset)
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
-                .build();
+                .build());
     }
 
     @Override

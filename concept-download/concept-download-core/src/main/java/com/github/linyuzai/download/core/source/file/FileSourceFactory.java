@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.file;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -32,11 +33,11 @@ public class FileSourceFactory implements SourceFactory {
      * @return 下载源 / Source {@link FileSource}
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return new FileSource.Builder<>()
+        return Mono.just(new FileSource.Builder<>()
                 .file((File) source)
                 .charset(charset)
-                .build();
+                .build());
     }
 }

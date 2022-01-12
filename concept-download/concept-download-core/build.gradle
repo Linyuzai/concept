@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    compile "javax.activation:activation:1.1.1"
     compile "io.projectreactor:reactor-core:${reactorVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"

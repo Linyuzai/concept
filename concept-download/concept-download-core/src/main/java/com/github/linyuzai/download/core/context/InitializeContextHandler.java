@@ -1,12 +1,11 @@
 package com.github.linyuzai.download.core.context;
 
-import com.github.linyuzai.download.core.handler.AutomaticDownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ import java.util.List;
  * 调用所有的上下文初始化器 / Call all initializers {@link DownloadContextInitializer#initialize(DownloadContext)}
  */
 @AllArgsConstructor
-public class InitializeContextHandler implements AutomaticDownloadHandler {
+public class InitializeContextHandler implements DownloadHandler {
 
     @NonNull
     private List<DownloadContextInitializer> initializers;
@@ -26,10 +25,11 @@ public class InitializeContextHandler implements AutomaticDownloadHandler {
      * @param context 下载上下文 / Context of download
      */
     @Override
-    public void doHandle(DownloadContext context) {
+    public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
         for (DownloadContextInitializer initializer : initializers) {
             initializer.initialize(context);
         }
+        return chain.next(context);
     }
 
     @Override

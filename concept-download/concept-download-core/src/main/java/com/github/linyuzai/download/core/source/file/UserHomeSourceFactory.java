@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 
@@ -30,7 +31,7 @@ public class UserHomeSourceFactory extends PrefixSourceFactory {
      * @return 下载源 / Source {@link FileSource}
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         String path = getContent((String) source);
         return factory.create(new File(USER_HOME, path), context);
     }

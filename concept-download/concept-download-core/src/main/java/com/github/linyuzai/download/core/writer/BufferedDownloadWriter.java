@@ -6,6 +6,7 @@ import com.github.linyuzai.download.core.concept.Downloadable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -42,7 +43,6 @@ public class BufferedDownloadWriter implements DownloadWriter {
      * @param range   写入的范围 / Range of writing
      * @param charset 编码 / Charset
      * @param length  总字节数，可能为0 / Total bytes count, may be 0
-     * @throws IOException I/O exception
      */
     @SneakyThrows
     @Override

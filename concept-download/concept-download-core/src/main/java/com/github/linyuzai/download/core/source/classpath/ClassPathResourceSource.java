@@ -20,8 +20,8 @@ public class ClassPathResourceSource extends AbstractSource {
 
     @SneakyThrows
     @Override
-    public Mono<InputStream> getInputStream() {
-        return Mono.just(resource.getInputStream());
+    public InputStream getInputStream() {
+        return resource.getInputStream();
     }
 
     /**

@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * 文件目录结构支持 / File directory structure support
@@ -28,8 +27,8 @@ public class FilePart implements Part {
 
     @SneakyThrows
     @Override
-    public Mono<InputStream> getInputStream() {
-        return file.isFile() ? Mono.just(new FileInputStream(file)) : Mono.empty();
+    public InputStream getInputStream() {
+        return file.isFile() ? new FileInputStream(file) : new EmptyInputStream();
     }
 
     @Override

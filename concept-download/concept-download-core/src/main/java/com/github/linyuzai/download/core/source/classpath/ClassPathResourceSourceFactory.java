@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
 
@@ -18,11 +19,11 @@ public class ClassPathResourceSourceFactory implements SourceFactory {
     }
 
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return new ClassPathResourceSource.Builder<>()
+        return Mono.just(new ClassPathResourceSource.Builder<>()
                 .resource((ClassPathResource) source)
                 .charset(charset)
-                .build();
+                .build());
     }
 }

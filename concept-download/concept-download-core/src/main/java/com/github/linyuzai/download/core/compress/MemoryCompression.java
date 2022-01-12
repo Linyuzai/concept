@@ -20,8 +20,8 @@ public class MemoryCompression extends AbstractCompression {
      * @return 字节输入流 / Input stream of bytes
      */
     @Override
-    public Mono<InputStream> getInputStream() {
-        return Mono.just(new ByteArrayInputStream(bytes));
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(bytes);
     }
 
     @Override

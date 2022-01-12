@@ -19,7 +19,7 @@ public class NoCompression implements Compression {
     protected Source source;
 
     @Override
-    public Mono<InputStream> getInputStream() {
+    public InputStream getInputStream() {
         return source.getInputStream();
     }
 

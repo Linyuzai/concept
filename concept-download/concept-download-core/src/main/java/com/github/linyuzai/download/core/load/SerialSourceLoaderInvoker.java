@@ -1,9 +1,9 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -17,15 +17,11 @@ public class SerialSourceLoaderInvoker implements SourceLoaderInvoker {
      * @param loaders 加载器 / Loaders
      * @param context 下载上下文 / Context of download
      * @return 加载结果 / Results of loadings
-     * @throws IOException I/O exception
      */
     @Override
-    public Collection<SourceLoadResult> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) {
-        Collection<SourceLoadResult> results = new ArrayList<>();
-        for (SourceLoader loader : loaders) {
-            SourceLoadResult result = loader.load(context);
-            results.add(result);
-        }
-        return results;
+    public Mono<? extends Collection<? extends SourceLoadResult>> invoke(Collection<? extends SourceLoader> loaders, DownloadContext context) {
+        return Flux.fromIterable(loaders)
+                .flatMap(it -> it.load(context))
+                .collectList();
     }
 }

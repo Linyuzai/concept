@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.range.Range;
 import com.github.linyuzai.download.core.concept.Downloadable;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,6 @@ public interface DownloadWriter extends OrderProvider {
      * @param range   写入的范围 / Range of writing
      * @param charset 编码 / Charset
      * @param length  总字节数，可能为null / Total bytes count, may be null
-     * @throws IOException I/O exception
      */
     void write(InputStream is, OutputStream os, Range range, Charset charset, Long length);
 }

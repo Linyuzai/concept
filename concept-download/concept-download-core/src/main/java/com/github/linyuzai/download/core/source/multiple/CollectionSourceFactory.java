@@ -4,6 +4,8 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,13 +36,10 @@ public class CollectionSourceFactory implements SourceFactory {
      * @return 下载源 / Source {@link MultipleSource}
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
-        List<Source> sources = new ArrayList<>();
-        for (Object o : ((Collection<?>) source)) {
-            SourceFactory factory = adapter.getFactory(o, context);
-            sources.add(factory.create(o, context));
-        }
-        return new MultipleSource(sources);
+        return Flux.fromIterable((Collection<?>) source)
+                .flatMap(it -> adapter.getFactory(it, context).create(it, context)).collectList()
+                .map(MultipleSource::new);
     }
 }

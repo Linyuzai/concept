@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.text;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
 
@@ -31,13 +32,13 @@ public class TextSourceFactory implements SourceFactory {
      * @return 下载源 / Source {@link TextSource}
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return new TextSource.Builder<>()
+        return Mono.just(new TextSource.Builder<>()
                 .text((String) source)
                 .name("text.txt")
                 .charset(charset)
-                .build();
+                .build());
     }
 
     @Override

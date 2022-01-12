@@ -20,8 +20,8 @@ public class FileCompression extends AbstractCompression {
      */
     @SneakyThrows
     @Override
-    public Mono<InputStream> getInputStream() {
-        return Mono.just(new FileInputStream(file));
+    public InputStream getInputStream() {
+        return new FileInputStream(file);
     }
 
     /**

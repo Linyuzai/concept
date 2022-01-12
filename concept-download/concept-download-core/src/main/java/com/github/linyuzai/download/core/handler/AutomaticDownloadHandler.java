@@ -1,8 +1,7 @@
 package com.github.linyuzai.download.core.handler;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-
-import java.io.IOException;
+import reactor.core.publisher.Mono;
 
 /**
  * 自动执行调用链 / Auto execute call chain
@@ -11,14 +10,9 @@ import java.io.IOException;
 public interface AutomaticDownloadHandler extends DownloadHandler {
 
     @Override
-    default void handle(DownloadContext context, DownloadHandlerChain chain) {
-        doHandle(context);
-        DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
-        if (interceptor != null) {
-            interceptor.intercept(this, context);
-        }
-        chain.next(context);
+    default Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        return doHandle(context).flatMap(it -> chain.next(context));
     }
 
-    void doHandle(DownloadContext context);
+    Mono<Void> doHandle(DownloadContext context);
 }

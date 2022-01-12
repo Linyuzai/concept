@@ -2,8 +2,7 @@ package com.github.linyuzai.download.core.handler;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
-
-import java.io.IOException;
+import reactor.core.publisher.Mono;
 
 /**
  * 下载处理器 / Handler to download
@@ -23,5 +22,5 @@ public interface DownloadHandler extends OrderProvider {
      * @param context 下载上下文 / Context of download
      * @param chain   处理链 / Chain of handler
      */
-    void handle(DownloadContext context, DownloadHandlerChain chain);
+    Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain);
 }

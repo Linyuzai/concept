@@ -3,7 +3,9 @@ package com.github.linyuzai.download.core.source.multiple;
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.source.file.EmptyInputStream;
 import lombok.*;
 import reactor.core.publisher.Mono;
 
@@ -12,6 +14,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 持有数据源集合的数据源 / A source that holds a collection of sources
@@ -25,8 +28,8 @@ public class MultipleSource implements Source {
     protected Collection<Source> sources;
 
     @Override
-    public Mono<InputStream> getInputStream() {
-        return Mono.empty();
+    public InputStream getInputStream() {
+        return new EmptyInputStream();
     }
 
     /**
@@ -137,13 +140,15 @@ public class MultipleSource implements Source {
      * 对集合中的所有下载源都执行加载 / Load all sources in the collection
      *
      * @param context 下载上下文 / Context of download
-     * @throws IOException I/O exception
      */
     @Override
-    public void load(DownloadContext context) {
-        for (Source source : sources) {
-            source.load(context);
-        }
+    public Mono<Source> load(DownloadContext context) {
+        List<Mono<Source>> monoList = sources.stream()
+                .map(Mono::just)
+                .collect(Collectors.toList());
+        return Mono.zip(monoList, objects -> Arrays.stream(objects)
+                        .collect(Collectors.toList()))
+                .map(it -> this);
     }
 
     @Override

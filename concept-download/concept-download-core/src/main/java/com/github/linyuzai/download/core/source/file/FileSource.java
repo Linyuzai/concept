@@ -27,8 +27,8 @@ public class FileSource extends AbstractSource {
     private FileInputStream fileInputStream;
 
     @Override
-    public Mono<InputStream> getInputStream() {
-        return file.isFile() ? Mono.just(open()) : Mono.empty();
+    public InputStream getInputStream() {
+        return file.isFile() ? open() : new EmptyInputStream();
     }
 
     @SneakyThrows

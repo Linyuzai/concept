@@ -43,21 +43,19 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      * @param os     写入的输出流 / Output stream to write
      * @param writer 写入执行器 / Executor of writing
      */
+    @SuppressWarnings("all")
     @Override
     public Mono<?> doCompress(Source source, OutputStream os, DownloadWriter writer) {
-        return Flux.fromIterable(source.getParts())
-                .flatMap(Part::toMono)
-                .collectList()
-                .map(holders -> {
+        return Mono.just(source.getParts())
+                .map(parts -> {
                     try (ZipOutputStream zos = newZipOutputStream(source, os)) {
-                        for (Part.Holder holder : holders) {
-                            Part part = holder.getPart();
-                            InputStream is = holder.getInputStream();
+                        for (Part part : parts) {
+                            InputStream is = part.getInputStream();
                             zos.putNextEntry(new ZipEntry(part.getPath()));
                             writer.write(is, zos, null, part.getCharset(), part.getLength());
                             zos.closeEntry();
                         }
-                        return holders;
+                        return parts;
                     } catch (Throwable e) {
                         return Mono.error(e);
                     }

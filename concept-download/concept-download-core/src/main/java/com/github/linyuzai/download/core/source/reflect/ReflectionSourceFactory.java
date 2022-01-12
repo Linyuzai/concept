@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
+import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,14 +39,15 @@ public class ReflectionSourceFactory implements SourceFactory {
      * @return 下载源 / Source
      */
     @Override
-    public Source create(Object model, DownloadContext context) {
+    public Mono<Source> create(Object model, DownloadContext context) {
         ReflectionTemplate template = reflectionTemplateMap.computeIfAbsent(model.getClass(), this::newTemplate);
         Object reflect = template.value(SourceObject.class, model);
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
         SourceFactory factory = adapter.getFactory(reflect, context);
-        Source source = factory.create(reflect, context);
-        template.reflect(model, source);
-        return source;
+        return factory.create(reflect, context).map(it -> {
+            template.reflect(model, it);
+            return it;
+        });
     }
 
     protected ReflectionTemplate newTemplate(Class<?> clazz) {

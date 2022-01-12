@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.source;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
+import reactor.core.publisher.Mono;
 
 /**
  * 数据源工厂 / Factory of download source
@@ -24,5 +25,5 @@ public interface SourceFactory extends OrderProvider {
      * @param context 下载上下文 / Context of download
      * @return 下载源 / Source
      */
-    Source create(Object source, DownloadContext context);
+    Mono<Source> create(Object source, DownloadContext context);
 }

@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.multiple;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class ArraySourceFactory implements SourceFactory {
      * @return 下载源 / Source
      */
     @Override
-    public Source create(Object source, DownloadContext context) {
+    public Mono<Source> create(Object source, DownloadContext context) {
         List<Object> objects = new ArrayList<>();
         int length = Array.getLength(source);
         for (int i = 0; i < length; i++) {

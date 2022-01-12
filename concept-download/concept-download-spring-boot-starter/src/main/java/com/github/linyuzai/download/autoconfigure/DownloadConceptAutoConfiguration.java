@@ -16,8 +16,11 @@ import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.load.*;
+import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
+import com.github.linyuzai.download.core.scheduler.ImmediateDownloadScheduler;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
+import com.github.linyuzai.download.core.source.reactive.PublisherSourceFactory;
 import com.github.linyuzai.download.core.web.DownloadRequestProvider;
 import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.response.WriteResponseHandler;
@@ -136,6 +139,12 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public PublisherSourceFactory publisherSourceFactory() {
+        return new PublisherSourceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public SourceFactoryAdapter sourceFactoryAdapter(List<SourceFactory> factories) {
         return new DefaultSourceFactoryAdapter(factories);
     }
@@ -224,9 +233,18 @@ public class DownloadConceptAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DownloadConcept downloadConcept(DownloadConfiguration configuration, List<DownloadConfigurer> configurers,
-                                           DownloadContextFactory factory, List<DownloadHandler> handlers) {
+    public DownloadScheduler downloadScheduler() {
+        return new ImmediateDownloadScheduler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DownloadConcept downloadConcept(DownloadConfiguration configuration,
+                                           DownloadContextFactory factory,
+                                           DownloadScheduler scheduler,
+                                           List<DownloadHandler> handlers,
+                                           List<DownloadConfigurer> configurers) {
         configurers.forEach(it -> it.configure(configuration));
-        return new ChainDownloadConcept(configuration, factory, handlers);
+        return new ChainDownloadConcept(configuration, factory, scheduler, handlers);
     }
 }
