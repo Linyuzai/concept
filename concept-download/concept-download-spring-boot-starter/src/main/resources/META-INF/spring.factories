@@ -1,7 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.linyuzai.download.autoconfigure.DownloadConceptWebServletAutoConfiguration,\
-com.github.linyuzai.download.autoconfigure.DownloadConceptWebReactiveAutoConfiguration,\
-com.github.linyuzai.download.autoconfigure.DownloadConceptSourceClassPathAutoConfiguration,\
+com.github.linyuzai.download.autoconfigure.DownloadConceptServletAutoConfiguration,\
+com.github.linyuzai.download.autoconfigure.DownloadConceptReactiveAutoConfiguration,\
 com.github.linyuzai.download.autoconfigure.DownloadConceptSourceOkHttpAutoConfiguration,\
-com.github.linyuzai.download.autoconfigure.DownloadConceptAutoConfiguration,\
+com.github.linyuzai.download.autoconfigure.DownloadConceptCoreAutoConfiguration,\
 com.github.linyuzai.download.autoconfigure.DownloadConceptAopAutoConfiguration

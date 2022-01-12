@@ -33,8 +33,7 @@ public class ChainDownloadConcept implements DownloadConcept {
 
     private final List<DownloadHandler> handlers;
 
-    @PostConstruct
-    public void init() {
+    public void sort() {
         this.handlers.sort(Comparator.comparingInt(OrderProvider::getOrder));
     }
 

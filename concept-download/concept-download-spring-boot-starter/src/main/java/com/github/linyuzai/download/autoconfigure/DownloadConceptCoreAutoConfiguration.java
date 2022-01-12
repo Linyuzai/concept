@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptProperties;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
 import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
@@ -20,6 +19,8 @@ import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
 import com.github.linyuzai.download.core.scheduler.ImmediateDownloadScheduler;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
+import com.github.linyuzai.download.core.source.classpath.ClassPathPrefixSourceFactory;
+import com.github.linyuzai.download.core.source.classpath.ClassPathResourceSourceFactory;
 import com.github.linyuzai.download.core.source.reactive.PublisherSourceFactory;
 import com.github.linyuzai.download.core.web.DownloadRequestProvider;
 import com.github.linyuzai.download.core.web.DownloadResponseProvider;
@@ -47,10 +48,10 @@ import java.util.List;
  * 基础组件的配置 / Configuration of basic components
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(DownloadConceptProperties.class)
-public class DownloadConceptAutoConfiguration {
+@EnableConfigurationProperties(DownloadConfiguration.class)
+public class DownloadConceptCoreAutoConfiguration {
 
-    @Bean
+    /*@Bean
     @ConditionalOnMissingBean
     public DownloadConfiguration downloadConfiguration(DownloadConceptProperties properties) {
         DownloadConfiguration configuration = new DownloadConfiguration();
@@ -63,7 +64,7 @@ public class DownloadConceptAutoConfiguration {
         configuration.getCompress().getCache().setPath(properties.getCompress().getCache().getPath());
         configuration.getCompress().getCache().setDelete(properties.getCompress().getCache().isDelete());
         return configuration;
-    }
+    }*/
 
     @Bean
     @ConditionalOnMissingBean
@@ -123,6 +124,18 @@ public class DownloadConceptAutoConfiguration {
     @ConditionalOnMissingBean
     public TextSourceFactory textSourceFactory() {
         return new TextSourceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ClassPathResourceSourceFactory classPathResourceSourceFactory() {
+        return new ClassPathResourceSourceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ClassPathPrefixSourceFactory classPathPrefixSourceFactory() {
+        return new ClassPathPrefixSourceFactory();
     }
 
     @Bean

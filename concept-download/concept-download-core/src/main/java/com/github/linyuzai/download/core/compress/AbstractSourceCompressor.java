@@ -25,11 +25,10 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @param writer  {@link DownloadWriter}
      * @param context 下载上下文 / Context of download
      * @return An specific compression
-     * @throws IOException I/O exception
      */
     @Override
-    public Mono<Compression> compress(Mono<Source> source, DownloadWriter writer, DownloadContext context) {
-        return source.flatMap(it -> {
+    public Mono<Compression> compress(Source source, DownloadWriter writer, DownloadContext context) {
+        return Mono.just(source).flatMap(it -> {
             String cachePath = context.getOptions().getCompressCachePath();
             String cacheName = getCacheName(it, context);
             boolean cacheEnable = context.getOptions().isCompressCacheEnabled();

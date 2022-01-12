@@ -8,8 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Map;
 
+@Deprecated
 @Data
-@ConfigurationProperties(prefix = "concept.download")
+//@ConfigurationProperties(prefix = "concept.download")
 public class DownloadConceptProperties {
 
     private ResponseProperties response = new ResponseProperties();

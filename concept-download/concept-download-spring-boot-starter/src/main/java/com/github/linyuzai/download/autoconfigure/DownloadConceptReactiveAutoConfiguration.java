@@ -3,6 +3,7 @@ package com.github.linyuzai.download.autoconfigure;
 import com.github.linyuzai.download.core.web.DownloadRequestProvider;
 import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.source.reactive.WebClientSourceFactory;
+import com.github.linyuzai.download.core.web.reactive.ReactiveDownloadFilter;
 import com.github.linyuzai.download.core.web.reactive.ReactiveDownloadRequestProvider;
 import com.github.linyuzai.download.core.web.reactive.ReactiveDownloadResponseProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -16,10 +17,15 @@ import org.springframework.context.annotation.Configuration;
  * Reactive的配置 / Configuration of reactive
  */
 @Configuration(proxyBeanMethods = false)
-@AutoConfigureBefore(DownloadConceptAutoConfiguration.class)
+@AutoConfigureBefore(DownloadConceptCoreAutoConfiguration.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-@ConditionalOnClass({ReactiveDownloadRequestProvider.class, ReactiveDownloadResponseProvider.class})
-public class DownloadConceptWebReactiveAutoConfiguration {
+public class DownloadConceptReactiveAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ReactiveDownloadFilter reactiveDownloadFilter() {
+        return new ReactiveDownloadFilter();
+    }
 
     @Bean
     @ConditionalOnMissingBean

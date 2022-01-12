@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  * 全局默认配置 / Global default configuration
  */
 @Data
+@ConfigurationProperties(prefix = "concept.download")
 public class DownloadConfiguration {
 
     private ResponseConfiguration response = new ResponseConfiguration();
