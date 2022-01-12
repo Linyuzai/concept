@@ -3,8 +3,6 @@ package com.github.linyuzai.download.core.handler;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
 /**
  * 下载处理链 / Chain of handler to download
  */

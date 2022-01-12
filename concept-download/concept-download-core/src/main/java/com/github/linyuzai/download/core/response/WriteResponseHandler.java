@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.range.Range;
@@ -17,7 +18,6 @@ import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -43,8 +43,8 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        Compression compression = context.get(Compression.class);
         Range range = context.get(Range.class);
+        Compression compression = context.get(Compression.class);
         return Mono.just(compression).flatMap(c -> {
             DownloadWriter writer = downloadWriterAdapter.getWriter(c, range, context);
             return downloadResponseProvider.getResponse(context)
@@ -54,6 +54,11 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                                 for (Part part : parts) {
                                     writer.write(part.getInputStream(), os, range,
                                             part.getCharset(), part.getLength());
+                                }
+                                try {
+                                    os.flush();
+                                } catch (IOException e) {
+                                    throw new DownloadException(e);
                                 }
                             })));
         }).flatMap(it -> chain.next(context));

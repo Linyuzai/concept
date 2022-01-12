@@ -2,10 +2,8 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.order.OrderProvider;
 import lombok.AllArgsConstructor;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,10 +13,6 @@ import java.util.List;
 public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {
 
     private final List<SourceCompressor> compressors;
-
-    public void sort() {
-        this.compressors.sort(Comparator.comparingInt(OrderProvider::getOrder));
-    }
 
     /**
      * 根据压缩格式获得对应的压缩器 / Obtain the corresponding compressor according to the compression format

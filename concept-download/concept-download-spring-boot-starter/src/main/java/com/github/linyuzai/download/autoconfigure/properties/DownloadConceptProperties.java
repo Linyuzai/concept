@@ -2,9 +2,7 @@ package com.github.linyuzai.download.autoconfigure.properties;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
-import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Map;
 

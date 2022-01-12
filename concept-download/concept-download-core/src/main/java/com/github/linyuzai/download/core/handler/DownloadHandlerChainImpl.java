@@ -26,16 +26,13 @@ public class DownloadHandlerChainImpl implements DownloadHandlerChain {
     @Override
     public Mono<Void> next(DownloadContext context) {
         if (index < handlers.size()) {
-            DownloadHandler handler = handlers.get(index++);
+            DownloadHandler handler = handlers.get(index);
+            DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
+            if (interceptor != null) {
+                interceptor.intercept(handler, context);
+            }
             DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);
-            return handler.handle(context, chain)
-                    .flatMap(it -> {
-                        DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
-                        if (interceptor != null) {
-                            interceptor.intercept(handler, context);
-                        }
-                        return Mono.empty();
-                    });
+            return handler.handle(context, chain);
         } else {
             return Mono.empty();
         }

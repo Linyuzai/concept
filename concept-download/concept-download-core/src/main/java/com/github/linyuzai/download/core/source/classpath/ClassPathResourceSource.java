@@ -3,7 +3,6 @@ package com.github.linyuzai.download.core.source.classpath;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 

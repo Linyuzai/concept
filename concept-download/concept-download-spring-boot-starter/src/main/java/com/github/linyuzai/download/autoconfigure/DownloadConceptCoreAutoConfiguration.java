@@ -10,33 +10,37 @@ import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
+import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.load.*;
+import com.github.linyuzai.download.core.response.WriteResponseHandler;
 import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
 import com.github.linyuzai.download.core.scheduler.ImmediateDownloadScheduler;
+import com.github.linyuzai.download.core.source.CreateSourceHandler;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
+import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.classpath.ClassPathPrefixSourceFactory;
 import com.github.linyuzai.download.core.source.classpath.ClassPathResourceSourceFactory;
-import com.github.linyuzai.download.core.source.reactive.PublisherSourceFactory;
-import com.github.linyuzai.download.core.web.DownloadRequestProvider;
-import com.github.linyuzai.download.core.web.DownloadResponseProvider;
-import com.github.linyuzai.download.core.response.WriteResponseHandler;
-import com.github.linyuzai.download.core.source.SourceFactory;
-import com.github.linyuzai.download.core.source.CreateSourceHandler;
-import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
+import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
 import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
+import com.github.linyuzai.download.core.source.reactive.PublisherSourceFactory;
 import com.github.linyuzai.download.core.source.reflect.ReflectionSourceFactory;
 import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
 import com.github.linyuzai.download.core.source.text.TextSourceFactory;
-import com.github.linyuzai.download.core.writer.*;
+import com.github.linyuzai.download.core.web.DownloadRequestProvider;
+import com.github.linyuzai.download.core.web.DownloadResponseProvider;
+import com.github.linyuzai.download.core.writer.BufferedDownloadWriter;
+import com.github.linyuzai.download.core.writer.DefaultDownloadWriterAdapter;
+import com.github.linyuzai.download.core.writer.DownloadWriter;
+import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -255,9 +259,10 @@ public class DownloadConceptCoreAutoConfiguration {
     public DownloadConcept downloadConcept(DownloadConfiguration configuration,
                                            DownloadContextFactory factory,
                                            DownloadScheduler scheduler,
+                                           DownloadReturnInterceptor returnInterceptor,
                                            List<DownloadHandler> handlers,
                                            List<DownloadConfigurer> configurers) {
         configurers.forEach(it -> it.configure(configuration));
-        return new ChainDownloadConcept(configuration, factory, scheduler, handlers);
+        return new ChainDownloadConcept(configuration, factory, scheduler, returnInterceptor, handlers);
     }
 }

@@ -7,9 +7,7 @@ import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 支持集合类型的工厂 / Factory support collection

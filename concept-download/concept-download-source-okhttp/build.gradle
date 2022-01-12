@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
     compileOnly project(':concept-download:concept-download-core')
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

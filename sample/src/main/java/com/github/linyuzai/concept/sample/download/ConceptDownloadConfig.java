@@ -2,10 +2,8 @@ package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
-import com.github.linyuzai.download.core.load.ExecutorSourceLoaderInvoker;
 import com.github.linyuzai.download.core.load.SourceLoadException;
 import com.github.linyuzai.download.core.load.SourceLoadExceptionHandler;
-import com.github.linyuzai.download.coroutines.loader.CoroutinesSourceLoaderInvoker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,16 +19,16 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
     }
 
     //@Bean
-    public CoroutinesSourceLoaderInvoker coroutinesSourceLoaderInvoker() {
+    /*public CoroutinesSourceLoaderInvoker coroutinesSourceLoaderInvoker() {
         System.out.println("如果需要进行HTTP请求可以使用协程加载！");
         return new CoroutinesSourceLoaderInvoker();
-    }
+    }*/
 
     //@Bean(destroyMethod = "shutdown")
-    public ExecutorSourceLoaderInvoker executorSourceLoaderInvoker() {
+    /*public ExecutorSourceLoaderInvoker executorSourceLoaderInvoker() {
         System.out.println("如果需要进行HTTP请求可以使用线程池加载！");
         return new ExecutorSourceLoaderInvoker(Executors.newFixedThreadPool(5));
-    }
+    }*/
 
     //@Bean
     public SourceLoadExceptionHandler sourceLoadExceptionHandler() {

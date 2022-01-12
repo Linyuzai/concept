@@ -62,6 +62,11 @@ public class ReactiveDownloadResponse implements DownloadResponse {
             writeSink((byte) b);
         }
 
+        @Override
+        public void flush() throws IOException {
+            fluxSink.complete();
+        }
+
         public void writeSink(byte... bytes) {
             fluxSink.next(response.bufferFactory().wrap(bytes));
         }

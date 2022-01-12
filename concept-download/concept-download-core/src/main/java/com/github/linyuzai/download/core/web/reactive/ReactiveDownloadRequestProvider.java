@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.core.web.reactive;
 
-import com.github.linyuzai.download.core.concept.DownloadFunction;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.web.DownloadRequest;
@@ -14,12 +13,7 @@ import reactor.core.publisher.Mono;
 public class ReactiveDownloadRequestProvider implements DownloadRequestProvider {
 
     @Override
-    public DownloadRequest getRequest(DownloadContext context) {
-        return null;
-    }
-
-    @Override
-    public Object getRequest(DownloadContext context, DownloadFunction<DownloadRequest, Object> function) {
+    public Mono<DownloadRequest> getRequest(DownloadContext context) {
         Object request = context.getOptions().getRequest();
         Object[] parameters = context.getOptions().getDownloadMethod().getParameters();
         return getServerHttpRequest(request, parameters).map(it -> {
@@ -27,12 +21,6 @@ public class ReactiveDownloadRequestProvider implements DownloadRequestProvider 
                 throw new DownloadException("ServerHttpRequest not found");
             } else {
                 return new ReactiveDownloadRequest(it);
-            }
-        }).flatMap(it -> {
-            try {
-                return (Mono<?>) function.apply(it);
-            } catch (Throwable e) {
-                return Mono.error(e);
             }
         });
     }

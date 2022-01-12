@@ -6,9 +6,9 @@ import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 /**
  * 方法上的 {@link Download} 注解作为切点 / Use annotation {@link Download} on method for pointcut
  */
-public class DownloadConceptPointcut extends AnnotationMatchingPointcut {
+public class DownloadPointcut extends AnnotationMatchingPointcut {
 
-    public DownloadConceptPointcut() {
+    public DownloadPointcut() {
         super(null, Download.class, true);
     }
 }

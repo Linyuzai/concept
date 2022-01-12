@@ -1,10 +1,8 @@
 package com.github.linyuzai.download.core.compress;
 
 import lombok.AllArgsConstructor;
-import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 

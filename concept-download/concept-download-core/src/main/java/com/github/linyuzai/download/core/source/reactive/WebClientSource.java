@@ -1,14 +1,22 @@
 package com.github.linyuzai.download.core.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.http.HttpSource;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.client.reactive.ClientHttpResponse;
+import org.springframework.web.reactive.function.BodyExtractor;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.function.Function;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,9 +35,19 @@ public class WebClientSource extends HttpSource {
                         }
                     }
                 })
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .map(ByteArrayInputStream::new);
+                .exchangeToMono(new Function<ClientResponse, Mono<InputStream>>() {
+                    @Override
+                    public Mono<InputStream> apply(ClientResponse clientResponse) {
+                        int code = clientResponse.statusCode().value();
+                        if (isResponseSuccess(clientResponse.statusCode().value())) {
+                            return clientResponse.body(new InputStreamBodyExtractor());
+                        } else {
+                            return clientResponse.bodyToMono(String.class).flatMap(it -> {
+                                return Mono.error(new DownloadException("code: " + code + ", " + it));
+                            });
+                        }
+                    }
+                });
     }
 
     @Override
@@ -37,6 +55,14 @@ public class WebClientSource extends HttpSource {
         return "WebClientSource{" +
                 "url='" + url + '\'' +
                 '}';
+    }
+
+    public static class InputStreamBodyExtractor implements BodyExtractor<Mono<InputStream>, ClientHttpResponse> {
+
+        @Override
+        public Mono<InputStream> extract(ClientHttpResponse response, Context context) {
+            return DataBufferUtils.join(response.getBody()).map(DataBuffer::asInputStream);
+        }
     }
 
     @SuppressWarnings("unchecked")

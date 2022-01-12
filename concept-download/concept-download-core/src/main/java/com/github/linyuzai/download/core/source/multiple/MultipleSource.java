@@ -3,13 +3,11 @@ package com.github.linyuzai.download.core.source.multiple;
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
 import lombok.*;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -144,10 +142,9 @@ public class MultipleSource implements Source {
     @Override
     public Mono<Source> load(DownloadContext context) {
         List<Mono<Source>> monoList = sources.stream()
-                .map(Mono::just)
+                .map(it -> it.load(context))
                 .collect(Collectors.toList());
-        return Mono.zip(monoList, objects -> Arrays.stream(objects)
-                        .collect(Collectors.toList()))
+        return Mono.zip(monoList, objects -> objects)
                 .map(it -> this);
     }
 

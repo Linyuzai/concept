@@ -163,27 +163,27 @@ public class ConceptDownloadController {
                         .interceptor(new StandardDownloadHandlerInterceptor() {
 
                             @Override
-                            public void onContextInitialized(DownloadContext context) {
+                            public void beforeContextInitialized(DownloadContext context) {
                             }
 
                             @Override
-                            public void onSourceCreated(DownloadContext context) {
+                            public void beforeSourceCreated(DownloadContext context) {
                             }
 
                             @Override
-                            public void onSourceLoaded(DownloadContext context) {
+                            public void beforeSourceLoaded(DownloadContext context) {
                             }
 
                             @Override
-                            public void onSourceCompressed(DownloadContext context) {
+                            public void beforeSourceCompressed(DownloadContext context) {
                             }
 
                             @Override
-                            public void onResponseWritten(DownloadContext context) {
+                            public void beforeResponseWritten(DownloadContext context) {
                             }
 
                             @Override
-                            public void onContextDestroyed(DownloadContext context) {
+                            public void beforeContextDestroyed(DownloadContext context) {
                             }
                         })
                         .build();
@@ -221,8 +221,8 @@ public class ConceptDownloadController {
     }*/
 
     @Download
-    @SourceCache(group = "s21")
-    @CompressCache(group = "s21")
+    //@SourceCache(group = "s21")
+    //@CompressCache(group = "s21")
     @GetMapping("/s21")
     public List<BusinessModel> s21() {
         List<BusinessModel> businessModels = new ArrayList<>();

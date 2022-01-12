@@ -7,7 +7,7 @@ import lombok.*;
 import okhttp3.*;
 import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.InputStream;
 
 /**
  * 使用OkHttp加载资源 / Use OkHttp to load source
@@ -31,7 +31,8 @@ public class OkHttpSource extends HttpSource {
         }
         Request request = rb.build();
         Response response = client.newCall(request).execute();
-        if (isResponseSuccess(response.code())) {
+        int code = response.code();
+        if (isResponseSuccess(code)) {
             ResponseBody body = response.body();
             if (body == null) {
                 throw new DownloadException("Body is null");
@@ -62,7 +63,7 @@ public class OkHttpSource extends HttpSource {
                     builder.append(s).append(";");
                 }
             }
-            throw new DownloadException(builder.toString());
+            throw new DownloadException("code: " + code + ", " + builder.toString());
         }
     }
 

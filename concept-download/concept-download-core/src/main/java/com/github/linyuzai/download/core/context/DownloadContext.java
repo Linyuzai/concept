@@ -54,4 +54,9 @@ public interface DownloadContext {
      * 销毁，清空所有内容 / Clear all content
      */
     void destroy();
+
+    default DownloadContext apply(Object key, Object value) {
+        set(key, value);
+        return this;
+    }
 }

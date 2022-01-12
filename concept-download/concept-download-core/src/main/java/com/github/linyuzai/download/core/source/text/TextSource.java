@@ -3,9 +3,9 @@ package com.github.linyuzai.download.core.source.text;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
-import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**

@@ -6,8 +6,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
 /**
  * 压缩器 / Compressor to compress source
  */

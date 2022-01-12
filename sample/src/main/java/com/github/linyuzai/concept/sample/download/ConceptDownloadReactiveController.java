@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.aop.annotation.Download;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("/concept-download-reactive")
@@ -27,14 +29,17 @@ public class ConceptDownloadReactiveController {
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=video.mp4");
         response.getHeaders().setContentType(MediaType.parseMediaType("video/mpeg4"));
         File file = new File("/Users/Shared/video.mp4");
-        return zeroCopyResponse.writeWith(file, 0, file.length());
+        return zeroCopyResponse.writeWith(file, 0, file.length())
+                .doOnNext(context -> System.out.println("Next"))
+                .doOnSubscribe(subscription -> System.out.println("Subscribe"))
+                .doOnSuccess(context -> System.out.println("Success"));
     }
 
     @Download
     //@SourceCache(group = "s21")
     //@CompressCache(group = "s21")
     @GetMapping("/rs1")
-    public Mono<Void> s21(ServerHttpRequest request, ServerHttpResponse response) {
+    public Mono<Void> s21() {
         List<ConceptDownloadController.BusinessModel> businessModels = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             //String url = "https://img2.baidu.com/it/u=3801884915,270435659&fm=26&fmt=auto";
@@ -46,3 +51,4 @@ public class ConceptDownloadReactiveController {
         return new DownloadMono(businessModels);
     }
 }
+*/

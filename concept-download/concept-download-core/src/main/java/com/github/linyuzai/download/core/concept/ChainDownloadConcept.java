@@ -6,15 +6,12 @@ import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChainImpl;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
@@ -31,11 +28,9 @@ public class ChainDownloadConcept implements DownloadConcept {
 
     private final DownloadScheduler scheduler;
 
-    private final List<DownloadHandler> handlers;
+    private final DownloadReturnInterceptor returnInterceptor;
 
-    public void sort() {
-        this.handlers.sort(Comparator.comparingInt(OrderProvider::getOrder));
-    }
+    private final List<DownloadHandler> handlers;
 
     /**
      * 通过下载配置获得一个下载参数 / Obtain a download parameter through the download configuration
@@ -48,9 +43,9 @@ public class ChainDownloadConcept implements DownloadConcept {
     @Override
     public Object download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException {
         DownloadOptions options = function.apply(configuration);
-        Mono<DownloadContext> contextMono = contextFactory.create(options);
-        return contextMono
-                .publishOn(scheduler.getScheduler())
+        Mono<DownloadContext> context = contextFactory.create(options);
+        Mono<Void> mono = context.publishOn(scheduler.getScheduler())
                 .flatMap(it -> new DownloadHandlerChainImpl(0, handlers).next(it));
+        return returnInterceptor.intercept(mono);
     }
 }

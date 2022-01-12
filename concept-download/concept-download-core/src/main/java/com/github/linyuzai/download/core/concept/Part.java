@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.concept;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -3,9 +3,10 @@ package com.github.linyuzai.download.core.compress;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * 文件压缩 / File compression

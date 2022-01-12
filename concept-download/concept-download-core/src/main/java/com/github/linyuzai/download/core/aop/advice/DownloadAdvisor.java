@@ -9,17 +9,17 @@ import org.springframework.lang.NonNull;
 /**
  * 切面定义 / Definition of advice
  */
-public class DownloadConceptAdvisor extends DefaultPointcutAdvisor implements BeanPostProcessor {
+public class DownloadAdvisor extends DefaultPointcutAdvisor implements BeanPostProcessor {
 
-    public DownloadConceptAdvisor() {
-        this(new DownloadConceptPointcut(), new DownloadConceptAdvice());
+    public DownloadAdvisor() {
+        this(new DownloadPointcut(), new DownloadAdvice());
     }
 
-    public DownloadConceptAdvisor(DownloadConceptAdvice advice) {
-        this(new DownloadConceptPointcut(), advice);
+    public DownloadAdvisor(DownloadAdvice advice) {
+        this(new DownloadPointcut(), advice);
     }
 
-    public DownloadConceptAdvisor(DownloadConceptPointcut pointcut, DownloadConceptAdvice advice) {
+    public DownloadAdvisor(DownloadPointcut pointcut, DownloadAdvice advice) {
         setPointcut(pointcut);
         setAdvice(advice);
     }
@@ -27,7 +27,7 @@ public class DownloadConceptAdvisor extends DefaultPointcutAdvisor implements Be
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         if (bean instanceof DownloadConcept) {
-            DownloadConceptAdvice advice = (DownloadConceptAdvice) getAdvice();
+            DownloadAdvice advice = (DownloadAdvice) getAdvice();
             advice.setDownloadConcept((DownloadConcept) bean);
         }
         return bean;

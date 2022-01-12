@@ -105,6 +105,10 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             });
         } else {
             return doLoad(context).map(is -> {
+                inputStream = is;
+                return this;
+            });
+            /*return doLoad(context).map(is -> {
                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -113,7 +117,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             }).map(is -> {
                 inputStream = is;
                 return this;
-            });
+            });*/
         }
     }
 

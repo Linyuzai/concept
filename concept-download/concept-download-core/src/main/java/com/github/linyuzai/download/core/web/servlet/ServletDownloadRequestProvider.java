@@ -8,6 +8,7 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,14 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 public class ServletDownloadRequestProvider implements DownloadRequestProvider {
 
     @Override
-    public DownloadRequest getRequest(DownloadContext context) {
+    public Mono<DownloadRequest> getRequest(DownloadContext context) {
         Object req = context.getOptions().getRequest();
         Object[] parameters = context.getOptions().getDownloadMethod().getParameters();
         HttpServletRequest request = getHttpServletRequest(req, parameters);
         if (request == null) {
             throw new DownloadException("HttpServletRequest not found");
         } else {
-            return new ServletDownloadRequest(request);
+            return Mono.just(new ServletDownloadRequest(request));
         }
     }
 

@@ -44,10 +44,10 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
                 SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                 DownloadWriter writer = writerAdapter.getWriter(it, null, context);
-                return compressor.compress(source, writer, context);
+                return compressor.compress(it, writer, context);
             }
-        }).flatMap(compression -> {
-            context.set(Compression.class, compression);
+        }).flatMap(it -> {
+            context.set(Compression.class, it);
             return chain.next(context);
         });
     }

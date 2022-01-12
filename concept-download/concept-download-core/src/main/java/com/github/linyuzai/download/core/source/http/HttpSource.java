@@ -78,7 +78,8 @@ public class HttpSource extends AbstractLoadableSource {
             }
         }
         connection.connect();
-        if (isResponseSuccess(connection.getResponseCode())) {
+        int code = connection.getResponseCode();
+        if (isResponseSuccess(code)) {
             String contentType = getContentType();
             if (contentType == null || contentType.isEmpty()) {
                 String ct = connection.getContentType();
@@ -96,7 +97,7 @@ public class HttpSource extends AbstractLoadableSource {
             DownloadWriter writer = writerAdapter.getWriter(this, null, context);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             writer.write(connection.getErrorStream(), os, null, null, null);
-            throw new DownloadException(os.toString());
+            throw new DownloadException("code: " + code + ", " + os.toString());
         }
     }
 

@@ -23,19 +23,19 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
     @Override
     default void intercept(DownloadHandler handler, DownloadContext context) {
         if (handler instanceof InitializeContextHandler) {
-            onContextInitialized(context);
+            beforeContextInitialized(context);
         } else if (handler instanceof CreateSourceHandler) {
-            onSourceCreated(context);
+            beforeSourceCreated(context);
         } else if (handler instanceof LoadSourceHandler) {
-            onSourceLoaded(context);
+            beforeSourceLoaded(context);
         } else if (handler instanceof CompressSourceHandler) {
-            onSourceCompressed(context);
+            beforeSourceCompressed(context);
         } else if (handler instanceof WriteResponseHandler) {
-            onResponseWritten(context);
+            beforeResponseWritten(context);
         } else if (handler instanceof DestroyContextHandler) {
-            onContextDestroyed(context);
+            beforeContextDestroyed(context);
         } else {
-            onOtherHandled(handler, context);
+            beforeOtherHandled(handler, context);
         }
     }
 
@@ -44,7 +44,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      *
      * @param context 下载上下文 / Context of download
      */
-    default void onContextInitialized(DownloadContext context) {
+    default void beforeContextInitialized(DownloadContext context) {
 
     }
 
@@ -53,7 +53,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      *
      * @param context 下载上下文 / Context of download
      */
-    default void onSourceCreated(DownloadContext context) {
+    default void beforeSourceCreated(DownloadContext context) {
 
     }
 
@@ -62,7 +62,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      *
      * @param context 下载上下文 / Context of download
      */
-    default void onSourceLoaded(DownloadContext context) {
+    default void beforeSourceLoaded(DownloadContext context) {
 
     }
 
@@ -71,7 +71,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      *
      * @param context 下载上下文 / Context of download
      */
-    default void onSourceCompressed(DownloadContext context) {
+    default void beforeSourceCompressed(DownloadContext context) {
 
     }
 
@@ -80,7 +80,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      *
      * @param context 下载上下文 / Context of download
      */
-    default void onResponseWritten(DownloadContext context) {
+    default void beforeResponseWritten(DownloadContext context) {
 
     }
 
@@ -89,7 +89,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      *
      * @param context 下载上下文 / Context of download
      */
-    default void onContextDestroyed(DownloadContext context) {
+    default void beforeContextDestroyed(DownloadContext context) {
 
     }
 
@@ -99,7 +99,7 @@ public interface StandardDownloadHandlerInterceptor extends DownloadHandlerInter
      * @param handler 没有匹配到的处理器 / No matching handler
      * @param context 下载上下文 / Context of download
      */
-    default void onOtherHandled(DownloadHandler handler, DownloadContext context) {
+    default void beforeOtherHandled(DownloadHandler handler, DownloadContext context) {
 
     }
 }

@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @NoArgsConstructor
 @AllArgsConstructor
-public class DownloadConceptAdvice implements MethodInterceptor {
+public class DownloadAdvice implements MethodInterceptor {
 
     @NonNull
     @Getter
