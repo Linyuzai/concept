@@ -10,6 +10,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 /**
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
  * 如果需要压缩则会适配压缩器 / If compression is required, the compressor will be adapted
  * 将通过压缩器对下载源进行压缩 / The download source will be compressed by a compressor
  */
+@CommonsLog
 @AllArgsConstructor
 public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
@@ -31,11 +33,13 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        log.info("Compress download source");
         Source source = context.get(Source.class);
         return Mono.just(source).flatMap(it -> {
             boolean single = it.isSingle();
             boolean forceCompress = context.getOptions().isForceCompress();
             if (single && !forceCompress) {
+                log.info("Skip compression");
                 return Mono.just(new NoCompression(it));
             } else {
                 String compressFormat = context.getOptions().getCompressFormat();

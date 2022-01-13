@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
  * 自动执行调用链 / Auto execute call chain
  * 支持拦截 / Support interception
  */
+@Deprecated
 public interface AutomaticDownloadHandler extends DownloadHandler {
 
     @Override

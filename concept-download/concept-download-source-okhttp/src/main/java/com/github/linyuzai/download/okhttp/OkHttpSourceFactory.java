@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.apachecommons.CommonsLog;
 import okhttp3.OkHttpClient;
 import reactor.core.publisher.Mono;
 
@@ -15,6 +16,7 @@ import java.nio.charset.Charset;
 /**
  * 匹配http前缀，使用OkHttp加载的下载源的工厂 / The factory of the source witch match the HTTP prefix and use okhttp to load
  */
+@CommonsLog
 @Getter
 @Setter
 @AllArgsConstructor
@@ -39,14 +41,16 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
         Charset charset = context.getOptions().getCharset();
         boolean cacheEnabled = context.getOptions().isSourceCacheEnabled();
         String cachePath = context.getOptions().getSourceCachePath();
-        return Mono.just(new OkHttpSource.Builder<>()
+        OkHttpSource build = new OkHttpSource.Builder<>()
                 .client(client)
                 .url(url)
                 .asyncLoad(true)
                 .charset(charset)
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
-                .build());
+                .build();
+        log.info("Created " + source);
+        return Mono.just(build);
     }
 
     @Override

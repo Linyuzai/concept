@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.classpath;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 
@@ -11,6 +12,7 @@ import java.nio.charset.Charset;
 /**
  * 支持 {@link ClassPathResource} 对象的工厂 / Factory support {@link ClassPathResource}
  */
+@CommonsLog
 public class ClassPathResourceSourceFactory implements SourceFactory {
 
     @Override
@@ -21,9 +23,11 @@ public class ClassPathResourceSourceFactory implements SourceFactory {
     @Override
     public Mono<Source> create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return Mono.just(new ClassPathResourceSource.Builder<>()
+        ClassPathResourceSource build = new ClassPathResourceSource.Builder<>()
                 .resource((ClassPathResource) source)
                 .charset(charset)
-                .build());
+                .build();
+        log.info("Created " + build);
+        return Mono.just(build);
     }
 }

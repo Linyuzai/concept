@@ -6,6 +6,7 @@ import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.client.reactive.ClientHttpResponse;
@@ -18,13 +19,15 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Function;
 
+@CommonsLog
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource {
 
     @SuppressWarnings("all")
     @Override
-    public Mono<InputStream> doLoad(DownloadContext context) {
+    public Mono<InputStream> loadRemote(DownloadContext context) {
+        log.info("Loading " + this);
         return WebClient.create()
                 .get()
                 .uri(url)

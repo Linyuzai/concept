@@ -3,9 +3,11 @@ package com.github.linyuzai.download.core.source.http;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.load.AbstractLoadableSource;
+import com.github.linyuzai.download.core.load.RemoteLoadableSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.*;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -16,9 +18,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("all")
+@CommonsLog
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class HttpSource extends AbstractLoadableSource {
+public class HttpSource extends RemoteLoadableSource {
 
     @NonNull
     @Setter
@@ -66,7 +69,8 @@ public class HttpSource extends AbstractLoadableSource {
 
     @SneakyThrows
     @Override
-    public Mono<InputStream> doLoad(DownloadContext context) {
+    public Mono<InputStream> loadRemote(DownloadContext context) {
+        log.info("Loading " + this);
         URL u = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) u.openConnection();
         connection.setRequestMethod("GET");
@@ -115,16 +119,11 @@ public class HttpSource extends AbstractLoadableSource {
     }
 
     @SuppressWarnings("unchecked")
-    public static class Builder<T extends HttpSource, B extends Builder<T, B>> extends AbstractLoadableSource.Builder<T, B> {
+    public static class Builder<T extends HttpSource, B extends Builder<T, B>> extends RemoteLoadableSource.Builder<T, B> {
 
         protected String url;
 
         protected Map<String, String> headers;
-
-        public Builder() {
-            asyncLoad = true;
-            cacheEnabled = true;
-        }
 
         public B url(String url) {
             this.url = url;
@@ -150,9 +149,6 @@ public class HttpSource extends AbstractLoadableSource {
 
         @Override
         protected T build(T target) {
-            if (cacheEnabled && (cachePath == null || cachePath.isEmpty())) {
-                throw new DownloadException("Cache path is null or empty");
-            }
             target.setUrl(url);
             target.setHeaders(headers);
             return super.build(target);

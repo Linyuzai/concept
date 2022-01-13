@@ -1,9 +1,5 @@
 package com.github.linyuzai.download.core.concept;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -16,7 +12,6 @@ public interface Part {
 
     /**
      * @return 输入流 / Input stream
-     * @throws IOException I/O exception
      */
     InputStream getInputStream();
 
@@ -52,14 +47,5 @@ public interface Part {
      */
     default Collection<Part> getChildren() {
         return Collections.emptyList();
-    }
-
-    @Getter
-    @AllArgsConstructor
-    class Holder {
-
-        private Part part;
-
-        private InputStream inputStream;
     }
 }

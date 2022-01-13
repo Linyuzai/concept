@@ -5,11 +5,13 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 /**
  * 加载处理器 / A handler to process loads
  */
+@CommonsLog
 @AllArgsConstructor
 public class LoadSourceHandler implements DownloadHandler {
 
@@ -28,6 +30,7 @@ public class LoadSourceHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        log.info("Load download source");
         Source source = context.get(Source.class);
         return Mono.just(source)
                 .flatMap(it -> it.load(context))

@@ -1,5 +1,6 @@
 server:
   port: 8080
+#debug: true
 #concept:
 #  download:
 #    compress:

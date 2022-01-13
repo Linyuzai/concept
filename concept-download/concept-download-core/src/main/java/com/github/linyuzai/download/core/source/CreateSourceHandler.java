@@ -6,11 +6,13 @@ import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 /**
  * 下载源处理拦截器
  */
+@CommonsLog
 @AllArgsConstructor
 public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
@@ -23,6 +25,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        log.info("Create download source");
         Object source = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
         return factory.create(source, context).flatMap(it -> {

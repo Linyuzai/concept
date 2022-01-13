@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,7 @@ import java.io.OutputStream;
  * 抽象的Source压缩器 / Abstract class of source compressor
  * 进行了统一的缓存处理 / Unified cache processing
  */
+@CommonsLog
 public abstract class AbstractSourceCompressor implements SourceCompressor {
 
     /**
@@ -50,6 +52,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                                     return Mono.error(e);
                                 }
                             } else {
+                                log.info("Using compress cache " + c);
                                 return Mono.just(c);
                             }
                         }).map(c -> {
@@ -76,7 +79,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @param os     写入的输出流 / Output stream to write
      * @param writer 写入执行器 / Executor of writing
      */
-    public abstract Mono<?> doCompress(Source source, OutputStream os, DownloadWriter writer);
+    public abstract Mono<OutputStream> doCompress(Source source, OutputStream os, DownloadWriter writer);
 
     /**
      * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used

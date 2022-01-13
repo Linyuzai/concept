@@ -15,6 +15,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "concept.download")
 public class DownloadConfiguration {
 
+    private static boolean log = true;
+
     private ResponseConfiguration response = new ResponseConfiguration();
 
     private SourceConfiguration source = new SourceConfiguration();

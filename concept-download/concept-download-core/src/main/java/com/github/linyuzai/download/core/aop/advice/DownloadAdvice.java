@@ -10,6 +10,7 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadMethod;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.*;
+import lombok.extern.apachecommons.CommonsLog;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 /**
  * 切面方法拦截器 / Interceptor of method on advice
  */
+@CommonsLog
 @NoArgsConstructor
 @AllArgsConstructor
 public class DownloadAdvice implements MethodInterceptor {
@@ -40,9 +42,10 @@ public class DownloadAdvice implements MethodInterceptor {
      */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        Object returnValue = unwrapContainer(invocation.proceed());
         Method method = invocation.getMethod();
+        log.info("@Download advice on method " + method);
         Object[] arguments = invocation.getArguments();
+        Object returnValue = unwrapContainer(invocation.proceed());
         return downloadConcept.download(configuration ->
                 buildOptions(method, arguments, returnValue, configuration));
     }

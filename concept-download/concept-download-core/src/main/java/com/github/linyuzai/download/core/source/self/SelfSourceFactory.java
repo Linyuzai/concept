@@ -3,11 +3,13 @@ package com.github.linyuzai.download.core.source.self;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 /**
  * 本身就是下载源的工厂 / Factory of source itself
  */
+@CommonsLog
 public class SelfSourceFactory implements SourceFactory {
 
     /**
@@ -31,6 +33,7 @@ public class SelfSourceFactory implements SourceFactory {
      */
     @Override
     public Mono<Source> create(Object source, DownloadContext context) {
+        log.info("Created " + source);
         return Mono.just((Source) source);
     }
 }

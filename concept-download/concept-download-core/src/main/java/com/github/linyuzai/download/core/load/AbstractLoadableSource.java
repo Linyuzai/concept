@@ -9,6 +9,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
@@ -17,6 +18,7 @@ import java.io.*;
  * 需要预加载资源的抽象类 / Abstract classes that require preloaded resources
  * 需要注意数据流只能使用一次 / Note that stream can only be used once
  */
+@CommonsLog
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
@@ -79,7 +81,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
                                 try (InputStream inputStream = is;
-                                     FileOutputStream fos = new FileOutputStream(cache)) {
+                                     FileOutputStream fos = new FileOutputStream(it)) {
                                     writer.write(inputStream, fos, null, getCharset(), getLength());
                                     return it;
                                 } catch (Throwable e) {
@@ -87,6 +89,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                                 }
                             });
                 } else {
+                    log.info("Using source cache " + this + " => " + it);
                     return Mono.just(it);
                 }
             }).map(f -> {

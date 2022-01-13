@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.*;
+import lombok.extern.apachecommons.CommonsLog;
 import okhttp3.*;
 import reactor.core.publisher.Mono;
 
@@ -13,6 +14,7 @@ import java.io.InputStream;
  * 使用OkHttp加载资源 / Use OkHttp to load source
  */
 @SuppressWarnings("all")
+@CommonsLog
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OkHttpSource extends HttpSource {
@@ -23,7 +25,8 @@ public class OkHttpSource extends HttpSource {
 
     @SneakyThrows
     @Override
-    public Mono<InputStream> doLoad(DownloadContext context) {
+    public Mono<InputStream> loadRemote(DownloadContext context) {
+        log.info("Loading " + this);
         Request.Builder rb = new Request.Builder();
         rb.url(url);
         if (headers != null) {

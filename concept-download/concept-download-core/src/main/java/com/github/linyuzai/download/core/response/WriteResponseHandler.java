@@ -15,6 +15,7 @@ import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.Map;
 /**
  * 写响应处理器 / A handler to write response
  */
+@CommonsLog
 @AllArgsConstructor
 public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
 
@@ -43,6 +45,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        log.info("Write download response");
         Range range = context.get(Range.class);
         Compression compression = context.get(Compression.class);
         return Mono.just(compression).flatMap(c -> {
@@ -52,6 +55,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                     .flatMap(response -> Mono.just(c.getParts())
                             .flatMap(parts -> response.write(os -> {
                                 for (Part part : parts) {
+                                    log.info("Write part " + part.getName());
                                     writer.write(part.getInputStream(), os, range,
                                             part.getCharset(), part.getLength());
                                 }

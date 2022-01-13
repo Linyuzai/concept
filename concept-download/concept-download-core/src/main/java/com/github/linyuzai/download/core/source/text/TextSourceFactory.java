@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.text;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
@@ -10,6 +11,7 @@ import java.nio.charset.Charset;
 /**
  * 支持文本类型的下载源工厂 / Factory support text
  */
+@CommonsLog
 public class TextSourceFactory implements SourceFactory {
 
     /**
@@ -34,11 +36,13 @@ public class TextSourceFactory implements SourceFactory {
     @Override
     public Mono<Source> create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
-        return Mono.just(new TextSource.Builder<>()
+        TextSource build = new TextSource.Builder<>()
                 .text((String) source)
                 .name("text.txt")
                 .charset(charset)
-                .build());
+                .build();
+        log.info("Created " + source);
+        return Mono.just(build);
     }
 
     @Override

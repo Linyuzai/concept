@@ -29,6 +29,6 @@ public class MemoryCompression extends AbstractCompression {
 
     @Override
     public Long getLength() {
-        return null;
+        return (long) bytes.length;
     }
 }

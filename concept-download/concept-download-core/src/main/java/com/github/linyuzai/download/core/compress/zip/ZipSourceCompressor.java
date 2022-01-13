@@ -8,6 +8,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
@@ -19,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * 使用ZIP压缩的压缩器 / Compressor using zip compression
  */
+@CommonsLog
 @AllArgsConstructor
 public class ZipSourceCompressor extends AbstractSourceCompressor {
 
@@ -43,9 +45,10 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      */
     @SuppressWarnings("all")
     @Override
-    public Mono<?> doCompress(Source source, OutputStream os, DownloadWriter writer) {
+    public Mono<OutputStream> doCompress(Source source, OutputStream os, DownloadWriter writer) {
+        log.info("Zip compression");
         return Mono.just(source.getParts())
-                .map(parts -> {
+                .flatMap(parts -> {
                     try (ZipOutputStream zos = newZipOutputStream(source, os)) {
                         for (Part part : parts) {
                             InputStream is = part.getInputStream();
@@ -53,7 +56,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
                             writer.write(is, zos, null, part.getCharset(), part.getLength());
                             zos.closeEntry();
                         }
-                        return parts;
+                        return Mono.just(zos);
                     } catch (Throwable e) {
                         return Mono.error(e);
                     }

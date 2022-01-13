@@ -9,15 +9,16 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
 /**
  * 基于链式处理的下载接口实现 / Implementation of download interface based on chain of handler
  */
+@CommonsLog
 @Getter
 @AllArgsConstructor
 public class ChainDownloadConcept implements DownloadConcept {
@@ -38,11 +39,11 @@ public class ChainDownloadConcept implements DownloadConcept {
      * 执行下载处理链 / Execute download handler chain
      *
      * @param function 可以通过下载配置来返回一个下载参数 / return an options from the configuration
-     * @throws IOException I/O exception
      */
     @Override
-    public Object download(Function<DownloadConfiguration, DownloadOptions> function) throws IOException {
+    public Object download(Function<DownloadConfiguration, DownloadOptions> function) {
         DownloadOptions options = function.apply(configuration);
+        log.info("Download options build " + options);
         Mono<DownloadContext> context = contextFactory.create(options);
         Mono<Void> mono = context.publishOn(scheduler.getScheduler())
                 .flatMap(it -> new DownloadHandlerChainImpl(0, handlers).next(it));
