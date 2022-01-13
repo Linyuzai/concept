@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -21,9 +22,18 @@ public class TextSource extends AbstractSource {
 
     protected byte[] bytes;
 
+    protected InputStream bytesInputStream;
+
     @Override
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(getBytes());
+        return open();
+    }
+
+    private InputStream open() {
+        if (bytesInputStream == null) {
+            bytesInputStream = new ByteArrayInputStream(getBytes());
+        }
+        return bytesInputStream;
     }
 
     @Override
@@ -57,6 +67,17 @@ public class TextSource extends AbstractSource {
     @Override
     public boolean isSingle() {
         return true;
+    }
+
+    @Override
+    public void release() {
+        if (bytesInputStream != null) {
+            try {
+                bytesInputStream.close();
+            } catch (Throwable ignore) {
+            }
+        }
+        bytesInputStream = null;
     }
 
     @Override

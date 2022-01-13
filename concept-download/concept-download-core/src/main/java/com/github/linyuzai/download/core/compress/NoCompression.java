@@ -45,4 +45,9 @@ public class NoCompression implements Compression {
     public Collection<Part> getParts() {
         return source.getParts();
     }
+
+    @Override
+    public void release() {
+        source.release();
+    }
 }

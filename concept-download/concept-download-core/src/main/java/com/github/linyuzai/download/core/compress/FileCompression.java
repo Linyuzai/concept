@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.contenttype.ContentType;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -11,18 +11,30 @@ import java.io.InputStream;
 /**
  * 文件压缩 / File compression
  */
-@AllArgsConstructor
 public class FileCompression extends AbstractCompression {
 
     protected File file;
 
+    protected InputStream fileInputStream;
+
+    public FileCompression(@NonNull File file) {
+        this.file = file;
+    }
+
     /**
      * @return 文件输入流 / File input stream
      */
-    @SneakyThrows
     @Override
     public InputStream getInputStream() {
-        return new FileInputStream(file);
+        return open();
+    }
+
+    @SneakyThrows
+    private InputStream open() {
+        if (fileInputStream == null) {
+            fileInputStream = new FileInputStream(file);
+        }
+        return fileInputStream;
     }
 
     /**
@@ -95,5 +107,16 @@ public class FileCompression extends AbstractCompression {
         if (isCacheEnabled() && isCacheExisted()) {
             boolean delete = file.delete();
         }
+    }
+
+    @Override
+    public void release() {
+        if (fileInputStream != null) {
+            try {
+                fileInputStream.close();
+            } catch (Throwable ignore) {
+            }
+        }
+        fileInputStream = null;
     }
 }

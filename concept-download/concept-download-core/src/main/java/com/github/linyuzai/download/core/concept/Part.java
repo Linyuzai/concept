@@ -48,4 +48,7 @@ public interface Part {
     default Collection<Part> getChildren() {
         return Collections.emptyList();
     }
+
+    default void release() {
+    }
 }

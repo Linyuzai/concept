@@ -128,6 +128,17 @@ public class FileSource extends AbstractSource {
     }
 
     @Override
+    public void release() {
+        if (fileInputStream != null) {
+            try {
+                fileInputStream.close();
+            } catch (Throwable ignore) {
+            }
+        }
+        fileInputStream = null;
+    }
+
+    @Override
     public String toString() {
         return "FileSource{" +
                 "file=" + file +
