@@ -25,7 +25,7 @@ public class WebClientSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        log.info("Created " + build);
+        context.log("[Create source] " + build);
         return Mono.just(build);
     }
 

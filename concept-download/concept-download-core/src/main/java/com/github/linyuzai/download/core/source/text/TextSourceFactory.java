@@ -41,7 +41,7 @@ public class TextSourceFactory implements SourceFactory {
                 .name("text.txt")
                 .charset(charset)
                 .build();
-        log.info("Created " + source);
+        context.log("[Create source] " + source);
         return Mono.just(build);
     }
 

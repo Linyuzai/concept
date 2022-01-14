@@ -202,30 +202,42 @@ public class DownloadConceptCoreAutoConfiguration {
         return new CreateSourceHandler(adapter);
     }
 
-    @Bean
+    /*@Bean
     @ConditionalOnMissingBean
     public SourceLoaderInvoker sourceLoaderInvoker() {
         return new SerialSourceLoaderInvoker();
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     @ConditionalOnMissingBean
     public SourceLoadExceptionHandler sourceLoadExceptionHandler() {
         return new RethrowLoadedSourceLoadExceptionHandler();
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     @ConditionalOnMissingBean
     public SourceLoaderFactory sourceLoaderFactory(SourceLoadExceptionHandler handler) {
         return new ExceptionCaughtSourceLoaderFactory(handler);
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     @ConditionalOnMissingBean
     public LoadSourceHandler loadSourceHandler(SourceLoaderFactory factory,
                                                SourceLoaderInvoker invoker,
                                                SourceLoadExceptionHandler handler) {
         return new LoadSourceHandler(factory, invoker, handler);
+    }*/
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SourceLoader sourceLoader() {
+        return new DefaultSourceLoader();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LoadSourceHandler loadSourceHandler(SourceLoader loader) {
+        return new LoadSourceHandler(loader);
     }
 
     @Bean

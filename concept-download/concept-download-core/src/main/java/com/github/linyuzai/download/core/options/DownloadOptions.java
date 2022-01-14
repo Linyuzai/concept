@@ -106,6 +106,8 @@ public class DownloadOptions {
      */
     Map<String, String> headers;
 
+    boolean logEnabled;
+
     /**
      * 提供支持任意Request的接口 / Provide an interface that supports any request
      */

@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
  */
 @Getter
 @Setter
-public abstract class DownloadResource implements Downloadable {
+public abstract class DownloadResource extends AbstractPart implements Downloadable {
 
     protected String name;
 

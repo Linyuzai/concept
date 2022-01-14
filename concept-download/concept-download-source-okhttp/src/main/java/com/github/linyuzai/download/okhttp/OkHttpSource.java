@@ -26,7 +26,7 @@ public class OkHttpSource extends HttpSource {
     @SneakyThrows
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
-        log.info("Loading " + this);
+        context.log("[Load source] " + this + " will be load by OkHttp");
         Request.Builder rb = new Request.Builder();
         rb.url(url);
         if (headers != null) {

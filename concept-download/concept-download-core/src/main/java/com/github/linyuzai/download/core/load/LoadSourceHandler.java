@@ -11,15 +11,16 @@ import reactor.core.publisher.Mono;
 /**
  * 加载处理器 / A handler to process loads
  */
-@CommonsLog
 @AllArgsConstructor
 public class LoadSourceHandler implements DownloadHandler {
 
-    private SourceLoaderFactory sourceLoaderFactory;
+    //private SourceLoaderFactory sourceLoaderFactory;
 
-    private SourceLoaderInvoker sourceLoaderInvoker;
+    //private SourceLoaderInvoker sourceLoaderInvoker;
 
-    private SourceLoadExceptionHandler sourceLoadExceptionHandler;
+    //private SourceLoadExceptionHandler sourceLoadExceptionHandler;
+
+    private SourceLoader sourceLoader;
 
     /**
      * 将所有的Source封装成对应的加载器 / Encapsulate all sources into corresponding loaders
@@ -30,10 +31,8 @@ public class LoadSourceHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        log.info("Load download source");
         Source source = context.get(Source.class);
-        return Mono.just(source)
-                .flatMap(it -> it.load(context))
+        return sourceLoader.load(source, context)
                 .flatMap(it -> chain.next(context));
         /*return source.flatMap(it -> {
             Collection<SourceLoader> loaders = new ArrayList<>();

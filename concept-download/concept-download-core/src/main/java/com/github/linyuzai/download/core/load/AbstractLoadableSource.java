@@ -22,8 +22,6 @@ import java.io.*;
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
-    protected InputStream inputStream;
-
     /**
      * 如果需要异步加载 / If asynchronous loading is required
      * 在启用缓存并存在缓存的情况下 / With cache enabled and cache present
@@ -56,6 +54,10 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      */
     @Override
     public Mono<Source> load(DownloadContext context) {
+        if (inputStream != null) {
+            context.log("[Load source] " + this + " is already loaded, skip!");
+            return Mono.just(this);
+        }
         if (isCacheEnabled()) {
             String cachePath = getCachePath();
             if (cachePath == null) {
@@ -77,19 +79,19 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             return Mono.just(cache).flatMap(it -> {
                 if (!it.exists()) {
                     return doLoad(context)
-                            .map(is -> {
+                            .flatMap(is -> {
                                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
                                 DownloadWriter writer = writerAdapter.getWriter(this, null, context);
                                 try (InputStream inputStream = is;
                                      FileOutputStream fos = new FileOutputStream(it)) {
                                     writer.write(inputStream, fos, null, getCharset(), getLength());
-                                    return it;
+                                    return Mono.just(it);
                                 } catch (Throwable e) {
-                                    throw new DownloadException(e);
+                                    return Mono.error(new DownloadException(e));
                                 }
                             });
                 } else {
-                    log.info("Using source cache " + this + " => " + it);
+                    context.log("[Load source] " + this + " using cache " + it);
                     return Mono.just(it);
                 }
             }).map(f -> {
@@ -111,17 +113,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 inputStream = is;
                 return this;
             });
-            /*return doLoad(context).map(is -> {
-                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                writer.write(is, os, null, getCharset(), getLength());
-                return new ByteArrayInputStream(os.toByteArray());
-            }).map(is -> {
-                inputStream = is;
-                return this;
-            });*/
         }
+    }
+
+    @Override
+    public InputStream openInputStream() {
+        return inputStream;
     }
 
     /**

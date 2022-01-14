@@ -11,6 +11,7 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,13 +34,12 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        log.info("Compress download source");
         Source source = context.get(Source.class);
         return Mono.just(source).flatMap(it -> {
             boolean single = it.isSingle();
             boolean forceCompress = context.getOptions().isForceCompress();
             if (single && !forceCompress) {
-                log.info("Skip compression");
+                context.log("[Compress source] " + it + " skip compress");
                 return Mono.just(new NoCompression(it));
             } else {
                 String compressFormat = context.getOptions().getCompressFormat();
@@ -74,12 +74,13 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      */
     @Override
     public void destroy(DownloadContext context) {
-        boolean delete = context.getOptions().isCompressCacheDelete();
-        if (delete) {
-            Compression compression = context.get(Compression.class);
-            if (compression != null) {
+        Compression compression = context.get(Compression.class);
+        if (compression != null) {
+            boolean delete = context.getOptions().isCompressCacheDelete();
+            if (delete) {
                 compression.deleteCache();
             }
+            compression.release();
         }
     }
 

@@ -5,7 +5,6 @@ import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -25,15 +24,8 @@ public class TextSource extends AbstractSource {
     protected InputStream bytesInputStream;
 
     @Override
-    public InputStream getInputStream() {
-        return open();
-    }
-
-    private InputStream open() {
-        if (bytesInputStream == null) {
-            bytesInputStream = new ByteArrayInputStream(getBytes());
-        }
-        return bytesInputStream;
+    public InputStream openInputStream() {
+        return new ByteArrayInputStream(getBytes());
     }
 
     @Override

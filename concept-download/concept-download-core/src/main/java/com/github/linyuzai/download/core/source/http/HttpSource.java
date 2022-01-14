@@ -70,7 +70,7 @@ public class HttpSource extends RemoteLoadableSource {
     @SneakyThrows
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
-        log.info("Loading " + this);
+        context.log("[Load source] " + this + " will be load by Http(s)URLConnection");
         URL u = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) u.openConnection();
         connection.setRequestMethod("GET");

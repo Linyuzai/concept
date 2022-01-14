@@ -19,7 +19,7 @@ public class ClassPathResourceSource extends AbstractSource {
 
     @SneakyThrows
     @Override
-    public InputStream getInputStream() {
+    public InputStream openInputStream() {
         return resource.getInputStream();
     }
 

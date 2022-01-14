@@ -41,7 +41,7 @@ public class FileSourceFactory implements SourceFactory {
                 .file((File) source)
                 .charset(charset)
                 .build();
-        log.info("Created " + build);
+        context.log("[Create source] " + build);
         return Mono.just(build);
     }
 }

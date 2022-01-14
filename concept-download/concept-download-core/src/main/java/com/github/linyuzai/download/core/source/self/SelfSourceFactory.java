@@ -33,7 +33,7 @@ public class SelfSourceFactory implements SourceFactory {
      */
     @Override
     public Mono<Source> create(Object source, DownloadContext context) {
-        log.info("Created " + source);
+        context.log("[Create source] " + source);
         return Mono.just((Source) source);
     }
 }

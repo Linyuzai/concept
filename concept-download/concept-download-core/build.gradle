@@ -20,6 +20,7 @@ dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-aop:${springBootVersion}"
     //compile "cglib:cglib:${cglibVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"

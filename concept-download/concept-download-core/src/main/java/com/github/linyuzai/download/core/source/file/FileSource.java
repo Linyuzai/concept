@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 文件下载源 / A source that holds a file
@@ -24,19 +25,12 @@ public class FileSource extends AbstractSource {
     @Setter
     protected File file;
 
-    private FileInputStream fileInputStream;
-
-    @Override
-    public InputStream getInputStream() {
-        return file.isFile() ? open() : new EmptyInputStream();
-    }
+    protected Part part;
 
     @SneakyThrows
-    private InputStream open() {
-        if (fileInputStream == null) {
-            fileInputStream = new FileInputStream(file);
-        }
-        return fileInputStream;
+    @Override
+    public InputStream openInputStream() {
+        return file.isFile() ? new FileInputStream(file) : new EmptyInputStream();
     }
 
     /**
@@ -117,25 +111,29 @@ public class FileSource extends AbstractSource {
     }
 
     /**
+     * 每次都新建，返回文件目录的实时结构
+     *
      * @return 返回一个文件或整个目录结构 / Returns a file or the entire directory structure
      */
     @Override
     public Collection<Part> getParts() {
+        if (part != null) {
+            part.release();
+        }
         String name = getName();
-        Collection<Part> parts = new ArrayList<>();
-        Downloadable.addPart(new FilePart(file, name, name), parts);
+        part = new FilePart(file, name, name);
+        List<Part> parts = new ArrayList<>();
+        Downloadable.addPart(part, parts);
         return parts;
     }
 
     @Override
     public void release() {
-        if (fileInputStream != null) {
-            try {
-                fileInputStream.close();
-            } catch (Throwable ignore) {
-            }
+        super.release();
+        if (part != null) {
+            part.release();
+            part = null;
         }
-        fileInputStream = null;
     }
 
     @Override

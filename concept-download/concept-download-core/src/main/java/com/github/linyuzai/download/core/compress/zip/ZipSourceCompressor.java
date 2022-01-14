@@ -51,6 +51,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
                 .flatMap(parts -> {
                     try (ZipOutputStream zos = newZipOutputStream(source, os)) {
                         for (Part part : parts) {
+                            log.info("Zip entry " + part.getPath() + part.getName());
                             InputStream is = part.getInputStream();
                             zos.putNextEntry(new ZipEntry(part.getPath()));
                             writer.write(is, zos, null, part.getCharset(), part.getLength());

@@ -16,4 +16,8 @@ server:
 #      cache:
 #        enabled: true
 #        delete: true
+concept:
+  download:
+    log:
+      enabled: true
 #        path: /s

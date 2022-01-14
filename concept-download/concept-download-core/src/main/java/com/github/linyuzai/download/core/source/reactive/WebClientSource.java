@@ -27,7 +27,7 @@ public class WebClientSource extends HttpSource {
     @SuppressWarnings("all")
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
-        log.info("Loading " + this);
+        context.log("[Load source] " + this + " will be load by WebClient(webflux)");
         return WebClient.create()
                 .get()
                 .uri(url)

@@ -52,7 +52,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                                     return Mono.error(e);
                                 }
                             } else {
-                                log.info("Using compress cache " + c);
+                                context.log("[Compress source] " + it + " use compress cache " + c);
                                 return Mono.just(c);
                             }
                         }).map(c -> {

@@ -49,7 +49,7 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        log.info("Created " + source);
+        context.log("[Create source] " + build);
         return Mono.just(build);
     }
 

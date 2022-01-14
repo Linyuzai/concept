@@ -1,12 +1,19 @@
 package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import org.apache.commons.logging.Log;
 
 /**
  * 下载上下文 / Context of download
  * 在下载操作中提供数据的隔离和共享 / Provides data isolation and sharing during download operations
  */
 public interface DownloadContext {
+
+    void log(String message);
+
+    void log(String log, String message);
+
+    void log(Log log, String message);
 
     /**
      * @return 下载参数 / Download options

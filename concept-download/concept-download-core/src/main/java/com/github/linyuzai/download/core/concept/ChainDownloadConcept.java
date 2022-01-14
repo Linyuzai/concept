@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.function.Function;
@@ -18,7 +19,6 @@ import java.util.function.Function;
 /**
  * 基于链式处理的下载接口实现 / Implementation of download interface based on chain of handler
  */
-@CommonsLog
 @Getter
 @AllArgsConstructor
 public class ChainDownloadConcept implements DownloadConcept {
@@ -43,10 +43,8 @@ public class ChainDownloadConcept implements DownloadConcept {
     @Override
     public Object download(Function<DownloadConfiguration, DownloadOptions> function) {
         DownloadOptions options = function.apply(configuration);
-        log.info("Download options build " + options);
         Mono<DownloadContext> context = contextFactory.create(options);
-        Mono<Void> mono = context.publishOn(scheduler.getScheduler())
-                .flatMap(it -> new DownloadHandlerChainImpl(0, handlers).next(it));
+        Mono<Void> mono = context.flatMap(it -> new DownloadHandlerChainImpl(0, handlers).next(it));
         return returnInterceptor.intercept(mono);
     }
 }

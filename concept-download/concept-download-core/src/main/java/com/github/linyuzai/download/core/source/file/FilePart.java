@@ -1,8 +1,10 @@
 package com.github.linyuzai.download.core.source.file;
 
+import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -16,8 +18,9 @@ import java.util.Collections;
 /**
  * 文件目录结构支持 / File directory structure support
  */
+@Getter
 @AllArgsConstructor
-public class FilePart implements Part {
+public class FilePart extends AbstractPart {
 
     protected File file;
 
@@ -27,7 +30,7 @@ public class FilePart implements Part {
 
     @SneakyThrows
     @Override
-    public InputStream getInputStream() {
+    public InputStream openInputStream() {
         return file.isFile() ? new FileInputStream(file) : new EmptyInputStream();
     }
 

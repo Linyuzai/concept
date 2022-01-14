@@ -25,7 +25,6 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        log.info("Create download source");
         Object source = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
         return factory.create(source, context).flatMap(it -> {
@@ -36,17 +35,25 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
 
     @Override
     public void initialize(DownloadContext context) {
+        context.log("[Initialize context] set SourceFactoryAdapter to context");
         context.set(SourceFactoryAdapter.class, sourceFactoryAdapter);
     }
 
     @Override
     public void destroy(DownloadContext context) {
-        boolean delete = context.getOptions().isSourceCacheDelete();
-        if (delete) {
-            Source source = context.get(Source.class);
-            if (source != null) {
+        Source source = context.get(Source.class);
+        if (source != null) {
+            boolean delete = context.getOptions().isSourceCacheDelete();
+            if (delete) {
+                if (context.getOptions().isLogEnabled()) {
+                    context.log("[Destroy context] delete source cache");
+                }
                 source.deleteCache();
             }
+            if (context.getOptions().isLogEnabled()) {
+                context.log("[Destroy context] release source");
+            }
+            source.release();
         }
     }
 

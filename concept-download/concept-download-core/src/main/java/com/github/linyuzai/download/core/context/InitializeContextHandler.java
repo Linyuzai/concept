@@ -4,7 +4,6 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
  * 在上下文创建之后执行 / After context creation
  * 调用所有的上下文初始化器 / Call all initializers {@link DownloadContextInitializer#initialize(DownloadContext)}
  */
-@CommonsLog
 @AllArgsConstructor
 public class InitializeContextHandler implements DownloadHandler {
 
@@ -28,7 +26,6 @@ public class InitializeContextHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        log.info("Initialize download context");
         for (DownloadContextInitializer initializer : initializers) {
             initializer.initialize(context);
         }

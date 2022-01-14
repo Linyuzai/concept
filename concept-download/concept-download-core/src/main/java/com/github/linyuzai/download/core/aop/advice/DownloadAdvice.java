@@ -23,7 +23,6 @@ import java.util.Map;
 /**
  * 切面方法拦截器 / Interceptor of method on advice
  */
-@CommonsLog
 @NoArgsConstructor
 @AllArgsConstructor
 public class DownloadAdvice implements MethodInterceptor {
@@ -43,7 +42,6 @@ public class DownloadAdvice implements MethodInterceptor {
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
-        log.info("@Download advice on method " + method);
         Object[] arguments = invocation.getArguments();
         Object returnValue = unwrapContainer(invocation.proceed());
         return downloadConcept.download(configuration ->
@@ -108,6 +106,7 @@ public class DownloadAdvice implements MethodInterceptor {
                 .forceCompress(download.forceCompress())
                 .charset(buildCharset(download))
                 .headers(buildHeaders(download, configuration))
+                .logEnabled(configuration.getLog().isEnabled())
                 .extra(download.extra());
 
         if (sourceCache == null) {
