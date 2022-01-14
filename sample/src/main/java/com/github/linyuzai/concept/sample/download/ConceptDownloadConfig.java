@@ -44,10 +44,10 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
         };
     }*/
 
-    @Bean
+    /*@Bean
     public SourceLoader sourceLoader() {
         return new BlockSchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(5)));
-    }
+    }*/
 
     //@Bean
     /*public SourceLoadExceptionHandler sourceLoadExceptionHandler() {

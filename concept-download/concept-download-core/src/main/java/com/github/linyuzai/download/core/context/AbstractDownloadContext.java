@@ -33,7 +33,7 @@ public abstract class AbstractDownloadContext implements DownloadContext {
             log(log, message);
         } else {
             Method method = downloadMethod.getMethod();
-            log(method.getDeclaringClass().getSimpleName() + "." + method.getName(), message);
+            log(method.getDeclaringClass().getSimpleName() + "#" + method.getName(), message);
         }
     }
 

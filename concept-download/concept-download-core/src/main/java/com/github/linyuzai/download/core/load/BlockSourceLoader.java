@@ -23,8 +23,8 @@ public abstract class BlockSourceLoader extends AsyncSourceLoader {
                 .collect(Collectors.toList());
         try {
             List<Source> block = Mono.zip(monoList, objects -> Arrays.stream(objects)
-                    .map(Source.class::cast)
-                    .collect(Collectors.toList())).block();
+                            .map(Source.class::cast)
+                            .collect(Collectors.toList())).block();
             return Mono.just(new MultipleSource(block == null ? Collections.emptyList() : block));
         } catch (Throwable e) {
             return Mono.error(e);

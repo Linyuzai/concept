@@ -1,4 +1,3 @@
-/*
 package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.aop.annotation.Download;
@@ -29,10 +28,7 @@ public class ConceptDownloadReactiveController {
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=video.mp4");
         response.getHeaders().setContentType(MediaType.parseMediaType("video/mpeg4"));
         File file = new File("/Users/Shared/video.mp4");
-        return zeroCopyResponse.writeWith(file, 0, file.length())
-                .doOnNext(context -> System.out.println("Next"))
-                .doOnSubscribe(subscription -> System.out.println("Subscribe"))
-                .doOnSuccess(context -> System.out.println("Success"));
+        return zeroCopyResponse.writeWith(file, 0, file.length());
     }
 
     @Download
@@ -51,4 +47,3 @@ public class ConceptDownloadReactiveController {
         return new DownloadMono(businessModels);
     }
 }
-*/
