@@ -2,17 +2,7 @@ package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
-import com.github.linyuzai.download.core.load.BlockSchedulerSourceLoader;
-import com.github.linyuzai.download.core.load.SourceLoadException;
-import com.github.linyuzai.download.core.load.SourceLoader;
-import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.Collection;
-import java.util.concurrent.Executors;
 
 @Configuration
 public class ConceptDownloadConfig implements DownloadConfigurer {

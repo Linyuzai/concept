@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class AsyncSourceLoader implements SourceLoader {
+public abstract class ConcurrentSourceLoader implements SourceLoader {
 
     @Getter
     @Setter
@@ -40,7 +40,7 @@ public abstract class AsyncSourceLoader implements SourceLoader {
                     monoList.add(s.load(context));
                 }
             } else {
-                monoList.add(loadAsync(asyncSources, context));
+                monoList.add(concurrentLoad(asyncSources, context));
             }
         }
         List<Mono<Source>> syncMonoList = syncSources.stream()
@@ -50,5 +50,5 @@ public abstract class AsyncSourceLoader implements SourceLoader {
         return Mono.zip(monoList, objects -> objects).map(it -> source);
     }
 
-    public abstract Mono<Source> loadAsync(Collection<Source> sources, DownloadContext context);
+    public abstract Mono<Source> concurrentLoad(Collection<Source> sources, DownloadContext context);
 }
