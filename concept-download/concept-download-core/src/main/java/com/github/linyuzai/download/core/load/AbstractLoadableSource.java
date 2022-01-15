@@ -87,22 +87,22 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                                     writer.write(inputStream, fos, null, getCharset(), getLength());
                                     return Mono.just(it);
                                 } catch (Throwable e) {
-                                    return Mono.error(new DownloadException(e));
+                                    return Mono.error(e);
                                 }
                             });
                 } else {
                     context.log("[Load source] " + this + " using cache " + it);
                     return Mono.just(it);
                 }
-            }).map(f -> {
+            }).flatMap(f -> {
                 String contentType = getContentType();
                 if (contentType == null || contentType.isEmpty()) {
                     setContentType(ContentType.file(f));
                 }
                 try {
-                    return new FileInputStream(f);
+                    return Mono.just(new FileInputStream(f));
                 } catch (FileNotFoundException e) {
-                    throw new DownloadException(e);
+                    return Mono.error(e);
                 }
             }).map(fis -> {
                 inputStream = fis;

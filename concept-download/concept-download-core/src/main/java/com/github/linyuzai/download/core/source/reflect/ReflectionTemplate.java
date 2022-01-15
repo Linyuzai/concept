@@ -6,6 +6,7 @@ import com.github.linyuzai.download.core.source.reflect.conversion.ValueConversi
 import com.github.linyuzai.download.core.source.reflect.conversion.ValueConvertor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -111,11 +112,7 @@ public class ReflectionTemplate {
      * @return 值 / Value
      */
     public Object value(Class<? extends Annotation> annotation, Object model) {
-        try {
-            return reflectorMap.get(annotation).reflect(model);
-        } catch (ReflectiveOperationException e) {
-            throw new DownloadException(e);
-        }
+        return reflectorMap.get(annotation).reflect(model);
     }
 
     /**
@@ -127,60 +124,57 @@ public class ReflectionTemplate {
      * @see ValueConversion
      * @see ValueConvertor
      */
+    @SneakyThrows
     public void reflect(Object model, Source source) {
-        try {
-            for (Map.Entry<Class<? extends Annotation>, Reflector> entry : reflectorMap.entrySet()) {
-                SourceReflection reflection = entry.getKey().getAnnotation(SourceReflection.class);
-                String methodName = reflection.methodName();
-                if (methodName.isEmpty()) {
-                    String fieldName = reflection.fieldName();
-                    if (fieldName.isEmpty()) {
-                        //Ignore SourceObject
-                    } else {
-                        Object reflect = entry.getValue().reflect(model);
-                        if (reflect == null) {
-                            continue;
-                        }
-                        Field field = getReflectField(source.getClass(), fieldName);
-                        if (field == null) {
-                            throw new NoSuchFieldException(fieldName);
-                        }
-                        Class<?> type = field.getType();
-                        Object value;
-                        if (type.isInstance(reflect)) {
-                            value = reflect;
-                        } else {
-                            value = convertValue(reflect, type);
-                        }
-                        if (!field.isAccessible()) {
-                            field.setAccessible(true);
-                        }
-                        field.set(source, value);
-                    }
+        for (Map.Entry<Class<? extends Annotation>, Reflector> entry : reflectorMap.entrySet()) {
+            SourceReflection reflection = entry.getKey().getAnnotation(SourceReflection.class);
+            String methodName = reflection.methodName();
+            if (methodName.isEmpty()) {
+                String fieldName = reflection.fieldName();
+                if (fieldName.isEmpty()) {
+                    //Ignore SourceObject
                 } else {
                     Object reflect = entry.getValue().reflect(model);
                     if (reflect == null) {
                         continue;
                     }
-                    Class<?> parameterType = reflection.methodParameterType();
+                    Field field = getReflectField(source.getClass(), fieldName);
+                    if (field == null) {
+                        throw new NoSuchFieldException(fieldName);
+                    }
+                    Class<?> type = field.getType();
                     Object value;
-                    if (parameterType.isInstance(reflect)) {
+                    if (type.isInstance(reflect)) {
                         value = reflect;
                     } else {
-                        value = convertValue(reflect, parameterType);
+                        value = convertValue(reflect, type);
                     }
-                    Method method = getReflectMethod(source.getClass(), methodName, parameterType);
-                    if (method == null) {
-                        throw new NoSuchMethodException(methodName);
+                    if (!field.isAccessible()) {
+                        field.setAccessible(true);
                     }
-                    if (!method.isAccessible()) {
-                        method.setAccessible(true);
-                    }
-                    method.invoke(source, value);
+                    field.set(source, value);
                 }
+            } else {
+                Object reflect = entry.getValue().reflect(model);
+                if (reflect == null) {
+                    continue;
+                }
+                Class<?> parameterType = reflection.methodParameterType();
+                Object value;
+                if (parameterType.isInstance(reflect)) {
+                    value = reflect;
+                } else {
+                    value = convertValue(reflect, parameterType);
+                }
+                Method method = getReflectMethod(source.getClass(), methodName, parameterType);
+                if (method == null) {
+                    throw new NoSuchMethodException(methodName);
+                }
+                if (!method.isAccessible()) {
+                    method.setAccessible(true);
+                }
+                method.invoke(source, value);
             }
-        } catch (Throwable e) {
-            throw new DownloadException(e);
         }
     }
 

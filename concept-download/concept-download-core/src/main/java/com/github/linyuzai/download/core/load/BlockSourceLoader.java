@@ -3,13 +3,11 @@ package com.github.linyuzai.download.core.load;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.multiple.MultipleSource;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class BlockSourceLoader extends AsyncSourceLoader {
@@ -21,14 +19,17 @@ public abstract class BlockSourceLoader extends AsyncSourceLoader {
                         .publishOn(getScheduler(context))
                         .flatMap(s -> s.load(context)))
                 .collect(Collectors.toList());
-        try {
-            List<Source> block = Mono.zip(monoList, objects -> Arrays.stream(objects)
-                            .map(Source.class::cast)
-                            .collect(Collectors.toList())).block();
-            return Mono.just(new MultipleSource(block == null ? Collections.emptyList() : block));
-        } catch (Throwable e) {
-            return Mono.error(e);
-        }
+        List<Source> result = new ArrayList<>();
+        Disposable disposable = Mono.zip(monoList, objects -> Arrays.stream(objects)
+                        .map(Source.class::cast)
+                        .collect(Collectors.toList()))
+                .subscribe(result::addAll, e -> {
+
+                });
+
+        return Mono.just(new MultipleSource(result))
+                .doOnCancel(disposable::dispose)
+                .map(Source.class::cast);
     }
 
     public abstract Scheduler getScheduler(DownloadContext context);

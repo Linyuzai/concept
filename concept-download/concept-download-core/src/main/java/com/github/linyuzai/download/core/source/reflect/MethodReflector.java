@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.source.reflect;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
 
@@ -19,8 +20,9 @@ public class MethodReflector implements Reflector {
         }
     }
 
+    @SneakyThrows
     @Override
-    public Object reflect(Object model) throws ReflectiveOperationException {
+    public Object reflect(Object model) {
         return method.invoke(model);
     }
 }

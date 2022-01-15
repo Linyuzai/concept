@@ -28,14 +28,10 @@ public class DestroyContextHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        try {
-            for (DownloadContextDestroyer destroyer : destroyers) {
-                destroyer.destroy(context);
-            }
-            context.destroy();
-        } catch (Throwable e) {
-            return Mono.error(e);
+        for (DownloadContextDestroyer destroyer : destroyers) {
+            destroyer.destroy(context);
         }
+        context.destroy();
         return chain.next(context);
     }
 

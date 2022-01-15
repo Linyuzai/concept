@@ -15,12 +15,15 @@ import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 写响应处理器 / A handler to write response
@@ -51,16 +54,17 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
         return downloadResponseProvider.getResponse(context)
                 .map(response -> applyHeaders(response, compression, context))
-                .flatMap(response -> response.write(os -> {
-                    Collection<Part> parts = compression.getParts();
-                    for (Part part : parts) {
-                        writer.write(part.getInputStream(), os, range,
-                                part.getCharset(), part.getLength());
-                    }
-                    try {
+                .flatMap(response -> response.write(new Consumer<OutputStream>() {
+
+                    @SneakyThrows
+                    @Override
+                    public void accept(OutputStream os) {
+                        Collection<Part> parts = compression.getParts();
+                        for (Part part : parts) {
+                            writer.write(part.getInputStream(), os, range,
+                                    part.getCharset(), part.getLength());
+                        }
                         os.flush();
-                    } catch (IOException e) {
-                        throw new DownloadException(e);
                     }
                 })).flatMap(it -> chain.next(context));
     }

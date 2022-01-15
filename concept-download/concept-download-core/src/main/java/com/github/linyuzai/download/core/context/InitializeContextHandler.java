@@ -26,12 +26,8 @@ public class InitializeContextHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        try {
-            for (DownloadContextInitializer initializer : initializers) {
-                initializer.initialize(context);
-            }
-        } catch (Throwable e) {
-            return Mono.error(e);
+        for (DownloadContextInitializer initializer : initializers) {
+            initializer.initialize(context);
         }
         return chain.next(context);
     }
