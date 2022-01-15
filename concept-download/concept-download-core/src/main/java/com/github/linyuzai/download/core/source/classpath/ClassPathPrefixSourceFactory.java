@@ -17,7 +17,7 @@ public class ClassPathPrefixSourceFactory extends PrefixSourceFactory {
     private final SourceFactory factory = new ClassPathResourceSourceFactory();
 
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         String path = getContent((String) source);
         return factory.create(new ClassPathResource(path), context);
     }

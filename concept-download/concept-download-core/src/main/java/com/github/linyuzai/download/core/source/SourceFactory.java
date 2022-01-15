@@ -25,5 +25,5 @@ public interface SourceFactory extends OrderProvider {
      * @param context 下载上下文 / Context of download
      * @return 下载源 / Source
      */
-    Mono<Source> create(Object source, DownloadContext context);
+    Source create(Object source, DownloadContext context);
 }

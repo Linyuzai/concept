@@ -29,7 +29,11 @@ public class DownloadHandlerChainImpl implements DownloadHandlerChain {
             DownloadHandler handler = handlers.get(index);
             DownloadHandlerInterceptor interceptor = context.getOptions().getInterceptor();
             if (interceptor != null) {
-                interceptor.intercept(handler, context);
+                try {
+                    interceptor.intercept(handler, context);
+                } catch (Throwable e) {
+                    return Mono.error(e);
+                }
             }
             DownloadHandlerChain chain = new DownloadHandlerChainImpl(index + 1, handlers);
             return handler.handle(context, chain);

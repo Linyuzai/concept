@@ -39,15 +39,14 @@ public class ReflectionSourceFactory implements SourceFactory {
      * @return 下载源 / Source
      */
     @Override
-    public Mono<Source> create(Object model, DownloadContext context) {
+    public Source create(Object model, DownloadContext context) {
         ReflectionTemplate template = reflectionTemplateMap.computeIfAbsent(model.getClass(), this::newTemplate);
         Object reflect = template.value(SourceObject.class, model);
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
         SourceFactory factory = adapter.getFactory(reflect, context);
-        return factory.create(reflect, context).map(it -> {
-            template.reflect(model, it);
-            return it;
-        });
+        Source source = factory.create(reflect, context);
+        template.reflect(model, source);
+        return source;
     }
 
     protected ReflectionTemplate newTemplate(Class<?> clazz) {

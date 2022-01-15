@@ -7,7 +7,9 @@ import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 支持集合类型的工厂 / Factory support collection
@@ -34,10 +36,14 @@ public class CollectionSourceFactory implements SourceFactory {
      * @return 下载源 / Source {@link MultipleSource}
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
-        return Flux.fromIterable((Collection<?>) source)
-                .flatMap(it -> adapter.getFactory(it, context).create(it, context)).collectList()
-                .map(MultipleSource::new);
+        List<Source> sources = new ArrayList<>();
+        for (Object o : ((Collection<?>) source)) {
+            SourceFactory factory = adapter.getFactory(o, context);
+            Source s = factory.create(o, context);
+            sources.add(s);
+        }
+        return new MultipleSource(sources);
     }
 }

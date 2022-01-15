@@ -32,8 +32,8 @@ public class SelfSourceFactory implements SourceFactory {
      * @return 下载源 / Source
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         context.log("[Create source] " + source);
-        return Mono.just((Source) source);
+        return (Source) source;
     }
 }

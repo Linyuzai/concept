@@ -14,7 +14,7 @@ public class HttpSourceFactory extends PrefixSourceFactory {
     public static final String[] PREFIXES = new String[]{"http://", "https://"};
 
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         String url = (String) source;
         Charset charset = context.getOptions().getCharset();
         boolean cacheEnabled = context.getOptions().isSourceCacheEnabled();
@@ -27,7 +27,7 @@ public class HttpSourceFactory extends PrefixSourceFactory {
                 .cachePath(cachePath)
                 .build();
         context.log("[Create source] " + build);
-        return Mono.just(build);
+        return build;
     }
 
     @Override

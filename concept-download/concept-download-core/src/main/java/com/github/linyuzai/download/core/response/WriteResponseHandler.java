@@ -19,6 +19,7 @@ import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -45,27 +46,23 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        log.info("Write download response");
         Range range = context.get(Range.class);
         Compression compression = context.get(Compression.class);
-        return Mono.just(compression).flatMap(c -> {
-            DownloadWriter writer = downloadWriterAdapter.getWriter(c, range, context);
-            return downloadResponseProvider.getResponse(context)
-                    .map(response -> applyHeaders(response, c, context))
-                    .flatMap(response -> Mono.just(c.getParts())
-                            .flatMap(parts -> response.write(os -> {
-                                for (Part part : parts) {
-                                    log.info("Write part " + part.getName());
-                                    writer.write(part.getInputStream(), os, range,
-                                            part.getCharset(), part.getLength());
-                                }
-                                try {
-                                    os.flush();
-                                } catch (IOException e) {
-                                    throw new DownloadException(e);
-                                }
-                            })));
-        }).flatMap(it -> chain.next(context));
+        DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
+        return downloadResponseProvider.getResponse(context)
+                .map(response -> applyHeaders(response, compression, context))
+                .flatMap(response -> response.write(os -> {
+                    Collection<Part> parts = compression.getParts();
+                    for (Part part : parts) {
+                        writer.write(part.getInputStream(), os, range,
+                                part.getCharset(), part.getLength());
+                    }
+                    try {
+                        os.flush();
+                    } catch (IOException e) {
+                        throw new DownloadException(e);
+                    }
+                })).flatMap(it -> chain.next(context));
     }
 
     private DownloadResponse applyHeaders(DownloadResponse response, Compression compression, DownloadContext context) {

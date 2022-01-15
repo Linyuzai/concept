@@ -14,5 +14,5 @@ public interface DownloadContextFactory {
      * @param options 下载操作参数 / Options of download
      * @return 下载上下文 / Context of download
      */
-    Mono<DownloadContext> create(DownloadOptions options);
+    DownloadContext create(DownloadOptions options);
 }

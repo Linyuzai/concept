@@ -25,7 +25,7 @@ public class FilePrefixSourceFactory extends PrefixSourceFactory {
      * @return 下载源 / Source {@link FileSource}
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         String path = getContent((String) source);
         return factory.create(new File(path), context);
     }

@@ -36,7 +36,7 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
      * @return 下载源 / Source {@link OkHttpSource}
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         String url = (String) source;
         Charset charset = context.getOptions().getCharset();
         boolean cacheEnabled = context.getOptions().isSourceCacheEnabled();
@@ -50,7 +50,7 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
                 .cachePath(cachePath)
                 .build();
         context.log("[Create source] " + build);
-        return Mono.just(build);
+        return build;
     }
 
     @Override

@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -43,8 +44,8 @@ public class ChainDownloadConcept implements DownloadConcept {
     @Override
     public Object download(Function<DownloadConfiguration, DownloadOptions> function) {
         DownloadOptions options = function.apply(configuration);
-        Mono<DownloadContext> context = contextFactory.create(options);
-        Mono<Void> mono = context.flatMap(it -> new DownloadHandlerChainImpl(0, handlers).next(it));
+        DownloadContext context = contextFactory.create(options);
+        Mono<Void> mono = new DownloadHandlerChainImpl(0, handlers).next(context);
         return returnInterceptor.intercept(mono);
     }
 }

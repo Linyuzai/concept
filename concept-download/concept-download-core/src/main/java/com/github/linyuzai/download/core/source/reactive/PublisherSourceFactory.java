@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.download.core.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -21,3 +22,4 @@ public class PublisherSourceFactory implements SourceFactory {
                 .flatMap(it -> adapter.getFactory(it, context).create(it, context));
     }
 }
+*/

@@ -34,7 +34,7 @@ public class TextSourceFactory implements SourceFactory {
      * @return 下载源 / Source {@link TextSource}
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
         TextSource build = new TextSource.Builder<>()
                 .text((String) source)
@@ -42,7 +42,7 @@ public class TextSourceFactory implements SourceFactory {
                 .charset(charset)
                 .build();
         context.log("[Create source] " + source);
-        return Mono.just(build);
+        return build;
     }
 
     @Override

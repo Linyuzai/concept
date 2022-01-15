@@ -25,12 +25,15 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        Object source = context.getOptions().getSource();
-        SourceFactory factory = sourceFactoryAdapter.getFactory(source, context);
-        return factory.create(source, context).flatMap(it -> {
-            context.set(Source.class, it);
+        try {
+            Object original = context.getOptions().getSource();
+            SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);
+            Source source = factory.create(original, context);
+            context.set(Source.class, source);
             return chain.next(context);
-        });
+        } catch (Throwable e) {
+            return Mono.error(e);
+        }
     }
 
     @Override

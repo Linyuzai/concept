@@ -35,25 +35,23 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
         Source source = context.get(Source.class);
-        return Mono.just(source).flatMap(it -> {
-            boolean single = it.isSingle();
-            boolean forceCompress = context.getOptions().isForceCompress();
-            if (single && !forceCompress) {
-                context.log("[Compress source] " + it + " skip compress");
-                return Mono.just(new NoCompression(it));
-            } else {
-                String compressFormat = context.getOptions().getCompressFormat();
-                String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
-                        CompressFormat.ZIP : compressFormat;
-                SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
-                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-                DownloadWriter writer = writerAdapter.getWriter(it, null, context);
-                return compressor.compress(it, writer, context);
-            }
-        }).flatMap(it -> {
-            context.set(Compression.class, it);
-            return chain.next(context);
-        });
+        Compression compression;
+        boolean single = source.isSingle();
+        boolean forceCompress = context.getOptions().isForceCompress();
+        if (single && !forceCompress) {
+            context.log("[Compress source] " + source + " skip compress");
+            compression = new NoCompression(source);
+        } else {
+            String compressFormat = context.getOptions().getCompressFormat();
+            String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
+                    CompressFormat.ZIP : compressFormat;
+            SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
+            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+            DownloadWriter writer = writerAdapter.getWriter(source, null, context);
+            compression = compressor.compress(source, writer, context);
+        }
+        context.set(Compression.class, compression);
+        return chain.next(context);
     }
 
     /**

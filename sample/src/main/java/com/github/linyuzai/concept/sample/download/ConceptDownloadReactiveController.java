@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.aop.annotation.Download;
@@ -46,4 +47,11 @@ public class ConceptDownloadReactiveController {
         businessModels.add(new ConceptDownloadController.BusinessModel("file", new File("/Users/Shared")));
         return new DownloadMono(businessModels);
     }
+
+    @Download
+    @GetMapping("error")
+    public Mono<Void> error() {
+        return new DownloadMono(new Object());
+    }
 }
+*/

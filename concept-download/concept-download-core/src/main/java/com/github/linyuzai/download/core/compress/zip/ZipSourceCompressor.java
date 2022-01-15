@@ -8,12 +8,14 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -43,25 +45,18 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      * @param os     写入的输出流 / Output stream to write
      * @param writer 写入执行器 / Executor of writing
      */
-    @SuppressWarnings("all")
+    @SneakyThrows
     @Override
-    public Mono<OutputStream> doCompress(Source source, OutputStream os, DownloadWriter writer) {
-        log.info("Zip compression");
-        return Mono.just(source.getParts())
-                .flatMap(parts -> {
-                    try (ZipOutputStream zos = newZipOutputStream(source, os)) {
-                        for (Part part : parts) {
-                            log.info("Zip entry " + part.getPath());
-                            InputStream is = part.getInputStream();
-                            zos.putNextEntry(new ZipEntry(part.getPath()));
-                            writer.write(is, zos, null, part.getCharset(), part.getLength());
-                            zos.closeEntry();
-                        }
-                        return Mono.just(zos);
-                    } catch (Throwable e) {
-                        return Mono.error(e);
-                    }
-                });
+    public void doCompress(Source source, OutputStream os, DownloadWriter writer) {
+        Collection<Part> parts = source.getParts();
+        try (ZipOutputStream zos = newZipOutputStream(source, os)) {
+            for (Part part : parts) {
+                InputStream is = part.getInputStream();
+                zos.putNextEntry(new ZipEntry(part.getPath()));
+                writer.write(is, zos, null, part.getCharset(), part.getLength());
+                zos.closeEntry();
+            }
+        }
     }
 
     /**

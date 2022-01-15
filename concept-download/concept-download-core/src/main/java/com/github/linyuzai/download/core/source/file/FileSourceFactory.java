@@ -35,13 +35,13 @@ public class FileSourceFactory implements SourceFactory {
      * @return 下载源 / Source {@link FileSource}
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         Charset charset = context.getOptions().getCharset();
         FileSource build = new FileSource.Builder<>()
                 .file((File) source)
                 .charset(charset)
                 .build();
         context.log("[Create source] " + build);
-        return Mono.just(build);
+        return build;
     }
 }

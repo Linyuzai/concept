@@ -37,7 +37,7 @@ public class ArraySourceFactory implements SourceFactory {
      * @return 下载源 / Source
      */
     @Override
-    public Mono<Source> create(Object source, DownloadContext context) {
+    public Source create(Object source, DownloadContext context) {
         List<Object> objects = new ArrayList<>();
         int length = Array.getLength(source);
         for (int i = 0; i < length; i++) {

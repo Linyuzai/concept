@@ -39,6 +39,17 @@ import java.util.concurrent.CountDownLatch;
 @RequestMapping("/concept-download")
 public class ConceptDownloadController {
 
+    @Download
+    @GetMapping("error")
+    public Object error() {
+        return new Object();
+    }
+
+    @GetMapping("/ex")
+    public void ex() {
+        throw new RuntimeException();
+    }
+
     @Download(source = "file:/Users/Shared/README.txt")
     @GetMapping("/s1")
     public void s1() {
