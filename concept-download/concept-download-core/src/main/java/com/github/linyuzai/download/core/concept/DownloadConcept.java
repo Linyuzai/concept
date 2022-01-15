@@ -3,7 +3,6 @@ package com.github.linyuzai.download.core.concept;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 
-import java.io.IOException;
 import java.util.function.Function;
 
 /**

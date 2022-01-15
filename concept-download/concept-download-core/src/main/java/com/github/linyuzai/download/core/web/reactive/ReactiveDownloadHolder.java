@@ -3,35 +3,33 @@ package com.github.linyuzai.download.core.web.reactive;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
-import reactor.util.context.ContextView;
 
 import java.util.function.Function;
 
 public class ReactiveDownloadHolder {
 
+    private static boolean hasMethod;
+
+    static {
+        try {
+            hasMethod = Mono.class.getMethod("deferContextual", Function.class) != null;
+        } catch (Throwable ignore) {
+        }
+    }
+
     public static Mono<ServerHttpRequest> getRequest() {
-        try {
-            return Mono.deferContextual((Function<ContextView, Mono<ServerHttpRequest>>) contextView ->
-                    Mono.justOrEmpty(contextView.get(ServerHttpRequest.class)));
-        } catch (Throwable ignore) {
-        }
-        try {
+        if (hasMethod) {
+            return Mono.deferContextual(contextView -> Mono.just(contextView.get(ServerHttpRequest.class)));
+        } else {
             return Mono.subscriberContext().map(ctx -> ctx.get(ServerHttpRequest.class));
-        } catch (Throwable ignore) {
         }
-        return null;
     }
 
     public static Mono<ServerHttpResponse> getResponse() {
-        try {
-            return Mono.deferContextual((Function<ContextView, Mono<ServerHttpResponse>>) contextView ->
-                    Mono.justOrEmpty(contextView.get(ServerHttpResponse.class)));
-        } catch (Throwable ignore) {
-        }
-        try {
+        if (hasMethod) {
+            return Mono.deferContextual(contextView -> Mono.just(contextView.get(ServerHttpResponse.class)));
+        } else {
             return Mono.subscriberContext().map(ctx -> ctx.get(ServerHttpResponse.class));
-        } catch (Throwable ignore) {
         }
-        return null;
     }
 }

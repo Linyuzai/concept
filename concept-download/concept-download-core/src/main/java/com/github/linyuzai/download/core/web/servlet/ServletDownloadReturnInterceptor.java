@@ -1,12 +1,8 @@
 package com.github.linyuzai.download.core.web.servlet;
 
 import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
-import com.github.linyuzai.download.core.exception.DownloadException;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import com.github.linyuzai.download.core.exception.ErrorHolder;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
 
 public class ServletDownloadReturnInterceptor implements DownloadReturnInterceptor {
 
@@ -17,22 +13,5 @@ public class ServletDownloadReturnInterceptor implements DownloadReturnIntercept
         }, holder::set);
         holder.throwIfError();
         return null;
-    }
-
-    static class ErrorHolder {
-
-        Throwable e;
-
-        void set(Throwable e) {
-            this.e = e;
-        }
-
-        @SneakyThrows
-        void throwIfError() {
-            if (e == null) {
-                return;
-            }
-            throw e;
-        }
     }
 }

@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.source.http;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.load.AbstractLoadableSource;
 import com.github.linyuzai.download.core.load.RemoteLoadableSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;

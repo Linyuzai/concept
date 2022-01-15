@@ -4,7 +4,6 @@ import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.load.SourceLoadResult;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
 import lombok.*;
@@ -13,7 +12,6 @@ import reactor.core.publisher.Mono;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

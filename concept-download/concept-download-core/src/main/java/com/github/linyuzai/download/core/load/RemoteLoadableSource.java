@@ -4,7 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
-import lombok.*;
+import lombok.SneakyThrows;
 import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 

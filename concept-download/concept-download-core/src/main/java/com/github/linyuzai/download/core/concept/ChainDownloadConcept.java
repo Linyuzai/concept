@@ -9,12 +9,9 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**

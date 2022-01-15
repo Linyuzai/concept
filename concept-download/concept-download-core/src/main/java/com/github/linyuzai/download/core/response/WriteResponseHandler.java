@@ -5,7 +5,6 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.contenttype.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.range.Range;
@@ -19,7 +18,6 @@ import lombok.SneakyThrows;
 import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;

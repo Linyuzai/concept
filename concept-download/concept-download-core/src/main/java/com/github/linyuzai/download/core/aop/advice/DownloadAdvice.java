@@ -10,7 +10,6 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadMethod;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.*;
-import lombok.extern.apachecommons.CommonsLog;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 

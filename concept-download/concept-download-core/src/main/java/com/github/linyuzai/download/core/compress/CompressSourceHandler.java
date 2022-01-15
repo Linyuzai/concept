@@ -11,7 +11,6 @@ import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**

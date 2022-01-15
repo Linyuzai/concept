@@ -3,7 +3,6 @@ package com.github.linyuzai.download.core.source;
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.Loadable;
-import com.github.linyuzai.download.core.load.SourceLoadResult;
 import com.github.linyuzai.download.core.source.multiple.MultipleSource;
 import reactor.core.publisher.Mono;
 

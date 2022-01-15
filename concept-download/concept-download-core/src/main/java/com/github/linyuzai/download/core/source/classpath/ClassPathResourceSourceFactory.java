@@ -5,7 +5,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
 

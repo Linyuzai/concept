@@ -5,7 +5,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import lombok.extern.apachecommons.CommonsLog;
-import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
 
