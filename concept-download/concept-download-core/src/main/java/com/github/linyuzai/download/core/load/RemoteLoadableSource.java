@@ -5,14 +5,12 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.SneakyThrows;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-@CommonsLog
 public abstract class RemoteLoadableSource extends AbstractLoadableSource {
 
     @SneakyThrows

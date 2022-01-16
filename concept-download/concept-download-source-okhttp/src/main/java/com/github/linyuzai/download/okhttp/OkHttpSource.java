@@ -1,10 +1,10 @@
 package com.github.linyuzai.download.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.*;
-import lombok.extern.apachecommons.CommonsLog;
 import okhttp3.*;
 import reactor.core.publisher.Mono;
 
@@ -14,7 +14,6 @@ import java.io.InputStream;
  * 使用OkHttp加载资源 / Use OkHttp to load source
  */
 @SuppressWarnings("all")
-@CommonsLog
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OkHttpSource extends HttpSource {
@@ -26,7 +25,6 @@ public class OkHttpSource extends HttpSource {
     @SneakyThrows
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
-        context.log("[Load source] " + this + " will be load by OkHttp");
         Request.Builder rb = new Request.Builder();
         rb.url(url);
         if (headers != null) {
@@ -51,6 +49,8 @@ public class OkHttpSource extends HttpSource {
             if (l != -1) {
                 length = l;
             }
+            DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+            publisher.publish(new OkHttpSourceLoadedEvent(context, this));
             return Mono.just(body.byteStream());
         } else {
             StringBuilder builder = new StringBuilder();

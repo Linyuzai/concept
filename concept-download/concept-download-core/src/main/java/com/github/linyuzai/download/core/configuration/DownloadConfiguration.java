@@ -15,27 +15,11 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "concept.download")
 public class DownloadConfiguration {
 
-    private LogConfiguration log = new LogConfiguration();
-
     private ResponseConfiguration response = new ResponseConfiguration();
 
     private SourceConfiguration source = new SourceConfiguration();
 
     private CompressConfiguration compress = new CompressConfiguration();
-
-    @Data
-    public static class LogConfiguration {
-
-        private boolean enabled;
-
-        private LogTagConfiguration tag = new LogTagConfiguration();
-    }
-
-    @Data
-    public static class LogTagConfiguration {
-
-        private int length = 18;
-    }
 
     @Data
     public static class ResponseConfiguration {

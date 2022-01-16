@@ -138,9 +138,7 @@ public class FileSource extends AbstractSource {
 
     @Override
     public String toString() {
-        return "FileSource{" +
-                "file=" + file +
-                '}';
+        return "FileSource(path = " + file.getAbsolutePath() + ")";
     }
 
     @SuppressWarnings("unchecked")

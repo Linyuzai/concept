@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
@@ -9,7 +10,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
@@ -18,7 +18,6 @@ import java.io.*;
  * 需要预加载资源的抽象类 / Abstract classes that require preloaded resources
  * 需要注意数据流只能使用一次 / Note that stream can only be used once
  */
-@CommonsLog
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
@@ -54,8 +53,9 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      */
     @Override
     public Mono<Source> load(DownloadContext context) {
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         if (inputStream != null) {
-            context.log("[Load source] " + this + " is already loaded, skip!");
+            publisher.publish(new SourceAlreadyLoadedEvent(context, this));
             return Mono.just(this);
         }
         if (isCacheEnabled()) {
@@ -77,7 +77,10 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             }
             File cache = new File(dir, name);
             return Mono.just(cache).flatMap(it -> {
-                if (!it.exists()) {
+                if (it.exists()) {
+                    publisher.publish(new SourceLoadedCacheUsedEvent(context, this, it.getAbsolutePath()));
+                    return Mono.just(it);
+                } else {
                     return doLoad(context)
                             .flatMap(is -> {
                                 DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
@@ -90,9 +93,6 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                                     return Mono.error(e);
                                 }
                             });
-                } else {
-                    context.log("[Load source] " + this + " using cache " + it);
-                    return Mono.just(it);
                 }
             }).flatMap(f -> {
                 String contentType = getContentType();

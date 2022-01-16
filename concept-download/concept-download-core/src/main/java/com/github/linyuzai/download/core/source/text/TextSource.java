@@ -74,9 +74,7 @@ public class TextSource extends AbstractSource {
 
     @Override
     public String toString() {
-        return "TextSource{" +
-                "text='" + text + '\'' +
-                '}';
+        return "TextSource(text = " + text + ")";
     }
 
     @SuppressWarnings("unchecked")

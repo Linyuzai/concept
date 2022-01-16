@@ -1,8 +1,10 @@
 package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.load.SourceLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
@@ -26,8 +28,12 @@ public class LoadSourceHandler implements DownloadHandler {
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
         Source source = context.get(Source.class);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return sourceLoader.load(source, context)
-                .flatMap(it -> chain.next(context));
+                .flatMap(it -> {
+                    publisher.publish(new SourceLoadedEvent(context, it));
+                    return chain.next(context);
+                });
     }
 
     @Override

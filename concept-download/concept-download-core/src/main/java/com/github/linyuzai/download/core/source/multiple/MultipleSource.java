@@ -189,8 +189,6 @@ public class MultipleSource implements Source {
 
     @Override
     public String toString() {
-        return "MultipleSource{" +
-                "sources=" + sources +
-                '}';
+        return sources.toString();
     }
 }

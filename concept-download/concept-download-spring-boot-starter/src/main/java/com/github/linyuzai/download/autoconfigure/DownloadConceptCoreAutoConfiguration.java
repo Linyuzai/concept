@@ -3,6 +3,10 @@ package com.github.linyuzai.download.autoconfigure;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
 import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
+import com.github.linyuzai.download.core.event.ApplicationDownloadEventPublisher;
+import com.github.linyuzai.download.core.event.DownloadEventListener;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
+import com.github.linyuzai.download.core.event.DownloadEventPublisherInitializer;
 import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
 import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
@@ -24,7 +28,7 @@ import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.classpath.ClassPathPrefixSourceFactory;
-import com.github.linyuzai.download.core.source.classpath.ClassPathResourceSourceFactory;
+import com.github.linyuzai.download.core.source.classpath.ClassPathSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
@@ -73,6 +77,18 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadContextFactory downloadContextFactory() {
         return new MapDownloadContextFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DownloadEventPublisher downloadEventPublisher(List<DownloadEventListener> listeners) {
+        return new ApplicationDownloadEventPublisher(listeners);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DownloadEventPublisherInitializer downloadEventPublisherInitializer(DownloadEventPublisher publisher) {
+        return new DownloadEventPublisherInitializer(publisher);
     }
 
     @Bean
@@ -131,8 +147,8 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ClassPathResourceSourceFactory classPathResourceSourceFactory() {
-        return new ClassPathResourceSourceFactory();
+    public ClassPathSourceFactory classPathResourceSourceFactory() {
+        return new ClassPathSourceFactory();
     }
 
     @Bean

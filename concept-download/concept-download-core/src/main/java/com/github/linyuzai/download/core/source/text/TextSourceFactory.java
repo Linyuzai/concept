@@ -1,16 +1,15 @@
 package com.github.linyuzai.download.core.source.text;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
-import lombok.extern.apachecommons.CommonsLog;
 
 import java.nio.charset.Charset;
 
 /**
  * 支持文本类型的下载源工厂 / Factory support text
  */
-@CommonsLog
 public class TextSourceFactory implements SourceFactory {
 
     /**
@@ -40,7 +39,8 @@ public class TextSourceFactory implements SourceFactory {
                 .name("text.txt")
                 .charset(charset)
                 .build();
-        context.log("[Create source] " + source);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new TextSourceCreatedEvent(context, build));
         return build;
     }
 

@@ -2,7 +2,7 @@ package com.github.linyuzai.download.core.options;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
-import com.github.linyuzai.download.core.handler.DownloadHandlerInterceptor;
+import com.github.linyuzai.download.core.event.DownloadEventListener;
 import lombok.Builder;
 import lombok.Value;
 
@@ -106,10 +106,6 @@ public class DownloadOptions {
      */
     Map<String, String> headers;
 
-    boolean logEnabled;
-
-    int logTagLength;
-
     /**
      * 提供支持任意Request的接口 / Provide an interface that supports any request
      */
@@ -133,7 +129,7 @@ public class DownloadOptions {
     /**
      * 处理链的拦截器 / Interceptor of handler
      */
-    DownloadHandlerInterceptor interceptor;
+    DownloadEventListener eventListener;
 
     public static DownloadOptions from(DownloadConfiguration configuration) {
         return new DownloadOptions.Builder()

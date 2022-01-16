@@ -2,20 +2,17 @@ package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
-import com.github.linyuzai.download.core.web.ContentType;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
+import com.github.linyuzai.download.core.web.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.web.DownloadRequestProvider;
-import com.github.linyuzai.download.core.web.DownloadResponse;
-import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.OutputStream;
@@ -26,7 +23,6 @@ import java.util.function.Consumer;
 /**
  * 写响应处理器 / A handler to write response
  */
-@CommonsLog
 @AllArgsConstructor
 public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
 
@@ -50,6 +46,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         Range range = context.get(Range.class);
         Compression compression = context.get(Compression.class);
         DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return downloadResponseProvider.getResponse(context)
                 .map(response -> applyHeaders(response, compression, context))
                 .flatMap(response -> response.write(new Consumer<OutputStream>() {
@@ -64,20 +61,26 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                         }
                         os.flush();
                     }
-                })).flatMap(it -> chain.next(context));
+                }))
+                .flatMap(it -> {
+                    publisher.publish(new ResponseWrittenEvent(context));
+                    return chain.next(context);
+                });
     }
 
     private DownloadResponse applyHeaders(DownloadResponse response, Compression compression, DownloadContext context) {
         boolean inline = context.getOptions().isInline();
-        if (inline) {
-            response.setInline();
+        String filename = context.getOptions().getFilename();
+        String filenameToUse;
+        if (filename == null || filename.isEmpty()) {
+            filenameToUse = compression.getName();
         } else {
-            String filename = context.getOptions().getFilename();
-            if (filename == null || filename.isEmpty()) {
-                response.setFilename(compression.getName());
-            } else {
-                response.setFilename(filename);
-            }
+            filenameToUse = filename;
+        }
+        if (inline) {
+            response.setInline(filenameToUse);
+        } else {
+            response.setAttachment(filenameToUse);
         }
         String contentType = context.getOptions().getContentType();
         if (contentType == null || contentType.isEmpty()) {

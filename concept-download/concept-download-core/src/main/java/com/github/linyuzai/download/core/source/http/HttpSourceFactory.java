@@ -1,13 +1,12 @@
 package com.github.linyuzai.download.core.source.http;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
-import lombok.extern.apachecommons.CommonsLog;
 
 import java.nio.charset.Charset;
 
-@CommonsLog
 public class HttpSourceFactory extends PrefixSourceFactory {
 
     public static final String[] PREFIXES = new String[]{"http://", "https://"};
@@ -25,7 +24,8 @@ public class HttpSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        context.log("[Create source] " + build);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new HttpSourceCreatedEvent(context, build));
         return build;
     }
 

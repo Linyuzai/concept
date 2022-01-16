@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.web;
 
 import lombok.SneakyThrows;
+import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Mono;
 
 import java.io.OutputStream;
@@ -13,9 +14,9 @@ import java.util.function.Consumer;
  */
 public interface DownloadResponse {
 
-    default Mono<Void> write(Consumer<OutputStream> consumer) {
+    default Mono<DownloadResponse> write(Consumer<OutputStream> consumer) {
         consumer.accept(getOutputStream());
-        return Mono.empty();
+        return Mono.just(this);
     }
 
     /**
@@ -37,17 +38,21 @@ public interface DownloadResponse {
      *
      * @param filename 文件名 / File name
      */
-    @SneakyThrows
-    default void setFilename(String filename) {
-        String encodeFilename = URLEncoder.encode(String.valueOf(filename), "UTF-8");
-        setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodeFilename);
+
+    default void setAttachment(String filename) {
+        setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encode(filename));
     }
 
     /**
      * 设置inline / Set inline
      */
-    default void setInline() {
-        setHeader("Content-Disposition", "inline");
+    default void setInline(String filename) {
+        setHeader("Content-Disposition", "inline; filename*=UTF-8''" + encode(filename));
+    }
+
+    @SneakyThrows
+    default String encode(String s) {
+        return URLEncoder.encode(String.valueOf(s), "UTF-8");
     }
 
     /**

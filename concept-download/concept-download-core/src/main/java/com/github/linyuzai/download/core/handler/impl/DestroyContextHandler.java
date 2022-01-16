@@ -1,12 +1,13 @@
 package com.github.linyuzai.download.core.handler.impl;
 
+import com.github.linyuzai.download.core.context.ContextDestroyedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.List;
  * 在下载流程结束后执行 / After downloaded
  * 调用所有的上下文销毁器 / Call all destroyers {@link DownloadContextDestroyer#destroy(DownloadContext)}
  */
-@CommonsLog
 @AllArgsConstructor
 public class DestroyContextHandler implements DownloadHandler {
 
@@ -30,11 +30,12 @@ public class DestroyContextHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        context.log("Destroy context", "");
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         for (DownloadContextDestroyer destroyer : destroyers) {
             destroyer.destroy(context);
         }
         context.destroy();
+        publisher.publish(new ContextDestroyedEvent(context));
         return chain.next(context);
     }
 

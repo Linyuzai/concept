@@ -28,14 +28,14 @@ public class ReactiveDownloadResponse implements DownloadResponse {
     }
 
     @Override
-    public Mono<Void> write(Consumer<OutputStream> consumer) {
+    public Mono<DownloadResponse> write(Consumer<OutputStream> consumer) {
         return response.writeWith(Flux.create(fluxSink -> {
             try {
                 consumer.accept(new FluxSinkOutputStream(fluxSink, response));
             } catch (Throwable e) {
                 fluxSink.error(e);
             }
-        }));
+        })).flatMap(it -> Mono.just(this));
     }
 
     @AllArgsConstructor

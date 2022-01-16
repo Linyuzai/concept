@@ -1,12 +1,12 @@
 package com.github.linyuzai.download.core.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.client.reactive.ClientHttpResponse;
@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Function;
 
-@CommonsLog
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource {
@@ -27,7 +26,6 @@ public class WebClientSource extends HttpSource {
     @SuppressWarnings("all")
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
-        context.log("[Load source] " + this + " will be load by WebClient(webflux)");
         return WebClient.create()
                 .get()
                 .uri(url)
@@ -43,6 +41,8 @@ public class WebClientSource extends HttpSource {
                     public Mono<InputStream> apply(ClientResponse clientResponse) {
                         int code = clientResponse.statusCode().value();
                         if (isResponseSuccess(clientResponse.statusCode().value())) {
+                            DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+                            publisher.publish(new WebClientSourceLoadedEvent(context, WebClientSource.this));
                             return clientResponse.body(new InputStreamBodyExtractor());
                         } else {
                             return clientResponse.bodyToMono(String.class).flatMap(it -> {
@@ -55,9 +55,7 @@ public class WebClientSource extends HttpSource {
 
     @Override
     public String toString() {
-        return "WebClientSource{" +
-                "url='" + url + '\'' +
-                '}';
+        return "WebClientSource(url = " + url + ")";
     }
 
     public static class InputStreamBodyExtractor implements BodyExtractor<Mono<InputStream>, ClientHttpResponse> {

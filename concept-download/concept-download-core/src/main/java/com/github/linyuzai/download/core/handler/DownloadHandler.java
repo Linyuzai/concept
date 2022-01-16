@@ -11,7 +11,7 @@ public interface DownloadHandler extends OrderProvider {
 
     int ORDER_INITIALIZE_CONTEXT = Integer.MIN_VALUE + 100;
     int ORDER_LOOKUP_CACHE = 0;
-    int ORDER_CREATE_SOURCE = 1000;
+    int ORDER_CREATE_SOURCE = 100;
     int ORDER_LOAD_SOURCE = 200;
     int ORDER_COMPRESS_SOURCE = 300;
     int ORDER_WRITE_RESPONSE = 400;

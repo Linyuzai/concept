@@ -3,13 +3,13 @@ package com.github.linyuzai.download.core.compress.zip;
 import com.github.linyuzai.download.core.compress.AbstractSourceCompressor;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.concept.Part;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.apachecommons.CommonsLog;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,7 +21,6 @@ import java.util.zip.ZipOutputStream;
 /**
  * 使用ZIP压缩的压缩器 / Compressor using zip compression
  */
-@CommonsLog
 @AllArgsConstructor
 public class ZipSourceCompressor extends AbstractSourceCompressor {
 
@@ -46,7 +45,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      */
     @SneakyThrows
     @Override
-    public void doCompress(Source source, OutputStream os, DownloadWriter writer) {
+    public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
         Collection<Part> parts = source.getParts();
         try (ZipOutputStream zos = newZipOutputStream(source, os)) {
             for (Part part : parts) {
@@ -56,6 +55,8 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
                 zos.closeEntry();
             }
         }
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new SourceZipCompressedEvent(context, source));
     }
 
     /**

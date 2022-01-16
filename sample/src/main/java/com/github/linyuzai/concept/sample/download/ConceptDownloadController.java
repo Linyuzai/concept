@@ -4,8 +4,8 @@ import com.github.linyuzai.download.core.aop.annotation.CompressCache;
 import com.github.linyuzai.download.core.aop.annotation.Download;
 import com.github.linyuzai.download.core.aop.annotation.SourceCache;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.handler.StandardDownloadHandlerInterceptor;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceCharset;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
@@ -171,30 +171,10 @@ public class ConceptDownloadController {
             public DownloadOptions rewrite(DownloadOptions options) {
                 System.out.println("在这里可以修改本次下载的参数！");
                 return options.toBuilder()
-                        .interceptor(new StandardDownloadHandlerInterceptor() {
-
+                        .eventListener(new DownloadEventListener() {
                             @Override
-                            public void beforeContextInitialized(DownloadContext context) {
-                            }
+                            public void onEvent(Object event) {
 
-                            @Override
-                            public void beforeSourceCreated(DownloadContext context) {
-                            }
-
-                            @Override
-                            public void beforeSourceLoaded(DownloadContext context) {
-                            }
-
-                            @Override
-                            public void beforeSourceCompressed(DownloadContext context) {
-                            }
-
-                            @Override
-                            public void beforeResponseWritten(DownloadContext context) {
-                            }
-
-                            @Override
-                            public void beforeContextDestroyed(DownloadContext context) {
                             }
                         })
                         .build();
@@ -266,7 +246,8 @@ public class ConceptDownloadController {
     public void image() {
     }
 
-    @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mpeg4")
+    //@Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mp4")
+    @Download(source = "classpath:/download/video.mp4")
     @GetMapping("/video.mp4")
     public void video() {
     }

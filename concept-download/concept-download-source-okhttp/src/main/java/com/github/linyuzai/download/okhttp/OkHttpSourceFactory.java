@@ -1,13 +1,13 @@
 package com.github.linyuzai.download.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.apachecommons.CommonsLog;
 import okhttp3.OkHttpClient;
 
 import java.nio.charset.Charset;
@@ -15,7 +15,6 @@ import java.nio.charset.Charset;
 /**
  * 匹配http前缀，使用OkHttp加载的下载源的工厂 / The factory of the source witch match the HTTP prefix and use okhttp to load
  */
-@CommonsLog
 @Getter
 @Setter
 @AllArgsConstructor
@@ -48,7 +47,8 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        context.log("[Create source] " + build);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new OkHttpSourceCreatedEvent(context, build));
         return build;
     }
 

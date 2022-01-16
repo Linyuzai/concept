@@ -11,7 +11,7 @@ import java.io.InputStream;
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ClassPathResourceSource extends AbstractSource {
+public class ClassPathSource extends AbstractSource {
 
     @NonNull
     @Setter
@@ -56,13 +56,11 @@ public class ClassPathResourceSource extends AbstractSource {
 
     @Override
     public String toString() {
-        return "ClassPathResourceSource{" +
-                "resource=" + resource +
-                '}';
+        return "ClassPathResourceSource(path = " + resource.getPath() + ")";
     }
 
     @SuppressWarnings("unchecked")
-    public static class Builder<T extends ClassPathResourceSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
+    public static class Builder<T extends ClassPathSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 
         private ClassPathResource resource;
 
@@ -79,7 +77,7 @@ public class ClassPathResourceSource extends AbstractSource {
 
         @Override
         public T build() {
-            return build((T) new ClassPathResourceSource());
+            return build((T) new ClassPathSource());
         }
     }
 }

@@ -1,14 +1,13 @@
 package com.github.linyuzai.download.core.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
-import lombok.extern.apachecommons.CommonsLog;
 
 import java.nio.charset.Charset;
 
-@CommonsLog
 public class WebClientSourceFactory extends PrefixSourceFactory {
 
     @Override
@@ -24,7 +23,8 @@ public class WebClientSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        context.log("[Create source] " + build);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new WebClientSourceCreatedEvent(context, build));
         return build;
     }
 

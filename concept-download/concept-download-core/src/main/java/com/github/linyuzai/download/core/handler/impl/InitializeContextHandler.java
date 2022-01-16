@@ -1,7 +1,9 @@
 package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.context.ContextInitializedEvent;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
@@ -28,10 +30,11 @@ public class InitializeContextHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        context.log("Initialize context", "");
         for (DownloadContextInitializer initializer : initializers) {
             initializer.initialize(context);
         }
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new ContextInitializedEvent(context));
         return chain.next(context);
     }
 

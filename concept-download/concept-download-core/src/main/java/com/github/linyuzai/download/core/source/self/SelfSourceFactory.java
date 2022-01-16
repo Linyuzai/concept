@@ -1,14 +1,13 @@
 package com.github.linyuzai.download.core.source.self;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
-import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * 本身就是下载源的工厂 / Factory of source itself
  */
-@CommonsLog
 public class SelfSourceFactory implements SourceFactory {
 
     /**
@@ -32,7 +31,8 @@ public class SelfSourceFactory implements SourceFactory {
      */
     @Override
     public Source create(Object source, DownloadContext context) {
-        context.log("[Create source] " + source);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new SelfSourceCreatedEvent(context, (Source) source));
         return (Source) source;
     }
 }

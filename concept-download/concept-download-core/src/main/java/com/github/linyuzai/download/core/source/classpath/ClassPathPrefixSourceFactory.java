@@ -13,7 +13,7 @@ public class ClassPathPrefixSourceFactory extends PrefixSourceFactory {
 
     public static final String[] PREFIXES = new String[]{"classpath:"};
 
-    private final SourceFactory factory = new ClassPathResourceSourceFactory();
+    private final SourceFactory factory = new ClassPathSourceFactory();
 
     @Override
     public Source create(Object source, DownloadContext context) {

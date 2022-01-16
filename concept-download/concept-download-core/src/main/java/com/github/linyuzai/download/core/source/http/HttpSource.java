@@ -1,12 +1,12 @@
 package com.github.linyuzai.download.core.source.http;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.load.RemoteLoadableSource;
 import com.github.linyuzai.download.core.writer.DownloadWriter;
 import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.*;
-import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -17,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SuppressWarnings("all")
-@CommonsLog
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HttpSource extends RemoteLoadableSource {
@@ -69,7 +68,6 @@ public class HttpSource extends RemoteLoadableSource {
     @SneakyThrows
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
-        context.log("[Load source] " + this + " will be load by Http(s)URLConnection");
         URL u = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) u.openConnection();
         connection.setRequestMethod("GET");
@@ -94,6 +92,8 @@ public class HttpSource extends RemoteLoadableSource {
             if (l != -1) {
                 length = l;
             }
+            DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+            publisher.publish(new HttpSourceLoadedEvent(context, this));
             return Mono.just(connection.getInputStream());
         } else {
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
@@ -112,9 +112,7 @@ public class HttpSource extends RemoteLoadableSource {
 
     @Override
     public String toString() {
-        return "HttpSource{" +
-                "url='" + url + '\'' +
-                '}';
+        return "HttpSource(url = " + url + ")";
     }
 
     @SuppressWarnings("unchecked")
