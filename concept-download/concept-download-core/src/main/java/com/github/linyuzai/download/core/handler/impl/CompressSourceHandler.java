@@ -1,5 +1,6 @@
-package com.github.linyuzai.download.core.compress;
+package com.github.linyuzai.download.core.handler.impl;
 
+import com.github.linyuzai.download.core.compress.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
@@ -38,7 +39,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
         boolean single = source.isSingle();
         boolean forceCompress = context.getOptions().isForceCompress();
         if (single && !forceCompress) {
-            context.log("[Compress source] " + source + " skip compress");
+            context.log("Compress source", "skip compress");
             compression = new NoCompression(source);
         } else {
             String compressFormat = context.getOptions().getCompressFormat();

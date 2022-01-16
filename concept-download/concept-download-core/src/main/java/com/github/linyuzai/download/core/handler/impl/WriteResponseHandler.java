@@ -1,8 +1,8 @@
-package com.github.linyuzai.download.core.response;
+package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
-import com.github.linyuzai.download.core.contenttype.ContentType;
+import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;

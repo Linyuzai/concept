@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.compress;
 
-import com.github.linyuzai.download.core.contenttype.ContentType;
+import com.github.linyuzai.download.core.web.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;

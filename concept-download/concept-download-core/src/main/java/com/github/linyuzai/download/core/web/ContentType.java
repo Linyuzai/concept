@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.contenttype;
+package com.github.linyuzai.download.core.web;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;

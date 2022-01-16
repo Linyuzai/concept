@@ -27,6 +27,14 @@ public class DownloadConfiguration {
     public static class LogConfiguration {
 
         private boolean enabled;
+
+        private LogTagConfiguration tag = new LogTagConfiguration();
+    }
+
+    @Data
+    public static class LogTagConfiguration {
+
+        private int length = 18;
     }
 
     @Data

@@ -9,11 +9,11 @@ import org.apache.commons.logging.Log;
  */
 public interface DownloadContext {
 
-    void log(String message);
+    void log(String tag, String message);
 
-    void log(String log, String message);
+    void log(String log, String tag, String message);
 
-    void log(Log log, String message);
+    void log(Log log, String tag, String message);
 
     /**
      * @return 下载参数 / Download options

@@ -1,10 +1,13 @@
-package com.github.linyuzai.download.core.source;
+package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.source.SourceFactory;
+import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import reactor.core.publisher.Mono;
@@ -25,6 +28,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        context.log("Create source", "");
         Object original = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);
         Source source = factory.create(original, context);
@@ -34,7 +38,6 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
 
     @Override
     public void initialize(DownloadContext context) {
-        context.log("[Initialize context] set SourceFactoryAdapter to context");
         context.set(SourceFactoryAdapter.class, sourceFactoryAdapter);
     }
 
@@ -45,12 +48,12 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
             boolean delete = context.getOptions().isSourceCacheDelete();
             if (delete) {
                 if (context.getOptions().isLogEnabled()) {
-                    context.log("[Destroy context] delete source cache");
+                    context.log("Destroy context", "delete source cache");
                 }
                 source.deleteCache();
             }
             if (context.getOptions().isLogEnabled()) {
-                context.log("[Destroy context] release source");
+                context.log("Destroy context", "release source");
             }
             source.release();
         }

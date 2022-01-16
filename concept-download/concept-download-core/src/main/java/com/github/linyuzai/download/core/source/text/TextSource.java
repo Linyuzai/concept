@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.source.text;
 
-import com.github.linyuzai.download.core.contenttype.ContentType;
+import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
 

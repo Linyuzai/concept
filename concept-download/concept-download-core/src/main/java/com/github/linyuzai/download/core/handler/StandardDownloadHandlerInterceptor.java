@@ -1,12 +1,12 @@
 package com.github.linyuzai.download.core.handler;
 
-import com.github.linyuzai.download.core.compress.CompressSourceHandler;
-import com.github.linyuzai.download.core.context.DestroyContextHandler;
+import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
+import com.github.linyuzai.download.core.handler.impl.DestroyContextHandler;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.InitializeContextHandler;
-import com.github.linyuzai.download.core.load.LoadSourceHandler;
-import com.github.linyuzai.download.core.response.WriteResponseHandler;
-import com.github.linyuzai.download.core.source.CreateSourceHandler;
+import com.github.linyuzai.download.core.handler.impl.InitializeContextHandler;
+import com.github.linyuzai.download.core.handler.impl.LoadSourceHandler;
+import com.github.linyuzai.download.core.handler.impl.WriteResponseHandler;
+import com.github.linyuzai.download.core.handler.impl.CreateSourceHandler;
 
 /**
  * 标准的下载处理器拦截器 / Standard interceptor of handler

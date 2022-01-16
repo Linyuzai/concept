@@ -2,7 +2,7 @@ package com.github.linyuzai.download.core.source.file;
 
 import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.concept.Part;
-import com.github.linyuzai.download.core.contenttype.ContentType;
+import com.github.linyuzai.download.core.web.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;

@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
-import com.github.linyuzai.download.core.contenttype.ContentType;
+import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.AbstractSource;

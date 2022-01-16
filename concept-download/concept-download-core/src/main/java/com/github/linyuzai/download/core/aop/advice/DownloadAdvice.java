@@ -106,6 +106,7 @@ public class DownloadAdvice implements MethodInterceptor {
                 .charset(buildCharset(download))
                 .headers(buildHeaders(download, configuration))
                 .logEnabled(configuration.getLog().isEnabled())
+                .logTagLength(configuration.getLog().getTag().getLength())
                 .extra(download.extra());
 
         if (sourceCache == null) {

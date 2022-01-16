@@ -27,25 +27,33 @@ public abstract class AbstractDownloadContext implements DownloadContext {
     private final DownloadOptions options;
 
     @Override
-    public void log(String message) {
-        DownloadMethod downloadMethod = options.getDownloadMethod();
+    public void log(String tag, String message) {
+        DownloadMethod downloadMethod = getOptions().getDownloadMethod();
         if (downloadMethod == null) {
-            log(log, message);
+            log(log, tag, message);
         } else {
             Method method = downloadMethod.getMethod();
-            log(method.getDeclaringClass().getSimpleName() + "#" + method.getName(), message);
+            log(method.getDeclaringClass().getSimpleName() + "#" + method.getName(), tag, message);
         }
     }
 
     @Override
-    public void log(String log, String message) {
-        log(logs.computeIfAbsent(log, LogFactory::getLog), message);
+    public void log(String log, String tag, String message) {
+        log(logs.computeIfAbsent(log, LogFactory::getLog), tag, message);
     }
 
     @Override
-    public void log(Log log, String message) {
+    public void log(Log log, String tag, String message) {
         if (getOptions().isLogEnabled()) {
-            log.info(message);
+            log.info(appendTag(tag, getOptions().getLogTagLength()) + message);
         }
+    }
+
+    private String appendTag(String tag, int length) {
+        StringBuilder builder = new StringBuilder(tag);
+        while (builder.length() < length) {
+            builder.append(" ");
+        }
+        return builder.append(" >> ").toString();
     }
 }

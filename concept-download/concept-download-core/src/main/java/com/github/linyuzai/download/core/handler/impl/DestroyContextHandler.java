@@ -1,5 +1,7 @@
-package com.github.linyuzai.download.core.context;
+package com.github.linyuzai.download.core.handler.impl;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import lombok.AllArgsConstructor;
@@ -28,6 +30,7 @@ public class DestroyContextHandler implements DownloadHandler {
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+        context.log("Destroy context", "");
         for (DownloadContextDestroyer destroyer : destroyers) {
             destroyer.destroy(context);
         }

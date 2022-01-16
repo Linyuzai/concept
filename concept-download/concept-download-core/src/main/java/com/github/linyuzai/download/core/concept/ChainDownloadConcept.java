@@ -12,6 +12,7 @@ import lombok.Getter;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
