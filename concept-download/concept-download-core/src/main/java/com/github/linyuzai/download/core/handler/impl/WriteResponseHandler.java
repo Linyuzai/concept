@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.handler.impl;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
+import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.web.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
@@ -43,32 +44,67 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-        Range range = context.get(Range.class);
         Compression compression = context.get(Compression.class);
-        DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        return downloadResponseProvider.getResponse(context)
-                .map(response -> applyHeaders(response, compression, context))
-                .flatMap(response -> response.write(new Consumer<OutputStream>() {
+        return downloadRequestProvider.getRequest(context).flatMap(request -> {
+            Range range = request.getRange();
+            DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
+            return downloadResponseProvider.getResponse(context)
+                    .filter(response -> applyHeaders(response, compression, range, context))
+                    .flatMap(response -> response.write(new Consumer<OutputStream>() {
 
-                    @SneakyThrows
-                    @Override
-                    public void accept(OutputStream os) {
-                        Collection<Part> parts = compression.getParts();
-                        for (Part part : parts) {
-                            writer.write(part.getInputStream(), os, range,
-                                    part.getCharset(), part.getLength());
+                        @SneakyThrows
+                        @Override
+                        public void accept(OutputStream os) {
+                            Collection<Part> parts = compression.getParts();
+                            for (Part part : parts) {
+                                writer.write(part.getInputStream(), os, range,
+                                        part.getCharset(), part.getLength());
+                            }
+                            os.flush();
                         }
-                        os.flush();
-                    }
-                }))
-                .flatMap(it -> {
-                    publisher.publish(new ResponseWrittenEvent(context));
-                    return chain.next(context);
-                });
+                    }));
+        }).flatMap(it -> {
+            publisher.publish(new ResponseWrittenEvent(context));
+            return chain.next(context);
+        });
     }
 
-    private DownloadResponse applyHeaders(DownloadResponse response, Compression compression, DownloadContext context) {
+    public boolean applyHeaders(DownloadResponse response, Compression compression, Range range, DownloadContext context) {
+        response.setBytesAcceptRanges();
+        Long length = compression.getLength();
+        if (range == null || length == null || length <= 0) {
+            response.setContentLength(length);
+        } else {
+            if (range.isSupport()) {
+                response.setStatusCode(206);
+                if (range.hasStart() && range.hasEnd()) {
+                    long l = range.getEnd() - range.getStart() + 1;
+                    range.setLength(l);
+                    response.setContentLength(l);
+                    response.setContentRange(range.getStart(), range.getEnd(), length);
+                } else if (range.hasStart()) {
+                    long l = length - range.getStart();
+                    range.setLength(l);
+                    response.setContentLength(l);
+                    response.setContentRange(range.getStart(), length - 1, length);
+                } else if (range.hasEnd()) {
+                    long l = range.getEnd();
+                    range.setLength(l);
+                    response.setContentLength(l);
+                    response.setContentRange(length - range.getEnd(), length - 1, length);
+                } else {
+                    long l = length;
+                    range.setLength(l);
+                    response.setContentLength(l);
+                    response.setContentRange(0, length - 1, length);
+                }
+            } else {
+                response.setStatusCode(416);
+                return false;
+            }
+        }
+
         boolean inline = context.getOptions().isInline();
         String filename = context.getOptions().getFilename();
         String filenameToUse;
@@ -93,13 +129,13 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         } else {
             response.setContentType(contentType);
         }
-        Long length = compression.getLength();
-        response.setContentLength(length);
+
         Map<String, String> headers = context.getOptions().getHeaders();
         if (headers != null) {
             response.setHeaders(headers);
         }
-        return response;
+
+        return true;
     }
 
     /**

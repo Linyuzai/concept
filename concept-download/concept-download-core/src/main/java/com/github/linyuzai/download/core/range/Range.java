@@ -1,50 +1,67 @@
 package com.github.linyuzai.download.core.range;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 /**
  * 指定资源的范围 / Specify the range of the resource
- * 暂时未用到，目前不支持 / Not used at the moment, not supported at present
  */
+@ToString
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Range {
 
     long start;
 
     long end;
 
+    @Setter
+    long length;
+
+    public boolean isSupport() {
+        return true;
+    }
+
     public boolean hasStart() {
-        return start > 0;
+        return start >= 0;
     }
 
     public boolean hasEnd() {
-        return end > 0;
-    }
-
-    public static Range start(long start) {
-        if (start < 0) {
-            throw new IllegalArgumentException("start < 0");
-        }
-        return new Range(start, -1);
-    }
-
-    public static Range end(long end) {
-        if (end < 0) {
-            throw new IllegalArgumentException("end < 0");
-        }
-        return new Range(-1, end);
+        return end >= 0;
     }
 
     public static Range of(long start, long end) {
-        if (start < 0 && end < 0) {
-            throw new IllegalArgumentException("start < 0 & end < 0");
+        Range range = new Range();
+        range.start = start;
+        range.end = end;
+        return range;
+    }
+
+    public static Range header(String header) {
+        if (header == null || header.isEmpty()) {
+            return null;
         }
-        if (end >= 0 && start > end) {
-            throw new IllegalArgumentException("start > end");
+        String[] split = header.split("=");
+        if (split.length == 2 && "bytes".equalsIgnoreCase(split[0])) {
+            if (split[1].contains(",")) {
+
+            }
+            String[] ranges = split[1].split("-", -1);
+            if (ranges.length == 2) {
+                long start;
+                if (ranges[0].isEmpty()) {
+                    start = -1;
+                } else {
+                    start = Long.parseLong(ranges[0]);
+                }
+                long end;
+                if (ranges[1].isEmpty()) {
+                    end = -1;
+                } else {
+                    end = Long.parseLong(ranges[1]);
+                }
+                return of(start, end);
+            }
         }
-        return new Range(start, end);
+        return null;
     }
 }

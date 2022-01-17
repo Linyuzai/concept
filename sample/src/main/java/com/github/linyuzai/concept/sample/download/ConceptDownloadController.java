@@ -246,8 +246,8 @@ public class ConceptDownloadController {
     public void image() {
     }
 
-    //@Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mp4")
-    @Download(source = "classpath:/download/video.mp4")
+    @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mp4")
+    //@Download(source = "classpath:/download/video.mp4")
     @GetMapping("/video.mp4")
     public void video() {
     }

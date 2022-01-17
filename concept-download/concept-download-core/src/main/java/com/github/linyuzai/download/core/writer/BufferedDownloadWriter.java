@@ -52,8 +52,31 @@ public class BufferedDownloadWriter implements DownloadWriter {
         if (charset == null /*|| length > 0 && bufferSize >= length*/) {
             int len;
             byte[] bytes = new byte[bufferSize];
-            while ((len = is.read(bytes)) > 0) {
-                os.write(bytes, 0, len);
+            if (range == null) {
+                while ((len = is.read(bytes)) > 0) {
+                    os.write(bytes, 0, len);
+                }
+            } else {
+                if (range.hasStart()) {
+                    long skip = is.skip(range.getStart());
+                }
+                if (range.hasEnd()) {
+                    long total = 0;
+                    long l = range.getLength();
+                    while ((len = is.read(bytes)) > 0) {
+                        if (total + len > l) {
+                            os.write(bytes, 0, (int) (l - total));
+                            break;
+                        } else {
+                            os.write(bytes, 0, len);
+                            total += len;
+                        }
+                    }
+                } else {
+                    while ((len = is.read(bytes)) > 0) {
+                        os.write(bytes, 0, len);
+                    }
+                }
             }
         } else {
             InputStreamReader isr = new InputStreamReader(is, charset);

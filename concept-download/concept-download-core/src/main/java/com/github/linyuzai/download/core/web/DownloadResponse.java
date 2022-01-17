@@ -64,6 +64,14 @@ public interface DownloadResponse {
 
     void setContentLength(Long contentLength);
 
+    default void setBytesAcceptRanges() {
+        setHeader("Accept-Ranges", "bytes");
+    }
+
+    default void setContentRange(long start, long end, long total) {
+        setHeader("Content-Range", "bytes " + start + "-" + end + "/" + total);
+    }
+
     /**
      * 设置响应头 / Set response header
      *

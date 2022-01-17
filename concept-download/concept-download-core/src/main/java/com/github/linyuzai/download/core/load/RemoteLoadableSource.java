@@ -13,6 +13,8 @@ import java.io.InputStream;
 
 public abstract class RemoteLoadableSource extends AbstractLoadableSource {
 
+    protected Long length;
+
     @SneakyThrows
     @Override
     public Mono<InputStream> doLoad(DownloadContext context) {
@@ -23,8 +25,12 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(this, null, context);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            writer.write(it, os, null, null, getLength());
-            return new ByteArrayInputStream(os.toByteArray());
+            writer.write(it, os, null, null, length);
+            byte[] bytes = os.toByteArray();
+            if (length == null) {
+                length = (long) bytes.length;
+            }
+            return new ByteArrayInputStream(bytes);
         });
     }
 

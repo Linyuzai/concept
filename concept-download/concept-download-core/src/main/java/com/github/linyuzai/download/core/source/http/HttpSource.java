@@ -28,8 +28,6 @@ public class HttpSource extends RemoteLoadableSource {
     @Setter
     protected Map<String, String> headers;
 
-    protected Long length;
-
     /**
      * 如果没有指定名称 / If no name is specified
      * 将截取url最后一段作为名称 / Take the last paragraph of the intercepted URL as the name

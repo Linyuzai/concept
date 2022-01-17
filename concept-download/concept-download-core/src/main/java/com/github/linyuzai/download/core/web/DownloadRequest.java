@@ -1,5 +1,7 @@
 package com.github.linyuzai.download.core.web;
 
+import com.github.linyuzai.download.core.range.Range;
+
 /**
  * 请求，如http / Request, such as http
  */
@@ -12,4 +14,9 @@ public interface DownloadRequest {
      * @return 请求头 / Header
      */
     String getHeader(String name);
+
+    default Range getRange() {
+        String range = getHeader("Range");
+        return Range.header(range);
+    }
 }
