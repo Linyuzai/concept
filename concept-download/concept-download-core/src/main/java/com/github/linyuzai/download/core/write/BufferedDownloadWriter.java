@@ -21,7 +21,9 @@ import java.nio.charset.Charset;
 @NoArgsConstructor
 public class BufferedDownloadWriter implements DownloadWriter {
 
-    private int bufferSize = 1024 * 1024;
+    private int minBufferSize = 1024 * 1024;
+
+    private int maxBufferSize = 8 * 1024 * 1024;
 
     /**
      * 返回true / Return true
@@ -50,17 +52,8 @@ public class BufferedDownloadWriter implements DownloadWriter {
     @Override
     public void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback) {
         if (charset == null /*|| length > 0 && bufferSize >= length*/) {
-            int len;
-            byte[] bytes = new byte[bufferSize];
             if (range == null) {
-                long current = 0;
-                while ((len = is.read(bytes)) > 0) {
-                    os.write(bytes, 0, len);
-                    current += len;
-                    if (callback != null) {
-                        callback.onWrite(current, len);
-                    }
-                }
+                write0(is, os, callback);
             } else {
                 if (range.hasStart()) {
                     long skip = is.skip(range.getStart());
@@ -69,6 +62,8 @@ public class BufferedDownloadWriter implements DownloadWriter {
                     long total = 0;
                     long l = range.getLength();
                     long current = 0;
+                    byte[] bytes = new byte[minBufferSize];
+                    int len;
                     while ((len = is.read(bytes)) > 0) {
                         if (total + len > l) {
                             long increase = l - total;
@@ -86,23 +81,17 @@ public class BufferedDownloadWriter implements DownloadWriter {
                                 callback.onWrite(current, len);
                             }
                         }
+                        bytes = getBuffer(bytes, len);
                     }
                 } else {
-                    long current = 0;
-                    while ((len = is.read(bytes)) > 0) {
-                        os.write(bytes, 0, len);
-                        current += len;
-                        if (callback != null) {
-                            callback.onWrite(current, len);
-                        }
-                    }
+                    write0(is, os, callback);
                 }
             }
         } else {
             InputStreamReader isr = new InputStreamReader(is, charset);
-            BufferedReader br = new BufferedReader(isr, bufferSize);
+            BufferedReader br = new BufferedReader(isr, minBufferSize);
             int len;
-            char[] chars = new char[bufferSize];
+            char[] chars = new char[minBufferSize];
             char[] result = new char[0];
             while ((len = br.read(chars)) > 0) {
                 result = concat(result, chars, len);
@@ -114,6 +103,50 @@ public class BufferedDownloadWriter implements DownloadWriter {
             }
             os.write(bytes);
         }
+    }
+
+    @SneakyThrows
+    private void write0(InputStream is, OutputStream os, Callback callback) {
+        long current = 0;
+        byte[] bytes = new byte[minBufferSize];
+        int len;
+        while ((len = is.read(bytes)) > 0) {
+            os.write(bytes, 0, len);
+            current += len;
+            if (callback != null) {
+                callback.onWrite(current, len);
+            }
+            bytes = getBuffer(bytes, len);
+        }
+    }
+
+    private byte[] getBuffer(byte[] buffer, int len) {
+        int size = buffer.length;
+        System.out.println("size:" + size + ", len:" + len);
+        if (size == maxBufferSize) {
+            return buffer;
+        }
+        if (len == size) {
+            int newSize = size * 2;
+            if (newSize > maxBufferSize) {
+                return new byte[maxBufferSize];
+            } else {
+                return new byte[newSize];
+            }
+        } else {
+            return buffer;
+        }
+    }
+
+    private int newBufferSize(int bufferSize) {
+        if (bufferSize == maxBufferSize) {
+            return bufferSize;
+        }
+        bufferSize = bufferSize * 2;
+        if (bufferSize > maxBufferSize) {
+            bufferSize = maxBufferSize;
+        }
+        return bufferSize;
     }
 
     private char[] concat(char[] current, char[] append, int length) {

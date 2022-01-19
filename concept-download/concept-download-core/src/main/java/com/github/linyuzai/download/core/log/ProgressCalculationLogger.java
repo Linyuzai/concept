@@ -1,8 +1,9 @@
 package com.github.linyuzai.download.core.log;
 
 import com.github.linyuzai.download.core.context.AfterContextDestroyedEvent;
-import com.github.linyuzai.download.core.context.AfterContextInitializedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
+import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
 import com.github.linyuzai.download.core.write.ProgressDownloadEvent;
 import lombok.Data;
 import lombok.Getter;
@@ -17,66 +18,62 @@ import java.util.function.Consumer;
 
 public class ProgressCalculationLogger extends DownloadLogger {
 
-    private final Map<String, ProgressInterval> progressIntervalMap = new ConcurrentHashMap<>();
-    private final Map<String, Disposable> disposableMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<Object, ProgressInterval>> progressIntervalMap = new ConcurrentHashMap<>();
 
-    public String getProgressMessage(ProgressDownloadEvent event) {
-        if (event != null) {
-            return event.getPercentageMessage();
-        }
-        return "Unknown";
+    public void onProgress(ProgressDownloadEvent event) {
+        log(event.getContext(), event.getPercentageMessage());
     }
 
     @Override
     public void onEvent(Object event) {
-        if (event instanceof AfterContextInitializedEvent) {
-            DownloadContext context = ((AfterContextInitializedEvent) event).getContext();
-            String id = context.getId();
-            ProgressInterval interval = new ProgressInterval();
-            Disposable disposable = Flux.create(interval).subscribe(ev ->
-                    log(context, getProgressMessage(ev)));
-            progressIntervalMap.put(id, interval);
-            disposableMap.put(id, disposable);
-        } else if (event instanceof AfterContextDestroyedEvent) {
+        if (event instanceof AfterContextDestroyedEvent) {
             DownloadContext context = ((AfterContextDestroyedEvent) event).getContext();
             String id = context.getId();
-            ProgressInterval interval = progressIntervalMap.remove(id);
-            if (interval != null) {
-                interval.release();
-            }
-            Disposable disposable = disposableMap.remove(id);
-            if (disposable != null && !disposable.isDisposed()) {
-                disposable.dispose();
+            Map<Object, ProgressInterval> remove = progressIntervalMap.remove(id);
+            if (remove != null) {
+                remove.values().forEach(ProgressInterval::disposable);
             }
         } else if (event instanceof ProgressDownloadEvent) {
             ProgressDownloadEvent pde = (ProgressDownloadEvent) event;
-            ProgressInterval interval = progressIntervalMap.get(pde.getContext().getId());
-            if (interval != null) {
-                interval.publish(pde);
-            }
+            DownloadContext context = ((ProgressDownloadEvent) event).getContext();
+            progressIntervalMap.computeIfAbsent(context.getId(), id ->
+                    new ConcurrentHashMap<>()).computeIfAbsent(getId(pde), o ->
+                    new ProgressInterval(this::onProgress)).publish(pde);
+        }
+    }
+
+    protected Object getId(ProgressDownloadEvent event) {
+        if (event instanceof SourceLoadingProgressEvent) {
+            return ((SourceLoadingProgressEvent) event).getSource();
+        } else if (event instanceof ResponseWritingProgressEvent) {
+            return ResponseWritingProgressEvent.class;
+        } else {
+            return ProgressDownloadEvent.class;
         }
     }
 
     public static class ProgressInterval implements Consumer<FluxSink<ProgressDownloadEvent>> {
 
-        private final Flux<Long> flux = Flux.interval(Duration.ofSeconds(2));
-
         private FluxSink<ProgressDownloadEvent> sink;
 
-        private Disposable disposable;
+        private final Disposable disposable;
+
+        private Disposable innerDisposable;
 
         @Getter
         private final ProgressEventHolder holder = new ProgressEventHolder();
 
+        public ProgressInterval(Consumer<ProgressDownloadEvent> consumer) {
+            disposable = Flux.create(this).subscribe(consumer);
+        }
+
         @Override
         public void accept(FluxSink<ProgressDownloadEvent> sink) {
             this.sink = sink;
-            disposable = flux.subscribe(unused -> {
-                if (!holder.isConsumed()) {
-                    ProgressDownloadEvent event = holder.get();
-                    if (event != null) {
-                        sink.next(event);
-                    }
+            innerDisposable = Flux.interval(Duration.ofSeconds(2)).subscribe(unused -> {
+                ProgressDownloadEvent event = holder.get();
+                if (event != null) {
+                    sink.next(event);
                 }
             });
         }
@@ -85,14 +82,17 @@ public class ProgressCalculationLogger extends DownloadLogger {
             holder.set(event);
             if (event.getProgress().getCurrent() == event.getProgress().getTotal()) {
                 sink.next(holder.get());
+                disposable();
             }
         }
 
-        public void release() {
+        public void disposable() {
             if (disposable != null && !disposable.isDisposed()) {
                 disposable.dispose();
             }
-            holder.release();
+            if (innerDisposable != null && !innerDisposable.isDisposed()) {
+                innerDisposable.dispose();
+            }
         }
     }
 
@@ -101,22 +101,12 @@ public class ProgressCalculationLogger extends DownloadLogger {
 
         private volatile ProgressDownloadEvent event;
 
-        private volatile boolean consumed;
-
-        public synchronized void set(ProgressDownloadEvent newEvent) {
-            if (event == null || event.getProgress().getCurrent() < newEvent.getProgress().getCurrent()) {
-                event = newEvent;
-                consumed = false;
-            }
+        public void set(ProgressDownloadEvent newEvent) {
+            event = newEvent;
         }
 
-        public synchronized ProgressDownloadEvent get() {
-            consumed = true;
+        public ProgressDownloadEvent get() {
             return event;
-        }
-
-        public void release() {
-            event = null;
         }
     }
 }

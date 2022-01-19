@@ -89,6 +89,11 @@ public class FileCompression extends AbstractCompression {
         return file.getParent();
     }
 
+    @Override
+    public String getDescription() {
+        return "FileCompression(" + file.getAbsolutePath() + ")";
+    }
+
     /**
      * 删除文件 / Delete file
      */

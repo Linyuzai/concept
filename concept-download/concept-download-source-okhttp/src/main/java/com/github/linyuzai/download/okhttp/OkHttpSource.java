@@ -72,7 +72,7 @@ public class OkHttpSource extends HttpSource {
 
     @Override
     public String getDescription() {
-        return "Create OkHttpSource(" + url + ")";
+        return "OkHttpSource(" + url + ")";
     }
 
     @SuppressWarnings("unchecked")

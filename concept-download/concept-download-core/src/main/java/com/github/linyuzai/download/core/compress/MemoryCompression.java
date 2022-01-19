@@ -33,4 +33,9 @@ public class MemoryCompression extends AbstractCompression {
     public Long getLength() {
         return (long) bytes.length;
     }
+
+    @Override
+    public String getDescription() {
+        return "MemoryCompression(" + getLength() + ")";
+    }
 }

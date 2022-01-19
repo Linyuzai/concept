@@ -18,6 +18,6 @@ public class SourceLoadingProgressEvent extends ProgressDownloadEvent {
 
     @Override
     public String getPercentageMessage() {
-        return "Loading " + source + " " + calculatePercent();
+        return "Loading " + source.getDescription() + " " + calculatePercent();
     }
 }

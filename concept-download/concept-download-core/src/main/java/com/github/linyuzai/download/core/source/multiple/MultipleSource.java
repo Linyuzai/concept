@@ -135,6 +135,16 @@ public class MultipleSource implements Source {
         return true;
     }
 
+    @Override
+    public String getDescription() {
+        List<String> descriptions = new ArrayList<>();
+        Collection<Source> list = list();
+        for (Source s : list) {
+            descriptions.add(s.getDescription());
+        }
+        return descriptions.toString();
+    }
+
     /**
      * 对集合中的所有下载源都执行加载 / Load all sources in the collection
      *
@@ -185,10 +195,5 @@ public class MultipleSource implements Source {
     @Override
     public void release() {
         sources.forEach(Downloadable::release);
-    }
-
-    @Override
-    public String toString() {
-        return sources.toString();
     }
 }

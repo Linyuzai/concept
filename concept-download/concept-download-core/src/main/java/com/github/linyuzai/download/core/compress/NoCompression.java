@@ -42,6 +42,11 @@ public class NoCompression implements Compression {
     }
 
     @Override
+    public String getDescription() {
+        return "NoCompression" + source.getDescription();
+    }
+
+    @Override
     public Collection<Part> getParts() {
         return source.getParts();
     }
