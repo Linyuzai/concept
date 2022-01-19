@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.writer;
+package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -10,7 +10,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * 默认的写入器的适配器 / Adapter of writer by default
+ * 默认的写入器的适配器 / Adapter of write by default
  */
 @Getter
 @AllArgsConstructor

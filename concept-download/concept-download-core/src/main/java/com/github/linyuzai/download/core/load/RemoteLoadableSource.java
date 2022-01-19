@@ -1,36 +1,31 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
-import lombok.SneakyThrows;
+import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.Progress;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public abstract class RemoteLoadableSource extends AbstractLoadableSource {
 
-    protected Long length;
-
-    @SneakyThrows
     @Override
-    public Mono<InputStream> doLoad(DownloadContext context) {
+    public Mono<Source> doLoad(OutputStream os, DownloadContext context) {
+        DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
+        DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return loadRemote(context).map(it -> {
-            if (it instanceof ByteArrayInputStream) {
-                return it;
-            }
-            DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            writer.write(it, os, null, null, length);
-            byte[] bytes = os.toByteArray();
-            if (length == null) {
-                length = (long) bytes.length;
-            }
-            return new ByteArrayInputStream(bytes);
+            long l = length == null ? -1 : length;
+            writer.write(it, os, null, null, length, (current, increase) -> {
+                Progress progress = new Progress(l, current, increase);
+                publisher.publish(new SourceLoadingProgressEvent(context, this, progress));
+            });
+            return this;
         });
     }
 

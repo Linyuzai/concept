@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.handler.impl;
 
-import com.github.linyuzai.download.core.context.ContextDestroyedEvent;
+import com.github.linyuzai.download.core.context.AfterContextDestroyedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
@@ -35,7 +35,7 @@ public class DestroyContextHandler implements DownloadHandler {
             destroyer.destroy(context);
         }
         context.destroy();
-        publisher.publish(new ContextDestroyedEvent(context));
+        publisher.publish(new AfterContextDestroyedEvent(context));
         return chain.next(context);
     }
 

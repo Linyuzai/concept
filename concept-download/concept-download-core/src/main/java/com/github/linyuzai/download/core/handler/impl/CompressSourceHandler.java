@@ -9,8 +9,8 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -50,7 +50,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
             DownloadWriter writer = writerAdapter.getWriter(source, null, context);
             compression = compressor.compress(source, writer, context);
         }
-        publisher.publish(new SourceCompressedEvent(context, source, compression));
+        publisher.publish(new AfterSourceCompressedEvent(context, source, compression));
         context.set(Compression.class, compression);
         return chain.next(context);
     }

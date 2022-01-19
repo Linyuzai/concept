@@ -110,6 +110,11 @@ public class FileSource extends AbstractSource {
         return file.getParent();
     }
 
+    @Override
+    public String getDescription() {
+        return "FileSource(" + file.getAbsolutePath() + ")";
+    }
+
     /**
      * 每次都新建，返回文件目录的实时结构
      *
@@ -134,11 +139,6 @@ public class FileSource extends AbstractSource {
             part.release();
             part = null;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "FileSource(path = " + file.getAbsolutePath() + ")";
     }
 
     @SuppressWarnings("unchecked")

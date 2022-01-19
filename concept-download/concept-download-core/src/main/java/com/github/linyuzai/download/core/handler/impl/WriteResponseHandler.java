@@ -3,19 +3,20 @@ package com.github.linyuzai.download.core.handler.impl;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
-import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.web.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.range.Range;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.Progress;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import reactor.core.publisher.Mono;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -57,15 +58,19 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                         @Override
                         public void accept(OutputStream os) {
                             Collection<Part> parts = compression.getParts();
+                            Long length = compression.getLength();
                             for (Part part : parts) {
-                                writer.write(part.getInputStream(), os, range,
-                                        part.getCharset(), part.getLength());
+                                InputStream is = part.getInputStream();
+                                writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
+                                    Progress progress = new Progress(length, current, increase);
+                                    publisher.publish(new ResponseWritingProgressEvent(context, progress));
+                                });
                             }
                             os.flush();
                         }
                     }));
         }).flatMap(it -> {
-            publisher.publish(new ResponseWrittenEvent(context));
+            publisher.publish(new AfterResponseWrittenEvent(context));
             return chain.next(context);
         });
     }

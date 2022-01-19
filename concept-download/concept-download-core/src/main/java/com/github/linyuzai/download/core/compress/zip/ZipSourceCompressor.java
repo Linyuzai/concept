@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -46,8 +46,8 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     @SneakyThrows
     @Override
     public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
-        Collection<Part> parts = source.getParts();
         try (ZipOutputStream zos = newZipOutputStream(source, os)) {
+            Collection<Part> parts = source.getParts();
             for (Part part : parts) {
                 InputStream is = part.getInputStream();
                 zos.putNextEntry(new ZipEntry(part.getPath()));

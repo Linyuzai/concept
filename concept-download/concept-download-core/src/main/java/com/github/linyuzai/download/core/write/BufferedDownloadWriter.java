@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.writer;
+package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -48,13 +48,18 @@ public class BufferedDownloadWriter implements DownloadWriter {
      */
     @SneakyThrows
     @Override
-    public void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) {
+    public void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback) {
         if (charset == null /*|| length > 0 && bufferSize >= length*/) {
             int len;
             byte[] bytes = new byte[bufferSize];
             if (range == null) {
+                long current = 0;
                 while ((len = is.read(bytes)) > 0) {
                     os.write(bytes, 0, len);
+                    current += len;
+                    if (callback != null) {
+                        callback.onWrite(current, len);
+                    }
                 }
             } else {
                 if (range.hasStart()) {
@@ -63,18 +68,33 @@ public class BufferedDownloadWriter implements DownloadWriter {
                 if (range.hasEnd()) {
                     long total = 0;
                     long l = range.getLength();
+                    long current = 0;
                     while ((len = is.read(bytes)) > 0) {
                         if (total + len > l) {
-                            os.write(bytes, 0, (int) (l - total));
+                            long increase = l - total;
+                            os.write(bytes, 0, (int) increase);
+                            current += increase;
+                            if (callback != null) {
+                                callback.onWrite(current, increase);
+                            }
                             break;
                         } else {
                             os.write(bytes, 0, len);
                             total += len;
+                            current += len;
+                            if (callback != null) {
+                                callback.onWrite(current, len);
+                            }
                         }
                     }
                 } else {
+                    long current = 0;
                     while ((len = is.read(bytes)) > 0) {
                         os.write(bytes, 0, len);
+                        current += len;
+                        if (callback != null) {
+                            callback.onWrite(current, len);
+                        }
                     }
                 }
             }
@@ -89,6 +109,9 @@ public class BufferedDownloadWriter implements DownloadWriter {
             }
             String string = new String(result);
             byte[] bytes = string.getBytes(charset);
+            if (callback != null) {
+                callback.onWrite(bytes.length, bytes.length);
+            }
             os.write(bytes);
         }
     }

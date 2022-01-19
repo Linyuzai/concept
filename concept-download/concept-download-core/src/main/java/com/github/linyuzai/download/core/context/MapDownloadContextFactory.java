@@ -2,6 +2,8 @@ package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
 
+import java.util.UUID;
+
 /**
  * 默认的下载上下文工厂 / Default factory
  */
@@ -15,6 +17,6 @@ public class MapDownloadContextFactory implements DownloadContextFactory {
      */
     @Override
     public DownloadContext create(DownloadOptions options) {
-        return new MapDownloadContext(options);
+        return new MapDownloadContext(UUID.randomUUID().toString(), options);
     }
 }

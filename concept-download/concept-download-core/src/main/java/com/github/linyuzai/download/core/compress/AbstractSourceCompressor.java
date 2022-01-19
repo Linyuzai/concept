@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
@@ -49,6 +49,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                 try (FileOutputStream fos = new FileOutputStream(cache)) {
                     doCompress(source, fos, writer, context);
                 }
+                publisher.publish(new SourceFileCompressedEvent(context, source, cache.getAbsolutePath()));
             }
             FileCompression compression = new FileCompression(cache);
             compression.setContentType(getContentType());

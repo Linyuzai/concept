@@ -115,4 +115,8 @@ public interface DownloadResponse {
             addHeader(entry.getKey(), entry.getValue());
         }
     }
+
+    default void flush() {
+
+    }
 }

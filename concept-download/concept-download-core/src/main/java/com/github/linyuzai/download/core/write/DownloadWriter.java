@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.writer;
+package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -22,6 +22,10 @@ public interface DownloadWriter extends OrderProvider {
      */
     boolean support(Downloadable downloadable, Range range, DownloadContext context);
 
+    default void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) {
+        write(is, os, range, charset, length, null);
+    }
+
     /**
      * 执行写入 / Do write
      *
@@ -31,5 +35,10 @@ public interface DownloadWriter extends OrderProvider {
      * @param charset 编码 / Charset
      * @param length  总字节数，可能为null / Total bytes count, may be null
      */
-    void write(InputStream is, OutputStream os, Range range, Charset charset, Long length);
+    void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback);
+
+    interface Callback {
+
+        void onWrite(long current, long increase);
+    }
 }

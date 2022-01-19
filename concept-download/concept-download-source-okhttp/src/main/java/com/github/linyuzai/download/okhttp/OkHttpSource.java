@@ -71,10 +71,8 @@ public class OkHttpSource extends HttpSource {
     }
 
     @Override
-    public String toString() {
-        return "OkHttpSource{" +
-                "url='" + url + '\'' +
-                '}';
+    public String getDescription() {
+        return "Create OkHttpSource(" + url + ")";
     }
 
     @SuppressWarnings("unchecked")

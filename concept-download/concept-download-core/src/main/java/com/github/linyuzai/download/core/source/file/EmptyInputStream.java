@@ -50,7 +50,7 @@ public class EmptyInputStream extends InputStream {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         closed = true;
     }
 }

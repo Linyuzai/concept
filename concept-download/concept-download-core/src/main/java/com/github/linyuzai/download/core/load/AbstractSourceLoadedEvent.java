@@ -7,16 +7,16 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class SourceLoadedEvent extends DownloadContextEvent {
+public abstract class AbstractSourceLoadedEvent extends DownloadContextEvent {
 
     @NonNull
     private final Source source;
 
-    public SourceLoadedEvent(DownloadContext context, Source source) {
-        this(context, source, "Load " + source);
+    public AbstractSourceLoadedEvent(DownloadContext context, Source source) {
+        this(context, source, "Load " + source.getDescription());
     }
 
-    public SourceLoadedEvent(DownloadContext context, @NonNull Source source, String message) {
+    public AbstractSourceLoadedEvent(DownloadContext context, @NonNull Source source, String message) {
         super(context);
         this.source = source;
         setMessage(message);

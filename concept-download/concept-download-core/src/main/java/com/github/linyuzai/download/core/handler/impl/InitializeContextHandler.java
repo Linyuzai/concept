@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.ContextInitializedEvent;
+import com.github.linyuzai.download.core.context.AfterContextInitializedEvent;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
@@ -34,7 +34,7 @@ public class InitializeContextHandler implements DownloadHandler {
             initializer.initialize(context);
         }
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        publisher.publish(new ContextInitializedEvent(context));
+        publisher.publish(new AfterContextInitializedEvent(context));
         return chain.next(context);
     }
 

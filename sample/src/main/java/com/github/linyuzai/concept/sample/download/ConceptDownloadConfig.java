@@ -2,7 +2,9 @@ package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
+import com.github.linyuzai.download.core.log.ProgressCalculationLogger;
 import com.github.linyuzai.download.core.log.StandardDownloadLogger;
+import com.github.linyuzai.download.core.log.TimeSpentCalculationLogger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +19,16 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
     @Bean
     public StandardDownloadLogger standardDownloadLogger() {
         return new StandardDownloadLogger();
+    }
+
+    @Bean
+    public ProgressCalculationLogger progressCalculationLogger() {
+        return new ProgressCalculationLogger();
+    }
+
+    @Bean
+    public TimeSpentCalculationLogger timeSpentDownloadLogger() {
+        return new TimeSpentCalculationLogger();
     }
 
     /*@Bean

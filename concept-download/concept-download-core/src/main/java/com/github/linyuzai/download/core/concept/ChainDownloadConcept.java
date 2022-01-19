@@ -6,13 +6,11 @@ import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChainImpl;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -25,8 +23,6 @@ public class ChainDownloadConcept implements DownloadConcept {
     private final DownloadConfiguration configuration;
 
     private final DownloadContextFactory contextFactory;
-
-    private final DownloadScheduler scheduler;
 
     private final DownloadReturnInterceptor returnInterceptor;
 

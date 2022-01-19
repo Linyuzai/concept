@@ -55,8 +55,8 @@ public class ClassPathSource extends AbstractSource {
     }
 
     @Override
-    public String toString() {
-        return "ClassPathResourceSource(path = " + resource.getPath() + ")";
+    public String getDescription() {
+        return "ClassPathSource(" + resource.getPath() + ")";
     }
 
     @SuppressWarnings("unchecked")

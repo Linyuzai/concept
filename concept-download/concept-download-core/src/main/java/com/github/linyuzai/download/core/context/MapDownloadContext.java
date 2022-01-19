@@ -18,8 +18,8 @@ public class MapDownloadContext extends AbstractDownloadContext {
      *
      * @param options 下载操作参数 / Options of download
      */
-    public MapDownloadContext(DownloadOptions options) {
-        this(options, new HashMap<>());
+    public MapDownloadContext(String id, DownloadOptions options) {
+        this(id, options, new HashMap<>());
     }
 
     /**
@@ -28,8 +28,8 @@ public class MapDownloadContext extends AbstractDownloadContext {
      * @param options 下载操作参数 / Options of download
      * @param map     基于的Map对象 / Map object to based
      */
-    public MapDownloadContext(DownloadOptions options, Map<Object, Object> map) {
-        super(options);
+    public MapDownloadContext(String id, DownloadOptions options, Map<Object, Object> map) {
+        super(id, options);
         this.map = map;
     }
 

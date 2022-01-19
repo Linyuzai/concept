@@ -29,8 +29,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 import java.io.*;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -233,6 +235,19 @@ public class ConceptDownloadController {
     public List<BusinessModel> s22() {
         List<BusinessModel> businessModels = new ArrayList<>();
         businessModels.add(new BusinessModelPlus("s22.txt", "UTF-8", "http://127.0.0.1:8080/concept-download/text.txt"));
+        return businessModels;
+    }
+
+    @Download
+    //@SourceCache(group = "s21")
+    //@CompressCache(group = "s21")
+    @GetMapping("/t")
+    public List<BusinessModel> t() {
+        List<BusinessModel> businessModels = new ArrayList<>();
+        for (int i = 0; i < 1; i++) {
+            String url = "http://192.168.20.112:8080/demo/download";
+            businessModels.add(new BusinessModel(i + ".exe", url));
+        }
         return businessModels;
     }
 

@@ -62,6 +62,11 @@ public class TextSource extends AbstractSource {
     }
 
     @Override
+    public String getDescription() {
+        return "TextSource(" + text + ")";
+    }
+
+    @Override
     public void release() {
         if (bytesInputStream != null) {
             try {
@@ -70,11 +75,6 @@ public class TextSource extends AbstractSource {
             }
         }
         bytesInputStream = null;
-    }
-
-    @Override
-    public String toString() {
-        return "TextSource(text = " + text + ")";
     }
 
     @SuppressWarnings("unchecked")

@@ -7,21 +7,18 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class SourceCompressedEvent extends DownloadContextEvent {
+public abstract class AbstractSourceCompressedEvent extends DownloadContextEvent {
 
     @NonNull
     private final Source source;
 
-    private final Compression compression;
-
-    public SourceCompressedEvent(DownloadContext context, Source source, Compression compression) {
-        this(context, source, compression, "Source compressed");
+    public AbstractSourceCompressedEvent(DownloadContext context, Source source) {
+        this(context, source, "Source compressed");
     }
 
-    public SourceCompressedEvent(DownloadContext context, @NonNull Source source, Compression compression, String message) {
+    public AbstractSourceCompressedEvent(DownloadContext context, @NonNull Source source, String message) {
         super(context);
         this.source = source;
-        this.compression = compression;
         setMessage(message);
     }
 }

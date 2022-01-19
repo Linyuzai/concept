@@ -7,9 +7,8 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
@@ -20,6 +19,8 @@ import java.io.*;
  */
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
+
+    protected Long length;
 
     /**
      * 如果需要异步加载 / If asynchronous loading is required
@@ -51,6 +52,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      *
      * @param context 下载上下文 / Context of download
      */
+    @SneakyThrows
     @Override
     public Mono<Source> load(DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
@@ -76,42 +78,47 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 }
             }
             File cache = new File(dir, name);
-            return Mono.just(cache).flatMap(it -> {
-                if (it.exists()) {
-                    publisher.publish(new SourceLoadedCacheUsedEvent(context, this, it.getAbsolutePath()));
-                    return Mono.just(it);
-                } else {
-                    return doLoad(context)
-                            .flatMap(is -> {
-                                DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-                                DownloadWriter writer = writerAdapter.getWriter(this, null, context);
-                                try (InputStream inputStream = is;
-                                     FileOutputStream fos = new FileOutputStream(it)) {
-                                    writer.write(inputStream, fos, null, getCharset(), getLength());
-                                    return Mono.just(it);
-                                } catch (Throwable e) {
-                                    return Mono.error(e);
-                                }
-                            });
+            Mono<Source> mono;
+            if (cache.exists()) {
+                publisher.publish(new SourceLoadedCacheUsedEvent(context, this, cache.getAbsolutePath()));
+                mono = Mono.just(this);
+            } else {
+                try (FileOutputStream fos = new FileOutputStream(cache)) {
+                    mono = doLoad(fos, context);
                 }
-            }).flatMap(f -> {
+            }
+            return mono.map(it -> {
                 String contentType = getContentType();
                 if (contentType == null || contentType.isEmpty()) {
-                    setContentType(ContentType.file(f));
+                    setContentType(ContentType.file(cache));
                 }
-                try {
-                    return Mono.just(new FileInputStream(f));
-                } catch (FileNotFoundException e) {
-                    return Mono.error(e);
+                long l = cache.length();
+                if (length == null) {
+                    length = l;
+                } else {
+                    if (length != l) {
+                        //TODO Wrong
+                        length = l;
+                    }
                 }
-            }).map(fis -> {
-                inputStream = fis;
-                return this;
+                inputStream = getCacheInputStream(cache);
+                return it;
             });
         } else {
-            return doLoad(context).map(is -> {
-                inputStream = is;
-                return this;
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            return doLoad(os, context).map(it -> {
+                byte[] bytes = os.toByteArray();
+                long l = bytes.length;
+                if (length == null) {
+                    length = l;
+                } else {
+                    if (length != l) {
+                        //TODO Wrong
+                        length = l;
+                    }
+                }
+                inputStream = new ByteArrayInputStream(bytes);
+                return it;
             });
         }
     }
@@ -119,6 +126,11 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     @Override
     public InputStream openInputStream() {
         return inputStream;
+    }
+
+    @SneakyThrows
+    public InputStream getCacheInputStream(File cache) {
+        return new FileInputStream(cache);
     }
 
     /**
@@ -140,7 +152,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * @param context 下载上下文 / Context of download
      * @return 输入流 / Input stream
      */
-    public abstract Mono<InputStream> doLoad(DownloadContext context);
+    public abstract Mono<Source> doLoad(OutputStream os, DownloadContext context);
 
     public static abstract class Builder<T extends AbstractLoadableSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 

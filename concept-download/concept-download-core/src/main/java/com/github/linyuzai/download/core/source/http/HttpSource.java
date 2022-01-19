@@ -4,8 +4,8 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.load.RemoteLoadableSource;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import lombok.*;
 import reactor.core.publisher.Mono;
 
@@ -51,11 +51,6 @@ public class HttpSource extends RemoteLoadableSource {
             }
         }
         return super.getName();
-    }
-
-    @Override
-    public Long getLength() {
-        return length;
     }
 
     @Override
@@ -109,8 +104,8 @@ public class HttpSource extends RemoteLoadableSource {
     }
 
     @Override
-    public String toString() {
-        return "HttpSource(url = " + url + ")";
+    public String getDescription() {
+        return "HttpSource(" + url + ")";
     }
 
     @SuppressWarnings("unchecked")

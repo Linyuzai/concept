@@ -30,7 +30,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
         Source source = factory.create(original, context);
         context.set(Source.class, source);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        publisher.publish(new SourceCreatedEvent(context, source));
+        publisher.publish(new AfterSourceCreatedEvent(context, source));
         return chain.next(context);
     }
 

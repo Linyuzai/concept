@@ -4,7 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
-import com.github.linyuzai.download.core.load.SourceLoadedEvent;
+import com.github.linyuzai.download.core.load.AfterSourceLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class LoadSourceHandler implements DownloadHandler {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return sourceLoader.load(source, context)
                 .flatMap(it -> {
-                    publisher.publish(new SourceLoadedEvent(context, it));
+                    publisher.publish(new AfterSourceLoadedEvent(context, it));
                     return chain.next(context);
                 });
     }

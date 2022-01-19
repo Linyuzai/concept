@@ -12,6 +12,8 @@ import lombok.NonNull;
 @AllArgsConstructor
 public abstract class AbstractDownloadContext implements DownloadContext {
 
+    private final String id;
+
     @NonNull
     private final DownloadOptions options;
 }

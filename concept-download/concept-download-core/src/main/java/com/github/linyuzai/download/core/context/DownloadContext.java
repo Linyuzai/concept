@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
  */
 public interface DownloadContext {
 
+    String getId();
+
     /**
      * @return 下载参数 / Download options
      */

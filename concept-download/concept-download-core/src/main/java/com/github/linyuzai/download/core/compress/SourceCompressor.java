@@ -3,7 +3,7 @@ package com.github.linyuzai.download.core.compress;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
 
 /**
  * 压缩器 / Compressor to compress source

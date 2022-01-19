@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class LookupCacheHandler implements DownloadHandler {
 
     @Override

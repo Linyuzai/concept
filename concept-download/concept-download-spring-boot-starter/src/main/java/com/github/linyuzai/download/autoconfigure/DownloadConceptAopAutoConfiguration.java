@@ -19,12 +19,4 @@ public class DownloadConceptAopAutoConfiguration {
     public DownloadAdvisor downloadConceptAdvisor() {
         return new DownloadAdvisor();
     }
-
-    /*@Bean
-    @ConditionalOnClass(Advisor.class)
-    public DownloadAnnotationBeanPostProcessor downloadAnnotationBeanPostProcessor(DownloadConcept downloadConcept) {
-        DownloadConceptAdvice advice = new DownloadConceptAdvice(downloadConcept);
-        DownloadConceptAdvisor advisor = new DownloadConceptAdvisor(advice);
-        return new DownloadAnnotationBeanPostProcessor(advisor);
-    }*/
 }

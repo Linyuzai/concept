@@ -22,8 +22,6 @@ import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.*;
 import com.github.linyuzai.download.core.load.DefaultSourceLoader;
 import com.github.linyuzai.download.core.load.SourceLoader;
-import com.github.linyuzai.download.core.scheduler.DownloadScheduler;
-import com.github.linyuzai.download.core.scheduler.ImmediateDownloadScheduler;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
@@ -40,10 +38,10 @@ import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
 import com.github.linyuzai.download.core.source.text.TextSourceFactory;
 import com.github.linyuzai.download.core.web.DownloadRequestProvider;
 import com.github.linyuzai.download.core.web.DownloadResponseProvider;
-import com.github.linyuzai.download.core.writer.BufferedDownloadWriter;
-import com.github.linyuzai.download.core.writer.DefaultDownloadWriterAdapter;
-import com.github.linyuzai.download.core.writer.DownloadWriter;
-import com.github.linyuzai.download.core.writer.DownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.BufferedDownloadWriter;
+import com.github.linyuzai.download.core.write.DefaultDownloadWriterAdapter;
+import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -57,21 +55,6 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DownloadConfiguration.class)
 public class DownloadConceptCoreAutoConfiguration {
-
-    /*@Bean
-    @ConditionalOnMissingBean
-    public DownloadConfiguration downloadConfiguration(DownloadConceptProperties properties) {
-        DownloadConfiguration configuration = new DownloadConfiguration();
-        configuration.getResponse().setHeaders(properties.getResponse().getHeaders());
-        configuration.getSource().getCache().setEnabled(properties.getSource().getCache().isEnabled());
-        configuration.getSource().getCache().setPath(properties.getSource().getCache().getPath());
-        configuration.getSource().getCache().setDelete(properties.getSource().getCache().isDelete());
-        configuration.getCompress().setFormat(properties.getCompress().getFormat());
-        configuration.getCompress().getCache().setEnabled(properties.getCompress().getCache().isEnabled());
-        configuration.getCompress().getCache().setPath(properties.getCompress().getCache().getPath());
-        configuration.getCompress().getCache().setDelete(properties.getCompress().getCache().isDelete());
-        return configuration;
-    }*/
 
     @Bean
     @ConditionalOnMissingBean
@@ -169,12 +152,6 @@ public class DownloadConceptCoreAutoConfiguration {
         return new ReflectionSourceFactory();
     }
 
-    /*@Bean
-    @ConditionalOnMissingBean
-    public PublisherSourceFactory publisherSourceFactory() {
-        return new PublisherSourceFactory();
-    }*/
-
     @Bean
     @ConditionalOnMissingBean
     public SourceFactoryAdapter sourceFactoryAdapter(List<SourceFactory> factories) {
@@ -217,32 +194,6 @@ public class DownloadConceptCoreAutoConfiguration {
         return new CreateSourceHandler(adapter);
     }
 
-    /*@Bean
-    @ConditionalOnMissingBean
-    public SourceLoaderInvoker sourceLoaderInvoker() {
-        return new SerialSourceLoaderInvoker();
-    }*/
-
-    /*@Bean
-    @ConditionalOnMissingBean
-    public SourceLoadExceptionHandler sourceLoadExceptionHandler() {
-        return new RethrowLoadedSourceLoadExceptionHandler();
-    }*/
-
-    /*@Bean
-    @ConditionalOnMissingBean
-    public SourceLoaderFactory sourceLoaderFactory(SourceLoadExceptionHandler handler) {
-        return new ExceptionCaughtSourceLoaderFactory(handler);
-    }*/
-
-    /*@Bean
-    @ConditionalOnMissingBean
-    public LoadSourceHandler loadSourceHandler(SourceLoaderFactory factory,
-                                               SourceLoaderInvoker invoker,
-                                               SourceLoadExceptionHandler handler) {
-        return new LoadSourceHandler(factory, invoker, handler);
-    }*/
-
     @Bean
     @ConditionalOnMissingBean
     public SourceLoader sourceLoader() {
@@ -277,19 +228,12 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DownloadScheduler downloadScheduler() {
-        return new ImmediateDownloadScheduler();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public DownloadConcept downloadConcept(DownloadConfiguration configuration,
                                            DownloadContextFactory factory,
-                                           DownloadScheduler scheduler,
                                            DownloadReturnInterceptor returnInterceptor,
                                            List<DownloadHandler> handlers,
                                            List<DownloadConfigurer> configurers) {
         configurers.forEach(it -> it.configure(configuration));
-        return new ChainDownloadConcept(configuration, factory, scheduler, returnInterceptor, handlers);
+        return new ChainDownloadConcept(configuration, factory, returnInterceptor, handlers);
     }
 }

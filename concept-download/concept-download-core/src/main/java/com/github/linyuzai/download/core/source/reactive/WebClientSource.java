@@ -54,8 +54,8 @@ public class WebClientSource extends HttpSource {
     }
 
     @Override
-    public String toString() {
-        return "WebClientSource(url = " + url + ")";
+    public String getDescription() {
+        return "WebClientSource(" + url + ")";
     }
 
     public static class InputStreamBodyExtractor implements BodyExtractor<Mono<InputStream>, ClientHttpResponse> {
