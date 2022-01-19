@@ -1,17 +1,16 @@
 package com.github.linyuzai.download.core.compress;
 
+import com.github.linyuzai.download.core.context.AbstractContextDestroyedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadContextEvent;
 import lombok.Getter;
 
 @Getter
-public class CompressionReleasedEvent extends DownloadContextEvent {
+public class CompressionReleasedEvent extends AbstractContextDestroyedEvent {
 
     private final Compression compression;
 
     public CompressionReleasedEvent(DownloadContext context, Compression compression) {
-        super(context);
+        super(context, "Compression resource released");
         this.compression = compression;
-        setMessage("Compression resource released");
     }
 }
