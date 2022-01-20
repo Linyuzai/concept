@@ -12,10 +12,7 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -33,13 +30,10 @@ public class SchedulerSourceLoader extends ConcurrentSourceLoader {
                         .publishOn(getScheduler())
                         .flatMap(s -> s.load(context)))
                 .collect(Collectors.toList());
-        List<Source> result = new ArrayList<>();
-        ErrorHolder holder = new ErrorHolder();
-        Disposable disposable = Mono.zip(monoList, objects -> Arrays.stream(objects)
+        List<Source> block = Mono.zip(monoList, objects -> Arrays.stream(objects)
                         .map(Source.class::cast)
                         .collect(Collectors.toList()))
-                .subscribe(result::addAll, holder::set);
-        holder.throwIfError();
-        return Mono.just(new MultipleSource(result));
+                .block();
+        return Mono.just(new MultipleSource(block == null ? Collections.emptyList() : block));
     }
 }

@@ -58,12 +58,6 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DownloadContextFactory downloadContextFactory() {
-        return new MapDownloadContextFactory();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public DownloadEventPublisher downloadEventPublisher(List<DownloadEventListener> listeners) {
         return new ApplicationDownloadEventPublisher(listeners);
     }
@@ -184,12 +178,6 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public InitializeContextHandler initializeContextHandler(List<DownloadContextInitializer> initializers) {
-        return new InitializeContextHandler(initializers);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public CreateSourceHandler createSourceHandler(SourceFactoryAdapter adapter) {
         return new CreateSourceHandler(adapter);
     }
@@ -222,8 +210,9 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DestroyContextHandler destroyContextHandler(List<DownloadContextDestroyer> destroyers) {
-        return new DestroyContextHandler(destroyers);
+    public DownloadContextFactory downloadContextFactory(List<DownloadContextInitializer> initializers,
+                                                         List<DownloadContextDestroyer> destroyers) {
+        return new DefaultDownloadContextFactory(initializers, destroyers);
     }
 
     @Bean

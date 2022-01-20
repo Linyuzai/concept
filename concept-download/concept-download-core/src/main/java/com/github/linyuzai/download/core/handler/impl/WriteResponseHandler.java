@@ -48,31 +48,29 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         Compression compression = context.get(Compression.class);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return downloadRequestProvider.getRequest(context).flatMap(request -> {
-            Range range = request.getRange();
-            DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
-            return downloadResponseProvider.getResponse(context)
-                    .filter(response -> applyHeaders(response, compression, range, context))
-                    .flatMap(response -> response.write(new Consumer<OutputStream>() {
+                    Range range = request.getRange();
+                    DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
+                    return downloadResponseProvider.getResponse(context)
+                            .filter(response -> applyHeaders(response, compression, range, context))
+                            .flatMap(response -> response.write(new Consumer<OutputStream>() {
 
-                        @SneakyThrows
-                        @Override
-                        public void accept(OutputStream os) {
-                            Collection<Part> parts = compression.getParts();
-                            Progress progress = new Progress(compression.getLength());
-                            for (Part part : parts) {
-                                InputStream is = part.getInputStream();
-                                writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
-                                    progress.update(increase);
-                                    publisher.publish(new ResponseWritingProgressEvent(context, progress.copy()));
-                                });
-                            }
-                            os.flush();
-                        }
-                    }));
-        }).flatMap(it -> {
-            publisher.publish(new AfterResponseWrittenEvent(context));
-            return chain.next(context);
-        });
+                                @SneakyThrows
+                                @Override
+                                public void accept(OutputStream os) {
+                                    Collection<Part> parts = compression.getParts();
+                                    Progress progress = new Progress(compression.getLength());
+                                    for (Part part : parts) {
+                                        InputStream is = part.getInputStream();
+                                        writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
+                                            progress.update(increase);
+                                            publisher.publish(new ResponseWritingProgressEvent(context, progress.copy()));
+                                        });
+                                    }
+                                    os.flush();
+                                }
+                            }));
+                })
+                .doOnSuccess(it -> publisher.publish(new AfterResponseWrittenEvent(context)));
     }
 
     public boolean applyHeaders(DownloadResponse response, Compression compression, Range range, DownloadContext context) {

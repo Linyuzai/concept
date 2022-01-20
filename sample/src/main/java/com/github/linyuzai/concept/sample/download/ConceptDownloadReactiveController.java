@@ -1,4 +1,3 @@
-/*
 package com.github.linyuzai.concept.sample.download;
 
 import com.github.linyuzai.download.core.aop.annotation.Download;
@@ -38,11 +37,11 @@ public class ConceptDownloadReactiveController {
     @GetMapping("/rs1")
     public Mono<Void> s21() {
         List<ConceptDownloadController.BusinessModel> businessModels = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        /*for (int i = 0; i < 10; i++) {
             //String url = "https://img2.baidu.com/it/u=3801884915,270435659&fm=26&fmt=auto";
             String url = "http://127.0.0.1:8080/concept-download-reactive/video.mp4";
             businessModels.add(new ConceptDownloadController.BusinessModel(i + ".mp4", url));
-        }
+        }*/
         businessModels.add(new ConceptDownloadController.BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
         businessModels.add(new ConceptDownloadController.BusinessModel("file", new File("/Users/Shared")));
         return new DownloadMono(businessModels);
@@ -53,5 +52,17 @@ public class ConceptDownloadReactiveController {
     public Mono<Void> error() {
         return new DownloadMono(new Object());
     }
+
+    @Download
+    //@SourceCache(group = "s21")
+    //@CompressCache(group = "s21")
+    @GetMapping("/t")
+    public Mono<Void> t() {
+        List<ConceptDownloadController.BusinessModel> businessModels = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            String url = "http://192.168.20.112:8080/demo/download?i=" + i;
+            businessModels.add(new ConceptDownloadController.BusinessModel(i + ".exe", url));
+        }
+        return new DownloadMono(businessModels);
+    }
 }
-*/

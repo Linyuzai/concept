@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import org.apache.commons.logging.Log;
+import reactor.core.publisher.Mono;
 
 /**
  * 下载上下文 / Context of download
@@ -48,6 +49,8 @@ public interface DownloadContext {
      * @param key 键 / Key
      */
     void remove(Object key);
+
+    void initialize();
 
     /**
      * 销毁，清空所有内容 / Clear all content

@@ -14,9 +14,9 @@ import java.util.function.Consumer;
  */
 public interface DownloadResponse {
 
-    default Mono<DownloadResponse> write(Consumer<OutputStream> consumer) {
+    default Mono<Void> write(Consumer<OutputStream> consumer) {
         consumer.accept(getOutputStream());
-        return Mono.just(this);
+        return Mono.empty();
     }
 
     /**

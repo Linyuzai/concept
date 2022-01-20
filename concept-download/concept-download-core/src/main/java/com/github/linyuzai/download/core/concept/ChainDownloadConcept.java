@@ -39,7 +39,10 @@ public class ChainDownloadConcept implements DownloadConcept {
     public Object download(Function<DownloadConfiguration, DownloadOptions> function) {
         DownloadOptions options = function.apply(configuration);
         DownloadContext context = contextFactory.create(options);
-        Mono<Void> mono = new DownloadHandlerChainImpl(0, handlers).next(context);
+        context.initialize();
+        Mono<Void> mono = new DownloadHandlerChainImpl(0, handlers)
+                .next(context)
+                .doAfterTerminate(context::destroy);
         return returnInterceptor.intercept(mono);
     }
 }

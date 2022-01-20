@@ -16,8 +16,12 @@ public abstract class AbstractProgressEvent extends DownloadContextEvent {
         setMessage(message);
     }
 
-    public String getCurrentMessage() {
+    public String getBaseCurrentMessage() {
         return format(progress.getCurrent());
+    }
+
+    public String getCurrentMessage() {
+        return getBaseCurrentMessage();
     }
 
     public String getRatioMessage() {
@@ -25,7 +29,7 @@ public abstract class AbstractProgressEvent extends DownloadContextEvent {
         if (progress.hasTotal()) {
             return format(progress.getCurrent()) + "/" + format(progress.getTotal());
         } else {
-            return getCurrentMessage();
+            return getBaseCurrentMessage();
         }
     }
 
@@ -36,14 +40,14 @@ public abstract class AbstractProgressEvent extends DownloadContextEvent {
             String format = String.format("%.2f", v);
             return format + "%";
         } else {
-            return getCurrentMessage();
+            return getBaseCurrentMessage();
         }
     }
 
     public String format(long size) {
-        if (size > 1024) {
+        if (size >= 1024) {
             double k = size / 1024.0;
-            if (k > 1024) {
+            if (k >= 1024) {
                 double m = k / 1024;
                 return String.format("%.2f", m) + "M";
             } else {

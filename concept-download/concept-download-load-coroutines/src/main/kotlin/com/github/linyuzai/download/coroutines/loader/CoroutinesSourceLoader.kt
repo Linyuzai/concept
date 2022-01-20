@@ -13,15 +13,11 @@ open class CoroutinesSourceLoader : ConcurrentSourceLoader() {
     override fun concurrentLoad(sources: Collection<Source>, context: DownloadContext): Mono<Source> {
         val results = mutableListOf<Source>()
         runBlocking {
-            val deferredList = mutableListOf<Deferred<Unit>>()
+            val deferredList = mutableListOf<Deferred<Source>>()
             sources.forEach {
                 val deferred = async(Dispatchers.IO) {
-                    val holder = ErrorHolder();
-                    it.load(context)
-                        .subscribe({
-                            results.add(it);
-                        }, holder::set)
-                    holder.throwIfError()
+                    it.load(context).block()
+                    return@async it
                 }
                 deferredList.add(deferred)
             }

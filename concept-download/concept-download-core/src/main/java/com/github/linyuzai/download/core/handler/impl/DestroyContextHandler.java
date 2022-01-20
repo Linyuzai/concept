@@ -17,6 +17,7 @@ import java.util.List;
  * 在下载流程结束后执行 / After downloaded
  * 调用所有的上下文销毁器 / Call all destroyers {@link DownloadContextDestroyer#destroy(DownloadContext)}
  */
+@Deprecated
 @AllArgsConstructor
 public class DestroyContextHandler implements DownloadHandler {
 

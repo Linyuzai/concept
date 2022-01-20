@@ -1,13 +1,23 @@
 package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * 默认的下载上下文工厂 / Default factory
  */
-public class MapDownloadContextFactory implements DownloadContextFactory {
+@AllArgsConstructor
+public class DefaultDownloadContextFactory implements DownloadContextFactory {
+
+    @NonNull
+    private List<DownloadContextInitializer> initializers;
+
+    @NonNull
+    private List<DownloadContextDestroyer> destroyers;
 
     /**
      * 直接创建一个上下文，没有额外的处理 / Create a context directly without additional processing
@@ -17,6 +27,6 @@ public class MapDownloadContextFactory implements DownloadContextFactory {
      */
     @Override
     public DownloadContext create(DownloadOptions options) {
-        return new MapDownloadContext(UUID.randomUUID().toString(), options);
+        return new DefaultDownloadContext(UUID.randomUUID().toString(), options, initializers, destroyers);
     }
 }

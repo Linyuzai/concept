@@ -97,7 +97,8 @@ public class ProgressCalculationLogger extends DownloadLogger {
 
         public void publish(AbstractProgressEvent event) {
             holder.set(event);
-            if (event.getProgress().getCurrent() == event.getProgress().getTotal()) {
+            if (event.getProgress().getTotal() != null &&
+                    event.getProgress().getCurrent() == event.getProgress().getTotal()) {
                 update();
                 disposable();
             }
@@ -130,11 +131,16 @@ public class ProgressCalculationLogger extends DownloadLogger {
         private volatile boolean update;
 
         public void set(AbstractProgressEvent newEvent) {
-            if (event.getProgress().getCurrent() == newEvent.getProgress().getCurrent()) {
-                update = false;
-            } else {
+            if (event == null) {
                 event = newEvent;
                 update = true;
+            } else {
+                if (event.getProgress().getCurrent() == newEvent.getProgress().getCurrent()) {
+                    update = false;
+                } else {
+                    event = newEvent;
+                    update = true;
+                }
             }
         }
 

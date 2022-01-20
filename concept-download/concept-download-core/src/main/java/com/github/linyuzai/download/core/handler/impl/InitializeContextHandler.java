@@ -17,6 +17,7 @@ import java.util.List;
  * 在上下文创建之后执行 / After context creation
  * 调用所有的上下文初始化器 / Call all initializers {@link DownloadContextInitializer#initialize(DownloadContext)}
  */
+@Deprecated
 @AllArgsConstructor
 public class InitializeContextHandler implements DownloadHandler {
 
