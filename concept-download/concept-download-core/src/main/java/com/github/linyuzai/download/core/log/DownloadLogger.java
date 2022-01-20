@@ -61,7 +61,7 @@ public abstract class DownloadLogger implements DownloadEventListener {
     }
 
     public void log(Log log, String tag, String message) {
-        log.info(appendTag(tag) + message);
+        log.info(appendTag(tag) + message + " ");
     }
 
     public String appendTag(String tag) {

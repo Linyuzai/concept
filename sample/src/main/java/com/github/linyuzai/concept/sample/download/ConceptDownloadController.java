@@ -246,7 +246,7 @@ public class ConceptDownloadController {
         List<BusinessModel> businessModels = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             String url = "http://192.168.20.112:8080/demo/download?i=" + i;
-            businessModels.add(new BusinessModel(i + ".exe", url));
+            businessModels.add(new BusinessModel(i + ".jar", url));
         }
         return businessModels;
     }

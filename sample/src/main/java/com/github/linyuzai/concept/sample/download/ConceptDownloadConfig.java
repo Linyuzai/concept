@@ -36,7 +36,7 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
         return new TimeSpentCalculationLogger();
     }
 
-    //@Bean
+    @Bean
     public SourceLoader sourceLoader() {
         return new SchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(5)));
     }

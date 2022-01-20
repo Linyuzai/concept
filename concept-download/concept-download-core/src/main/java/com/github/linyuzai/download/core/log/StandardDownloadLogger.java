@@ -8,9 +8,7 @@ import com.github.linyuzai.download.core.event.DownloadContextEvent;
 import com.github.linyuzai.download.core.load.AbstractSourceLoadedEvent;
 import com.github.linyuzai.download.core.source.AbstractSourceCreatedEvent;
 import com.github.linyuzai.download.core.web.AbstractResponseWrittenEvent;
-import lombok.extern.apachecommons.CommonsLog;
 
-@CommonsLog
 public class StandardDownloadLogger extends DownloadLogger {
 
     @Override
