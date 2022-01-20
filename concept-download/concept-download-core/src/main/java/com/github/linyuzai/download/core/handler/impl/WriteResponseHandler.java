@@ -58,12 +58,12 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                         @Override
                         public void accept(OutputStream os) {
                             Collection<Part> parts = compression.getParts();
-                            Long length = compression.getLength();
+                            Progress progress = new Progress(compression.getLength());
                             for (Part part : parts) {
                                 InputStream is = part.getInputStream();
                                 writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
-                                    Progress progress = new Progress(length, current, increase);
-                                    publisher.publish(new ResponseWritingProgressEvent(context, progress));
+                                    progress.update(increase);
+                                    publisher.publish(new ResponseWritingProgressEvent(context, progress.copy()));
                                 });
                             }
                             os.flush();

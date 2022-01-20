@@ -3,21 +3,41 @@ package com.github.linyuzai.download.core.load;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.Progress;
-import com.github.linyuzai.download.core.write.ProgressDownloadEvent;
+import com.github.linyuzai.download.core.write.AbstractProgressEvent;
 import lombok.Getter;
 
 @Getter
-public class SourceLoadingProgressEvent extends ProgressDownloadEvent {
+public class SourceLoadingProgressEvent extends AbstractProgressEvent {
+
+    private static final String L = "Loading ";
 
     private final Source source;
 
     public SourceLoadingProgressEvent(DownloadContext context, Source source, Progress progress) {
-        super(context, progress, "Loading " + source + " " + progress.getCurrent() + "/" + progress.getTotal());
+        super(context, progress, getLS(source) + progress.getCurrent() + "/" + progress.getTotal());
         this.source = source;
     }
 
     @Override
+    public String getCurrentMessage() {
+        return getLS() + super.getCurrentMessage();
+    }
+
+    @Override
+    public String getRatioMessage() {
+        return getLS() + super.getRatioMessage();
+    }
+
+    @Override
     public String getPercentageMessage() {
-        return "Loading " + source.getDescription() + " " + calculatePercent();
+        return getLS() + super.getPercentageMessage();
+    }
+
+    public String getLS() {
+        return getLS(source);
+    }
+
+    public static String getLS(Source source) {
+        return L + source.getDescription() + " ";
     }
 }

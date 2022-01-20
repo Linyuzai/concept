@@ -11,6 +11,7 @@ import com.github.linyuzai.download.core.write.DownloadWriter;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -37,34 +38,24 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     }
 
     /**
-     * 执行zip压缩 / Perform zip compression
-     *
-     * @param source 被压缩的对象 / Object to compress
-     * @param os     写入的输出流 / Output stream to write
-     * @param writer 写入执行器 / Executor of writing
-     */
-    @SneakyThrows
-    @Override
-    public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
-        try (ZipOutputStream zos = newZipOutputStream(source, os)) {
-            Collection<Part> parts = source.getParts();
-            for (Part part : parts) {
-                InputStream is = part.getInputStream();
-                zos.putNextEntry(new ZipEntry(part.getPath()));
-                writer.write(is, zos, null, part.getCharset(), part.getLength());
-                zos.closeEntry();
-            }
-        }
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        publisher.publish(new SourceZipCompressedEvent(context, source));
-    }
-
-    /**
      * 新建一个ZipOutputStream / new a ZipOutputStream
      * {@link ZipOutputStream#ZipOutputStream(OutputStream, Charset)}
      */
-    public ZipOutputStream newZipOutputStream(Source source, OutputStream os) {
+    @Override
+    public OutputStream newOutputStream(OutputStream os, Source source) {
         return new ZipOutputStream(os);
+    }
+
+    @SneakyThrows
+    @Override
+    public void beforeWrite(Part part, OutputStream os) {
+        ((ZipOutputStream) os).putNextEntry(new ZipEntry(part.getPath()));
+    }
+
+    @SneakyThrows
+    @Override
+    public void afterWrite(Part part, OutputStream os) {
+        ((ZipOutputStream) os).closeEntry();
     }
 
     /**

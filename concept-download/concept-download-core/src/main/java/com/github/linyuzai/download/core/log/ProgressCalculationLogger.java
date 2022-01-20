@@ -4,9 +4,11 @@ import com.github.linyuzai.download.core.context.AfterContextDestroyedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
-import com.github.linyuzai.download.core.write.ProgressDownloadEvent;
+import com.github.linyuzai.download.core.write.AbstractProgressEvent;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -16,12 +18,33 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+@AllArgsConstructor
 public class ProgressCalculationLogger extends DownloadLogger {
 
     private final Map<String, Map<Object, ProgressInterval>> progressIntervalMap = new ConcurrentHashMap<>();
 
-    public void onProgress(ProgressDownloadEvent event) {
-        log(event.getContext(), event.getPercentageMessage());
+    @Getter
+    @Setter
+    private Duration duration;
+
+    @Getter
+    @Setter
+    private boolean percentage;
+
+    public ProgressCalculationLogger() {
+        this(Duration.ofSeconds(1), false);
+    }
+
+    public ProgressCalculationLogger(long second) {
+        this(Duration.ofSeconds(second), false);
+    }
+
+    public ProgressCalculationLogger(boolean percentage) {
+        this(Duration.ofSeconds(1), percentage);
+    }
+
+    public void onProgress(AbstractProgressEvent event) {
+        log(event.getContext(), percentage ? event.getPercentageMessage() : event.getRatioMessage());
     }
 
     @Override
@@ -33,56 +56,59 @@ public class ProgressCalculationLogger extends DownloadLogger {
             if (remove != null) {
                 remove.values().forEach(ProgressInterval::disposable);
             }
-        } else if (event instanceof ProgressDownloadEvent) {
-            ProgressDownloadEvent pde = (ProgressDownloadEvent) event;
-            DownloadContext context = ((ProgressDownloadEvent) event).getContext();
+        } else if (event instanceof AbstractProgressEvent) {
+            AbstractProgressEvent pde = (AbstractProgressEvent) event;
+            DownloadContext context = ((AbstractProgressEvent) event).getContext();
             progressIntervalMap.computeIfAbsent(context.getId(), id ->
                     new ConcurrentHashMap<>()).computeIfAbsent(getId(pde), o ->
                     new ProgressInterval(this::onProgress)).publish(pde);
         }
     }
 
-    protected Object getId(ProgressDownloadEvent event) {
+    protected Object getId(AbstractProgressEvent event) {
         if (event instanceof SourceLoadingProgressEvent) {
             return ((SourceLoadingProgressEvent) event).getSource();
         } else if (event instanceof ResponseWritingProgressEvent) {
             return ResponseWritingProgressEvent.class;
         } else {
-            return ProgressDownloadEvent.class;
+            return AbstractProgressEvent.class;
         }
     }
 
-    public static class ProgressInterval implements Consumer<FluxSink<ProgressDownloadEvent>> {
+    public class ProgressInterval implements Consumer<FluxSink<AbstractProgressEvent>> {
 
-        private FluxSink<ProgressDownloadEvent> sink;
+        private FluxSink<AbstractProgressEvent> sink;
 
         private final Disposable disposable;
 
         private Disposable innerDisposable;
 
-        @Getter
         private final ProgressEventHolder holder = new ProgressEventHolder();
 
-        public ProgressInterval(Consumer<ProgressDownloadEvent> consumer) {
+        public ProgressInterval(Consumer<AbstractProgressEvent> consumer) {
             disposable = Flux.create(this).subscribe(consumer);
         }
 
         @Override
-        public void accept(FluxSink<ProgressDownloadEvent> sink) {
+        public void accept(FluxSink<AbstractProgressEvent> sink) {
             this.sink = sink;
-            innerDisposable = Flux.interval(Duration.ofSeconds(2)).subscribe(unused -> {
-                ProgressDownloadEvent event = holder.get();
+            innerDisposable = Flux.interval(duration).subscribe(unused -> update());
+        }
+
+        public void publish(AbstractProgressEvent event) {
+            holder.set(event);
+            if (event.getProgress().getCurrent() == event.getProgress().getTotal()) {
+                update();
+                disposable();
+            }
+        }
+
+        private void update() {
+            if (holder.isUpdate()) {
+                AbstractProgressEvent event = holder.get();
                 if (event != null) {
                     sink.next(event);
                 }
-            });
-        }
-
-        public void publish(ProgressDownloadEvent event) {
-            holder.set(event);
-            if (event.getProgress().getCurrent() == event.getProgress().getTotal()) {
-                sink.next(holder.get());
-                disposable();
             }
         }
 
@@ -99,13 +125,21 @@ public class ProgressCalculationLogger extends DownloadLogger {
     @Data
     public static class ProgressEventHolder {
 
-        private volatile ProgressDownloadEvent event;
+        private volatile AbstractProgressEvent event;
 
-        public void set(ProgressDownloadEvent newEvent) {
-            event = newEvent;
+        private volatile boolean update;
+
+        public void set(AbstractProgressEvent newEvent) {
+            if (event.getProgress().getCurrent() == newEvent.getProgress().getCurrent()) {
+                update = false;
+            } else {
+                event = newEvent;
+                update = true;
+            }
         }
 
-        public ProgressDownloadEvent get() {
+        public AbstractProgressEvent get() {
+            update = false;
             return event;
         }
     }

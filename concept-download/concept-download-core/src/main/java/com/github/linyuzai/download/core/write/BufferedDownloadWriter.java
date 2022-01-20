@@ -122,7 +122,6 @@ public class BufferedDownloadWriter implements DownloadWriter {
 
     private byte[] getBuffer(byte[] buffer, int len) {
         int size = buffer.length;
-        System.out.println("size:" + size + ", len:" + len);
         if (size == maxBufferSize) {
             return buffer;
         }
@@ -136,17 +135,6 @@ public class BufferedDownloadWriter implements DownloadWriter {
         } else {
             return buffer;
         }
-    }
-
-    private int newBufferSize(int bufferSize) {
-        if (bufferSize == maxBufferSize) {
-            return bufferSize;
-        }
-        bufferSize = bufferSize * 2;
-        if (bufferSize > maxBufferSize) {
-            bufferSize = maxBufferSize;
-        }
-        return bufferSize;
     }
 
     private char[] concat(char[] current, char[] append, int length) {

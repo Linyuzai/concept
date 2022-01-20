@@ -1,17 +1,20 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
+import com.github.linyuzai.download.core.compress.zip.SourceZipCompressedEvent;
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.Progress;
 import lombok.SneakyThrows;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.Collection;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 抽象的Source压缩器 / Abstract class of source compressor
@@ -72,7 +75,30 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @param os     写入的输出流 / Output stream to write
      * @param writer 写入执行器 / Executor of writing
      */
-    public abstract void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context);
+    @SneakyThrows
+    public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        try (OutputStream nos = newOutputStream(os, source)) {
+            Progress progress = new Progress(source.getLength());
+            Collection<Part> parts = source.getParts();
+            for (Part part : parts) {
+                InputStream is = part.getInputStream();
+                beforeWrite(part, nos);
+                writer.write(is, nos, null, part.getCharset(), part.getLength(), (current, increase) -> {
+                    progress.update(increase);
+                    publisher.publish(new SourceCompressingProgressEvent(context, progress.copy()));
+                });
+                afterWrite(part, nos);
+            }
+        }
+        publisher.publish(new SourceZipCompressedEvent(context, source));
+    }
+
+    public abstract OutputStream newOutputStream(OutputStream os, Source source);
+
+    public abstract void beforeWrite(Part part, OutputStream os);
+
+    public abstract void afterWrite(Part part, OutputStream os);
 
     /**
      * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used

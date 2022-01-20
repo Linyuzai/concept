@@ -1,15 +1,32 @@
 package com.github.linyuzai.download.core.write;
 
-import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
 
-@Value
-@AllArgsConstructor
+@Getter
 public class Progress {
 
-    long total;
+    private final Long total;
 
-    long current;
+    private long current;
 
-    long increase;
+    public Progress(Long total) {
+        this.total = total;
+    }
+
+    public boolean hasTotal() {
+        return total != null && total > 0;
+    }
+
+    public void update(long increase) {
+        if (increase <= 0) {
+            return;
+        }
+        current += increase;
+    }
+
+    public Progress copy() {
+        Progress progress = new Progress(total);
+        progress.current = current;
+        return progress;
+    }
 }

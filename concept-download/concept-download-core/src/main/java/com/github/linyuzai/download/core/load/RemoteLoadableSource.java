@@ -20,10 +20,10 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
         DownloadWriter writer = writerAdapter.getWriter(this, null, context);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return loadRemote(context).map(it -> {
-            long l = length == null ? -1 : length;
+            Progress progress = new Progress(length);
             writer.write(it, os, null, null, length, (current, increase) -> {
-                Progress progress = new Progress(l, current, increase);
-                publisher.publish(new SourceLoadingProgressEvent(context, this, progress));
+                progress.update(increase);
+                publisher.publish(new SourceLoadingProgressEvent(context, this, progress.copy()));
             });
             return this;
         });
