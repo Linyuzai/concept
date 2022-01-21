@@ -7,7 +7,9 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
 
 /**
- * 切面定义 / Definition of advice
+ * 切面定义。
+ * <p>
+ * Definition of advice.
  */
 public class DownloadAdvisor extends DefaultPointcutAdvisor implements BeanPostProcessor {
 

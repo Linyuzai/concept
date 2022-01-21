@@ -20,7 +20,7 @@ public interface Cacheable {
     /**
      * 默认的缓存地址 / Default cache path
      */
-    String PATH = new File(System.getProperty("user.home"), "DownloadCache").getAbsolutePath();
+    String PATH = new File(System.getProperty("user.home"), "concept/download").getAbsolutePath();
 
     /**
      * @return 是否启用缓存 / If enable cache
