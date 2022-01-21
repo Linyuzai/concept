@@ -120,6 +120,7 @@ public class ProgressCalculationLogger extends DownloadLogger {
             if (innerDisposable != null && !innerDisposable.isDisposed()) {
                 innerDisposable.dispose();
             }
+            holder.reset();
         }
     }
 
@@ -147,6 +148,11 @@ public class ProgressCalculationLogger extends DownloadLogger {
         public AbstractProgressEvent get() {
             update = false;
             return event;
+        }
+
+        public void reset() {
+            update = false;
+            event = null;
         }
     }
 }
