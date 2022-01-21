@@ -63,9 +63,18 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public DownloadEventPublisherInitializer downloadEventPublisherInitializer(DownloadEventPublisher publisher) {
         return new DownloadEventPublisherInitializer(publisher);
+    }
+
+    @Bean
+    public PublishContextEventInitializer publishContextEventInitializer() {
+        return new PublishContextEventInitializer();
+    }
+
+    @Bean
+    public PublishContextEventDestroyer publishContextEventDestroyer() {
+        return new PublishContextEventDestroyer();
     }
 
     @Bean
@@ -159,7 +168,6 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheNameGeneratorInitializer cacheNameGeneratorInitializer(CacheNameGenerator generator) {
         return new CacheNameGeneratorInitializer(generator);
     }
@@ -216,7 +224,6 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public DownloadConcept downloadConcept(DownloadConfiguration configuration,
                                            DownloadContextFactory factory,
                                            DownloadReturnInterceptor returnInterceptor,

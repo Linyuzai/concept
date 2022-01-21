@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 public class DownloadConceptReactiveAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public ReactiveDownloadFilter reactiveDownloadFilter() {
         return new ReactiveDownloadFilter();
     }
