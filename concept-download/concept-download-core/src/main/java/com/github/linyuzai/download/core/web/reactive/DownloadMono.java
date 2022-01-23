@@ -5,16 +5,23 @@ import lombok.*;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Mono;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DownloadMono extends Mono<Void> implements ValueContainer {
 
-    @Setter
     @Getter
     private Object value;
 
     @Override
     public void subscribe(@NonNull CoreSubscriber<? super Void> actual) {
         //can not be called
+    }
+
+    public static DownloadMono empty() {
+        return new DownloadMono();
+    }
+
+    public static DownloadMono value(Object value) {
+        return new DownloadMono(value);
     }
 }

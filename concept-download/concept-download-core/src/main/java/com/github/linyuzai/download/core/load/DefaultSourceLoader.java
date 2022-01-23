@@ -8,7 +8,6 @@ public class DefaultSourceLoader implements SourceLoader {
 
     @Override
     public Mono<Source> load(Source source, DownloadContext context) {
-        return Mono.just(source)
-                .flatMap(it -> it.load(context));
+        return source.load(context);
     }
 }
