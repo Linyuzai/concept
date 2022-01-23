@@ -10,43 +10,67 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * 使用ZIP压缩的压缩器 / Compressor using zip compression
+ * 使用 {@link ZipOutputStream} 进行压缩。
+ * <p>
+ * Use {@link ZipOutputStream} for compression.
  */
 @AllArgsConstructor
 public class ZipSourceCompressor extends AbstractSourceCompressor {
 
     /**
-     * 支持ZIP格式 / Support ZIP format
+     * 支持 ZIP 格式的压缩。
+     * <p>
+     * Support ZIP format compression.
      *
-     * @param format  压缩格式 / Compression format
-     * @param context 下载上下文 / Context of download
-     * @return 是否支持该压缩格式 / If support this compressed format
+     * @param format  压缩格式
+     *                <p>
+     *                Compression format
+     * @param context {@link DownloadContext}
+     * @return 如果使用 ZIP 格式压缩则返回 true
+     * <p>
+     * Returns true if ZIP format compression is used
      */
     @Override
     public boolean support(String format, DownloadContext context) {
-        return CompressFormat.ZIP.equals(format);
+        return CompressFormat.ZIP.equalsIgnoreCase(format);
     }
 
     /**
-     * 新建一个ZipOutputStream / new a ZipOutputStream
-     * {@link ZipOutputStream#ZipOutputStream(OutputStream, Charset)}
+     * 新建一个 {@link ZipOutputStream}
+     * <p>
+     * New a {@link ZipOutputStream}
      */
     @Override
     public OutputStream newOutputStream(OutputStream os, Source source) {
         return new ZipOutputStream(os);
     }
 
+    /**
+     * 写之前添加一个 {@link ZipEntry}。
+     * <p>
+     * Add a {@link ZipEntry} before writing.
+     *
+     * @param part {@link Part}
+     * @param os   {@link ZipOutputStream}
+     */
     @SneakyThrows
     @Override
     public void beforeWrite(Part part, OutputStream os) {
         ((ZipOutputStream) os).putNextEntry(new ZipEntry(part.getPath()));
     }
 
+    /**
+     * 写入之后关闭 {@link ZipEntry}。
+     * <p>
+     * Close {@link ZipEntry} after writing.
+     *
+     * @param part {@link Part}
+     * @param os   {@link ZipOutputStream}
+     */
     @SneakyThrows
     @Override
     public void afterWrite(Part part, OutputStream os) {
@@ -54,7 +78,11 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     }
 
     /**
-     * @return .zip后缀 / Use suffix .zip
+     * 获得 zip 文件扩展后缀。
+     * <p>
+     * Get the zip file extension suffix.
+     *
+     * @return .zip
      */
     @Override
     public String getSuffix() {
@@ -62,6 +90,10 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
     }
 
     /**
+     * 获得 zip 文件的 Content-Type。
+     * <p>
+     * Get the Content-Type of the zip file.
+     *
      * @return application/x-zip-compressed
      */
     @Override
