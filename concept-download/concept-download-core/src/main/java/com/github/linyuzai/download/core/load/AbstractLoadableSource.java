@@ -1,12 +1,12 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
-import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.web.ContentType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;

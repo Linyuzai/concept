@@ -14,8 +14,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.Collection;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * 抽象的Source压缩器 / Abstract class of source compressor

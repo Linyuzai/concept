@@ -1,18 +1,19 @@
 package com.github.linyuzai.download.core.load;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.exception.ErrorHolder;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.multiple.MultipleSource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter

@@ -2,8 +2,8 @@ package com.github.linyuzai.download.core.source.file;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.concept.Part;
-import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
+import com.github.linyuzai.download.core.web.ContentType;
 import lombok.*;
 import org.springframework.util.StringUtils;
 

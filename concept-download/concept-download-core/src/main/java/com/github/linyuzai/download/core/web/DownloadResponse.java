@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.web;
 
 import lombok.SneakyThrows;
-import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Mono;
 
 import java.io.OutputStream;

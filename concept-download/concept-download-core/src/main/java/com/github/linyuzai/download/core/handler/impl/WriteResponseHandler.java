@@ -2,13 +2,13 @@ package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
-import com.github.linyuzai.download.core.web.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.range.Range;
+import com.github.linyuzai.download.core.web.*;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.Progress;

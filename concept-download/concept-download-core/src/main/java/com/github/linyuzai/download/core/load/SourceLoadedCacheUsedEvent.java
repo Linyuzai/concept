@@ -4,8 +4,6 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
-import java.io.File;
-
 @Getter
 public class SourceLoadedCacheUsedEvent extends AbstractSourceLoadedEvent {
 
