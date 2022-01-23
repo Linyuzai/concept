@@ -176,7 +176,8 @@ public class ConceptDownloadController {
         return businessModels;
     }
 
-    @Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")
+    //@Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
+    @Download(source = "classpath:/download/text.txt")
     @GetMapping("/text.txt")
     public void readme() {
     }

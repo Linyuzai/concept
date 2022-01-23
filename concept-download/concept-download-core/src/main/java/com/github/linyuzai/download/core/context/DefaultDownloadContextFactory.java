@@ -27,6 +27,9 @@ public class DefaultDownloadContextFactory implements DownloadContextFactory {
      */
     @Override
     public DownloadContext create(DownloadOptions options) {
-        return new DefaultDownloadContext(UUID.randomUUID().toString(), options, initializers, destroyers);
+        DefaultDownloadContext context = new DefaultDownloadContext(UUID.randomUUID().toString(), options);
+        context.setInitializers(initializers);
+        context.setDestroyers(destroyers);
+        return context;
     }
 }

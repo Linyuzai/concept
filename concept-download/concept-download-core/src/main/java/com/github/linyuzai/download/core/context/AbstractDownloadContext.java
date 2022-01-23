@@ -1,30 +1,43 @@
 package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 持有下载操作参数的下载上下文 / Context of download holding download options
  */
 @Getter
-@AllArgsConstructor
 public abstract class AbstractDownloadContext implements DownloadContext {
 
-    @NonNull
     private final String id;
 
-    @NonNull
     private final DownloadOptions options;
 
     @NonNull
-    private final Collection<DownloadContextInitializer> initializers;
+    @Setter
+    private Collection<DownloadContextInitializer> initializers = Collections.emptyList();
 
     @NonNull
-    private final Collection<DownloadContextDestroyer> destroyers;
+    @Setter
+    private Collection<DownloadContextDestroyer> destroyers = Collections.emptyList();
+
+    public AbstractDownloadContext(@NonNull String id, @NonNull DownloadOptions options) {
+        this.id = id;
+        this.options = options;
+    }
+
+    @Override
+    public void initialize() {
+        initializers.forEach(it -> it.initialize(this));
+    }
+
+    @Override
+    public void destroy() {
+        destroyers.forEach(it -> it.destroy(this));
+    }
 }

@@ -185,7 +185,8 @@ public class ConceptDownloadReactiveController {
         return DownloadMono.value(businessModels);
     }
 
-    @Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")
+    //@Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")
+    @Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain;charset=utf-8")
     @GetMapping("/text.txt")
     public Mono<Void> readme() {
         return DownloadMono.empty();

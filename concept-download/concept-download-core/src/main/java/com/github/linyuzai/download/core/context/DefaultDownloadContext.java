@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,13 +15,11 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
     /**
      * 上下文依赖一个下载操作的参数和一个Map对象 / Context depend on a download options and a Map
      *
+     * @param id      context id
      * @param options 下载操作参数 / Options of download
-     * @param map     基于的Map对象 / Map object to based
      */
-    public DefaultDownloadContext(String id, DownloadOptions options,
-                                  Collection<DownloadContextInitializer> initializers,
-                                  Collection<DownloadContextDestroyer> destroyers) {
-        super(id, options, initializers, destroyers);
+    public DefaultDownloadContext(String id, DownloadOptions options) {
+        super(id, options);
     }
 
     /**
@@ -71,17 +68,12 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
         map.remove(key);
     }
 
-    @Override
-    public void initialize() {
-        getInitializers().forEach(it -> it.initialize(this));
-    }
-
     /**
      * 销毁，清空所有内容 / Clear all content
      */
     @Override
     public void destroy() {
-        getDestroyers().forEach(it -> it.destroy(this));
+        super.destroy();
         map.clear();
     }
 }
