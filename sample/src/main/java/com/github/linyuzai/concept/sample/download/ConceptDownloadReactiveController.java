@@ -15,6 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -183,6 +184,18 @@ public class ConceptDownloadReactiveController {
         businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
         businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
         return DownloadMono.value(businessModels);
+    }
+
+    @Download
+    @GetMapping("/s20")
+    public Mono<Void> s20() {
+        return DownloadMono.value(Mono.just("123"));
+    }
+
+    @Download
+    @GetMapping("/s21")
+    public Mono<Void> s21() {
+        return DownloadMono.value(Flux.just("123", "classpath:/download/image.jpg"));
     }
 
     //@Download(source = "classpath:/download/text.txt", inline = true, contentType = "text/plain")

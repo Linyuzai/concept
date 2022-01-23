@@ -31,7 +31,10 @@ public class LoadSourceHandler implements DownloadHandler {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         return sourceLoader.load(source, context)
                 .doOnSuccess(it -> publisher.publish(new AfterSourceLoadedEvent(context, it)))
-                .flatMap(it -> chain.next(context));
+                .flatMap(it -> {
+                    context.set(Source.class, it);
+                    return chain.next(context);
+                });
     }
 
     @Override
