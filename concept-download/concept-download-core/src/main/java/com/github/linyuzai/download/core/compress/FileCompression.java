@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.web.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +37,7 @@ public class FileCompression extends AbstractCompression {
     @Override
     public String getName() {
         String name = super.getName();
-        if (name == null || name.isEmpty()) {
+        if (!StringUtils.hasText(name)) {
             setName(file.getName());
         }
         return super.getName();
@@ -51,7 +52,7 @@ public class FileCompression extends AbstractCompression {
     @Override
     public String getContentType() {
         String contentType = super.getContentType();
-        if (contentType == null || contentType.isEmpty()) {
+        if (!StringUtils.hasText(contentType)) {
             setContentType(ContentType.file(file));
         }
         return super.getContentType();

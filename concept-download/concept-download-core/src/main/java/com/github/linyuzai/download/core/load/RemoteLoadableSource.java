@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.Progress;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
@@ -40,7 +41,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
 
         @Override
         protected T build(T target) {
-            if (cacheEnabled && (cachePath == null || cachePath.isEmpty())) {
+            if (cacheEnabled && !StringUtils.hasText(cachePath)) {
                 throw new DownloadException("Cache path is null or empty");
             }
             return super.build(target);

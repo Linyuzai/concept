@@ -9,6 +9,7 @@ import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
@@ -69,27 +70,26 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
             }
-            String name = getName();
-            if (name == null || name.isEmpty()) {
-                CacheNameGenerator generator = context.get(CacheNameGenerator.class);
-                name = generator.generate(this, context);
-                if (name == null || name.isEmpty()) {
-                    throw new DownloadException("Cache name is null or empty");
-                }
+            CacheNameGenerator generator = context.get(CacheNameGenerator.class);
+            String nameToUse = generator.generate(this, context);
+            if (!StringUtils.hasText(nameToUse)) {
+                throw new DownloadException("Cache name is null or empty");
             }
-            File cache = new File(dir, name);
+
+            File cache = new File(dir, nameToUse);
             Mono<Source> mono;
             if (cache.exists()) {
                 publisher.publish(new SourceLoadedCacheUsedEvent(context, this, cache.getAbsolutePath()));
                 mono = Mono.just(this);
             } else {
-                try (FileOutputStream fos = new FileOutputStream(cache)) {
-                    mono = doLoad(fos, context);
-                }
+                FileOutputStream fos = new FileOutputStream(cache);
+                mono = doLoad(fos, context)
+                        .doOnSuccess(s -> closeStream(fos))
+                        .doOnError(e -> closeStream(fos));
             }
             return mono.map(it -> {
                 String contentType = getContentType();
-                if (contentType == null || contentType.isEmpty()) {
+                if (!StringUtils.hasText(contentType)) {
                     setContentType(ContentType.file(cache));
                 }
                 long l = cache.length();
@@ -97,7 +97,6 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                     length = l;
                 } else {
                     if (length != l) {
-                        //TODO Wrong
                         length = l;
                     }
                 }
@@ -113,13 +112,19 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                     length = l;
                 } else {
                     if (length != l) {
-                        //TODO Wrong
                         length = l;
                     }
                 }
                 inputStream = new ByteArrayInputStream(bytes);
                 return it;
             });
+        }
+    }
+
+    private void closeStream(OutputStream os) {
+        try {
+            os.close();
+        } catch (IOException ignore) {
         }
     }
 

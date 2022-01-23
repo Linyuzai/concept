@@ -12,6 +12,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import lombok.AllArgsConstructor;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 /**
@@ -43,8 +44,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
             publisher.publish(new SourceNoCompressedEvent(context, source));
         } else {
             String compressFormat = context.getOptions().getCompressFormat();
-            String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
-                    CompressFormat.ZIP : compressFormat;
+            String formatToUse = StringUtils.hasText(compressFormat) ? compressFormat : CompressFormat.ZIP;
             SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, null, context);

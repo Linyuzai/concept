@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +43,7 @@ public class FileSource extends AbstractSource {
     @Override
     public String getName() {
         String name = super.getName();
-        if (name == null || name.isEmpty()) {
+        if (!StringUtils.hasText(name)) {
             setName(file.getName());
         }
         return super.getName();
@@ -51,7 +52,7 @@ public class FileSource extends AbstractSource {
     @Override
     public String getContentType() {
         String contentType = super.getContentType();
-        if (contentType == null || contentType.isEmpty()) {
+        if (!StringUtils.hasText(contentType)) {
             setContentType(ContentType.file(file));
         }
         return super.getContentType();

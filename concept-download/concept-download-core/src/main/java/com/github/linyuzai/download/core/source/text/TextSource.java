@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.text;
 import com.github.linyuzai.download.core.web.ContentType;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -31,7 +32,7 @@ public class TextSource extends AbstractSource {
     @Override
     public String getContentType() {
         String contentType = super.getContentType();
-        if (contentType == null || contentType.isEmpty()) {
+        if (!StringUtils.hasText(contentType)) {
             setContentType(ContentType.Text.PLAIN);
         }
         return super.getContentType();

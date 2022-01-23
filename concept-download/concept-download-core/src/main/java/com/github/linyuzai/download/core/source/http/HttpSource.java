@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.load.RemoteLoadableSource;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import lombok.*;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -37,7 +38,7 @@ public class HttpSource extends RemoteLoadableSource {
     @Override
     public String getName() {
         String name = super.getName();
-        if (name == null || name.isEmpty()) {
+        if (!StringUtils.hasText(name)) {
             String path;
             if (url.contains("?")) {
                 path = url.split("\\?")[0];
@@ -75,7 +76,7 @@ public class HttpSource extends RemoteLoadableSource {
         int code = connection.getResponseCode();
         if (isResponseSuccess(code)) {
             String contentType = getContentType();
-            if (contentType == null || contentType.isEmpty()) {
+            if (!StringUtils.hasText(contentType)) {
                 String ct = connection.getContentType();
                 if (ct != null) {
                     setContentType(ct);

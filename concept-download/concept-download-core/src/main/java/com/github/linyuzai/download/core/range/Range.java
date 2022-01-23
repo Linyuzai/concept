@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.range;
 
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 /**
  * 指定资源的范围 / Specify the range of the resource
@@ -37,13 +38,13 @@ public class Range {
     }
 
     public static Range header(String header) {
-        if (header == null || header.isEmpty()) {
+        if (!StringUtils.hasText(header)) {
             return null;
         }
         String[] split = header.split("=");
         if (split.length == 2 && "bytes".equalsIgnoreCase(split[0])) {
             if (split[1].contains(",")) {
-
+                //TODO
             }
             String[] ranges = split[1].split("-", -1);
             if (ranges.length == 2) {

@@ -10,6 +10,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.Progress;
 import lombok.SneakyThrows;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.Collection;
@@ -112,28 +113,26 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
      * @see CacheNameGenerator
      */
     public String getCacheName(Source source, DownloadContext context) {
-        String name = context.getOptions().getCompressCacheName();
+        String compressCacheName = context.getOptions().getCompressCacheName();
         String suffix = getSuffix();
-        if (name == null || name.isEmpty()) {
-            name = source.getName();
-            if (name == null || name.isEmpty()) {
-                CacheNameGenerator generator = context.get(CacheNameGenerator.class);
-                name = generator.generate(source, context);
-                if (name == null || name.isEmpty()) {
-                    throw new DownloadException("Cache name is null or empty");
-                }
-            }
-            if (name.endsWith(suffix)) {
-                return name;
-            }
-            int index = name.lastIndexOf(CompressFormat.DOT);
-            if (index == -1) {
-                return name + suffix;
-            } else {
-                return name.substring(0, index) + suffix;
-            }
+        String nameToUse;
+        if (StringUtils.hasText(compressCacheName)) {
+            nameToUse = compressCacheName;
         } else {
-            return name;
+            CacheNameGenerator generator = context.get(CacheNameGenerator.class);
+            nameToUse = generator.generate(source, context);
+        }
+        if (!StringUtils.hasText(nameToUse)) {
+            throw new DownloadException("Cache name is null or empty");
+        }
+        if (nameToUse.endsWith(suffix)) {
+            return nameToUse;
+        }
+        int index = nameToUse.lastIndexOf(CompressFormat.DOT);
+        if (index == -1) {
+            return nameToUse + suffix;
+        } else {
+            return nameToUse.substring(0, index) + suffix;
         }
     }
 

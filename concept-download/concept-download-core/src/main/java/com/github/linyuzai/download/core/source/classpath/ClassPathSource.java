@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.source.classpath;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import lombok.*;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 
@@ -32,11 +33,10 @@ public class ClassPathSource extends AbstractSource {
     @Override
     public String getName() {
         String name = super.getName();
-        if (name == null || name.isEmpty()) {
-            return resource.getFilename();
-        } else {
-            return name;
+        if (!StringUtils.hasText(name)) {
+            setName(resource.getFilename());
         }
+        return super.getName();
     }
 
     @SneakyThrows
