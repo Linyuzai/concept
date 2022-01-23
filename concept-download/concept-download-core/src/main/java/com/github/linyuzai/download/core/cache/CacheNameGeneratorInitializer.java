@@ -5,7 +5,9 @@ import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import lombok.AllArgsConstructor;
 
 /**
- * 缓存名称生成器初始化器 / Initializer of cache name generator
+ * 将 {@link CacheNameGenerator} 设置到 {@link DownloadContext} 中。
+ * <p>
+ * Set {@link CacheNameGenerator} to {@link DownloadContext}.
  */
 @AllArgsConstructor
 public class CacheNameGeneratorInitializer implements DownloadContextInitializer {
@@ -13,9 +15,13 @@ public class CacheNameGeneratorInitializer implements DownloadContextInitializer
     private CacheNameGenerator cacheNameGenerator;
 
     /**
-     * 将缓存名称生成器设置到下载上下文 / Set the cache name generator to the download context
+     * 在 {@link DownloadContext} 初始化时，
+     * 设置 {@link CacheNameGenerator}。
+     * <p>
+     * When {@link DownloadContext} is initialized,
+     * set {@link CacheNameGenerator}.
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @Override
     public void initialize(DownloadContext context) {

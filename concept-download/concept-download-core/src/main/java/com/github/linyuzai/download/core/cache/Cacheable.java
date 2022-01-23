@@ -1,53 +1,68 @@
 package com.github.linyuzai.download.core.cache;
 
 import com.github.linyuzai.download.core.compress.Compression;
-import com.github.linyuzai.download.core.concept.Downloadable;
-import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
-import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 
 import java.io.File;
 
 /**
- * 代表一个可缓存的对象 / Mark an object which may need cache
- * 用于可下载的对象 / Used for {@link Downloadable}
- * 下载的源文件 / Original file {@link Source}
- * 压缩后的文件 / Compressed file {@link Compression}
+ * 支持 {@link Source} 和 {@link Compression} 的缓存处理。
+ * <p>
+ * Supports cache processing for {@link Source} and {@link Compression}.
  */
 public interface Cacheable {
 
     /**
-     * 默认的缓存地址 / Default cache path
+     * 默认的缓存路径。
+     * <p>
+     * Default cache path.
      */
     String PATH = new File(System.getProperty("user.home"), "concept/download").getAbsolutePath();
 
     /**
-     * @return 是否启用缓存 / If enable cache
+     * 是否启用缓存。
+     * <p>
+     * Enable caching.
+     *
+     * @return 如果启用缓存则返回 true
+     * <p>
+     * Return true if caching is enabled
      */
     default boolean isCacheEnabled() {
         return false;
     }
 
     /**
-     * @return 缓存是否存在 / Cache if existed
+     * 缓存是否存在。
+     * <p>
+     * Does the cache exist.
+     *
+     * @return 如果缓存存在则返回 true
+     * <p>
+     * Return true if the cache exists
      */
     default boolean isCacheExisted() {
         return false;
     }
 
     /**
-     * @return 缓存路径 / The path of cache
+     * 缓存路径。
+     * <p>
+     * The path of cache.
+     *
+     * @return 如果存在缓存则返回缓存路径，否则返回 null
+     * <p>
+     * If there is a cache, the cache path is returned;
+     * otherwise, null is returned
      */
     default String getCachePath() {
         return null;
     }
 
     /**
-     * 删除缓存 / Delete the cache
-     * 如果对应的属性为true / If the property is true {@link DownloadOptions#isCompressCacheDelete()} &
-     * {@link DownloadOptions#isSourceCacheDelete()}
-     * 就会在销毁时删除 / Will be deleted when destroyed {@link DownloadContextDestroyer#destroy(DownloadContext)}
+     * 删除缓存。
+     * <p>
+     * Delete the cache.
      */
     default void deleteCache() {
 
