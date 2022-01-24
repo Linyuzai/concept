@@ -8,8 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Map;
 
 /**
- * 下载配置 / Configuration of download
- * 全局默认配置 / Global default configuration
+ * 下载配置。
+ * <p>
+ * Configuration of download.
  */
 @Data
 @ConfigurationProperties(prefix = "concept.download")
@@ -24,6 +25,11 @@ public class DownloadConfiguration {
     @Data
     public static class ResponseConfiguration {
 
+        /**
+         * 额外的响应头。
+         * <p>
+         * Additional response headers.
+         */
         private Map<String, String> headers;
     }
 
@@ -36,6 +42,11 @@ public class DownloadConfiguration {
     @Data
     public static class CompressConfiguration {
 
+        /**
+         * 压缩格式。
+         * <p>
+         * Compression format.
+         */
         private String format = CompressFormat.ZIP;
 
         private CacheConfiguration cache = new CacheConfiguration();
@@ -44,10 +55,25 @@ public class DownloadConfiguration {
     @Data
     public static class CacheConfiguration {
 
+        /**
+         * 是否启用缓存。
+         * <p>
+         * Enable caching.
+         */
         private boolean enabled;
 
+        /**
+         * 缓存路径。
+         * <p>
+         * Cache path.
+         */
         private String path = Cacheable.PATH;
 
+        /**
+         * 下载结束后是否删除缓存。
+         * <p>
+         * Delete cache after downloading.
+         */
         private boolean delete;
     }
 }
