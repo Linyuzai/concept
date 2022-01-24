@@ -9,37 +9,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 可下载的对象 / An object can download
- *
- * @see Source
- * @see Compression
+ * 抽象 {@link Source} 和 {@link Compression} 的通用部分。
+ * <p>
+ * Abstract the common parts of {@link Source} and {@link Compression}.
  */
 public interface Downloadable extends Part, Cacheable {
 
     /**
-     * @return 名称 / name
+     * 获得描述。
+     * <p>
+     * Get description.
+     *
+     * @return 描述
+     * <p>
+     * Description
      */
-    String getName();
-
-    /**
-     * @return Content Type
-     */
-    String getContentType();
-
-    /**
-     * @return 编码 / charset
-     */
-    Charset getCharset();
-
-    /**
-     * @return 字节数 / bytes count
-     */
-    Long getLength();
-
     String getDescription();
 
     /**
-     * @return 所有的部分，如文件夹下的多个文件 / All parts, such as multiple files under a folder
+     * 获得所有的 {@link Part}。
+     * <p>
+     * Get all {@link Part}.
+     *
+     * @return 所有的 {@link Part}
+     * <p>
+     * All {@link Part}
      */
     default Collection<Part> getParts() {
         Collection<Part> parts = new ArrayList<>();
@@ -47,6 +41,16 @@ public interface Downloadable extends Part, Cacheable {
         return parts;
     }
 
+    /**
+     * 递归获得所有的 {@link Part}。
+     * <p>
+     * Get all {@link Part} recursively.
+     *
+     * @param part  {@link Part}
+     * @param parts 集合容器
+     *              <p>
+     *              Collection container
+     */
     static void addPart(Part part, Collection<Part> parts) {
         parts.add(part);
         for (Part child : part.getChildren()) {

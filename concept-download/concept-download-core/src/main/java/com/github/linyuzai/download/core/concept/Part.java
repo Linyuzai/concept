@@ -6,49 +6,94 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * 一个下载对象可能有多个部分 / A download object may have multiple parts
+ * 一个 {@link Downloadable} 可能包含多个部分。
+ * <p>
+ * A {@link Downloadable} may contain multiple parts.
  */
 public interface Part {
 
     /**
-     * @return 输入流 / Input stream
+     * 获得 {@link InputStream}。
+     * <p>
+     * Get {@link InputStream}.
+     *
+     * @return {@link InputStream}
      */
     InputStream getInputStream();
 
     /**
-     * @return 名称 / name
+     * 获得名称。
+     * <p>
+     * Get name.
+     *
+     * @return 名称
+     * <p>
+     * Name
      */
     String getName();
 
     /**
-     * @return 路径 / Path
+     * 获得路径。
+     * <p>
+     * Get path.
+     *
+     * @return 路径
+     * <p>
+     * Path
      */
     default String getPath() {
         return getName();
     }
 
     /**
-     * @return Content Type
+     * 获得 Content-Type。
+     * <p>
+     * Get Content-Type.
+     *
+     * @return Content-Type
      */
     String getContentType();
 
     /**
-     * @return 编码 / charset
+     * 获得编码。
+     * <p>
+     * Get charset.
+     *
+     * @return 编码
+     * <p>
+     * Charset
      */
     Charset getCharset();
 
     /**
-     * @return 字节数 / bytes count
+     * 获得长度，即字节数。
+     * <p>
+     * Get the length,that is, the number of bytes.
+     *
+     * @return 长度
+     * <p>
+     * Length
      */
     Long getLength();
 
     /**
-     * @return 子部分 / Sub parts
+     * 获得子节点。
+     * <p>
+     * Get sub parts.
+     *
+     * @return 子节点
+     * <p>
+     * Sub parts
      */
     default Collection<Part> getChildren() {
         return Collections.emptyList();
     }
 
+    /**
+     * 释放资源。
+     * <p>
+     * Release resources.
+     */
     default void release() {
     }
 }

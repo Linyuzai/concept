@@ -6,23 +6,31 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 import java.util.function.Function;
 
 /**
- * 执行下载的统一对外接口 / Unified external interface for downloading
+ * 下载处理的入口。
+ * <p>
+ * Entry for download processing.
  */
 public interface DownloadConcept {
 
     /**
-     * 执行下载操作 / Perform download operation
+     * 执行下载操作。
+     * <p>
+     * Perform download operation.
      *
-     * @param options 下载参数 / Options of download
+     * @param options {@link DownloadOptions}
      */
     default Object download(DownloadOptions options) {
-        return download(downloadConfiguration -> options);
+        return download(configuration -> options);
     }
 
     /**
-     * 执行下载操作 / Perform download operation
+     * 执行下载操作。
+     * <p>
+     * Perform download operation.
      *
-     * @param function 可以通过下载配置来返回一个下载参数 / return an options from the configuration
+     * @param function 基于 {@link DownloadConfiguration} 返回 {@link DownloadOptions}
+     *                 <p>
+     *                 Return {@link DownloadOptions} based on {@link DownloadConfiguration}
      */
     Object download(Function<DownloadConfiguration, DownloadOptions> function);
 }
