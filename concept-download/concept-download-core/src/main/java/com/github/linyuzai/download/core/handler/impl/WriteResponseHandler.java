@@ -64,7 +64,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                                         InputStream is = part.getInputStream();
                                         writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
                                             progress.update(increase);
-                                            publisher.publish(new ResponseWritingProgressEvent(context, progress.copy()));
+                                            publisher.publish(new ResponseWritingProgressEvent(context, progress.freeze()));
                                         });
                                     }
                                     os.flush();

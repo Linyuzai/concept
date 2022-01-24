@@ -12,10 +12,6 @@ public abstract class AbstractSourceLoadedEvent extends DownloadContextEvent {
     @NonNull
     private final Source source;
 
-    public AbstractSourceLoadedEvent(DownloadContext context, Source source) {
-        this(context, source, "Load " + source.getDescription());
-    }
-
     public AbstractSourceLoadedEvent(DownloadContext context, @NonNull Source source, String message) {
         super(context);
         this.source = source;

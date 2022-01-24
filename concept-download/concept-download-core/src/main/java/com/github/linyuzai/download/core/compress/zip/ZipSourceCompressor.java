@@ -19,7 +19,7 @@ import java.util.zip.ZipOutputStream;
  * Use {@link ZipOutputStream} for compression.
  */
 @AllArgsConstructor
-public class ZipSourceCompressor extends AbstractSourceCompressor {
+public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStream> {
 
     /**
      * 支持 ZIP 格式的压缩。
@@ -43,9 +43,16 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      * 新建一个 {@link ZipOutputStream}
      * <p>
      * New a {@link ZipOutputStream}
+     *
+     * @param os      被包装的输出流
+     *                <p>
+     *                Wrapped output stream
+     * @param source  {@link Source}
+     * @param context {@link DownloadContext}
+     * @return
      */
     @Override
-    public OutputStream newOutputStream(OutputStream os, Source source) {
+    public ZipOutputStream newOutputStream(OutputStream os, Source source, DownloadContext context) {
         return new ZipOutputStream(os);
     }
 
@@ -59,8 +66,8 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      */
     @SneakyThrows
     @Override
-    public void beforeWrite(Part part, OutputStream os) {
-        ((ZipOutputStream) os).putNextEntry(new ZipEntry(part.getPath()));
+    public void beforeWrite(Part part, ZipOutputStream os) {
+        os.putNextEntry(new ZipEntry(part.getPath()));
     }
 
     /**
@@ -73,8 +80,8 @@ public class ZipSourceCompressor extends AbstractSourceCompressor {
      */
     @SneakyThrows
     @Override
-    public void afterWrite(Part part, OutputStream os) {
-        ((ZipOutputStream) os).closeEntry();
+    public void afterWrite(Part part, ZipOutputStream os) {
+        os.closeEntry();
     }
 
     /**

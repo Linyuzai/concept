@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadContextEvent;
+import com.github.linyuzai.download.core.utils.DownloadUtils;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -17,7 +18,7 @@ public abstract class AbstractProgressEvent extends DownloadContextEvent {
     }
 
     public String getBaseCurrentMessage() {
-        return format(progress.getCurrent());
+        return DownloadUtils.format(progress.getCurrent());
     }
 
     public String getCurrentMessage() {
@@ -27,7 +28,7 @@ public abstract class AbstractProgressEvent extends DownloadContextEvent {
     public String getRatioMessage() {
         Progress progress = getProgress();
         if (progress.hasTotal()) {
-            return format(progress.getCurrent()) + "/" + format(progress.getTotal());
+            return DownloadUtils.format(progress.getCurrent()) + "/" + DownloadUtils.format(progress.getTotal());
         } else {
             return getBaseCurrentMessage();
         }
@@ -41,20 +42,6 @@ public abstract class AbstractProgressEvent extends DownloadContextEvent {
             return format + "%";
         } else {
             return getBaseCurrentMessage();
-        }
-    }
-
-    public String format(long size) {
-        if (size >= 1024) {
-            double k = size / 1024.0;
-            if (k >= 1024) {
-                double m = k / 1024;
-                return String.format("%.2f", m) + "M";
-            } else {
-                return String.format("%.2f", k) + "K";
-            }
-        } else {
-            return size + "B";
         }
     }
 }

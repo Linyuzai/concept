@@ -80,7 +80,7 @@ public class WebClientSource extends HttpSource {
             return Flux.from(response.getBody())
                     .doOnNext(it -> writer.write(it.asInputStream(), os, null, null, length, (current, increase) -> {
                         progress.update(increase);
-                        publisher.publish(new SourceLoadingProgressEvent(context, WebClientSource.this, progress.copy()));
+                        publisher.publish(new SourceLoadingProgressEvent(context, WebClientSource.this, progress.freeze()));
                     }))
                     .collectList()
                     .flatMap(it -> {

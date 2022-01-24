@@ -24,7 +24,7 @@ public class Progress {
         current += increase;
     }
 
-    public Progress copy() {
+    public Progress freeze() {
         Progress progress = new Progress(total);
         progress.current = current;
         return progress;

@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 /**
- * 默认实现的压缩器适配器 / Adapter of compressor implemented by default
+ * {@link SourceCompressor} 适配器实现
+ * <p>
+ * Adapter implementation of {@link SourceCompressor}
  */
 @AllArgsConstructor
 public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {
@@ -15,11 +17,19 @@ public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {
     private final List<SourceCompressor> compressors;
 
     /**
-     * 根据压缩格式获得对应的压缩器 / Obtain the corresponding compressor according to the compression format
+     * 根据压缩格式获得对应的 {@link SourceCompressor}。
+     * 如果没有可用的 {@link SourceCompressor} 则抛出异常。
+     * <p>
+     * Obtain the corresponding {@link SourceCompressor} according to the compression format.
+     * Throw an exception if no {@link SourceCompressor} is available.
      *
-     * @param format  压缩格式 / Format of Compression
-     * @param context 下载上下文 / Context of download
-     * @return 压缩器 / compressor
+     * @param format  压缩格式
+     *                <p>
+     *                Compression format
+     * @param context {@link DownloadContext}
+     * @return 匹配上的 {@link SourceCompressor}
+     * <p>
+     * Match {@link SourceCompressor}
      */
     @Override
     public SourceCompressor getCompressor(String format, DownloadContext context) {

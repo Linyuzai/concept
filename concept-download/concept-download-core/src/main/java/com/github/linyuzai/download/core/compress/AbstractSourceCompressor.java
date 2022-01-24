@@ -16,21 +16,25 @@ import java.io.*;
 import java.util.Collection;
 
 /**
- * 抽象的Source压缩器 / Abstract class of source compressor
- * 进行了统一的缓存处理 / Unified cache processing
+ * 对缓存做了判断。
+ * <p>
+ * Made a judgment on the cache.
  */
-public abstract class AbstractSourceCompressor implements SourceCompressor {
+public abstract class AbstractSourceCompressor<OS extends OutputStream> implements SourceCompressor {
 
     /**
-     * 如果没有启用缓存，使用内存压缩 / Use memory compression if caching is not enabled
-     * 内存压缩会将压缩操作延后到写入响应时触发 / Memory compression delays the compression operation when writing response
-     * 如果启用缓存并且缓存存在，直接使用缓存 / Use the cache directly if caching is enabled and the cache exists
-     * 如果启用缓存并且缓存不存在，压缩到本地缓存文件 / Compress to the local cache file if caching is enabled and the cache does not exist
+     * 如果没有启用缓存，使用内存压缩。
+     * 如果启用缓存并且缓存存在，直接使用缓存。
+     * 如果启用缓存并且缓存不存在，压缩到本地缓存文件。
+     * <p>
+     * If caching is not enabled, use memory compression.
+     * If caching is enabled and the cache exists, use the cache directly.
+     * If caching is enabled and the cache does not exist, compress to the local cache file.
      *
      * @param source  {@link Source}
      * @param writer  {@link DownloadWriter}
-     * @param context 下载上下文 / Context of download
-     * @return An specific compression
+     * @param context {@link DownloadContext}
+     * @return {@link MemoryCompression} / {@link FileCompression}
      */
     @SneakyThrows
     @Override
@@ -68,16 +72,18 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
     }
 
     /**
-     * 执行压缩 / Perform compression
+     * 执行压缩。
+     * <p>
+     * Perform compression.
      *
-     * @param source 被压缩的对象 / Object to compress
-     * @param os     写入的输出流 / Output stream to write
-     * @param writer 写入执行器 / Executor of writing
+     * @param source {@link Source}
+     * @param os     {@link OutputStream}
+     * @param writer {@link DownloadWriter}
      */
     @SneakyThrows
     public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        try (OutputStream nos = newOutputStream(os, source)) {
+        try (OS nos = newOutputStream(os, source, context)) {
             Progress progress = new Progress(source.getLength());
             Collection<Part> parts = source.getParts();
             for (Part part : parts) {
@@ -85,7 +91,7 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
                 beforeWrite(part, nos);
                 writer.write(is, nos, null, part.getCharset(), part.getLength(), (current, increase) -> {
                     progress.update(increase);
-                    publisher.publish(new SourceCompressingProgressEvent(context, progress.copy()));
+                    publisher.publish(new SourceCompressingProgressEvent(context, progress.freeze()));
                 });
                 afterWrite(part, nos);
             }
@@ -93,22 +99,55 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
         publisher.publish(new SourceZipCompressedEvent(context, source));
     }
 
-    public abstract OutputStream newOutputStream(OutputStream os, Source source);
-
-    public abstract void beforeWrite(Part part, OutputStream os);
-
-    public abstract void afterWrite(Part part, OutputStream os);
+    /**
+     * 新建一个压缩输出流。
+     * <p>
+     * Create a new compressed output stream.
+     *
+     * @param os      被包装的输出流
+     *                <p>
+     *                Wrapped output stream
+     * @param source  {@link Source}
+     * @param context {@link DownloadContext}
+     * @return 新建的压缩输出流
+     * <p>
+     * New compressed output stream
+     */
+    public abstract OS newOutputStream(OutputStream os, Source source, DownloadContext context);
 
     /**
-     * 如果指定了缓存名称则使用指定的名称 / If a cache name is specified, the specified name is used
-     * 否则使用Source的名称 / Otherwise, use the name of the source {@link Source#getName()}
-     * 如果对应的名称为空 / If the name is empty
-     * 否则使用缓存名称生成器生成 / Otherwise, it is generated using the cache name generator
+     * 写入之前调用。
+     * <p>
+     * Call before writing.
      *
-     * @param source  被压缩的对象 / Object to compress
-     * @param context 下载上下文 / Context of download
-     * @return 缓存名称 / Name of cache
-     * @see CacheNameGenerator
+     * @param part {@link Part}
+     * @param os   {@link OS}
+     */
+    public abstract void beforeWrite(Part part, OS os);
+
+    /**
+     * 写入之后调用。
+     * <p>
+     * Call after writing.
+     *
+     * @param part {@link Part}
+     * @param os   {@link OS}
+     */
+    public abstract void afterWrite(Part part, OS os);
+
+    /**
+     * 如果指定了压缩文件缓存名称则使用指定的名称，
+     * 否则通过 {@link CacheNameGenerator} 生成。
+     * <p>
+     * If the compressed file cache name is specified,
+     * the specified name is used;
+     * otherwise, it is generated through {@link CacheNameGenerator}.
+     *
+     * @param source  {@link Source}
+     * @param context {@link DownloadContext}
+     * @return 压缩文件缓存名称
+     * <p>
+     * Compressed file cache name
      */
     public String getCacheName(Source source, DownloadContext context) {
         String compressCacheName = context.getOptions().getCompressCacheName();
@@ -135,12 +174,22 @@ public abstract class AbstractSourceCompressor implements SourceCompressor {
     }
 
     /**
-     * @return 压缩包的后缀 / Suffix of the compressed package
+     * 获得压缩文件的扩展后缀。
+     * <p>
+     * Get the extended suffix of the compressed file.
+     *
+     * @return 后缀
+     * <p>
+     * Suffix
      */
     public abstract String getSuffix();
 
     /**
-     * @return Content Type
+     * 获得压缩文件的 Content-Type
+     * <p>
+     * Get the Content-Type of the compressed file
+     *
+     * @return Content-Type
      */
     public abstract String getContentType();
 }

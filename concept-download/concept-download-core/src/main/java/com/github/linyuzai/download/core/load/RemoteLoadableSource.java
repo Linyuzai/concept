@@ -24,7 +24,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
             Progress progress = new Progress(length);
             writer.write(it, os, null, null, length, (current, increase) -> {
                 progress.update(increase);
-                publisher.publish(new SourceLoadingProgressEvent(context, this, progress.copy()));
+                publisher.publish(new SourceLoadingProgressEvent(context, this, progress.freeze()));
             });
             return this;
         });
