@@ -3,14 +3,18 @@ package com.github.linyuzai.download.core.context;
 import com.github.linyuzai.download.core.order.OrderProvider;
 
 /**
- * 上下文销毁器 / Destroyer of context
+ * {@link DownloadContext} 销毁器。
+ * <p>
+ * Destroyer of {@link DownloadContext}.
  */
 public interface DownloadContextDestroyer extends OrderProvider {
 
     /**
-     * 销毁处理 / destroy
+     * 销毁。
+     * <p>
+     * Destroy.
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     void destroy(DownloadContext context);
 }

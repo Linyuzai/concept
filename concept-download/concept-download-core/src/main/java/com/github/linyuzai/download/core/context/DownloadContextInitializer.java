@@ -3,14 +3,18 @@ package com.github.linyuzai.download.core.context;
 import com.github.linyuzai.download.core.order.OrderProvider;
 
 /**
- * 上下文初始化器 / Initializer of context
+ * {@link DownloadContext} 初始化器。
+ * <p>
+ * Initializer of {@link DownloadContext}
  */
 public interface DownloadContextInitializer extends OrderProvider {
 
     /**
-     * 初始化处理 / init
+     * 初始化。
+     * <p>
+     * initialize.
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     void initialize(DownloadContext context);
 }

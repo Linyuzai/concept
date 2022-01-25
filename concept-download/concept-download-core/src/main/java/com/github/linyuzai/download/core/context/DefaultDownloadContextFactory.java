@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 默认的下载上下文工厂 / Default factory
+ * 默认实现的 {@link DownloadContextFactory}。
+ * <p>
+ * Default implementation of {@link DownloadContextFactory}.
  */
 @AllArgsConstructor
 public class DefaultDownloadContextFactory implements DownloadContextFactory {
@@ -20,10 +22,14 @@ public class DefaultDownloadContextFactory implements DownloadContextFactory {
     private List<DownloadContextDestroyer> destroyers;
 
     /**
-     * 直接创建一个上下文，没有额外的处理 / Create a context directly without additional processing
+     * 创建一个 {@link DefaultDownloadContext}。
+     * 使用 {@link UUID} 生成唯一ID。
+     * <p>
+     * Create a {@link DefaultDownloadContext}.
+     * Use {@link UUID} to generate a unique ID.
      *
-     * @param options 下载操作参数 / Options of download
-     * @return 下载上下文 / Context of download
+     * @param options {@link DownloadOptions}
+     * @return {@link DefaultDownloadContext}
      */
     @Override
     public DownloadContext create(DownloadOptions options) {

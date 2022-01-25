@@ -6,27 +6,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基于Map的下载上下文 / Context of download based on Map
+ * {@link DownloadContext} 的默认实现。
+ * <p>
+ * The default implementation of {@link DownloadContext}.
  */
 public class DefaultDownloadContext extends AbstractDownloadContext {
 
     private final Map<Object, Object> map = new HashMap<>();
 
-    /**
-     * 上下文依赖一个下载操作的参数和一个Map对象 / Context depend on a download options and a Map
-     *
-     * @param id      context id
-     * @param options 下载操作参数 / Options of download
-     */
     public DefaultDownloadContext(String id, DownloadOptions options) {
         super(id, options);
     }
 
     /**
-     * 在上下文中设置一个键值对 / Set a key-value in the context
+     * 在内部的 {@link HashMap} 中设置一个键值对。
+     * <p>
+     * Set a key-value in the internal {@link HashMap}.
      *
-     * @param key   键 / Key
-     * @param value 值 / value
+     * @param key   键
+     *              <p>
+     *              Key
+     * @param value 值
+     *              <p>
      */
     @Override
     public void set(Object key, Object value) {
@@ -34,12 +35,19 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
     }
 
     /**
-     * 在上下文中根据键获得一个值 / Get a value with the key
-     * 不存在返回null / Return null if not existed
+     * 在内部的 {@link HashMap} 中根据键获得一个值。
+     * <p>
+     * Get a value with the key in the internal {@link HashMap}.
      *
-     * @param key 键 / Key
-     * @param <T> 类型 / Type
-     * @return 值 / Value
+     * @param key 键
+     *            <p>
+     *            Key
+     * @param <T> 类型
+     *            <p>
+     *            Type
+     * @return 值
+     * <p>
+     * Value
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -48,10 +56,16 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
     }
 
     /**
-     * 判断一个键是否存在 / if a key exists
+     * 判断健是否在内部的 {@link HashMap} 中存在。
+     * <p>
+     * Determine whether the key exists in the internal {@link HashMap}.
      *
-     * @param key 键 / Key
-     * @return 是否存在 / if exists
+     * @param key 键
+     *            <p>
+     *            Key
+     * @return 如果存在则返回 true
+     * <p>
+     * Return true if it exists
      */
     @Override
     public boolean contains(Object key) {
@@ -59,9 +73,13 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
     }
 
     /**
-     * 通过键移除一个键值对 / Remove a key-value by key
+     * 通过键移除在内部的 {@link HashMap} 中的一个键值对。
+     * <p>
+     * Remove a key-value by key in the internal {@link HashMap}.
      *
-     * @param key 键 / Key
+     * @param key 键
+     *            <p>
+     *            Key
      */
     @Override
     public void remove(Object key) {
@@ -69,7 +87,9 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
     }
 
     /**
-     * 销毁，清空所有内容 / Clear all content
+     * 销毁并清空 {@link HashMap}。
+     * <p>
+     * Destroy and clear {@link HashMap}.
      */
     @Override
     public void destroy() {

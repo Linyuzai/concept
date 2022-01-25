@@ -9,7 +9,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * 持有下载操作参数的下载上下文 / Context of download holding download options
+ * 持有 {@link DownloadOptions}。
+ * 应用 {@link DownloadContextInitializer} 初始化 {@link DownloadContext}。
+ * 应用 {@link DownloadContextDestroyer} 销毁 {@link DownloadContext}。
+ * <p>
+ * Hold {@link DownloadOptions}.
+ * Apply {@link DownloadContextInitializer} to initialize {@link DownloadContext}.
+ * Apply {@link DownloadContextInitializer} to destroy {@link DownloadContext}.
  */
 @Getter
 public abstract class AbstractDownloadContext implements DownloadContext {
@@ -31,11 +37,21 @@ public abstract class AbstractDownloadContext implements DownloadContext {
         this.options = options;
     }
 
+    /**
+     * 遍历 {@link DownloadContextInitializer} 初始化 {@link DownloadContext}。
+     * <p>
+     * Traverse {@link DownloadContextInitializer} to initialize {@link DownloadContext}.
+     */
     @Override
     public void initialize() {
         initializers.forEach(it -> it.initialize(this));
     }
 
+    /**
+     * 遍历 {@link DownloadContextDestroyer} 销毁 {@link DownloadContext}。
+     * <p>
+     * Traverse {@link DownloadContextDestroyer} and destroy {@link DownloadContext}.
+     */
     @Override
     public void destroy() {
         destroyers.forEach(it -> it.destroy(this));
