@@ -12,8 +12,12 @@ public class DownloadEventPublisherInitializer implements DownloadContextInitial
     @Override
     public void initialize(DownloadContext context) {
         DownloadEventListener listener = context.getOptions().getEventListener();
-        DownloadEventPublisher publisherToUse = listener == null ? eventPublisher :
-                new DownloadEventPublisherDelegate(eventPublisher, listener);
-        context.set(DownloadEventPublisher.class, publisherToUse);
+        DownloadEventPublisher publisher;
+        if (listener == null) {
+            publisher = eventPublisher;
+        } else {
+            publisher = new DownloadEventPublisherDelegate(eventPublisher, listener);
+        }
+        context.set(DownloadEventPublisher.class, publisher);
     }
 }
