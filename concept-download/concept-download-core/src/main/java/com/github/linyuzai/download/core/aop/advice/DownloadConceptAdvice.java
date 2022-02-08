@@ -7,7 +7,6 @@ import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.concept.ValueContainer;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
-import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadMethod;
 import com.github.linyuzai.download.core.options.DownloadOptions;
@@ -43,8 +42,7 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
     @Setter
     private DownloadConcept downloadConcept;
 
-    public DownloadConceptAdvice(DownloadConfiguration configuration) {
-        this.configuration = configuration;
+    public DownloadConceptAdvice() {
         setPointcut(new AnnotationMatchingPointcut(null, Download.class, true));
         setAdvice(this);
         setOrder(Ordered.LOWEST_PRECEDENCE);
@@ -271,8 +269,8 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         if (bean instanceof DownloadConcept) {
             this.downloadConcept = (DownloadConcept) bean;
-        } else if (bean instanceof DownloadConfigurer) {
-            ((DownloadConfigurer) bean).configure(configuration);
+        } else if (bean instanceof DownloadConfiguration) {
+            this.configuration = (DownloadConfiguration) bean;
         }
         return bean;
     }

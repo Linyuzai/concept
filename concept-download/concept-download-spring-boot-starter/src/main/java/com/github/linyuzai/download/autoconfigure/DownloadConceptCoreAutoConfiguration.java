@@ -12,6 +12,7 @@ import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
+import com.github.linyuzai.download.core.configuration.DownloadConfigurerInvoker;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.event.ApplicationDownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
@@ -58,6 +59,12 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DownloadConfiguration.class)
 public class DownloadConceptCoreAutoConfiguration {
+
+    @Bean
+    public DownloadConfigurerInvoker downloadConfigurerInvoker(DownloadConfiguration configuration,
+                                                               List<DownloadConfigurer> configurers) {
+        return new DownloadConfigurerInvoker(configuration, configurers);
+    }
 
     @Bean
     @ConditionalOnMissingBean
