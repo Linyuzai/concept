@@ -233,12 +233,9 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
-    public DownloadConcept downloadConcept(DownloadConfiguration configuration,
-                                           DownloadContextFactory factory,
+    public DownloadConcept downloadConcept(DownloadContextFactory factory,
                                            DownloadReturnInterceptor returnInterceptor,
-                                           List<DownloadHandler> handlers,
-                                           List<DownloadConfigurer> configurers) {
-        configurers.forEach(it -> it.configure(configuration));
-        return new ChainDownloadConcept(configuration, factory, returnInterceptor, handlers);
+                                           List<DownloadHandler> handlers) {
+        return new ChainDownloadConcept(factory, returnInterceptor, handlers);
     }
 }

@@ -23,8 +23,6 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class ChainDownloadConcept implements DownloadConcept {
 
-    private final DownloadConfiguration configuration;
-
     private final DownloadContextFactory contextFactory;
 
     private final DownloadReturnInterceptor returnInterceptor;
@@ -44,13 +42,12 @@ public class ChainDownloadConcept implements DownloadConcept {
      * destroy {@link DownloadContext},
      * and return the final value through {@link DownloadReturnInterceptor}.
      *
-     * @param function 基于 {@link DownloadConfiguration} 返回 {@link DownloadOptions}
+     * @param options 基于 {@link DownloadConfiguration} 返回 {@link DownloadOptions}
      *                 <p>
      *                 Return {@link DownloadOptions} based on {@link DownloadConfiguration}
      */
     @Override
-    public Object download(Function<DownloadConfiguration, DownloadOptions> function) {
-        DownloadOptions options = function.apply(configuration);
+    public Object download(DownloadOptions options) {
         DownloadContext context = contextFactory.create(options);
         context.initialize();
         Mono<Void> mono = new DownloadHandlerChainImpl(0, handlers)

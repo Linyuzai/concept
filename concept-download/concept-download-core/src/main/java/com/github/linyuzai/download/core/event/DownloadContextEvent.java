@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+/**
+ * 附带了 {@link DownloadContext} 的 {@link DownloadEvent}。
+ * <p>
+ * {@link DownloadEvent} with {@link DownloadContext}.
+ */
 @Getter
 @Setter
 @AllArgsConstructor

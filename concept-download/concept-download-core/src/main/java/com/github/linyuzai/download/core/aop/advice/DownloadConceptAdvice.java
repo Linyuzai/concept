@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.concept.ValueContainer;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
+import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadMethod;
 import com.github.linyuzai.download.core.options.DownloadOptions;
@@ -14,6 +15,11 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -21,61 +27,54 @@ import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
- * 对标注了 {@link Download} 的方法进行拦截。
- * <p>
- * Intercept the method marked with {@link Download}.
+ * 下载功能的AOP实现。
+ * 对标注了注解 {@link Download} 的方法进行拦截，
+ * 并委托 {@link DownloadConcept} 统一处理下载数据。
  */
-@NoArgsConstructor
-@AllArgsConstructor
-public class DownloadAdvice implements MethodInterceptor {
+public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements MethodInterceptor, BeanPostProcessor {
 
-    @NonNull
+    @Getter
+    @Setter
+    private DownloadConfiguration configuration;
+
     @Getter
     @Setter
     private DownloadConcept downloadConcept;
+
+    public DownloadConceptAdvice(DownloadConfiguration configuration) {
+        this.configuration = configuration;
+        setPointcut(new AnnotationMatchingPointcut(null, Download.class, true));
+        setAdvice(this);
+        setOrder(Ordered.LOWEST_PRECEDENCE);
+    }
 
     /**
      * 根据全局配置 {@link DownloadConfiguration}，
      * 注解 {@link Download} {@link SourceCache} {@link CompressCache}
      * 和返回值构建一个 {@link DownloadOptions}
-     * 并调用 {@link DownloadConcept#download(Function)} 处理。
-     * <p>
-     * According to the global configuration {@link DownloadConfiguration} and
-     * annotations {@link Download} {@link SourceCache} {@link CompressCache} and
-     * the return value to builds a {@link DownloadOptions}.
-     * Then call {@link DownloadConcept#download(Function)} for processing.
+     * 并调用 {@link DownloadConcept#download(DownloadOptions)} 处理下载数据。
      *
      * @param invocation {@link MethodInvocation}
      * @return null or {@link Mono<Void>}
-     * @throws Throwable 方法调用或下载处理抛出异常
-     *                   <p>
-     *                   if method invoking or download handing throws an exception
+     * @throws Throwable 方法调用或下载数据处理抛出异常
      */
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
         Object[] arguments = invocation.getArguments();
         Object returnValue = unwrap(invocation.proceed());
-        return downloadConcept.download(configuration ->
-                buildOptions(method, arguments, returnValue, configuration));
+        DownloadOptions options = buildOptions(method, arguments, returnValue, configuration);
+        return downloadConcept.download(options);
     }
 
     /**
-     * 如果是 {@link ValueContainer}，
-     * 则调用 {@link ValueContainer#getValue()} 获得真实值。
-     * <p>
-     * Call {@link ValueContainer#getValue()} to get the real value
-     * if it is a {@link ValueContainer}.
+     * 如果返回值是 {@link ValueContainer}，
+     * 则调用 {@link ValueContainer#getValue()} 获得真实的方法返回值。
      *
      * @param value 方法返回值
-     *              <p>
-     *              The return value of the method
-     * @return 真实值
-     * <p>
-     * The real value
+     * @return 真实的方法返回值
      */
     private Object unwrap(Object value) {
         if (value instanceof ValueContainer) {
@@ -86,33 +85,19 @@ public class DownloadAdvice implements MethodInterceptor {
     }
 
     /**
-     * 构建下载参数。
-     * 注解的优先级高于配置。
-     * 如果返回值是 {@link DownloadOptions} 则直接使用。
+     * 构建下载参数，
+     * 注解的优先级高于 {@link DownloadConfiguration} 全局配置。
+     * 如果返回值是 {@link DownloadOptions} 则直接使用；
      * 如果返回值是 null 或者是 {@link DownloadOptions.Rewriter}
      * 则使用 {@link Download#source()}，否则使用返回值。
      * 如果返回值是 {@link DownloadOptions.Rewriter}
-     * 则会调用 {@link DownloadOptions.Rewriter#rewrite(DownloadOptions)}。
-     * <p>
-     * Build download options.
-     * Annotations take precedence over configuration.
-     * It will be used directly if the return value is {@link DownloadOptions}.
-     * If the return value is null or {@link DownloadOptions.Rewriter},
-     * {@link Download#source()} will be used.
-     * Otherwise, use return value
-     * If the return value is {@link DownloadOptions.Rewriter},
-     * {@link DownloadOptions.Rewriter#rewrite(DownloadOptions)} will be called.
+     * 则会调用 {@link DownloadOptions.Rewriter#rewrite(DownloadOptions)}，
+     * 回调给开发者重写 {@link DownloadOptions}。
      *
      * @param method        切面方法
-     *                      <p>
-     *                      Method of the advice
      * @param arguments     方法入参
-     *                      <p>
-     *                      Parameters of the method
      * @param returnValue   方法返回值
-     *                      <p>
-     *                      Return value of the method
-     * @param configuration {@link DownloadConfiguration}
+     * @param configuration 全局配置 {@link DownloadConfiguration}
      * @return {@link DownloadOptions}
      */
     public DownloadOptions buildOptions(Method method,
@@ -188,14 +173,13 @@ public class DownloadAdvice implements MethodInterceptor {
 
     /**
      * 获得压缩格式。
-     * <p>
-     * Build compressed format.
+     * 如果 {@link Download} 注解未指定压缩格式，
+     * 则使用全局配置 {@link DownloadConfiguration} 中的压缩格式，
+     * 默认为 ZIP。
      *
-     * @param download      {@link Download}
-     * @param configuration {@link DownloadConfiguration}
-     * @return 压缩格式
-     * <p>
-     * Compression format
+     * @param download      注解 {@link Download}
+     * @param configuration 全局配置 {@link DownloadConfiguration}
+     * @return 最终的压缩格式
      */
     private String buildCompressFormat(Download download, DownloadConfiguration configuration) {
         String compressFormat = download.compressFormat();
@@ -208,11 +192,11 @@ public class DownloadAdvice implements MethodInterceptor {
 
     /**
      * 获得编码。
-     * <p>
-     * Build charset.
+     * 如果 {@link Download} 注解未指定编码，
+     * 则编码为 null，否则使用指定的编码。
      *
-     * @param download {@link Download}
-     * @return {@link Charset}
+     * @param download 注解 {@link Download}
+     * @return 指定的编码或 null
      */
     private Charset buildCharset(Download download) {
         String charset = download.charset();
@@ -220,17 +204,11 @@ public class DownloadAdvice implements MethodInterceptor {
     }
 
     /**
-     * 构建响应头。
-     * 每两个为一组，分别作为 name 和 value。
-     * <p>
-     * Build response headers.
-     * Each two is a group, which is used as name and value respectively.
+     * 构建额外的响应头，每两个为一组，分别作为 name 和 value。
      *
-     * @param download      {@link Download}
-     * @param configuration {@link DownloadConfiguration}
-     * @return 响应头
-     * <p>
-     * Response headers
+     * @param download      注解 {@link Download}
+     * @param configuration 全局配置 {@link DownloadConfiguration}
+     * @return 额外响应头的 Map 对象
      */
     private Map<String, String> buildHeaders(Download download, DownloadConfiguration configuration) {
         Map<String, String> headerMap = new LinkedHashMap<>();
@@ -287,5 +265,15 @@ public class DownloadAdvice implements MethodInterceptor {
         } else {
             return new File(path, cache.group()).getAbsolutePath();
         }
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
+        if (bean instanceof DownloadConcept) {
+            this.downloadConcept = (DownloadConcept) bean;
+        } else if (bean instanceof DownloadConfigurer) {
+            ((DownloadConfigurer) bean).configure(configuration);
+        }
+        return bean;
     }
 }
