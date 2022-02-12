@@ -8,10 +8,22 @@ import org.springframework.util.StopWatch;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 时间计算日志。
+ */
 public class TimeSpentCalculationLogger extends DownloadLogger {
 
+    /**
+     * {@link StopWatch} 缓存
+     */
     private final Map<String, StopWatch> stopWatchMap = new ConcurrentHashMap<>();
 
+    /**
+     * {@link DownloadContext} 初始化时开始计算，
+     * {@link DownloadContext} 销毁时计算事件并移除缓存。
+     *
+     * @param event 事件
+     */
     @Override
     public void onEvent(Object event) {
         if (event instanceof AfterContextInitializedEvent) {

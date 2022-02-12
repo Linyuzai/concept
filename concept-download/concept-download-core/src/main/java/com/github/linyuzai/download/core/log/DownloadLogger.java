@@ -15,17 +15,29 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 下载日志抽象类。
+ */
 @CommonsLog
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class DownloadLogger implements DownloadEventListener {
 
+    /**
+     * {@link Log} 缓存
+     */
     private static final Map<String, Log> logs = new ConcurrentHashMap<>();
 
+    /**
+     * 标签
+     */
     @Getter
     @Setter
     private String tag = "Download";
 
+    /**
+     * 用于标签长度对齐
+     */
     @Getter
     @Setter
     private int tagLength = 8;
@@ -38,6 +50,13 @@ public abstract class DownloadLogger implements DownloadEventListener {
         log(context, tag, message);
     }
 
+    /**
+     * 使用类名加方法名作为日志名称。
+     *
+     * @param context {@link DownloadContext}
+     * @param tag     标签
+     * @param message 信息
+     */
     public void log(DownloadContext context, String tag, String message) {
         DownloadMethod downloadMethod = context.getOptions().getDownloadMethod();
         if (downloadMethod == null) {
