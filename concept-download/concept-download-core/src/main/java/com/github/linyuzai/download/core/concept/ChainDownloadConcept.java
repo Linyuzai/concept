@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.core.concept;
 
-import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
@@ -15,43 +14,46 @@ import java.util.List;
 
 /**
  * 基于 {@link DownloadHandlerChain} 的 {@link DownloadConcept} 实现。
- * <p>
- * Implementation of {@link DownloadConcept} based on {@link DownloadHandlerChain}.
  */
 @Getter
 @AllArgsConstructor
 public class ChainDownloadConcept implements DownloadConcept {
 
+    /**
+     * 上下文工厂
+     */
     private final DownloadContextFactory contextFactory;
 
+    /**
+     * 返回拦截
+     */
     private final DownloadReturnInterceptor returnInterceptor;
 
+    /**
+     * 处理器
+     */
     private final List<DownloadHandler> handlers;
 
     /**
-     * 通过 {@link DownloadConfiguration} 获得 {@link DownloadOptions}，
      * 创建 {@link DownloadContext} 并初始化，
      * 调用 {@link DownloadHandlerChain} 处理下载数据，
      * 销毁 {@link DownloadContext}，
      * 通过 {@link DownloadReturnInterceptor} 返回最终值。
-     * <p>
-     * Obtain {@link DownloadOptions} through {@link DownloadConfiguration},
-     * create {@link DownloadContext} and initialize it,
-     * call {@link DownloadHandlerChain} to process the downloaded data,
-     * destroy {@link DownloadContext},
-     * and return the final value through {@link DownloadReturnInterceptor}.
      *
-     * @param options 基于 {@link DownloadConfiguration} 返回 {@link DownloadOptions}
-     *                 <p>
-     *                 Return {@link DownloadOptions} based on {@link DownloadConfiguration}
+     * @param options {@link DownloadOptions}
      */
     @Override
     public Object download(DownloadOptions options) {
+        //创建上下文
         DownloadContext context = contextFactory.create(options);
+        //初始化上下文
         context.initialize();
+        //处理链
         Mono<Void> mono = new DownloadHandlerChainImpl(0, handlers)
                 .next(context)
+                //最后销毁上下文
                 .doAfterTerminate(context::destroy);
+        //拦截返回值
         return returnInterceptor.intercept(mono);
     }
 }

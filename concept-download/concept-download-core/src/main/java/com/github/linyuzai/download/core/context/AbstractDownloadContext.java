@@ -9,13 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * 持有 {@link DownloadOptions}。
- * 应用 {@link DownloadContextInitializer} 初始化 {@link DownloadContext}。
- * 应用 {@link DownloadContextDestroyer} 销毁 {@link DownloadContext}。
- * <p>
- * Hold {@link DownloadOptions}.
- * Apply {@link DownloadContextInitializer} to initialize {@link DownloadContext}.
- * Apply {@link DownloadContextInitializer} to destroy {@link DownloadContext}.
+ * {@link DownloadContext} 的抽象类。
  */
 @Getter
 public abstract class AbstractDownloadContext implements DownloadContext {
@@ -39,8 +33,6 @@ public abstract class AbstractDownloadContext implements DownloadContext {
 
     /**
      * 遍历 {@link DownloadContextInitializer} 初始化 {@link DownloadContext}。
-     * <p>
-     * Traverse {@link DownloadContextInitializer} to initialize {@link DownloadContext}.
      */
     @Override
     public void initialize() {
@@ -49,8 +41,6 @@ public abstract class AbstractDownloadContext implements DownloadContext {
 
     /**
      * 遍历 {@link DownloadContextDestroyer} 销毁 {@link DownloadContext}。
-     * <p>
-     * Traverse {@link DownloadContextDestroyer} and destroy {@link DownloadContext}.
      */
     @Override
     public void destroy() {

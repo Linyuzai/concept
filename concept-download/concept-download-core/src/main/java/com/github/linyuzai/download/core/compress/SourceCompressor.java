@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.compress;
 
+import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.source.Source;
@@ -7,6 +8,8 @@ import com.github.linyuzai.download.core.write.DownloadWriter;
 
 /**
  * 压缩器。
+ *
+ * @see ZipSourceCompressor
  */
 public interface SourceCompressor extends OrderProvider {
 

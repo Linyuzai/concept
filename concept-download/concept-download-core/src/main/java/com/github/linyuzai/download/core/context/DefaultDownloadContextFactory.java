@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 默认实现的 {@link DownloadContextFactory}。
- * <p>
- * Default implementation of {@link DownloadContextFactory}.
+ * {@link DownloadContextFactory} 的默认实现。
  */
 @AllArgsConstructor
 public class DefaultDownloadContextFactory implements DownloadContextFactory {
@@ -24,9 +22,6 @@ public class DefaultDownloadContextFactory implements DownloadContextFactory {
     /**
      * 创建一个 {@link DefaultDownloadContext}。
      * 使用 {@link UUID} 生成唯一ID。
-     * <p>
-     * Create a {@link DefaultDownloadContext}.
-     * Use {@link UUID} to generate a unique ID.
      *
      * @param options {@link DownloadOptions}
      * @return {@link DefaultDownloadContext}

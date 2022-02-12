@@ -7,6 +7,8 @@ import com.github.linyuzai.download.core.source.Source;
 
 /**
  * 缓存名称生成器。
+ *
+ * @see TimestampCacheNameGenerator
  */
 public interface CacheNameGenerator {
 

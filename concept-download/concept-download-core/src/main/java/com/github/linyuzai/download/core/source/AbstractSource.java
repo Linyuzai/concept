@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.concept.DownloadResource;
+import com.github.linyuzai.download.core.concept.AbstractDownloadable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +9,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public abstract class AbstractSource extends DownloadResource implements Source {
+public abstract class AbstractSource extends AbstractDownloadable implements Source {
 
     protected boolean asyncLoad;
 
     @SuppressWarnings("unchecked")
-    public static abstract class Builder<T extends AbstractSource, B extends Builder<T, B>> extends DownloadResource.Builder<T, B> {
+    public static abstract class Builder<T extends AbstractSource, B extends Builder<T, B>> extends AbstractDownloadable.Builder<T, B> {
 
         protected boolean asyncLoad;
 

@@ -1,11 +1,11 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.context.AbstractContextDestroyedEvent;
+import com.github.linyuzai.download.core.context.AbstractDestroyContextEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import lombok.Getter;
 
 @Getter
-public class SourceCacheDeletedEvent extends AbstractContextDestroyedEvent {
+public class SourceCacheDeletedEvent extends AbstractDestroyContextEvent {
 
     private final Source source;
 

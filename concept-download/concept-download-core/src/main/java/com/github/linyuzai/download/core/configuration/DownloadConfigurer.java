@@ -2,15 +2,12 @@ package com.github.linyuzai.download.core.configuration;
 
 /**
  * {@link DownloadConfiguration} 的配置器。
- * <p>
- * Configurer of {@link DownloadConfiguration}.
+ * 可以在代码中修改全局默认配置。
  */
 public interface DownloadConfigurer {
 
     /**
      * 配置。
-     * <p>
-     * Configure.
      *
      * @param configuration {@link DownloadConfiguration}
      */

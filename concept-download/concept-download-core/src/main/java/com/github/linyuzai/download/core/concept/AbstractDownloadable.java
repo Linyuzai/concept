@@ -6,18 +6,14 @@ import lombok.Setter;
 import java.nio.charset.Charset;
 
 /**
- * 可配置属性的 {@link Downloadable}。
- * <p>
- * {@link Downloadable} with configurable fields
+ * {@link Downloadable} 的抽象类。
  */
 @Getter
 @Setter
-public abstract class DownloadResource extends AbstractPart implements Downloadable {
+public abstract class AbstractDownloadable extends AbstractPart implements Downloadable {
 
     /**
      * 名称。
-     * <p>
-     * Name.
      */
     protected String name;
 
@@ -28,27 +24,21 @@ public abstract class DownloadResource extends AbstractPart implements Downloada
 
     /**
      * 编码。
-     * <p>
-     * Charset.
      */
     protected Charset charset;
 
     /**
      * 缓存是否启用。
-     * <p>
-     * Whether caching is enabled.
      */
     protected boolean cacheEnabled;
 
     /**
      * 缓存路径。
-     * <p>
-     * Cache path.
      */
     protected String cachePath;
 
     @SuppressWarnings("unchecked")
-    public static class Builder<T extends DownloadResource, B extends Builder<T, B>> {
+    public static class Builder<T extends AbstractDownloadable, B extends Builder<T, B>> {
 
         protected String name;
 

@@ -7,8 +7,6 @@ import java.util.Map;
 
 /**
  * {@link DownloadContext} 的默认实现。
- * <p>
- * The default implementation of {@link DownloadContext}.
  */
 public class DefaultDownloadContext extends AbstractDownloadContext {
 
@@ -20,14 +18,9 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
 
     /**
      * 在内部的 {@link HashMap} 中设置一个键值对。
-     * <p>
-     * Set a key-value in the internal {@link HashMap}.
      *
      * @param key   键
-     *              <p>
-     *              Key
      * @param value 值
-     *              <p>
      */
     @Override
     public void set(Object key, Object value) {
@@ -36,18 +29,10 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
 
     /**
      * 在内部的 {@link HashMap} 中根据键获得一个值。
-     * <p>
-     * Get a value with the key in the internal {@link HashMap}.
      *
      * @param key 键
-     *            <p>
-     *            Key
      * @param <T> 类型
-     *            <p>
-     *            Type
      * @return 值
-     * <p>
-     * Value
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -57,15 +42,9 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
 
     /**
      * 判断健是否在内部的 {@link HashMap} 中存在。
-     * <p>
-     * Determine whether the key exists in the internal {@link HashMap}.
      *
      * @param key 键
-     *            <p>
-     *            Key
      * @return 如果存在则返回 true
-     * <p>
-     * Return true if it exists
      */
     @Override
     public boolean contains(Object key) {
@@ -74,12 +53,8 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
 
     /**
      * 通过键移除在内部的 {@link HashMap} 中的一个键值对。
-     * <p>
-     * Remove a key-value by key in the internal {@link HashMap}.
      *
      * @param key 键
-     *            <p>
-     *            Key
      */
     @Override
     public void remove(Object key) {
@@ -88,8 +63,6 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
 
     /**
      * 销毁并清空 {@link HashMap}。
-     * <p>
-     * Destroy and clear {@link HashMap}.
      */
     @Override
     public void destroy() {
