@@ -3,10 +3,13 @@ package com.github.linyuzai.download.core.exception;
 import lombok.SneakyThrows;
 
 /**
- * 错误持有者。
+ * 异常持有者。
  */
 public class ErrorHolder {
 
+    /**
+     * 异常
+     */
     private Throwable e;
 
     /**

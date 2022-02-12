@@ -13,9 +13,15 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DefaultDownloadContextFactory implements DownloadContextFactory {
 
+    /**
+     * 初始化器
+     */
     @NonNull
     private List<DownloadContextInitializer> initializers;
 
+    /**
+     * 销毁器
+     */
     @NonNull
     private List<DownloadContextDestroyer> destroyers;
 

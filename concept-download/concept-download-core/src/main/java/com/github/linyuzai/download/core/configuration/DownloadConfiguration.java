@@ -24,7 +24,7 @@ public class DownloadConfiguration {
     public static class ResponseConfiguration {
 
         /**
-         * 额外的响应头。
+         * 额外的响应头
          */
         private Map<String, String> headers;
     }
@@ -39,7 +39,7 @@ public class DownloadConfiguration {
     public static class CompressConfiguration {
 
         /**
-         * 压缩格式。
+         * 压缩格式
          */
         private String format = CompressFormat.ZIP;
 
@@ -50,12 +50,12 @@ public class DownloadConfiguration {
     public static class CacheConfiguration {
 
         /**
-         * 是否启用缓存。
+         * 是否启用缓存
          */
         private boolean enabled;
 
         /**
-         * 缓存路径。
+         * 缓存路径
          */
         private String path = Cacheable.PATH;
 

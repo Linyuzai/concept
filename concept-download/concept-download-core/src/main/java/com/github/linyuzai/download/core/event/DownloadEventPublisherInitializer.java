@@ -6,13 +6,23 @@ import lombok.AllArgsConstructor;
 
 /**
  * {@link DownloadEventPublisher} 初始化器。
- * 将 {@link DownloadEventPublisher} 设置到 {@link DownloadContext} 中。
+ * 在 {@link DownloadContext} 初始化时，设置 {@link DownloadEventPublisher}。
  */
 @AllArgsConstructor
 public class DownloadEventPublisherInitializer implements DownloadContextInitializer {
 
+    /**
+     * 被设置的 {@link DownloadEventPublisher}
+     */
     private DownloadEventPublisher eventPublisher;
 
+    /**
+     * 如果设置了额外的 {@link DownloadEventListener}，
+     * 使用 {@link DownloadEventPublisherDelegate} 回调额外的 {@link DownloadEventListener}，
+     * 否则直接设置 {@link DownloadEventPublisher}。
+     *
+     * @param context {@link DownloadContext}
+     */
     @Override
     public void initialize(DownloadContext context) {
         DownloadEventListener listener = context.getOptions().getEventListener();

@@ -10,6 +10,9 @@ import java.util.Map;
  */
 public class DefaultDownloadContext extends AbstractDownloadContext {
 
+    /**
+     * 用来存储上下文数据
+     */
     private final Map<Object, Object> map = new HashMap<>();
 
     public DefaultDownloadContext(String id, DownloadOptions options) {

@@ -12,6 +12,9 @@ import java.util.List;
  */
 public class DownloadEventListenerContainer implements DownloadEventListener {
 
+    /**
+     * {@link DownloadEventListener} 列表
+     */
     @Getter
     private final List<DownloadEventListener> listeners;
 

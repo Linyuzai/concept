@@ -10,11 +10,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CacheNameGeneratorInitializer implements DownloadContextInitializer {
 
+    /**
+     * 需要设置的 {@link CacheNameGenerator}
+     */
     private CacheNameGenerator cacheNameGenerator;
 
     /**
-     * 在 {@link DownloadContext} 初始化时，
-     * 设置 {@link CacheNameGenerator}。
+     * 在 {@link DownloadContext} 初始化时，设置 {@link CacheNameGenerator}。
      *
      * @param context {@link DownloadContext}
      */

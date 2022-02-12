@@ -13,7 +13,7 @@ import java.io.File;
 public class SourceFileCompressionEvent extends AbstractCompressSourceEvent {
 
     /**
-     * 压缩文件。
+     * 压缩文件
      */
     private final File file;
 

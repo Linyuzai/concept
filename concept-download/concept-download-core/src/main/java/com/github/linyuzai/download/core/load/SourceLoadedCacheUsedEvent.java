@@ -4,6 +4,9 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
+/**
+ * {@link Source} 加载使用缓存时会发布该事件。
+ */
 @Getter
 public class SourceLoadedCacheUsedEvent extends AbstractLoadSourceEvent {
 

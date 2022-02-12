@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * 下载功能的AOP拦截。
- * 对标注了注解 {@link Download} 的方法进行拦截，
+ * 对标注了注解 {@link Download} 的方法进行拦截。
  */
 public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements MethodInterceptor, BeanPostProcessor {
 

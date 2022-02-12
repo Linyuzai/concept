@@ -7,15 +7,18 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 /**
- * {@link SourceCompressor} 适配器实现
+ * {@link SourceCompressor} 适配器实现。
  */
 @AllArgsConstructor
 public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {
 
+    /**
+     * {@link SourceCompressor} 列表
+     */
     private final List<SourceCompressor> compressors;
 
     /**
-     * 根据压缩格式获得对应的 {@link SourceCompressor}。
+     * 根据压缩格式获得对应的 {@link SourceCompressor}，
      * 如果没有可用的 {@link SourceCompressor} 则抛出异常。
      *
      * @param format  压缩格式

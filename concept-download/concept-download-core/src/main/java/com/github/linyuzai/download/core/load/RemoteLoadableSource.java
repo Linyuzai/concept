@@ -13,8 +13,18 @@ import reactor.core.publisher.Mono;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * 支持网络加载的 {@link Source}。
+ */
 public abstract class RemoteLoadableSource extends AbstractLoadableSource {
 
+    /**
+     * 将 {@link InputStream} 写到 {@link OutputStream}，更新并发布加载进度。
+     *
+     * @param os      {@link OutputStream}
+     * @param context {@link DownloadContext}
+     * @return 加载后的 {@link Source}
+     */
     @Override
     public Mono<Source> doLoad(OutputStream os, DownloadContext context) {
         DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
@@ -30,6 +40,12 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
         });
     }
 
+    /**
+     * 远程加载。
+     *
+     * @param context {@link DownloadContext}
+     * @return 加载后的 {@link Source}
+     */
     public abstract Mono<InputStream> loadRemote(DownloadContext context);
 
     public static abstract class Builder<T extends RemoteLoadableSource, B extends Builder<T, B>> extends AbstractLoadableSource.Builder<T, B> {

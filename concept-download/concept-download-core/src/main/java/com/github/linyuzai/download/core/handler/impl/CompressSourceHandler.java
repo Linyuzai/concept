@@ -18,17 +18,12 @@ import reactor.core.publisher.Mono;
 
 /**
  * 对 {@link Source} 进行压缩。
- * 压缩处理器 / A handler to process compression
- * 单个下载源默认不压缩 / A single download source is not compressed by default
- * 可以通过指定配置强制压缩 / You can force compression by specifying the configuration {@link DownloadOptions#isForceCompress()}
- * 如果需要压缩则会适配压缩器 / If compression is required, the compressor will be adapted
- * 将通过压缩器对下载源进行压缩 / The download source will be compressed by a compressor
  */
 @AllArgsConstructor
 public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     /**
-     * {@link SourceCompressor} 适配器。
+     * {@link SourceCompressor} 适配器
      */
     private SourceCompressorAdapter sourceCompressorAdapter;
 

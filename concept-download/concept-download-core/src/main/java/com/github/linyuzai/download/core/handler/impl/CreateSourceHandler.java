@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     /**
-     * {@link SourceFactory} 适配器。
+     * {@link SourceFactory} 适配器
      */
     private SourceFactoryAdapter sourceFactoryAdapter;
 

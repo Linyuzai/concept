@@ -11,7 +11,7 @@ import lombok.Setter;
 public abstract class AbstractDownloadEvent implements DownloadEvent {
 
     /**
-     * 事件信息。
+     * 事件信息
      */
     private String message;
 }

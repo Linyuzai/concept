@@ -14,6 +14,9 @@ import java.util.Collection;
 @AllArgsConstructor
 public class NoCompression implements Compression {
 
+    /**
+     * 单个的 {@link Source}
+     */
     protected Source source;
 
     /**

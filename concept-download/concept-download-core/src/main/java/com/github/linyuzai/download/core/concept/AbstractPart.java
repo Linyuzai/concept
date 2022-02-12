@@ -8,7 +8,7 @@ import java.io.InputStream;
 public abstract class AbstractPart implements Part {
 
     /**
-     * 当前持有的 {@link InputStream}。
+     * 当前持有的 {@link InputStream}
      */
     protected InputStream inputStream;
 

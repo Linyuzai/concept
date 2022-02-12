@@ -8,5 +8,10 @@ package com.github.linyuzai.download.core.event;
  */
 public interface DownloadEventPublisher {
 
+    /**
+     * 发布事件。
+     *
+     * @param event 事件
+     */
     void publish(Object event);
 }

@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
 /**
- * 当确定压缩格式时会发布该事件。
+ * 当确定 {@link Source} 压缩格式时会发布该事件。
  */
 @Getter
 public class SourceCompressionFormatEvent extends AbstractCompressSourceEvent {

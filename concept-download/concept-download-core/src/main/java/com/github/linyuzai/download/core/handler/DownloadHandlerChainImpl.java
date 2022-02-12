@@ -13,18 +13,17 @@ import java.util.List;
 public class DownloadHandlerChainImpl implements DownloadHandlerChain {
 
     /**
-     * 下标，指定处理器位置。
+     * 下标，指定处理器位置
      */
     private int index;
 
     /**
-     * 处理器列表。
+     * 处理器列表
      */
     private final List<DownloadHandler> handlers;
 
     /**
-     * 如果可以获得下一个处理器则调用，
-     * 否则返回 {@link Mono#empty()}
+     * 如果可以获得下一个处理器则调用，否则返回 {@link Mono#empty()}。
      *
      * @param context {@link DownloadContext}
      */

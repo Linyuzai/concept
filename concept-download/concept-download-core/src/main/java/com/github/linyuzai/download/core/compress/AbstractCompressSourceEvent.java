@@ -7,11 +7,14 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * {@link Source} 压缩相关的事件的父类
+ * {@link Source} 压缩相关的事件的父类。
  */
 @Getter
 public abstract class AbstractCompressSourceEvent extends DownloadContextEvent {
 
+    /**
+     * 被压缩的 {@link Source}
+     */
     @NonNull
     private final Source source;
 

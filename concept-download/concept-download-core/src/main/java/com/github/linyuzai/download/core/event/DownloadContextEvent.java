@@ -15,7 +15,7 @@ import lombok.Setter;
 public abstract class DownloadContextEvent extends AbstractDownloadEvent {
 
     /**
-     * 下载上下文。
+     * 下载上下文
      */
     @NonNull
     private final DownloadContext context;

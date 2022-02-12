@@ -13,11 +13,14 @@ import java.io.InputStream;
 @AllArgsConstructor
 public class MemoryCompression extends AbstractCompression {
 
+    /**
+     * 存储在字节数组中
+     */
     @NonNull
     protected final byte[] bytes;
 
     /**
-     * 获得一个 {@link ByteArrayInputStream}
+     * 获得一个 {@link ByteArrayInputStream}。
      *
      * @return {@link ByteArrayInputStream}
      */

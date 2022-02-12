@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public interface DownloadHandlerChain {
 
     /**
-     * 调度下一个下载处理器
+     * 调度下一个下载处理器。
      *
      * @param context {@link DownloadContext}
      */

@@ -16,14 +16,13 @@ import java.lang.annotation.*;
 public @interface Download {
 
     /**
-     * 需要下载的原始数据对象或对应格式。
+     * 需要下载的原始数据对象或对应格式，
      * 最终将会被处理成 {@link Source}。
      */
     String[] source() default {};
 
     /**
-     * 在某些格式下可以直接预览。
-     * 如图片或视频。
+     * 在某些格式下可以直接预览，如图片或视频。
      */
     boolean inline() default false;
 
@@ -43,8 +42,8 @@ public @interface Download {
     String compressFormat() default "";
 
     /**
-     * 如果下载的是单个文件默认不会压缩。
-     * 该属性可以强制对单个文件的下载也进行压缩。
+     * 如果下载的是单个文件默认不会压缩，
+     * 该属性可以强制让单个文件的下载也进行压缩。
      */
     boolean forceCompress() default false;
 

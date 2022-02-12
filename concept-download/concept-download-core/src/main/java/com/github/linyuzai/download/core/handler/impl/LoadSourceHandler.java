@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class LoadSourceHandler implements DownloadHandler {
 
     /**
-     * 加载器。
+     * 加载器
      */
     private SourceLoader sourceLoader;
 

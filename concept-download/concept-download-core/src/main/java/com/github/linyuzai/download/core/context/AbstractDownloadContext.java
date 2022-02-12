@@ -14,14 +14,26 @@ import java.util.Collections;
 @Getter
 public abstract class AbstractDownloadContext implements DownloadContext {
 
+    /**
+     * 唯一id
+     */
     private final String id;
 
+    /**
+     * 操作参数
+     */
     private final DownloadOptions options;
 
+    /**
+     * 初始化器
+     */
     @NonNull
     @Setter
     private Collection<DownloadContextInitializer> initializers = Collections.emptyList();
 
+    /**
+     * 销毁器
+     */
     @NonNull
     @Setter
     private Collection<DownloadContextDestroyer> destroyers = Collections.emptyList();

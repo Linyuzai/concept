@@ -15,14 +15,13 @@ import java.io.*;
 import java.util.Collection;
 
 /**
- * {@link SourceCompressor} 的抽象类。
- * 对缓存做了处理。
+ * {@link SourceCompressor} 的抽象类，对缓存做了处理。
  */
 public abstract class AbstractSourceCompressor<OS extends OutputStream> implements SourceCompressor {
 
     /**
-     * 如果没有启用缓存，使用内存压缩。
-     * 如果启用缓存并且缓存存在，直接使用缓存。
+     * 如果没有启用缓存，使用内存压缩；
+     * 如果启用缓存并且缓存存在，直接使用缓存；
      * 如果启用缓存并且缓存不存在，压缩到本地缓存文件。
      *
      * @param source  {@link Source}

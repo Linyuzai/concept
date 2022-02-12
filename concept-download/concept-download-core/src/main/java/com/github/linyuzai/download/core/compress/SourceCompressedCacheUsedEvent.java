@@ -5,13 +5,13 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
 /**
- * 压缩使用缓存时会发布该事件。
+ * {@link Source} 压缩使用缓存时会发布该事件。
  */
 @Getter
 public class SourceCompressedCacheUsedEvent extends AbstractCompressSourceEvent {
 
     /**
-     * 缓存路径。
+     * 缓存
      */
     private final String cache;
 

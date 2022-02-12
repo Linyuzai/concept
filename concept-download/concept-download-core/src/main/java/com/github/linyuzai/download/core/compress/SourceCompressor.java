@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 
 /**
- * 压缩器。
+ * {@link Source} 压缩器。
  *
  * @see ZipSourceCompressor
  */

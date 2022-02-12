@@ -20,7 +20,7 @@ import java.util.zip.ZipOutputStream;
 public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStream> {
 
     /**
-     * 新建一个 {@link ZipOutputStream}
+     * 新建一个 {@link ZipOutputStream}。
      *
      * @param os      被包装的输出流
      * @param source  {@link Source}

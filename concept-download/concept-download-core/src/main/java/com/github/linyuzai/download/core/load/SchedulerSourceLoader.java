@@ -7,36 +7,42 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * 支持 {@link Scheduler} 的 {@link SourceLoader}。
+ * 如果想要忽略 {@link Source#isAsyncLoad()}
+ * 可以使用 {@link DefaultSourceLoader}。
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SchedulerSourceLoader extends ConcurrentSourceLoader {
 
-    private Scheduler scheduler;
+    /**
+     * Reactor调度器
+     */
+    private Scheduler scheduler = Schedulers.immediate();
 
+    /**
+     * 并发加载使用指定的 {@link Scheduler}。
+     *
+     * @param sources {@link Source} 集合
+     * @param context {@link DownloadContext}
+     * @return 加载后的 {@link Source}
+     */
     @Override
     public Mono<Source> concurrentLoad(Collection<Source> sources, DownloadContext context) {
-        Scheduler scheduler = getScheduler();
-        List<Mono<Source>> monoList = sources.stream()
-                .map(it -> Mono.just(it)
-                        .publishOn(scheduler)
-                        .flatMap(s -> s.load(context)))
-                .collect(Collectors.toList());
-        List<Source> block = Mono.zip(monoList, objects -> Arrays.stream(objects)
-                        .map(Source.class::cast)
-                        .collect(Collectors.toList()))
-                //.publishOn(scheduler)
-                .block();
-        return Mono.just(new MultipleSource(block == null ? Collections.emptyList() : block));
+        return Flux.fromIterable(sources)
+                .publishOn(scheduler)
+                .flatMap(it -> it.load(context))
+                .collectList()
+                .map(MultipleSource::new);
     }
 }

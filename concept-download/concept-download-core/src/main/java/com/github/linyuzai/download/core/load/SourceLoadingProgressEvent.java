@@ -6,6 +6,9 @@ import com.github.linyuzai.download.core.write.AbstractProgressEvent;
 import com.github.linyuzai.download.core.write.Progress;
 import lombok.Getter;
 
+/**
+ * {@link Source} 加载进度更新时会发布该事件。
+ */
 @Getter
 public class SourceLoadingProgressEvent extends AbstractProgressEvent {
 

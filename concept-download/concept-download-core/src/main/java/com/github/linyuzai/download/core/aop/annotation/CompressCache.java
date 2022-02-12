@@ -18,7 +18,7 @@ public @interface CompressCache {
 
     /**
      * 是否开启压缩文件缓存。
-     * 开启后，将会先在本地生成一个压缩文件。
+     * 开启后，将会先在本地生成一个压缩文件；
      * 否则，将直接在内存中压缩。
      * 如果文件小可以不开启。
      */
@@ -26,7 +26,7 @@ public @interface CompressCache {
 
     /**
      * 缓存目录分组。
-     * 相当于在配置的缓存目录下新建一个子目录。
+     * 相当于在配置的缓存目录下新建一个子目录，
      * 方便根据不同业务指定不同的缓存文件夹，
      * 防止文件重名等问题。
      */
@@ -34,8 +34,7 @@ public @interface CompressCache {
 
     /**
      * 缓存的压缩文件名称。
-     * 如果不指定，
-     * 则使用 {@link CacheNameGenerator#generate(Downloadable, DownloadContext)} 来生成一个名称。
+     * 如果不指定则使用 {@link CacheNameGenerator#generate(Downloadable, DownloadContext)} 来生成一个名称。
      */
     String name() default "";
 

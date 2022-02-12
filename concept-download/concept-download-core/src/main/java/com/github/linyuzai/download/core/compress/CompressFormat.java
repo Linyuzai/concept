@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.compress;
 
 /**
- * 压缩格式
+ * 压缩格式。
  */
 public class CompressFormat {
 

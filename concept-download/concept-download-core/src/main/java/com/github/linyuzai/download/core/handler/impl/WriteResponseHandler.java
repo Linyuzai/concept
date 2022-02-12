@@ -30,17 +30,17 @@ import java.util.function.Consumer;
 public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
 
     /**
-     * {@link DownloadWriter} 适配器。
+     * {@link DownloadWriter} 适配器
      */
     private DownloadWriterAdapter downloadWriterAdapter;
 
     /**
-     * {@link DownloadRequest} 提供者。
+     * {@link DownloadRequest} 提供者
      */
     private DownloadRequestProvider downloadRequestProvider;
 
     /**
-     * {@link DownloadResponse} 提供者。
+     * {@link DownloadResponse} 提供者
      */
     private DownloadResponseProvider downloadResponseProvider;
 

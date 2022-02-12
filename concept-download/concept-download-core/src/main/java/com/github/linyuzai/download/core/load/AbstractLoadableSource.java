@@ -15,20 +15,20 @@ import reactor.core.publisher.Mono;
 import java.io.*;
 
 /**
- * 需要预加载资源的抽象类 / Abstract classes that require preloaded resources
- * 需要注意数据流只能使用一次 / Note that stream can only be used once
+ * 支持预加载的 {@link Source}。
  */
 @Getter
 public abstract class AbstractLoadableSource extends AbstractSource {
 
+    /**
+     * 资源长度
+     */
     protected Long length;
 
     /**
-     * 如果需要异步加载 / If asynchronous loading is required
-     * 在启用缓存并存在缓存的情况下 / With cache enabled and cache present
-     * 直接同步加载本地缓存 / Loading local cache synchronous
+     * 在启用缓存并存在缓存的情况下直接同步加载本地缓存。
      *
-     * @return 是否异步加载 / If async load
+     * @return 是否异步加载
      */
     public boolean isAsyncLoad() {
         boolean asyncLoad = super.isAsyncLoad();
@@ -39,7 +39,9 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     }
 
     /**
-     * @return 本地文件是否存在
+     * 本地文件是否存在。
+     *
+     * @return 如果本地文件存在则返回 true
      */
     @Override
     public boolean isCacheExisted() {
@@ -47,17 +49,19 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     }
 
     /**
-     * 不启用缓存，则直接加载 / If caching is not enabled, load directly
-     * 启用缓存并缓存存在，则使用缓存 / Cache is used if cache is enabled and exists
-     * 启用缓存并缓存不存在，则加载到缓存并使用缓存 / Load into cache and use cache if cache is enabled and cache does not exist,
+     * 如果当前已经持有 {@link InputStream} 则直接使用；
+     * 不启用缓存，则直接加载到内存；
+     * 启用缓存并缓存存在，则使用缓存；
+     * 启用缓存并缓存不存在，则加载到缓存并使用缓存。
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @SneakyThrows
     @Override
     public Mono<Source> load(DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         if (inputStream != null) {
+            //直接使用
             publisher.publish(new SourceAlreadyLoadedEvent(context, this));
             return Mono.just(this);
         }
@@ -78,20 +82,24 @@ public abstract class AbstractLoadableSource extends AbstractSource {
 
             File cache = new File(dir, nameToUse);
             Mono<Source> mono;
+            //缓存存在
             if (cache.exists()) {
                 publisher.publish(new SourceLoadedCacheUsedEvent(context, this, cache.getAbsolutePath()));
                 mono = Mono.just(this);
             } else {
+                //写到缓存文件
                 FileOutputStream fos = new FileOutputStream(cache);
                 mono = doLoad(fos, context)
                         .doOnSuccess(s -> closeStream(fos))
                         .doOnError(e -> closeStream(fos));
             }
             return mono.map(it -> {
+                //Content Type
                 String contentType = getContentType();
                 if (!StringUtils.hasText(contentType)) {
                     setContentType(ContentType.file(cache));
                 }
+                //设置长度
                 long l = cache.length();
                 if (length == null) {
                     length = l;
@@ -104,6 +112,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 return it;
             });
         } else {
+            //内存加载
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             return doLoad(os, context).map(it -> {
                 byte[] bytes = os.toByteArray();
@@ -121,6 +130,11 @@ public abstract class AbstractLoadableSource extends AbstractSource {
         }
     }
 
+    /**
+     * 关闭流。
+     *
+     * @param os {@link OutputStream}
+     */
     private void closeStream(OutputStream os) {
         try {
             os.close();
@@ -128,18 +142,29 @@ public abstract class AbstractLoadableSource extends AbstractSource {
         }
     }
 
+    /**
+     * 预加载时获得。
+     *
+     * @return 持有的 {@link InputStream}
+     */
     @Override
     public InputStream openInputStream() {
         return inputStream;
     }
 
+    /**
+     * 通过缓存文件获得 {@link FileInputStream}。
+     *
+     * @param cache 缓存文件
+     * @return 缓存文件的 {@link FileInputStream}
+     */
     @SneakyThrows
     public InputStream getCacheInputStream(File cache) {
         return new FileInputStream(cache);
     }
 
     /**
-     * 删除缓存
+     * 如果缓存文件存在则删除。
      */
     @Override
     public void deleteCache() {
@@ -152,10 +177,10 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     }
 
     /**
-     * 加载输入流 / Load input stream
+     * 加载到对应的输出流。
      *
-     * @param context 下载上下文 / Context of download
-     * @return 输入流 / Input stream
+     * @param context {@link DownloadContext}
+     * @return 加载后的 {@link Source}
      */
     public abstract Mono<Source> doLoad(OutputStream os, DownloadContext context);
 

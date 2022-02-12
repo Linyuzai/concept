@@ -16,11 +16,14 @@ import java.io.InputStream;
 @AllArgsConstructor
 public class FileCompression extends AbstractCompression {
 
+    /**
+     * 压缩文件
+     */
     @NonNull
     protected final File file;
 
     /**
-     * 获得一个 {@link FileInputStream}
+     * 获得一个 {@link FileInputStream}。
      *
      * @return {@link FileInputStream}
      */
@@ -31,8 +34,7 @@ public class FileCompression extends AbstractCompression {
     }
 
     /**
-     * 如果设置了名称则使用设置的名称，
-     * 否则设置为文件名称。
+     * 如果设置了名称则使用设置的名称，否则设置为文件名称。
      *
      * @return 自定义的名称或文件名称
      */

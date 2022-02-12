@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 public abstract class AbstractDownloadable extends AbstractPart implements Downloadable {
 
     /**
-     * 名称。
+     * 名称
      */
     protected String name;
 
@@ -23,17 +23,17 @@ public abstract class AbstractDownloadable extends AbstractPart implements Downl
     protected String contentType;
 
     /**
-     * 编码。
+     * 编码
      */
     protected Charset charset;
 
     /**
-     * 缓存是否启用。
+     * 缓存是否启用
      */
     protected boolean cacheEnabled;
 
     /**
-     * 缓存路径。
+     * 缓存路径
      */
     protected String cachePath;
 

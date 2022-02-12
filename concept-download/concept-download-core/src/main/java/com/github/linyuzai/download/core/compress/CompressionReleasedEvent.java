@@ -5,11 +5,14 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import lombok.Getter;
 
 /**
- * 压缩资源释放时会发布该事件。
+ * {@link Compression} 的资源释放时会发布该事件。
  */
 @Getter
 public class CompressionReleasedEvent extends AbstractDestroyContextEvent {
 
+    /**
+     * 被释放资源的 {@link Compression}
+     */
     private final Compression compression;
 
     public CompressionReleasedEvent(DownloadContext context, Compression compression) {
