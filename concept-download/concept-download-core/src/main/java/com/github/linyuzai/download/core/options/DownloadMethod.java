@@ -6,24 +6,24 @@ import lombok.Value;
 import java.lang.reflect.Method;
 
 /**
- * 下载方法，主要用于切面 / Download method, mainly used for aop
+ * 下载方法，主要用于切面记录对应的方法。
  */
 @Value
 @Builder(builderClassName = "Builder")
 public class DownloadMethod {
 
     /**
-     * 方法 / Method
+     * 方法
      */
     Method method;
 
     /**
-     * 入参 / Parameters
+     * 入参
      */
     Object[] parameters;
 
     /**
-     * 返回值 / Return value
+     * 返回值
      */
     Object returnValue;
 }

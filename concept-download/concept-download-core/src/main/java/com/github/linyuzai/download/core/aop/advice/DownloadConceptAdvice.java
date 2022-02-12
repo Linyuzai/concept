@@ -101,13 +101,13 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
      * 回调给开发者重写 {@link DownloadOptions}。
      *
      * @param method        切面方法
-     * @param arguments     方法入参
+     * @param parameters     方法入参
      * @param returnValue   方法返回值
      * @param configuration 全局配置 {@link DownloadConfiguration}
      * @return {@link DownloadOptions}
      */
     public DownloadOptions buildOptions(Method method,
-                                        Object[] arguments,
+                                        Object[] parameters,
                                         Object returnValue,
                                         DownloadConfiguration configuration) {
 
@@ -119,7 +119,7 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
 
         DownloadMethod downloadMethod = DownloadMethod.builder()
                 .method(method)
-                .parameters(arguments)
+                .parameters(parameters)
                 .returnValue(returnValue)
                 .build();
 

@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.options;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
+import com.github.linyuzai.download.core.source.Source;
 import lombok.Builder;
 import lombok.Value;
 
@@ -10,21 +11,21 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * 下载操作参数 / Download options
+ * 下载参数。
  */
 @Value
 @Builder(builderClassName = "Builder", toBuilder = true)
 public class DownloadOptions {
 
     /**
-     * 需要下载是原始数据对象 / Original source to download
+     * 需要下载的原始数据对象，
+     * 后续会适配解析为 {@link Source}。
      */
     Object source;
 
     /**
-     * 原始数据对象是否开启缓存 / Whether the cache is enabled for the original source
-     * 主要用于一些需要网络IO操作，如http等数据源的缓存 / It is mainly used for caching sources that require network IO operations, such as HTTP
-     * 本地文件没有缓存的概念，或者说文件本身就是缓存 / The local file does not have the concept of cache, or the file itself is a cache
+     * {@link Source} 是否开启缓存。
+     * 主要用于需要网络操作，如http等数据的缓存，
      */
     boolean sourceCacheEnabled;
 
