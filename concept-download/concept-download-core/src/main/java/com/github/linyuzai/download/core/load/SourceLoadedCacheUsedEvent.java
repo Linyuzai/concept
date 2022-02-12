@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
 @Getter
-public class SourceLoadedCacheUsedEvent extends AbstractSourceLoadedEvent {
+public class SourceLoadedCacheUsedEvent extends AbstractLoadSourceEvent {
 
     private final String cache;
 

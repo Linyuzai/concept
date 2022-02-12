@@ -8,6 +8,7 @@ import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.log.ProgressCalculationLogger;
 import com.github.linyuzai.download.core.log.StandardDownloadLogger;
 import com.github.linyuzai.download.core.log.TimeSpentCalculationLogger;
+import com.github.linyuzai.download.coroutines.loader.CoroutinesSourceLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -39,8 +40,13 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
     }
 
     //@Bean
-    public SourceLoader sourceLoader() {
+    public SchedulerSourceLoader schedulerSourceLoader() {
         return new SchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(5)));
+    }
+
+    @Bean
+    public CoroutinesSourceLoader coroutinesSourceLoader() {
+        return new CoroutinesSourceLoader();
     }
 
     @EventListener

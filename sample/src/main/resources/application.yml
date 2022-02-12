@@ -1,5 +1,9 @@
 server:
   port: 18080
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 #debug: true
 #concept:
 #  download:
@@ -16,8 +20,4 @@ server:
 #      cache:
 #        enabled: true
 #        delete: true
-concept:
-  download:
-    log:
-      enabled: true
 #        path: /s

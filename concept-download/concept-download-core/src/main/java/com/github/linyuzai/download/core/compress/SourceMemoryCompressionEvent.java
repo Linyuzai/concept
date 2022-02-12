@@ -8,9 +8,9 @@ import com.github.linyuzai.download.core.source.Source;
  * <p>
  * This event is published when {@link MemoryCompression} is used.
  */
-public class SourceMemoryCompressedEvent extends AbstractSourceCompressedEvent {
+public class SourceMemoryCompressionEvent extends AbstractCompressSourceEvent {
 
-    public SourceMemoryCompressedEvent(DownloadContext context, Source source) {
+    public SourceMemoryCompressionEvent(DownloadContext context, Source source) {
         super(context, source, "Compress source in memory");
     }
 }

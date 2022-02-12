@@ -177,10 +177,8 @@ public class ConceptDownloadReactiveController {
     @GetMapping("/s19")
     public Mono<Void> s19() {
         List<BusinessModel> businessModels = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            String url = "http://192.168.20.112:8088/demo/download?i=" + i;
-            businessModels.add(new BusinessModel(i + ".jar", url));
-        }
+        businessModels.add(new BusinessModel("1.jar", "http://192.168.20.112:8088/demo/download"));
+        businessModels.add(new BusinessModel("2.jar", "http://192.168.20.112:8088/demo/download2"));
         businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
         businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
         return DownloadMono.value(businessModels);

@@ -10,7 +10,7 @@ import lombok.Getter;
  * This event is published when compression uses the cache
  */
 @Getter
-public class SourceCompressedCacheUsedEvent extends AbstractSourceCompressedEvent {
+public class SourceCompressedCacheUsedEvent extends AbstractCompressSourceEvent {
 
     /**
      * 缓存路径。

@@ -26,14 +26,16 @@ public class SchedulerSourceLoader extends ConcurrentSourceLoader {
 
     @Override
     public Mono<Source> concurrentLoad(Collection<Source> sources, DownloadContext context) {
+        Scheduler scheduler = getScheduler();
         List<Mono<Source>> monoList = sources.stream()
                 .map(it -> Mono.just(it)
-                        .publishOn(getScheduler())
+                        .publishOn(scheduler)
                         .flatMap(s -> s.load(context)))
                 .collect(Collectors.toList());
         List<Source> block = Mono.zip(monoList, objects -> Arrays.stream(objects)
                         .map(Source.class::cast)
                         .collect(Collectors.toList()))
+                //.publishOn(scheduler)
                 .block();
         return Mono.just(new MultipleSource(block == null ? Collections.emptyList() : block));
     }

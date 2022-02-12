@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
-import com.github.linyuzai.download.core.compress.zip.SourceZipCompressedEvent;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
@@ -52,21 +51,21 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             if (cache.exists()) {
                 publisher.publish(new SourceCompressedCacheUsedEvent(context, source, cache.getAbsolutePath()));
             } else {
+                publisher.publish(new SourceFileCompressionEvent(context, source, cache.getAbsolutePath()));
                 try (FileOutputStream fos = new FileOutputStream(cache)) {
                     doCompress(source, fos, writer, context);
                 }
-                publisher.publish(new SourceFileCompressedEvent(context, source, cache.getAbsolutePath()));
             }
             FileCompression compression = new FileCompression(cache);
             compression.setContentType(getContentType());
             return compression;
         } else {
+            publisher.publish(new SourceMemoryCompressionEvent(context, source));
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             doCompress(source, os, writer, context);
             MemoryCompression compression = new MemoryCompression(os.toByteArray());
             compression.setName(cacheName);
             compression.setContentType(getContentType());
-            publisher.publish(new SourceMemoryCompressedEvent(context, source));
             return compression;
         }
     }
@@ -83,6 +82,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
     @SneakyThrows
     public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new SourceCompressionFormatEvent(context, source, getFormat()));
         try (OS nos = newOutputStream(os, source, context)) {
             Progress progress = new Progress(source.getLength());
             Collection<Part> parts = source.getParts();
@@ -96,7 +96,6 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
                 afterWrite(part, nos);
             }
         }
-        publisher.publish(new SourceZipCompressedEvent(context, source));
     }
 
     /**

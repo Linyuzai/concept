@@ -8,9 +8,9 @@ import com.github.linyuzai.download.core.source.Source;
  * <p>
  * This event is published when {@link NoCompression} is used.
  */
-public class SourceNoCompressedEvent extends AbstractSourceCompressedEvent {
+public class SourceNoCompressionEvent extends AbstractCompressSourceEvent {
 
-    public SourceNoCompressedEvent(DownloadContext context, Source source) {
+    public SourceNoCompressionEvent(DownloadContext context, Source source) {
         super(context, source, "Compress skipped");
     }
 }

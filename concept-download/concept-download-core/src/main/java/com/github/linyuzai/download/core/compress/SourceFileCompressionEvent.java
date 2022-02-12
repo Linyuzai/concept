@@ -10,7 +10,7 @@ import lombok.Getter;
  * This event is published when {@link FileCompression} is used.
  */
 @Getter
-public class SourceFileCompressedEvent extends AbstractSourceCompressedEvent {
+public class SourceFileCompressionEvent extends AbstractCompressSourceEvent {
 
     /**
      * 文件路径。
@@ -19,7 +19,7 @@ public class SourceFileCompressedEvent extends AbstractSourceCompressedEvent {
      */
     private final String filePath;
 
-    public SourceFileCompressedEvent(DownloadContext context, Source source, String filePath) {
+    public SourceFileCompressionEvent(DownloadContext context, Source source, String filePath) {
         super(context, source, "Compress source with file " + filePath);
         this.filePath = filePath;
     }

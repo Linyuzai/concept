@@ -22,24 +22,6 @@ import java.util.zip.ZipOutputStream;
 public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStream> {
 
     /**
-     * 支持 ZIP 格式的压缩。
-     * <p>
-     * Support ZIP format compression.
-     *
-     * @param format  压缩格式
-     *                <p>
-     *                Compression format
-     * @param context {@link DownloadContext}
-     * @return 如果使用 ZIP 格式压缩则返回 true
-     * <p>
-     * Returns true if ZIP format compression is used
-     */
-    @Override
-    public boolean support(String format, DownloadContext context) {
-        return CompressFormat.ZIP.equalsIgnoreCase(format);
-    }
-
-    /**
      * 新建一个 {@link ZipOutputStream}
      * <p>
      * New a {@link ZipOutputStream}
@@ -106,5 +88,10 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
     @Override
     public String getContentType() {
         return ContentType.Application.X_ZIP_COMPRESSED;
+    }
+
+    @Override
+    public String getFormat() {
+        return CompressFormat.ZIP;
     }
 }

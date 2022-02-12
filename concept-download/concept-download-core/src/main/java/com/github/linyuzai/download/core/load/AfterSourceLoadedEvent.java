@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
 @Getter
-public class AfterSourceLoadedEvent extends AbstractSourceLoadedEvent {
+public class AfterSourceLoadedEvent extends AbstractLoadSourceEvent {
 
     public AfterSourceLoadedEvent(DownloadContext context, Source source) {
         super(context, source, "Source loaded");

@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 import java.time.Duration;
 import java.util.Map;
@@ -75,50 +74,43 @@ public class ProgressCalculationLogger extends DownloadLogger {
         }
     }
 
-    public class ProgressInterval implements Consumer<FluxSink<AbstractProgressEvent>> {
+    public class ProgressInterval {
 
-        private FluxSink<AbstractProgressEvent> sink;
+        private volatile boolean ready = true;
+
+        private final Consumer<AbstractProgressEvent> consumer;
 
         private final Disposable disposable;
-
-        private Disposable innerDisposable;
 
         private final ProgressEventHolder holder = new ProgressEventHolder();
 
         public ProgressInterval(Consumer<AbstractProgressEvent> consumer) {
-            disposable = Flux.create(this).subscribe(consumer);
-        }
-
-        @Override
-        public void accept(FluxSink<AbstractProgressEvent> sink) {
-            this.sink = sink;
-            innerDisposable = Flux.interval(duration).subscribe(unused -> update());
+            this.consumer = consumer;
+            disposable = Flux.interval(duration).subscribe(unused -> ready = true);
         }
 
         public void publish(AbstractProgressEvent event) {
-            holder.set(event);
             if (event.getProgress().getTotal() != null &&
                     event.getProgress().getCurrent() == event.getProgress().getTotal()) {
-                update();
+                update(event);
                 disposable();
+            } else {
+                if (ready) {
+                    update(event);
+                }
             }
         }
 
-        private void update() {
-            if (holder.isUpdate()) {
-                AbstractProgressEvent event = holder.get();
-                if (event != null) {
-                    sink.next(event);
-                }
+        private synchronized void update(AbstractProgressEvent event) {
+            if (holder.update(event)) {
+                ready = false;
+                consumer.accept(event);
             }
         }
 
         public void disposable() {
             if (disposable != null && !disposable.isDisposed()) {
                 disposable.dispose();
-            }
-            if (innerDisposable != null && !innerDisposable.isDisposed()) {
-                innerDisposable.dispose();
             }
             holder.reset();
         }
@@ -129,29 +121,21 @@ public class ProgressCalculationLogger extends DownloadLogger {
 
         private volatile AbstractProgressEvent event;
 
-        private volatile boolean update;
-
-        public void set(AbstractProgressEvent newEvent) {
+        public boolean update(AbstractProgressEvent newEvent) {
             if (event == null) {
                 event = newEvent;
-                update = true;
+                return true;
             } else {
                 if (event.getProgress().getCurrent() == newEvent.getProgress().getCurrent()) {
-                    update = false;
+                    return false;
                 } else {
                     event = newEvent;
-                    update = true;
+                    return true;
                 }
             }
         }
 
-        public AbstractProgressEvent get() {
-            update = false;
-            return event;
-        }
-
         public void reset() {
-            update = false;
             event = null;
         }
     }

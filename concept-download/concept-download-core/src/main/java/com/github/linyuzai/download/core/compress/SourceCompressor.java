@@ -12,6 +12,8 @@ import com.github.linyuzai.download.core.write.DownloadWriter;
  */
 public interface SourceCompressor extends OrderProvider {
 
+    String getFormat();
+
     /**
      * 判断是否支持对应的压缩格式。
      * <p>
@@ -25,7 +27,9 @@ public interface SourceCompressor extends OrderProvider {
      * <p>
      * Return true if supported
      */
-    boolean support(String format, DownloadContext context);
+    default boolean support(String format, DownloadContext context) {
+        return format.equalsIgnoreCase(getFormat());
+    }
 
     /**
      * 如果支持对应的格式就会调用该方法执行压缩。

@@ -12,12 +12,12 @@ import lombok.NonNull;
  * Super class of {@link Source} compression related events
  */
 @Getter
-public abstract class AbstractSourceCompressedEvent extends DownloadContextEvent {
+public abstract class AbstractCompressSourceEvent extends DownloadContextEvent {
 
     @NonNull
     private final Source source;
 
-    public AbstractSourceCompressedEvent(DownloadContext context, @NonNull Source source, String message) {
+    public AbstractCompressSourceEvent(DownloadContext context, @NonNull Source source, String message) {
         super(context);
         this.source = source;
         setMessage(message);

@@ -10,7 +10,7 @@ import lombok.Getter;
  * This event is published after compression is complete.
  */
 @Getter
-public class AfterSourceCompressedEvent extends AbstractSourceCompressedEvent {
+public class AfterSourceCompressedEvent extends AbstractCompressSourceEvent {
 
     private final Compression compression;
 

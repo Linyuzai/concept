@@ -41,7 +41,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
         boolean forceCompress = context.getOptions().isForceCompress();
         if (single && !forceCompress) {
             compression = new NoCompression(source);
-            publisher.publish(new SourceNoCompressedEvent(context, source));
+            publisher.publish(new SourceNoCompressionEvent(context, source));
         } else {
             String compressFormat = context.getOptions().getCompressFormat();
             String formatToUse = StringUtils.hasText(compressFormat) ? compressFormat : CompressFormat.ZIP;
