@@ -15,23 +15,17 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * 使用 {@link ZipOutputStream} 进行压缩。
- * <p>
- * Use {@link ZipOutputStream} for compression.
  */
 @AllArgsConstructor
 public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStream> {
 
     /**
      * 新建一个 {@link ZipOutputStream}
-     * <p>
-     * New a {@link ZipOutputStream}
      *
      * @param os      被包装的输出流
-     *                <p>
-     *                Wrapped output stream
      * @param source  {@link Source}
      * @param context {@link DownloadContext}
-     * @return
+     * @return {@link ZipOutputStream}
      */
     @Override
     public ZipOutputStream newOutputStream(OutputStream os, Source source, DownloadContext context) {
@@ -40,8 +34,6 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
 
     /**
      * 写之前添加一个 {@link ZipEntry}。
-     * <p>
-     * Add a {@link ZipEntry} before writing.
      *
      * @param part {@link Part}
      * @param os   {@link ZipOutputStream}
@@ -54,8 +46,6 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
 
     /**
      * 写入之后关闭 {@link ZipEntry}。
-     * <p>
-     * Close {@link ZipEntry} after writing.
      *
      * @param part {@link Part}
      * @param os   {@link ZipOutputStream}
@@ -68,8 +58,6 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
 
     /**
      * 获得 zip 文件扩展后缀。
-     * <p>
-     * Get the zip file extension suffix.
      *
      * @return .zip
      */
@@ -80,8 +68,6 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
 
     /**
      * 获得 zip 文件的 Content-Type。
-     * <p>
-     * Get the Content-Type of the zip file.
      *
      * @return application/x-zip-compressed
      */
@@ -90,6 +76,11 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
         return ContentType.Application.X_ZIP_COMPRESSED;
     }
 
+    /**
+     * 获得文件的压缩格式。
+     *
+     * @return zip
+     */
     @Override
     public String getFormat() {
         return CompressFormat.ZIP;

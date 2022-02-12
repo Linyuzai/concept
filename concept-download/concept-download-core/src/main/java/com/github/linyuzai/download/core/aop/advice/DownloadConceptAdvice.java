@@ -21,6 +21,7 @@ import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.Ordered;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -30,16 +31,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 下载功能的AOP实现。
+ * 下载功能的AOP拦截。
  * 对标注了注解 {@link Download} 的方法进行拦截，
- * 并委托 {@link DownloadConcept} 统一处理下载数据。
  */
 public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements MethodInterceptor, BeanPostProcessor {
 
+    /**
+     * 全局配置
+     */
     @Getter
     @Setter
     private DownloadConfiguration configuration;
 
+    /**
+     * 下载处理的统一入口
+     */
     @Getter
     @Setter
     private DownloadConcept downloadConcept;
@@ -119,9 +125,11 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
 
         builder.downloadMethod(downloadMethod);
 
+        //如果是 DownloadOptions 直接使用
         if (returnValue instanceof DownloadOptions) {
             return (DownloadOptions) returnValue;
         }
+        //如果为 null 或 Rewriter 则使用注解指定的数据，否则使用返回值
         if (returnValue == null || returnValue instanceof DownloadOptions.Rewriter) {
             builder.source(download.source());
         } else {
@@ -165,6 +173,7 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
         DownloadOptions options = builder.build();
 
         if (returnValue instanceof DownloadOptions.Rewriter) {
+            //回调重写接口
             return ((DownloadOptions.Rewriter) returnValue).rewrite(options);
         } else {
             return options;
@@ -179,14 +188,14 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
      *
      * @param download      注解 {@link Download}
      * @param configuration 全局配置 {@link DownloadConfiguration}
-     * @return 最终的压缩格式
+     * @return 压缩格式
      */
     private String buildCompressFormat(Download download, DownloadConfiguration configuration) {
         String compressFormat = download.compressFormat();
-        if (compressFormat.isEmpty()) {
-            return configuration.getCompress().getFormat();
-        } else {
+        if (StringUtils.hasText(compressFormat)) {
             return compressFormat;
+        } else {
+            return configuration.getCompress().getFormat();
         }
     }
 
@@ -200,7 +209,7 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
      */
     private Charset buildCharset(Download download) {
         String charset = download.charset();
-        return charset.isEmpty() ? null : Charset.forName(charset);
+        return StringUtils.hasText(charset) ? Charset.forName(charset) : null;
     }
 
     /**
@@ -208,14 +217,16 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
      *
      * @param download      注解 {@link Download}
      * @param configuration 全局配置 {@link DownloadConfiguration}
-     * @return 额外响应头的 Map 对象
+     * @return 额外响应头的 {@link Map} 对象
      */
     private Map<String, String> buildHeaders(Download download, DownloadConfiguration configuration) {
         Map<String, String> headerMap = new LinkedHashMap<>();
         Map<String, String> globalHeaders = configuration.getResponse().getHeaders();
+        //全局响应头
         if (globalHeaders != null) {
             headerMap.putAll(globalHeaders);
         }
+        //注解上指定的响应头
         String[] headers = download.headers();
         if (headers.length % 2 == 0) {
             for (int i = 0; i < headers.length; i += 2) {
@@ -229,14 +240,10 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
 
     /**
      * 获得 {@link Source} 的缓存路径。
-     * <p>
-     * Build the cache path of {@link Source}.
      *
      * @param cache         {@link SourceCache}
      * @param configuration {@link DownloadConfiguration}
-     * @return 缓存路径
-     * <p>
-     * Cache path
+     * @return {@link Source} 的缓存路径
      */
     private String buildSourceCachePath(SourceCache cache, DownloadConfiguration configuration) {
         String path = configuration.getSource().getCache().getPath();
@@ -249,14 +256,10 @@ public class DownloadConceptAdvice extends DefaultPointcutAdvisor implements Met
 
     /**
      * 获得 {@link Compression} 的缓存路径。
-     * <p>
-     * Build the cache path of {@link Compression}.
      *
      * @param cache         {@link CompressCache}
      * @param configuration {@link DownloadConfiguration}
-     * @return 缓存路径
-     * <p>
-     * Cache path
+     * @return {@link Compression} 的缓存路径
      */
     private String buildCompressPath(CompressCache cache, DownloadConfiguration configuration) {
         String path = configuration.getCompress().getCache().getPath();
