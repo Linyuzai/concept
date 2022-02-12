@@ -43,7 +43,7 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
         return new SchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(5)));
     }
 
-    @Bean
+    //@Bean
     public CoroutinesSourceLoader coroutinesSourceLoader() {
         return new CoroutinesSourceLoader();
     }

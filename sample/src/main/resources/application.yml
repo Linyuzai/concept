@@ -1,9 +1,9 @@
 server:
   port: 18080
-spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+#spring:
+#  mvc:
+#    pathmatch:
+#      matching-strategy: path_pattern_parser
 #debug: true
 #concept:
 #  download:
