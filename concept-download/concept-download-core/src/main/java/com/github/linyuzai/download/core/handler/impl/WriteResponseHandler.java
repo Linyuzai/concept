@@ -24,35 +24,50 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * 写响应处理器 / A handler to write response
+ * 将 {@link Compression} 写入到 {@link DownloadResponse}。
  */
 @AllArgsConstructor
 public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
 
+    /**
+     * {@link DownloadWriter} 适配器。
+     */
     private DownloadWriterAdapter downloadWriterAdapter;
 
+    /**
+     * {@link DownloadRequest} 提供者。
+     */
     private DownloadRequestProvider downloadRequestProvider;
 
+    /**
+     * {@link DownloadResponse} 提供者。
+     */
     private DownloadResponseProvider downloadResponseProvider;
 
     /**
-     * 将压缩后的对象写入输出流 / Writes the compressed object to the output stream
-     * 设置inline或文件名 / Set inline or file name
-     * 设置ContentType / Set ContentType
-     * 设置ContentLength / Set ContentLength
-     * 设置响应头 / Set response headers
+     * 写 {@link DownloadResponse}。
+     * 处理 {@link DownloadRequest} 中的 {@link Range}，
+     * 设置 {@link DownloadResponse} 的响应头，
+     * 将 {@link Compression} 写入到 {@link DownloadResponse} 中
+     * 并发布 {@link ResponseWritingProgressEvent} 事件，
+     * 最后发布 {@link AfterResponseWrittenEvent} 事件。
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
         Compression compression = context.get(Compression.class);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        //获得Request
         return downloadRequestProvider.getRequest(context).flatMap(request -> {
+                    //获得Range
                     Range range = request.getRange();
                     DownloadWriter writer = downloadWriterAdapter.getWriter(compression, range, context);
+                    //获得Response
                     return downloadResponseProvider.getResponse(context)
+                            //设置响应头
                             .filter(response -> applyHeaders(response, compression, range, context))
+                            //写数据
                             .flatMap(response -> response.write(new Consumer<OutputStream>() {
 
                                 @SneakyThrows
@@ -63,6 +78,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                                     for (Part part : parts) {
                                         InputStream is = part.getInputStream();
                                         writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
+                                            //更新并发布写入进度
                                             progress.update(increase);
                                             publisher.publish(new ResponseWritingProgressEvent(context, progress.freeze()));
                                         });
@@ -74,7 +90,21 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
                 .doOnSuccess(it -> publisher.publish(new AfterResponseWrittenEvent(context)));
     }
 
+    /**
+     * 设置响应头。
+     * 处理 {@link Range}，
+     * 设置 inline 或 attachment，
+     * 设置 Content-Type，
+     * 设置自定义的响应头。
+     *
+     * @param response    {@link DownloadResponse}
+     * @param compression {@link Compression}
+     * @param range       {@link Range}
+     * @param context     {@link DownloadContext}
+     * @return 是否继续处理
+     */
     public boolean applyHeaders(DownloadResponse response, Compression compression, Range range, DownloadContext context) {
+        //Range处理
         response.setBytesAcceptRanges();
         Long length = compression.getLength();
         if (range == null || length == null || length <= 0) {
@@ -109,6 +139,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
             }
         }
 
+        //inline 或 attachment
         boolean inline = context.getOptions().isInline();
         String filename = context.getOptions().getFilename();
         String filenameToUse;
@@ -122,6 +153,8 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         } else {
             response.setAttachment(filenameToUse);
         }
+
+        //ContentType
         String contentType = context.getOptions().getContentType();
         if (StringUtils.hasText(contentType)) {
             response.setContentType(contentType);
@@ -134,6 +167,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
             }
         }
 
+        //Headers
         Map<String, String> headers = context.getOptions().getHeaders();
         if (headers != null) {
             response.setHeaders(headers);
@@ -143,9 +177,11 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
     }
 
     /**
-     * 初始化时，将请求和响应放到上下文中 / Put the request and response into context when initializing
+     * 初始化时，将 {@link DownloadWriterAdapter} 设置到 {@link DownloadContext} 中；
+     * 将 {@link DownloadRequestProvider} 设置到 {@link DownloadContext} 中；
+     * 将 {@link DownloadResponseProvider} 设置到 {@link DownloadContext} 中。
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @Override
     public void initialize(DownloadContext context) {

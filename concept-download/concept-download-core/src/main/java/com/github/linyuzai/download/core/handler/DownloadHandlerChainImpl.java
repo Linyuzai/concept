@@ -7,21 +7,26 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * 下载处理链默认实现
+ * {@link DownloadHandlerChain} 的默认实现。
  */
 @AllArgsConstructor
 public class DownloadHandlerChainImpl implements DownloadHandlerChain {
 
+    /**
+     * 下标，指定处理器位置。
+     */
     private int index;
 
+    /**
+     * 处理器列表。
+     */
     private final List<DownloadHandler> handlers;
 
     /**
-     * 对上一个处理器进行拦截 / Intercept the previous handler
-     * 获取下一个处理器 / Get next handler
-     * 执行处理器 / Execute handler
+     * 如果可以获得下一个处理器则调用，
+     * 否则返回 {@link Mono#empty()}
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @Override
     public Mono<Void> next(DownloadContext context) {

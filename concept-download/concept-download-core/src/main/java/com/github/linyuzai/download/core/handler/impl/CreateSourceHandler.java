@@ -11,17 +11,24 @@ import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
 /**
- * 下载源处理拦截器
+ * 将任意的对象解析成对应的 {@link Source}。
  */
 @AllArgsConstructor
 public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
+    /**
+     * {@link SourceFactory} 适配器。
+     */
     private SourceFactoryAdapter sourceFactoryAdapter;
 
     /**
-     * 将所有需要下载的数据对象转换为下载源
+     * 创建 {@link Source}。
+     * 通过 {@link SourceFactoryAdapter} 获得适配的 {@link SourceFactory}，
+     * 通过 {@link SourceFactory} 创建对应的 {@link Source}，
+     * 将 {@link Source} 设置到 {@link DownloadContext} 中，
+     * 发布 {@link AfterSourceCreatedEvent} 事件。
      *
-     * @param context 下载上下文
+     * @param context {@link DownloadContext}
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
@@ -34,21 +41,34 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
         return chain.next(context);
     }
 
+    /**
+     * 初始化时将 {@link SourceFactoryAdapter} 设置到 {@link DownloadContext} 中。
+     *
+     * @param context {@link DownloadContext}
+     */
     @Override
     public void initialize(DownloadContext context) {
         context.set(SourceFactoryAdapter.class, sourceFactoryAdapter);
     }
 
+    /**
+     * 销毁时，如果需要则删除缓存并发布 {@link SourceCacheDeletedEvent} 事件；
+     * 释放资源并发布 {@link SourceReleasedEvent} 事件。
+     *
+     * @param context {@link DownloadContext}
+     */
     @Override
     public void destroy(DownloadContext context) {
         Source source = context.get(Source.class);
         if (source != null) {
             DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
             boolean delete = context.getOptions().isSourceCacheDelete();
+            //是否删除缓存
             if (delete) {
                 source.deleteCache();
                 publisher.publish(new SourceCacheDeletedEvent(context, source));
             }
+            //释放资源
             source.release();
             publisher.publish(new SourceReleasedEvent(context, source));
         }

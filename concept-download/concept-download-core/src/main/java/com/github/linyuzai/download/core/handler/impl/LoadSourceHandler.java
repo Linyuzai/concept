@@ -11,19 +11,23 @@ import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
 /**
- * 加载处理器 / A handler to process loads
+ * 对所有的 {@link Source} 进行加载。
  */
 @AllArgsConstructor
 public class LoadSourceHandler implements DownloadHandler {
 
+    /**
+     * 加载器。
+     */
     private SourceLoader sourceLoader;
 
     /**
-     * 将所有的Source封装成对应的加载器 / Encapsulate all sources into corresponding loaders
-     * 使用Invoker调用加载器 / Invoking the loader using invoker
-     * 处理加载异常 / Handle load exception
+     * 加载 {@link Source}。
+     * 使用 {@link SourceLoader} 加载所有的 {@link Source}，
+     * 发布 {@link AfterSourceLoadedEvent} 事件，
+     * 设置新的 {@link Source} 到 {@link DownloadContext} 中。
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @Override
     public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {

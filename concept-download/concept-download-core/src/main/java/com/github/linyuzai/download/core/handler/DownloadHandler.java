@@ -5,23 +5,21 @@ import com.github.linyuzai.download.core.order.OrderProvider;
 import reactor.core.publisher.Mono;
 
 /**
- * 下载处理器 / Handler to download
+ * 下载处理器。
  */
 public interface DownloadHandler extends OrderProvider {
 
-    int ORDER_INITIALIZE_CONTEXT = Integer.MIN_VALUE + 100;
     int ORDER_LOOKUP_CACHE = 0;
     int ORDER_CREATE_SOURCE = 100;
     int ORDER_LOAD_SOURCE = 200;
     int ORDER_COMPRESS_SOURCE = 300;
     int ORDER_WRITE_RESPONSE = 400;
-    int ORDER_DESTROY_CONTEXT = Integer.MAX_VALUE - 100;
 
     /**
-     * 执行处理 / Do handle
+     * 执行处理。
      *
-     * @param context 下载上下文 / Context of download
-     * @param chain   处理链 / Chain of handler
+     * @param context {@link DownloadContext}
+     * @param chain   {@link DownloadHandlerChain}
      */
     Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain);
 }
