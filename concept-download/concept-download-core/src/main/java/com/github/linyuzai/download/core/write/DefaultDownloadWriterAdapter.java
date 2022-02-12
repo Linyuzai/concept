@@ -3,7 +3,7 @@ package com.github.linyuzai.download.core.write;
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import com.github.linyuzai.download.core.range.Range;
+import com.github.linyuzai.download.core.web.Range;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

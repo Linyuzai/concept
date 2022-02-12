@@ -2,7 +2,7 @@ package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.concept.Downloadable;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.range.Range;
+import com.github.linyuzai.download.core.web.Range;
 
 /**
  * 写入器的适配器 / Adapter of write

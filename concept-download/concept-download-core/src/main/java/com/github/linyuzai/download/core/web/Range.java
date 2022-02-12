@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.range;
+package com.github.linyuzai.download.core.web;
 
 import lombok.*;
 import org.springframework.util.StringUtils;

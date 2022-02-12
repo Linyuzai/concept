@@ -1,7 +1,5 @@
 package com.github.linyuzai.download.core.web;
 
-import com.github.linyuzai.download.core.range.Range;
-
 /**
  * 请求，如http / Request, such as http
  */
