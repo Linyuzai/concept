@@ -2,8 +2,6 @@ package com.github.linyuzai.download.core.compress;
 
 /**
  * 压缩格式
- * <p>
- * Compression format
  */
 public class CompressFormat {
 

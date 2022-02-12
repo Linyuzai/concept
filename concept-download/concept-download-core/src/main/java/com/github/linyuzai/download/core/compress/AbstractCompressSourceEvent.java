@@ -8,8 +8,6 @@ import lombok.NonNull;
 
 /**
  * {@link Source} 压缩相关的事件的父类
- * <p>
- * Super class of {@link Source} compression related events
  */
 @Getter
 public abstract class AbstractCompressSourceEvent extends DownloadContextEvent {

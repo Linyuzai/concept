@@ -4,23 +4,21 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
+import java.io.File;
+
 /**
- * 当使用 {@link FileCompression} 时会发布该事件。
- * <p>
- * This event is published when {@link FileCompression} is used.
+ * 当使用 {@link FileCompression} 文件压缩时会发布该事件。
  */
 @Getter
 public class SourceFileCompressionEvent extends AbstractCompressSourceEvent {
 
     /**
-     * 文件路径。
-     * <p>
-     * File path.
+     * 压缩文件。
      */
-    private final String filePath;
+    private final File file;
 
-    public SourceFileCompressionEvent(DownloadContext context, Source source, String filePath) {
-        super(context, source, "Compress source with file " + filePath);
-        this.filePath = filePath;
+    public SourceFileCompressionEvent(DownloadContext context, Source source, File file) {
+        super(context, source, "Compress source with file " + file.getAbsolutePath());
+        this.file = file;
     }
 }

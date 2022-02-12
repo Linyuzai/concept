@@ -6,16 +6,12 @@ import lombok.Getter;
 
 /**
  * 压缩使用缓存时会发布该事件。
- * <p>
- * This event is published when compression uses the cache
  */
 @Getter
 public class SourceCompressedCacheUsedEvent extends AbstractCompressSourceEvent {
 
     /**
      * 缓存路径。
-     * <p>
-     * Cache path.
      */
     private final String cache;
 

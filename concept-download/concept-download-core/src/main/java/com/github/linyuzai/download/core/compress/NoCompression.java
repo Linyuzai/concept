@@ -10,8 +10,6 @@ import java.util.Collection;
 
 /**
  * 不压缩。
- * <p>
- * No compression.
  */
 @AllArgsConstructor
 public class NoCompression implements Compression {
@@ -20,8 +18,6 @@ public class NoCompression implements Compression {
 
     /**
      * 直接返回 {@link Source#getInputStream()}。
-     * <p>
-     * Directly return {@link Source#getInputStream()}.
      *
      * @return {@link Source#getInputStream()}
      */
@@ -32,8 +28,6 @@ public class NoCompression implements Compression {
 
     /**
      * 直接返回 {@link Source#getName()}。
-     * <p>
-     * Directly return {@link Source#getName()}.
      *
      * @return {@link Source#getName()}
      */
@@ -44,8 +38,6 @@ public class NoCompression implements Compression {
 
     /**
      * 直接返回 {@link Source#getContentType()}。
-     * <p>
-     * Directly return {@link Source#getContentType()}.
      *
      * @return {@link Source#getContentType()}
      */
@@ -56,8 +48,6 @@ public class NoCompression implements Compression {
 
     /**
      * 直接返回 {@link Source#getCharset()}。
-     * <p>
-     * Directly return {@link Source#getCharset()}.
      *
      * @return {@link Source#getCharset()}
      */
@@ -68,8 +58,6 @@ public class NoCompression implements Compression {
 
     /**
      * 直接返回 {@link Source#getLength()}。
-     * <p>
-     * Directly return {@link Source#getLength()}.
      *
      * @return {@link Source#getLength()}
      */
@@ -80,8 +68,6 @@ public class NoCompression implements Compression {
 
     /**
      * 不压缩描述。
-     * <p>
-     * No compression description.
      *
      * @return NoCompression:{@link Source#getDescription()}
      */
@@ -92,8 +78,6 @@ public class NoCompression implements Compression {
 
     /**
      * 直接返回 {@link Source#getParts()}。
-     * <p>
-     * Directly return {@link Source#getParts()}.
      *
      * @return {@link Source#getParts()}
      */

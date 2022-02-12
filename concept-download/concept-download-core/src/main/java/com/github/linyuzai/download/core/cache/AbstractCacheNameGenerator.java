@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.source.Source;
 import org.springframework.util.StringUtils;
 
 /**
+ * {@link CacheNameGenerator} 的抽象类。
  * 将会优先使用 {@link Source} 或 {@link Compression} 的名称。
  */
 public abstract class AbstractCacheNameGenerator implements CacheNameGenerator {

@@ -6,8 +6,6 @@ import lombok.Getter;
 
 /**
  * 压缩资源释放时会发布该事件。
- * <p>
- * This event is published when a compressed resource is released.
  */
 @Getter
 public class CompressionReleasedEvent extends AbstractContextDestroyedEvent {

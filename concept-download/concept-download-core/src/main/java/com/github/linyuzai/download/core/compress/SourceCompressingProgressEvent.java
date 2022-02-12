@@ -6,8 +6,6 @@ import com.github.linyuzai.download.core.write.Progress;
 
 /**
  * 压缩进度更新时会发布该事件。
- * <p>
- * This event is published when the compression progress is updated.
  */
 public class SourceCompressingProgressEvent extends AbstractProgressEvent {
 

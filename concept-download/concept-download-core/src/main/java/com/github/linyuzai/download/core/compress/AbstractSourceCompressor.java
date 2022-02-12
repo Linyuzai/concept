@@ -15,9 +15,8 @@ import java.io.*;
 import java.util.Collection;
 
 /**
- * 对缓存做了判断。
- * <p>
- * Made a judgment on the cache.
+ * {@link SourceCompressor} 的抽象类。
+ * 对缓存做了处理。
  */
 public abstract class AbstractSourceCompressor<OS extends OutputStream> implements SourceCompressor {
 
@@ -25,10 +24,6 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * 如果没有启用缓存，使用内存压缩。
      * 如果启用缓存并且缓存存在，直接使用缓存。
      * 如果启用缓存并且缓存不存在，压缩到本地缓存文件。
-     * <p>
-     * If caching is not enabled, use memory compression.
-     * If caching is enabled and the cache exists, use the cache directly.
-     * If caching is enabled and the cache does not exist, compress to the local cache file.
      *
      * @param source  {@link Source}
      * @param writer  {@link DownloadWriter}
@@ -42,16 +37,19 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
         String cacheName = getCacheName(source, context);
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        //是否启用缓存
         if (cacheEnable) {
             File dir = new File(cachePath);
             if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
             }
             File cache = new File(dir, cacheName);
+            //缓存是否存在
             if (cache.exists()) {
                 publisher.publish(new SourceCompressedCacheUsedEvent(context, source, cache.getAbsolutePath()));
             } else {
-                publisher.publish(new SourceFileCompressionEvent(context, source, cache.getAbsolutePath()));
+                publisher.publish(new SourceFileCompressionEvent(context, source, cache));
+                //写入缓存文件
                 try (FileOutputStream fos = new FileOutputStream(cache)) {
                     doCompress(source, fos, writer, context);
                 }
@@ -60,6 +58,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             compression.setContentType(getContentType());
             return compression;
         } else {
+            //在内存中压缩
             publisher.publish(new SourceMemoryCompressionEvent(context, source));
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             doCompress(source, os, writer, context);
@@ -72,8 +71,6 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
 
     /**
      * 执行压缩。
-     * <p>
-     * Perform compression.
      *
      * @param source {@link Source}
      * @param os     {@link OutputStream}
@@ -100,24 +97,16 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
 
     /**
      * 新建一个压缩输出流。
-     * <p>
-     * Create a new compressed output stream.
      *
      * @param os      被包装的输出流
-     *                <p>
-     *                Wrapped output stream
      * @param source  {@link Source}
      * @param context {@link DownloadContext}
      * @return 新建的压缩输出流
-     * <p>
-     * New compressed output stream
      */
     public abstract OS newOutputStream(OutputStream os, Source source, DownloadContext context);
 
     /**
      * 写入之前调用。
-     * <p>
-     * Call before writing.
      *
      * @param part {@link Part}
      * @param os   {@link OS}
@@ -126,8 +115,6 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
 
     /**
      * 写入之后调用。
-     * <p>
-     * Call after writing.
      *
      * @param part {@link Part}
      * @param os   {@link OS}
@@ -137,16 +124,10 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
     /**
      * 如果指定了压缩文件缓存名称则使用指定的名称，
      * 否则通过 {@link CacheNameGenerator} 生成。
-     * <p>
-     * If the compressed file cache name is specified,
-     * the specified name is used;
-     * otherwise, it is generated through {@link CacheNameGenerator}.
      *
      * @param source  {@link Source}
      * @param context {@link DownloadContext}
      * @return 压缩文件缓存名称
-     * <p>
-     * Compressed file cache name
      */
     public String getCacheName(Source source, DownloadContext context) {
         String compressCacheName = context.getOptions().getCompressCacheName();
@@ -174,19 +155,13 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
 
     /**
      * 获得压缩文件的扩展后缀。
-     * <p>
-     * Get the extended suffix of the compressed file.
      *
      * @return 后缀
-     * <p>
-     * Suffix
      */
     public abstract String getSuffix();
 
     /**
      * 获得压缩文件的 Content-Type
-     * <p>
-     * Get the Content-Type of the compressed file
      *
      * @return Content-Type
      */
