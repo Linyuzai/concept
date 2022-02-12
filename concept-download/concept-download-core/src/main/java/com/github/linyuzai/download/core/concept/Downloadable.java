@@ -4,7 +4,6 @@ import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.source.Source;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 

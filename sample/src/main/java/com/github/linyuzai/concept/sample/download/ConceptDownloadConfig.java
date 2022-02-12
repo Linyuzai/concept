@@ -4,7 +4,6 @@ import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
 import com.github.linyuzai.download.core.event.DownloadEvent;
 import com.github.linyuzai.download.core.load.SchedulerSourceLoader;
-import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.log.ProgressCalculationLogger;
 import com.github.linyuzai.download.core.log.StandardDownloadLogger;
 import com.github.linyuzai.download.core.log.TimeSpentCalculationLogger;
