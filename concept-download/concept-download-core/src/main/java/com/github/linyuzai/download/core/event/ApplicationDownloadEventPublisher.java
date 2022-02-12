@@ -3,10 +3,15 @@ package com.github.linyuzai.download.core.event;
 import lombok.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 
 import java.util.Collection;
 
-public class ApplicationDownloadEventPublisher extends DefaultDownloadEventPublisher
+/**
+ * 基于 {@link ApplicationEventPublisher} 的 {@link DownloadEventPublisher}。
+ * 支持 {@link EventListener} 和 {@link DownloadEventListener} 的监听机制。
+ */
+public class ApplicationDownloadEventPublisher extends SimpleDownloadEventPublisher
         implements ApplicationEventPublisherAware {
 
     private ApplicationEventPublisher applicationEventPublisher;

@@ -4,8 +4,12 @@ import lombok.AllArgsConstructor;
 
 import java.util.Collection;
 
+/**
+ * {@link DownloadEventPublisher} 的简单实现。
+ * 支持 {@link DownloadEventListener} 的监听机制。
+ */
 @AllArgsConstructor
-public class DefaultDownloadEventPublisher implements DownloadEventPublisher {
+public class SimpleDownloadEventPublisher implements DownloadEventPublisher {
 
     private Collection<DownloadEventListener> listeners;
 

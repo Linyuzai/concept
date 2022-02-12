@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.exception;
 
 /**
- * 下载异常
+ * 下载异常。
  */
 public class DownloadException extends RuntimeException {
 

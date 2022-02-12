@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link DownloadEventListener} 的组合监听器。
+ */
 public class DownloadEventListenerContainer implements DownloadEventListener {
 
     @Getter
