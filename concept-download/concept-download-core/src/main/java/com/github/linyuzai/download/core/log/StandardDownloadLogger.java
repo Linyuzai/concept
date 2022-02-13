@@ -24,7 +24,7 @@ public class StandardDownloadLogger extends DownloadLogger {
      * @param event 事件
      */
     @Override
-    public void onEvent(Object event) {
+    public void logOnEvent(Object event) {
         if (event instanceof DownloadContextEvent) {
             DownloadContextEvent dce = (DownloadContextEvent) event;
             DownloadContext context = dce.getContext();

@@ -1,5 +1,9 @@
 server:
   port: 18080
+concept:
+  download:
+    logger:
+      enabled: true
 #spring:
 #  mvc:
 #    pathmatch:

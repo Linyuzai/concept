@@ -28,7 +28,7 @@ open class CoroutinesSourceLoader : ConcurrentSourceLoader() {
                 deferredList.add(deferred)
             }
             deferredList.forEach {
-                it.await()
+                results.add(it.await())
             }
         }
         return Mono.just(MultipleSource(results))

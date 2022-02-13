@@ -171,7 +171,7 @@ public class ConceptDownloadReactiveController {
         return DownloadMono.value(new File("/Users/Shared"));
     }
 
-    @Download
+    @Download(filename = "s19.zip")
     @SourceCache(group = "s19")
     @CompressCache(group = "s19")
     @GetMapping("/s19")

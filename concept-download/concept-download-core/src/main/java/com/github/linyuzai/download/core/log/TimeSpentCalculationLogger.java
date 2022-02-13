@@ -25,7 +25,7 @@ public class TimeSpentCalculationLogger extends DownloadLogger {
      * @param event 事件
      */
     @Override
-    public void onEvent(Object event) {
+    public void logOnEvent(Object event) {
         if (event instanceof AfterContextInitializedEvent) {
             StopWatch watch = new StopWatch();
             watch.start();

@@ -88,7 +88,7 @@ public class DownloadConfiguration {
         /**
          * 是否启用标准日志
          */
-        private boolean enabled;
+        private boolean enabled = true;
     }
 
     @Data
@@ -97,7 +97,7 @@ public class DownloadConfiguration {
         /**
          * 是否启用事件计算日志
          */
-        private boolean enabled;
+        private boolean enabled = true;
     }
 
     @Data
@@ -106,7 +106,7 @@ public class DownloadConfiguration {
         /**
          * 是否启用进度计算日志
          */
-        private boolean enabled;
+        private boolean enabled = true;
 
         /**
          * 间隔，ms

@@ -163,9 +163,9 @@ public class ConceptDownloadController {
         return new File("/Users/Shared");
     }
 
-    @Download
+    @Download(filename = "s19.zip")
     @SourceCache(group = "s19")
-    @CompressCache(group = "s19")
+    @CompressCache(group = "s19", name = "s19.zip")
     @GetMapping("/s19")
     public List<BusinessModel> s19() {
         List<BusinessModel> businessModels = new ArrayList<>();

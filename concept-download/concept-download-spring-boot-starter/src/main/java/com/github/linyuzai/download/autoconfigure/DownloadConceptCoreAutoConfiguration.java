@@ -49,7 +49,6 @@ import com.github.linyuzai.download.core.write.BufferedDownloadWriter;
 import com.github.linyuzai.download.core.write.DefaultDownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -72,23 +71,35 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnExpression("${concept.download.log.standard.enabled:${concept.download.log.enabled:false}}")
-    public StandardDownloadLogger standardDownloadLogger() {
-        return new StandardDownloadLogger();
+    @ConditionalOnMissingBean
+    public StandardDownloadLogger standardDownloadLogger(DownloadConfigurerInvoker invoker) {
+        boolean enabled = invoker.getConfiguration().getLogger().getStandard().isEnabled() &&
+                invoker.getConfiguration().getLogger().isEnabled();
+        StandardDownloadLogger logger = new StandardDownloadLogger();
+        logger.setEnabled(enabled);
+        return logger;
     }
 
     @Bean
-    @ConditionalOnExpression("${concept.download.log.time-spent.enabled:${concept.download.log.enabled:false}}")
-    public TimeSpentCalculationLogger timeSpentCalculationLogger() {
-        return new TimeSpentCalculationLogger();
+    @ConditionalOnMissingBean
+    public TimeSpentCalculationLogger timeSpentCalculationLogger(DownloadConfigurerInvoker invoker) {
+        boolean enabled = invoker.getConfiguration().getLogger().getTimeSpent().isEnabled() &&
+                invoker.getConfiguration().getLogger().isEnabled();
+        TimeSpentCalculationLogger logger = new TimeSpentCalculationLogger();
+        logger.setEnabled(enabled);
+        return logger;
     }
 
     @Bean
-    @ConditionalOnExpression("${concept.download.log.progress.enabled:${concept.download.log.enabled:false}}")
-    public ProgressCalculationLogger progressCalculationLogger(DownloadConfiguration configuration,
-                                                               DownloadConfigurerInvoker invoker) {
-        DownloadConfiguration.ProgressLoggerConfiguration progress = configuration.getLogger().getProgress();
-        return new ProgressCalculationLogger(Duration.ofMillis(progress.getDuration()), progress.isPercentage());
+    @ConditionalOnMissingBean
+    public ProgressCalculationLogger progressCalculationLogger(DownloadConfigurerInvoker invoker) {
+        boolean enabled = invoker.getConfiguration().getLogger().getProgress().isEnabled() &&
+                invoker.getConfiguration().getLogger().isEnabled();
+        Duration duration = Duration.ofMillis(invoker.getConfiguration().getLogger().getProgress().getDuration());
+        boolean percentage = invoker.getConfiguration().getLogger().getProgress().isPercentage();
+        ProgressCalculationLogger logger = new ProgressCalculationLogger(duration, percentage);
+        logger.setEnabled(enabled);
+        return logger;
     }
 
     @Bean

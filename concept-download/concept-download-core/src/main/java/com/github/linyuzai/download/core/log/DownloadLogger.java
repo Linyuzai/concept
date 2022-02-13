@@ -42,6 +42,19 @@ public abstract class DownloadLogger implements DownloadEventListener {
     @Setter
     private int tagLength = 8;
 
+    @Getter
+    @Setter
+    private boolean enabled;
+
+    @Override
+    public void onEvent(Object event) {
+        if (enabled) {
+            logOnEvent(event);
+        }
+    }
+
+    public abstract void logOnEvent(Object event);
+
     public Log getLog() {
         return log;
     }

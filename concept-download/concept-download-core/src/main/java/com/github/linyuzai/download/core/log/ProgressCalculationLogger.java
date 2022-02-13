@@ -70,7 +70,7 @@ public class ProgressCalculationLogger extends DownloadLogger {
      * @param event 事件
      */
     @Override
-    public void onEvent(Object event) {
+    public void logOnEvent(Object event) {
         if (event instanceof AfterContextDestroyedEvent) {
             DownloadContext context = ((AfterContextDestroyedEvent) event).getContext();
             String id = context.getId();

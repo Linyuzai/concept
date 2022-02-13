@@ -39,10 +39,29 @@ public class SchedulerSourceLoader extends ConcurrentSourceLoader {
      */
     @Override
     public Mono<Source> concurrentLoad(Collection<Source> sources, DownloadContext context) {
-        return Flux.fromIterable(sources)
+        /*List<Mono<Source>> list = sources.stream()
+                .map(it -> Mono.just(it)
+                        .publishOn(scheduler)
+                        .flatMap(s -> s.load(context)))
+                .collect(Collectors.toList());
+        MultipleSource source = Mono.zip(list, objects -> Arrays.stream(objects)
+                        .map(Source.class::cast)
+                        .collect(Collectors.toList()))
+                .map(MultipleSource::new).block();
+        return Mono.just(source == null ? new MultipleSource(Collections.emptyList()) : source);*/
+        MultipleSource source = Flux.fromIterable(sources)
+                .parallel()
+                .runOn(scheduler)
+                .flatMap(it -> it.load(context))
+                //目前没有排序的需求
+                .collectSortedList((o1, o2) -> 0)
+                .map(MultipleSource::new)
+                .block();
+        return Mono.justOrEmpty(source);
+        /*return Mono.from(Flux.fromIterable(sources)
                 .publishOn(scheduler)
                 .flatMap(it -> it.load(context))
                 .collectList()
-                .map(MultipleSource::new);
+                .map(MultipleSource::new));*/
     }
 }

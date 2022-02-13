@@ -61,11 +61,11 @@ public abstract class ConcurrentSourceLoader implements SourceLoader {
                         .collectList()
                         .map(MultipleSource::new);
             } else {
-                Mono<Source> syncMono = Flux.defer(() -> Flux.fromIterable(syncSources))
+                Mono<Source> syncMono =  Flux.fromIterable(syncSources)
                         .flatMap(it -> it.load(context))
                         .collectList()
                         .map(MultipleSource::new);
-                Mono<Source> asyncMono = Mono.defer(() -> concurrentLoad(asyncSources, context));
+                Mono<Source> asyncMono = concurrentLoad(asyncSources, context);
                 return Mono.zip(syncMono, asyncMono).map(objects -> {
                     Collection<Source> newSources = new ArrayList<>();
                     newSources.addAll(objects.getT1().list());

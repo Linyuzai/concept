@@ -23,7 +23,7 @@ public class DownloadMono extends Mono<Void> implements ValueContainer {
         //can not be called
     }
 
-    public static DownloadMono empty() {
+    public static @NonNull DownloadMono empty() {
         return new DownloadMono();
     }
 
