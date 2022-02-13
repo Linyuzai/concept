@@ -10,14 +10,26 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * 默认的写入器的适配器 / Adapter of write by default
+ * {@link DownloadWriterAdapter} 的默认实现。
  */
 @Getter
 @AllArgsConstructor
 public class DefaultDownloadWriterAdapter implements DownloadWriterAdapter {
 
+    /**
+     * {@link DownloadWriter} 列表
+     */
     private final List<DownloadWriter> writers;
 
+    /**
+     * 匹配合适的 {@link DownloadWriter}，
+     * 如没有可用的 {@link DownloadWriter} 则抛出异常。
+     *
+     * @param downloadableResource {@link DownloadableResource}
+     * @param range                {@link Range}
+     * @param context              {@link DownloadContext}
+     * @return 匹配到的 {@link DownloadWriter}
+     */
     @Override
     public DownloadWriter getWriter(DownloadableResource downloadableResource, Range range, DownloadContext context) {
         for (DownloadWriter writer : writers) {

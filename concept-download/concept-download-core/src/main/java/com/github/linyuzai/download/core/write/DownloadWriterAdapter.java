@@ -5,17 +5,17 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.Range;
 
 /**
- * 写入器的适配器 / Adapter of write
+ * {@link DownloadWriter} 的适配器。
  */
 public interface DownloadWriterAdapter {
 
     /**
-     * 匹配一个写入器 / Match a write
+     * 匹配一个 {@link DownloadWriter}。
      *
-     * @param downloadableResource 可下载的资源 / Resource can be downloaded
-     * @param range        写入的范围 / Range of writing
-     * @param context      下载上下文 / Context of download
-     * @return 匹配到的写入器 / Writer matched
+     * @param downloadableResource {@link DownloadableResource}
+     * @param range                {@link Range}
+     * @param context              {@link DownloadContext}
+     * @return 匹配到的 {@link DownloadWriter}
      */
     DownloadWriter getWriter(DownloadableResource downloadableResource, Range range, DownloadContext context);
 }

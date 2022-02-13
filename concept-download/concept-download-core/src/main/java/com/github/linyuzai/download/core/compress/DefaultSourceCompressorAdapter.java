@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 /**
- * {@link SourceCompressor} 适配器实现。
+ * {@link SourceCompressorAdapter} 的默认实现。
  */
 @AllArgsConstructor
 public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {

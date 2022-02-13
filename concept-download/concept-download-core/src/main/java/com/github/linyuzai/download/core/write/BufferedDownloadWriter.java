@@ -39,7 +39,7 @@ public class BufferedDownloadWriter implements DownloadWriter {
     }
 
     /**
-     * 如果编码为null则使用字节流处理 / Byte stream is used if the charset is null
+     * 如果编码为 null 则使用字节流处理 / Byte stream is used if the charset is null
      * 如果有编码则使用字符流处理 / Char stream is used if the charset is existed
      *
      * @param is      输入流 / Input stream

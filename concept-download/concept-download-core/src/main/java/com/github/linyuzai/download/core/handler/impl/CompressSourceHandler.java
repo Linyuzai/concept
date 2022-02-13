@@ -8,7 +8,6 @@ import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
-import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;

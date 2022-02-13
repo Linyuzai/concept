@@ -10,30 +10,42 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 /**
- * 具体操作字节或字符的写入器 / Writer to write bytes or chars
+ * 具体操作 {@link InputStream} 和 {@link OutputStream} 的写入器。
  */
 public interface DownloadWriter extends OrderProvider {
 
     /**
-     * @param downloadableResource 可下载的资源 / Resource can be downloaded
-     * @param range        写入的范围 / Range of writing
-     * @param context      下载上下文 / Context of download
-     * @return 是否支持 / Is it supported
+     * 该写入器是否支持写入。
+     *
+     * @param downloadableResource {@link DownloadableResource}
+     * @param range                {@link Range}
+     * @param context              {@link DownloadContext}
+     * @return 如果支持则返回 true
      */
     boolean support(DownloadableResource downloadableResource, Range range, DownloadContext context);
 
+    /**
+     * 执行写入。
+     *
+     * @param is      {@link InputStream}
+     * @param os      {@link OutputStream}
+     * @param range   {@link Range}
+     * @param charset {@link Charset}
+     * @param length  总大小，可能为 null
+     */
     default void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) {
         write(is, os, range, charset, length, null);
     }
 
     /**
-     * 执行写入 / Do write
+     * 执行写入。
      *
-     * @param is      输入流 / Input stream
-     * @param os      输出流 / Output stream
-     * @param range   写入的范围 / Range of writing
-     * @param charset 编码 / Charset
-     * @param length  总字节数，可能为null / Total bytes count, may be null
+     * @param is       {@link InputStream}
+     * @param os       {@link OutputStream}
+     * @param range    {@link Range}
+     * @param charset  {@link Charset}
+     * @param length   总大小，可能为 null
+     * @param callback 回调当前进度和增长的大小
      */
     void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback);
 
