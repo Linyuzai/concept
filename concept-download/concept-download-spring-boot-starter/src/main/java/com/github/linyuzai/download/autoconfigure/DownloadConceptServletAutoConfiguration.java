@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Servlet的配置 / Configuration of servlet
+ * Servlet 环境配置。
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptCoreAutoConfiguration.class)

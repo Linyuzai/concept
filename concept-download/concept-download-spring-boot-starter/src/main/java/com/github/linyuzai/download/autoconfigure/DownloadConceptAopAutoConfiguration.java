@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * AOP配置 / Configuration of AOP
+ * AOP配置。
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(DownloadConceptAdvice.class)

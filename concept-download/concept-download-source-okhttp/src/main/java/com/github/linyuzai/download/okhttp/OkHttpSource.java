@@ -3,6 +3,7 @@ package com.github.linyuzai.download.okhttp;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.*;
 import okhttp3.*;
@@ -12,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.io.InputStream;
 
 /**
- * 使用OkHttp加载资源 / Use OkHttp to load source
+ * 使用 {@link OkHttpClient} 处理 http 请求的 {@link Source}。
  */
 @SuppressWarnings("all")
 @Getter

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Reactive的配置 / Configuration of reactive
+ * Reactive 环境配置。
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptCoreAutoConfiguration.class)

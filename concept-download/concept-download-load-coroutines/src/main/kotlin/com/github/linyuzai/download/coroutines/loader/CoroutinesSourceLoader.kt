@@ -2,6 +2,7 @@ package com.github.linyuzai.download.coroutines.loader
 
 import com.github.linyuzai.download.core.context.DownloadContext
 import com.github.linyuzai.download.core.load.ConcurrentSourceLoader
+import com.github.linyuzai.download.core.load.SourceLoader
 import com.github.linyuzai.download.core.source.Source
 import com.github.linyuzai.download.core.source.multiple.MultipleSource
 import kotlinx.coroutines.Deferred
@@ -10,6 +11,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import reactor.core.publisher.Mono
 
+/**
+ * 基于协程调度的 [SourceLoader]。
+ */
 open class CoroutinesSourceLoader : ConcurrentSourceLoader() {
 
     override fun concurrentLoad(sources: Collection<Source>, context: DownloadContext): Mono<Source> {

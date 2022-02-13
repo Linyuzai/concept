@@ -59,7 +59,7 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * 基础组件的配置 / Configuration of basic components
+ * 基础组件的配置。
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DownloadConfiguration.class)
