@@ -4,6 +4,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * 空的 {@link InputStream}。
+ */
 public class EmptyInputStream extends InputStream {
 
     private volatile boolean closed;

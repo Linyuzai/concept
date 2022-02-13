@@ -9,7 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.nio.charset.Charset;
 
 /**
- * 支持 {@link ClassPathResource} 对象的工厂 / Factory support {@link ClassPathResource}
+ * 匹配 {@link ClassPathResource} 对象的 {@link SourceFactory}。
  */
 public class ClassPathSourceFactory implements SourceFactory {
 

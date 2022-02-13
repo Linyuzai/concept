@@ -16,49 +16,95 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * 文件目录结构支持 / File directory structure support
+ * 支持 {@link File} 的 {@link Part}。
  */
 @Getter
 @AllArgsConstructor
 public class FilePart extends AbstractPart {
 
+    /**
+     * 文件
+     */
     protected File file;
 
+    /**
+     * 名称
+     */
     protected String name;
 
+    /**
+     * 路径
+     */
     protected String path;
 
+    /**
+     * 如果 {@link File#isFile()} 则返回 {@link FileInputStream}，
+     * 否则返回 {@link EmptyInputStream}。
+     *
+     * @return {@link FileInputStream} 或 {@link EmptyInputStream}
+     */
     @SneakyThrows
     @Override
     public InputStream openInputStream() {
         return file.isFile() ? new FileInputStream(file) : new EmptyInputStream();
     }
 
+    /**
+     * 获得名称。
+     *
+     * @return 名称
+     */
     @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * 获得文件路径。
+     *
+     * @return 文件路径
+     */
     @Override
     public String getPath() {
         return file.isFile() ? path : path + File.separator;
     }
 
+    /**
+     * 如果 {@link File#isFile()} 则返回 {@link ContentType#file(File)}，否则返回 null。
+     *
+     * @return {@link ContentType#file(File)} 获得的 Content-Type 或 null
+     */
     @Override
     public String getContentType() {
         return file.isFile() ? ContentType.file(file) : null;
     }
 
+    /**
+     * 直接返回 null。
+     *
+     * @return null
+     */
     @Override
     public Charset getCharset() {
         return null;
     }
 
+    /**
+     * 如果 {@link File#isFile()} 则返回 {@link File#length()}，否则返回 null。
+     *
+     * @return {@link File#length()} 或 null
+     */
     @Override
     public Long getLength() {
         return file.isFile() ? file.length() : null;
     }
 
+    /**
+     * 获得子目录。
+     * 如果 {@link File#isFile()} 则返回 {@link Collections#emptyList()}。
+     *
+     * @return 子目录
+     */
     @Override
     public Collection<Part> getChildren() {
         if (file.isFile()) {
@@ -81,8 +127,6 @@ public class FilePart extends AbstractPart {
 
     @Override
     public String toString() {
-        return "FilePart{" +
-                "file=" + file +
-                '}';
+        return "FilePart(" + file.getAbsolutePath() + ")";
     }
 }

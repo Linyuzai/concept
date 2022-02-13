@@ -1,8 +1,9 @@
 package com.github.linyuzai.download.core.source.file;
 
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.source.AbstractSource;
+import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.ContentType;
 import lombok.*;
 import org.springframework.util.StringUtils;
@@ -15,19 +16,30 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 文件下载源 / A source that holds a file
- * 该下载源持有一个文件对象，可能是文件，可能是目录 / The source holds a file object, which may be a file or a directory
+ * 持有 {@link File} 的 {@link Source}。
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileSource extends AbstractSource {
 
+    /**
+     * 持有的 {@link File}
+     */
     @NonNull
     @Setter
     protected File file;
 
+    /**
+     * 持有的 {@link Part}
+     */
     protected Part part;
 
+    /**
+     * 如果 {@link File#isFile()} 则返回 {@link FileInputStream}，
+     * 否则返回 {@link EmptyInputStream}。
+     *
+     * @return {@link FileInputStream} 或 {@link EmptyInputStream}
+     */
     @SneakyThrows
     @Override
     public InputStream openInputStream() {
@@ -35,10 +47,9 @@ public class FileSource extends AbstractSource {
     }
 
     /**
-     * 如果没有指定名称 / If no name is specified
-     * 返回文件名称 / Return file name
+     * 如果没有指定名称则返回 {@link File#getName()}。
      *
-     * @return 名称 / Name
+     * @return 指定的名称或 {@link File#getName()}
      */
     @Override
     public String getName() {
@@ -49,6 +60,11 @@ public class FileSource extends AbstractSource {
         return super.getName();
     }
 
+    /**
+     * 如果没有指定 Content-Type 则尝试使用 {@link ContentType#file(File)} 获取。
+     *
+     * @return 指定的 Content-Type 或 {@link ContentType#file(File)} 获得的或 null
+     */
     @Override
     public String getContentType() {
         String contentType = super.getContentType();
@@ -59,10 +75,9 @@ public class FileSource extends AbstractSource {
     }
 
     /**
-     * 如果是文件则返回文件大小 / If it is a file, the file size is returned
-     * 如果是文件夹则返回整个文件夹的大小 / If it is a folder, returns the size of the entire folder
+     * 如果是文件则返回文件大小，如果是文件夹则返回整个文件夹的大小。
      *
-     * @return 文件或文件夹大小 / File or folder size
+     * @return 文件或整个文件夹大小
      */
     @Override
     public Long getLength() {
@@ -86,26 +101,40 @@ public class FileSource extends AbstractSource {
     }
 
     /**
-     * 如果是文件则返回true / Returns true if it is a file
-     * 如果是文件夹则返回false / False if it is a folder
+     * 如果是文件则返回 true，如果是文件夹则返回 false。
      *
-     * @return 是否是单个的 / If single
+     * @return 如果是文件则返回 true，如果是文件夹则返回 false
      */
     @Override
     public boolean isSingle() {
         return file.isFile();
     }
 
+    /**
+     * 直接返回 true。
+     *
+     * @return true
+     */
     @Override
     public boolean isCacheEnabled() {
         return true;
     }
 
+    /**
+     * 通过 {@link File#exists()} 获得。
+     *
+     * @return 如果文件存在则返回 true
+     */
     @Override
     public boolean isCacheExisted() {
         return file.exists();
     }
 
+    /**
+     * 通过 {@link File#getParent()} 获得。
+     *
+     * @return 缓存目录
+     */
     @Override
     public String getCachePath() {
         return file.getParent();
@@ -117,9 +146,9 @@ public class FileSource extends AbstractSource {
     }
 
     /**
-     * 每次都新建，返回文件目录的实时结构
+     * 实时返回文件目录的结构。
      *
-     * @return 返回一个文件或整个目录结构 / Returns a file or the entire directory structure
+     * @return 一个文件或整个目录结构
      */
     @Override
     public Collection<Part> getParts() {
@@ -129,10 +158,13 @@ public class FileSource extends AbstractSource {
         String name = getName();
         part = new FilePart(file, name, name);
         List<Part> parts = new ArrayList<>();
-        DownloadableResource.addPart(part, parts);
+        Resource.addPart(part, parts);
         return parts;
     }
 
+    /**
+     * 释放资源。
+     */
     @Override
     public void release() {
         super.release();

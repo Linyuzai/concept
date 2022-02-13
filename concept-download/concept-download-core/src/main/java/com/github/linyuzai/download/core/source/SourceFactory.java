@@ -4,25 +4,25 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 
 /**
- * 数据源工厂 / Factory of download source
+ * {@link Source} 工厂。
  */
 public interface SourceFactory extends OrderProvider {
 
     /**
-     * 是否支持某个对象 / Whether an object is supported
+     * 是否支持需要下载的原始数据对象。
      *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 是否支持 / Is it supported
+     * @param source  需要下载的原始数据对象
+     * @param context {@link DownloadContext}
+     * @return 如果支持则返回 true
      */
     boolean support(Object source, DownloadContext context);
 
     /**
-     * 创建 / Create
+     * 创建。
      *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 下载源 / Source
+     * @param source  需要下载的原始数据对象
+     * @param context {@link DownloadContext}
+     * @return 创建的 {@link Source}
      */
     Source create(Object source, DownloadContext context);
 }

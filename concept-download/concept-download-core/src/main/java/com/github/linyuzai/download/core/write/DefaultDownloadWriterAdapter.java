@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.write;
 
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.web.Range;
@@ -25,18 +25,18 @@ public class DefaultDownloadWriterAdapter implements DownloadWriterAdapter {
      * 匹配合适的 {@link DownloadWriter}，
      * 如没有可用的 {@link DownloadWriter} 则抛出异常。
      *
-     * @param downloadableResource {@link DownloadableResource}
+     * @param resource {@link Resource}
      * @param range                {@link Range}
      * @param context              {@link DownloadContext}
      * @return 匹配到的 {@link DownloadWriter}
      */
     @Override
-    public DownloadWriter getWriter(DownloadableResource downloadableResource, Range range, DownloadContext context) {
+    public DownloadWriter getWriter(Resource resource, Range range, DownloadContext context) {
         for (DownloadWriter writer : writers) {
-            if (writer.support(downloadableResource, range, context)) {
+            if (writer.support(resource, range, context)) {
                 return writer;
             }
         }
-        throw new DownloadException("No DownloadWriter support: " + downloadableResource);
+        throw new DownloadException("No DownloadWriter support: " + resource);
     }
 }

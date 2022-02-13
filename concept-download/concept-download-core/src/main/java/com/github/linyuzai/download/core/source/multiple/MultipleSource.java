@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.source.multiple;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
@@ -193,6 +193,6 @@ public class MultipleSource implements Source {
 
     @Override
     public void release() {
-        sources.forEach(DownloadableResource::release);
+        sources.forEach(Resource::release);
     }
 }

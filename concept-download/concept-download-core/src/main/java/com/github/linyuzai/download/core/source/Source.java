@@ -1,52 +1,55 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.Loadable;
-import com.github.linyuzai.download.core.source.multiple.MultipleSource;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
 
 /**
- * 下载的数据源，作为处理的最小单位 / The downloaded data source as the smallest unit of processing
+ * 需要下载的原始数据对象的抽象。
  */
-public interface Source extends DownloadableResource, Loadable {
+public interface Source extends Resource, Loadable {
 
+    /**
+     * 默认直接返回本身的 {@link Mono}。
+     *
+     * @param context {@link DownloadContext}
+     * @return {@link Mono#just(Object)}
+     */
     @Override
     default Mono<Source> load(DownloadContext context) {
         return Mono.just(this);
     }
 
     /**
-     * 如果对于一个File对象 / If for a file object {@link java.io.File}
-     * 是一个文件夹 / Is a folder
-     * 那么将返回false / False will be returned
-     * 因为一个文件夹里面可能有多个文件或子文件夹 / Because there may be multiple files or sub folders in a folder
+     * 是否是单个文件。
+     * 比如对于 {@link File#isFile()} 则为 true，
+     * 对于 {@link File#isDirectory()} 则为 false。
      *
-     * @return 是否是单个的 / If single
+     * @return 如果是单个文件则返回 true
      */
     boolean isSingle();
 
     /**
-     * 将深层结构的下载源都提取放在一个集合中 / Extract the download sources of deep structure into a collection
+     * 将树形结构的 {@link Source} 展开放在一个集合中。
      *
-     * @return 列出的所有的数据源 / All sources which is listed
-     * @see MultipleSource
+     * @return 列出的所有的 {@link Source}
      */
     default Collection<Source> list() {
         return list(source -> true);
     }
 
     /**
-     * 筛选所有符合条件的下载源 / Filter all qualified download sources
-     * 并且将深层结构的下载源都提取放在一个集合中 / Extract the download sources of deep structure into a collection
+     * 筛选所有符合条件的 {@link Source}，
+     * 并且将树形结构的 {@link Source} 展开放在一个集合中。
      *
-     * @param predicate 过滤条件 / Filter condition
-     * @return 列出的所有符合条件的数据源 / All sources which is qualified
-     * @see MultipleSource
+     * @param predicate 过滤条件
+     * @return 列出的所有符合条件的 {@link Source}
      */
     default Collection<Source> list(Predicate<Source> predicate) {
         if (predicate.test(this)) {

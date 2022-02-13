@@ -3,16 +3,16 @@ package com.github.linyuzai.download.core.source;
 import com.github.linyuzai.download.core.context.DownloadContext;
 
 /**
- * 数据源工厂的适配器 / Adapter of source factory
+ * {@link SourceFactory} 的适配器。
  */
 public interface SourceFactoryAdapter {
 
     /**
-     * 获得适配的工厂 / Get suitable factory
+     * 获得适配的 {@link SourceFactory}。
      *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 数据源工厂 / Factory of source
+     * @param source  需要下载的原始数据对象
+     * @param context {@link DownloadContext}
+     * @return 匹配上的 {@link SourceFactory}
      */
     SourceFactory getFactory(Object source, DownloadContext context);
 }

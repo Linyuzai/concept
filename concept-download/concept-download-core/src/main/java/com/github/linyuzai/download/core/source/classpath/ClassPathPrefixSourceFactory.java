@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * ClassPath前缀 'classpath:' 的工厂 / Factory for class path prefix 'classpath:'
+ * 匹配前缀 'classpath:' 的 {@link SourceFactory}。
  */
 public class ClassPathPrefixSourceFactory extends PrefixSourceFactory {
 

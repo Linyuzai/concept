@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * 一个 {@link DownloadableResource} 可能包含多个部分。
+ * 一个 {@link Resource} 可能包含多个部分。
  */
 public interface Part {
 

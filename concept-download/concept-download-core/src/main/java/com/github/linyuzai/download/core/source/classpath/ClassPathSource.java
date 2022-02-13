@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.source.classpath;
 
 import com.github.linyuzai.download.core.source.AbstractSource;
+import com.github.linyuzai.download.core.source.Source;
 import lombok.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
@@ -8,16 +9,24 @@ import org.springframework.util.StringUtils;
 import java.io.InputStream;
 
 /**
- * 持有一个 {@link ClassPathResource} 的下载源 / Source holds an {@link ClassPathResource}
+ * 持有 {@link ClassPathResource} 的 {@link Source}
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ClassPathSource extends AbstractSource {
 
+    /**
+     * 持有的 {@link ClassPathResource}
+     */
     @NonNull
     @Setter
     protected ClassPathResource resource;
 
+    /**
+     * 直接调用 {@link ClassPathResource#getInputStream()}。
+     *
+     * @return {@link ClassPathResource#getInputStream()}
+     */
     @SneakyThrows
     @Override
     public InputStream openInputStream() {
@@ -25,10 +34,9 @@ public class ClassPathSource extends AbstractSource {
     }
 
     /**
-     * 如果没有指定名称 / If no name is specified
-     * 将使用资源名称 / The resource name will be used
+     * 如果没有指定名称则使用 {@link ClassPathResource#getFilename()}。
      *
-     * @return 名称 / Name
+     * @return 指定的名称或 {@link ClassPathResource#getFilename()}
      */
     @Override
     public String getName() {
@@ -39,6 +47,12 @@ public class ClassPathSource extends AbstractSource {
         return super.getName();
     }
 
+    /**
+     * 调用 {@link ClassPathResource#contentLength()} 获得长度，
+     * 如果为 -1 则返回 null。
+     *
+     * @return 长度或 null
+     */
     @SneakyThrows
     @Override
     public Long getLength() {
@@ -49,6 +63,11 @@ public class ClassPathSource extends AbstractSource {
         return length;
     }
 
+    /**
+     * 直接返回 true。
+     *
+     * @return true
+     */
     @Override
     public boolean isSingle() {
         return true;

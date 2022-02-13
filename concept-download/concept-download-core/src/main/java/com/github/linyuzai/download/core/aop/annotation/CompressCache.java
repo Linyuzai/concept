@@ -2,7 +2,7 @@ package com.github.linyuzai.download.core.aop.annotation;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.compress.Compression;
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 
 import java.lang.annotation.*;
@@ -34,7 +34,7 @@ public @interface CompressCache {
 
     /**
      * 缓存的压缩文件名称。
-     * 如果不指定则使用 {@link CacheNameGenerator#generate(DownloadableResource, DownloadContext)} 来生成一个名称。
+     * 如果不指定则使用 {@link CacheNameGenerator#generate(Resource, DownloadContext)} 来生成一个名称。
      */
     String name() default "";
 

@@ -8,8 +8,7 @@ import com.github.linyuzai.download.core.source.prefix.PrefixSourceFactory;
 import java.io.File;
 
 /**
- * 用户目录前缀 'user.home:' 的工厂 / Factory for user home prefix 'user.home:'
- * 也支持 'user_home:' 或 'user-home:' / Also 'user_home:' or 'user-home:'
+ * 匹配前缀 'user.home:' 或 'user_home:' 或 'user-home:' 的 {@link SourceFactory}
  */
 public class UserHomeSourceFactory extends PrefixSourceFactory {
 
@@ -22,13 +21,6 @@ public class UserHomeSourceFactory extends PrefixSourceFactory {
 
     private final SourceFactory factory = new FileSourceFactory();
 
-    /**
-     * Use {@link FileSource}
-     *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 下载源 / Source {@link FileSource}
-     */
     @Override
     public Source create(Object source, DownloadContext context) {
         String path = getContent((String) source);

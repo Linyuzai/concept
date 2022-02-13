@@ -1,20 +1,23 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.concept.AbstractDownloadableResource;
+import com.github.linyuzai.download.core.concept.AbstractResource;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 抽象的数据源 / Abstract source
+ * {@link Source} 的抽象类。
  */
 @Getter
 @Setter
-public abstract class AbstractSource extends AbstractDownloadableResource implements Source {
+public abstract class AbstractSource extends AbstractResource implements Source {
 
+    /**
+     * 异步加载
+     */
     protected boolean asyncLoad;
 
     @SuppressWarnings("unchecked")
-    public static abstract class Builder<T extends AbstractSource, B extends Builder<T, B>> extends AbstractDownloadableResource.Builder<T, B> {
+    public static abstract class Builder<T extends AbstractSource, B extends Builder<T, B>> extends AbstractResource.Builder<T, B> {
 
         protected boolean asyncLoad;
 

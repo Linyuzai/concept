@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.write;
 
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.web.Range;
@@ -17,12 +17,12 @@ public interface DownloadWriter extends OrderProvider {
     /**
      * 该写入器是否支持写入。
      *
-     * @param downloadableResource {@link DownloadableResource}
+     * @param resource {@link Resource}
      * @param range                {@link Range}
      * @param context              {@link DownloadContext}
      * @return 如果支持则返回 true
      */
-    boolean support(DownloadableResource downloadableResource, Range range, DownloadContext context);
+    boolean support(Resource resource, Range range, DownloadContext context);
 
     /**
      * 执行写入。

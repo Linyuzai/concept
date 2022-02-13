@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.write;
 
-import com.github.linyuzai.download.core.concept.DownloadableResource;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.Range;
 import lombok.AllArgsConstructor;
@@ -28,13 +28,13 @@ public class BufferedDownloadWriter implements DownloadWriter {
     /**
      * 返回true / Return true
      *
-     * @param downloadableResource 可下载的资源 / Resource can be downloaded
+     * @param resource 可下载的资源 / Resource can be downloaded
      * @param range        写入的范围 / Range of writing
      * @param context      下载上下文 / Context of download
      * @return true
      */
     @Override
-    public boolean support(DownloadableResource downloadableResource, Range range, DownloadContext context) {
+    public boolean support(Resource resource, Range range, DownloadContext context) {
         return true;
     }
 
