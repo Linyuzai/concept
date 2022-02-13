@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.source.file;
 
-import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.concept.Part;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.ContentType;

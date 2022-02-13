@@ -7,7 +7,7 @@ import lombok.Getter;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * HttpServletRequest实现 / implementations by HttpServletRequest
+ * 持有 {@link HttpServletRequest} 的 {@link DownloadRequest}，用于 webmvc。
  */
 @Getter
 @AllArgsConstructor

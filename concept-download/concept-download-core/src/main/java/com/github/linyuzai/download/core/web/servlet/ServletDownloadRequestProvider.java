@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * ServletDownloadRequest提供者 / Provider of ServletDownloadRequest
+ * {@link ServletDownloadRequest} 的提供者。
  */
 public class ServletDownloadRequestProvider implements DownloadRequestProvider {
 
@@ -30,13 +30,13 @@ public class ServletDownloadRequestProvider implements DownloadRequestProvider {
     }
 
     /**
-     * 如果下载参数中配置了请求对象则直接返回 / If the request object is configured in the download parameters, it will be returned directly
-     * 判断方法参数中是否存在，有则返回该参数 / Judge whether the method parameter exists. If so, return the parameter
-     * 否则使用 {@link ServletRequestAttributes} 获取 / Otherwise, use {@link ServletRequestAttributes} to get
+     * 如果下载参数中配置了请求对象则直接返回，
+     * 判断方法参数中是否存在，有则返回该参数，
+     * 否则使用 {@link ServletRequestAttributes} 获取。
      *
-     * @param request    下载参数中的请求 / Request in download options
-     * @param parameters 方法入参 / Method parameters
-     * @return {@link HttpServletRequest}
+     * @param request    下载参数中的请求
+     * @param parameters 方法入参
+     * @return {@link HttpServletRequest} 或 null
      */
     protected HttpServletRequest getHttpServletRequest(Object request, Object[] parameters) {
         if (request instanceof HttpServletRequest) {

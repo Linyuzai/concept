@@ -4,6 +4,9 @@ import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
 import com.github.linyuzai.download.core.exception.ErrorHolder;
 import reactor.core.publisher.Mono;
 
+/**
+ * 基于 Servlet 的返回拦截，用于 webmvc。
+ */
 public class ServletDownloadReturnInterceptor implements DownloadReturnInterceptor {
 
     @Override

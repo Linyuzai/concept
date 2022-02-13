@@ -9,8 +9,16 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
+/**
+ * 用于设置当前的请求和响应。
+ *
+ * @see ReactiveDownloadHolder
+ */
 public class ReactiveDownloadFilter implements WebFilter {
 
+    /**
+     * 版本兼容
+     */
     private static boolean hasMethod;
 
     static {

@@ -8,7 +8,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
 
 /**
- * ReactiveDownloadResponse提供者 / Provider of ReactiveDownloadResponse
+ * {@link ReactiveDownloadResponse} 的提供者。
  */
 public class ReactiveDownloadResponseProvider implements DownloadResponseProvider {
 
@@ -26,12 +26,13 @@ public class ReactiveDownloadResponseProvider implements DownloadResponseProvide
     }
 
     /**
-     * 如果下载参数中配置了响应对象则直接返回 / If the response object is configured in the download parameters, it will be returned directly
-     * 判断方法参数中是否存在，有则返回该参数 / Judge whether the method parameter exists. If so, return the parameter
+     * 如果下载参数中配置了响应对象则直接返回，
+     * 判断方法参数中是否存在，有则返回该参数，
+     * 否则使用 {@link ReactiveDownloadHolder} 获取。
      *
-     * @param response   下载参数中的响应 / Response in download options
-     * @param parameters 方法入参 / Method parameters
-     * @return {@link ServerHttpResponse}
+     * @param response   下载参数中的响应
+     * @param parameters 方法入参
+     * @return {@link ServerHttpResponse} 对应的 {@link Mono}
      */
     protected Mono<ServerHttpResponse> getServerHttpResponse(Object response, Object[] parameters) {
         if (response instanceof ServerHttpResponse) {

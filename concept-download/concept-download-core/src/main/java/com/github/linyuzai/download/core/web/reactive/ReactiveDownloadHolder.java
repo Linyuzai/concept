@@ -6,8 +6,16 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
+/**
+ * 用于获得当前的请求和响应。
+ *
+ * @see ReactiveDownloadFilter
+ */
 public class ReactiveDownloadHolder {
 
+    /**
+     * 版本兼容
+     */
     private static boolean hasMethod;
 
     static {

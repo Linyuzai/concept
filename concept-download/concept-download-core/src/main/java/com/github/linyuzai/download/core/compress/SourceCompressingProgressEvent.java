@@ -16,16 +16,33 @@ public class SourceCompressingProgressEvent extends AbstractProgressEvent {
         super(context, progress, CS + progress.getCurrent() + "/" + progress.getTotal());
     }
 
+    /**
+     * 返回当前进度的格式化数据。
+     *
+     * @return 当前进度
+     */
     @Override
     public String getCurrentMessage() {
         return CS + super.getCurrentMessage();
     }
 
+    /**
+     * 如果存在总大小则返回比值，
+     * 否则返回当前进度。
+     *
+     * @return 比值或当前进度
+     */
     @Override
     public String getRatioMessage() {
         return CS + super.getRatioMessage();
     }
 
+    /**
+     * 如果存在总大小则返回百分比，
+     * 否则返回当前进度。
+     *
+     * @return 百分比或当前进度
+     */
     @Override
     public String getPercentageMessage() {
         return CS + super.getPercentageMessage();

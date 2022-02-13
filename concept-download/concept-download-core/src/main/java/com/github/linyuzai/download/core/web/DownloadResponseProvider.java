@@ -4,15 +4,15 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import reactor.core.publisher.Mono;
 
 /**
- * 响应提供者 / Provider of response
+ * {@link DownloadResponse} 的提供者。
  */
 public interface DownloadResponseProvider {
 
     /**
-     * 获得响应 / Get response
+     * 获得 {@link DownloadResponse}。
      *
-     * @param context 下载上下文 / Context of download
-     * @return 响应 / Response
+     * @param context {@link DownloadContext}
+     * @return {@link DownloadResponse} 对应的 {@link Mono}
      */
     Mono<DownloadResponse> getResponse(DownloadContext context);
 }

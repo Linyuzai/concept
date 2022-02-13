@@ -4,28 +4,56 @@ import lombok.*;
 import org.springframework.util.StringUtils;
 
 /**
- * 指定资源的范围 / Specify the range of the resource
+ * 指定资源的范围，对应 'Range' 请求头。
  */
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Range {
 
+    /**
+     * 开始位置
+     */
     long start;
 
+    /**
+     * 结束位置
+     */
     long end;
 
+    /**
+     * 长度
+     */
     @Setter
     long length;
 
+    /**
+     * 范围是否支持。
+     *
+     * @return 如果支持则返回 true
+     */
     public boolean isSupport() {
-        return true;
+        if (hasStart() && hasEnd()) {
+            return start >= end;
+        } else {
+            return true;
+        }
     }
 
+    /**
+     * 是否有开始位置。
+     *
+     * @return 如果有开始位置则返回 true
+     */
     public boolean hasStart() {
         return start >= 0;
     }
 
+    /**
+     * 是否有结束位置。
+     *
+     * @return 如果有结束位置则返回 true
+     */
     public boolean hasEnd() {
         return end >= 0;
     }
@@ -37,6 +65,12 @@ public class Range {
         return range;
     }
 
+    /**
+     * 根据 'Range' 请求头解析 {@link Range}。
+     *
+     * @param header 'Range' 请求头
+     * @return 解析得到的 {@link Range} 或 null
+     */
     public static Range header(String header) {
         if (!StringUtils.hasText(header)) {
             return null;

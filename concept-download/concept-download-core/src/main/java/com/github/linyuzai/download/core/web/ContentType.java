@@ -6,7 +6,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 
 /**
- * Content type
+ * Content-type
  */
 public class ContentType {
 
@@ -20,10 +20,10 @@ public class ContentType {
     }
 
     /**
-     * 获得文件的 Content Type / Get the content type of the file
+     * 获得文件的 Content-Type。
      *
-     * @param file 文件 / File
-     * @return Content Type
+     * @param file 文件
+     * @return Content-Type
      */
     public static String file(File file) {
         try {

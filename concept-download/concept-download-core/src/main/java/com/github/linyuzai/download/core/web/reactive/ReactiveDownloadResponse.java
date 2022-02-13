@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.util.function.Consumer;
 
 /**
- * ServerHttpResponse实现 / implementations by ServerHttpResponse
+ * 持有 {@link ServerHttpResponse} 的 {@link DownloadResponse}，用于 webflux。
  */
 @Getter
 public class ReactiveDownloadResponse implements DownloadResponse {

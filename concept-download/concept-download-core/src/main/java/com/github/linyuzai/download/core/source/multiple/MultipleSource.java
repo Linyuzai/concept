@@ -1,8 +1,8 @@
 package com.github.linyuzai.download.core.source.multiple;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
-import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.concept.Part;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;

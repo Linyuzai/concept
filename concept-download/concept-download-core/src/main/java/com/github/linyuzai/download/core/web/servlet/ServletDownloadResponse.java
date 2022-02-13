@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 
 /**
- * HttpServletResponse实现 / implementations by HttpServletResponse
+ * 持有 {@link HttpServletResponse} 的 {@link DownloadResponse}，用于 webmvc。
  */
 @Getter
 @AllArgsConstructor

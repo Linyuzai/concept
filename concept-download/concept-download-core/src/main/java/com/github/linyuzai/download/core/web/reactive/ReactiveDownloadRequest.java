@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
- * ServerHttpRequest实现 / implementations by ServerHttpRequest
+ * 持有 {@link ServerHttpRequest} 的 {@link DownloadRequest}，用于 webflux。
  */
 @Getter
 @AllArgsConstructor
