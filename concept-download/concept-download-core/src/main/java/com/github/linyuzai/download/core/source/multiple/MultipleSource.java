@@ -1,13 +1,11 @@
 package com.github.linyuzai.download.core.source.multiple;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
-import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.concept.DownloadableResource;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.load.Loadable;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
-import com.github.linyuzai.download.core.utils.DownloadUtils;
 import lombok.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,7 +14,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * 持有数据源集合的数据源 / A source that holds a collection of sources
@@ -196,6 +193,6 @@ public class MultipleSource implements Source {
 
     @Override
     public void release() {
-        sources.forEach(Downloadable::release);
+        sources.forEach(DownloadableResource::release);
     }
 }

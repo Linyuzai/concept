@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.source.file;
 
-import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.concept.DownloadableResource;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.web.ContentType;
@@ -129,7 +129,7 @@ public class FileSource extends AbstractSource {
         String name = getName();
         part = new FilePart(file, name, name);
         List<Part> parts = new ArrayList<>();
-        Downloadable.addPart(part, parts);
+        DownloadableResource.addPart(part, parts);
         return parts;
     }
 

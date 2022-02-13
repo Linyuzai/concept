@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * 抽象 {@link Source} 和 {@link Compression} 的通用部分。
  */
-public interface Downloadable extends Part, Cacheable {
+public interface DownloadableResource extends Part, Cacheable {
 
     /**
      * 获得描述。

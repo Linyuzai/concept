@@ -20,6 +20,8 @@ public class DownloadConfiguration {
 
     private CompressConfiguration compress = new CompressConfiguration();
 
+    private LoggerConfiguration logger = new LoggerConfiguration();
+
     @Data
     public static class ResponseConfiguration {
 
@@ -63,5 +65,57 @@ public class DownloadConfiguration {
          * 下载结束后是否删除缓存。
          */
         private boolean delete;
+    }
+
+    @Data
+    public static class LoggerConfiguration {
+
+        /**
+         * 是否启用日志
+         */
+        private boolean enabled;
+
+        private StandardLoggerConfiguration standard = new StandardLoggerConfiguration();
+
+        private TimeSpentLoggerConfiguration timeSpent = new TimeSpentLoggerConfiguration();
+
+        private ProgressLoggerConfiguration progress = new ProgressLoggerConfiguration();
+    }
+
+    @Data
+    public static class StandardLoggerConfiguration {
+
+        /**
+         * 是否启用标准日志
+         */
+        private boolean enabled;
+    }
+
+    @Data
+    public static class TimeSpentLoggerConfiguration {
+
+        /**
+         * 是否启用事件计算日志
+         */
+        private boolean enabled;
+    }
+
+    @Data
+    public static class ProgressLoggerConfiguration {
+
+        /**
+         * 是否启用进度计算日志
+         */
+        private boolean enabled;
+
+        /**
+         * 间隔，ms
+         */
+        private int duration = 1000;
+
+        /**
+         * 百分比计算
+         */
+        private boolean percentage;
     }
 }

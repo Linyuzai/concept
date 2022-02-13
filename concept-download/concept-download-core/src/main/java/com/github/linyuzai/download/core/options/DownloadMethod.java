@@ -6,7 +6,7 @@ import lombok.Value;
 import java.lang.reflect.Method;
 
 /**
- * 下载方法，主要用于切面记录对应的方法。
+ * 下载方法，切面中拦截的方法。
  */
 @Value
 @Builder(builderClassName = "Builder")

@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.compress;
 
-import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.concept.DownloadableResource;
 
 /**
  * 压缩对象。
@@ -9,6 +9,6 @@ import com.github.linyuzai.download.core.concept.Downloadable;
  * @see MemoryCompression
  * @see NoCompression
  */
-public interface Compression extends Downloadable {
+public interface Compression extends DownloadableResource {
 
 }

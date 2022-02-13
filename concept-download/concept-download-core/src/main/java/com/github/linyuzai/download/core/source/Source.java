@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.source;
 
-import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.concept.DownloadableResource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.Loadable;
 import com.github.linyuzai.download.core.source.multiple.MultipleSource;
@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 /**
  * 下载的数据源，作为处理的最小单位 / The downloaded data source as the smallest unit of processing
  */
-public interface Source extends Downloadable, Loadable {
+public interface Source extends DownloadableResource, Loadable {
 
     @Override
     default Mono<Source> load(DownloadContext context) {

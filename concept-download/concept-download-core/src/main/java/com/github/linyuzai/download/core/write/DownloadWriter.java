@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.write;
 
-import com.github.linyuzai.download.core.concept.Downloadable;
+import com.github.linyuzai.download.core.concept.DownloadableResource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.web.Range;
@@ -15,12 +15,12 @@ import java.nio.charset.Charset;
 public interface DownloadWriter extends OrderProvider {
 
     /**
-     * @param downloadable 可下载的资源 / Resource can be downloaded
+     * @param downloadableResource 可下载的资源 / Resource can be downloaded
      * @param range        写入的范围 / Range of writing
      * @param context      下载上下文 / Context of download
      * @return 是否支持 / Is it supported
      */
-    boolean support(Downloadable downloadable, Range range, DownloadContext context);
+    boolean support(DownloadableResource downloadableResource, Range range, DownloadContext context);
 
     default void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) {
         write(is, os, range, charset, length, null);

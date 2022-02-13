@@ -6,11 +6,11 @@ import lombok.Setter;
 import java.nio.charset.Charset;
 
 /**
- * {@link Downloadable} 的抽象类。
+ * {@link DownloadableResource} 的抽象类。
  */
 @Getter
 @Setter
-public abstract class AbstractDownloadable extends AbstractPart implements Downloadable {
+public abstract class AbstractDownloadableResource extends AbstractPart implements DownloadableResource {
 
     /**
      * 名称
@@ -38,7 +38,7 @@ public abstract class AbstractDownloadable extends AbstractPart implements Downl
     protected String cachePath;
 
     @SuppressWarnings("unchecked")
-    public static class Builder<T extends AbstractDownloadable, B extends Builder<T, B>> {
+    public static class Builder<T extends AbstractDownloadableResource, B extends Builder<T, B>> {
 
         protected String name;
 
