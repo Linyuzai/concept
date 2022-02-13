@@ -15,8 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 每个类对应一个反射模版 / Each class corresponds to a reflection template
- * 包含该类的反射信息 / Contains reflection information for this class
+ * 每个类对应一个反射模版，包含该类的反射信息。
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReflectionTemplate {
@@ -28,10 +27,10 @@ public class ReflectionTemplate {
     }
 
     /**
-     * 方法或字段上存在标记了 {@link SourceReflection} 的注解 / Annotation marked {@link SourceReflection} exists on the method or field
+     * 处理标记了 {@link SourceReflection} 注解的方法或字段
      *
      * @param clazz        Class
-     * @param reflectSuper 是否反射父类 / Reflect parent class
+     * @param reflectSuper 是否反射父类
      */
     public ReflectionTemplate(Class<?> clazz, boolean reflectSuper) {
         Method[] methods = clazz.getDeclaredMethods();
@@ -105,24 +104,22 @@ public class ReflectionTemplate {
     }
 
     /**
-     * 通过注解获得值 / Get value through annotation
+     * 通过注解获得值。
      *
      * @param annotation Annotation
-     * @param model      模型 / Model
-     * @return 值 / Value
+     * @param model      模型
+     * @return 值
      */
     public Object value(Class<? extends Annotation> annotation, Object model) {
         return reflectorMap.get(annotation).reflect(model);
     }
 
     /**
-     * 将模型的值通过反射设置到下载源 / Set the value of the model to the source through reflection
-     * 如果值类型不匹配则进行值转换 / If the value types do not match, value conversion is performed
+     * 将模型的值通过反射设置到 {@link Source}，
+     * 如果值类型不匹配则尝试使用 {@link ValueConvertor} 进行值转换。
      *
-     * @param model  模型 / model
-     * @param source 下载源 / Source
-     * @see ValueConversion
-     * @see ValueConvertor
+     * @param model  模型
+     * @param source {@link Source}
      */
     @SneakyThrows
     public void reflect(Object model, Source source) {
@@ -206,6 +203,12 @@ public class ReflectionTemplate {
         return ValueConversion.getInstance().convert(value, type);
     }
 
+    /**
+     * 合并父类模版的反射信息，
+     * 即支持父类上的注解。
+     *
+     * @param template 父类模版
+     */
     protected void mergeSuper(ReflectionTemplate template) {
         for (Map.Entry<Class<? extends Annotation>, Reflector> entry : template.reflectorMap.entrySet()) {
             if (!reflectorMap.containsKey(entry.getKey())) {

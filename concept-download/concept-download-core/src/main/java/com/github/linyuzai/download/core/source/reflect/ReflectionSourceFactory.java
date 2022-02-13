@@ -9,18 +9,18 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 支持反射的工厂 / Factory support reflection
+ * 支持反射 {@link SourceFactory}。
  */
 public class ReflectionSourceFactory implements SourceFactory {
 
     private final Map<Class<?>, ReflectionTemplate> reflectionTemplateMap = new ConcurrentHashMap<>();
 
     /**
-     * 类上是否标记了 {@link SourceModel} / If {@link SourceModel} marked on the class
+     * 类上是否标记了 {@link SourceModel}。
      *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 是否支持 / Is it supported
+     * @param source  需要下载的原始数据对象
+     * @param context {@link DownloadContext}
+     * @return 如果支持则返回 true
      */
     @Override
     public boolean support(Object source, DownloadContext context) {
@@ -28,14 +28,14 @@ public class ReflectionSourceFactory implements SourceFactory {
     }
 
     /**
-     * 对模型进行注解解析 / Parse the annotation on model
-     * 获得对应的下载源 / Get the source {@link SourceObject}
-     * 基于下载源进行适配 / Adaptation based on source
-     * 将一些属性通过反射重新设置 / Reset some attributes through reflection
+     * 对模型进行注解解析，
+     * 获得 {@link SourceObject} 对应的对象，
+     * 基于需要下载的原始数据对象进行适配，
+     * 将属性通过反射重新设置。
      *
-     * @param model   模型 / Model
-     * @param context 下载上下文 / Context of download
-     * @return 下载源 / Source
+     * @param model   模型
+     * @param context {@link DownloadContext}
+     * @return 创建的 {@link Source}
      */
     @Override
     public Source create(Object model, DownloadContext context) {
@@ -48,6 +48,12 @@ public class ReflectionSourceFactory implements SourceFactory {
         return source;
     }
 
+    /**
+     * 新建一个 {@link ReflectionTemplate}。
+     *
+     * @param clazz 模型类
+     * @return 新建的 {@link ReflectionTemplate}
+     */
     protected ReflectionTemplate newTemplate(Class<?> clazz) {
         return new ReflectionTemplate(clazz);
     }

@@ -5,21 +5,27 @@ import com.github.linyuzai.download.core.exception.DownloadException;
 import java.lang.reflect.*;
 
 /**
- * 值转换器 / Value convertor
+ * 值转换器。
  *
- * @param <Original> 原始类型 / Original type
- * @param <Target>   目标类型 / Target type
+ * @param <Original> 原始类型
+ * @param <Target>   目标类型
  */
 public interface ValueConvertor<Original, Target> {
 
+    /**
+     * 转换。
+     *
+     * @param value 原始值
+     * @return 目标值
+     */
     Target convert(Original value);
 
     /**
-     * 转换器是否支持将值转为对应的类型 / Does the converter support converting value to target type
+     * 转换器是否支持将值转为对应的类型。
      *
-     * @param value 需要转换的值 / Value to convert
-     * @param type  目标类型 / Target type
-     * @return 是否支持 / Is it supported
+     * @param value 需要转换的值
+     * @param type  目标类型
+     * @return 如果支持则返回 true
      */
     default boolean support(Object value, Class<?> type) {
         ParameterizedType pt = find(getClass());
@@ -59,10 +65,10 @@ public interface ValueConvertor<Original, Target> {
     }
 
     /**
-     * 找到指定的泛型接口 / Found the specified generic interface
+     * 找到指定的泛型接口。
      *
      * @param clazz Class
-     * @return 泛型接口 / generic interface
+     * @return 泛型接口
      */
     static ParameterizedType find(Class<?> clazz) {
         if (clazz == null) {

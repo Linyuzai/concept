@@ -1,10 +1,11 @@
 package com.github.linyuzai.download.core.source.reflect;
 
+import com.github.linyuzai.download.core.source.Source;
+
 import java.lang.annotation.*;
 
 /**
- * 基础注解 / Basic annotation
- * 方法反射优先于字段反射 / Method reflection takes precedence over field reflection
+ * 基础注解，方便扩展自定义注解。
  */
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -12,17 +13,23 @@ import java.lang.annotation.*;
 public @interface SourceReflection {
 
     /**
-     * @return 对应下载源的方法名称 / Method name corresponding to the source
+     * 对应 {@link Source} 的方法名称。
+     *
+     * @return {@link Source} 的方法名称
      */
     String methodName() default "";
 
     /**
-     * @return 对应下载源的方法参数类型 / The method parameter type corresponding to the source
+     * 对应 {@link Source} 的方法参数类型。
+     *
+     * @return {@link Source} 的方法参数类型
      */
     Class<?> methodParameterType() default void.class;
 
     /**
-     * @return 对应下载源的字段 / Fields corresponding to the download source
+     * 对应 {@link Source} 的字段名称。
+     *
+     * @return {@link Source} 的字段名称
      */
     String fieldName() default "";
 }

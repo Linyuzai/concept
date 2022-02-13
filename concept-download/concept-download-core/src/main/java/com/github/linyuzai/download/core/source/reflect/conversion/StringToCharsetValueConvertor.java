@@ -3,7 +3,7 @@ package com.github.linyuzai.download.core.source.reflect.conversion;
 import java.nio.charset.Charset;
 
 /**
- * 将String转为Charset的转换器 / Converter for converting String to Charset
+ * 将 {@link String} 转为 {@link Charset} 的 {@link ValueConvertor}。
  */
 public class StringToCharsetValueConvertor implements ValueConvertor<String, Charset> {
 

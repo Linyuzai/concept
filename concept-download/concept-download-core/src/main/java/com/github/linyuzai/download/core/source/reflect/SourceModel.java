@@ -3,7 +3,7 @@ package com.github.linyuzai.download.core.source.reflect;
 import java.lang.annotation.*;
 
 /**
- * 标记一个类作为反射的数据模型 / Mark a class as the data model for reflection
+ * 标记一个类作为反射的数据模型。
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -13,7 +13,9 @@ import java.lang.annotation.*;
 public @interface SourceModel {
 
     /**
-     * @return 是否反射父类 / Reflect parent class
+     * 是否反射父类。
+     *
+     * @return 反射父类则返回 true
      */
     boolean superclass() default true;
 }

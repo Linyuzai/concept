@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import java.lang.reflect.Method;
 
 /**
- * 基于方法的反射器 / Method based reflector
+ * 基于 {@link Method} 的 {@link Reflector}。
  */
 @Getter
 public class MethodReflector implements Reflector {

@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 将值做类型转换 / Convert the value use specific type
+ * 值类型转换的帮助类。
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ValueConversion {
@@ -25,9 +25,9 @@ public class ValueConversion {
     }
 
     /**
-     * 注册转换器 / Register converters
+     * 注册转换器。
      *
-     * @param convertors 转换器 / Convertors
+     * @param convertors 转换器
      */
     public void register(Collection<? extends ValueConvertor> convertors) {
         if (convertors == null) {
@@ -37,20 +37,20 @@ public class ValueConversion {
     }
 
     /**
-     * 注册转换器 / Register converters
+     * 注册转换器
      *
-     * @param convertors 转换器 / Convertors
+     * @param convertors 转换器
      */
     public void register(ValueConvertor... convertors) {
         register(Arrays.asList(convertors));
     }
 
     /**
-     * 转换值 / Convert value
+     * 转换值。
      *
-     * @param value 需要转换的值 / Value to convert
-     * @param type  目标类型 / Target type
-     * @return 转换后的值 / Converted value
+     * @param value 需要转换的值
+     * @param type  目标类型
+     * @return 转换后的值
      */
     public Object convert(Object value, Class<?> type) {
         if (value == null) {

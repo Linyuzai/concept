@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import java.lang.reflect.Field;
 
 /**
- * 基于属性的反射器 / Field based reflector
+ * 基于 {@link Field} 的 {@link Reflector}。
  */
 @Getter
 public class FieldReflector implements Reflector {
