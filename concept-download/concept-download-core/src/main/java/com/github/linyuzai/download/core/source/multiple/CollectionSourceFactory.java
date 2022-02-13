@@ -10,29 +10,15 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 支持集合类型的工厂 / Factory support collection
+ * 匹配 {@link Collection} 的 {@link SourceFactory}。
  */
 public class CollectionSourceFactory implements SourceFactory {
 
-    /**
-     * 支持集合 / Collection supported
-     *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 是否支持 / Is it supported
-     */
     @Override
     public boolean support(Object source, DownloadContext context) {
         return source instanceof Collection;
     }
 
-    /**
-     * Use {@link MultipleSource}
-     *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 下载源 / Source {@link MultipleSource}
-     */
     @Override
     public Source create(Object source, DownloadContext context) {
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);

@@ -24,12 +24,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+/**
+ * 使用 {@link WebClient} 处理 http 请求的 {@link Source}。
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource {
 
     @Override
     public Mono<Source> doLoad(OutputStream os, DownloadContext context) {
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new LoadWebClientSourceEvent(context, this));
         return WebClient.create()
                 .get()
                 .uri(url)
@@ -43,9 +48,7 @@ public class WebClientSource extends HttpSource {
                 .exchangeToMono(clientResponse -> {
                     clientResponse.headers().contentLength().ifPresent(l -> length = l);
                     int code = clientResponse.statusCode().value();
-                    if (isResponseSuccess(clientResponse.statusCode().value())) {
-                        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-                        publisher.publish(new WebClientSourceLoadedEvent(context, WebClientSource.this));
+                    if (isResponseSuccess(code)) {
                         return clientResponse.body(new InputStreamBodyExtractor(os, context));
                     } else {
                         return clientResponse.bodyToMono(String.class)
@@ -54,6 +57,12 @@ public class WebClientSource extends HttpSource {
                 });
     }
 
+    /**
+     * 不会被调用。
+     *
+     * @param context {@link DownloadContext}
+     * @return {@link Mono#empty()}
+     */
     @Override
     public Mono<InputStream> loadRemote(DownloadContext context) {
         return Mono.empty();

@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
 import lombok.*;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,38 +17,51 @@ import java.util.*;
 import java.util.function.Predicate;
 
 /**
- * 持有数据源集合的数据源 / A source that holds a collection of sources
+ * 容器化的 {@link Source} 实现。
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class MultipleSource implements Source {
 
+    /**
+     * 实际的 {@link Source} 集合
+     */
     @NonNull
     protected Collection<Source> sources;
 
+    /**
+     * 无法获得输入流。
+     *
+     * @return {@link EmptyInputStream}
+     */
     @Override
     public InputStream getInputStream() {
         return new EmptyInputStream();
     }
 
     /**
-     * 如果集合为空返回null / Returns null if the collection is empty
-     * 否则返回第一个有名称的数据源的名称 / Otherwise, the name of the first named source is returned
+     * 如果集合为空则返回 null，
+     * 否则返回第一个有名称的 {@link Source} 的名称。
      *
-     * @return 名称 / Name
+     * @return 名称
      */
     @Override
     public String getName() {
         for (Source source : sources) {
             String name = source.getName();
-            if (name != null && !name.isEmpty()) {
+            if (StringUtils.hasText(name)) {
                 return name;
             }
         }
         return null;
     }
 
+    /**
+     * 如果只有一个 {@link Source} 则返回该 {@link Source} 的 Content-Type，否则返回 null。
+     *
+     * @return Content-Type
+     */
     @Override
     public String getContentType() {
         Set<String> contentTypes = new HashSet<>();
@@ -62,11 +76,9 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 如果集合只有一个下载源对象 / If the collection has only one source
-     * 则使用这个下载源的编码 / Use the charset of this source
-     * 否则返回null / Otherwise, null is returned
+     * 如果只有一个 {@link Source} 则返回该 {@link Source} 的编码，否则返回 null。
      *
-     * @return 编码 / Charset
+     * @return 编码
      */
     @Override
     public Charset getCharset() {
@@ -82,9 +94,9 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 集合中所有下载源的字节数总和 / The sum of bytes of all sources in the collection
+     * 所有 {@link Source} 的长度总和。
      *
-     * @return 字节数 / bytes count
+     * @return 长度
      */
     @Override
     public Long getLength() {
@@ -100,9 +112,9 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 集合中的下载源只要有一个异步加载就是异步加载 / As long as there is one source load async in the collection, it is load async
+     * 只要有一个异步加载就是异步加载。
      *
-     * @return 是否异步加载 / If async load
+     * @return 是否异步加载
      */
     @Override
     public boolean isAsyncLoad() {
@@ -115,9 +127,9 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 集合中只有一个下载源并且这个下载源是单个的才返回true / True is returned only if there is only one source in the collection and the source is single
+     * 只有一个 {@link Source} 并且 {@link Source#isSingle()} 返回 true。
      *
-     * @return 是否是单个的 / If single
+     * @return 是否是单个文件
      */
     @Override
     public boolean isSingle() {
@@ -146,9 +158,9 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 对集合中的所有下载源都执行加载 / Load all sources in the collection
+     * 加载所有的 {@link Source}。
      *
-     * @param context 下载上下文 / Context of download
+     * @param context {@link DownloadContext}
      */
     @Override
     public Mono<Source> load(DownloadContext context) {
@@ -158,6 +170,11 @@ public class MultipleSource implements Source {
                 .map(MultipleSource::new);
     }
 
+    /**
+     * 合并所有 {@link Source} 的 {@link Part}。
+     *
+     * @return 所有的 {@link Part}
+     */
     @Override
     public Collection<Part> getParts() {
         Collection<Part> parts = new ArrayList<>();
@@ -168,11 +185,11 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 筛选所有符合条件的下载源 / Filter all qualified download sources
-     * 并且将深层结构的下载源都提取放在一个集合中 / Extract the download sources of deep structure into a collection
+     * 筛选所有符合条件的 {@link Source}，
+     * 合并所有符合条件的 {@link Source} 的 {@link Part}。
      *
-     * @param predicate 过滤条件 / Filter condition
-     * @return 列出的所有符合条件的数据源 / All sources which is qualified
+     * @param predicate 过滤条件
+     * @return 所有符合条件的 {@link Source} 的 {@link Part}
      */
     @Override
     public Collection<Source> list(Predicate<Source> predicate) {
@@ -184,13 +201,16 @@ public class MultipleSource implements Source {
     }
 
     /**
-     * 对集合中的所有下载源都删除缓存 / Delete all sources cache in the collection
+     * 删除所有 {@link Source} 的缓存。
      */
     @Override
     public void deleteCache() {
         sources.forEach(Cacheable::deleteCache);
     }
 
+    /**
+     * 释放所有 {@link Source} 的资源。
+     */
     @Override
     public void release() {
         sources.forEach(Resource::release);

@@ -2,10 +2,14 @@ package com.github.linyuzai.download.core.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.AbstractLoadSourceEvent;
+import org.springframework.web.reactive.function.client.WebClient;
 
-public class WebClientSourceLoadedEvent extends AbstractLoadSourceEvent {
+/**
+ * 使用 {@link WebClient} 加载时会发布该事件。
+ */
+public class LoadWebClientSourceEvent extends AbstractLoadSourceEvent {
 
-    public WebClientSourceLoadedEvent(DownloadContext context, WebClientSource source) {
+    public LoadWebClientSourceEvent(DownloadContext context, WebClientSource source) {
         super(context, source, "Load " + source.getDescription() + " using WebClient(webflux)");
     }
 }

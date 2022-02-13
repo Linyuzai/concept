@@ -5,6 +5,9 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import org.reactivestreams.Publisher;
 
+/**
+ * 匹配 {@link Publisher} 对象的 {@link SourceFactory}。
+ */
 public class PublisherSourceFactory implements SourceFactory {
 
     @Override

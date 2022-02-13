@@ -4,16 +4,16 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.SourceFactory;
 
 /**
- * 基于字符串前缀匹配的工厂 / Factory based on string prefix matching
+ * 基于字符串前缀匹配的 {@link SourceFactory}。
  */
 public abstract class PrefixSourceFactory implements SourceFactory {
 
     /**
-     * 需要String类型并且前缀匹配的才能支持 / String type and prefix matching are required to support
+     * 需要String类型并且前缀匹配的才能支持。
      *
-     * @param source  需要下载的数据对象 / Object to download
-     * @param context 下载上下文 / Context of download
-     * @return 是否支持 / Is it supported
+     * @param source  需要下载的原始数据对象
+     * @param context {@link DownloadContext}
+     * @return 如果支持则返回 true
      */
     @Override
     public boolean support(Object source, DownloadContext context) {
@@ -21,10 +21,10 @@ public abstract class PrefixSourceFactory implements SourceFactory {
     }
 
     /**
-     * 匹配前缀 / Match prefix
+     * 匹配前缀。
      *
-     * @param source 需要下载的数据对象的字符串表示 / String representation of the data object to be downloaded
-     * @return 匹配到的前缀，为匹配到返回null
+     * @param source 需要下载的原始数据对象
+     * @return 匹配到的前缀，未匹配到返回 null
      */
     protected String matchPrefix(String source) {
         String[] prefixes = getPrefixes();
@@ -37,10 +37,10 @@ public abstract class PrefixSourceFactory implements SourceFactory {
     }
 
     /**
-     * 获得内容，及去掉前缀之后的数据 / Get the content and the data after removing the prefix
+     * 获得内容，即去掉前缀之后的数据。
      *
-     * @param source 需要下载的数据对象的字符串表示 / String representation of the data object to be downloaded
-     * @return 内容 / Content
+     * @param source 需要下载的原始数据对象
+     * @return 内容
      */
     protected String getContent(String source) {
         String prefix = matchPrefix(source);
@@ -48,7 +48,9 @@ public abstract class PrefixSourceFactory implements SourceFactory {
     }
 
     /**
-     * @return 支持的前缀 / Supported prefixes
+     * 获得支持的前缀。
+     *
+     * @return 支持的前缀
      */
     protected abstract String[] getPrefixes();
 }
