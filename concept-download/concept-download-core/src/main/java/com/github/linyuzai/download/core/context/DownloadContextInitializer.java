@@ -9,8 +9,6 @@ public interface DownloadContextInitializer extends OrderProvider {
 
     /**
      * 初始化。
-     * <p>
-     * initialize.
      *
      * @param context {@link DownloadContext}
      */

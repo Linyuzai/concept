@@ -18,8 +18,8 @@ public interface DownloadWriter extends OrderProvider {
      * 该写入器是否支持写入。
      *
      * @param resource {@link Resource}
-     * @param range                {@link Range}
-     * @param context              {@link DownloadContext}
+     * @param range    {@link Range}
+     * @param context  {@link DownloadContext}
      * @return 如果支持则返回 true
      */
     boolean support(Resource resource, Range range, DownloadContext context);
@@ -49,8 +49,17 @@ public interface DownloadWriter extends OrderProvider {
      */
     void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback);
 
+    /**
+     * 进度回调。
+     */
     interface Callback {
 
+        /**
+         * 回调进度。
+         *
+         * @param current  当前值
+         * @param increase 增长值
+         */
         void onWrite(long current, long increase);
     }
 }
