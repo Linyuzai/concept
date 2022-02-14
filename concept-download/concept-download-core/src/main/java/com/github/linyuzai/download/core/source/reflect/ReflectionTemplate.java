@@ -34,11 +34,15 @@ public class ReflectionTemplate {
      */
     public ReflectionTemplate(Class<?> clazz, boolean reflectSuper) {
         Method[] methods = clazz.getDeclaredMethods();
+        //处理所有方法
         for (Method method : methods) {
+            //获得方法上的注解
             Annotation[] annotations = method.getAnnotations();
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
+                //如果注解上标注了特定的注解
                 if (annotationType.isAnnotationPresent(SourceReflection.class)) {
+                    //将注解和方法反射器缓存起来
                     int count = method.getParameterCount();
                     if (count == 0) {
                         Reflector exist = reflectorMap.get(annotationType);
@@ -54,12 +58,16 @@ public class ReflectionTemplate {
                 }
             }
         }
+        //处理所有的属性
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
+            //获得属性上的注解
             Annotation[] annotations = field.getAnnotations();
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
+                //如果注解上标注了特定的注解
                 if (annotationType.isAnnotationPresent(SourceReflection.class)) {
+                    //将注解和属性反射器缓存起来
                     Reflector exist = reflectorMap.get(annotationType);
                     if (exist == null) {
                         reflectorMap.put(annotationType, new FieldReflector(field));
@@ -71,6 +79,7 @@ public class ReflectionTemplate {
             }
         }
 
+        //处理父类
         if (reflectSuper) {
             Class<?> superclass = clazz.getSuperclass();
             if (superclass != null) {
@@ -124,55 +133,64 @@ public class ReflectionTemplate {
     @SneakyThrows
     public void reflect(Object model, Source source) {
         for (Map.Entry<Class<? extends Annotation>, Reflector> entry : reflectorMap.entrySet()) {
+            Object reflect = entry.getValue().reflect(model);
+            /*if (reflect == null) {
+                continue;
+            }*/
             SourceReflection reflection = entry.getKey().getAnnotation(SourceReflection.class);
-            String methodName = reflection.methodName();
-            if (methodName.isEmpty()) {
-                String fieldName = reflection.fieldName();
-                if (fieldName.isEmpty()) {
-                    //Ignore SourceObject
-                } else {
-                    Object reflect = entry.getValue().reflect(model);
-                    if (reflect == null) {
-                        continue;
-                    }
-                    Field field = getReflectField(source.getClass(), fieldName);
-                    if (field == null) {
-                        throw new NoSuchFieldException(fieldName);
-                    }
-                    Class<?> type = field.getType();
-                    Object value;
-                    if (type.isInstance(reflect)) {
-                        value = reflect;
-                    } else {
-                        value = convertValue(reflect, type);
-                    }
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
-                    field.set(source, value);
-                }
-            } else {
-                Object reflect = entry.getValue().reflect(model);
-                if (reflect == null) {
-                    continue;
-                }
-                Class<?> parameterType = reflection.methodParameterType();
-                Object value;
-                if (parameterType.isInstance(reflect)) {
-                    value = reflect;
-                } else {
-                    value = convertValue(reflect, parameterType);
-                }
-                Method method = getReflectMethod(source.getClass(), methodName, parameterType);
-                if (method == null) {
-                    throw new NoSuchMethodException(methodName);
-                }
-                if (!method.isAccessible()) {
-                    method.setAccessible(true);
-                }
-                method.invoke(source, value);
+            //优先使用方法设置
+            if (!reflectMethod(reflection, source, reflect)) {
+                reflectField(reflection, source, reflect);
             }
         }
+    }
+
+    @SneakyThrows
+    protected boolean reflectField(SourceReflection reflection, Source source, Object reflect) {
+        String fieldName = reflection.fieldName();
+        if (fieldName.isEmpty()) {
+            return false;
+        }
+        Field field = getReflectField(source.getClass(), fieldName);
+        if (field == null) {
+            return false;
+        }
+        Class<?> type = field.getType();
+        Object value;
+        if (reflect == null || type.isInstance(reflect)) {
+            value = reflect;
+        } else {
+            value = convertValue(reflect, type);
+        }
+        if (!field.isAccessible()) {
+            field.setAccessible(true);
+        }
+        field.set(source, value);
+        return true;
+    }
+
+    @SneakyThrows
+    protected boolean reflectMethod(SourceReflection reflection, Source source, Object reflect) {
+        String methodName = reflection.methodName();
+        if (methodName.isEmpty()) {
+            return false;
+        }
+        Class<?> parameterType = reflection.methodParameterType();
+        Method method = getReflectMethod(source.getClass(), methodName, parameterType);
+        if (method == null) {
+            return false;
+        }
+        Object value;
+        if (reflect == null || parameterType.isInstance(reflect)) {
+            value = reflect;
+        } else {
+            value = convertValue(reflect, parameterType);
+        }
+        if (!method.isAccessible()) {
+            method.setAccessible(true);
+        }
+        method.invoke(source, value);
+        return true;
     }
 
     protected Field getReflectField(Class<?> clazz, String name) {

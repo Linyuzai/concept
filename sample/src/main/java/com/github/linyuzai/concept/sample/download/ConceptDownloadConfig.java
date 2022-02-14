@@ -44,7 +44,7 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
 
     //@Bean
     public SchedulerSourceLoader schedulerSourceLoader() {
-        return new SchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(2)));
+        return new SchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(3)));
     }
 
     //@Bean

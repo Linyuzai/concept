@@ -179,7 +179,8 @@ public class ConceptDownloadReactiveController {
         List<BusinessModel> businessModels = new ArrayList<>();
         businessModels.add(new BusinessModel("1.jar", "http://192.168.20.112:8088/demo/download"));
         businessModels.add(new BusinessModel("2.jar", "http://192.168.20.112:8088/demo/download2"));
-        businessModels.add(new BusinessModel("classpath.txt", new ClassPathResource("/download/README.txt")));
+        businessModels.add(new BusinessModel("3.jar", "http://192.168.20.112:8088/demo/download3"));
+        businessModels.add(new BusinessModel("classpath.txt", "classpath:/download/README.txt"));
         businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
         return DownloadMono.value(businessModels);
     }
