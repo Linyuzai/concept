@@ -13,12 +13,12 @@ repositories {
 }
 
 dependencies {
-    /*compile "com.github.linyuzai:concept-download-core:${conceptDownloadVersion}"
-    */
-    compileOnly project(':concept-download:concept-download-core')
+    //compile "com.github.linyuzai:concept-download-core:${conceptDownloadVersion}"
 
+    compileOnly project(':concept-download:concept-download-core')
     compileOnly project(':concept-download:concept-download-source-okhttp')
     compileOnly project(':concept-download:concept-download-load-coroutines')
+
     compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

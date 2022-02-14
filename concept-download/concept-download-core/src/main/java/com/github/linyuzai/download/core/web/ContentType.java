@@ -39,7 +39,6 @@ public class ContentType {
                 return contentType;
             }
         } catch (Throwable ignore) {
-
         }
         try {
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(file.getAbsolutePath());
@@ -47,7 +46,6 @@ public class ContentType {
                 return contentType;
             }
         } catch (Throwable ignore) {
-
         }
         return null;
     }
