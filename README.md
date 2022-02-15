@@ -12,4 +12,4 @@
 
 # 目录
 
-- [这绝对是下载接口最简单的实现方式](../../wiki/Concept-Download)
+- [一个注解实现下载接口](../../wiki/Concept-Download)
