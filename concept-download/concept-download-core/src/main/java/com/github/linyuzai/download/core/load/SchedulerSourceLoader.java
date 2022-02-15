@@ -16,8 +16,6 @@ import java.util.Collection;
 
 /**
  * 支持 {@link Scheduler} 的 {@link SourceLoader}。
- * 如果想要忽略 {@link Source#isAsyncLoad()}
- * 可以使用 {@link DefaultSourceLoader}。
  */
 @Getter
 @Setter
