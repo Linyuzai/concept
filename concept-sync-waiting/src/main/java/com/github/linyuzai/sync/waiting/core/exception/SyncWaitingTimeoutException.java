@@ -1,5 +1,8 @@
 package com.github.linyuzai.sync.waiting.core.exception;
 
+/**
+ * 同步等待超时异常。
+ */
 public class SyncWaitingTimeoutException extends SyncWaitingException {
 
     public SyncWaitingTimeoutException(String message) {

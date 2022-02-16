@@ -8,6 +8,9 @@ import lombok.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 基于 {@link Map} 实现的 {@link SyncWaiterContainer}，默认使用 {@link HashMap}。
+ */
 @AllArgsConstructor
 public class MapSyncWaiterContainer implements SyncWaiterContainer {
 

@@ -14,47 +14,69 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 基于 {@link Condition } 实现的 {@link SyncWaitingConcept}。
+ */
 public class ConditionSyncWaitingConcept extends AbstractSyncWaitingConcept {
 
+    /**
+     * 锁
+     */
     protected final Lock lock;
 
-    protected final boolean signalAll;
-
     public ConditionSyncWaitingConcept() {
-        this(new MapSyncWaiterContainer(), new DisposableSyncWaiterRecycler(), new ReentrantLock(), false);
+        this(new MapSyncWaiterContainer(), new DisposableSyncWaiterRecycler(), new ReentrantLock());
     }
 
-    protected ConditionSyncWaitingConcept(SyncWaiterContainer container, SyncWaiterRecycler recycler,
-                                          @NonNull Lock lock, boolean signalAll) {
+    protected ConditionSyncWaitingConcept(SyncWaiterContainer container,
+                                          SyncWaiterRecycler recycler,
+                                          @NonNull Lock lock) {
         super(container, recycler);
         this.lock = lock;
-        this.signalAll = signalAll;
     }
 
+    /**
+     * 加锁。
+     */
     @SneakyThrows
     @Override
     public void lock() {
         lock.lockInterruptibly();
     }
 
+    /**
+     * 解锁。
+     */
     @Override
     public void unlock() {
         lock.unlock();
     }
 
+    /**
+     * 创建一个 {@link ConditionSyncWaiter}。
+     *
+     * @return 新建的 {@link ConditionSyncWaiter}
+     */
     @Override
-    protected SyncWaiter createSyncWaiter() {
-        return new ConditionSyncWaiter(lock.newCondition(), signalAll);
+    public SyncWaiter createSyncWaiter() {
+        return new ConditionSyncWaiter(lock.newCondition());
     }
 
+    /**
+     * 基于 {@link Condition } 实现的 {@link SyncWaiter}。
+     */
     @AllArgsConstructor
     public static class ConditionSyncWaiter extends AbstractSyncWaiter {
 
         @NonNull
         private final Condition condition;
 
-        private final boolean signalAll;
-
+        /**
+         * 如果超时时间大于 0 则调用 {@link Condition#await(long, TimeUnit)}，
+         * 否则调用 {@link Condition#await()}。
+         *
+         * @param time 等待超时时间
+         */
         @SneakyThrows
         @Override
         public void performWait(long time) {
@@ -67,13 +89,12 @@ public class ConditionSyncWaitingConcept extends AbstractSyncWaitingConcept {
             }
         }
 
+        /**
+         * 调用 {@link Condition#signalAll()}。
+         */
         @Override
         public void performNotify() {
-            if (signalAll) {
-                condition.signalAll();
-            } else {
-                condition.signal();
-            }
+            condition.signalAll();
         }
     }
 
@@ -81,26 +102,12 @@ public class ConditionSyncWaitingConcept extends AbstractSyncWaitingConcept {
 
         private Lock lock;
 
-        private boolean fairLock;
-
-        private boolean signalAll;
-
         private SyncWaiterContainer container;
 
         private SyncWaiterRecycler recycler;
 
         public Builder lock(Lock lock) {
             this.lock = lock;
-            return this;
-        }
-
-        public Builder fairLock(boolean fairLock) {
-            this.fairLock = fairLock;
-            return this;
-        }
-
-        public Builder signalAll(boolean signalAll) {
-            this.signalAll = signalAll;
             return this;
         }
 
@@ -116,7 +123,7 @@ public class ConditionSyncWaitingConcept extends AbstractSyncWaitingConcept {
 
         public ConditionSyncWaitingConcept build() {
             if (lock == null) {
-                lock = new ReentrantLock(fairLock);
+                lock = new ReentrantLock();
             }
             if (container == null) {
                 container = new MapSyncWaiterContainer();
@@ -124,7 +131,7 @@ public class ConditionSyncWaitingConcept extends AbstractSyncWaitingConcept {
             if (recycler == null) {
                 recycler = new DisposableSyncWaiterRecycler();
             }
-            return new ConditionSyncWaitingConcept(container, recycler, lock, signalAll);
+            return new ConditionSyncWaitingConcept(container, recycler, lock);
         }
     }
 }

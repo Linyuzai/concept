@@ -4,12 +4,21 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 同步等待配置。
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SyncWaitingConfiguration {
 
+    /**
+     * 等待时间
+     */
     private long waitingTime;
 
+    /**
+     * 排队时间
+     */
     private long queuingTime;
 
     public static class Builder {
