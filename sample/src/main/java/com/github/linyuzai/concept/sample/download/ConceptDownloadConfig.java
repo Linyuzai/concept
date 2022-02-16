@@ -18,7 +18,6 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
     @Override
     public void configure(DownloadConfiguration configuration) {
         System.out.println("可以在这里覆盖配置文件的配置！");
-        //configuration.getLogger().getTimeSpent().setEnabled(true);
     }
 
     //@Bean
@@ -26,7 +25,7 @@ public class ConceptDownloadConfig implements DownloadConfigurer {
         return new SchedulerSourceLoader(Schedulers.fromExecutor(Executors.newFixedThreadPool(3)));
     }
 
-    @Bean
+    //@Bean
     public CoroutinesSourceLoader coroutinesSourceLoader() {
         return new CoroutinesSourceLoader();
     }

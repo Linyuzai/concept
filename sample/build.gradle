@@ -20,16 +20,16 @@ repositories {
 }
 
 dependencies {
-    compile "com.github.linyuzai:concept-download-spring-boot-starter:1.2.0"
+    /*compile "com.github.linyuzai:concept-download-spring-boot-starter:1.2.0"
     compile "com.github.linyuzai:concept-download-source-okhttp:1.2.0"
-    compile "com.github.linyuzai:concept-download-load-coroutines:1.2.0"
-
-    /*implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
+    compile "com.github.linyuzai:concept-download-load-coroutines:1.2.0"*/
+    implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-source-okhttp', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-load-coroutines', configuration: 'default')
-    implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')*/
+    implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
 
-    //implementation project(path: ':concept-sync-waiting', configuration: 'default')
+    implementation project(path: ':concept-sync-waiting', configuration: 'default')
+
     //implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     /*implementation("org.springframework.boot:spring-boot-starter-web") {
