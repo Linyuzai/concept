@@ -13,3 +13,4 @@
 # 目录
 
 - [一个注解实现下载接口](../../wiki/Concept-Download)
+- [异步回调转同步等待](../../wiki/Concept-Sync-Waiting)
