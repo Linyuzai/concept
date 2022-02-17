@@ -1,5 +1,6 @@
 package com.github.linyuzai.concept.sample.sync.waiting;
 
+import com.github.linyuzai.sync.waiting.core.caller.SyncCaller;
 import com.github.linyuzai.sync.waiting.core.concept.ConditionSyncWaitingConcept;
 import com.github.linyuzai.sync.waiting.core.concept.SyncWaitingConcept;
 import com.github.linyuzai.sync.waiting.core.exception.SyncWaitingTimeoutException;
@@ -26,7 +27,12 @@ public class SyncWaitingController {
     @RequestMapping("/send")
     public String send(@RequestParam String key) {
         try {
-            return concept.waitSync(key, k -> System.out.println("Cmd id: " + k), 0, 5000);
+            return concept.waitSync(key, new SyncCaller() {
+                @Override
+                public void call(Object k) {
+                    System.out.println("Cmd id: " + k);
+                }
+            }, 0, 5000);
         } catch (SyncWaitingTimeoutException e) {
             return "下发命令超时";
         }
