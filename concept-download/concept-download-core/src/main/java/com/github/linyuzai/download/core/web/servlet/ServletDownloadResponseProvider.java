@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.web.servlet;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.web.AbstractDownloadResponseProvider;
 import com.github.linyuzai.download.core.web.DownloadResponse;
 import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -15,17 +16,23 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * {@link ServletDownloadResponse} 的提供者。
  */
-public class ServletDownloadResponseProvider implements DownloadResponseProvider {
+public class ServletDownloadResponseProvider extends AbstractDownloadResponseProvider {
 
+    /**
+     * 获得 {@link ServletDownloadResponse} 对应的 {@link Mono}。
+     *
+     * @param response   指定响应
+     * @param parameters 方法参数
+     * @param context    {@link DownloadContext}
+     * @return {@link ServletDownloadResponse} 对应的 {@link Mono}
+     */
     @Override
-    public Mono<DownloadResponse> getResponse(DownloadContext context) {
-        Object resp = context.getOptions().getResponse();
-        Object[] parameters = context.getOptions().getDownloadMethod().getParameters();
-        HttpServletResponse response = getHttpServletResponse(resp, parameters);
-        if (response == null) {
+    public Mono<DownloadResponse> doGetResponse(Object response, Object[] parameters, DownloadContext context) {
+        HttpServletResponse resp = getHttpServletResponse(response, parameters);
+        if (resp == null) {
             throw new DownloadException("HttpServletResponse not found");
         } else {
-            return Mono.just(new ServletDownloadResponse(response));
+            return Mono.just(new ServletDownloadResponse(resp));
         }
     }
 

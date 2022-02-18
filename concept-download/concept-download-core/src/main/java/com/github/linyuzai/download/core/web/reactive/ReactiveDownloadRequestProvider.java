@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.web.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.web.AbstractDownloadRequestProvider;
 import com.github.linyuzai.download.core.web.DownloadRequest;
 import com.github.linyuzai.download.core.web.DownloadRequestProvider;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -10,12 +11,18 @@ import reactor.core.publisher.Mono;
 /**
  * {@link ReactiveDownloadRequest} 的提供者。
  */
-public class ReactiveDownloadRequestProvider implements DownloadRequestProvider {
+public class ReactiveDownloadRequestProvider extends AbstractDownloadRequestProvider {
 
+    /**
+     * 获得 {@link ReactiveDownloadRequest} 对应的 {@link Mono}。
+     *
+     * @param request    指定请求
+     * @param parameters 方法参数
+     * @param context    {@link DownloadContext}
+     * @return {@link ReactiveDownloadRequest} 对应的 {@link Mono}
+     */
     @Override
-    public Mono<DownloadRequest> getRequest(DownloadContext context) {
-        Object request = context.getOptions().getRequest();
-        Object[] parameters = context.getOptions().getDownloadMethod().getParameters();
+    public Mono<DownloadRequest> doGetRequest(Object request, Object[] parameters, DownloadContext context) {
         return getServerHttpRequest(request, parameters).map(it -> {
             if (it == null) {
                 throw new DownloadException("ServerHttpRequest not found");

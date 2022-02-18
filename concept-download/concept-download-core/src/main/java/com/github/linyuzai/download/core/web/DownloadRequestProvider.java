@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public interface DownloadRequestProvider {
 
     /**
-     * 获得 {@link DownloadRequest}
+     * 获得 {@link DownloadRequest} 对应的 {@link Mono}。
      *
      * @param context {@link DownloadContext}
      * @return {@link DownloadRequest} 对应的 {@link Mono}
