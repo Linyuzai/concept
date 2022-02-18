@@ -23,7 +23,7 @@ public abstract class AbstractDownloadResponseProvider implements DownloadRespon
             return Mono.just((DownloadResponse) response);
         }
         DownloadMethod method = context.getOptions().getDownloadMethod();
-        Object[] parameters = method == null ? null : method.getParameters();
+        Object[] parameters = method == null ? new Object[]{} : method.getParameters();
         return doGetResponse(response, parameters, context);
     }
 
