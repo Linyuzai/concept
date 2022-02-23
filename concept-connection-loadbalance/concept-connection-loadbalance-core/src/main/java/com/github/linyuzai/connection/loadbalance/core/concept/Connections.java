@@ -7,7 +7,7 @@ import java.util.Collection;
 @AllArgsConstructor
 public class Connections implements Connection {
 
-    private Collection<Connection> connections;
+    private Collection<? extends Connection> connections;
 
     @Override
     public String host() {

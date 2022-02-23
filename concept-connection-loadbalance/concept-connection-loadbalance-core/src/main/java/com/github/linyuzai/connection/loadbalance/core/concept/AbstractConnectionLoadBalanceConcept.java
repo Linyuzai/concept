@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.discovery.ConnectionDiscoverer;
+
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 

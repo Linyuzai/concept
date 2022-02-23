@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
+    compileOnly project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
 
     //compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
     compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
