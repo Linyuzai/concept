@@ -19,13 +19,16 @@ test {
 
 allprojects {
     ext {
-        set('springBootVersion', "2.6.0")
+        set('springBootVersion', "2.6.3")
     }
     ext {
         set('springDependencyManagementVersion', "1.0.11.RELEASE")
     }
     ext {
-        set('springCloudVersion', "2021.0.0-RC1")
+        set('springCloudVersion', "3.1.1")
+    }
+    ext {
+        set('springCloudDependencyManagementVersion', "2021.0.1")
     }
     ext {
         set('kotlinVersion', "1.5.10")
