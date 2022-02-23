@@ -32,7 +32,7 @@ public class SyncWaitingController {
                 public void call(Object k) {
                     System.out.println("Cmd id: " + k);
                 }
-            }, 0, 5000);
+            }, 0, 0);
         } catch (SyncWaitingTimeoutException e) {
             return "下发命令超时";
         }

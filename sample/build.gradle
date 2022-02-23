@@ -28,6 +28,7 @@ dependencies {
     implementation project(path: ':concept-download:concept-download-load-coroutines', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
 
+    //compile "com.github.linyuzai:concept-sync-waiting:1.0.0"
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
 
     //implementation 'org.springframework.boot:spring-boot-starter-webflux'

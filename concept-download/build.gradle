@@ -2,8 +2,10 @@ plugins {
     id 'java'
 }
 
+apply from: 'version.gradle'
+
 group 'com.github.linyuzai'
-version '1.0.0'
+version "${conceptDownloadVersion}"
 
 repositories {
     mavenCentral()
