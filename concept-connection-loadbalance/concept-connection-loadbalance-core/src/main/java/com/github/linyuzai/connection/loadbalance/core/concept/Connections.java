@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.AllArgsConstructor;
 
 import java.util.Collection;
@@ -9,18 +10,12 @@ public class Connections implements Connection {
 
     private Collection<? extends Connection> connections;
 
-    @Override
-    public String host() {
-        return null;
+    public Collection<? extends Connection> real() {
+        return connections;
     }
 
     @Override
-    public int port() {
-        return -1;
-    }
-
-    @Override
-    public void send(Object message) {
+    public void send(Message message) {
         connections.forEach(it -> it.send(message));
     }
 }

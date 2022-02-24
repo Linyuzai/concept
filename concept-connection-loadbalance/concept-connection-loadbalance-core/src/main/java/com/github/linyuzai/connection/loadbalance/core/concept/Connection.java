@@ -1,10 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
+
 public interface Connection {
 
-    String host();
-
-    int port();
-
-    void send(Object message);
+    void send(Message message);
 }
