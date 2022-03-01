@@ -5,7 +5,7 @@ plugins {
 apply from: '../version.gradle'
 
 group 'com.github.linyuzai'
-version "${conceptConnectionLoadbalanceVersion}"
+version "${conceptPropertiesRefreshVersion}"
 sourceCompatibility = '1.8'
 
 repositories {
@@ -13,8 +13,8 @@ repositories {
 }
 
 dependencies {
+
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
