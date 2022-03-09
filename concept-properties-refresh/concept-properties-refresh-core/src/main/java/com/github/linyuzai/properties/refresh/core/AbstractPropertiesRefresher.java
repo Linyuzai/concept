@@ -1,6 +1,7 @@
 package com.github.linyuzai.properties.refresh.core;
 
 import com.github.linyuzai.properties.refresh.core.condition.RefreshPropertiesCondition;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolver;
 import lombok.AllArgsConstructor;
 
 import java.lang.ref.WeakReference;
@@ -17,8 +18,11 @@ public abstract class AbstractPropertiesRefresher implements PropertiesRefresher
 
     protected final WeakReference<Object> target;
 
-    public AbstractPropertiesRefresher(Object target) {
+    protected final PropertiesResolver resolver;
+
+    public AbstractPropertiesRefresher(Object target, PropertiesResolver resolver) {
         this.target = new WeakReference<>(target);
+        this.resolver = resolver;
     }
 
     /**

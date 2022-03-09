@@ -13,8 +13,6 @@ import java.util.Set;
 /**
  * 配置属性
  * 支持动态更新
- *
- * @see PlatformPropertiesFactory
  */
 public interface PlatformProperties {
 
