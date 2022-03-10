@@ -1,6 +1,8 @@
 package com.github.linyuzai.properties.refresh.core;
 
 import com.github.linyuzai.properties.refresh.core.condition.RefreshPropertiesCondition;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolver;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolverAdapter;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -24,56 +26,52 @@ public class FieldPropertiesRefresher extends AbstractPropertiesRefresher {
     /**
      * 值的类型和匹配key
      */
-    private final KeyTypePair keyTypePair;
+    private final String key;
+
+    private final Type type;
+
+    private final PropertiesResolver resolver;
 
     public FieldPropertiesRefresher(
-            String key,
+            Field field,
             Object target,
-            Field field) {
-        this(key, field.getGenericType(), target, field);
-    }
-
-    public FieldPropertiesRefresher(
-            String key,
-            Type type,
-            Object target,
-            Field field) {
+            PropertiesResolverAdapter adapter) {
         super(target);
         this.field = field;
-        this.keyTypePair = new KeyTypePair(key, type);
+        RefreshableProperties annotation = this.field.getAnnotation(RefreshableProperties.class);
+        this.key = annotation.value();
+        this.type = field.getGenericType();
+        this.resolver = adapter.getResolver(key, type);
+        this.field.setAccessible(true);
     }
 
-    /**
-     * 是否需要刷新
-     *
-     * @param condition 刷新条件
-     * @return 是否需要刷新
-     */
-    //@Override
-    public boolean needRefresh(RefreshPropertiesCondition condition) {
-        return condition.match(keyTypePair);
-    }
-
-    @Override
-    public void doRefresh(RefreshPropertiesCondition condition) {
-
-    }
-
-    /**
-     * 刷新，如果值为null则不覆盖，可用于支持默认值
-     *
-     * @param properties 配置属性源
-     * @throws Throwable 异常
-     */
     @SneakyThrows
     @Override
-    public void refresh(PlatformProperties properties) {
-        Object value = getValue(keyTypePair, properties);
-        if (value != null) {
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
+    public void doRefresh(RefreshPropertiesCondition condition, Object target) {
+        boolean needOldValue = condition.needOldValue();
+        boolean needNewValue = condition.needNewValue();
+        Object oldValue;
+        if (needOldValue) {
+            oldValue = field.get(target);
+        } else {
+            oldValue = null;
+        }
+        Object newValue;
+        if (needNewValue) {
+            newValue = resolver.resolve(key, type);
+        } else {
+            newValue = null;
+        }
+        if (condition.match(key, type, oldValue, newValue)) {
+            Object value;
+            if (needNewValue) {
+                value = newValue;
+            } else {
+                value = resolver.resolve(key, type);
             }
-            field.set(target, value);
+            if (value != null || condition.refreshOnNull()) {
+                field.set(target, value);
+            }
         }
     }
 }

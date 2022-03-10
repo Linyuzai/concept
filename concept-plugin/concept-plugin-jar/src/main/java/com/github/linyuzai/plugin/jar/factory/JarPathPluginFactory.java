@@ -1,19 +1,27 @@
-package com.github.linyuzai.plugin.jar;
+package com.github.linyuzai.plugin.jar.factory;
 
-import com.github.linyuzai.plugin.core.adapter.PluginAdapter;
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.factory.PluginFactory;
+import com.github.linyuzai.plugin.jar.JarPlugin;
+import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.net.URL;
 
-public class JarPluginAdapter implements PluginAdapter {
+@AllArgsConstructor
+public class JarPathPluginFactory implements PluginFactory {
+
+    private JarPluginClassLoader classLoader;
 
     @Override
-    public Plugin adapt(Object o) {
-        if (o instanceof URL && "jar".equals(((URL) o).getProtocol())) {
-            return new JarPlugin((URL) o);
-        }
-        return null;
+    public boolean support(Object o) {
+        return o instanceof String && ((String) o).endsWith(".jar");
+    }
+
+    @Override
+    public Plugin create(Object o) {
+        return new JarPlugin(parseURL((String) o), classLoader);
     }
 
     @SneakyThrows

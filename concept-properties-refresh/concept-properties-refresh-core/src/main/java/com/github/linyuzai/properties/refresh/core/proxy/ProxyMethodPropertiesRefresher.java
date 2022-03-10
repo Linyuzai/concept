@@ -18,7 +18,7 @@ public class ProxyMethodPropertiesRefresher extends MethodPropertiesRefresher {
     private final MethodHandle methodHandle;
 
     public ProxyMethodPropertiesRefresher(Object target, Method method, MethodHandle methodHandle) {
-        super(target, method);
+        super(method, target, null);
         this.methodHandle = methodHandle;
     }
 

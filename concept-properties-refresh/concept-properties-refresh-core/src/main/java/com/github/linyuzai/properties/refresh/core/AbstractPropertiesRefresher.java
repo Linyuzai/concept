@@ -1,7 +1,6 @@
 package com.github.linyuzai.properties.refresh.core;
 
 import com.github.linyuzai.properties.refresh.core.condition.RefreshPropertiesCondition;
-import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolver;
 import lombok.AllArgsConstructor;
 
 import java.lang.ref.WeakReference;
@@ -16,29 +15,30 @@ import java.util.Set;
 @AllArgsConstructor
 public abstract class AbstractPropertiesRefresher implements PropertiesRefresher {
 
-    protected final WeakReference<Object> target;
+    private final WeakReference<Object> targetRef;
 
-    protected final PropertiesResolver resolver;
-
-    public AbstractPropertiesRefresher(Object target, PropertiesResolver resolver) {
-        this.target = new WeakReference<>(target);
-        this.resolver = resolver;
+    public AbstractPropertiesRefresher(Object target) {
+        this.targetRef = new WeakReference<>(target);
     }
 
-    /**
-     * 是否需要刷新
-     *
-     * @param condition 刷新条件
-     * @return 是否需要刷新
-     */
-
-    public abstract void doRefresh(RefreshPropertiesCondition condition);
+    public Object getTarget() {
+        Object target = targetRef.get();
+        if (target == null) {
+            //TODO remove
+        }
+        return target;
+    }
 
     @Override
-    public void refresh(PlatformProperties properties) {
-
-
+    public void refresh(RefreshPropertiesCondition condition) {
+        Object target = getTarget();
+        if (target == null) {
+            return;
+        }
+        doRefresh(condition, target);
     }
+
+    public abstract void doRefresh(RefreshPropertiesCondition condition, Object target);
 
     /**
      * 通过给定的类型，匹配的key，和配置属性，获得对应的值

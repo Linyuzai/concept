@@ -2,8 +2,9 @@ package com.github.linyuzai.properties.refresh.core;
 
 import com.github.linyuzai.properties.refresh.core.condition.RefreshPropertiesCondition;
 import com.github.linyuzai.properties.refresh.core.exception.PropertiesRefreshException;
-import lombok.Getter;
-import lombok.SneakyThrows;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolver;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolverAdapter;
+import lombok.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -29,7 +30,7 @@ public class MethodPropertiesRefresher extends AbstractPropertiesRefresher {
     /**
      * 方法参数对应的匹配要求
      */
-    private final Map<Integer, KeyTypePair> keyTypePairMap;
+    private final Map<Integer, Key_Type_Resolver> map;
 
     /**
      * 方法参数个数
@@ -37,8 +38,9 @@ public class MethodPropertiesRefresher extends AbstractPropertiesRefresher {
     private final int parameterCount;
 
     public MethodPropertiesRefresher(
+            Method method,
             Object target,
-            Method method) {
+            PropertiesResolverAdapter adapter) {
         super(target);
         this.method = method;
         this.parameterCount = method.getParameterCount();
@@ -48,40 +50,18 @@ public class MethodPropertiesRefresher extends AbstractPropertiesRefresher {
         }
         Parameter[] parameters = this.method.getParameters();
         Type[] parameterTypes = this.method.getGenericParameterTypes();
-        this.keyTypePairMap = new HashMap<>();
+        this.map = new HashMap<>();
         for (int i = 0; i < parameters.length; i++) {
             RefreshableProperties annotation = parameters[i].getAnnotation(RefreshableProperties.class);
             if (annotation == null) {
-                //如果方法参数上没有注解，则key按照空字符串匹配
-                keyTypePairMap.put(i, new KeyTypePair("", parameterTypes[i]));
-            } else {
-                keyTypePairMap.put(i, new KeyTypePair(annotation.value(), parameterTypes[i]));
+                continue;
             }
+            String key = annotation.value();
+            Type type = parameterTypes[i];
+            PropertiesResolver resolver = adapter.getResolver(key, type);
+            map.put(i, new Key_Type_Resolver(key, type, resolver));
         }
-
-    }
-
-    /**
-     * 判断是否需要刷新回调
-     * 只要有一个参数需要刷新就需要回调
-     *
-     * @param condition 刷新条件
-     * @return 是否需要刷新回调
-     */
-    //@Override
-    public boolean needRefresh(RefreshPropertiesCondition condition) {
-        Collection<KeyTypePair> values = keyTypePairMap.values();
-        for (KeyTypePair pair : values) {
-            if (condition.match(pair)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void doRefresh(RefreshPropertiesCondition condition) {
-
+        this.method.setAccessible(true);
     }
 
     /**
@@ -93,20 +73,56 @@ public class MethodPropertiesRefresher extends AbstractPropertiesRefresher {
      */
     @SneakyThrows
     @Override
-    public void refresh(PlatformProperties properties) {
+    public void doRefresh(RefreshPropertiesCondition condition, Object target) {
+        //boolean needOldValue = condition.needOldValue();
+        boolean needNewValue = condition.needNewValue();
+
+        boolean needRefresh = false;
+
         Object[] values = new Object[parameterCount];
         for (int i = 0; i < parameterCount; i++) {
-            KeyTypePair pair = keyTypePairMap.get(i);
-            if (pair != null) {
-                if (pair.getType() instanceof Class && ((Class<?>) pair.getType()).isInstance(target)) {
+            Key_Type_Resolver ktr = map.get(i);
+            if (ktr == null) {
+                continue;
+            }
+            String key = ktr.key;
+            Type type = ktr.type;
+
+            Object newValue;
+            if (needNewValue) {
+                if (ktr.getType() instanceof Class && ((Class<?>) ktr.getType()).isInstance(target)) {
                     //如果方法参数的类型是target，则直接赋值target
-                    values[i] = target;
+                    newValue = target;
                 } else {
-                    values[i] = getValue(pair, properties);
+                    newValue = ktr.resolver.resolve(key, type);
                 }
+            } else {
+                newValue = null;
+            }
+            values[i] = newValue;
+            if (condition.match(key, type, null, newValue)) {
+                needRefresh = true;
             }
         }
-        invokeMethod(method, values);
+        if (needRefresh) {
+            if (!needNewValue) {
+                for (int i = 0; i < parameterCount; i++) {
+                    Key_Type_Resolver ktr = map.get(i);
+                    if (ktr == null) {
+                        continue;
+                    }
+                    String key = ktr.key;
+                    Type type = ktr.type;
+                    if (ktr.getType() instanceof Class && ((Class<?>) ktr.getType()).isInstance(target)) {
+                        //如果方法参数的类型是target，则直接赋值target
+                        values[i] = target;
+                    } else {
+                        values[i] = ktr.resolver.resolve(key, type);
+                    }
+                }
+            }
+            method.invoke(target, values);
+        }
     }
 
     /**
@@ -120,6 +136,25 @@ public class MethodPropertiesRefresher extends AbstractPropertiesRefresher {
         if (!method.isAccessible()) {
             method.setAccessible(true);
         }
-        method.invoke(target, values);
+
+    }
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Key_Type_Resolver {
+
+        /**
+         * 匹配的key
+         */
+        private String key;
+
+        /**
+         * 属性的类型
+         */
+        private Type type;
+
+        private PropertiesResolver resolver;
     }
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ public class KeySetRefreshPropertiesCondition implements RefreshPropertiesCondit
      */
     private Set<String> keys;
 
-    @Override
+    //@Override
     public boolean match(KeyTypePair pair) {
         for (String key : keys) {
             //相等或Map情况下前缀匹配
@@ -28,6 +29,11 @@ public class KeySetRefreshPropertiesCondition implements RefreshPropertiesCondit
                 return true;
             }
         }
+        return false;
+    }
+
+    @Override
+    public boolean match(String key, Type type, Object oldValue, Object newValue) {
         return false;
     }
 }

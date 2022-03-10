@@ -1,8 +1,10 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import com.github.linyuzai.plugin.core.adapter.PluginAdapter;
+import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
+import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.extractor.PluginExtractor;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
 import com.github.linyuzai.plugin.core.resolver.PluginResolver;
@@ -14,32 +16,48 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractPluginConcept implements PluginConcept {
 
-    private PluginContextFactory pluginContextFactory;
+    protected final PluginContextFactory pluginContextFactory;
 
-    private Collection<PluginAdapter> pluginAdapters;
+    protected final Collection<PluginFactory> pluginFactories;
 
-    private Collection<PluginResolver> pluginResolvers;
+    protected final Collection<PluginResolver> pluginResolvers;
 
-    private Collection<PluginMatcher> pluginMatchers;
+    protected final Collection<PluginMatcher> pluginMatchers;
 
-    private Collection<PluginExtractor> pluginExtractors;
+    protected AbstractPluginConcept(PluginContextFactory pluginContextFactory,
+                                    Collection<PluginFactory> pluginFactories,
+                                    Collection<PluginResolver> pluginResolvers,
+                                    Collection<PluginMatcher> pluginMatchers) {
+        this.pluginContextFactory = pluginContextFactory;
+        this.pluginFactories = pluginFactories;
+        this.pluginResolvers = pluginResolvers;
+        this.pluginMatchers = pluginMatchers;
+    }
 
-    public void doLoad(Object o) {
-        Plugin plugin = adaptPlugin(o);
+    public Plugin doLoad(Object o) {
+        Plugin plugin = createPlugin(o);
+        if (plugin == null) {
+            throw new PluginException("Plugin can not created");
+        }
+        onPluginCreated(plugin);
         PluginContext context = pluginContextFactory.create(plugin);
         onContextCreated(context);
-        new PluginResolverChainImpl(pluginResolvers, pluginExtractors).next(context);
+        new PluginResolverChainImpl(pluginResolvers).next(context);
+        return plugin;
+    }
+
+    public void onPluginCreated(Plugin plugin) {
+
     }
 
     public void onContextCreated(PluginContext context) {
 
     }
 
-    public Plugin adaptPlugin(Object plugin) {
-        for (PluginAdapter adapter : pluginAdapters) {
-            Plugin adapt = adapter.adapt(plugin);
-            if (adapt != null) {
-                return adapt;
+    public Plugin createPlugin(Object o) {
+        for (PluginFactory factory : pluginFactories) {
+            if (factory.support(o)) {
+                return factory.create(o);
             }
         }
         return null;
@@ -53,42 +71,55 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         }
     }
 
-    public void extractPlugin(Plugin plugin, Object matched) {
-        for (PluginExtractor extractor : pluginExtractors) {
-            //extractor.extract(plugin, matched);
-        }
-    }
-
-    public static class Builder {
+    @SuppressWarnings("unchecked")
+    public static abstract class AbstractBuilder<T extends AbstractBuilder<T>> {
 
         private final Set<Class<? extends PluginResolver>> pluginResolverTypes = new HashSet<>();
 
-        private final List<PluginResolver> pluginResolvers = new ArrayList<>();
+        protected PluginContextFactory pluginContextFactory;
+
+        protected final List<PluginFactory> pluginFactories = new ArrayList<>();
+
+        protected final List<PluginResolver> pluginResolvers = new ArrayList<>();
+
+        public T contextFactory(PluginContextFactory factory) {
+            this.pluginContextFactory = factory;
+            return (T) this;
+        }
+
+        public T addFactories(PluginFactory... pluginFactories) {
+            return addFactories(Arrays.asList(pluginFactories));
+        }
+
+        public T addFactories(Collection<? extends PluginFactory> pluginFactories) {
+            this.pluginFactories.addAll(pluginFactories);
+            return (T) this;
+        }
 
         public void addResolver(PluginResolver resolver) {
             addResolver(resolver, true);
         }
 
-        public void addResolver(PluginResolver resolver, boolean dependence) {
-            addResolvers(Collections.singletonList(resolver), dependence);
+        public T addResolver(PluginResolver resolver, boolean dependence) {
+            return addResolvers(Collections.singletonList(resolver), dependence);
         }
 
-        public void addResolvers(PluginResolver... resolvers) {
-            addResolvers(Arrays.asList(resolvers));
+        public T addResolvers(PluginResolver... resolvers) {
+            return addResolvers(Arrays.asList(resolvers));
         }
 
-        public void addResolvers(Collection<? extends PluginResolver> resolvers) {
-            addResolvers(resolvers, true);
+        public T addResolvers(Collection<? extends PluginResolver> resolvers) {
+            return addResolvers(resolvers, true);
         }
 
-        public void addResolvers(Collection<? extends PluginResolver> resolvers, boolean dependence) {
-            addResolversWithDependencies(resolvers, dependence);
+        public T addResolvers(Collection<? extends PluginResolver> resolvers, boolean dependence) {
+            return addResolversWithDependencies(resolvers, dependence);
         }
 
         @SneakyThrows
-        private void addResolversWithDependencies(Collection<? extends PluginResolver> resolvers, boolean dependence) {
+        private T addResolversWithDependencies(Collection<? extends PluginResolver> resolvers, boolean dependence) {
             if (resolvers.isEmpty()) {
-                return;
+                return (T) this;
             }
             Set<? extends Class<? extends PluginResolver>> classSet = resolvers.stream()
                     .map(PluginResolver::getClass)
@@ -114,23 +145,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 }
             }
             pluginResolvers.addAll(resolvers);
+            return (T) this;
         }
 
-        @Deprecated
-        @SneakyThrows
-        private void dependence(Class<? extends PluginResolver> resolverType,
-                                Set<Class<? extends PluginResolver>> resolverTypes,
-                                Collection<PluginResolver> container) {
-            if (resolverTypes.contains(resolverType)) {
-                return;
+        protected void preBuild() {
+            if (pluginContextFactory == null) {
+                pluginContextFactory = new DefaultPluginContextFactory();
             }
-            PluginResolver resolver = resolverType.newInstance();
-            Class<? extends PluginResolver>[] dependencies = resolver.dependencies();
-            for (Class<? extends PluginResolver> dependency : dependencies) {
-                dependence(dependency, resolverTypes, container);
-            }
-            resolverTypes.add(resolverType);
-            container.add(resolver);
         }
     }
 }

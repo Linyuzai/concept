@@ -16,6 +16,7 @@ public class KeyTypePair {
      */
     private String key;
 
+
     /**
      * 属性的类型
      */

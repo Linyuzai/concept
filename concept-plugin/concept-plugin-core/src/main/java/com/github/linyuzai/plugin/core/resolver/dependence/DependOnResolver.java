@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.resolver.annotation;
+package com.github.linyuzai.plugin.core.resolver.dependence;
 
 import com.github.linyuzai.plugin.core.resolver.PluginResolver;
 

@@ -50,10 +50,11 @@ public class ProxyFieldPropertiesRefresher extends AbstractPropertiesRefresher {
      */
     //@Override
     public boolean needRefresh(RefreshPropertiesCondition condition) {
-        return condition.match(keyTypePair);
+        //return condition.match(keyTypePair);
+        return false;
     }
 
-    @Override
+    //@Override
     public void doRefresh(RefreshPropertiesCondition condition) {
 
     }
@@ -64,11 +65,16 @@ public class ProxyFieldPropertiesRefresher extends AbstractPropertiesRefresher {
      * @param properties 配置属性源
      * @throws Throwable 异常
      */
-    @Override
+    //@Override
     public void refresh(PlatformProperties properties) {
         Object value = getValue(keyTypePair, properties);
         if (value != null) {
             valueMap.put(method, value);
         }
+    }
+
+    @Override
+    public void doRefresh(RefreshPropertiesCondition condition, Object target) {
+
     }
 }

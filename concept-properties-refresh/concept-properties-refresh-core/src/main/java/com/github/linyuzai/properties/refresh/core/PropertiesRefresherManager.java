@@ -36,7 +36,7 @@ public class PropertiesRefresherManager {
      */
     public void refresh(PlatformProperties properties, RefreshPropertiesCondition condition) {
         for (PropertiesRefresher refresher : refreshers) {
-            refresher.refresh(properties);
+            //refresher.refresh(properties);
         }
     }
 

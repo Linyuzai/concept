@@ -1,0 +1,25 @@
+package com.github.linyuzai.plugin.jar.factory;
+
+import com.github.linyuzai.plugin.core.factory.PluginFactory;
+import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.jar.JarPlugin;
+import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
+import lombok.AllArgsConstructor;
+
+import java.net.URL;
+
+@AllArgsConstructor
+public class JarURLPluginFactory implements PluginFactory {
+
+    private JarPluginClassLoader classLoader;
+
+    @Override
+    public boolean support(Object o) {
+        return o instanceof URL && "jar".equals(((URL) o).getProtocol());
+    }
+
+    @Override
+    public Plugin create(Object o) {
+        return new JarPlugin((URL) o, classLoader);
+    }
+}

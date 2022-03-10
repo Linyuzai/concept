@@ -3,14 +3,13 @@ package com.github.linyuzai.plugin.jar.resolver;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolver.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.resolver.PluginResolverChain;
-import com.github.linyuzai.plugin.core.resolver.annotation.DependOnResolver;
+import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolver;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 @DependOnResolver(JarEntryPluginResolver.class)

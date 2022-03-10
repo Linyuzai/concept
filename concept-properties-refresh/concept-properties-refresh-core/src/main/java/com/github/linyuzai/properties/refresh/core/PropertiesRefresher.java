@@ -17,5 +17,5 @@ public interface PropertiesRefresher {
      * @param properties 配置属性源
      * @throws Throwable 异常
      */
-    void refresh(PlatformProperties properties);
+    void refresh(RefreshPropertiesCondition condition);
 }

@@ -1,22 +1,28 @@
 package com.github.linyuzai.properties.refresh.core.concept;
 
 import com.github.linyuzai.properties.refresh.core.*;
+import com.github.linyuzai.properties.refresh.core.condition.ForceRefreshPropertiesCondition;
 import com.github.linyuzai.properties.refresh.core.condition.RefreshPropertiesCondition;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolver;
+import com.github.linyuzai.properties.refresh.core.resolver.PropertiesResolverAdapter;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 支持自动刷新的配置属性
  */
 public class ReflectPropertiesRefreshConcept implements PropertiesRefreshConcept {
 
+    private PropertiesResolverAdapter adapter;
+
     /**
      * 刷新器管理器
      */
-    private final PropertiesRefresherManager refresherManager = new PropertiesRefresherManager();
+    private final Map<PropertiesRefresher, Boolean> refreshers = new ConcurrentHashMap<>();
 
     /**
      * 获得所有的字段和方法进行处理
@@ -42,20 +48,18 @@ public class ReflectPropertiesRefreshConcept implements PropertiesRefreshConcept
     public void registerFields(List<Field> fields, Object object) {
         for (Field field : fields) {
             //判断是否标注了注解
-            RefreshableProperties annotation = field.getAnnotation(RefreshableProperties.class);
-            if (annotation == null) {
-                Class<?> clazz = field.getType();
-                if (clazz.isAnnotationPresent(PropertiesModel.class)) {
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
-                    //嵌套处理
-                    register(field.get(object));
+            Class<?> clazz = field.getType();
+            if (clazz.isAnnotationPresent(PropertiesModel.class)) {
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
                 }
-            } else {
+                //嵌套处理
+                register(field.get(object));
+            }
+
+            if (field.isAnnotationPresent(RefreshableProperties.class)) {
                 //如果标注了注解则添加一个该字段的刷新器
-                refresherManager.addRefresher(
-                        new FieldPropertiesRefresher(annotation.value(), object, field));
+                refreshers.put(new FieldPropertiesRefresher(field, object, adapter), true);
             }
         }
     }
@@ -70,7 +74,7 @@ public class ReflectPropertiesRefreshConcept implements PropertiesRefreshConcept
         for (Method method : methods) {
             //如果标注了注解则添加一个该方法的回调刷新器
             if (method.isAnnotationPresent(OnPropertiesRefresh.class)) {
-                refresherManager.addRefresher(new MethodPropertiesRefresher(object, method));
+                refreshers.put(new MethodPropertiesRefresher(method, object, adapter), true);
             }
         }
     }
@@ -80,7 +84,7 @@ public class ReflectPropertiesRefreshConcept implements PropertiesRefreshConcept
      */
     //@Override
     public void refresh() {
-        refresherManager.refresh(null);
+        refresh(new ForceRefreshPropertiesCondition());
     }
 
     /**
@@ -90,7 +94,9 @@ public class ReflectPropertiesRefreshConcept implements PropertiesRefreshConcept
      */
     //@Override
     public void refresh(RefreshPropertiesCondition condition) {
-        refresherManager.refresh(null, condition);
+        for (PropertiesRefresher refresher : refreshers.keySet()) {
+            refresher.refresh(condition);
+        }
     }
 
     /**
@@ -98,6 +104,6 @@ public class ReflectPropertiesRefreshConcept implements PropertiesRefreshConcept
      */
     //@Override
     public void destroy() {
-        refresherManager.destroy();
+        refreshers.clear();
     }
 }

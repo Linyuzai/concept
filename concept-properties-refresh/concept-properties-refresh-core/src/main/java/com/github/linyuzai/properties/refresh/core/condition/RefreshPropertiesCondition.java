@@ -14,5 +14,22 @@ public interface RefreshPropertiesCondition {
      *
      * @return 是否匹配刷新条件
      */
-    boolean match(KeyTypePair pair);
+    boolean match(String key, Type type, Object oldValue, Object newValue);
+
+    default boolean needOldValue() {
+        return false;
+    }
+
+    default boolean needNewValue() {
+        return false;
+    }
+
+    /**
+     * 可用于支持默认值
+     *
+     * @return
+     */
+    default boolean refreshOnNull() {
+        return false;
+    }
 }
