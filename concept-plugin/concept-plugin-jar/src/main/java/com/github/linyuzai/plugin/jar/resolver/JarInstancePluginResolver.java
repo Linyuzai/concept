@@ -4,26 +4,31 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolver.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
+import lombok.SneakyThrows;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@DependOnResolvers(JarFileNamePluginResolver.class)
-public class JarClassNamePluginResolver extends AbstractPluginResolver {
+@DependOnResolvers(JarClassPluginResolver.class)
+public class JarInstancePluginResolver extends AbstractPluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        Collection<String> filenames = context.get(JarPlugin.FILE_NAMES);
-        List<String> classNames = filenames.stream()
-                .filter(it -> it.endsWith(".class"))
-                .map(it -> it.substring(0, it.lastIndexOf(".")).replaceAll("/", "."))
+        Collection<Class<?>> classes = context.get(JarPlugin.CLASSES);
+        List<?> instances = classes.stream()
+                .map(this::newInstance)
                 .collect(Collectors.toList());
-        context.set(JarPlugin.CLASS_NAMES, classNames);
+        context.set(JarPlugin.INSTANCES, instances);
+    }
+
+    @SneakyThrows
+    private Object newInstance(Class<?> clazz) {
+        return clazz.newInstance();
     }
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.FILE_NAMES);
+        return context.contains(JarPlugin.CLASSES);
     }
 }

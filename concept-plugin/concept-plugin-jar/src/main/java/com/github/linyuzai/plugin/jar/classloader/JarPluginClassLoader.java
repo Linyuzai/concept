@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class JarPluginClassLoader extends URLClassLoader {
 
-    private final Map<URL, ClassLoader> classLoaders = new ConcurrentHashMap<>();
+    private final Map<String, ClassLoader> classLoaders = new ConcurrentHashMap<>();
 
     public JarPluginClassLoader() {
         super(new URL[]{});
@@ -22,8 +22,8 @@ public class JarPluginClassLoader extends URLClassLoader {
         return classLoaders.values();
     }
 
-    public void add(URL url, ClassLoader classLoader) {
-        classLoaders.put(url, classLoader);
+    public void add(String id, ClassLoader classLoader) {
+        classLoaders.put(id, classLoader);
     }
 
     @Override

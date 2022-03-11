@@ -7,5 +7,5 @@ public interface PluginResolver extends PluginResolverDependency {
 
     boolean support(PluginContext context);
 
-    void resolve(PluginContext context, PluginResolverChain chain);
+    void resolve(PluginContext context);
 }

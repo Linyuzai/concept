@@ -12,12 +12,11 @@ import java.util.stream.Collectors;
 public class JarEntryPluginResolver extends AbstractPluginResolver {
 
     @Override
-    public void resolve(PluginContext context, PluginResolverChain chain) {
+    public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();
         List<JarEntry> entries = plugin.getFile()
                 .stream().collect(Collectors.toList());
         context.set(JarPlugin.ENTRIES, entries);
-        chain.next(context);
     }
 
     @Override

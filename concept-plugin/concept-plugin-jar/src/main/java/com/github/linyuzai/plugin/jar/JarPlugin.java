@@ -4,12 +4,10 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.classloader.DynamicParentClassLoader;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 
 public class JarPlugin implements Plugin {
@@ -26,6 +24,11 @@ public class JarPlugin implements Plugin {
 
     public static final String CLASSES = JAR_PREFIX + "CLASSES";
 
+    public static final String INSTANCES = JAR_PREFIX + "INSTANCES";
+
+    @Getter
+    private final String id;
+
     @Getter
     private final URL url;
 
@@ -37,6 +40,7 @@ public class JarPlugin implements Plugin {
     private JarFile file;
 
     public JarPlugin(URL url, JarPluginClassLoader classLoader) {
+        this.id = url.toString();
         this.url = url;
         this.classLoader = new DynamicParentClassLoader(url, classLoader);
     }

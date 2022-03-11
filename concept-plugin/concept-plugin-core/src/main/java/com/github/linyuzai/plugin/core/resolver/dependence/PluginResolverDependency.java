@@ -8,7 +8,7 @@ public interface PluginResolverDependency {
     default Class<? extends PluginResolver>[] dependencies() {
         Class<?> clazz = getClass();
         while (clazz != null) {
-            DependOnResolver annotation = clazz.getAnnotation(DependOnResolver.class);
+            DependOnResolvers annotation = clazz.getAnnotation(DependOnResolvers.class);
             if (annotation != null) {
                 return annotation.value();
             }
