@@ -8,7 +8,7 @@ public abstract class JarPluginMatcher extends AbstractPluginMatcher<JarPlugin> 
 
     @Override
     public boolean ifMatch(PluginContext context) {
-        return true;
+        return context.getPlugin() instanceof JarPlugin;
     }
 
     @Override

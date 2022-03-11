@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public class PluginConflictException extends PluginException {
 
-    private final Plugin curPlugin;
+    private final Plugin plugin;
 
     private final Plugin newPlugin;
 
-    public PluginConflictException(String id, Plugin curPlugin, Plugin newPlugin) {
-        super("Plugin conflicted: " + id);
-        this.curPlugin = curPlugin;
+    public PluginConflictException(Plugin plugin, Plugin newPlugin) {
+        super("Plugin conflicted: " + plugin.getId());
+        this.plugin = plugin;
         this.newPlugin = newPlugin;
     }
 }

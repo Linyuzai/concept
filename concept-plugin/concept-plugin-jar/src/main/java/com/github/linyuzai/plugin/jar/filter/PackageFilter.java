@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.filter;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.jar.JarPlugin;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @FilterWithResolver(JarClassNamePluginResolver.class)
-public class PackageFilter implements PluginFilter {
+public class PackageFilter extends AbstractPluginFilter<List<String>> {
 
     private final Collection<String> packages;
 
@@ -25,12 +26,15 @@ public class PackageFilter implements PluginFilter {
     }
 
     @Override
-    public void filter(PluginContext context) {
-        Collection<String> classNames = context.get(JarPlugin.CLASS_NAMES);
-        List<String> filteredClassNames = classNames.stream()
+    public List<String> doFilter(List<String> plugins) {
+        return plugins.stream()
                 .filter(this::inPackages)
                 .collect(Collectors.toList());
-        context.set(JarPlugin.CLASS_NAMES, filteredClassNames);
+    }
+
+    @Override
+    public Object getKey() {
+        return JarPlugin.CLASS_NAMES;
     }
 
     private boolean inPackages(String className) {

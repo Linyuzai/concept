@@ -5,20 +5,20 @@ import com.github.linyuzai.plugin.core.exception.PluginConflictException;
 
 public interface PluginConflictStrategy {
 
-    Plugin getPlugin(String id, Plugin curPlugin, Plugin newPlugin);
+    Plugin getPlugin(Plugin plugin, Plugin newPlugin);
 
     class Keep implements PluginConflictStrategy {
 
         @Override
-        public Plugin getPlugin(String id, Plugin curPlugin, Plugin newPlugin) {
-            return curPlugin;
+        public Plugin getPlugin(Plugin plugin, Plugin newPlugin) {
+            return plugin;
         }
     }
 
     class Cover implements PluginConflictStrategy {
 
         @Override
-        public Plugin getPlugin(String id, Plugin curPlugin, Plugin newPlugin) {
+        public Plugin getPlugin(Plugin plugin, Plugin newPlugin) {
             return newPlugin;
         }
     }
@@ -26,8 +26,8 @@ public interface PluginConflictStrategy {
     class Error implements PluginConflictStrategy {
 
         @Override
-        public Plugin getPlugin(String id, Plugin curPlugin, Plugin newPlugin) {
-            throw new PluginConflictException(id, curPlugin, newPlugin);
+        public Plugin getPlugin(Plugin plugin, Plugin newPlugin) {
+            throw new PluginConflictException(plugin, newPlugin);
         }
     }
 }

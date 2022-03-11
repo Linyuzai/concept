@@ -10,6 +10,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.jar.JarFile;
 
+@Getter
 public class JarPlugin implements Plugin {
 
     public static final String JAR_PREFIX = PREFIX + "JAR@";
@@ -20,19 +21,18 @@ public class JarPlugin implements Plugin {
 
     public static final String PROPERTIES_NAMES = JAR_PREFIX + "PROPERTIES_NAMES";
 
+    public static final String PROPERTIES = JAR_PREFIX + "PROPERTIES";
+
     public static final String CLASS_NAMES = JAR_PREFIX + "CLASS_NAMES";
 
     public static final String CLASSES = JAR_PREFIX + "CLASSES";
 
     public static final String INSTANCES = JAR_PREFIX + "INSTANCES";
 
-    @Getter
     private final String id;
 
-    @Getter
     private final URL url;
 
-    @Getter
     private final ClassLoader classLoader;
 
     private JarURLConnection connection;
@@ -46,18 +46,21 @@ public class JarPlugin implements Plugin {
     }
 
     @SneakyThrows
-    public JarURLConnection getConnection() {
-        if (connection == null) {
-            connection = (JarURLConnection) getUrl().openConnection();
-        }
-        return connection;
+    @Override
+    public void initialize() {
+        connection = (JarURLConnection) getUrl().openConnection();
+        file = getConnection().getJarFile();
     }
 
-    @SneakyThrows
-    public JarFile getFile() {
-        if (file == null) {
-            file = getConnection().getJarFile();
+    @Override
+    public void destroy() {
+        if (file != null) {
+            try {
+                file.close();
+            } catch (Throwable ignore) {
+            }
         }
-        return file;
+        file = null;
+        connection = null;
     }
 }

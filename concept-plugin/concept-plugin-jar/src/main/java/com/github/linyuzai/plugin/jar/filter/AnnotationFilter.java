@@ -1,8 +1,7 @@
 package com.github.linyuzai.plugin.jar.filter;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
-import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarClassPluginResolver;
 import lombok.AllArgsConstructor;
@@ -17,21 +16,25 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @FilterWithResolver(JarClassPluginResolver.class)
-public class AnnotationFilter implements PluginFilter {
+public class AnnotationFilter extends AbstractPluginFilter<List<Class<?>>> {
 
     private Collection<? extends Class<? extends Annotation>> annotationClasses;
 
+    @SafeVarargs
     public AnnotationFilter(Class<? extends Annotation>... annotationClasses) {
         this(Arrays.asList(annotationClasses));
     }
 
     @Override
-    public void filter(PluginContext context) {
-        Collection<Class<?>> classes = context.get(JarPlugin.CLASSES);
-        List<Class<?>> filteredClasses = classes.stream()
+    public List<Class<?>> doFilter(List<Class<?>> plugins) {
+        return plugins.stream()
                 .filter(this::hasAnnotation)
                 .collect(Collectors.toList());
-        context.set(JarPlugin.CLASSES, filteredClasses);
+    }
+
+    @Override
+    public Object getKey() {
+        return JarPlugin.CLASSES;
     }
 
     private boolean hasAnnotation(Class<?> clazz) {

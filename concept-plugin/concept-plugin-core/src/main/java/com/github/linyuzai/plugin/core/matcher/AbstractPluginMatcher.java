@@ -11,9 +11,11 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
         }
     }
 
-    public abstract boolean ifMatch(PluginContext context);
+    public T getMatchedPlugin(PluginContext context) {
+        return context.get(this);
+    }
 
-    public abstract T getMatchedPlugin(PluginContext context);
+    public abstract boolean ifMatch(PluginContext context);
 
     public abstract void onMatched(T plugin);
 }

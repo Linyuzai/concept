@@ -4,6 +4,10 @@ import com.github.linyuzai.plugin.core.concept.AbstractPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.conflict.PluginConflictStrategy;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
+import com.github.linyuzai.plugin.core.event.PluginAddedEvent;
+import com.github.linyuzai.plugin.core.event.PluginEvent;
+import com.github.linyuzai.plugin.core.event.PluginEventListener;
+import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
@@ -17,28 +21,22 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 
-public class JarPluginConcept extends AbstractPluginConcept {
+public class JarPluginConcept extends AbstractPluginConcept implements PluginEventListener {
 
     private final JarPluginClassLoader jarPluginClassLoader;
 
     public JarPluginConcept(PluginContextFactory pluginContextFactory,
                             PluginConflictStrategy pluginConflictStrategy,
+                            PluginEventPublisher pluginEventPublisher,
                             Collection<PluginFactory> pluginFactories,
                             Collection<PluginResolver> pluginResolvers,
                             Collection<PluginFilter> pluginFilters,
                             Collection<PluginMatcher> pluginMatchers,
                             JarPluginClassLoader jarPluginClassLoader) {
-        super(pluginContextFactory, pluginConflictStrategy, pluginFactories,
-                pluginResolvers, pluginFilters, pluginMatchers);
+        super(pluginContextFactory, pluginConflictStrategy, pluginEventPublisher,
+                pluginFactories, pluginResolvers, pluginFilters, pluginMatchers);
+        pluginEventPublisher.register(this);
         this.jarPluginClassLoader = jarPluginClassLoader;
-    }
-
-    @Override
-    public void onPluginCreated(Plugin plugin) {
-        if (plugin instanceof JarPlugin) {
-            ClassLoader classLoader = ((JarPlugin) plugin).getClassLoader();
-            jarPluginClassLoader.add(plugin.getId(), classLoader);
-        }
     }
 
     public Plugin add(URL url) {
@@ -65,6 +63,17 @@ public class JarPluginConcept extends AbstractPluginConcept {
         return super.load(path);
     }
 
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof PluginAddedEvent) {
+            Plugin plugin = ((PluginEvent) event).getPlugin();
+            if (plugin instanceof JarPlugin) {
+                ClassLoader classLoader = ((JarPlugin) plugin).getClassLoader();
+                jarPluginClassLoader.add(plugin.getId(), classLoader);
+            }
+        }
+    }
+
     public static class Builder extends AbstractBuilder<Builder> {
 
         private JarPluginClassLoader classLoader;
@@ -81,8 +90,6 @@ public class JarPluginConcept extends AbstractPluginConcept {
 
         public JarPluginConcept build() {
 
-            preBuild();
-
             if (classLoader == null) {
                 classLoader = new JarPluginClassLoader(getClass().getClassLoader());
             }
@@ -90,9 +97,12 @@ public class JarPluginConcept extends AbstractPluginConcept {
             addFactory(new JarPathPluginFactory(classLoader));
             addFactory(new JarURLPluginFactory(classLoader));
 
+            preBuild();
+
             return new JarPluginConcept(
                     pluginContextFactory,
                     pluginConflictStrategy,
+                    pluginEventPublisher,
                     pluginFactories,
                     pluginResolvers,
                     pluginFilters,

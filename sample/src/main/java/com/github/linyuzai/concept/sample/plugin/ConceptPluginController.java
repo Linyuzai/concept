@@ -2,21 +2,33 @@ package com.github.linyuzai.concept.sample.plugin;
 
 import com.github.linyuzai.plugin.core.matcher.OnPluginMatched;
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
-import com.github.linyuzai.plugin.jar.matcher.ClassMatcher;
+import com.github.linyuzai.plugin.jar.filter.AnnotationFilter;
+import com.github.linyuzai.plugin.jar.filter.PackageFilter;
+import com.github.linyuzai.plugin.jar.matcher.ClassListMatcher;
+import com.github.linyuzai.plugin.jar.matcher.InstanceMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 @RestController
 @RequestMapping("/concept-plugin")
 public class ConceptPluginController {
 
-    private final JarPluginConcept jarPluginConcept = new JarPluginConcept.Builder()
-            .addMatchers(new ClassMatcher<CustomPlugin>() {
+    private final JarPluginConcept concept = new JarPluginConcept.Builder()
+            .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
+            .addFilter(new AnnotationFilter(Override.class))
+            .addMatcher(new ClassListMatcher<CustomPlugin>() {
                 @Override
-                public void onMatched(Collection<Class<? extends CustomPlugin>> plugins) {
+                public void onMatched(List<Class<? extends CustomPlugin>> plugins) {
+
+                }
+            })
+            .addMatcher(new InstanceMatcher<CustomPlugin>() {
+                @Override
+                public void onMatched(CustomPlugin plugin) {
 
                 }
             })

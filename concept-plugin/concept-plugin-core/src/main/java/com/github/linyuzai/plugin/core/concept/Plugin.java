@@ -5,4 +5,8 @@ public interface Plugin {
     String PREFIX = "CONCEPT_PLUGIN@";
 
     String getId();
+
+    void initialize();
+
+    void destroy();
 }

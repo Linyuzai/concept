@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.jar.matcher;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.matcher.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.core.matcher.GenericTypePluginMatcher;
 import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @DependOnResolvers(JarInstancePluginResolver.class)
-public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
+public abstract class InstanceListMatcher<T> extends GenericTypePluginMatcher<List<? extends T>> {
 
     @Override
     public boolean ifMatch(PluginContext context) {
@@ -23,14 +23,14 @@ public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
         if (matchedInstances.isEmpty()) {
             return false;
         }
-        if (matchedInstances.size() > 1) {
-            throw new PluginException("Multi instance found, try InstanceListMatcher");
-        }
-        context.set(this, matchedInstances.get(0));
+        context.set(this, matchedInstances);
         return true;
     }
 
     public Class<?> getMatchingClass() {
         return null;
     }
+
+    @Override
+    public abstract void onMatched(List<? extends T> plugins);
 }

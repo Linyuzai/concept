@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,7 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
     public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();
         ClassLoader classLoader = plugin.getClassLoader();
-        Collection<String> classNames = context.get(JarPlugin.CLASS_NAMES);
+        List<String> classNames = context.get(JarPlugin.CLASS_NAMES);
         List<Class<?>> classes = classNames.stream()
                 .map(className -> loadClass(classLoader, className))
                 .collect(Collectors.toList());
