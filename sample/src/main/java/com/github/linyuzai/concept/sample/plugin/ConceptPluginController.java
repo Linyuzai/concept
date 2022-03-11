@@ -19,20 +19,8 @@ public class ConceptPluginController {
 
     private final JarPluginConcept concept = new JarPluginConcept.Builder()
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
-            .addFilter(new AnnotationFilter(Override.class))
-            .addMatcher(new ClassListMatcher<CustomPlugin>() {
-                @Override
-                public void onMatched(List<Class<? extends CustomPlugin>> plugins) {
-
-                }
-            })
-            .addMatcher(new InstanceMatcher<CustomPlugin>() {
-                @Override
-                public void onMatched(CustomPlugin plugin) {
-
-                }
-            })
-            .match(this)//自动匹配回调方法参数
+            //.addFilter(new AnnotationFilter())
+            .match(this)//自动匹配回调添加了@OnPluginMatched注解的方法参数
             .autoLoad()//自动监听目录
             .build();
 
@@ -44,6 +32,6 @@ public class ConceptPluginController {
      */
     @OnPluginMatched
     private void onPluginMatched(Collection<? extends CustomPlugin> plugins, Properties properties) {
-
+        //在这里处理匹配到的插件和配置文件
     }
 }

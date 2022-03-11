@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.jar;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.jar.classloader.DynamicParentClassLoader;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -33,16 +33,19 @@ public class JarPlugin implements Plugin {
 
     private final URL url;
 
-    private final ClassLoader classLoader;
+    private final PluginConcept pluginConcept;
+
+    private final JarPluginClassLoader classLoader;
 
     private JarURLConnection connection;
 
     private JarFile file;
 
-    public JarPlugin(URL url, JarPluginClassLoader classLoader) {
+    public JarPlugin(URL url, ClassLoader parent, JarPluginConcept pluginConcept) {
         this.id = url.toString();
         this.url = url;
-        this.classLoader = new DynamicParentClassLoader(url, classLoader);
+        this.pluginConcept = pluginConcept;
+        this.classLoader = new JarPluginClassLoader(url, parent, pluginConcept);
     }
 
     @SneakyThrows

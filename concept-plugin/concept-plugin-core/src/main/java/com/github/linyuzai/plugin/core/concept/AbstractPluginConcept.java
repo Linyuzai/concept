@@ -52,6 +52,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         this.pluginResolvers = pluginResolvers;
         this.pluginFilters = pluginFilters;
         this.pluginMatchers = pluginMatchers;
+
     }
 
     @Override
@@ -81,8 +82,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     public Plugin createPlugin(Object o) {
         for (PluginFactory factory : pluginFactories) {
-            if (factory.support(o)) {
-                return factory.create(o);
+            if (factory.support(o, this)) {
+                return factory.create(o, this);
             }
         }
         return null;
@@ -103,7 +104,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             throw new PluginNotFoundException(id);
         }
 
-        PluginContext context = pluginContextFactory.create(plugin);
+        PluginContext context = pluginContextFactory.create(plugin, this);
         pluginEventPublisher.publish(new PluginContextCreatedEvent(plugin, context));
 
         plugin.initialize();

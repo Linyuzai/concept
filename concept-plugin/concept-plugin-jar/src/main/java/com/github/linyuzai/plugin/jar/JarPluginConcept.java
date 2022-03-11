@@ -20,10 +20,12 @@ import com.github.linyuzai.plugin.jar.matcher.JarDynamicPluginMatcher;
 import java.io.File;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JarPluginConcept extends AbstractPluginConcept implements PluginEventListener {
 
-    private final JarPluginClassLoader jarPluginClassLoader;
+    private final Map<String, JarPluginClassLoader> classLoaders = new ConcurrentHashMap<>();
 
     public JarPluginConcept(PluginContextFactory pluginContextFactory,
                             PluginConflictStrategy pluginConflictStrategy,
@@ -31,12 +33,10 @@ public class JarPluginConcept extends AbstractPluginConcept implements PluginEve
                             Collection<PluginFactory> pluginFactories,
                             Collection<PluginResolver> pluginResolvers,
                             Collection<PluginFilter> pluginFilters,
-                            Collection<PluginMatcher> pluginMatchers,
-                            JarPluginClassLoader jarPluginClassLoader) {
+                            Collection<PluginMatcher> pluginMatchers) {
         super(pluginContextFactory, pluginConflictStrategy, pluginEventPublisher,
                 pluginFactories, pluginResolvers, pluginFilters, pluginMatchers);
         pluginEventPublisher.register(this);
-        this.jarPluginClassLoader = jarPluginClassLoader;
     }
 
     public Plugin add(URL url) {
@@ -63,22 +63,28 @@ public class JarPluginConcept extends AbstractPluginConcept implements PluginEve
         return super.load(path);
     }
 
+
+
+    public Collection<JarPluginClassLoader> getClassLoaders() {
+        return classLoaders.values();
+    }
+
     @Override
     public void onEvent(Object event) {
         if (event instanceof PluginAddedEvent) {
             Plugin plugin = ((PluginEvent) event).getPlugin();
             if (plugin instanceof JarPlugin) {
-                ClassLoader classLoader = ((JarPlugin) plugin).getClassLoader();
-                jarPluginClassLoader.add(plugin.getId(), classLoader);
+                JarPluginClassLoader classLoader = ((JarPlugin) plugin).getClassLoader();
+                classLoaders.put(plugin.getId(), classLoader);
             }
         }
     }
 
     public static class Builder extends AbstractBuilder<Builder> {
 
-        private JarPluginClassLoader classLoader;
+        private ClassLoader classLoader;
 
-        public Builder classLoader(JarPluginClassLoader classLoader) {
+        public Builder classLoader(ClassLoader classLoader) {
             this.classLoader = classLoader;
             return this;
         }
@@ -91,7 +97,7 @@ public class JarPluginConcept extends AbstractPluginConcept implements PluginEve
         public JarPluginConcept build() {
 
             if (classLoader == null) {
-                classLoader = new JarPluginClassLoader(getClass().getClassLoader());
+                classLoader = getClass().getClassLoader();
             }
 
             addFactory(new JarPathPluginFactory(classLoader));
@@ -106,8 +112,7 @@ public class JarPluginConcept extends AbstractPluginConcept implements PluginEve
                     pluginFactories,
                     pluginResolvers,
                     pluginFilters,
-                    pluginMatchers,
-                    classLoader);
+                    pluginMatchers);
         }
     }
 }
