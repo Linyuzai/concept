@@ -8,10 +8,12 @@ import com.github.linyuzai.plugin.jar.resolver.JarClassPluginResolver;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated
 @NoArgsConstructor
 @AllArgsConstructor
 @DependOnResolvers(JarClassPluginResolver.class)
@@ -20,7 +22,7 @@ public abstract class ClassListMatcher<T> extends GenericTypePluginMatcher<List<
     private boolean equals;
 
     @Override
-    public boolean ifMatch(PluginContext context) {
+    public boolean tryMatch(PluginContext context, Type type) {
         Collection<Class<?>> classes = context.get(JarPlugin.CLASSES);
         List<Class<?>> matchedClasses = classes.stream()
                 .filter(this::matchClass)
@@ -32,11 +34,7 @@ public abstract class ClassListMatcher<T> extends GenericTypePluginMatcher<List<
         return true;
     }
 
-    public boolean matchClass(Class<?> clazz) {
-        return matchClass(clazz, equals);
-    }
-
-    public Class<?> getMatchingClass() {
+    public Class<List<Class<? extends T>>> getMatchingClass() {
         return null;
     }
 

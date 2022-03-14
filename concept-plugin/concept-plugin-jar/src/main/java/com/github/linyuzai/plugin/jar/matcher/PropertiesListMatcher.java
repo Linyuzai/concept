@@ -10,11 +10,12 @@ import com.github.linyuzai.plugin.jar.resolver.JarPropertiesPluginResolver;
 import java.util.List;
 import java.util.Properties;
 
+@Deprecated
 @DependOnResolvers(JarPropertiesPluginResolver.class)
 public abstract class PropertiesListMatcher extends AbstractPluginMatcher<List<? extends Properties>> {
 
     @Override
-    public boolean ifMatch(PluginContext context) {
+    public boolean tryMatch(PluginContext context) {
         List<Properties> properties = context.get(JarPlugin.PROPERTIES);
         if (properties.isEmpty()) {
             return false;

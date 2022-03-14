@@ -11,11 +11,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated
 @DependOnResolvers(JarInstancePluginResolver.class)
 public abstract class InstanceListMatcher<T> extends GenericTypePluginMatcher<List<? extends T>> {
 
     @Override
-    public boolean ifMatch(PluginContext context) {
+    public boolean tryMatch(PluginContext context) {
         Collection<?> instances = context.get(JarPlugin.INSTANCES);
         List<?> matchedInstances = instances.stream()
                 .filter(this::matchInstance)
@@ -27,7 +28,7 @@ public abstract class InstanceListMatcher<T> extends GenericTypePluginMatcher<Li
         return true;
     }
 
-    public Class<?> getMatchingClass() {
+    public Class<List<? extends T>> getMatchingClass() {
         return null;
     }
 

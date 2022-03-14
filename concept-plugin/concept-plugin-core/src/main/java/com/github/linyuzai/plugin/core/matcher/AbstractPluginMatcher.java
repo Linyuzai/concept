@@ -6,16 +6,16 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
 
     @Override
     public void match(PluginContext context) {
-        if (ifMatch(context)) {
-            onMatched(getMatchedPlugin(context));
+        if (tryMatch(context)) {
+            onMatched(getMatched(context));
         }
     }
 
-    public T getMatchedPlugin(PluginContext context) {
+    public T getMatched(PluginContext context) {
         return context.get(this);
     }
 
-    public abstract boolean ifMatch(PluginContext context);
+    public abstract boolean tryMatch(PluginContext context);
 
     public abstract void onMatched(T plugin);
 }
