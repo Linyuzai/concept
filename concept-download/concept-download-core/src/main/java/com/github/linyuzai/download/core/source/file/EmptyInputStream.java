@@ -1,6 +1,5 @@
 package com.github.linyuzai.download.core.source.file;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -42,14 +41,6 @@ public class EmptyInputStream extends InputStream {
     public long skip(long n) throws IOException {
         ensureOpen();
         return 0L;
-    }
-
-    @Override
-    public void skipNBytes(long n) throws IOException {
-        ensureOpen();
-        if (n > 0) {
-            throw new EOFException();
-        }
     }
 
     @Override

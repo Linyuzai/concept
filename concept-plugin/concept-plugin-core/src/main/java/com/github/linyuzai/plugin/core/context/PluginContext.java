@@ -1,8 +1,11 @@
 package com.github.linyuzai.plugin.core.context;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 
 public interface PluginContext {
+
+    <C extends PluginConcept> C getPluginConcept();
 
     <P extends Plugin> P getPlugin();
 
@@ -12,5 +15,7 @@ public interface PluginContext {
 
     boolean contains(Object key);
 
-    PluginContext duplicate();
+    void initialize();
+
+    void destroy();
 }

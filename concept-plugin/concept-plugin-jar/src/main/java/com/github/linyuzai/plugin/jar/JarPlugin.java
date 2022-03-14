@@ -25,8 +25,6 @@ public class JarPlugin implements Plugin {
 
     public static final String INSTANCES = JAR_PREFIX + "INSTANCES";
 
-    private final String id;
-
     private final URL url;
 
     private final PluginConcept pluginConcept;
@@ -38,7 +36,6 @@ public class JarPlugin implements Plugin {
     private JarFile file;
 
     public JarPlugin(URL url, ClassLoader parent, JarPluginConcept pluginConcept) {
-        this.id = url.toString();
         this.url = url;
         this.pluginConcept = pluginConcept;
         this.classLoader = new JarPluginClassLoader(url, parent, pluginConcept);
@@ -59,7 +56,5 @@ public class JarPlugin implements Plugin {
             } catch (Throwable ignore) {
             }
         }
-        file = null;
-        connection = null;
     }
 }

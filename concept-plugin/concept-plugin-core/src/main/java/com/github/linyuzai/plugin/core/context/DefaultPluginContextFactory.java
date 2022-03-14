@@ -7,6 +7,6 @@ public class DefaultPluginContextFactory implements PluginContextFactory {
 
     @Override
     public PluginContext create(Plugin plugin, PluginConcept concept) {
-        return null;
+        return new DefaultPluginContext(concept, plugin);
     }
 }

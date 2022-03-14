@@ -1,10 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import com.github.linyuzai.plugin.core.conflict.PluginConflictStrategy;
-import com.github.linyuzai.plugin.core.conflict.PluginConflictedEvent;
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
-import com.github.linyuzai.plugin.core.exception.PluginNotFoundException;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
@@ -16,13 +13,10 @@ import com.github.linyuzai.plugin.core.resolver.PluginResolverChainImpl;
 import lombok.SneakyThrows;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected final PluginContextFactory pluginContextFactory;
-
-    protected final PluginConflictStrategy pluginConflictStrategy;
 
     protected final PluginEventPublisher pluginEventPublisher;
 
@@ -34,19 +28,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected final Collection<PluginMatcher> pluginMatchers;
 
-    protected final Map<String, Plugin> pluginMap = new ConcurrentHashMap<>();
-
-    protected final Map<String, Plugin> loadedPluginMap = new ConcurrentHashMap<>();
-
     protected AbstractPluginConcept(PluginContextFactory pluginContextFactory,
-                                    PluginConflictStrategy pluginConflictStrategy,
                                     PluginEventPublisher pluginEventPublisher,
                                     Collection<PluginFactory> pluginFactories,
                                     Collection<PluginResolver> pluginResolvers,
                                     Collection<PluginFilter> pluginFilters,
                                     Collection<PluginMatcher> pluginMatchers) {
         this.pluginContextFactory = pluginContextFactory;
-        this.pluginConflictStrategy = pluginConflictStrategy;
         this.pluginEventPublisher = pluginEventPublisher;
         this.pluginFactories = pluginFactories;
         this.pluginResolvers = pluginResolvers;
@@ -56,27 +44,24 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public synchronized Plugin add(Object o) {
+    public Plugin load(Object o) {
         Plugin plugin = createPlugin(o);
         if (plugin == null) {
             throw new PluginException("Plugin can not created");
         }
-        pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
+        PluginContext context = pluginContextFactory.create(plugin, this);
 
-        String id = plugin.getId();
-        Plugin exist = find(id);
-        if (exist == null) {
-            pluginMap.put(id, plugin);
-        } else {
-            Plugin finalPlugin = pluginConflictStrategy.getPlugin(exist, plugin);
-            if (finalPlugin == null) {
-                throw new PluginException("Plugin is null on conflict");
-            }
-            pluginEventPublisher.publish(new PluginConflictedEvent(exist, plugin, finalPlugin));
-            pluginMap.put(id, finalPlugin);
+        plugin.initialize();
+        context.initialize();
+
+        new PluginResolverChainImpl(pluginResolvers, pluginFilters).next(context);
+        for (PluginMatcher matcher : pluginMatchers) {
+            matcher.match(context);
         }
 
-        pluginEventPublisher.publish(new PluginAddedEvent(plugin));
+        context.destroy();
+        plugin.destroy();
+
         return plugin;
     }
 
@@ -89,80 +74,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         return null;
     }
 
-    @Override
-    public Plugin load(Object o) {
-        return load(add(o).getId());
-    }
-
-    @Override
-    public Plugin load(String id) {
-        if (isLoaded(id)) {
-            return loadedPluginMap.get(id);
-        }
-        Plugin plugin = find(id);
-        if (plugin == null) {
-            throw new PluginNotFoundException(id);
-        }
-
-        PluginContext context = pluginContextFactory.create(plugin, this);
-        pluginEventPublisher.publish(new PluginContextCreatedEvent(plugin, context));
-
-        plugin.initialize();
-        pluginEventPublisher.publish(new PluginInitializedEvent(plugin));
-
-        new PluginResolverChainImpl(pluginResolvers, pluginFilters).next(context);
-        for (PluginMatcher matcher : pluginMatchers) {
-            matcher.match(context);
-        }
-
-        loadedPluginMap.put(id, plugin);
-        pluginEventPublisher.publish(new PluginLoadedEvent(plugin));
-
-        return plugin;
-    }
-
-    @Override
-    public Plugin unload(String id) {
-        Plugin plugin = loadedPluginMap.remove(id);
-        if (plugin != null) {
-            plugin.destroy();
-            pluginEventPublisher.publish(new PluginDestroyedEvent(plugin));
-            pluginEventPublisher.publish(new PluginUnloadedEvent(plugin));
-        }
-        return plugin;
-    }
-
-    @Override
-    public Plugin remove(String id) {
-        unload(id);
-        Plugin plugin = pluginMap.remove(id);
-        if (plugin != null) {
-            pluginEventPublisher.publish(new PluginRemovedEvent(plugin));
-        }
-        return plugin;
-    }
-
-    @Override
-    public Plugin find(String id) {
-        return pluginMap.get(id);
-    }
-
-    @Override
-    public boolean isExisted(String id) {
-        return pluginMap.containsKey(id);
-    }
-
-    @Override
-    public boolean isLoaded(String id) {
-        return loadedPluginMap.containsKey(id);
-    }
-
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<T extends AbstractBuilder<T>> {
 
         protected PluginContextFactory pluginContextFactory;
-
-        protected PluginConflictStrategy pluginConflictStrategy;
 
         protected PluginEventPublisher pluginEventPublisher;
 
@@ -179,23 +94,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         public T contextFactory(PluginContextFactory contextFactory) {
             this.pluginContextFactory = contextFactory;
             return (T) this;
-        }
-
-        public T conflictStrategy(PluginConflictStrategy conflictStrategy) {
-            this.pluginConflictStrategy = conflictStrategy;
-            return (T) this;
-        }
-
-        public T conflictUseCover() {
-            return conflictStrategy(new PluginConflictStrategy.Cover());
-        }
-
-        public T conflictUseKeep() {
-            return conflictStrategy(new PluginConflictStrategy.Keep());
-        }
-
-        public T conflictUseError() {
-            return conflictStrategy(new PluginConflictStrategy.Error());
         }
 
         public T eventPublisher(PluginEventPublisher eventPublisher) {
@@ -268,17 +166,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (T) this;
         }
 
-        public T autoLoad() {
-            return (T) this;
-        }
-
         protected void preBuild() {
             if (pluginContextFactory == null) {
                 pluginContextFactory = new DefaultPluginContextFactory();
-            }
-
-            if (pluginConflictStrategy == null) {
-                pluginConflictStrategy = new PluginConflictStrategy.Cover();
             }
 
             if (pluginEventPublisher == null) {

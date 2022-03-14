@@ -1,16 +1,17 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.exception.PluginException;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
+@Getter
 public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private final PluginConcept pluginConcept;
@@ -19,14 +20,39 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private final PluginPath[] paths;
 
-    private final Map<String, Plugin> pluginMap = new ConcurrentHashMap<>();
+    private final Consumer<Throwable> errorConsumer;
+
+    private final boolean loadOnStart;
+
+    private final Set<String> notifyCreate = new HashSet<>();
+
+    private final Set<String> notifyModify = new HashSet<>();
+
+    private final Set<String> notifyDelete = new HashSet<>();
+
+    private final Set<String> files = new HashSet<>();
 
     private boolean running = false;
 
-    public WatchServicePluginAutoLoader(PluginConcept pluginConcept, ExecutorService executor, PluginPath... paths) {
-        this.pluginConcept = pluginConcept;
+    private WatchServicePluginAutoLoader(PluginConcept concept, ExecutorService executor,
+                                         Consumer<Throwable> consumer, boolean loadOnStart,
+                                         PluginPath... paths) {
+        this.pluginConcept = concept;
         this.executor = executor;
         this.paths = paths;
+        this.errorConsumer = consumer;
+        this.loadOnStart = loadOnStart;
+        for (PluginPath path : this.paths) {
+            if (path.isNotifyCreate()) {
+                notifyCreate.add(path.getPath());
+            }
+            if (path.isNotifyModify()) {
+                notifyModify.add(path.getPath());
+            }
+            if (path.isNotifyDelete()) {
+                notifyDelete.add(path.getPath());
+            }
+        }
     }
 
     public synchronized void start() {
@@ -34,17 +60,18 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             return;
         }
         running = true;
-        for (PluginPath path : paths) {
-            String[] list = new File(path.getPath()).list();
-            if (list == null) {
-                continue;
+        if (loadOnStart) {
+            for (PluginPath path : paths) {
+                String[] list = new File(path.getPath()).list();
+                if (list == null) {
+                    continue;
+                }
+                if (path.getFilter() == null) {
+                    Arrays.stream(list).forEach(pluginConcept::load);
+                } else {
+                    Arrays.stream(list).filter(path.getFilter()).forEach(pluginConcept::load);
+                }
             }
-            if (path.getFilter() == null) {
-                Arrays.stream(list).forEach(pluginConcept::load);
-            } else {
-                Arrays.stream(list).filter(path.getFilter()).forEach(pluginConcept::load);
-            }
-
         }
         if (executor == null) {
             new Thread(this::listen).start();
@@ -76,38 +103,108 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                             continue;
                         }
                         if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                            final Path p = ((WatchEvent<Path>) watchEvent).context();
-                            File file = p.toFile();
-                            load(file);
+                            onFileCreated((WatchEvent<Path>) watchEvent);
                         }
                         if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                            final Path p = ((WatchEvent<Path>) watchEvent).context();
-                            File file = p.toFile();
-                            unload(file);
-                            load(file);
+                            onFileModified((WatchEvent<Path>) watchEvent);
                         }
                         if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                            final Path p = ((WatchEvent<Path>) watchEvent).context();
-                            File file = p.toFile();
-                            unload(file);
+                            onFileDeleted((WatchEvent<Path>) watchEvent);
                         }
                     }
                     key.reset();
-                } catch (Throwable ignore) {
-
+                } catch (Throwable e) {
+                    onError(e);
                 }
             }
         }
     }
 
-    private void load(File file) {
-        pluginMap.put(file.getAbsolutePath(), pluginConcept.load(file));
+    public void onFileCreated(WatchEvent<Path> watchEvent) {
+        final Path path = watchEvent.context();
+        File file = path.toFile();
+        if (notifyCreate.contains(file.getAbsolutePath())) {
+            load(file);
+        }
     }
 
-    private void unload(File file) {
-        Plugin plugin = pluginMap.remove(file.getAbsolutePath());
-        if (plugin != null) {
-            pluginConcept.remove(plugin.getId());
+    public void onFileModified(WatchEvent<Path> watchEvent) {
+        final Path path = watchEvent.context();
+        File file = path.toFile();
+        if (notifyModify.contains(file.getAbsolutePath())) {
+            unload(file);
+            load(file);
+        }
+    }
+
+    public void onFileDeleted(WatchEvent<Path> watchEvent) {
+        final Path path = watchEvent.context();
+        File file = path.toFile();
+        if (notifyDelete.contains(file.getAbsolutePath())) {
+            unload(file);
+        }
+    }
+
+    public void load(File file) {
+        pluginConcept.load(file);
+        files.add(file.getAbsolutePath());
+    }
+
+    public void unload(File file) {
+        files.remove(file.getAbsolutePath());
+    }
+
+    public void onError(Throwable e) {
+        if (errorConsumer != null) {
+            errorConsumer.accept(e);
+        }
+    }
+
+    public static class Builder {
+
+        private PluginConcept concept;
+
+        private ExecutorService executor;
+
+        private PluginPath[] paths;
+
+        private Consumer<Throwable> consumer;
+
+        private boolean loadOnStart = true;
+
+        public Builder pluginConcept(PluginConcept concept) {
+            this.concept = concept;
+            return this;
+        }
+
+        public Builder executorService(ExecutorService executor) {
+            this.executor = executor;
+            return this;
+        }
+
+        public Builder paths(PluginPath... paths) {
+            this.paths = paths;
+            return this;
+        }
+
+        public Builder errorConsumer(Consumer<Throwable> consumer) {
+            this.consumer = consumer;
+            return this;
+        }
+
+        public Builder loadOnStart(boolean loadOnStart) {
+            this.loadOnStart = loadOnStart;
+            return this;
+        }
+
+        public WatchServicePluginAutoLoader build() {
+            if (concept == null) {
+                throw new PluginException("PluginConcept is null");
+            }
+            if (paths == null || paths.length == 0) {
+                throw new PluginException("No path watched");
+            }
+            return new WatchServicePluginAutoLoader(concept, executor, consumer, loadOnStart, paths);
         }
     }
 }

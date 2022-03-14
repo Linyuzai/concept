@@ -8,7 +8,7 @@ public interface Plugin {
 
     String PROPERTIES = PREFIX + "PROPERTIES";
 
-    String getId();
+    PluginConcept getPluginConcept();
 
     void initialize();
 

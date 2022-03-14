@@ -1,19 +1,27 @@
 package com.github.linyuzai.concept.sample.plugin;
 
+import com.github.linyuzai.plugin.core.autoload.PluginPath;
+import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.matcher.OnPluginMatched;
+import com.github.linyuzai.plugin.jar.matcher.PropertiesMatcher;
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.matcher.*;
 import com.github.linyuzai.plugin.core.matcher.PluginMatch;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executors;
 
+@Slf4j
 @RestController
 @RequestMapping("/concept-plugin")
 public class ConceptPluginController {
@@ -28,8 +36,24 @@ public class ConceptPluginController {
                 }
             })
             .match(this)//自动匹配回调添加了@OnPluginMatched注解的方法参数
-            .autoLoad()//自动监听目录
             .build();
+
+    private final WatchServicePluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
+            .pluginConcept(concept)
+            .paths(new PluginPath.Builder().path("").build())
+            .executorService(Executors.newSingleThreadExecutor())
+            .errorConsumer(e -> log.error("Plugin auto load error", e))
+            .build();
+
+    @PostConstruct
+    private void start() {
+        loader.start();
+    }
+
+    @PreDestroy
+    private void stop() {
+        loader.stop();
+    }
 
     /**
      * 插件匹配回调
