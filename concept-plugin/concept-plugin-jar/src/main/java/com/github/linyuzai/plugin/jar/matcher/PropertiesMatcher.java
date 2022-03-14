@@ -29,9 +29,4 @@ public abstract class PropertiesMatcher<T> extends GenericTypePluginMatcher<T> {
         }
         return false;
     }
-
-    @Override
-    public Class<T> getMatchingClass() {
-        return null;
-    }
 }

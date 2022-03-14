@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarClassPluginResolver;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,10 +29,5 @@ public abstract class ClassMatcher<T> extends GenericTypePluginMatcher<Class<? e
         }
         context.set(this, matchedClasses.get(0));
         return true;
-    }
-
-    @Override
-    public Class<Class<? extends T>> getMatchingClass() {
-        return null;
     }
 }
