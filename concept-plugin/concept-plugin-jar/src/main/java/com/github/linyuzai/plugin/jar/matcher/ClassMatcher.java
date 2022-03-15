@@ -20,64 +20,82 @@ public abstract class ClassMatcher<T> extends GenericTypePluginMatcher<T> {
     @SneakyThrows
     @Override
     public boolean tryMatch(PluginContext context, Type type) {
-        Map<String, Class<?>> classes = context.get(JarPlugin.CLASSES);
-        if (type instanceof Class) {
-            Class<?> clazz = (Class<?>) type;
-            if (Collection.class.isAssignableFrom(clazz)) {
-                Collection<Class<?>> collection = newCollection(clazz);
-                collection.addAll(classes.values());
-                context.set(this, collection);
-                return true;
-            } else if (Map.class.isAssignableFrom(clazz)) {
-                Map<String, Class<?>> map = newMap(clazz);
-                map.putAll(classes);
-                context.set(this, map);
-                return true;
-            } else {
-                return filterOneClass(context, classes, clazz);
-            }
-        } else if (type instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) type).getRawType();
-            Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
-            if (rawType instanceof Class) {
-                Class<?> rawClass = (Class<?>) rawType;
-                if (Class.class.isAssignableFrom(rawClass)) {
-                    Type actualTypeArgument = actualTypeArguments[0];
-                    if (actualTypeArgument instanceof Class) {
-                        return filterOneClass(context, classes, (Class<?>) actualTypeArgument);
-                    } else if (actualTypeArgument instanceof WildcardType){
-                        WildcardType wildcardType = (WildcardType) actualTypeArgument;
-                        Type[] upperBounds = wildcardType.getUpperBounds();
-                        if (upperBounds.length > 0) {
-                            Type upperBound = upperBounds[0];
-                            if (upperBound instanceof Class) {
-                                return filterOneClass(context,classes, (Class<?>) upperBound);
-                            }
-                        }
-                        //TODO ? super xxx 好像没有必要
+        Metadata metadata = getMetadata(type);
+        if (metadata == null) {
+            return false;
+        }
+        Type target = metadata.getTarget();
+        if (target instanceof Class) {
+            Class<?> clazz = (Class<?>) target;
+            return setContextValue(context, metadata, clazz);
+        } else if (target instanceof ParameterizedType) {
+            return handleParameterizedType(context, metadata, (ParameterizedType) target);
+        } else if (target instanceof WildcardType) {
+            Type[] upperBounds = ((WildcardType) target).getUpperBounds();
+            if (upperBounds.length > 0) {
+                Type upperBound = upperBounds[0];
+                if (upperBound instanceof Class) {
+                    if (Class.class.isAssignableFrom((Class<?>) upperBound)) {
+                        return setContextValue(context, metadata, Object.class);
                     }
-                } else if (Collection.class.isAssignableFrom(rawClass)) {
-
-                } else if (Map.class.isAssignableFrom(rawClass)) {
-
+                } else if (upperBound instanceof ParameterizedType) {
+                    return handleParameterizedType(context, metadata, (ParameterizedType) upperBound);
                 }
             }
         }
         return false;
     }
 
-    public boolean filterOneClass(PluginContext context, Map<String, Class<?>> classes, Class<?> clazz) {
-        List<Class<?>> list = classes.values()
-                .stream()
-                .filter(clazz::isAssignableFrom)
-                .collect(Collectors.toList());
-        if (list.isEmpty()) {
+    public boolean handleParameterizedType(PluginContext context, Metadata metadata, ParameterizedType type) {
+        Type rawType = type.getRawType();
+        if (rawType instanceof Class) {
+            if (Class.class.isAssignableFrom((Class<?>) rawType)) {
+                Type[] arguments = type.getActualTypeArguments();
+                Class<?> toClass = toClass(arguments[0]);
+                if (toClass != null) {
+                    return setContextValue(context, metadata, toClass);
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean setContextValue(PluginContext context, Metadata metadata, Class<?> target) {
+        Map<String, Class<?>> classes = context.get(JarPlugin.CLASSES);
+        Map<String, Class<?>> map = filterByClass(classes, target);
+        if (map.isEmpty()) {
             return false;
         }
-        if (list.size() > 1) {
-            throw new PluginException("More than one class found: " + list);
+        if (metadata.isMap()) {
+            metadata.getMap().putAll(map);
+            context.set(this, metadata.getMap());
+            return true;
+        } else if (metadata.isList()) {
+            metadata.getList().addAll(map.values());
+            context.set(this, metadata.getList());
+            return true;
+        } else if (metadata.isSet()) {
+            metadata.getSet().addAll(map.values());
+            context.set(this, metadata.getSet());
+            return true;
+        } else if (metadata.isCollection()) {
+            metadata.getCollection().addAll(map.values());
+            context.set(this, metadata.getCollection());
+            return true;
+        } else {
+            List<Class<?>> list = new ArrayList<>(map.values());
+            if (list.size() > 1) {
+                throw new PluginException("More than one class found: " + list);
+            }
+            context.set(this, list.get(0));
+            return true;
         }
-        context.set(this, list.get(0));
-        return true;
+    }
+
+    public Map<String, Class<?>> filterByClass(Map<String, Class<?>> classes, Class<?> target) {
+        return classes.entrySet()
+                .stream()
+                .filter(it -> target.isAssignableFrom(it.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

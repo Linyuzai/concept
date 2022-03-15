@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +24,8 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     private final Consumer<Throwable> errorConsumer;
 
     private final boolean loadOnStart;
+
+    private WatchService watchService;
 
     private final Set<String> notifyCreate = new HashSet<>();
 
@@ -55,6 +58,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    @Override
     public synchronized void start() {
         if (running) {
             return;
@@ -84,14 +88,22 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    @Override
     public synchronized void stop() {
         running = false;
+        if (watchService != null) {
+            try {
+                watchService.close();
+            } catch (IOException ignore) {
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
     public void listen() {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+            this.watchService = watchService;
             for (PluginPath pluginPath : paths) {
                 final Path path = Paths.get(pluginPath.getPath());
                 path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,

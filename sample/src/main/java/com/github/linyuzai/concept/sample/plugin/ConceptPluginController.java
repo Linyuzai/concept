@@ -1,10 +1,10 @@
 package com.github.linyuzai.concept.sample.plugin;
 
+import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginPath;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.matcher.OnPluginMatched;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
-import com.github.linyuzai.plugin.jar.matcher.PropertiesMatcher;
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.matcher.*;
@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 @Slf4j
@@ -32,16 +29,16 @@ public class ConceptPluginController {
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
             .addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter())
-            .addMatcher(new ClassMatcher<Class<? extends CustomPlugin>>() {
+            .addMatcher(new ClassMatcher<LinkedHashSet<? extends Class<? extends CustomPlugin>>>() {
                 @Override
-                public void onMatched(Class<? extends CustomPlugin> plugin) {
+                public void onMatched(LinkedHashSet<? extends Class<? extends CustomPlugin>> plugin) {
                     System.out.println(plugin);
                 }
             })
             //.match(this)//自动匹配回调添加了@OnPluginMatched注解的方法参数
             .build();
 
-    private final WatchServicePluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
+    private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
             .pluginConcept(concept)
             .paths(new PluginPath.Builder().path("/Users/tanghanzheng/concept/plugin/").build())
             .executorService(Executors.newSingleThreadExecutor())
