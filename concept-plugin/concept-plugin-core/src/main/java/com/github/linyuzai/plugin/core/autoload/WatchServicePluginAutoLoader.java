@@ -62,14 +62,18 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         running = true;
         if (loadOnStart) {
             for (PluginPath path : paths) {
-                String[] list = new File(path.getPath()).list();
+                File[] list = new File(path.getPath()).listFiles();
                 if (list == null) {
                     continue;
                 }
                 if (path.getFilter() == null) {
-                    Arrays.stream(list).forEach(pluginConcept::load);
+                    Arrays.stream(list)
+                            .map(File::getAbsolutePath)
+                            .forEach(pluginConcept::load);
                 } else {
-                    Arrays.stream(list).filter(path.getFilter()).forEach(pluginConcept::load);
+                    Arrays.stream(list)
+                            .map(File::getAbsolutePath)
+                            .filter(path.getFilter()).forEach(pluginConcept::load);
                 }
             }
         }

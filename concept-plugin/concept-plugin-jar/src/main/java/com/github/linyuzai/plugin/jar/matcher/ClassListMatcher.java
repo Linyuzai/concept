@@ -25,7 +25,7 @@ public abstract class ClassListMatcher<T> extends GenericTypePluginMatcher<List<
     public boolean tryMatch(PluginContext context, Type type) {
         Collection<Class<?>> classes = context.get(JarPlugin.CLASSES);
         List<Class<?>> matchedClasses = classes.stream()
-                .filter(this::matchClass)
+                .filter(((Class<?>) type)::isAssignableFrom)
                 .collect(Collectors.toList());
         if (matchedClasses.isEmpty()) {
             return false;

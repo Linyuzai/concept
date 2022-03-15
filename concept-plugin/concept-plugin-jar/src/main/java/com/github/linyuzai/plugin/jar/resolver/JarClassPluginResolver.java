@@ -7,6 +7,8 @@ import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @DependOnResolvers(JarClassNamePluginResolver.class)
@@ -16,10 +18,10 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
     public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();
         ClassLoader classLoader = plugin.getClassLoader();
-        List<String> classNames = context.get(JarPlugin.CLASS_NAMES);
-        List<Class<?>> classes = classNames.stream()
-                .map(className -> loadClass(classLoader, className))
-                .collect(Collectors.toList());
+        Map<String, String> classNames = context.get(JarPlugin.CLASS_NAMES);
+        Map<String, Class<?>> classes = classNames.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, it ->
+                        loadClass(classLoader, it.getValue())));
         context.set(JarPlugin.CLASSES, classes);
     }
 
@@ -30,6 +32,6 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.FILE_NAMES);
+        return context.contains(JarPlugin.CLASS_NAMES);
     }
 }

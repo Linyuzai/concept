@@ -14,19 +14,16 @@ public class JarDynamicPluginMatcher extends DynamicPluginMatcher {
         matchers.add(new PluginContextMatcher<PluginContext>() {
             @Override
             public void onMatched(PluginContext plugin) {
-
             }
         });
         matchers.add(new PluginObjectMatcher<Plugin>() {
             @Override
             public void onMatched(Plugin plugin) {
-
             }
         });
         matchers.add(new ClassMatcher<Object>() {
             @Override
-            public void onMatched(Class<?> plugin) {
-
+            public void onMatched(Object plugin) {
             }
         });
         matchers.add(new InstanceMatcher<Object>() {

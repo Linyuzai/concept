@@ -17,7 +17,6 @@ public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @Override
     public boolean tryMatch(PluginContext context, Type type) {
-
         Collection<?> instances = context.get(JarPlugin.INSTANCES);
         List<?> matchedInstances = instances.stream()
                 .filter(((Class<?>) type)::isInstance)

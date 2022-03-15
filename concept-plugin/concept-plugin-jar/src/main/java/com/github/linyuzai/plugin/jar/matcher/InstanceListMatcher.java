@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarInstancePluginResolver;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +17,10 @@ import java.util.stream.Collectors;
 public abstract class InstanceListMatcher<T> extends GenericTypePluginMatcher<List<? extends T>> {
 
     @Override
-    public boolean tryMatch(PluginContext context) {
+    public boolean tryMatch(PluginContext context, Type type) {
         Collection<?> instances = context.get(JarPlugin.INSTANCES);
         List<?> matchedInstances = instances.stream()
-                .filter(this::matchInstance)
+                .filter(((Class<?>) type)::isInstance)
                 .collect(Collectors.toList());
         if (matchedInstances.isEmpty()) {
             return false;

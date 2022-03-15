@@ -7,7 +7,6 @@ import com.github.linyuzai.plugin.jar.resolver.JarClassPluginResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -16,19 +15,18 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @FilterWithResolver(JarClassPluginResolver.class)
-public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
+public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
-    private Collection<Class<? extends Annotation>> annotationClasses;
+    private Collection<Class<?>> classes;
 
-    @SafeVarargs
-    public AnnotationFilter(Class<? extends Annotation>... annotationClasses) {
-        this(Arrays.asList(annotationClasses));
+    public ClassFilter(Class<?>... classes) {
+        this(Arrays.asList(classes));
     }
 
     @Override
     public Map<String, Class<?>> doFilter(Map<String, Class<?>> plugins) {
         return plugins.entrySet().stream()
-                .filter(it -> filterWithNegation(hasAnnotation(it.getValue())))
+                .filter(it -> filterWithNegation(filterClass(it.getValue())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -37,9 +35,9 @@ public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>
         return JarPlugin.CLASSES;
     }
 
-    private boolean hasAnnotation(Class<?> clazz) {
-        for (Class<? extends Annotation> annotationClass : annotationClasses) {
-            if (clazz.isAnnotationPresent(annotationClass)) {
+    private boolean filterClass(Class<?> c) {
+        for (Class<?> clazz : classes) {
+            if (clazz.isAssignableFrom(c)) {
                 return true;
             }
         }
