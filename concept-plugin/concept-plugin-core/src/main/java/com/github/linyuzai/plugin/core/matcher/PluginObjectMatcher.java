@@ -3,12 +3,13 @@ package com.github.linyuzai.plugin.core.matcher;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 public abstract class PluginObjectMatcher<T extends Plugin> extends GenericTypePluginMatcher<T> {
 
     @Override
-    public boolean tryMatch(PluginContext context, Type type) {
+    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
         return type instanceof Class && ((Class<?>) type).isInstance(context.getPlugin());
     }
 

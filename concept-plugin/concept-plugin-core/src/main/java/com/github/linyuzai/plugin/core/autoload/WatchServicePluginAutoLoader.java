@@ -97,6 +97,9 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             } catch (IOException ignore) {
             }
         }
+        if (executor != null && !executor.isShutdown()) {
+            executor.shutdown();
+        }
     }
 
     @SuppressWarnings("unchecked")

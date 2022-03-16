@@ -4,7 +4,9 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,7 +15,7 @@ import java.util.Map;
 
 public abstract class DynamicPluginMatcher extends AbstractPluginMatcher<Map<Method, Object[]>> {
 
-    protected final Map<Method, Map<Integer, Type>> map = new LinkedHashMap<>();
+    protected final Map<Method, Map<Integer, Parameter>> map = new LinkedHashMap<>();
 
     protected final Object target;
 
@@ -29,10 +31,10 @@ public abstract class DynamicPluginMatcher extends AbstractPluginMatcher<Map<Met
                     if (!method.isAccessible()) {
                         method.setAccessible(true);
                     }
-                    Type[] types = method.getGenericParameterTypes();
-                    for (int i = 0; i < types.length; i++) {
+                    Parameter[] parameters = method.getParameters();
+                    for (int i = 0; i < parameters.length; i++) {
                         map.computeIfAbsent(method, m -> new LinkedHashMap<>())
-                                .put(i, types[i]);
+                                .put(i, parameters[i]);
                     }
                 }
             }
@@ -43,14 +45,16 @@ public abstract class DynamicPluginMatcher extends AbstractPluginMatcher<Map<Met
     @Override
     public boolean tryMatch(PluginContext context) {
         Map<Method, Object[]> valuesMap = new LinkedHashMap<>();
-        for (Map.Entry<Method, Map<Integer, Type>> entry : map.entrySet()) {
-            Map<Integer, Type> typeMap = entry.getValue();
-            Object[] values = new Object[typeMap.size()];
+        for (Map.Entry<Method, Map<Integer, Parameter>> entry : map.entrySet()) {
+            Map<Integer, Parameter> parameterMap = entry.getValue();
+            Object[] values = new Object[parameterMap.size()];
             boolean matched = false;
-            for (Map.Entry<Integer, Type> typeEntry : typeMap.entrySet()) {
-                Type type = typeEntry.getValue();
+            for (Map.Entry<Integer, Parameter> typeEntry : parameterMap.entrySet()) {
+                Parameter parameter = typeEntry.getValue();
+                Type type = parameter.getParameterizedType();
+                Annotation[] annotations = parameter.getAnnotations();
                 for (GenericTypePluginMatcher<?> matcher : matchers) {
-                    if (matcher.tryMatch(context, type)) {
+                    if (matcher.tryMatch(context, type, annotations)) {
                         Object o = matcher.getMatched(context);
                         values[typeEntry.getKey()] = o;
                         matched = true;

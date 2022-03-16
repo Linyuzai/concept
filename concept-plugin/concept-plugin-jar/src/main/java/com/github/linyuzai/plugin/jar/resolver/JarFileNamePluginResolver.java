@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.jar.resolver;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolver.AbstractPluginResolver;
+import com.github.linyuzai.plugin.core.resolver.FileNamePluginResolver;
 import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 @DependOnResolvers(JarEntryPluginResolver.class)
-public class JarFileNamePluginResolver extends AbstractPluginResolver {
+public class JarFileNamePluginResolver extends AbstractPluginResolver implements FileNamePluginResolver {
 
     @Override
     public void resolve(PluginContext context) {

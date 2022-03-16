@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarInstancePluginResolver;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @Override
-    public boolean tryMatch(PluginContext context, Type type) {
+    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
         Metadata metadata = getMetadata(type);
         if (metadata == null) {
             return false;

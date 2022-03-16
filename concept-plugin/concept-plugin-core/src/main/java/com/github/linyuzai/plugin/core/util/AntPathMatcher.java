@@ -7,6 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 直接复制的 Spring 中的 AntPathMatcher
+ */
 public class AntPathMatcher {
 
     public static final String DEFAULT_PATH_SEPARATOR = "/";

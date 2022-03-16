@@ -7,12 +7,15 @@ import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
-import com.github.linyuzai.plugin.core.resolver.PluginResolver;
+import com.github.linyuzai.plugin.core.resolver.*;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
 import com.github.linyuzai.plugin.jar.matcher.JarDynamicPluginMatcher;
+import com.github.linyuzai.plugin.jar.resolver.JarBytesPluginResolver;
+import com.github.linyuzai.plugin.jar.resolver.JarFileNamePluginResolver;
+import com.github.linyuzai.plugin.jar.resolver.JarPropertiesPluginResolver;
 
 import java.util.*;
 
@@ -48,6 +51,12 @@ public class JarPluginConcept extends AbstractPluginConcept {
     public static class Builder extends AbstractBuilder<Builder> {
 
         private ClassLoader classLoader;
+
+        public Builder() {
+            mappingResolver(BytesPluginResolver.class, JarBytesPluginResolver.class);
+            mappingResolver(FileNamePluginResolver.class, JarFileNamePluginResolver.class);
+            mappingResolver(PropertiesPluginResolver.class, JarPropertiesPluginResolver.class);
+        }
 
         public Builder classLoader(ClassLoader classLoader) {
             this.classLoader = classLoader;

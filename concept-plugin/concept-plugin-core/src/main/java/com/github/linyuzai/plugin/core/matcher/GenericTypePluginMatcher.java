@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Data;
 import lombok.SneakyThrows;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,10 +19,10 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
 
     @Override
     public boolean tryMatch(PluginContext context) {
-        return tryMatch(context, matchingType);
+        return tryMatch(context, matchingType, new Annotation[0]);
     }
 
-    public abstract boolean tryMatch(PluginContext context, Type type);
+    public abstract boolean tryMatch(PluginContext context, Type type, Annotation[] annotations);
 
     public Type getMatchingType() {
         Type type = getClass().getGenericSuperclass();

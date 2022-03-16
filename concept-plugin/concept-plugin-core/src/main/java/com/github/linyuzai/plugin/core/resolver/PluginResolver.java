@@ -5,7 +5,7 @@ import com.github.linyuzai.plugin.core.resolver.dependence.PluginResolverDepende
 
 public interface PluginResolver extends PluginResolverDependency {
 
-    boolean support(PluginContext context);
-
     void resolve(PluginContext context);
+
+    boolean support(PluginContext context);
 }

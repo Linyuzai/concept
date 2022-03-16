@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarClassPluginResolver;
 import lombok.SneakyThrows;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -18,7 +19,7 @@ public abstract class ClassMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @SneakyThrows
     @Override
-    public boolean tryMatch(PluginContext context, Type type) {
+    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
         Metadata metadata = getMetadata(type);
         if (metadata == null) {
             return false;

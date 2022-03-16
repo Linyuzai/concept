@@ -8,12 +8,16 @@ import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
+import com.github.linyuzai.plugin.core.resolver.FileNamePluginResolver;
 import com.github.linyuzai.plugin.core.resolver.PluginResolver;
 import com.github.linyuzai.plugin.core.resolver.PluginResolverChainImpl;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.util.*;
 
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected final PluginContextFactory pluginContextFactory;
@@ -27,21 +31,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected final Collection<PluginFilter> pluginFilters;
 
     protected final Collection<PluginMatcher> pluginMatchers;
-
-    protected AbstractPluginConcept(PluginContextFactory pluginContextFactory,
-                                    PluginEventPublisher pluginEventPublisher,
-                                    Collection<PluginFactory> pluginFactories,
-                                    Collection<PluginResolver> pluginResolvers,
-                                    Collection<PluginFilter> pluginFilters,
-                                    Collection<PluginMatcher> pluginMatchers) {
-        this.pluginContextFactory = pluginContextFactory;
-        this.pluginEventPublisher = pluginEventPublisher;
-        this.pluginFactories = pluginFactories;
-        this.pluginResolvers = pluginResolvers;
-        this.pluginFilters = pluginFilters;
-        this.pluginMatchers = pluginMatchers;
-
-    }
 
     @Override
     public Plugin load(Object o) {
@@ -90,6 +79,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected final Collection<PluginFilter> pluginFilters = new ArrayList<>();
 
         protected final Collection<PluginMatcher> pluginMatchers = new ArrayList<>();
+
+        protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
+                resolverDefaultImpl = new HashMap<>();
 
         public T contextFactory(PluginContextFactory contextFactory) {
             this.pluginContextFactory = contextFactory;
@@ -166,6 +158,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (T) this;
         }
 
+        public T mappingResolver(Class<? extends PluginResolver> resolverClass,
+                                 Class<? extends PluginResolver> resolverImplClass) {
+            resolverDefaultImpl.put(resolverClass, resolverImplClass);
+            return (T) this;
+        }
+
         protected void preBuild() {
             if (pluginContextFactory == null) {
                 pluginContextFactory = new DefaultPluginContextFactory();
@@ -192,7 +190,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                     if (containsResolver(dependency)) {
                         continue;
                     }
-                    PluginResolver resolver = dependency.newInstance();
+                    Class<? extends PluginResolver> implOrDefault =
+                            resolverDefaultImpl.getOrDefault(dependency, dependency);
+                    PluginResolver resolver = implOrDefault.newInstance();
                     addResolversWithDependencies(Collections.singletonList(resolver));
                 }
             }
@@ -217,7 +217,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             List<PluginResolver> unfoundedPluginResolvers = new ArrayList<>();
             if (!unfounded.isEmpty()) {
                 for (Class<? extends PluginResolver> dependency : unfounded) {
-                    PluginResolver instance = dependency.newInstance();
+                    Class<? extends PluginResolver> implOrDefault =
+                            resolverDefaultImpl.getOrDefault(dependency, dependency);
+                    PluginResolver instance = implOrDefault.newInstance();
                     unfoundedPluginResolvers.add(instance);
                 }
                 addResolversWithDependencies(unfoundedPluginResolvers);

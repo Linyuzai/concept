@@ -17,8 +17,6 @@ public class JarPlugin implements Plugin {
 
     public static final String ENTRIES = JAR_PREFIX + "ENTRIES";
 
-    public static final String FILE_NAMES = JAR_PREFIX + "FILE_NAMES";
-
     public static final String CLASS_NAMES = JAR_PREFIX + "CLASS_NAMES";
 
     public static final String CLASSES = JAR_PREFIX + "CLASSES";
