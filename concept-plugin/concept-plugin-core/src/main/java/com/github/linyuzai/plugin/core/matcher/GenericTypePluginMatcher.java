@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
@@ -22,7 +19,17 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
         return tryMatch(context, matchingType, new Annotation[0]);
     }
 
-    public abstract boolean tryMatch(PluginContext context, Type type, Annotation[] annotations);
+    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
+        Metadata metadata = getMetadata(type);
+        if (metadata == null) {
+            return false;
+        }
+        return tryMatch(context, metadata, annotations);
+    }
+
+    public boolean tryMatch(PluginContext context, Metadata metadata, Annotation[] annotations) {
+        return false;
+    }
 
     public Type getMatchingType() {
         Type type = getClass().getGenericSuperclass();
@@ -98,6 +105,9 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
         } else if (Collection.class.isAssignableFrom(clazz)) {
             metadata.collection = newList(clazz);
             metadata.target = target;
+        } else if (clazz.isArray()) {
+            metadata.array = newList(clazz);
+            metadata.target = clazz.getComponentType();
         } else {
             metadata.target = clazz;
         }
@@ -132,11 +142,17 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
                 return getMetadata(upperBounds[0]);
             }
             //TODO ? super xxx 好像没有必要
+        } else if (type instanceof GenericArrayType) {
+            Type componentType = ((GenericArrayType) type).getGenericComponentType();
+            Metadata metadata = new Metadata();
+            metadata.array = newList(List.class);
+            metadata.target = componentType;
+            return metadata;
         }
         return null;
     }
 
-    public boolean setMatchedValue(PluginContext context, Metadata metadata, Map<String, ?> map, String typeMsg) {
+    public boolean setMatchedValue(PluginContext context, Metadata metadata, Map<String, ?> map, Class<?> target, String typeMsg) {
         if (map.isEmpty()) {
             return false;
         }
@@ -155,6 +171,15 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
         } else if (metadata.isCollection()) {
             metadata.getCollection().addAll(map.values());
             context.set(this, metadata.getCollection());
+            return true;
+        } else if (metadata.isArray()) {
+            metadata.getArray().addAll(map.values());
+            Object array = Array.newInstance(target, metadata.getArray().size());
+            for (int i = 0; i < metadata.getArray().size(); i++) {
+                Object o = metadata.getArray().get(i);
+                Array.set(array, i, o);
+            }
+            context.set(this, array);
             return true;
         } else {
             List<?> list = new ArrayList<>(map.values());
@@ -177,6 +202,8 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
 
         private Collection<Object> collection;
 
+        private List<Object> array;
+
         private Type target;
 
         public boolean isMap() {
@@ -193,6 +220,10 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
 
         public boolean isCollection() {
             return collection != null;
+        }
+
+        public boolean isArray() {
+            return array != null;
         }
     }
 }

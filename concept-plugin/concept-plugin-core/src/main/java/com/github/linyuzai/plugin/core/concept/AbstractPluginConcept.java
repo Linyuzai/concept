@@ -8,7 +8,6 @@ import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
-import com.github.linyuzai.plugin.core.resolver.FileNamePluginResolver;
 import com.github.linyuzai.plugin.core.resolver.PluginResolver;
 import com.github.linyuzai.plugin.core.resolver.PluginResolverChainImpl;
 import lombok.AccessLevel;

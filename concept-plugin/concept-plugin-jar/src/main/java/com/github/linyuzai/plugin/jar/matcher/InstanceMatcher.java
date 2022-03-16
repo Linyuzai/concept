@@ -17,11 +17,7 @@ import java.util.stream.Collectors;
 public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @Override
-    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
-        Metadata metadata = getMetadata(type);
-        if (metadata == null) {
-            return false;
-        }
+    public boolean tryMatch(PluginContext context, Metadata metadata, Annotation[] annotations) {
         Type target = metadata.getTarget();
         if (target instanceof Class) {
             Class<?> clazz = (Class<?>) target;
@@ -47,7 +43,7 @@ public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
     public boolean setMatchedValueWithInstance(PluginContext context, Metadata metadata, Class<?> target) {
         Map<String, ?> instances = context.get(JarPlugin.INSTANCES);
         Map<String, ?> map = filterByClass(instances, target);
-        return setMatchedValue(context, metadata, map, "instance");
+        return setMatchedValue(context, metadata, map, target, "instance");
     }
 
     public Map<String, ?> filterByClass(Map<String, ?> instances, Class<?> target) {

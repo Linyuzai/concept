@@ -19,11 +19,7 @@ public abstract class ClassMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @SneakyThrows
     @Override
-    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
-        Metadata metadata = getMetadata(type);
-        if (metadata == null) {
-            return false;
-        }
+    public boolean tryMatch(PluginContext context, Metadata metadata, Annotation[] annotations) {
         Type target = metadata.getTarget();
         if (target instanceof Class) {
             Class<?> clazz = (Class<?>) target;
@@ -63,7 +59,7 @@ public abstract class ClassMatcher<T> extends GenericTypePluginMatcher<T> {
     public boolean setMatchedValueWithClass(PluginContext context, Metadata metadata, Class<?> target) {
         Map<String, Class<?>> classes = context.get(JarPlugin.CLASSES);
         Map<String, Class<?>> map = filterByClass(classes, target);
-        return setMatchedValue(context, metadata, map, "class");
+        return setMatchedValue(context, metadata, map, Class.class, "class");
     }
 
     public Map<String, Class<?>> filterByClass(Map<String, Class<?>> classes, Class<?> target) {

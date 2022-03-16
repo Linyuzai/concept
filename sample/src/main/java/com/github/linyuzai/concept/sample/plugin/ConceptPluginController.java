@@ -29,11 +29,17 @@ public class ConceptPluginController {
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
             .addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter())
-            .addMatcher(new ClassMatcher<LinkedHashSet<? extends Class<? extends CustomPlugin>>>() {
+            /*.addMatcher(new ClassMatcher<LinkedHashSet<? extends Class<? extends CustomPlugin>>>() {
                 @Override
                 public void onMatched(LinkedHashSet<? extends Class<? extends CustomPlugin>> plugin) {
                     System.out.println(plugin.getClass());
                     System.out.println(plugin);
+                }
+            })*/
+            .addMatcher(new ClassMatcher<Class<CustomPluginImpl>[]>() {
+                @Override
+                public void onMatched(Class<CustomPluginImpl>[] plugin) {
+                    System.out.println(Arrays.toString(plugin));
                 }
             })
             //.match(this)//自动匹配回调添加了@OnPluginMatched注解的方法参数
