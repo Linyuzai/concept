@@ -135,6 +135,36 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
         return null;
     }
 
+    public boolean setMatchedValue(PluginContext context, Metadata metadata, Map<String, ?> map, String typeMsg) {
+        if (map.isEmpty()) {
+            return false;
+        }
+        if (metadata.isMap()) {
+            metadata.getMap().putAll(map);
+            context.set(this, metadata.getMap());
+            return true;
+        } else if (metadata.isList()) {
+            metadata.getList().addAll(map.values());
+            context.set(this, metadata.getList());
+            return true;
+        } else if (metadata.isSet()) {
+            metadata.getSet().addAll(map.values());
+            context.set(this, metadata.getSet());
+            return true;
+        } else if (metadata.isCollection()) {
+            metadata.getCollection().addAll(map.values());
+            context.set(this, metadata.getCollection());
+            return true;
+        } else {
+            List<?> list = new ArrayList<>(map.values());
+            if (list.size() > 1) {
+                throw new PluginException("More than one " + typeMsg + " matched: " + list);
+            }
+            context.set(this, list.get(0));
+            return true;
+        }
+    }
+
     @Data
     public static class Metadata {
 

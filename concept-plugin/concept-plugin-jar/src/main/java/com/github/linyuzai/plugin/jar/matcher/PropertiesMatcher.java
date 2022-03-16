@@ -16,6 +16,7 @@ public abstract class PropertiesMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @Override
     public boolean tryMatch(PluginContext context, Type type) {
+
         if (type instanceof Class && Properties.class.isAssignableFrom((Class<?>) type)) {
             List<Properties> properties = context.get(JarPlugin.PROPERTIES);
             if (properties.isEmpty()) {

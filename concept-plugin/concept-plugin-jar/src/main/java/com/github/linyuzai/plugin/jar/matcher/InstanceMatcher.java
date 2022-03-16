@@ -1,15 +1,15 @@
 package com.github.linyuzai.plugin.jar.matcher;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.matcher.GenericTypePluginMatcher;
 import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarInstancePluginResolver;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.WildcardType;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @DependOnResolvers(JarInstancePluginResolver.class)
@@ -17,21 +17,42 @@ public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
 
     @Override
     public boolean tryMatch(PluginContext context, Type type) {
-        Collection<?> instances = context.get(JarPlugin.INSTANCES);
-        List<?> matchedInstances = instances.stream()
-                .filter(((Class<?>) type)::isInstance)
-                .collect(Collectors.toList());
-        if (matchedInstances.isEmpty()) {
+        Metadata metadata = getMetadata(type);
+        if (metadata == null) {
             return false;
         }
-        if (matchedInstances.size() > 1) {
-            throw new PluginException("Multi instance found, try InstanceListMatcher");
+        Type target = metadata.getTarget();
+        if (target instanceof Class) {
+            Class<?> clazz = (Class<?>) target;
+            return setMatchedValueWithInstance(context, metadata, clazz);
+        } else if (target instanceof ParameterizedType) {
+            Type rawType = ((ParameterizedType) target).getRawType();
+            Class<?> toClass = toClass(rawType);
+            if (toClass != null) {
+                return setMatchedValueWithInstance(context, metadata, toClass);
+            }
+        } else if (target instanceof WildcardType) {
+            Type[] upperBounds = ((WildcardType) target).getUpperBounds();
+            if (upperBounds.length > 0) {
+                Class<?> toClass = toClass(upperBounds[0]);
+                if (toClass != null) {
+                    return setMatchedValueWithInstance(context, metadata, toClass);
+                }
+            }
         }
-        context.set(this, matchedInstances.get(0));
-        return true;
+        return false;
     }
 
-    public Class<T> getMatchingClass() {
-        return null;
+    public boolean setMatchedValueWithInstance(PluginContext context, Metadata metadata, Class<?> target) {
+        Map<String, ?> instances = context.get(JarPlugin.INSTANCES);
+        Map<String, ?> map = filterByClass(instances, target);
+        return setMatchedValue(context, metadata, map, "instance");
+    }
+
+    public Map<String, ?> filterByClass(Map<String, ?> instances, Class<?> target) {
+        return instances.entrySet()
+                .stream()
+                .filter(it -> target.isInstance(it.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

@@ -32,6 +32,7 @@ public class ConceptPluginController {
             .addMatcher(new ClassMatcher<LinkedHashSet<? extends Class<? extends CustomPlugin>>>() {
                 @Override
                 public void onMatched(LinkedHashSet<? extends Class<? extends CustomPlugin>> plugin) {
+                    System.out.println(plugin.getClass());
                     System.out.println(plugin);
                 }
             })
