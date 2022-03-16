@@ -14,8 +14,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.nio.charset.Charset;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -63,22 +63,25 @@ public abstract class ContentMatcher<T> extends GenericTypePluginMatcher<T> {
     }
 
     public boolean setMatchedValueWithBytes(PluginContext context, Metadata metadata, Class<?> target) {
-        Map<String, byte[]> bytes = context.get(Plugin.BYTES);
-        Map<String, ?> contents;
+        Map<String, byte[]> bytesMap = context.get(Plugin.BYTES);
+        Map<String, Object> contentMap;
         if (byte[].class == target) {
-            contents = bytes;
+            contentMap = new LinkedHashMap<>(bytesMap);
         } else if (InputStream.class == target) {
-            contents = bytes.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, it ->
-                            new ByteArrayInputStream(it.getValue())));
+            contentMap = new LinkedHashMap<>();
+            for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
+                contentMap.put(entry.getKey(), new ByteArrayInputStream(entry.getValue()));
+            }
         } else if (String.class == target) {
-            contents = bytes.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, it ->
-                            charset == null ? new String(it.getValue()) :
-                                    new String(it.getValue(), charset)));
+            contentMap = new LinkedHashMap<>();
+            for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
+                byte[] value = entry.getValue();
+                String v = charset == null ? new String(value) : new String(value, charset);
+                contentMap.put(entry.getKey(), v);
+            }
         } else {
             return false;
         }
-        return setMatchedValue(context, metadata, contents, target, "content");
+        return setMatchedValue(context, metadata, contentMap, target, "content");
     }
 }

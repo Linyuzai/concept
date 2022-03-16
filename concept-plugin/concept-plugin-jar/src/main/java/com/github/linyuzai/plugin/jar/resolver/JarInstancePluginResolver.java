@@ -8,6 +8,7 @@ import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,13 +18,15 @@ public class JarInstancePluginResolver extends AbstractPluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        Map<String, Class<?>> classes = context.get(JarPlugin.CLASSES);
-        Map<String, ?> instances = classes.entrySet()
-                .stream()
-                .filter(it -> canNewInstance(it.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, it ->
-                        newInstance(it.getValue())));
-        context.set(JarPlugin.INSTANCES, instances);
+        Map<String, Class<?>> classMap = context.get(JarPlugin.CLASSES);
+        Map<String, Object> instanceMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Class<?>> entry : classMap.entrySet()) {
+            Class<?> value = entry.getValue();
+            if (canNewInstance(value)) {
+                instanceMap.put(entry.getKey(), newInstance(value));
+            }
+        }
+        context.set(JarPlugin.INSTANCES, instanceMap);
     }
 
     private boolean canNewInstance(Class<?> clazz) {

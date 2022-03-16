@@ -152,7 +152,7 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
         return null;
     }
 
-    public boolean setMatchedValue(PluginContext context, Metadata metadata, Map<String, ?> map, Class<?> target, String typeMsg) {
+    public boolean setMatchedValue(PluginContext context, Metadata metadata, Map<String, Object> map, Class<?> target, String typeMsg) {
         if (map.isEmpty()) {
             return false;
         }

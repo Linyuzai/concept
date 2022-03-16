@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -18,11 +19,12 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
     public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();
         ClassLoader classLoader = plugin.getClassLoader();
-        Map<String, String> classNames = context.get(JarPlugin.CLASS_NAMES);
-        Map<String, Class<?>> classes = classNames.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, it ->
-                        loadClass(classLoader, it.getValue())));
-        context.set(JarPlugin.CLASSES, classes);
+        Map<String, String> classNameMap = context.get(JarPlugin.CLASS_NAMES);
+        Map<String, Class<?>> classMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : classNameMap.entrySet()) {
+            classMap.put(entry.getKey(), loadClass(classLoader, entry.getValue()));
+        }
+        context.set(JarPlugin.CLASSES, classMap);
     }
 
     @SneakyThrows

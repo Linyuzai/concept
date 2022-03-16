@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,10 +23,13 @@ public class JarBytesPluginResolver extends BytesPluginResolver {
         List<String> filenames = context.get(Plugin.FILE_NAMES);
         JarPlugin plugin = context.getPlugin();
         JarFile jarFile = plugin.getFile();
-        Map<String, byte[]> bytesMap = filenames.stream()
-                .filter(it -> !it.endsWith(".class"))
-                .collect(Collectors.toMap(Function.identity(), it ->
-                        getBytes(jarFile, it)));
+        Map<String, byte[]> bytesMap = new LinkedHashMap<>();
+        for (String filename : filenames) {
+            if (filename.endsWith(".class")) {
+                continue;
+            }
+            bytesMap.put(filename, getBytes(jarFile, filename));
+        }
         context.set(JarPlugin.BYTES, bytesMap);
     }
 

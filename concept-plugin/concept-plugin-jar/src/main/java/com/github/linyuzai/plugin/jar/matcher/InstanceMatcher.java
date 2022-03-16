@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -41,15 +42,19 @@ public abstract class InstanceMatcher<T> extends GenericTypePluginMatcher<T> {
     }
 
     public boolean setMatchedValueWithInstance(PluginContext context, Metadata metadata, Class<?> target) {
-        Map<String, ?> instances = context.get(JarPlugin.INSTANCES);
-        Map<String, ?> map = filterByClass(instances, target);
+        Map<String, Object> instances = context.get(JarPlugin.INSTANCES);
+        Map<String, Object> map = filterByClass(instances, target);
         return setMatchedValue(context, metadata, map, target, "instance");
     }
 
-    public Map<String, ?> filterByClass(Map<String, ?> instances, Class<?> target) {
-        return instances.entrySet()
-                .stream()
-                .filter(it -> target.isInstance(it.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public Map<String, Object> filterByClass(Map<String, Object> instances, Class<?> target) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : instances.entrySet()) {
+            Object value = entry.getValue();
+            if (target.isInstance(value)) {
+                map.put(entry.getKey(), value);
+            }
+        }
+        return map;
     }
 }

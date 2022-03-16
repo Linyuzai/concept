@@ -5,7 +5,8 @@ import lombok.*;
 
 import java.util.function.Predicate;
 
-@Data
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginPath {
 
     private String path;
@@ -54,13 +55,7 @@ public class PluginPath {
             if (path == null || path.isEmpty()) {
                 throw new PluginException("Path is null or empty");
             }
-            PluginPath pluginPath = new PluginPath();
-            pluginPath.setPath(path);
-            pluginPath.setFilter(filter);
-            pluginPath.setNotifyCreate(notifyCreate);
-            pluginPath.setNotifyModify(notifyModify);
-            pluginPath.setNotifyDelete(notifyDelete);
-            return pluginPath;
+            return new PluginPath(path, filter, notifyCreate, notifyModify, notifyDelete);
         }
     }
 }
