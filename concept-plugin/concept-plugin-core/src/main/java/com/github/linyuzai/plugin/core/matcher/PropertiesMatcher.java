@@ -1,10 +1,9 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.core.matcher;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.matcher.GenericTypePluginMatcher;
 import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
-import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.core.resolver.PropertiesPluginResolver;
 
 import java.lang.annotation.Annotation;
@@ -18,7 +17,7 @@ public abstract class PropertiesMatcher<T> extends GenericTypePluginMatcher<T> {
     @Override
     public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
         if (type instanceof Class && Properties.class.isAssignableFrom((Class<?>) type)) {
-            List<Properties> properties = context.get(JarPlugin.PROPERTIES);
+            List<Properties> properties = context.get(Plugin.PROPERTIES);
             if (properties.isEmpty()) {
                 return false;
             }
