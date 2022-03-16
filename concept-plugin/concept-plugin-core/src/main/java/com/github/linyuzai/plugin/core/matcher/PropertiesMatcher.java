@@ -49,6 +49,10 @@ public abstract class PropertiesMatcher<T> extends GenericTypePluginMatcher<T> {
             contents = new LinkedHashMap<>();
             for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
                 Map<String, String> map = newMap(target);
+                Properties properties = entry.getValue();
+                for (String propertyName : properties.stringPropertyNames()) {
+                    map.put(propertyName, properties.getProperty(propertyName));
+                }
                 contents.put(entry.getKey(), map);
             }
         } else {
