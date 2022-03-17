@@ -5,5 +5,9 @@ import com.github.linyuzai.plugin.core.resolver.dependence.PluginResolverDepende
 
 public interface PluginMatcher extends PluginResolverDependency {
 
+    boolean isMatched(PluginContext context);
+
+    Object getMatched(PluginContext context);
+
     void match(PluginContext context);
 }

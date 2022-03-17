@@ -16,7 +16,7 @@ public abstract class BytesPluginResolver extends AbstractPluginResolver {
     private final int bufferSize;
 
     public BytesPluginResolver() {
-        this(1024);
+        this(-1);
     }
 
     @Override
@@ -32,10 +32,19 @@ public abstract class BytesPluginResolver extends AbstractPluginResolver {
     public static byte[] toBytes(InputStream stream, int bufferSize) {
         try (InputStream is = stream;
              ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[bufferSize];
-            int l;
-            while ((l = is.read(buffer)) > 0) {
-                os.write(buffer, 0, l);
+            if (bufferSize > 0) {
+                byte[] buffer = new byte[bufferSize];
+                int l;
+                while ((l = is.read(buffer)) > 0) {
+                    os.write(buffer, 0, l);
+                }
+            } else {
+                int available = stream.available();
+                if (available > 0) {
+                    byte[] buffer = new byte[available];
+                    int l = is.read(buffer);
+                    os.write(buffer, 0, l);
+                }
             }
             return os.toByteArray();
         }

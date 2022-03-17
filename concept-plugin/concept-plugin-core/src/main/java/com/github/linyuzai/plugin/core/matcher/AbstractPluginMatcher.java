@@ -17,5 +17,7 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
 
     public abstract boolean tryMatch(PluginContext context);
 
-    public abstract void onMatched(T plugin);
+    public  void onMatched(T plugin) {
+
+    }
 }
