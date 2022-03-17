@@ -1,8 +1,6 @@
 package com.github.linyuzai.plugin.core.extractor;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.matcher.PluginContextMatcher;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
 import com.github.linyuzai.plugin.core.matcher.PluginObjectMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;

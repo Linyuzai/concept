@@ -11,13 +11,12 @@ import java.lang.reflect.*;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<T> {
+public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher {
 
     private final Type matchingType = getMatchingType();
 
     private TypeMetadata metadata;
 
-    @Override
     public boolean support(Type type) {
         metadata = TypeMetadata.from(type);
         if (metadata == null) {
@@ -28,7 +27,6 @@ public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<
 
     public abstract boolean support(TypeMetadata metadata, Type type);
 
-    @Override
     public boolean tryMatch(PluginContext context) {
         return tryMatch(context, matchingType, new Annotation[0]);
     }

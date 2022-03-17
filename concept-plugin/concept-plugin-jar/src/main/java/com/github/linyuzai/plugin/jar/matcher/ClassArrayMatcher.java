@@ -1,36 +1,24 @@
 package com.github.linyuzai.plugin.jar.matcher;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.util.TypeMetadata;
-import lombok.AllArgsConstructor;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import java.lang.reflect.Type;
+public class ClassArrayMatcher extends ClassMatcher {
 
-@AllArgsConstructor
-public class ClassArrayMatcher extends ClassMatcher<Object> {
-
-    private final Class<?> target;
-
-    /**
-     * Class
-     *
-     * @param metadata
-     * @param type
-     * @return
-     */
-    @Override
-    public boolean support(TypeMetadata metadata, Type type) {
-        if (metadata.isObject()) {
-            Type t = metadata.getType();
-            if (t instanceof Class) {
-
-            }
-        }
-        return false;
+    public ClassArrayMatcher(Class<?> target) {
+        super(target);
     }
 
     @Override
-    public boolean isMatched(PluginContext context) {
-        return false;
+    public Object map(Map<String, Object> map) {
+        List<Object> values = new ArrayList<>(map.values());
+        Object array = Array.newInstance(target, values.size());
+        for (int i = 0; i < values.size(); i++) {
+            Object o = values.get(i);
+            Array.set(array, i, o);
+        }
+        return array;
     }
 }

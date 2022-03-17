@@ -1,8 +1,12 @@
 package com.github.linyuzai.plugin.core.util;
 
+import lombok.SneakyThrows;
+
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.*;
 
 public class ReflectionUtils {
 
@@ -23,5 +27,35 @@ public class ReflectionUtils {
             return null;
         }
         return null;
+    }
+
+    @SneakyThrows
+    public static <E> List<E> newList(Class<?> clazz) {
+        int modifiers = clazz.getModifiers();
+        if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
+            return new ArrayList<>();
+        } else {
+            return (List<E>) clazz.newInstance();
+        }
+    }
+
+    @SneakyThrows
+    public static <E> Set<E> newSet(Class<?> clazz) {
+        int modifiers = clazz.getModifiers();
+        if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
+            return new HashSet<>();
+        } else {
+            return (Set<E>) clazz.newInstance();
+        }
+    }
+
+    @SneakyThrows
+    public static <E> Map<String, E> newMap(Class<?> clazz) {
+        int modifiers = clazz.getModifiers();
+        if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
+            return new LinkedHashMap<>();
+        } else {
+            return (Map<String, E>) clazz.newInstance();
+        }
     }
 }

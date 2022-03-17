@@ -7,7 +7,5 @@ import java.lang.reflect.Type;
 
 public interface PluginMatcher extends PluginResolverDependency {
 
-    boolean isMatched(PluginContext context);
-
-    Object getMatched(PluginContext context);
+    Object match(PluginContext context);
 }
