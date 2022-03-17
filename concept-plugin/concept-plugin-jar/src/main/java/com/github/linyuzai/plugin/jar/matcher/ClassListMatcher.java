@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import java.lang.reflect.Type;
 
 @AllArgsConstructor
-public class ClassObjectMatcher extends ClassMatcher<Object> {
+public class ClassListMatcher extends ClassMatcher<Object> {
+
+    private final Class<?> listClass;
 
     private final Class<?> target;
 

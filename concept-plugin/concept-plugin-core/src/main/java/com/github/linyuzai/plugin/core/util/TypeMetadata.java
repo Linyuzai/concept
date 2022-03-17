@@ -11,40 +11,41 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class TypeMetadata {
 
-    private Map<String, Object> map;
+    private Class<?> mapClass;
 
-    private List<Object> list;
+    private Class<?> listClass;
 
-    private Set<Object> set;
+    private Class<?> setClass;
 
-    private Collection<Object> collection;
+    private Class<?> collectionClass;
 
-    private List<Object> array;
+    private Class<?> arrayClass;
 
     private Type type;
 
     public boolean isMap() {
-        return map != null;
+        return mapClass != null;
     }
 
     public boolean isList() {
-        return list != null;
+        return listClass != null;
     }
 
     public boolean isSet() {
-        return set != null;
+        return setClass != null;
     }
 
     public boolean isCollection() {
-        return collection != null;
+        return collectionClass != null;
     }
 
     public boolean isArray() {
-        return array != null;
+        return arrayClass != null;
     }
 
     public boolean isObject() {
-        return map == null && list == null && set == null && collection == null && array == null;
+        return mapClass == null && listClass == null && setClass == null
+                && collectionClass == null && arrayClass == null;
     }
 
     public static TypeMetadata from(Type type) {
@@ -78,7 +79,7 @@ public class TypeMetadata {
         } else if (type instanceof GenericArrayType) {
             Type componentType = ((GenericArrayType) type).getGenericComponentType();
             TypeMetadata metadata = new TypeMetadata();
-            metadata.array = newList(List.class);
+            metadata.arrayClass = List.class;
             metadata.type = componentType;
             return metadata;
         }
@@ -88,19 +89,19 @@ public class TypeMetadata {
     public static TypeMetadata create(Class<?> clazz, Type type) {
         TypeMetadata metadata = new TypeMetadata();
         if (Map.class.isAssignableFrom(clazz)) {
-            metadata.map = newMap(clazz);
+            metadata.mapClass = clazz;
             metadata.type = type;
         } else if (List.class.isAssignableFrom(clazz)) {
-            metadata.list = newList(clazz);
+            metadata.listClass = clazz;
             metadata.type = type;
         } else if (Set.class.isAssignableFrom(clazz)) {
-            metadata.set = newSet(clazz);
+            metadata.setClass = clazz;
             metadata.type = type;
         } else if (Collection.class.isAssignableFrom(clazz)) {
-            metadata.collection = newList(clazz);
+            metadata.collectionClass = clazz;
             metadata.type = type;
         } else if (clazz.isArray()) {
-            metadata.array = newList(clazz);
+            metadata.arrayClass = List.class;
             metadata.type = clazz.getComponentType();
         } else {
             metadata.type = clazz;

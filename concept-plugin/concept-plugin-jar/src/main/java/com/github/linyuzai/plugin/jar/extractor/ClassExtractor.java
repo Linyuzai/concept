@@ -7,7 +7,7 @@ import com.github.linyuzai.plugin.core.matcher.GenericTypePluginMatcher;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
-import com.github.linyuzai.plugin.jar.matcher.ClassObjectMatcher;
+import com.github.linyuzai.plugin.jar.matcher.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,19 +23,18 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
             return null;
         }
         if (metadata.isMap()) {
-
+            return new ClassMapMatcher(metadata.getMapClass(), targetClass);
         } else if (metadata.isList()) {
-
+            return new ClassListMatcher(metadata.getListClass(), targetClass);
         } else if (metadata.isSet()) {
-
+            return new ClassSetMatcher(metadata.getSetClass(), targetClass);
         } else if (metadata.isCollection()) {
-
+            return new ClassListMatcher(metadata.getCollectionClass(), targetClass);
         } else if (metadata.isArray()) {
-
+            return new ClassArrayMatcher(targetClass);
         } else {
             return new ClassObjectMatcher(targetClass);
         }
-        return null;
     }
 
     public Class<?> getTargetClass(Type type) {
@@ -45,7 +44,7 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
             Type rawType = ((ParameterizedType) type).getRawType();
             if (rawType instanceof Class) {
                 if (Class.class.isAssignableFrom((Class<?>) rawType)) {
-                    Type[] arguments = ((ParameterizedType) type).getActualTypeArguments()
+                    Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
                     return ReflectionUtils.toClass(arguments[0]);
                 }
             }
