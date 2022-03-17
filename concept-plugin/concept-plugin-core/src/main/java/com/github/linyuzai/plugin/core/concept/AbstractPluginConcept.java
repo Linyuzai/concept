@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
+import com.github.linyuzai.plugin.core.extractor.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
@@ -29,7 +30,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected final Collection<PluginFilter> pluginFilters;
 
-    protected final Collection<PluginMatcher> pluginMatchers;
+    protected final Collection<PluginExtractor> pluginExtractors;
 
     @Override
     public Plugin load(Object o) {
@@ -43,8 +44,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         context.initialize();
 
         new PluginResolverChainImpl(pluginResolvers, pluginFilters).next(context);
-        for (PluginMatcher matcher : pluginMatchers) {
-            matcher.match(context);
+        for (PluginExtractor extractor : pluginExtractors) {
+            extractor.extract(context);
         }
 
         context.destroy();
@@ -77,7 +78,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected final Collection<PluginFilter> pluginFilters = new ArrayList<>();
 
-        protected final Collection<PluginMatcher> pluginMatchers = new ArrayList<>();
+        protected final Collection<PluginExtractor> pluginExtractors = new ArrayList<>();
 
         protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
                 resolverDefaultImpl = new HashMap<>();
@@ -131,16 +132,16 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (T) this;
         }
 
-        public T addMatcher(PluginMatcher matcher) {
-            return addMatchers(matcher);
+        public T addExtractor(PluginExtractor extractor) {
+            return addExtractors(extractor);
         }
 
-        public T addMatchers(PluginMatcher... matchers) {
-            return addMatchers(Arrays.asList(matchers));
+        public T addExtractors(PluginExtractor... extractors) {
+            return addExtractors(Arrays.asList(extractors));
         }
 
-        public T addMatchers(Collection<? extends PluginMatcher> matchers) {
-            this.pluginMatchers.addAll(matchers);
+        public T addExtractors(Collection<? extends PluginExtractor> extractors) {
+            this.pluginExtractors.addAll(extractors);
             return (T) this;
         }
 
@@ -178,13 +179,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             pluginResolvers.clear();
 
             addResolversWithDependencies(customResolvers);
-            addResolversDependOnMatchers(pluginMatchers);
+            addResolversDependOnExtractors(pluginExtractors);
         }
 
         @SneakyThrows
-        private void addResolversDependOnMatchers(Collection<? extends PluginMatcher> matchers) {
-            for (PluginMatcher matcher : matchers) {
-                Class<? extends PluginResolver>[] dependencies = matcher.dependencies();
+        private void addResolversDependOnExtractors(Collection<? extends PluginExtractor> extractors) {
+            for (PluginExtractor extractor : extractors) {
+                Class<? extends PluginResolver>[] dependencies = extractor.dependencies();
                 for (Class<? extends PluginResolver> dependency : dependencies) {
                     if (containsResolver(dependency)) {
                         continue;

@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.AbstractPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
+import com.github.linyuzai.plugin.core.extractor.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
@@ -29,9 +30,9 @@ public class JarPluginConcept extends AbstractPluginConcept {
                             Collection<PluginFactory> pluginFactories,
                             Collection<PluginResolver> pluginResolvers,
                             Collection<PluginFilter> pluginFilters,
-                            Collection<PluginMatcher> pluginMatchers) {
+                            Collection<PluginExtractor> pluginExtractors) {
         super(pluginContextFactory, pluginEventPublisher, pluginFactories,
-                pluginResolvers, pluginFilters, pluginMatchers);
+                pluginResolvers, pluginFilters, pluginExtractors);
     }
 
     public Collection<JarPluginClassLoader> getClassLoaders() {
@@ -63,8 +64,8 @@ public class JarPluginConcept extends AbstractPluginConcept {
             return this;
         }
 
-        public Builder match(Object callback) {
-            addMatchers(new JarDynamicPluginMatcher(callback));
+        public Builder extractTo(Object callback) {
+            //addExtractors(new JarDynamicPluginMatcher(callback));
             return this;
         }
 
@@ -86,7 +87,7 @@ public class JarPluginConcept extends AbstractPluginConcept {
                     pluginFactories,
                     pluginResolvers,
                     pluginFilters,
-                    pluginMatchers);
+                    pluginExtractors);
         }
     }
 }

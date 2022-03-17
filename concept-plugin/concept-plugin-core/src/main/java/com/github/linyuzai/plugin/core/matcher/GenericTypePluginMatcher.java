@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.matcher;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.util.TypeMetadata;
 import lombok.Data;
 import lombok.SneakyThrows;
 
@@ -13,6 +14,19 @@ import java.util.*;
 public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher<T> {
 
     private final Type matchingType = getMatchingType();
+
+    private TypeMetadata metadata;
+
+    @Override
+    public boolean support(Type type) {
+        metadata = TypeMetadata.from(type);
+        if (metadata == null) {
+            return false;
+        }
+        return support(metadata, type);
+    }
+
+    public abstract boolean support(TypeMetadata metadata, Type type);
 
     @Override
     public boolean tryMatch(PluginContext context) {

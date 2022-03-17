@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.matcher;
+package com.github.linyuzai.plugin.core.util;
 
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Data;
@@ -41,6 +41,10 @@ public class TypeMetadata {
 
     public boolean isArray() {
         return array != null;
+    }
+
+    public boolean isObject() {
+        return map == null && list == null && set == null && collection == null && array == null;
     }
 
     public static TypeMetadata from(Type type) {
