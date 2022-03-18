@@ -34,7 +34,7 @@ public class ModifierFilter extends AbstractPluginFilter<Map<String, Class<?>>> 
 
     @Override
     public Object getKey() {
-        return JarPlugin.CLASSES;
+        return JarPlugin.CLASS;
     }
 
     private boolean filterClass(Class<?> c) {

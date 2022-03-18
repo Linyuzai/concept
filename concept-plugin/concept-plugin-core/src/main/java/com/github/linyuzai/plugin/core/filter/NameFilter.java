@@ -8,23 +8,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FileNameFilter extends AbstractPluginFilter<List<String>> {
+public class NameFilter extends AbstractPluginFilter<List<String>> {
 
     private final Collection<String> names;
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
-    public FileNameFilter(String... names) {
+    public NameFilter(String... names) {
         this(Arrays.asList(names));
     }
 
-    public FileNameFilter(Collection<String> names) {
+    public NameFilter(Collection<String> names) {
         this.names = names;
     }
 
     @Override
     public Object getKey() {
-        return Plugin.FILE_NAMES;
+        return Plugin.PATH_NAME;
     }
 
     @Override

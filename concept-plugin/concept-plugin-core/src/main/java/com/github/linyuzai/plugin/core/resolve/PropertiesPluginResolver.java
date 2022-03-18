@@ -13,7 +13,7 @@ public abstract class PropertiesPluginResolver extends AbstractPluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        List<String> propertiesNames = context.get(Plugin.PROPERTIES_NAMES);
+        List<String> propertiesNames = context.get(Plugin.PROPERTIES_NAME);
         Map<String, Properties> propertiesMap = new LinkedHashMap<>();
         for (String propertiesName : propertiesNames) {
             propertiesMap.put(propertiesName, load(context, propertiesName));
@@ -25,6 +25,6 @@ public abstract class PropertiesPluginResolver extends AbstractPluginResolver {
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(Plugin.PROPERTIES_NAMES);
+        return context.contains(Plugin.PROPERTIES_NAME);
     }
 }

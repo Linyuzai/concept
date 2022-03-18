@@ -21,7 +21,7 @@ public abstract class InstanceMatcher extends AbstractPluginMatcher<Object> {
 
     @Override
     public Object getKey() {
-        return JarPlugin.INSTANCES;
+        return JarPlugin.INSTANCE;
     }
 
     public Map<String, Object> filter(Map<String, Object> instances) {

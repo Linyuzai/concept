@@ -9,18 +9,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 @AllArgsConstructor
-@DependOnResolvers(FilePathNamePluginResolver.class)
-public abstract class BytesPluginResolver extends AbstractPluginResolver {
+@DependOnResolvers(PathNamePluginResolver.class)
+public abstract class ByteArrayPluginResolver extends AbstractPluginResolver {
 
     private final int bufferSize;
 
-    public BytesPluginResolver() {
+    public ByteArrayPluginResolver() {
         this(-1);
     }
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(Plugin.FILE_NAMES);
+        return context.contains(Plugin.PATH_NAME);
     }
 
     public byte[] toBytes(InputStream stream) {

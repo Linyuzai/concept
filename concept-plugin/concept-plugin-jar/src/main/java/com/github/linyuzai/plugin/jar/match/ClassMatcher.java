@@ -56,7 +56,7 @@ public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
 
     @Override
     public Object getKey() {
-        return JarPlugin.CLASSES;
+        return JarPlugin.CLASS;
     }
 
     public Map<String, Object> filter(Map<String, Class<?>> classes) {

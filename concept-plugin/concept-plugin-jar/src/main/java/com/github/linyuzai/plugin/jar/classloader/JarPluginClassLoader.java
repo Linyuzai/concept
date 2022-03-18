@@ -1,18 +1,20 @@
 package com.github.linyuzai.plugin.jar.classloader;
 
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
+import lombok.Getter;
 
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 
+@Getter
 public class JarPluginClassLoader extends URLClassLoader {
 
-    private final JarPluginConcept concept;
+    private final JarPluginConcept pluginConcept;
 
     public JarPluginClassLoader(URL url, ClassLoader parent, JarPluginConcept concept) {
         super(new URL[]{url}, parent);
-        this.concept = concept;
+        this.pluginConcept = concept;
     }
 
     public Class<?> superFindClass(String name) throws ClassNotFoundException {
@@ -24,7 +26,7 @@ public class JarPluginClassLoader extends URLClassLoader {
         try {
             return super.findClass(name);
         } catch (Throwable e) {
-            Collection<JarPluginClassLoader> classLoaders = concept.getClassLoaders();
+            Collection<JarPluginClassLoader> classLoaders = pluginConcept.getClassLoaders();
             for (JarPluginClassLoader classLoader : classLoaders) {
                 if (classLoader == this) {
                     continue;

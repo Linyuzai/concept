@@ -15,13 +15,13 @@ public class JarPlugin implements Plugin {
 
     public static final String JAR_PREFIX = PREFIX + "JAR@";
 
-    public static final String ENTRIES = JAR_PREFIX + "ENTRIES";
+    public static final String ENTRY = JAR_PREFIX + "ENTRY";
 
-    public static final String CLASS_NAMES = JAR_PREFIX + "CLASS_NAMES";
+    public static final String CLASS_NAME = JAR_PREFIX + "CLASS_NAME";
 
-    public static final String CLASSES = JAR_PREFIX + "CLASSES";
+    public static final String CLASS = JAR_PREFIX + "CLASS";
 
-    public static final String INSTANCES = JAR_PREFIX + "INSTANCES";
+    public static final String INSTANCE = JAR_PREFIX + "INSTANCE";
 
     private final URL url;
 
@@ -33,10 +33,10 @@ public class JarPlugin implements Plugin {
 
     private JarFile file;
 
-    public JarPlugin(URL url, ClassLoader parent, JarPluginConcept pluginConcept) {
+    public JarPlugin(URL url, ClassLoader parent, JarPluginConcept concept) {
         this.url = url;
-        this.pluginConcept = pluginConcept;
-        this.classLoader = new JarPluginClassLoader(url, parent, pluginConcept);
+        this.pluginConcept = concept;
+        this.classLoader = new JarPluginClassLoader(url, parent, concept);
     }
 
     @SneakyThrows

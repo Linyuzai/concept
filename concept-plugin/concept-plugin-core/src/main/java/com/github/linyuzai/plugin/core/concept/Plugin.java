@@ -4,11 +4,11 @@ public interface Plugin {
 
     String PREFIX = "CONCEPT_PLUGIN@";
 
-    String FILE_NAMES = PREFIX + "FILE_NAMES";
+    String PATH_NAME = PREFIX + "PATH_NAME";
 
-    String BYTES = PREFIX + "BYTES";
+    String BYTE_ARRAY = PREFIX + "BYTE_ARRAY";
 
-    String PROPERTIES_NAMES = PREFIX + "PROPERTIES_NAMES";
+    String PROPERTIES_NAME = PREFIX + "PROPERTIES_NAME";
 
     String PROPERTIES = PREFIX + "PROPERTIES";
 

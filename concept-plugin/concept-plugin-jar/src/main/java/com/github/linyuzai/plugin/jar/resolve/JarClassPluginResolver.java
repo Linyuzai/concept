@@ -16,12 +16,12 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
     public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();
         ClassLoader classLoader = plugin.getClassLoader();
-        Map<String, String> classNameMap = context.get(JarPlugin.CLASS_NAMES);
+        Map<String, String> classNameMap = context.get(JarPlugin.CLASS_NAME);
         Map<String, Class<?>> classMap = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : classNameMap.entrySet()) {
             classMap.put(entry.getKey(), loadClass(classLoader, entry.getValue()));
         }
-        context.set(JarPlugin.CLASSES, classMap);
+        context.set(JarPlugin.CLASS, classMap);
     }
 
     @SneakyThrows
@@ -31,6 +31,6 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.CLASS_NAMES);
+        return context.contains(JarPlugin.CLASS_NAME);
     }
 }

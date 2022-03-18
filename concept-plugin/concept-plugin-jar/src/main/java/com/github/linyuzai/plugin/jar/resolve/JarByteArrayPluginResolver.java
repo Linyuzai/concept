@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolve.BytesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
-@DependOnResolvers(JarFilePathNamePluginResolver.class)
-public class JarBytesPluginResolver extends BytesPluginResolver {
+@DependOnResolvers(JarPathNamePluginResolver.class)
+public class JarByteArrayPluginResolver extends ByteArrayPluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        List<String> filenames = context.get(Plugin.FILE_NAMES);
+        List<String> filenames = context.get(Plugin.PATH_NAME);
         JarPlugin plugin = context.getPlugin();
         JarFile jarFile = plugin.getFile();
         Map<String, byte[]> bytesMap = new LinkedHashMap<>();
@@ -28,7 +28,7 @@ public class JarBytesPluginResolver extends BytesPluginResolver {
             }
             bytesMap.put(filename, getBytes(jarFile, filename));
         }
-        context.set(JarPlugin.BYTES, bytesMap);
+        context.set(JarPlugin.BYTE_ARRAY, bytesMap);
     }
 
     @SneakyThrows

@@ -9,12 +9,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@DependOnResolvers(JarFilePathNamePluginResolver.class)
+@DependOnResolvers(JarPathNamePluginResolver.class)
 public class JarClassNamePluginResolver extends AbstractPluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        List<String> filenames = context.get(JarPlugin.FILE_NAMES);
+        List<String> filenames = context.get(JarPlugin.PATH_NAME);
         Map<String, String> classNameMap = new LinkedHashMap<>();
         for (String filename : filenames) {
             if (filename.endsWith(".class")) {
@@ -23,11 +23,11 @@ public class JarClassNamePluginResolver extends AbstractPluginResolver {
                 classNameMap.put(filename, className);
             }
         }
-        context.set(JarPlugin.CLASS_NAMES, classNameMap);
+        context.set(JarPlugin.CLASS_NAME, classNameMap);
     }
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.FILE_NAMES);
+        return context.contains(JarPlugin.PATH_NAME);
     }
 }

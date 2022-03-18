@@ -7,8 +7,8 @@ import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
-import com.github.linyuzai.plugin.core.resolve.BytesPluginResolver;
-import com.github.linyuzai.plugin.core.resolve.FilePathNamePluginResolver;
+import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
@@ -16,8 +16,8 @@ import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
 import com.github.linyuzai.plugin.jar.match.JarDynamicPluginExtractor;
-import com.github.linyuzai.plugin.jar.resolve.JarBytesPluginResolver;
-import com.github.linyuzai.plugin.jar.resolve.JarFilePathNamePluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarByteArrayPluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarPathNamePluginResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarPropertiesPluginResolver;
 
 import java.util.Collection;
@@ -58,8 +58,8 @@ public class JarPluginConcept extends AbstractPluginConcept {
         private ClassLoader classLoader;
 
         public Builder() {
-            mappingResolver(BytesPluginResolver.class, JarBytesPluginResolver.class);
-            mappingResolver(FilePathNamePluginResolver.class, JarFilePathNamePluginResolver.class);
+            mappingResolver(ByteArrayPluginResolver.class, JarByteArrayPluginResolver.class);
+            mappingResolver(PathNamePluginResolver.class, JarPathNamePluginResolver.class);
             mappingResolver(PropertiesPluginResolver.class, JarPropertiesPluginResolver.class);
         }
 

@@ -15,7 +15,7 @@ public class JarEntryPluginResolver extends AbstractPluginResolver {
         JarPlugin plugin = context.getPlugin();
         List<JarEntry> entries = plugin.getFile()
                 .stream().collect(Collectors.toList());
-        context.set(JarPlugin.ENTRIES, entries);
+        context.set(JarPlugin.ENTRY, entries);
     }
 
     @Override

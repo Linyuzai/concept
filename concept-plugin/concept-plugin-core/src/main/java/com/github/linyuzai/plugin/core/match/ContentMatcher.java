@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.resolve.BytesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@DependOnResolvers(BytesPluginResolver.class)
+@DependOnResolvers(ByteArrayPluginResolver.class)
 public abstract class ContentMatcher extends AbstractPluginMatcher<byte[]> {
 
     protected final Class<?> target;
@@ -36,7 +36,7 @@ public abstract class ContentMatcher extends AbstractPluginMatcher<byte[]> {
 
     @Override
     public Object getKey() {
-        return Plugin.BYTES;
+        return Plugin.BYTE_ARRAY;
     }
 
     public Map<String, Object> filter(Map<String, byte[]> bytesMap) {

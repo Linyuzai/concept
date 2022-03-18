@@ -38,7 +38,7 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
 
     @Override
     public Object getKey() {
-        return JarPlugin.CLASS_NAMES;
+        return JarPlugin.CLASS_NAME;
     }
 
     public boolean matchPackages(String className) {

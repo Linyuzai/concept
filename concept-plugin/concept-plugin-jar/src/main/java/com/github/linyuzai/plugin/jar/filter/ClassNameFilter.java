@@ -32,7 +32,7 @@ public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
 
     @Override
     public Object getKey() {
-        return JarPlugin.CLASS_NAMES;
+        return JarPlugin.CLASS_NAME;
     }
 
     public boolean matchClassNames(String className) {

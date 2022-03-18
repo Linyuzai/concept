@@ -16,7 +16,7 @@ public class JarInstancePluginResolver extends AbstractPluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        Map<String, Class<?>> classMap = context.get(JarPlugin.CLASSES);
+        Map<String, Class<?>> classMap = context.get(JarPlugin.CLASS);
         Map<String, Object> instanceMap = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classMap.entrySet()) {
             Class<?> value = entry.getValue();
@@ -24,7 +24,7 @@ public class JarInstancePluginResolver extends AbstractPluginResolver {
                 instanceMap.put(entry.getKey(), newInstance(value));
             }
         }
-        context.set(JarPlugin.INSTANCES, instanceMap);
+        context.set(JarPlugin.INSTANCE, instanceMap);
     }
 
     private boolean canNewInstance(Class<?> clazz) {
@@ -48,6 +48,6 @@ public class JarInstancePluginResolver extends AbstractPluginResolver {
 
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.CLASSES);
+        return context.contains(JarPlugin.CLASS);
     }
 }
