@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PluginPath {
+public class PluginLocation {
 
     private String path;
 
@@ -53,11 +53,11 @@ public class PluginPath {
             return this;
         }
 
-        public PluginPath build() {
+        public PluginLocation build() {
             if (path == null || path.isEmpty()) {
                 throw new PluginException("Path is null or empty");
             }
-            return new PluginPath(path, filter, notifyCreate, notifyModify, notifyDelete);
+            return new PluginLocation(path, filter, notifyCreate, notifyModify, notifyDelete);
         }
     }
 }

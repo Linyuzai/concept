@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.FilePathNamePluginResolver;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 
+import java.io.File;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class JarFilePathNamePluginResolver extends AbstractPluginResolver implem
         List<JarEntry> entries = context.get(JarPlugin.ENTRIES);
         List<String> filenames = entries.stream()
                 .map(ZipEntry::getName)
+                .map(it -> it.replaceAll(File.separator, "/"))
                 .collect(Collectors.toList());
         context.set(JarPlugin.FILE_NAMES, filenames);
     }

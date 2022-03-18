@@ -1,6 +1,7 @@
 package com.github.linyuzai.concept.sample.plugin;
 
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
+import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.match.PluginName;
@@ -49,7 +50,7 @@ public class ConceptPluginController {
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
             .pluginConcept(concept)
-            .paths(new com.github.linyuzai.plugin.core.autoload.PluginPath.Builder().path("/Users/tanghanzheng/concept/plugin/").build())
+            .locations(new PluginLocation.Builder().path("/Users/tanghanzheng/concept/plugin/").build())
             .executorService(Executors.newSingleThreadExecutor())
             .errorConsumer(e -> log.error("Plugin auto load error", e))
             .build();

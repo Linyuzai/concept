@@ -21,7 +21,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private final ExecutorService executor;
 
-    private final PluginPath[] paths;
+    private final PluginLocation[] locations;
 
     private final Consumer<Throwable> errorConsumer;
 
@@ -41,21 +41,21 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private WatchServicePluginAutoLoader(PluginConcept concept, ExecutorService executor,
                                          Consumer<Throwable> consumer, boolean loadOnStart,
-                                         PluginPath... paths) {
+                                         PluginLocation... locations) {
         this.pluginConcept = concept;
         this.executor = executor;
-        this.paths = paths;
+        this.locations = locations;
         this.errorConsumer = consumer;
         this.loadOnStart = loadOnStart;
-        for (PluginPath path : this.paths) {
-            if (path.isNotifyCreate()) {
-                notifyCreate.add(path.getPath());
+        for (PluginLocation location : this.locations) {
+            if (location.isNotifyCreate()) {
+                notifyCreate.add(location.getPath());
             }
-            if (path.isNotifyModify()) {
-                notifyModify.add(path.getPath());
+            if (location.isNotifyModify()) {
+                notifyModify.add(location.getPath());
             }
-            if (path.isNotifyDelete()) {
-                notifyDelete.add(path.getPath());
+            if (location.isNotifyDelete()) {
+                notifyDelete.add(location.getPath());
             }
         }
     }
@@ -67,19 +67,19 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
         running = true;
         if (loadOnStart) {
-            for (PluginPath path : paths) {
-                File[] list = new File(path.getPath()).listFiles();
+            for (PluginLocation location : locations) {
+                File[] list = new File(location.getPath()).listFiles();
                 if (list == null) {
                     continue;
                 }
-                if (path.getFilter() == null) {
+                if (location.getFilter() == null) {
                     Arrays.stream(list)
                             .map(File::getAbsolutePath)
                             .forEach(pluginConcept::load);
                 } else {
                     Arrays.stream(list)
                             .map(File::getAbsolutePath)
-                            .filter(path.getFilter()).forEach(pluginConcept::load);
+                            .filter(location.getFilter()).forEach(pluginConcept::load);
                 }
             }
         }
@@ -109,8 +109,8 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     public void listen() {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             this.watchService = watchService;
-            for (PluginPath pluginPath : paths) {
-                final Path path = Paths.get(pluginPath.getPath());
+            for (PluginLocation location : locations) {
+                final Path path = Paths.get(location.getPath());
                 path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
                         StandardWatchEventKinds.ENTRY_MODIFY,
                         StandardWatchEventKinds.ENTRY_DELETE);
@@ -187,7 +187,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
         private ExecutorService executor;
 
-        private PluginPath[] paths;
+        private PluginLocation[] locations;
 
         private Consumer<Throwable> consumer;
 
@@ -203,8 +203,8 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             return this;
         }
 
-        public Builder paths(PluginPath... paths) {
-            this.paths = paths;
+        public Builder locations(PluginLocation... locations) {
+            this.locations = locations;
             return this;
         }
 
@@ -222,10 +222,10 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             if (concept == null) {
                 throw new PluginException("PluginConcept is null");
             }
-            if (paths == null || paths.length == 0) {
+            if (locations == null || locations.length == 0) {
                 throw new PluginException("No path watched");
             }
-            return new WatchServicePluginAutoLoader(concept, executor, consumer, loadOnStart, paths);
+            return new WatchServicePluginAutoLoader(concept, executor, consumer, loadOnStart, locations);
         }
     }
 }
