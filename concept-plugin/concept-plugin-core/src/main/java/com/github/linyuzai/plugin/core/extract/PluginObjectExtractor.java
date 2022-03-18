@@ -5,12 +5,13 @@ import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.match.PluginObjectMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 public abstract class PluginObjectExtractor<T extends Plugin> extends AbstractPluginExtractor<T> {
 
     @Override
-    public PluginMatcher getMatcher(Type type) {
+    public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
         Class<?> clazz = ReflectionUtils.toClass(type);
         if (clazz == null) {
             return null;

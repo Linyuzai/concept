@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarInstancePluginResolver;
 import lombok.AllArgsConstructor;
 
+import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,17 +17,19 @@ public abstract class InstanceMatcher extends AbstractPluginMatcher {
 
     protected final Class<?> target;
 
+    protected final Annotation[] annotations;
+
     @Override
     public Object match(PluginContext context) {
         Map<String, Object> instances = context.get(JarPlugin.INSTANCES);
-        Map<String, Object> map = filterByClass(instances, target);
+        Map<String, Object> map = filter(instances);
         if (map.isEmpty()) {
             return null;
         }
         return convert(map);
     }
 
-    public Map<String, Object> filterByClass(Map<String, Object> instances, Class<?> target) {
+    public Map<String, Object> filter(Map<String, Object> instances) {
         Map<String, Object> map = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : instances.entrySet()) {
             Object value = entry.getValue();

@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+@Deprecated
 @SuppressWarnings("unchecked")
 public abstract class GenericTypePluginMatcher<T> extends AbstractPluginMatcher {
 

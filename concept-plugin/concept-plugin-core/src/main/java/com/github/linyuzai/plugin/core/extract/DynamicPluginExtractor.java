@@ -8,6 +8,7 @@ import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -62,8 +63,8 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         return new PluginContextExtractor<PluginContext>() {
 
             @Override
-            public void match(Type type) {
-                matcher = getMatcher(parameter.getParameterizedType());
+            public void match(Type type, Annotation[] annotations) {
+                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
             }
 
             @Override
@@ -77,8 +78,8 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         return new PluginObjectExtractor<Plugin>() {
 
             @Override
-            public void match(Type type) {
-                matcher = getMatcher(parameter.getParameterizedType());
+            public void match(Type type, Annotation[] annotations) {
+                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
             }
 
             @Override

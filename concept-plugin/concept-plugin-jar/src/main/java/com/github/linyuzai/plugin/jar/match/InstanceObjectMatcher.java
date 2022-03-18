@@ -2,14 +2,15 @@ package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.exception.PluginException;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class InstanceObjectMatcher extends InstanceMatcher {
 
-    public InstanceObjectMatcher(Class<?> target) {
-        super(target);
+    public InstanceObjectMatcher(Class<?> target, Annotation[] annotations) {
+        super(target, annotations);
     }
 
     @Override

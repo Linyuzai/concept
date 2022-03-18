@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
 import com.github.linyuzai.plugin.jar.match.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -13,24 +14,24 @@ import java.lang.reflect.WildcardType;
 public abstract class InstanceExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Type type) {
+    public PluginMatcher getMatcher(TypeMetadata metadata, Type type, Annotation[] annotations) {
         Type target = metadata.getType();
         Class<?> targetClass = getTargetClass(target);
         if (targetClass == null) {
             return null;
         }
         if (metadata.isMap()) {
-            return new InstanceMapMatcher(metadata.getMapClass(), targetClass);
+            return new InstanceMapMatcher(metadata.getMapClass(), targetClass, annotations);
         } else if (metadata.isList()) {
-            return new InstanceListMatcher(metadata.getListClass(), targetClass);
+            return new InstanceListMatcher(metadata.getListClass(), targetClass, annotations);
         } else if (metadata.isSet()) {
-            return new InstanceSetMatcher(metadata.getSetClass(), targetClass);
+            return new InstanceSetMatcher(metadata.getSetClass(), targetClass, annotations);
         } else if (metadata.isCollection()) {
-            return new InstanceListMatcher(metadata.getCollectionClass(), targetClass);
+            return new InstanceListMatcher(metadata.getCollectionClass(), targetClass, annotations);
         } else if (metadata.isArray()) {
-            return new InstanceArrayMatcher(targetClass);
+            return new InstanceArrayMatcher(targetClass, annotations);
         } else {
-            return new InstanceObjectMatcher(targetClass);
+            return new InstanceObjectMatcher(targetClass, annotations);
         }
     }
 

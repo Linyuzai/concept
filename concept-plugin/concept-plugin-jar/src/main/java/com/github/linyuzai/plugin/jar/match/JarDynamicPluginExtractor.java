@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import lombok.NonNull;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
@@ -36,8 +37,8 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
         return new ClassExtractor<Object>() {
 
             @Override
-            public void match(Type type) {
-                matcher = getMatcher(parameter.getParameterizedType());
+            public void match(Type type, Annotation[] annotations) {
+                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
             }
 
             @Override
@@ -51,8 +52,8 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
         return new InstanceExtractor<Object>() {
 
             @Override
-            public void match(Type type) {
-                matcher = getMatcher(parameter.getParameterizedType());
+            public void match(Type type, Annotation[] annotations) {
+                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
             }
 
             @Override

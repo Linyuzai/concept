@@ -37,7 +37,7 @@ public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>
         return JarPlugin.CLASSES;
     }
 
-    private boolean hasAnnotation(Class<?> clazz) {
+    public boolean hasAnnotation(Class<?> clazz) {
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
             if (clazz.isAnnotationPresent(annotationClass)) {
                 return true;

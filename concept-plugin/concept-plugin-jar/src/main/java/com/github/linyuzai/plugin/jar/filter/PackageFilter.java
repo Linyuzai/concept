@@ -41,7 +41,7 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
         return JarPlugin.CLASS_NAMES;
     }
 
-    private boolean matchPackages(String className) {
+    public boolean matchPackages(String className) {
         for (String p : packages) {
             int lastIndexOf = className.lastIndexOf(".");
             if (lastIndexOf == -1) {

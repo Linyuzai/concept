@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
 import com.github.linyuzai.plugin.jar.match.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -13,24 +14,24 @@ import java.lang.reflect.WildcardType;
 public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Type type) {
+    public PluginMatcher getMatcher(TypeMetadata metadata, Type type, Annotation[] annotations) {
         Type target = metadata.getType();
         Class<?> targetClass = getTargetClass(target);
         if (targetClass == null) {
             return null;
         }
         if (metadata.isMap()) {
-            return new ClassMapMatcher(metadata.getMapClass(), targetClass);
+            return new ClassMapMatcher(metadata.getMapClass(), targetClass, annotations);
         } else if (metadata.isList()) {
-            return new ClassListMatcher(metadata.getListClass(), targetClass);
+            return new ClassListMatcher(metadata.getListClass(), targetClass, annotations);
         } else if (metadata.isSet()) {
-            return new ClassSetMatcher(metadata.getSetClass(), targetClass);
+            return new ClassSetMatcher(metadata.getSetClass(), targetClass, annotations);
         } else if (metadata.isCollection()) {
-            return new ClassListMatcher(metadata.getCollectionClass(), targetClass);
+            return new ClassListMatcher(metadata.getCollectionClass(), targetClass, annotations);
         } else if (metadata.isArray()) {
-            return new ClassArrayMatcher(targetClass);
+            return new ClassArrayMatcher(targetClass, annotations);
         } else {
-            return new ClassObjectMatcher(targetClass);
+            return new ClassObjectMatcher(targetClass, annotations);
         }
     }
 

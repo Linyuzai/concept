@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.match;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +8,8 @@ import java.util.Map;
 
 public class InstanceArrayMatcher extends InstanceMatcher {
 
-    public InstanceArrayMatcher(Class<?> target) {
-        super(target);
+    public InstanceArrayMatcher(Class<?> target, Annotation[] annotations) {
+        super(target, annotations);
     }
 
     @Override

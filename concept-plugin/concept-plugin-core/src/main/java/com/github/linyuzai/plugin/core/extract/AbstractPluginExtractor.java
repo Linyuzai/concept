@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -17,11 +18,11 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     protected PluginMatcher matcher;
 
     public AbstractPluginExtractor() {
-        match(getGenericType());
+        match(getGenericType(), new Annotation[0]);
     }
 
-    public void match(Type type) {
-        this.matcher = getMatcher(type);
+    public void match(Type type, Annotation[] annotations) {
+        this.matcher = getMatcher(type, annotations);
         if (this.matcher == null) {
             throw new PluginException("Can not match " + type);
         }
@@ -38,7 +39,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         throw new PluginException("U may need to try override this method");
     }
 
-    public abstract PluginMatcher getMatcher(Type type);
+    public abstract PluginMatcher getMatcher(Type type, Annotation[] annotations);
 
     @SuppressWarnings("unchecked")
     @Override
