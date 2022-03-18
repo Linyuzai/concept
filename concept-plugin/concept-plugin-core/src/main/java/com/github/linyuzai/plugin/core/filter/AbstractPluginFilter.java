@@ -8,7 +8,8 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
     @Getter
     protected boolean negate;
 
-    public AbstractPluginFilter<T> negate() {
+    @Override
+    public PluginFilter negate() {
         this.negate = !this.negate;
         return this;
     }
@@ -24,7 +25,8 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
         return negate != filter;
     }
 
+    public abstract Object getKey();
+
     public abstract T doFilter(T plugins);
 
-    public abstract Object getKey();
 }

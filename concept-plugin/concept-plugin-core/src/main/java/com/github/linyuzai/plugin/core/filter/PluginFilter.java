@@ -8,6 +8,8 @@ public interface PluginFilter {
 
     void filter(PluginContext context);
 
+    PluginFilter negate();
+
     default Class<? extends PluginResolver> filterWith() {
         Class<?> clazz = getClass();
         while (clazz != null) {
