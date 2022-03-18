@@ -7,5 +7,5 @@ public interface PluginFactory {
 
     boolean support(Object o, PluginConcept concept);
 
-    Plugin create(Object o,PluginConcept concept);
+    Plugin create(Object o, PluginConcept concept);
 }

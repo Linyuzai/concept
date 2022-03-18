@@ -3,8 +3,14 @@ package com.github.linyuzai.plugin.core.util;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Data;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 public class TypeMetadata {

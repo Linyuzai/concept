@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.jar.factory;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
 import lombok.AllArgsConstructor;

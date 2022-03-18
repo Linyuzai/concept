@@ -1,7 +1,9 @@
 package com.github.linyuzai.plugin.core.autoload;
 
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.function.Predicate;
 

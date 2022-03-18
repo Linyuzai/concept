@@ -1,63 +1,108 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
+import com.github.linyuzai.plugin.core.util.ReflectionUtils;
+import lombok.Getter;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Function;
 
 @DependOnResolvers(PropertiesPluginResolver.class)
-public abstract class PropertiesMatcher<T> extends GenericTypePluginMatcher<T> {
+public abstract class PropertiesMatcher extends AbstractPluginMatcher<Properties> {
 
-    @Override
-    public boolean tryMatch(PluginContext context, Metadata metadata, Annotation[] annotations) {
-        Type target = metadata.getTarget();
-        if (target instanceof Class) {
-            Class<?> clazz = (Class<?>) target;
-            return setMatchedValueWithProperties(context, metadata, clazz);
-        } else if (target instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) target).getRawType();
-            Class<?> toClass = toClass(rawType);
-            if (toClass != null) {
-                return setMatchedValueWithProperties(context, metadata, toClass);
-            }
-        } else if (target instanceof WildcardType) {
-            Type[] upperBounds = ((WildcardType) target).getUpperBounds();
-            if (upperBounds.length > 0) {
-                Class<?> toClass = toClass(upperBounds[0]);
-                if (toClass != null) {
-                    return setMatchedValueWithProperties(context, metadata, toClass);
+    protected Class<?> target;
+
+    protected Function<Properties, Object> function;
+
+    public PropertiesMatcher(Class<?> target, Annotation[] annotations) {
+        this.target = target;
+        if (target != Properties.class && Map.class.isAssignableFrom(target)) {
+            this.function = properties -> {
+                Map<String, String> newMap = ReflectionUtils.newMap(target);
+                for (String propertyName : properties.stringPropertyNames()) {
+                    newMap.put(propertyName, properties.getProperty(propertyName));
                 }
-            }
+                return newMap;
+            };
         }
-        return false;
     }
 
-    public boolean setMatchedValueWithProperties(PluginContext context, Metadata metadata, Class<?> target) {
-        Map<String, Properties> propertiesMap = context.get(Plugin.PROPERTIES);
-        Map<String, Object> contents;
-        if (Properties.class == target) {
-            contents = new LinkedHashMap<>(propertiesMap);
-        } else if (Map.class.isAssignableFrom(target)) {
-            contents = new LinkedHashMap<>();
-            for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
-                Map<String, String> map = newMap(target);
-                Properties properties = entry.getValue();
-                for (String propertyName : properties.stringPropertyNames()) {
-                    map.put(propertyName, properties.getProperty(propertyName));
-                }
-                contents.put(entry.getKey(), map);
+    @Override
+    public Object getKey() {
+        return Plugin.PROPERTIES;
+    }
+
+    public Map<String, Object> filter(Map<String, Properties> propertiesMap) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
+            if (function == null) {
+                map.put(entry.getKey(), entry.getValue());
+            } else {
+                map.put(entry.getKey(), function.apply(entry.getValue()));
             }
-        } else {
-            return false;
         }
-        return setMatchedValue(context, metadata, contents, target, "properties");
+        return map;
+    }
+
+    @Getter
+    public static class MapMatcher extends PropertiesMatcher implements MapConvertor {
+
+        private final Class<?> mapClass;
+
+        public MapMatcher(Class<?> mapClass, Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+            this.mapClass = mapClass;
+        }
+    }
+
+    @Getter
+    public static class ListMatcher extends PropertiesMatcher implements ListConvertor {
+
+        private final Class<?> listClass;
+
+        public ListMatcher(Class<?> listClass, Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+            this.listClass = listClass;
+        }
+    }
+
+    @Getter
+    public static class SetMatcher extends PropertiesMatcher implements SetConvertor {
+
+        private final Class<?> setClass;
+
+        public SetMatcher(Class<?> setClass, Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+            this.setClass = setClass;
+        }
+    }
+
+    public static class ArrayMatcher extends PropertiesMatcher implements ArrayConvertor {
+
+        public ArrayMatcher(Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+        }
+
+        @Override
+        public Class<?> getArrayClass() {
+            return target;
+        }
+    }
+
+    public static class ObjectMatcher extends PropertiesMatcher implements ObjectConvertor {
+
+        public ObjectMatcher(Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+        }
+
+        @Override
+        public String getType() {
+            return "properties";
+        }
     }
 }

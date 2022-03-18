@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.jar.match;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
@@ -8,12 +7,14 @@ import com.github.linyuzai.plugin.jar.filter.AnnotationFilter;
 import com.github.linyuzai.plugin.jar.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.resolve.JarClassPluginResolver;
+import lombok.Getter;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @DependOnResolvers(JarClassPluginResolver.class)
-public abstract class ClassMatcher extends AbstractPluginMatcher {
+public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
 
     protected final Class<?> target;
 
@@ -48,17 +49,12 @@ public abstract class ClassMatcher extends AbstractPluginMatcher {
     }
 
     @Override
-    public Object match(PluginContext context) {
-        Map<String, Class<?>> classes = context.get(JarPlugin.CLASSES);
-        Map<String, Class<?>> map = filter(classes);
-        if (map.isEmpty()) {
-            return null;
-        }
-        return convert(map);
+    public Object getKey() {
+        return JarPlugin.CLASSES;
     }
 
-    public Map<String, Class<?>> filter(Map<String, Class<?>> classes) {
-        Map<String, Class<?>> map = new LinkedHashMap<>();
+    public Map<String, Object> filter(Map<String, Class<?>> classes) {
+        Map<String, Object> map = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {
             Class<?> value = entry.getValue();
             if (!target.isAssignableFrom(value)) {
@@ -78,5 +74,60 @@ public abstract class ClassMatcher extends AbstractPluginMatcher {
         return map;
     }
 
-    public abstract Object convert(Map<String, Class<?>> map);
+    @Getter
+    public static class MapMatcher extends ClassMatcher implements MapConvertor {
+
+        private final Class<?> mapClass;
+
+        public MapMatcher(Class<?> mapClass, Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+            this.mapClass = mapClass;
+        }
+    }
+
+    @Getter
+    public static class ListMatcher extends ClassMatcher implements ListConvertor {
+
+        private final Class<?> listClass;
+
+        public ListMatcher(Class<?> listClass, Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+            this.listClass = listClass;
+        }
+    }
+
+    @Getter
+    public static class SetMatcher extends ClassMatcher implements SetConvertor {
+
+        private final Class<?> setClass;
+
+        public SetMatcher(Class<?> setClass, Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+            this.setClass = setClass;
+        }
+    }
+
+    public static class ArrayMatcher extends ClassMatcher implements ArrayConvertor {
+
+        public ArrayMatcher(Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+        }
+
+        @Override
+        public Class<?> getArrayClass() {
+            return target;
+        }
+    }
+
+    public static class ObjectMatcher extends ClassMatcher implements ObjectConvertor {
+
+        public ObjectMatcher(Class<?> target, Annotation[] annotations) {
+            super(target, annotations);
+        }
+
+        @Override
+        public String getType() {
+            return "class";
+        }
+    }
 }

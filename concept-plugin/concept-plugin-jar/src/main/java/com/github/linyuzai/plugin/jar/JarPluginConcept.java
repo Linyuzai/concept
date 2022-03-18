@@ -3,11 +3,14 @@ package com.github.linyuzai.plugin.jar;
 import com.github.linyuzai.plugin.core.concept.AbstractPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
-import com.github.linyuzai.plugin.core.event.*;
+import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
-import com.github.linyuzai.plugin.core.resolve.*;
+import com.github.linyuzai.plugin.core.resolve.BytesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.FileNamePluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
@@ -17,7 +20,9 @@ import com.github.linyuzai.plugin.jar.resolve.JarBytesPluginResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarFileNamePluginResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarPropertiesPluginResolver;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.WeakHashMap;
 
 public class JarPluginConcept extends AbstractPluginConcept {
 

@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
-import com.github.linyuzai.plugin.jar.match.*;
+import com.github.linyuzai.plugin.jar.match.ClassMatcher;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -14,27 +14,23 @@ import java.lang.reflect.WildcardType;
 public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Type type, Annotation[] annotations) {
-        Type target = metadata.getType();
-        Class<?> targetClass = getTargetClass(target);
-        if (targetClass == null) {
-            return null;
-        }
+    public PluginMatcher getMatcher(TypeMetadata metadata, Class<?> target, Annotation[] annotations) {
         if (metadata.isMap()) {
-            return new ClassMapMatcher(metadata.getMapClass(), targetClass, annotations);
+            return new ClassMatcher.MapMatcher(metadata.getMapClass(), target, annotations);
         } else if (metadata.isList()) {
-            return new ClassListMatcher(metadata.getListClass(), targetClass, annotations);
+            return new ClassMatcher.ListMatcher(metadata.getListClass(), target, annotations);
         } else if (metadata.isSet()) {
-            return new ClassSetMatcher(metadata.getSetClass(), targetClass, annotations);
+            return new ClassMatcher.SetMatcher(metadata.getSetClass(), target, annotations);
         } else if (metadata.isCollection()) {
-            return new ClassListMatcher(metadata.getCollectionClass(), targetClass, annotations);
+            return new ClassMatcher.ListMatcher(metadata.getCollectionClass(), target, annotations);
         } else if (metadata.isArray()) {
-            return new ClassArrayMatcher(targetClass, annotations);
+            return new ClassMatcher.ArrayMatcher(target, annotations);
         } else {
-            return new ClassObjectMatcher(targetClass, annotations);
+            return new ClassMatcher.ObjectMatcher(target, annotations);
         }
     }
 
+    @Override
     public Class<?> getTargetClass(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;

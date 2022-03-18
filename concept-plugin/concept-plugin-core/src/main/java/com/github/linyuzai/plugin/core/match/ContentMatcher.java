@@ -1,87 +1,110 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.BytesPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @DependOnResolvers(BytesPluginResolver.class)
-public abstract class ContentMatcher<T> extends GenericTypePluginMatcher<T> {
+public abstract class ContentMatcher extends AbstractPluginMatcher<byte[]> {
 
-    private Charset charset;
+    protected final Class<?> target;
 
-    public ContentMatcher(String charset) {
-        this.charset = Charset.forName(charset);
+    protected final Charset charset;
+
+    protected Function<byte[], Object> function;
+
+    public ContentMatcher(Class<?> target, Charset charset, Annotation[] annotations) {
+        this.target = target;
+        this.charset = charset;
+        if (byte[].class != target) {
+            if (InputStream.class == target) {
+                function = ByteArrayInputStream::new;
+            } else if (String.class == target) {
+                function = bytes -> charset == null ? new String(bytes) : new String(bytes, charset);
+            }
+        }
     }
 
     @Override
-    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
-        if (type == byte[].class) {
-            Metadata metadata = new Metadata();
-            metadata.setTarget(byte[].class);
-            return setMatchedValueWithBytes(context, metadata, byte[].class);
-        }
-        return super.tryMatch(context, type, annotations);
+    public Object getKey() {
+        return Plugin.BYTES;
     }
 
-    @Override
-    public boolean tryMatch(PluginContext context, Metadata metadata, Annotation[] annotations) {
-        Type target = metadata.getTarget();
-        if (target instanceof Class) {
-            Class<?> clazz = (Class<?>) target;
-            return setMatchedValueWithBytes(context, metadata, clazz);
-        } else if (target instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) target).getRawType();
-            Class<?> toClass = toClass(rawType);
-            if (toClass != null) {
-                return setMatchedValueWithBytes(context, metadata, toClass);
-            }
-        } else if (target instanceof WildcardType) {
-            Type[] upperBounds = ((WildcardType) target).getUpperBounds();
-            if (upperBounds.length > 0) {
-                Class<?> toClass = toClass(upperBounds[0]);
-                if (toClass != null) {
-                    return setMatchedValueWithBytes(context, metadata, toClass);
-                }
+    public Map<String, Object> filter(Map<String, byte[]> bytesMap) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
+            if (function == null) {
+                map.put(entry.getKey(), entry.getValue());
+            } else {
+                map.put(entry.getKey(), function.apply(entry.getValue()));
             }
         }
-        return false;
+        return map;
     }
 
-    public boolean setMatchedValueWithBytes(PluginContext context, Metadata metadata, Class<?> target) {
-        Map<String, byte[]> bytesMap = context.get(Plugin.BYTES);
-        Map<String, Object> contentMap;
-        if (byte[].class == target) {
-            contentMap = new LinkedHashMap<>(bytesMap);
-        } else if (InputStream.class == target) {
-            contentMap = new LinkedHashMap<>();
-            for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
-                contentMap.put(entry.getKey(), new ByteArrayInputStream(entry.getValue()));
-            }
-        } else if (String.class == target) {
-            contentMap = new LinkedHashMap<>();
-            for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
-                byte[] value = entry.getValue();
-                String v = charset == null ? new String(value) : new String(value, charset);
-                contentMap.put(entry.getKey(), v);
-            }
-        } else {
-            return false;
+    @Getter
+    public static class MapMatcher extends ContentMatcher implements MapConvertor {
+
+        private final Class<?> mapClass;
+
+        public MapMatcher(Class<?> mapClass, Class<?> target, Charset charset, Annotation[] annotations) {
+            super(target, charset, annotations);
+            this.mapClass = mapClass;
         }
-        return setMatchedValue(context, metadata, contentMap, target, "content");
+    }
+
+    @Getter
+    public static class ListMatcher extends ContentMatcher implements ListConvertor {
+
+        private final Class<?> listClass;
+
+        public ListMatcher(Class<?> listClass, Class<?> target, Charset charset, Annotation[] annotations) {
+            super(target, charset, annotations);
+            this.listClass = listClass;
+        }
+    }
+
+    @Getter
+    public static class SetMatcher extends ContentMatcher implements SetConvertor {
+
+        private final Class<?> setClass;
+
+        public SetMatcher(Class<?> setClass, Class<?> target, Charset charset, Annotation[] annotations) {
+            super(target, charset, annotations);
+            this.setClass = setClass;
+        }
+    }
+
+    public static class ArrayMatcher extends ContentMatcher implements ArrayConvertor {
+
+        public ArrayMatcher(Class<?> target, Charset charset, Annotation[] annotations) {
+            super(target, charset, annotations);
+        }
+
+        @Override
+        public Class<?> getArrayClass() {
+            return target;
+        }
+    }
+
+    public static class ObjectMatcher extends ContentMatcher implements ObjectConvertor {
+
+        public ObjectMatcher(Class<?> target, Charset charset, Annotation[] annotations) {
+            super(target, charset, annotations);
+        }
+
+        @Override
+        public String getType() {
+            return "content";
+        }
     }
 }

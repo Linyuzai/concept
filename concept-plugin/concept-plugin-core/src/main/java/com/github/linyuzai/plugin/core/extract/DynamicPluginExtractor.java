@@ -56,6 +56,10 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         if (pluginObjectMatcher != null) {
             return pluginObjectMatcher;
         }
+        PluginMatcher propertiesMatcher = getPropertiesMatcher(parameter);
+        if (propertiesMatcher != null) {
+            return propertiesMatcher;
+        }
         return null;
     }
 
@@ -84,6 +88,21 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
 
             @Override
             public void onExtract(Plugin plugin) {
+
+            }
+        }.getMatcher();
+    }
+
+    public PluginMatcher getPropertiesMatcher(Parameter parameter) {
+        return new PropertiesExtractor<Object>() {
+
+            @Override
+            public void match(Type type, Annotation[] annotations) {
+                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
+            }
+
+            @Override
+            public void onExtract(Object plugin) {
 
             }
         }.getMatcher();
