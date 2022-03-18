@@ -1,6 +1,6 @@
-package com.github.linyuzai.plugin.core.extractor;
+package com.github.linyuzai.plugin.core.extract;
 
-import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
+import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
 
 import java.lang.reflect.Type;

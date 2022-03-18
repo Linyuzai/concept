@@ -1,8 +1,7 @@
 package com.github.linyuzai.plugin.jar.resolver;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.AbstractPluginResolver;
-import com.github.linyuzai.plugin.core.resolver.PluginResolverChain;
+import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 
 import java.util.List;

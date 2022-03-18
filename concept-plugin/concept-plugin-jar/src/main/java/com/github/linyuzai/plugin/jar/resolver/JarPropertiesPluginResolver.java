@@ -1,9 +1,9 @@
 package com.github.linyuzai.plugin.jar.resolver;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.PropertiesNamePluginResolver;
-import com.github.linyuzai.plugin.core.resolver.PropertiesPluginResolver;
-import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
+import com.github.linyuzai.plugin.core.resolve.PropertiesNamePluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
 

@@ -1,9 +1,9 @@
-package com.github.linyuzai.plugin.core.extractor;
+package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
-import com.github.linyuzai.plugin.core.resolver.PluginResolver;
+import com.github.linyuzai.plugin.core.match.PluginMatcher;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

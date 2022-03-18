@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.resolver.PluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 
 public interface PluginFilter {
 
@@ -17,6 +17,6 @@ public interface PluginFilter {
             }
             clazz = clazz.getSuperclass();
         }
-        throw new PluginException("A plugin resolver must be bound");
+        throw new PluginException("A plugin resolve must be bound");
     }
 }

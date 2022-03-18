@@ -1,7 +1,7 @@
-package com.github.linyuzai.plugin.core.extractor;
+package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.dependence.PluginResolverDependency;
+import com.github.linyuzai.plugin.core.resolve.PluginResolverDependency;
 
 public interface PluginExtractor extends PluginResolverDependency {
 

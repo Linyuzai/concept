@@ -1,8 +1,7 @@
-package com.github.linyuzai.plugin.core.resolver;
+package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
 
 import java.util.List;
 import java.util.stream.Collectors;

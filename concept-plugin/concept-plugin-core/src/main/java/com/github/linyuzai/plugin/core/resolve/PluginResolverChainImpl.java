@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.resolver;
+package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;

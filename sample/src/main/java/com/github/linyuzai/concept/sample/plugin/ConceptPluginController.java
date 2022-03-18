@@ -3,12 +3,13 @@ package com.github.linyuzai.concept.sample.plugin;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginPath;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
-import com.github.linyuzai.plugin.core.matcher.OnPluginMatched;
+import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
+import com.github.linyuzai.plugin.jar.extractor.ClassExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.matcher.*;
-import com.github.linyuzai.plugin.core.matcher.PluginMatch;
+import com.github.linyuzai.plugin.core.match.PluginMatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,13 +37,13 @@ public class ConceptPluginController {
                     System.out.println(plugin);
                 }
             })*/
-            .addMatcher(new ClassMatcher<Class<CustomPluginImpl>[]>() {
+            .addExtractor(new ClassExtractor<Class<CustomPluginImpl>[]>() {
                 @Override
-                public void onMatched(Class<CustomPluginImpl>[] plugin) {
+                public void onExtract(Class<CustomPluginImpl>[] plugin) {
                     System.out.println(Arrays.toString(plugin));
                 }
             })
-            //.match(this)//自动匹配回调添加了@OnPluginMatched注解的方法参数
+            .extractTo(this)//自动匹配回调添加了@OnPluginMatched注解的方法参数
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
@@ -67,7 +68,7 @@ public class ConceptPluginController {
      *
      * @param properties 匹配到的配置文件
      */
-    @OnPluginMatched
+    @OnPluginExtract
     private void onPluginMatched(
             //包下所有的class
             @PluginPackage("com.github.linyuzai.concept.sample.plugin") Collection<?> pluginsByPackage,

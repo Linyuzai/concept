@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.jar.matcher;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.matcher.GenericTypePluginMatcher;
-import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
+import com.github.linyuzai.plugin.core.match.GenericTypePluginMatcher;
+import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolver.JarInstancePluginResolver;
 

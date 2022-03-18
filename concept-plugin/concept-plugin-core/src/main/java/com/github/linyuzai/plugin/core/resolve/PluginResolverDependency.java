@@ -1,6 +1,4 @@
-package com.github.linyuzai.plugin.core.resolver.dependence;
-
-import com.github.linyuzai.plugin.core.resolver.PluginResolver;
+package com.github.linyuzai.plugin.core.resolve;
 
 public interface PluginResolverDependency {
 

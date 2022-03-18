@@ -4,14 +4,15 @@ import com.github.linyuzai.plugin.core.concept.AbstractPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
-import com.github.linyuzai.plugin.core.extractor.PluginExtractor;
+import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
-import com.github.linyuzai.plugin.core.resolver.*;
+import com.github.linyuzai.plugin.core.resolve.*;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
+import com.github.linyuzai.plugin.jar.matcher.JarDynamicPluginExtractor;
 import com.github.linyuzai.plugin.jar.resolver.JarBytesPluginResolver;
 import com.github.linyuzai.plugin.jar.resolver.JarFileNamePluginResolver;
 import com.github.linyuzai.plugin.jar.resolver.JarPropertiesPluginResolver;
@@ -63,12 +64,10 @@ public class JarPluginConcept extends AbstractPluginConcept {
         }
 
         public Builder extractTo(Object callback) {
-            //addExtractors(new JarDynamicPluginMatcher(callback));
-            return this;
+            return addExtractors(new JarDynamicPluginExtractor(callback));
         }
 
         public JarPluginConcept build() {
-
             if (classLoader == null) {
                 classLoader = getClass().getClassLoader();
             }

@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.filter;
 
-import com.github.linyuzai.plugin.core.resolver.PluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 
 import java.lang.annotation.*;
 

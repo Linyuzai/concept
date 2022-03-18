@@ -1,9 +1,9 @@
-package com.github.linyuzai.plugin.core.matcher;
+package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.BytesPluginResolver;
-import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
+import com.github.linyuzai.plugin.core.resolve.BytesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

@@ -1,9 +1,7 @@
-package com.github.linyuzai.plugin.core.matcher;
+package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.dependence.PluginResolverDependency;
-
-import java.lang.reflect.Type;
+import com.github.linyuzai.plugin.core.resolve.PluginResolverDependency;
 
 public interface PluginMatcher extends PluginResolverDependency {
 

@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.jar.matcher;
 
-import com.github.linyuzai.plugin.core.extractor.DynamicPluginExtractor;
-import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
+import com.github.linyuzai.plugin.core.extract.DynamicPluginExtractor;
+import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.jar.extractor.ClassExtractor;
 import lombok.NonNull;
 

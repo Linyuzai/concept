@@ -1,11 +1,10 @@
-package com.github.linyuzai.plugin.core.extractor;
+package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.matcher.OnPluginMatched;
-import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
-import com.github.linyuzai.plugin.core.resolver.PluginResolver;
+import com.github.linyuzai.plugin.core.match.PluginMatcher;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
@@ -28,7 +27,7 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         while (clazz != null) {
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
-                if (method.isAnnotationPresent(OnPluginMatched.class)) {
+                if (method.isAnnotationPresent(OnPluginExtract.class)) {
                     if (!method.isAccessible()) {
                         method.setAccessible(true);
                     }

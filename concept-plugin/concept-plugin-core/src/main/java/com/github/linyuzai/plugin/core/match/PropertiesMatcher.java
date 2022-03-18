@@ -1,9 +1,9 @@
-package com.github.linyuzai.plugin.core.matcher;
+package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
-import com.github.linyuzai.plugin.core.resolver.PropertiesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
+import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;

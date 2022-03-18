@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.matcher;
+package com.github.linyuzai.plugin.core.match;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

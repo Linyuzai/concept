@@ -1,17 +1,15 @@
 package com.github.linyuzai.plugin.jar.resolver;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolver.AbstractPluginResolver;
-import com.github.linyuzai.plugin.core.resolver.dependence.DependOnResolvers;
+import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @DependOnResolvers(JarClassPluginResolver.class)
 public class JarInstancePluginResolver extends AbstractPluginResolver {
