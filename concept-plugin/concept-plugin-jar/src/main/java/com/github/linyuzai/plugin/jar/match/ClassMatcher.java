@@ -1,11 +1,12 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
-import com.github.linyuzai.plugin.jar.resolver.JarClassPluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarClassPluginResolver;
 import lombok.AllArgsConstructor;
+
 import java.util.*;
 
 @AllArgsConstructor
@@ -17,15 +18,15 @@ public abstract class ClassMatcher extends AbstractPluginMatcher {
     @Override
     public Object match(PluginContext context) {
         Map<String, Class<?>> classes = context.get(JarPlugin.CLASSES);
-        Map<String, Object> map = filterByClass(classes, target);
+        Map<String, Class<?>> map = filterByClass(classes, target);
         if (map.isEmpty()) {
             return null;
         }
-        return map(map);
+        return convert(map);
     }
 
-    public Map<String, Object> filterByClass(Map<String, Class<?>> classes, Class<?> target) {
-        Map<String, Object> map = new LinkedHashMap<>();
+    public Map<String, Class<?>> filterByClass(Map<String, Class<?>> classes, Class<?> target) {
+        Map<String, Class<?>> map = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {
             Class<?> value = entry.getValue();
             if (target.isAssignableFrom(value)) {
@@ -35,5 +36,5 @@ public abstract class ClassMatcher extends AbstractPluginMatcher {
         return map;
     }
 
-    public abstract Object map(Map<String, Object> map);
+    public abstract Object convert(Map<String, Class<?>> map);
 }

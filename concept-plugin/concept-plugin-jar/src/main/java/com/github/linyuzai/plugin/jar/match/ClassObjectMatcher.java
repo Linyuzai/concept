@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.exception.PluginException;
 
@@ -13,8 +13,8 @@ public class ClassObjectMatcher extends ClassMatcher {
     }
 
     @Override
-    public Object map(Map<String, Object> map) {
-        List<?> list = new ArrayList<>(map.values());
+    public Object convert(Map<String, Class<?>> map) {
+        List<Class<?>> list = new ArrayList<>(map.values());
         if (map.size() > 1) {
             throw new PluginException("More than one class matched: " + list);
         }

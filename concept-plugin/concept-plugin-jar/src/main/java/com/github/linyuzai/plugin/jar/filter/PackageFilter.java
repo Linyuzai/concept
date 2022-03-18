@@ -4,8 +4,7 @@ import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import com.github.linyuzai.plugin.jar.JarPlugin;
-import com.github.linyuzai.plugin.jar.resolver.JarClassNamePluginResolver;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.plugin.jar.resolve.JarClassNamePluginResolver;
 import lombok.Getter;
 
 import java.util.Arrays;

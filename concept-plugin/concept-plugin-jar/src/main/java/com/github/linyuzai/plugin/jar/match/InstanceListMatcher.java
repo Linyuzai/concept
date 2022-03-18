@@ -1,21 +1,21 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 
 import java.util.List;
 import java.util.Map;
 
-public class ClassListMatcher extends ClassMatcher {
+public class InstanceListMatcher extends InstanceMatcher {
 
     private final Class<?> listClass;
 
-    public ClassListMatcher(Class<?> target, Class<?> listClass) {
+    public InstanceListMatcher(Class<?> target, Class<?> listClass) {
         super(target);
         this.listClass = listClass;
     }
 
     @Override
-    public Object map(Map<String, Object> map) {
+    public Object convert(Map<String, Object> map) {
         List<Object> list = ReflectionUtils.newList(listClass);
         list.addAll(map.values());
         return list;

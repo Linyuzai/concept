@@ -1,8 +1,9 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.extract.DynamicPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.jar.extractor.ClassExtractor;
+import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
+import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import lombok.NonNull;
 
 import java.lang.reflect.Parameter;
@@ -24,11 +25,30 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
         if (classMatcher != null) {
             return classMatcher;
         }
+        PluginMatcher instanceMatcher = getInstanceMatcher(parameter);
+        if (instanceMatcher != null) {
+            return instanceMatcher;
+        }
         return null;
     }
 
     public PluginMatcher getClassMatcher(Parameter parameter) {
         return new ClassExtractor<Object>() {
+
+            @Override
+            public void match(Type type) {
+                matcher = getMatcher(parameter.getParameterizedType());
+            }
+
+            @Override
+            public void onExtract(Object plugin) {
+
+            }
+        }.getMatcher();
+    }
+
+    public PluginMatcher getInstanceMatcher(Parameter parameter) {
+        return new InstanceExtractor<Object>() {
 
             @Override
             public void match(Type type) {

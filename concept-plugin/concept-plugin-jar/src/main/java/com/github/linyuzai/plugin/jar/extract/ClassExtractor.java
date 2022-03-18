@@ -1,10 +1,10 @@
-package com.github.linyuzai.plugin.jar.extractor;
+package com.github.linyuzai.plugin.jar.extract;
 
 import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
-import com.github.linyuzai.plugin.jar.matcher.*;
+import com.github.linyuzai.plugin.jar.match.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

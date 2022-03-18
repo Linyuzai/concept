@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PluginClass {
+public @interface PluginClassName {
 
-    Class<?>[] value();
+    String[] value();
 }

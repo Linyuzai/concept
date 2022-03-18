@@ -1,0 +1,24 @@
+package com.github.linyuzai.plugin.jar.match;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class ClassArrayMatcher extends ClassMatcher {
+
+    public ClassArrayMatcher(Class<?> target) {
+        super(target);
+    }
+
+    @Override
+    public Object convert(Map<String, Class<?>> map) {
+        List<Class<?>> values = new ArrayList<>(map.values());
+        Object array = Array.newInstance(target, values.size());
+        for (int i = 0; i < values.size(); i++) {
+            Class<?> c = values.get(i);
+            Array.set(array, i, c);
+        }
+        return array;
+    }
+}

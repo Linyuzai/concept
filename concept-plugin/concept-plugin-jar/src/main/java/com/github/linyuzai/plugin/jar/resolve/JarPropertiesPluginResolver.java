@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.resolver;
+package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.PropertiesNamePluginResolver;

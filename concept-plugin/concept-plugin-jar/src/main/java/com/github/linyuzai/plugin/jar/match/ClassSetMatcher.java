@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 
@@ -15,8 +15,8 @@ public class ClassSetMatcher extends ClassMatcher {
     }
 
     @Override
-    public Object map(Map<String, Object> map) {
-        Set<Object> set = ReflectionUtils.newSet(setClass);
+    public Object convert(Map<String, Class<?>> map) {
+        Set<Class<?>> set = ReflectionUtils.newSet(setClass);
         set.addAll(map.values());
         return set;
     }

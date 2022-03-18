@@ -12,10 +12,10 @@ import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
-import com.github.linyuzai.plugin.jar.matcher.JarDynamicPluginExtractor;
-import com.github.linyuzai.plugin.jar.resolver.JarBytesPluginResolver;
-import com.github.linyuzai.plugin.jar.resolver.JarFileNamePluginResolver;
-import com.github.linyuzai.plugin.jar.resolver.JarPropertiesPluginResolver;
+import com.github.linyuzai.plugin.jar.match.JarDynamicPluginExtractor;
+import com.github.linyuzai.plugin.jar.resolve.JarBytesPluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarFileNamePluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarPropertiesPluginResolver;
 
 import java.util.*;
 

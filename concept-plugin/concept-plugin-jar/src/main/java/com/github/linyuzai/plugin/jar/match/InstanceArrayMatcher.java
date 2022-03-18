@@ -1,18 +1,18 @@
-package com.github.linyuzai.plugin.jar.matcher;
+package com.github.linyuzai.plugin.jar.match;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ClassArrayMatcher extends ClassMatcher {
+public class InstanceArrayMatcher extends InstanceMatcher {
 
-    public ClassArrayMatcher(Class<?> target) {
+    public InstanceArrayMatcher(Class<?> target) {
         super(target);
     }
 
     @Override
-    public Object map(Map<String, Object> map) {
+    public Object convert(Map<String, Object> map) {
         List<Object> values = new ArrayList<>(map.values());
         Object array = Array.newInstance(target, values.size());
         for (int i = 0; i < values.size(); i++) {
