@@ -45,6 +45,9 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
             }
             clazz = clazz.getSuperclass();
         }
+        if (methodPluginMatchersMap.isEmpty()) {
+            throw new PluginException("No method with @OnPluginExtract");
+        }
     }
 
     public PluginMatcher getMatcher(Parameter parameter) {
