@@ -4,11 +4,8 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.AllArgsConstructor;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-
 @AllArgsConstructor
-public class PluginObjectMatcher extends GenericTypePluginMatcher<Plugin> {
+public class PluginObjectMatcher implements PluginMatcher {
 
     private final Class<?> clazz;
 
@@ -17,17 +14,11 @@ public class PluginObjectMatcher extends GenericTypePluginMatcher<Plugin> {
     }
 
     @Override
-    public boolean tryMatch(PluginContext context, Type type, Annotation[] annotations) {
-        return type instanceof Class && ((Class<?>) type).isInstance(context.getPlugin());
-    }
-
-    @Override
-    public boolean isMatched(PluginContext context) {
-        return clazz.isInstance(context.getPlugin());
-    }
-
-    @Override
-    public Plugin getMatched(PluginContext context) {
-        return context.getPlugin();
+    public Object match(PluginContext context) {
+        Plugin plugin = context.getPlugin();
+        if (clazz.isInstance(plugin)) {
+            return plugin;
+        }
+        return null;
     }
 }

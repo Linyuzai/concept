@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 public abstract class PluginObjectExtractor<T extends Plugin> extends AbstractPluginExtractor<T> {
 
     @Override
-    public PluginMatcher bind(Type type) {
+    public PluginMatcher getMatcher(Type type) {
         Class<?> clazz = ReflectionUtils.toClass(type);
         if (clazz == null) {
             return null;

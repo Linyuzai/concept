@@ -5,22 +5,28 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.matcher.PluginMatcher;
 import com.github.linyuzai.plugin.core.resolver.PluginResolver;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+@Getter
 @AllArgsConstructor
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
-    private final PluginMatcher matcher;
+    protected PluginMatcher matcher;
 
     public AbstractPluginExtractor() {
-        Type type = getGenericType();
-        this.matcher = bind(type);
+        match(getGenericType());
+    }
+
+    public void match(Type type) {
+        this.matcher = getMatcher(type);
         if (this.matcher == null) {
-            throw new PluginException("Can not bind " + type + " to " + getClass().getGenericSuperclass());
+            throw new PluginException("Can not match " + type);
         }
     }
+
     public Type getGenericType() {
         Type type = getClass().getGenericSuperclass();
         if (type instanceof ParameterizedType) {
@@ -32,14 +38,16 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         throw new PluginException("U may need to try override this method");
     }
 
-    public abstract PluginMatcher bind(Type type);
+    public abstract PluginMatcher getMatcher(Type type);
 
     @SuppressWarnings("unchecked")
     @Override
     public void extract(PluginContext context) {
-        if (matcher.isMatched(context)) {
-            onExtract((T) matcher.getMatched(context));
+        Object match = matcher.match(context);
+        if (match == null) {
+            return;
         }
+        onExtract((T) match);
     }
 
     public abstract void onExtract(T plugin);

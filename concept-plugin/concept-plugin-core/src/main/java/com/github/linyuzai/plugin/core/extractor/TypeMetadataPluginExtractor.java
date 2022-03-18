@@ -8,13 +8,13 @@ import java.lang.reflect.Type;
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
 
     @Override
-    public PluginMatcher bind(Type type) {
+    public PluginMatcher getMatcher(Type type) {
         TypeMetadata metadata = TypeMetadata.from(type);
         if (metadata == null) {
             return null;
         }
-        return bind(metadata, type);
+        return getMatcher(metadata, type);
     }
 
-    public abstract PluginMatcher bind(TypeMetadata metadata, Type type);
+    public abstract PluginMatcher getMatcher(TypeMetadata metadata, Type type);
 }

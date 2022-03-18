@@ -13,7 +13,7 @@ import java.lang.reflect.WildcardType;
 public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     @Override
-    public PluginMatcher bind(TypeMetadata metadata, Type type) {
+    public PluginMatcher getMatcher(TypeMetadata metadata, Type type) {
         Type target = metadata.getType();
         Class<?> targetClass = getTargetClass(target);
         if (targetClass == null) {
