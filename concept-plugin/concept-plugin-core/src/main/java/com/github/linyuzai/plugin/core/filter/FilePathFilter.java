@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.resolve.FileNamePluginResolver;
+import com.github.linyuzai.plugin.core.resolve.FilePathNamePluginResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import lombok.Getter;
 
@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@FilterWithResolver(FileNamePluginResolver.class)
-public class PathFilter extends AbstractPluginFilter<List<String>> {
+@FilterWithResolver(FilePathNamePluginResolver.class)
+public class FilePathFilter extends AbstractPluginFilter<List<String>> {
 
     private final Collection<String> paths;
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
-    public PathFilter(String... paths) {
+    public FilePathFilter(String... paths) {
         this(Arrays.asList(paths));
     }
 
-    public PathFilter(Collection<String> paths) {
+    public FilePathFilter(Collection<String> paths) {
         this.paths = paths;
     }
 

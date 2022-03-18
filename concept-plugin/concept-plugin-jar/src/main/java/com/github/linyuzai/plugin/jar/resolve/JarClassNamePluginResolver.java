@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@DependOnResolvers(JarFileNamePluginResolver.class)
+@DependOnResolvers(JarFilePathNamePluginResolver.class)
 public class JarClassNamePluginResolver extends AbstractPluginResolver {
 
     @Override

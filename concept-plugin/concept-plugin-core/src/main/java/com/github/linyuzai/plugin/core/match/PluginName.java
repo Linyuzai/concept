@@ -7,15 +7,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PluginMatch {
-
-    String[] path() default {};
+public @interface PluginName {
 
     String[] name() default {};
 
-    String[] prefix() default {};
-
-    String[] suffix() default {};
-
-    String[] regex() default {};
+    //String[] regex() default {};
 }

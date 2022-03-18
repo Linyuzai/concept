@@ -6,7 +6,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@DependOnResolvers(FileNamePluginResolver.class)
+@DependOnResolvers(FilePathNamePluginResolver.class)
 public class PropertiesNamePluginResolver extends AbstractPluginResolver {
 
     @Override

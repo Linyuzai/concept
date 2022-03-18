@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class ReflectionUtils {
 
     public static Class<?> toClass(Type type) {
@@ -43,7 +44,7 @@ public class ReflectionUtils {
     public static <E> Set<E> newSet(Class<?> clazz) {
         int modifiers = clazz.getModifiers();
         if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
-            return new HashSet<>();
+            return new LinkedHashSet<>();
         } else {
             return (Set<E>) clazz.newInstance();
         }

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
-@DependOnResolvers(JarFileNamePluginResolver.class)
+@DependOnResolvers(JarFilePathNamePluginResolver.class)
 public class JarBytesPluginResolver extends BytesPluginResolver {
 
     @Override

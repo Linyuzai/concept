@@ -9,7 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 @AllArgsConstructor
-@DependOnResolvers(FileNamePluginResolver.class)
+@DependOnResolvers(FilePathNamePluginResolver.class)
 public abstract class BytesPluginResolver extends AbstractPluginResolver {
 
     private final int bufferSize;

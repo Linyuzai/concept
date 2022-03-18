@@ -1,15 +1,15 @@
 package com.github.linyuzai.concept.sample.plugin;
 
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.PluginPath;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
+import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.*;
-import com.github.linyuzai.plugin.core.match.PluginMatch;
+import com.github.linyuzai.plugin.core.match.PluginPath;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,7 @@ public class ConceptPluginController {
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
             .pluginConcept(concept)
-            .paths(new PluginPath.Builder().path("/Users/tanghanzheng/concept/plugin/").build())
+            .paths(new com.github.linyuzai.plugin.core.autoload.PluginPath.Builder().path("/Users/tanghanzheng/concept/plugin/").build())
             .executorService(Executors.newSingleThreadExecutor())
             .errorConsumer(e -> log.error("Plugin auto load error", e))
             .build();
@@ -77,9 +77,9 @@ public class ConceptPluginController {
             //所有的 com.github.linyuzai.concept.sample.plugin.CustomPlugin 类
             @PluginClassName("com.github.linyuzai.concept.sample.plugin.CustomPlugin") Collection<? extends CustomPlugin> pluginsByClassName,
             @PluginClass(CustomPluginImpl.class) Collection<?> pluginsByClass,
-            @PluginMatch(path = "/resources/concept") Properties properties,
+            @PluginPath(path = "/resources/concept") Properties properties,
             @PluginProperties("concept.plugin") Map<String, String> map,
-            @PluginMatch(name = "config.json") String json) {
+            @PluginName(name = "config.json") String json) {
         //在这里处理匹配到的插件和配置文件
         for (CustomPlugin plugin : pluginsByClassName) {
             System.out.println(plugin.getClass());

@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.filter.AnnotationFilter;
 import com.github.linyuzai.plugin.jar.filter.ClassFilter;
+import com.github.linyuzai.plugin.jar.filter.ClassNameFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.resolve.JarClassPluginResolver;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
 
     protected PackageFilter packageFilter;
 
+    protected ClassNameFilter classNameFilter;
+
     protected ClassFilter classFilter;
 
     protected AnnotationFilter annotationFilter;
@@ -33,7 +36,10 @@ public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
                     packageFilter = new PackageFilter(packages);
                 }
             } else if (annotation.annotationType() == PluginClassName.class) {
-
+                String[] classNames = ((PluginClassName) annotation).value();
+                if (classNames.length > 0) {
+                    classNameFilter = new ClassNameFilter(classNames);
+                }
             } else if (annotation.annotationType() == PluginClass.class) {
                 Class<?>[] classes = ((PluginClass) annotation).value();
                 if (classes.length > 0) {
@@ -61,6 +67,9 @@ public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
                 continue;
             }
             if (packageFilter != null && !packageFilter.matchPackages(value.getName())) {
+                continue;
+            }
+            if (classNameFilter != null && !classNameFilter.matchClassNames(value.getName())) {
                 continue;
             }
             if (classFilter != null && !classFilter.matchClasses(value)) {
