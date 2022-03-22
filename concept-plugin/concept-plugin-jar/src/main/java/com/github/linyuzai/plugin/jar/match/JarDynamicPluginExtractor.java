@@ -22,6 +22,10 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
         if (matcher != null) {
             return matcher;
         }
+        return getMatcher0(parameter);
+    }
+
+    private PluginMatcher getMatcher0(Parameter parameter) {
         PluginMatcher classMatcher = getClassMatcher(parameter);
         if (classMatcher != null) {
             return classMatcher;
@@ -35,13 +39,23 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
 
     @Override
     public boolean hasAssociationAnnotation(Annotation annotation) {
-        //TODO
+        if (annotation.annotationType() == PluginAnnotation.class ||
+                annotation.annotationType() == PluginClass.class ||
+                annotation.annotationType() == PluginClassName.class ||
+                annotation.annotationType() == PluginPackage.class) {
+            return true;
+        }
         return super.hasAssociationAnnotation(annotation);
     }
 
     @Override
     public PluginMatcher getAssociationMatcher(Annotation annotation, Parameter parameter) {
-        //TODO
+        if (annotation.annotationType() == PluginAnnotation.class ||
+                annotation.annotationType() == PluginClass.class ||
+                annotation.annotationType() == PluginClassName.class ||
+                annotation.annotationType() == PluginPackage.class) {
+            return getMatcher0(parameter);
+        }
         return super.getAssociationMatcher(annotation, parameter);
     }
 
