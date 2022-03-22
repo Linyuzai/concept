@@ -33,6 +33,18 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
         return null;
     }
 
+    @Override
+    public boolean hasAssociationAnnotation(Annotation annotation) {
+        //TODO
+        return super.hasAssociationAnnotation(annotation);
+    }
+
+    @Override
+    public PluginMatcher getAssociationMatcher(Annotation annotation, Parameter parameter) {
+        //TODO
+        return super.getAssociationMatcher(annotation, parameter);
+    }
+
     public PluginMatcher getClassMatcher(Parameter parameter) {
         return new ClassExtractor<Object>() {
 

@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
+import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -46,11 +47,17 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
             clazz = clazz.getSuperclass();
         }
         if (methodPluginMatchersMap.isEmpty()) {
-            throw new PluginException("No method with @OnPluginExtract");
+            throw new PluginException("No method has @OnPluginExtract");
         }
     }
 
     public PluginMatcher getMatcher(Parameter parameter) {
+        Annotation[] annotations = parameter.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (hasAssociationAnnotation(annotation)) {
+                return getAssociationMatcher(annotation, parameter);
+            }
+        }
         PluginMatcher pluginContextMatcher = getPluginContextMatcher(parameter);
         if (pluginContextMatcher != null) {
             return pluginContextMatcher;
@@ -64,6 +71,17 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
             return propertiesMatcher;
         }
         return null;
+    }
+
+    public boolean hasAssociationAnnotation(Annotation annotation) {
+        return annotation.annotationType() == PluginProperties.class;
+    }
+
+    public PluginMatcher getAssociationMatcher(Annotation annotation, Parameter parameter) {
+        if (annotation.annotationType() == PluginProperties.class) {
+            return getPropertiesMatcher(parameter);
+        }
+        throw new PluginException(annotation + " has no association with matcher");
     }
 
     public PluginMatcher getPluginContextMatcher(Parameter parameter) {

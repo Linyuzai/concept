@@ -1,12 +1,7 @@
 package com.github.linyuzai.plugin.jar.match;
 
-import com.github.linyuzai.plugin.core.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
-import com.github.linyuzai.plugin.jar.filter.AnnotationFilter;
-import com.github.linyuzai.plugin.jar.filter.ClassFilter;
-import com.github.linyuzai.plugin.jar.filter.ClassNameFilter;
-import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.resolve.JarClassPluginResolver;
 import lombok.Getter;
 
@@ -15,43 +10,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @DependOnResolvers(JarClassPluginResolver.class)
-public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
-
-    protected final Class<?> target;
-
-    protected PackageFilter packageFilter;
-
-    protected ClassNameFilter classNameFilter;
-
-    protected ClassFilter classFilter;
-
-    protected AnnotationFilter annotationFilter;
+public abstract class ClassMatcher extends AbstractJarPluginMatcher<Class<?>> {
 
     public ClassMatcher(Class<?> target, Annotation[] annotations) {
-        this.target = target;
-        for (Annotation annotation : annotations) {
-            if (annotation.annotationType() == PluginPackage.class) {
-                String[] packages = ((PluginPackage) annotation).value();
-                if (packages.length > 0) {
-                    packageFilter = new PackageFilter(packages);
-                }
-            } else if (annotation.annotationType() == PluginClassName.class) {
-                String[] classNames = ((PluginClassName) annotation).value();
-                if (classNames.length > 0) {
-                    classNameFilter = new ClassNameFilter(classNames);
-                }
-            } else if (annotation.annotationType() == PluginClass.class) {
-                Class<?>[] classes = ((PluginClass) annotation).value();
-                if (classes.length > 0) {
-                    classFilter = new ClassFilter(classes);
-                }
-            } else if (annotation.annotationType() == PluginAnnotation.class) {
-                Class<? extends Annotation>[] classes = ((PluginAnnotation) annotation).value();
-                if (classes.length > 0) {
-                    annotationFilter = new AnnotationFilter(classes);
-                }
-            }
-        }
+        super(target, annotations);
     }
 
     @Override
@@ -63,22 +25,9 @@ public abstract class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
         Map<String, Object> map = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {
             Class<?> value = entry.getValue();
-            if (!target.isAssignableFrom(value)) {
-                continue;
+            if (target.isAssignableFrom(value) && filterWithAnnotation(value)) {
+                map.put(entry.getKey(), value);
             }
-            if (packageFilter != null && !packageFilter.matchPackages(value.getName())) {
-                continue;
-            }
-            if (classNameFilter != null && !classNameFilter.matchClassNames(value.getName())) {
-                continue;
-            }
-            if (classFilter != null && !classFilter.matchClasses(value)) {
-                continue;
-            }
-            if (annotationFilter != null && !annotationFilter.hasAnnotation(value)) {
-                continue;
-            }
-            map.put(entry.getKey(), value);
         }
         return map;
     }
