@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.convert;
 
-import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

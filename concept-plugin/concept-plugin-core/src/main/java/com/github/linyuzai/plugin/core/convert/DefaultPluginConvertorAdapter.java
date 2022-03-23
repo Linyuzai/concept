@@ -6,6 +6,7 @@ public class DefaultPluginConvertorAdapter implements PluginConvertorAdapter {
 
     @Override
     public PluginConvertor adapt(TypeMetadata metadata) {
+        //暂时枚举
         Class<?> target = metadata.getTargetClass();
         if (metadata.isMap()) {
             return new MapToMapConvertor(metadata.getMapClass());

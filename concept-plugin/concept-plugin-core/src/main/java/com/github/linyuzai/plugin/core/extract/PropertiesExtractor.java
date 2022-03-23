@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.extract;
 
-import com.github.linyuzai.plugin.core.convert.*;
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.match.PropertiesMatcher;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
