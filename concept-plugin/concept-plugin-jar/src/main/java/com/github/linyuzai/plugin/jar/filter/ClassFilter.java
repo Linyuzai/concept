@@ -26,7 +26,7 @@ public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
     @Override
     public Map<String, Class<?>> doFilter(Map<String, Class<?>> plugins) {
         return plugins.entrySet().stream()
-                .filter(it -> filterWithNegation(matchClasses(it.getValue())))
+                .filter(it -> filterWithNegation(matchClass(it.getValue())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -35,7 +35,7 @@ public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
         return JarPlugin.CLASS;
     }
 
-    public boolean matchClasses(Class<?> c) {
+    public boolean matchClass(Class<?> c) {
         for (Class<?> clazz : classes) {
             if (clazz.isAssignableFrom(c)) {
                 return true;

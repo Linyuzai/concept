@@ -5,7 +5,6 @@ import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
-import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
@@ -21,7 +20,7 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<String, Propert
     protected Function<Properties, Object> function;
 
     public PropertiesMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
-        super(convertor);
+        super(annotations, convertor);
         this.target = target;
         if (target != Properties.class && Map.class.isAssignableFrom(target)) {
             this.function = properties -> {

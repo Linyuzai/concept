@@ -38,7 +38,7 @@ public class PathFilter extends AbstractPluginFilter<List<String>> {
         return Plugin.PATH_NAME;
     }
 
-    private boolean matchPath(String path) {
+    public boolean matchPath(String path) {
         for (String p : paths) {
             if (!p.endsWith("/")) {
                 p = p + "/";

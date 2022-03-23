@@ -23,7 +23,7 @@ public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>, M
     protected Function<byte[], Object> function;
 
     public ContentMatcher(Class<?> target, Charset charset, Annotation[] annotations, PluginConvertor convertor) {
-        super(convertor);
+        super(annotations, convertor);
         this.target = target;
         this.charset = charset;
         if (byte[].class != target) {

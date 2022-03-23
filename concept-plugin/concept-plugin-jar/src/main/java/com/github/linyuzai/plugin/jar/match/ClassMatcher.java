@@ -25,7 +25,7 @@ public class ClassMatcher extends AbstractJarPluginMatcher<Map<String, Class<?>>
         Map<String, Class<?>> map = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {
             Class<?> value = entry.getValue();
-            if (target.isAssignableFrom(value) && filterWithAnnotation(value)) {
+            if (target.isAssignableFrom(value) && filterWithAnnotation(entry.getKey(), value)) {
                 map.put(entry.getKey(), value);
             }
         }

@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PluginPath {
 
-    String[] path() default {};
+    String[] value() default {};
 }

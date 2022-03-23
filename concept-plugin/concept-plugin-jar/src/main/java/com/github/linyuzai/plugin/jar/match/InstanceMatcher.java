@@ -25,7 +25,7 @@ public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object
         Map<String, Object> map = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : instances.entrySet()) {
             Object value = entry.getValue();
-            if (target.isInstance(value) && filterWithAnnotation(value.getClass())) {
+            if (target.isInstance(value) && filterWithAnnotation(entry.getKey(), value.getClass())) {
                 map.put(entry.getKey(), value);
             }
         }

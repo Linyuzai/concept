@@ -32,7 +32,7 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
     public Map<String, String> doFilter(Map<String, String> plugins) {
         return plugins.entrySet()
                 .stream()
-                .filter(it -> filterWithNegation(matchPackages(it.getValue())))
+                .filter(it -> filterWithNegation(matchPackage(it.getValue())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -41,7 +41,7 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
         return JarPlugin.CLASS_NAME;
     }
 
-    public boolean matchPackages(String className) {
+    public boolean matchPackage(String className) {
         for (String p : packages) {
             int lastIndexOf = className.lastIndexOf(".");
             if (lastIndexOf == -1) {

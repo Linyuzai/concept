@@ -34,7 +34,7 @@ public class NameFilter extends AbstractPluginFilter<List<String>> {
                 .collect(Collectors.toList());
     }
 
-    private boolean matchName(String name) {
+    public boolean matchName(String name) {
         for (String n : names) {
             int lastIndexOf = name.lastIndexOf("/");
             if (matcher.match(n, name.substring(lastIndexOf + 1))) {

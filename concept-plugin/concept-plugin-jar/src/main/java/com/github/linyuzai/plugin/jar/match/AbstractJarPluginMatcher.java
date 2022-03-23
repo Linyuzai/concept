@@ -24,7 +24,7 @@ public abstract class AbstractJarPluginMatcher<T, R> extends AbstractPluginMatch
     protected AnnotationFilter annotationFilter;
 
     public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
-        super(convertor);
+        super(annotations, convertor);
         this.target = target;
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginPackage.class) {
@@ -51,14 +51,17 @@ public abstract class AbstractJarPluginMatcher<T, R> extends AbstractPluginMatch
         }
     }
 
-    public boolean filterWithAnnotation(Class<?> clazz) {
-        if (packageFilter != null && !packageFilter.matchPackages(clazz.getName())) {
+    public boolean filterWithAnnotation(String pathAndName, Class<?> clazz) {
+        if (!filterWithAnnotation(pathAndName)) {
             return false;
         }
-        if (classNameFilter != null && !classNameFilter.matchClassNames(clazz.getName())) {
+        if (packageFilter != null && !packageFilter.matchPackage(clazz.getName())) {
             return false;
         }
-        if (classFilter != null && !classFilter.matchClasses(clazz)) {
+        if (classNameFilter != null && !classNameFilter.matchClassName(clazz.getName())) {
+            return false;
+        }
+        if (classFilter != null && !classFilter.matchClass(clazz)) {
             return false;
         }
         if (annotationFilter != null && !annotationFilter.hasAnnotation(clazz)) {

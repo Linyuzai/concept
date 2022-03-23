@@ -26,7 +26,7 @@ public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
     @Override
     public Map<String, String> doFilter(Map<String, String> plugins) {
         return plugins.entrySet().stream()
-                .filter(it -> filterWithNegation(matchClassNames(it.getValue())))
+                .filter(it -> filterWithNegation(matchClassName(it.getValue())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -35,7 +35,7 @@ public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
         return JarPlugin.CLASS_NAME;
     }
 
-    public boolean matchClassNames(String className) {
+    public boolean matchClassName(String className) {
         for (String name : classNames) {
             if (className.equals(name)) {
                 return true;
