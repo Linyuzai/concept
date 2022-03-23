@@ -61,12 +61,12 @@ public class ReflectionUtils {
     }
 
     @SneakyThrows
-    public static <E> Map<String, E> newMap(Class<?> clazz) {
+    public static <K, E> Map<K, E> newMap(Class<?> clazz) {
         int modifiers = clazz.getModifiers();
         if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
             return new LinkedHashMap<>();
         } else {
-            return (Map<String, E>) clazz.newInstance();
+            return (Map<K, E>) clazz.newInstance();
         }
     }
 }

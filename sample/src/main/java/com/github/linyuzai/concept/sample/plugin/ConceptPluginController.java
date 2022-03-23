@@ -45,7 +45,7 @@ public class ConceptPluginController {
                     System.out.println(Arrays.toString(plugin));
                 }
             })
-            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()

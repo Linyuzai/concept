@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.extract;
 
+import com.github.linyuzai.plugin.core.convert.*;
 import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
@@ -21,24 +22,14 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
     }
 
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Class<?> target, Annotation[] annotations) {
+    public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
+        Class<?> target = metadata.getTargetClass();
         if (metadata.isArray() && target == byte.class) {
-            return new ContentMatcher.ObjectMatcher(byte[].class, charset, annotations);
+            return new ContentMatcher(byte[].class, charset, annotations, new MapToObjectConvertor());
         }
         if (target == String.class || InputStream.class.isAssignableFrom(target)) {
-            if (metadata.isMap()) {
-                return new ContentMatcher.MapMatcher(metadata.getMapClass(), target, charset, annotations);
-            } else if (metadata.isList()) {
-                return new ContentMatcher.ListMatcher(metadata.getListClass(), target, charset, annotations);
-            } else if (metadata.isSet()) {
-                return new ContentMatcher.SetMatcher(metadata.getSetClass(), target, charset, annotations);
-            } else if (metadata.isCollection()) {
-                return new ContentMatcher.ListMatcher(metadata.getCollectionClass(), target, charset, annotations);
-            } else if (metadata.isArray()) {
-                return new ContentMatcher.ArrayMatcher(target, charset, annotations);
-            } else {
-                return new ContentMatcher.ObjectMatcher(target, charset, annotations);
-            }
+            PluginConvertor convertor = getConvertorAdapter().adapt(metadata);
+            return new ContentMatcher(target, charset, annotations, convertor);
         }
         return null;
     }

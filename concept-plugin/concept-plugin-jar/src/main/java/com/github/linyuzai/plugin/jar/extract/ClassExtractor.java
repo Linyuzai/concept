@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.extract;
 
+import com.github.linyuzai.plugin.core.convert.*;
 import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
@@ -14,20 +15,10 @@ import java.lang.reflect.WildcardType;
 public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Class<?> target, Annotation[] annotations) {
-        if (metadata.isMap()) {
-            return new ClassMatcher.MapMatcher(metadata.getMapClass(), target, annotations);
-        } else if (metadata.isList()) {
-            return new ClassMatcher.ListMatcher(metadata.getListClass(), target, annotations);
-        } else if (metadata.isSet()) {
-            return new ClassMatcher.SetMatcher(metadata.getSetClass(), target, annotations);
-        } else if (metadata.isCollection()) {
-            return new ClassMatcher.ListMatcher(metadata.getCollectionClass(), target, annotations);
-        } else if (metadata.isArray()) {
-            return new ClassMatcher.ArrayMatcher(target, annotations);
-        } else {
-            return new ClassMatcher.ObjectMatcher(target, annotations);
-        }
+    public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
+        Class<?> target = metadata.getTargetClass();
+        PluginConvertor convertor = getConvertorAdapter().adapt(metadata);
+        return new ClassMatcher(target, annotations, convertor);
     }
 
     @Override

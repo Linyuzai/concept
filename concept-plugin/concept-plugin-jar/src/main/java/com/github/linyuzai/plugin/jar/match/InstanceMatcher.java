@@ -1,19 +1,19 @@
 package com.github.linyuzai.plugin.jar.match;
 
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarInstancePluginResolver;
-import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @DependOnResolvers(JarInstancePluginResolver.class)
-public abstract class InstanceMatcher extends AbstractJarPluginMatcher<Object> {
+public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object>, Map<String, Object>> {
 
-    public InstanceMatcher(Class<?> target, Annotation[] annotations) {
-        super(target, annotations);
+    public InstanceMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
+        super(target, annotations, convertor);
     }
 
     @Override
@@ -32,60 +32,8 @@ public abstract class InstanceMatcher extends AbstractJarPluginMatcher<Object> {
         return map;
     }
 
-    @Getter
-    public static class MapMatcher extends InstanceMatcher implements MapConvertor {
-
-        private final Class<?> mapClass;
-
-        public MapMatcher(Class<?> mapClass, Class<?> target, Annotation[] annotations) {
-            super(target, annotations);
-            this.mapClass = mapClass;
-        }
-    }
-
-    @Getter
-    public static class ListMatcher extends InstanceMatcher implements ListConvertor {
-
-        private final Class<?> listClass;
-
-        public ListMatcher(Class<?> listClass, Class<?> target, Annotation[] annotations) {
-            super(target, annotations);
-            this.listClass = listClass;
-        }
-    }
-
-    @Getter
-    public static class SetMatcher extends InstanceMatcher implements SetConvertor {
-
-        private final Class<?> setClass;
-
-        public SetMatcher(Class<?> setClass, Class<?> target, Annotation[] annotations) {
-            super(target, annotations);
-            this.setClass = setClass;
-        }
-    }
-
-    public static class ArrayMatcher extends InstanceMatcher implements ArrayConvertor {
-
-        public ArrayMatcher(Class<?> target, Annotation[] annotations) {
-            super(target, annotations);
-        }
-
-        @Override
-        public Class<?> getArrayClass() {
-            return target;
-        }
-    }
-
-    public static class ObjectMatcher extends InstanceMatcher implements ObjectConvertor {
-
-        public ObjectMatcher(Class<?> target, Annotation[] annotations) {
-            super(target, annotations);
-        }
-
-        @Override
-        public String getType() {
-            return "instance";
-        }
+    @Override
+    public boolean isEmpty(Map<String, Object> filter) {
+        return filter.isEmpty();
     }
 }

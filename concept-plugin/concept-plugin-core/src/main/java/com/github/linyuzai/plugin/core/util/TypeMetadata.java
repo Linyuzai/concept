@@ -25,7 +25,9 @@ public class TypeMetadata {
 
     private Class<?> arrayClass;
 
-    private Type type;
+    private Type targetType;
+
+    private Class<?> targetClass;
 
     public boolean isMap() {
         return mapClass != null;
@@ -66,7 +68,7 @@ public class TypeMetadata {
                     Type actualTypeArgument0 = actualTypeArguments[0];
                     if (actualTypeArgument0 instanceof Class &&
                             ((Class<?>) actualTypeArgument0).isAssignableFrom(String.class)) {
-                        metadata.type = actualTypeArguments[1];
+                        metadata.targetType = actualTypeArguments[1];
                     } else {
                         throw new PluginException("Map key must be String");
                     }
@@ -84,7 +86,7 @@ public class TypeMetadata {
             Type componentType = ((GenericArrayType) type).getGenericComponentType();
             TypeMetadata metadata = new TypeMetadata();
             metadata.arrayClass = List.class;
-            metadata.type = componentType;
+            metadata.targetType = componentType;
             return metadata;
         }
         return null;
@@ -94,21 +96,21 @@ public class TypeMetadata {
         TypeMetadata metadata = new TypeMetadata();
         if (Map.class.isAssignableFrom(clazz)) {
             metadata.mapClass = clazz;
-            metadata.type = type;
+            metadata.targetType = type;
         } else if (List.class.isAssignableFrom(clazz)) {
             metadata.listClass = clazz;
-            metadata.type = type;
+            metadata.targetType = type;
         } else if (Set.class.isAssignableFrom(clazz)) {
             metadata.setClass = clazz;
-            metadata.type = type;
+            metadata.targetType = type;
         } else if (Collection.class.isAssignableFrom(clazz)) {
             metadata.collectionClass = clazz;
-            metadata.type = type;
+            metadata.targetType = type;
         } else if (clazz.isArray()) {
             metadata.arrayClass = List.class;
-            metadata.type = clazz.getComponentType();
+            metadata.targetType = clazz.getComponentType();
         } else {
-            metadata.type = clazz;
+            metadata.targetType = clazz;
         }
         return metadata;
     }

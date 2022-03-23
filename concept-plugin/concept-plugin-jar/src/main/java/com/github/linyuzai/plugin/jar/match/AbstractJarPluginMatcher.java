@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.match;
 
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.jar.filter.AnnotationFilter;
 import com.github.linyuzai.plugin.jar.filter.ClassFilter;
@@ -10,7 +11,7 @@ import lombok.Getter;
 import java.lang.annotation.Annotation;
 
 @Getter
-public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<T> {
+public abstract class AbstractJarPluginMatcher<T, R> extends AbstractPluginMatcher<T, R> {
 
     protected final Class<?> target;
 
@@ -22,7 +23,8 @@ public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<
 
     protected AnnotationFilter annotationFilter;
 
-    public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations) {
+    public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
+        super(convertor);
         this.target = target;
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginPackage.class) {
