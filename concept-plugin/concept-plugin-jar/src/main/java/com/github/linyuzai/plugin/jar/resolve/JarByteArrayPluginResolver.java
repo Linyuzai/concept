@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
-import com.github.linyuzai.plugin.jar.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.SneakyThrows;
 
 import java.util.LinkedHashMap;

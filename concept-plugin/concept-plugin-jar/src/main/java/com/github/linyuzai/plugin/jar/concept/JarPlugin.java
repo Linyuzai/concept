@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar;
+package com.github.linyuzai.plugin.jar.concept;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;

@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.jar.classloader;
 
-import com.github.linyuzai.plugin.jar.JarPluginConcept;
+import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import lombok.Getter;
 
 import java.net.URL;

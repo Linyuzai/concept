@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.jar.filter;
 
 import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
-import com.github.linyuzai.plugin.jar.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarClassPluginResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

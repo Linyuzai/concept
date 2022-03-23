@@ -8,7 +8,7 @@ import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
-import com.github.linyuzai.plugin.jar.JarPluginConcept;
+import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.*;
 import com.github.linyuzai.plugin.core.match.PluginPath;
@@ -32,13 +32,6 @@ public class ConceptPluginController {
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
             .addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter())
-            /*.addMatcher(new ClassMatcher<LinkedHashSet<? extends Class<? extends CustomPlugin>>>() {
-                @Override
-                public void onMatched(LinkedHashSet<? extends Class<? extends CustomPlugin>> plugin) {
-                    System.out.println(plugin.getClass());
-                    System.out.println(plugin);
-                }
-            })*/
             .addExtractor(new ClassExtractor<Class<CustomPluginImpl>[]>() {
                 @Override
                 public void onExtract(Class<CustomPluginImpl>[] plugin) {
@@ -90,10 +83,10 @@ public class ConceptPluginController {
             @PluginProperties("concept.plugin") Map<String, String> p6,
 
             //一个指定目录下的 properties 文件
-            @PluginPath(path = "/resources/concept") Properties p7,
+            @PluginPath("/resources/concept") Properties p7,
 
             //名称为 config.json 的文件内容
-            @PluginName(name = "config.json") String p8) {
+            @PluginName("config.json") String p8) {
     }
 
     @GetMapping("/load")

@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.jar.resolve;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
-import com.github.linyuzai.plugin.jar.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.SneakyThrows;
 
 import java.util.LinkedHashMap;

@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
-import com.github.linyuzai.plugin.jar.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 import java.io.File;
 import java.util.List;
