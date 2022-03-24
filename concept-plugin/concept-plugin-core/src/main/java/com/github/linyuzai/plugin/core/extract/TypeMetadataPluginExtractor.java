@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.extract;
 
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.format.DefaultPluginFormatterAdapter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatterAdapter;
@@ -27,6 +28,15 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
             return null;
         }
         return getMatcher(metadata, annotations);
+    }
+
+    @Override
+    public PluginConvertor getConvertor(Type type, Annotation[] annotations) {
+        TypeMetadata metadata = getAvailableTypeMetadata(type);
+        if (metadata == null) {
+            return null;
+        }
+        return getConvertor(metadata, annotations);
     }
 
     @Override
@@ -66,6 +76,10 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
     }
 
     public abstract PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations);
+
+    public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
+        return null;
+    }
 
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
         return formatterAdapter.adapt(metadata);
