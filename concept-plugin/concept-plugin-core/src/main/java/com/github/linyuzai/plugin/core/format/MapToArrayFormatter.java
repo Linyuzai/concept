@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.convert;
+package com.github.linyuzai.plugin.core.format;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,12 +10,12 @@ import java.util.Map;
 
 @Getter
 @AllArgsConstructor
-public class MapToArrayConvertor extends AbstractPluginConvertor<Map<?, ?>, Object> {
+public class MapToArrayFormatter extends AbstractPluginFormatter<Map<?, ?>, Object> {
 
     private Class<?> arrayClass;
 
     @Override
-    public Object doConvert(Map<?, ?> source) {
+    public Object doFormat(Map<?, ?> source) {
         List<Object> values = new ArrayList<>(source.values());
         Object array = Array.newInstance(arrayClass, values.size());
         for (int i = 0; i < values.size(); i++) {

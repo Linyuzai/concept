@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.convert;
+package com.github.linyuzai.plugin.core.format;
 
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import lombok.AllArgsConstructor;
@@ -9,16 +9,16 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-public class MapToSetConvertor extends AbstractPluginConvertor<Map<?, ?>, Set<Object>> {
+public class MapToSetFormatter extends AbstractPluginFormatter<Map<?, ?>, Set<Object>> {
 
     private Class<?> setClass;
 
-    public MapToSetConvertor() {
+    public MapToSetFormatter() {
         this(Set.class);
     }
 
     @Override
-    public Set<Object> doConvert(Map<?, ?> source) {
+    public Set<Object> doFormat(Map<?, ?> source) {
         Set<Object> set = ReflectionUtils.newSet(setClass);
         set.addAll(source.values());
         return set;

@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.filter.NameFilter;
 import com.github.linyuzai.plugin.core.filter.PathFilter;
 import lombok.Getter;

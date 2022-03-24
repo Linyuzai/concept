@@ -1,12 +1,12 @@
 package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.format.IntactFormatter;
+import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -15,20 +15,19 @@ import java.lang.reflect.Type;
 @Getter
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
-    protected PluginMatcher matcher;
-
-    @Setter
-    protected PluginConvertor convertor;
+    protected final Invoker invoker;
 
     public AbstractPluginExtractor() {
-        match(getGenericType(), new Annotation[0]);
+        invoker = getInvoker(getGenericType(), new Annotation[0]);
     }
 
-    public void match(Type type, Annotation[] annotations) {
-        this.matcher = getMatcher(type, annotations);
-        if (this.matcher == null) {
+    public Invoker getInvoker(Type type, Annotation[] annotations) {
+        PluginMatcher matcher = getMatcher(type, annotations);
+        if (matcher == null) {
             throw new PluginException("Can not match " + type);
         }
+        PluginFormatter formatter = getFormatter(type, annotations);
+        return new Invoker(matcher, formatter);
     }
 
     public Type getGenericType() {
@@ -44,24 +43,24 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
     public abstract PluginMatcher getMatcher(Type type, Annotation[] annotations);
 
+    public PluginFormatter getFormatter(Type type, Annotation[] annotations) {
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void extract(PluginContext context) {
-        Object match = matcher.match(context);
-        if (match == null) {
+        Object invoke = invoker.invoke(context);
+        if (invoke == null) {
             return;
         }
-        Object convert = convertor.convert(match);
-        if (convert == null) {
-            return;
-        }
-        onExtract((T) convert);
+        onExtract((T) invoke);
     }
 
     public abstract void onExtract(T plugin);
 
     @Override
     public Class<? extends PluginResolver>[] dependencies() {
-        return matcher.dependencies();
+        return invoker.getMatcher().dependencies();
     }
 }

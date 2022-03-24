@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.core.extract;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.NonNull;
@@ -19,7 +18,7 @@ import java.util.Map;
 
 public abstract class DynamicPluginExtractor implements PluginExtractor {
 
-    protected final Map<Method, Map<Integer, PluginMatcher>> methodPluginMatchersMap = new LinkedHashMap<>();
+    protected final Map<Method, Map<Integer, Invoker>> methodInvokersMap = new LinkedHashMap<>();
 
     protected final Object target;
 
@@ -35,40 +34,40 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
                     }
                     Parameter[] parameters = method.getParameters();
                     for (int i = 0; i < parameters.length; i++) {
-                        PluginMatcher matcher = getMatcher(parameters[i]);
-                        if (matcher == null) {
-                            throw new PluginException("Can not match " + parameters[i]);
+                        Invoker invoker = getInvoker(parameters[i]);
+                        if (invoker == null) {
+                            throw new PluginException("Can not invoke " + parameters[i]);
                         }
-                        methodPluginMatchersMap.computeIfAbsent(method, m ->
-                                new LinkedHashMap<>()).put(i, matcher);
+                        methodInvokersMap.computeIfAbsent(method, m ->
+                                new LinkedHashMap<>()).put(i, invoker);
                     }
                 }
             }
             clazz = clazz.getSuperclass();
         }
-        if (methodPluginMatchersMap.isEmpty()) {
+        if (methodInvokersMap.isEmpty()) {
             throw new PluginException("No method has @OnPluginExtract");
         }
     }
 
-    public PluginMatcher getMatcher(Parameter parameter) {
+    public Invoker getInvoker(Parameter parameter) {
         Annotation[] annotations = parameter.getAnnotations();
         for (Annotation annotation : annotations) {
             if (hasAssociationAnnotation(annotation)) {
-                return getAssociationMatcher(annotation, parameter);
+                return getAssociationInvoker(annotation, parameter);
             }
         }
-        PluginMatcher pluginContextMatcher = getPluginContextMatcher(parameter);
-        if (pluginContextMatcher != null) {
-            return pluginContextMatcher;
+        Invoker pluginContextInvoker = getPluginContextInvoker(parameter);
+        if (pluginContextInvoker != null) {
+            return pluginContextInvoker;
         }
-        PluginMatcher pluginObjectMatcher = getPluginObjectMatcher(parameter);
-        if (pluginObjectMatcher != null) {
-            return pluginObjectMatcher;
+        Invoker pluginObjectInvoker = getPluginObjectInvoker(parameter);
+        if (pluginObjectInvoker != null) {
+            return pluginObjectInvoker;
         }
-        PluginMatcher propertiesMatcher = getPropertiesMatcher(parameter);
-        if (propertiesMatcher != null) {
-            return propertiesMatcher;
+        Invoker propertiesInvoker = getPropertiesInvoker(parameter);
+        if (propertiesInvoker != null) {
+            return propertiesInvoker;
         }
         return null;
     }
@@ -77,72 +76,85 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         return annotation.annotationType() == PluginProperties.class;
     }
 
-    public PluginMatcher getAssociationMatcher(Annotation annotation, Parameter parameter) {
+    public Invoker getAssociationInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginProperties.class) {
-            return getPropertiesMatcher(parameter);
+            return getPropertiesInvoker(parameter);
         }
         throw new PluginException(annotation + " has no association with matcher");
     }
 
-    public PluginMatcher getPluginContextMatcher(Parameter parameter) {
-        return new PluginContextExtractor<PluginContext>() {
+    public Invoker getPluginContextInvoker(Parameter parameter) {
+        try {
+            return new PluginContextExtractor<PluginContext>() {
 
-            @Override
-            public void match(Type type, Annotation[] annotations) {
-                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
-            }
+                @Override
+                public Invoker getInvoker(Type type, Annotation[] annotations) {
+                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                }
 
-            @Override
-            public void onExtract(PluginContext plugin) {
+                @Override
+                public void onExtract(PluginContext plugin) {
 
-            }
-        }.getMatcher();
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
-    public PluginMatcher getPluginObjectMatcher(Parameter parameter) {
-        return new PluginObjectExtractor<Plugin>() {
+    public Invoker getPluginObjectInvoker(Parameter parameter) {
+        try {
+            return new PluginObjectExtractor<Plugin>() {
 
-            @Override
-            public void match(Type type, Annotation[] annotations) {
-                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
-            }
+                @Override
+                public Invoker getInvoker(Type type, Annotation[] annotations) {
+                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                }
 
-            @Override
-            public void onExtract(Plugin plugin) {
+                @Override
+                public void onExtract(Plugin plugin) {
 
-            }
-        }.getMatcher();
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
-    public PluginMatcher getPropertiesMatcher(Parameter parameter) {
-        return new PropertiesExtractor<Object>() {
+    public Invoker getPropertiesInvoker(Parameter parameter) {
+        try {
+            return new PropertiesExtractor<Object>() {
 
-            @Override
-            public void match(Type type, Annotation[] annotations) {
-                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
-            }
+                @Override
+                public Invoker getInvoker(Type type, Annotation[] annotations) {
+                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                }
 
-            @Override
-            public void onExtract(Object plugin) {
+                @Override
+                public void onExtract(Object plugin) {
 
-            }
-        }.getMatcher();
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     @SneakyThrows
     @Override
     public void extract(PluginContext context) {
-        for (Map.Entry<Method, Map<Integer, PluginMatcher>> entry : methodPluginMatchersMap.entrySet()) {
-            Map<Integer, PluginMatcher> matcherMap = entry.getValue();
+
+        for (Map.Entry<Method, Map<Integer, Invoker>> entry : methodInvokersMap.entrySet()) {
+            Map<Integer, Invoker> matcherMap = entry.getValue();
             Object[] values = new Object[matcherMap.size()];
             boolean matched = false;
-            for (Map.Entry<Integer, PluginMatcher> typeEntry : matcherMap.entrySet()) {
-                PluginMatcher matcher = typeEntry.getValue();
-                Object match = matcher.match(context);
-                if (match == null) {
+            for (Map.Entry<Integer, Invoker> methodEntry : matcherMap.entrySet()) {
+                Invoker invoker = methodEntry.getValue();
+                Object invoke = invoker.invoke(context);
+                if (invoke == null) {
                     continue;
                 }
-                values[typeEntry.getKey()] = match;
+                values[methodEntry.getKey()] = invoke;
                 matched = true;
             }
             if (matched) {
@@ -154,9 +166,9 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends PluginResolver>[] dependencies() {
-        return methodPluginMatchersMap.values().stream()
+        return methodInvokersMap.values().stream()
                 .flatMap(it -> it.values().stream())
-                .flatMap(it -> Arrays.stream(it.dependencies()))
+                .flatMap(it -> Arrays.stream(it.getMatcher().dependencies()))
                 .distinct()
                 .toArray(Class[]::new);
     }

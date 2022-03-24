@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.extract.DynamicPluginExtractor;
-import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import lombok.NonNull;
@@ -17,22 +16,22 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
     }
 
     @Override
-    public PluginMatcher getMatcher(Parameter parameter) {
-        PluginMatcher matcher = super.getMatcher(parameter);
-        if (matcher != null) {
-            return matcher;
+    public Invoker getInvoker(Parameter parameter) {
+        Invoker invoker = super.getInvoker(parameter);
+        if (invoker != null) {
+            return invoker;
         }
-        return getMatcher0(parameter);
+        return getInvoker0(parameter);
     }
 
-    private PluginMatcher getMatcher0(Parameter parameter) {
-        PluginMatcher classMatcher = getClassMatcher(parameter);
-        if (classMatcher != null) {
-            return classMatcher;
+    private Invoker getInvoker0(Parameter parameter) {
+        Invoker classInvoker = getClassInvoker(parameter);
+        if (classInvoker != null) {
+            return classInvoker;
         }
-        PluginMatcher instanceMatcher = getInstanceMatcher(parameter);
-        if (instanceMatcher != null) {
-            return instanceMatcher;
+        Invoker instanceInvoker = getInstanceInvoker(parameter);
+        if (instanceInvoker != null) {
+            return instanceInvoker;
         }
         return null;
     }
@@ -49,43 +48,51 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
     }
 
     @Override
-    public PluginMatcher getAssociationMatcher(Annotation annotation, Parameter parameter) {
+    public Invoker getAssociationInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginAnnotation.class ||
                 annotation.annotationType() == PluginClass.class ||
                 annotation.annotationType() == PluginClassName.class ||
                 annotation.annotationType() == PluginPackage.class) {
-            return getMatcher0(parameter);
+            return getInvoker0(parameter);
         }
-        return super.getAssociationMatcher(annotation, parameter);
+        return super.getAssociationInvoker(annotation, parameter);
     }
 
-    public PluginMatcher getClassMatcher(Parameter parameter) {
-        return new ClassExtractor<Object>() {
+    public Invoker getClassInvoker(Parameter parameter) {
+        try {
+            return new ClassExtractor<Object>() {
 
-            @Override
-            public void match(Type type, Annotation[] annotations) {
-                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
-            }
+                @Override
+                public Invoker getInvoker(Type type, Annotation[] annotations) {
+                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                }
 
-            @Override
-            public void onExtract(Object plugin) {
+                @Override
+                public void onExtract(Object plugin) {
 
-            }
-        }.getMatcher();
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
-    public PluginMatcher getInstanceMatcher(Parameter parameter) {
-        return new InstanceExtractor<Object>() {
+    public Invoker getInstanceInvoker(Parameter parameter) {
+        try {
+            return new InstanceExtractor<Object>() {
 
-            @Override
-            public void match(Type type, Annotation[] annotations) {
-                matcher = getMatcher(parameter.getParameterizedType(), parameter.getAnnotations());
-            }
+                @Override
+                public Invoker getInvoker(Type type, Annotation[] annotations) {
+                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                }
 
-            @Override
-            public void onExtract(Object plugin) {
+                @Override
+                public void onExtract(Object plugin) {
 
-            }
-        }.getMatcher();
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.jar.match;
 
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.jar.filter.AnnotationFilter;
 import com.github.linyuzai.plugin.jar.filter.ClassFilter;

@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.core.extract;
 
-import com.github.linyuzai.plugin.core.convert.DefaultPluginConvertorAdapter;
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.convert.PluginConvertorAdapter;
+import com.github.linyuzai.plugin.core.format.DefaultPluginFormatterAdapter;
+import com.github.linyuzai.plugin.core.format.PluginFormatter;
+import com.github.linyuzai.plugin.core.format.PluginFormatterAdapter;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
@@ -18,10 +18,27 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
 
     @Getter
     @Setter
-    private PluginConvertorAdapter convertorAdapter = new DefaultPluginConvertorAdapter();
+    private PluginFormatterAdapter formatterAdapter = new DefaultPluginFormatterAdapter();
 
     @Override
     public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
+        TypeMetadata metadata = getAvailableTypeMetadata(type);
+        if (metadata == null) {
+            return null;
+        }
+        return getMatcher(metadata, annotations);
+    }
+
+    @Override
+    public PluginFormatter getFormatter(Type type, Annotation[] annotations) {
+        TypeMetadata metadata = getAvailableTypeMetadata(type);
+        if (metadata == null) {
+            return null;
+        }
+        return getFormatter(metadata, annotations);
+    }
+
+    public TypeMetadata getAvailableTypeMetadata(Type type) {
         TypeMetadata metadata = TypeMetadata.from(type);
         if (metadata == null) {
             return null;
@@ -30,8 +47,7 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
         if (metadata.getTargetClass() == null) {
             return null;
         }
-        convertor = getConvertor(metadata);
-        return getMatcher(metadata, annotations);
+        return metadata;
     }
 
     public Class<?> getTargetClass(Type type) {
@@ -49,9 +65,9 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
         return null;
     }
 
-    public PluginConvertor getConvertor(TypeMetadata metadata) {
-        return convertorAdapter.adapt(metadata);
-    }
-
     public abstract PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations);
+
+    public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
+        return formatterAdapter.adapt(metadata);
+    }
 }

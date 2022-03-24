@@ -61,6 +61,6 @@ public class ValueConversion {
                 return convertor.convert(value);
             }
         }
-        throw new DownloadException("Value " + value + " cannot convert to " + type);
+        throw new DownloadException("Value " + value + " cannot format to " + type);
     }
 }
