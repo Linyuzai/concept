@@ -26,12 +26,19 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
         if (metadata.isArray() && target == byte.class) {
-            return new ContentMatcher(byte[].class, charset, annotations, new MapToObjectConvertor());
+            return new ContentMatcher(byte[].class, charset, annotations);
         }
         if (target == String.class || InputStream.class.isAssignableFrom(target)) {
-            PluginConvertor convertor = getConvertorAdapter().adapt(metadata);
-            return new ContentMatcher(target, charset, annotations, convertor);
+            return new ContentMatcher(target, charset, annotations);
         }
         return null;
+    }
+
+    @Override
+    public PluginConvertor getConvertor(TypeMetadata metadata) {
+        if (metadata.isArray() && metadata.getTargetClass() == byte.class) {
+            return new MapToObjectConvertor();
+        }
+        return super.getConvertor(metadata);
     }
 }

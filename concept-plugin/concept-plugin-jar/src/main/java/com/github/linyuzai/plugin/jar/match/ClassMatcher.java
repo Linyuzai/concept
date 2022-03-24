@@ -12,8 +12,8 @@ import java.util.Map;
 @DependOnResolvers(JarClassPluginResolver.class)
 public class ClassMatcher extends AbstractJarPluginMatcher<Map<String, Class<?>>, Map<String, Class<?>>> {
 
-    public ClassMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
-        super(target, annotations, convertor);
+    public ClassMatcher(Class<?> target, Annotation[] annotations) {
+        super(target, annotations);
     }
 
     @Override

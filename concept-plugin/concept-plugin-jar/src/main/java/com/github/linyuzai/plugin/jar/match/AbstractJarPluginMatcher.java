@@ -23,8 +23,8 @@ public abstract class AbstractJarPluginMatcher<T, R> extends AbstractPluginMatch
 
     protected AnnotationFilter annotationFilter;
 
-    public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
-        super(annotations, convertor);
+    public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations) {
+        super(annotations);
         this.target = target;
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginPackage.class) {

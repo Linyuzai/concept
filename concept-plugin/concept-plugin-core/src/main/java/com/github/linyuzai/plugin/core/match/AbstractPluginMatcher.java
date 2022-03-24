@@ -12,14 +12,11 @@ import java.lang.annotation.Annotation;
 @Getter
 public abstract class AbstractPluginMatcher<T, R> implements PluginMatcher {
 
-    private final PluginConvertor convertor;
-
     private PathFilter pathFilter;
 
     private NameFilter nameFilter;
 
-    public AbstractPluginMatcher(@NonNull Annotation[] annotations, @NonNull PluginConvertor convertor) {
-        this.convertor = convertor;
+    public AbstractPluginMatcher(@NonNull Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginPath.class) {
                 String[] packages = ((PluginPath) annotation).value();
@@ -42,7 +39,7 @@ public abstract class AbstractPluginMatcher<T, R> implements PluginMatcher {
         if (isEmpty(filter)) {
             return null;
         }
-        return convertor.convert(filter);
+        return filter;
     }
 
     public boolean filterWithAnnotation(String pathAndName) {

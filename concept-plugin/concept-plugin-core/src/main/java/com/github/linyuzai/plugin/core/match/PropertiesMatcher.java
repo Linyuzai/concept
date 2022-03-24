@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
@@ -19,8 +18,8 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<String, Propert
 
     protected Function<Properties, Object> function;
 
-    public PropertiesMatcher(Class<?> target, Annotation[] annotations, PluginConvertor convertor) {
-        super(annotations, convertor);
+    public PropertiesMatcher(Class<?> target, Annotation[] annotations) {
+        super(annotations);
         this.target = target;
         if (target != Properties.class && Map.class.isAssignableFrom(target)) {
             this.function = properties -> {

@@ -1,21 +1,24 @@
 package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 @Getter
-@AllArgsConstructor
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
     protected PluginMatcher matcher;
+
+    @Setter
+    protected PluginConvertor convertor;
 
     public AbstractPluginExtractor() {
         match(getGenericType(), new Annotation[0]);
@@ -48,7 +51,11 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         if (match == null) {
             return;
         }
-        onExtract((T) match);
+        Object convert = convertor.convert(match);
+        if (convert == null) {
+            return;
+        }
+        onExtract((T) convert);
     }
 
     public abstract void onExtract(T plugin);

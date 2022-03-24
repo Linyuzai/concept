@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.convert.DefaultPluginConvertorAdapter;
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.convert.PluginConvertorAdapter;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
@@ -29,6 +30,7 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
         if (metadata.getTargetClass() == null) {
             return null;
         }
+        convertor = getConvertor(metadata);
         return getMatcher(metadata, annotations);
     }
 
@@ -45,6 +47,10 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
             }
         }
         return null;
+    }
+
+    public PluginConvertor getConvertor(TypeMetadata metadata) {
+        return convertorAdapter.adapt(metadata);
     }
 
     public abstract PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations);

@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.jar.extract;
 
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
@@ -17,8 +16,7 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
     @Override
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
-        PluginConvertor convertor = getConvertorAdapter().adapt(metadata);
-        return new ClassMatcher(target, annotations, convertor);
+        return new ClassMatcher(target, annotations);
     }
 
     @Override
