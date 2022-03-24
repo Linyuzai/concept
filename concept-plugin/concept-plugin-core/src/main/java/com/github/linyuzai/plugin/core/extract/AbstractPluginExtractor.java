@@ -18,7 +18,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     protected final Invoker invoker;
 
     public AbstractPluginExtractor() {
-        invoker = getInvoker(getGenericType(), new Annotation[0]);
+        invoker = getInvoker(getGenericType(), getAnnotations());
     }
 
     public Invoker getInvoker(Type type, Annotation[] annotations) {
@@ -40,6 +40,10 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
             }
         }
         throw new PluginException("U may need to try override this method");
+    }
+
+    public Annotation[] getAnnotations() {
+        return new Annotation[0];
     }
 
     public abstract PluginMatcher getMatcher(Type type, Annotation[] annotations);

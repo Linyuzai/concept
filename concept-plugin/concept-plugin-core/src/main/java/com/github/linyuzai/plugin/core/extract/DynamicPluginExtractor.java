@@ -88,8 +88,13 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
             return new PluginContextExtractor<PluginContext>() {
 
                 @Override
-                public Invoker getInvoker(Type type, Annotation[] annotations) {
-                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
+                }
+
+                @Override
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
                 }
 
                 @Override
@@ -107,8 +112,13 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
             return new PluginObjectExtractor<Plugin>() {
 
                 @Override
-                public Invoker getInvoker(Type type, Annotation[] annotations) {
-                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
+                }
+
+                @Override
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
                 }
 
                 @Override
@@ -123,15 +133,20 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
 
     public Invoker getPropertiesInvoker(Parameter parameter) {
         try {
-            return new PropertiesExtractor<Object>() {
+            return new PropertiesExtractor<Void>() {
 
                 @Override
-                public Invoker getInvoker(Type type, Annotation[] annotations) {
-                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
                 }
 
                 @Override
-                public void onExtract(Object plugin) {
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
+                }
+
+                @Override
+                public void onExtract(Void plugin) {
 
                 }
             }.getInvoker();
@@ -143,7 +158,6 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     @SneakyThrows
     @Override
     public void extract(PluginContext context) {
-
         for (Map.Entry<Method, Map<Integer, Invoker>> entry : methodInvokersMap.entrySet()) {
             Map<Integer, Invoker> matcherMap = entry.getValue();
             Object[] values = new Object[matcherMap.size()];

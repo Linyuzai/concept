@@ -60,15 +60,20 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
 
     public Invoker getClassInvoker(Parameter parameter) {
         try {
-            return new ClassExtractor<Object>() {
+            return new ClassExtractor<Void>() {
 
                 @Override
-                public Invoker getInvoker(Type type, Annotation[] annotations) {
-                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
                 }
 
                 @Override
-                public void onExtract(Object plugin) {
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
+                }
+
+                @Override
+                public void onExtract(Void plugin) {
 
                 }
             }.getInvoker();
@@ -79,15 +84,20 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
 
     public Invoker getInstanceInvoker(Parameter parameter) {
         try {
-            return new InstanceExtractor<Object>() {
+            return new InstanceExtractor<Void>() {
 
                 @Override
-                public Invoker getInvoker(Type type, Annotation[] annotations) {
-                    return super.getInvoker(parameter.getParameterizedType(), parameter.getAnnotations());
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
                 }
 
                 @Override
-                public void onExtract(Object plugin) {
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
+                }
+
+                @Override
+                public void onExtract(Void plugin) {
 
                 }
             }.getInvoker();
