@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @DependOnResolvers(JarInstancePluginResolver.class)
-public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object>, Map<String, Object>> {
+public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object>> {
 
     public InstanceMatcher(Class<?> target, Annotation[] annotations) {
         super(target, annotations);

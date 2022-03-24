@@ -1,5 +1,8 @@
 package com.github.linyuzai.plugin.core.extract;
 
+import com.github.linyuzai.plugin.core.convert.ByteArrayToInputStreamMapConvertor;
+import com.github.linyuzai.plugin.core.convert.ByteArrayToStringMapConvertor;
+import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.ContentMatcher;
@@ -25,13 +28,24 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
     @Override
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
-        if (metadata.isArray() && target == byte.class) {
-            return new ContentMatcher(byte[].class, charset, annotations);
-        }
-        if (target == String.class || InputStream.class.isAssignableFrom(target)) {
-            return new ContentMatcher(target, charset, annotations);
+        if (metadata.isArray() && target == byte.class ||
+                target == String.class ||
+                InputStream.class.isAssignableFrom(target)) {
+            return new ContentMatcher(annotations);
         }
         return null;
+    }
+
+    @Override
+    public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
+        Class<?> target = metadata.getTargetClass();
+        if (InputStream.class == target) {
+            return new ByteArrayToInputStreamMapConvertor();
+        }
+        if (String.class == target) {
+            return new ByteArrayToStringMapConvertor(charset);
+        }
+        return super.getConvertor(metadata, annotations);
     }
 
     @Override

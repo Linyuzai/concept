@@ -10,7 +10,7 @@ import lombok.Getter;
 import java.lang.annotation.Annotation;
 
 @Getter
-public abstract class AbstractJarPluginMatcher<T, R> extends AbstractPluginMatcher<T, R> {
+public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<T> {
 
     protected final Class<?> target;
 

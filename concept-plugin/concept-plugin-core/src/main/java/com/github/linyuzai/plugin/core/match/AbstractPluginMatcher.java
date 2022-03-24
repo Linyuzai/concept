@@ -9,7 +9,7 @@ import lombok.NonNull;
 import java.lang.annotation.Annotation;
 
 @Getter
-public abstract class AbstractPluginMatcher<T, R> implements PluginMatcher {
+public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
 
     private PathFilter pathFilter;
 
@@ -34,7 +34,7 @@ public abstract class AbstractPluginMatcher<T, R> implements PluginMatcher {
     @Override
     public Object match(PluginContext context) {
         T source = context.get(getKey());
-        R filter = filter(source);
+        T filter = filter(source);
         if (isEmpty(filter)) {
             return null;
         }
@@ -53,7 +53,7 @@ public abstract class AbstractPluginMatcher<T, R> implements PluginMatcher {
 
     public abstract Object getKey();
 
-    public abstract R filter(T source);
+    public abstract T filter(T source);
 
-    public abstract boolean isEmpty(R filter);
+    public abstract boolean isEmpty(T filter);
 }

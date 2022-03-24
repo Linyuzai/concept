@@ -4,34 +4,15 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @DependOnResolvers(ByteArrayPluginResolver.class)
-public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>, Map<String, Object>> {
+public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>> {
 
-    protected final Class<?> target;
-
-    protected final Charset charset;
-
-    protected Function<byte[], Object> function;
-
-    public ContentMatcher(Class<?> target, Charset charset, Annotation[] annotations) {
+    public ContentMatcher(Annotation[] annotations) {
         super(annotations);
-        this.target = target;
-        this.charset = charset;
-        if (byte[].class != target) {
-            if (InputStream.class == target) {
-                function = ByteArrayInputStream::new;
-            } else if (String.class == target) {
-                function = bytes -> charset == null ? new String(bytes) : new String(bytes, charset);
-            }
-        }
     }
 
     @Override
@@ -40,20 +21,18 @@ public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>, M
     }
 
     @Override
-    public Map<String, Object> filter(Map<String, byte[]> bytesMap) {
-        Map<String, Object> map = new LinkedHashMap<>();
+    public Map<String, byte[]> filter(Map<String, byte[]> bytesMap) {
+        Map<String, byte[]> map = new LinkedHashMap<>();
         for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
-            if (function == null) {
+            if (filterWithAnnotation(entry.getKey())) {
                 map.put(entry.getKey(), entry.getValue());
-            } else {
-                map.put(entry.getKey(), function.apply(entry.getValue()));
             }
         }
         return map;
     }
 
     @Override
-    public boolean isEmpty(Map<String, Object> filter) {
+    public boolean isEmpty(Map<String, byte[]> filter) {
         return filter.isEmpty();
     }
 }
