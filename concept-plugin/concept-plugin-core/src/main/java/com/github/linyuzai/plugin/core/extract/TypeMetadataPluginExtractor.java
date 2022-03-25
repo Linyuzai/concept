@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatterAdapter;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
-import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.annotation.Annotation;
@@ -14,9 +13,15 @@ import java.lang.reflect.Type;
 
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
 
-    @Getter
     @Setter
-    private PluginFormatterAdapter formatterAdapter = new DefaultPluginFormatterAdapter();
+    private PluginFormatterAdapter formatterAdapter;
+
+    public PluginFormatterAdapter getFormatterAdapter() {
+        if (formatterAdapter == null) {
+            formatterAdapter = new DefaultPluginFormatterAdapter();
+        }
+        return formatterAdapter;
+    }
 
     @Override
     public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
@@ -57,11 +62,7 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
     }
 
     public TypeMetadata createTypeMetadata(Type type) {
-        return TypeMetadata.create(type, isClassTypeMetadata());
-    }
-
-    public boolean isClassTypeMetadata() {
-        return false;
+        return TypeMetadata.create(type);
     }
 
     public abstract PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations);
@@ -71,6 +72,6 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
     }
 
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
-        return formatterAdapter.adapt(metadata);
+        return getFormatterAdapter().adapt(metadata);
     }
 }

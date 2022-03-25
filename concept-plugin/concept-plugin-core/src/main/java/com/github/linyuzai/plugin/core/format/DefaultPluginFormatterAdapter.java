@@ -17,7 +17,7 @@ public class DefaultPluginFormatterAdapter implements PluginFormatterAdapter {
         } else if (metadata.isCollection()) {
             return new MapToListFormatter(metadata.getCollectionClass());
         } else if (metadata.isArray()) {
-            return new MapToArrayFormatter(target);
+            return new MapToArrayFormatter(metadata.getArrayClass());
         } else {
             return new MapToObjectFormatter();
         }
