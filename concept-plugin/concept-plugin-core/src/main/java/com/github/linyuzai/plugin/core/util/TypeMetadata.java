@@ -65,13 +65,7 @@ public class TypeMetadata {
                 Class<?> clazz = (Class<?>) rawType;
                 TypeMetadata metadata = create0(clazz, actualTypeArguments[0]);
                 if (metadata.isMap()) {
-                    Type actualTypeArgument0 = actualTypeArguments[0];
-                    if (actualTypeArgument0 instanceof Class &&
-                            ((Class<?>) actualTypeArgument0).isAssignableFrom(String.class)) {
-                        metadata.targetType = actualTypeArguments[1];
-                    } else {
-                        throw new PluginException("Map key must be String");
-                    }
+                    metadata.targetType = actualTypeArguments[1];
                 }
                 return metadata;
             }

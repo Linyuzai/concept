@@ -18,8 +18,8 @@ public class MapToMapFormatter extends AbstractPluginFormatter<Map<?, ?>, Map<Ob
 
     @Override
     public Map<Object, Object> doFormat(Map<?, ?> source) {
-        Map<Object, Object> newMap = ReflectionUtils.newMap(mapClass);
-        newMap.putAll(source);
-        return newMap;
+        Map<Object, Object> map = ReflectionUtils.newMap(mapClass);
+        map.putAll(source);
+        return map;
     }
 }

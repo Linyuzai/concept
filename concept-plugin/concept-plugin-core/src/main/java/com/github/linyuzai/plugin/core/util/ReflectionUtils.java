@@ -32,12 +32,7 @@ public class ReflectionUtils {
 
     @SneakyThrows
     public static <E> Collection<E> newCollection(Class<?> clazz) {
-        int modifiers = clazz.getModifiers();
-        if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
-            return new ArrayList<>();
-        } else {
-            return (Collection<E>) clazz.newInstance();
-        }
+        return newList(clazz);
     }
 
     @SneakyThrows

@@ -26,12 +26,20 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
             return null;
         }
         metadata.setTargetClass(getTargetClass(metadata.getTargetType()));
+        if (metadata.isArray()) {
+            metadata.setArrayClass(Class.class);
+        }
         return metadata;
     }
 
     public static Class<?> getTargetClass(Type type) {
         if (type instanceof Class) {
-            return (Class<?>) type;
+            if (type == Class.class) {
+                return Object.class;
+            }
+            if (((Class<?>) type).isAssignableFrom(Class.class)) {
+                return Object.class;
+            }
         } else if (type instanceof ParameterizedType) {
             Type rawType = ((ParameterizedType) type).getRawType();
             if (rawType instanceof Class) {
@@ -45,9 +53,7 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
             if (upperBounds.length > 0) {
                 Type upperBound = upperBounds[0];
                 if (upperBound instanceof Class) {
-                    if (Class.class.isAssignableFrom((Class<?>) upperBound)) {
-                        return Object.class;
-                    }
+                    return getTargetClass(upperBound);
                 } else if (upperBound instanceof ParameterizedType) {
                     return getTargetClass(upperBound);
                 }

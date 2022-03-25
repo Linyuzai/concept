@@ -7,7 +7,6 @@ public class DefaultPluginFormatterAdapter implements PluginFormatterAdapter {
     @Override
     public PluginFormatter adapt(TypeMetadata metadata) {
         //暂时枚举
-        Class<?> target = metadata.getTargetClass();
         if (metadata.isMap()) {
             return new MapToMapFormatter(metadata.getMapClass());
         } else if (metadata.isList()) {
