@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.core.extract;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.match.PluginContent;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.NonNull;
@@ -12,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,8 +55,8 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     public Invoker getInvoker(Parameter parameter) {
         Annotation[] annotations = parameter.getAnnotations();
         for (Annotation annotation : annotations) {
-            if (hasAssociationAnnotation(annotation)) {
-                return getAssociationInvoker(annotation, parameter);
+            if (hasExplicitAnnotation(annotation)) {
+                return getExplicitInvoker(annotation, parameter);
             }
         }
         Invoker pluginContextInvoker = getPluginContextInvoker(parameter);
@@ -69,16 +71,25 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         if (propertiesInvoker != null) {
             return propertiesInvoker;
         }
+        Invoker contentInvoker = getContentInvoker(parameter, null);
+        if (contentInvoker != null) {
+            return contentInvoker;
+        }
         return null;
     }
 
-    public boolean hasAssociationAnnotation(Annotation annotation) {
-        return annotation.annotationType() == PluginProperties.class;
+    public boolean hasExplicitAnnotation(Annotation annotation) {
+        return annotation.annotationType() == PluginProperties.class ||
+                annotation.annotationType() == PluginContent.class;
     }
 
-    public Invoker getAssociationInvoker(Annotation annotation, Parameter parameter) {
+    public Invoker getExplicitInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginProperties.class) {
             return getPropertiesInvoker(parameter);
+        }
+        if (annotation.annotationType() == PluginContent.class) {
+            String charset = ((PluginContent) annotation).charset();
+            return getContentInvoker(parameter, charset.isEmpty() ? null : Charset.forName(charset));
         }
         throw new PluginException(annotation + " has no association with matcher");
     }
@@ -134,6 +145,30 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     public Invoker getPropertiesInvoker(Parameter parameter) {
         try {
             return new PropertiesExtractor<Void>() {
+
+                @Override
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
+                }
+
+                @Override
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
+                }
+
+                @Override
+                public void onExtract(Void plugin) {
+
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    public Invoker getContentInvoker(Parameter parameter, Charset charset) {
+        try {
+            return new ContentExtractor<Void>(charset) {
 
                 @Override
                 public Type getGenericType() {

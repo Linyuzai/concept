@@ -5,15 +5,12 @@ import com.github.linyuzai.plugin.core.format.DefaultPluginFormatterAdapter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatterAdapter;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
 
@@ -49,30 +46,22 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
     }
 
     public TypeMetadata getAvailableTypeMetadata(Type type) {
-        TypeMetadata metadata = TypeMetadata.from(type);
+        TypeMetadata metadata = createTypeMetadata(type);
         if (metadata == null) {
             return null;
         }
-        metadata.setTargetClass(getTargetClass(metadata.getTargetType()));
         if (metadata.getTargetClass() == null) {
             return null;
         }
         return metadata;
     }
 
-    public Class<?> getTargetClass(Type type) {
-        if (type instanceof Class) {
-            return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) type).getRawType();
-            return ReflectionUtils.toClass(rawType);
-        } else if (type instanceof WildcardType) {
-            Type[] upperBounds = ((WildcardType) type).getUpperBounds();
-            if (upperBounds.length > 0) {
-                return ReflectionUtils.toClass(upperBounds[0]);
-            }
-        }
-        return null;
+    public TypeMetadata createTypeMetadata(Type type) {
+        return TypeMetadata.create(type, isClassTypeMetadata());
+    }
+
+    public boolean isClassTypeMetadata() {
+        return false;
     }
 
     public abstract PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations);

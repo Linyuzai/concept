@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @DependOnResolvers(ByteArrayPluginResolver.class)
-public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>> {
+public class ContentMatcher extends AbstractPluginMatcher<Map<Object, byte[]>> {
 
     public ContentMatcher(Annotation[] annotations) {
         super(annotations);
@@ -21,10 +21,15 @@ public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>> {
     }
 
     @Override
-    public Map<String, byte[]> filter(Map<String, byte[]> bytesMap) {
-        Map<String, byte[]> map = new LinkedHashMap<>();
-        for (Map.Entry<String, byte[]> entry : bytesMap.entrySet()) {
-            if (filterWithAnnotation(entry.getKey())) {
+    public Map<Object, byte[]> filter(Map<Object, byte[]> bytesMap) {
+        Map<Object, byte[]> map = new LinkedHashMap<>();
+        for (Map.Entry<Object, byte[]> entry : bytesMap.entrySet()) {
+            Object key = entry.getKey();
+            if (key instanceof String) {
+                if (filterWithAnnotation((String) key)) {
+                    map.put(entry.getKey(), entry.getValue());
+                }
+            } else {
                 map.put(entry.getKey(), entry.getValue());
             }
         }
@@ -32,7 +37,7 @@ public class ContentMatcher extends AbstractPluginMatcher<Map<String, byte[]>> {
     }
 
     @Override
-    public boolean isEmpty(Map<String, byte[]> filter) {
+    public boolean isEmpty(Map<Object, byte[]> filter) {
         return filter.isEmpty();
     }
 }

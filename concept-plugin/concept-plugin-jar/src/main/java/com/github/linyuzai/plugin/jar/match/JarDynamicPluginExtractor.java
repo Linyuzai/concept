@@ -37,25 +37,25 @@ public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
     }
 
     @Override
-    public boolean hasAssociationAnnotation(Annotation annotation) {
+    public boolean hasExplicitAnnotation(Annotation annotation) {
         if (annotation.annotationType() == PluginAnnotation.class ||
                 annotation.annotationType() == PluginClass.class ||
                 annotation.annotationType() == PluginClassName.class ||
                 annotation.annotationType() == PluginPackage.class) {
             return true;
         }
-        return super.hasAssociationAnnotation(annotation);
+        return super.hasExplicitAnnotation(annotation);
     }
 
     @Override
-    public Invoker getAssociationInvoker(Annotation annotation, Parameter parameter) {
+    public Invoker getExplicitInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginAnnotation.class ||
                 annotation.annotationType() == PluginClass.class ||
                 annotation.annotationType() == PluginClassName.class ||
                 annotation.annotationType() == PluginPackage.class) {
             return getInvoker0(parameter);
         }
-        return super.getAssociationInvoker(annotation, parameter);
+        return super.getExplicitInvoker(annotation, parameter);
     }
 
     public Invoker getClassInvoker(Parameter parameter) {
