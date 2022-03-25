@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.util;
 
-import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Data;
 
 import java.lang.reflect.GenericArrayType;

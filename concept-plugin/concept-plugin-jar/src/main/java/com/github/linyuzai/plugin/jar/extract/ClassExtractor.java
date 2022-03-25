@@ -52,9 +52,7 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
             Type[] upperBounds = ((WildcardType) type).getUpperBounds();
             if (upperBounds.length > 0) {
                 Type upperBound = upperBounds[0];
-                if (upperBound instanceof Class) {
-                    return getTargetClass(upperBound);
-                } else if (upperBound instanceof ParameterizedType) {
+                if (upperBound instanceof Class || upperBound instanceof ParameterizedType) {
                     return getTargetClass(upperBound);
                 }
             }
