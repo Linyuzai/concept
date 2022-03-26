@@ -1,27 +1,14 @@
 package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.format.DefaultPluginFormatterAdapter;
-import com.github.linyuzai.plugin.core.format.PluginFormatter;
-import com.github.linyuzai.plugin.core.format.PluginFormatterAdapter;
+import com.github.linyuzai.plugin.core.format.*;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.util.TypeMetadata;
-import lombok.Setter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
-
-    @Setter
-    private PluginFormatterAdapter formatterAdapter;
-
-    public PluginFormatterAdapter getFormatterAdapter() {
-        if (formatterAdapter == null) {
-            formatterAdapter = new DefaultPluginFormatterAdapter();
-        }
-        return formatterAdapter;
-    }
 
     @Override
     public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
@@ -72,6 +59,18 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
     }
 
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
-        return getFormatterAdapter().adapt(metadata);
+        if (metadata.isMap()) {
+            return new MapToMapFormatter(metadata.getMapClass());
+        } else if (metadata.isList()) {
+            return new MapToListFormatter(metadata.getListClass());
+        } else if (metadata.isSet()) {
+            return new MapToSetFormatter(metadata.getSetClass());
+        } else if (metadata.isCollection()) {
+            return new MapToListFormatter(metadata.getCollectionClass());
+        } else if (metadata.isArray()) {
+            return new MapToArrayFormatter(metadata.getArrayClass());
+        } else {
+            return new MapToObjectFormatter();
+        }
     }
 }
