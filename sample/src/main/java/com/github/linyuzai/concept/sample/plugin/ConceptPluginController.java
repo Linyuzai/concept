@@ -3,7 +3,11 @@ package com.github.linyuzai.concept.sample.plugin;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
+import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
+import com.github.linyuzai.plugin.core.extract.PluginContextExtractor;
+import com.github.linyuzai.plugin.core.extract.PluginObjectExtractor;
 import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
@@ -43,6 +47,18 @@ public class ConceptPluginController {
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
             //.addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter(CustomPluginAnnotation.class))
+            /*.addExtractor(new PluginContextExtractor<PluginContext>() {
+                @Override
+                public void onExtract(PluginContext plugin) {
+                    System.out.println(append("PluginContextExtractor<PluginContext>: ") + plugin);
+                }
+            })
+            .addExtractor(new PluginObjectExtractor<Plugin>() {
+                @Override
+                public void onExtract(Plugin plugin) {
+                    System.out.println(append("PluginObjectExtractor<Plugin>: ") + plugin);
+                }
+            })*/
             //Class
             /*.addExtractor(new ClassExtractor<Collection>() {
                 @Override
@@ -423,7 +439,7 @@ public class ConceptPluginController {
                 }
             })*/
             //Instance
-            .addExtractor(new InstanceExtractor<Collection>() {
+            /*.addExtractor(new InstanceExtractor<Collection>() {
                 @Override
                 public void onExtract(Collection plugin) {
                     System.out.println(append("InstanceExtractor<Collection>: ") + plugin);
@@ -554,7 +570,7 @@ public class ConceptPluginController {
                 public void onExtract(Map<Object, ? extends CustomPlugin> plugin) {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
-            })
+            })*/
             //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 
