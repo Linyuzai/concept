@@ -9,6 +9,7 @@ import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
+import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
@@ -42,7 +43,8 @@ public class ConceptPluginController {
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
             //.addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter(CustomPluginAnnotation.class))
-            .addExtractor(new ClassExtractor<Collection>() {
+            //Class
+            /*.addExtractor(new ClassExtractor<Collection>() {
                 @Override
                 public void onExtract(Collection plugin) {
                     System.out.println(append("ClassExtractor<Collection>: ") + plugin);
@@ -419,21 +421,141 @@ public class ConceptPluginController {
                 public void onExtract(Map<Object, ? extends Class<? extends CustomPlugin>> plugin) {
                     System.out.println(append("ClassExtractor<Map<Object, ? extends Class<? extends CustomPlugin>>>: ") + plugin);
                 }
-            })
-            /*.addExtractor(new ClassExtractor<Class<? extends CustomPlugin>[]>() {
-                @Override
-                public void onExtract(Class<? extends CustomPlugin>[] plugin) {
-                    System.out.println("ClassExtractor<Class<? extends CustomPlugin>[]>: "
-                            + Arrays.toString(plugin));
-                }
-            })
-            .addExtractor(new ClassExtractor<Class<CustomPlugin>[]>() {
-                @Override
-                public void onExtract(Class<CustomPlugin>[] plugin) {
-                    System.out.println("ClassExtractor<Class<CustomPlugin>[]>: "
-                            + Arrays.toString(plugin));
-                }
             })*/
+            //Instance
+            .addExtractor(new InstanceExtractor<Collection>() {
+                @Override
+                public void onExtract(Collection plugin) {
+                    System.out.println(append("InstanceExtractor<Collection>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<List>() {
+                @Override
+                public void onExtract(List plugin) {
+                    System.out.println(append("InstanceExtractor<List>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Set>() {
+                @Override
+                public void onExtract(Set plugin) {
+                    System.out.println(append("InstanceExtractor<Set>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Map>() {
+                @Override
+                public void onExtract(Map plugin) {
+                    System.out.println(append("InstanceExtractor<Map>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Collection<?>>() {
+                @Override
+                public void onExtract(Collection<?> plugin) {
+                    System.out.println(append("InstanceExtractor<Collection<?>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<List<?>>() {
+                @Override
+                public void onExtract(List<?> plugin) {
+                    System.out.println(append("InstanceExtractor<List<?>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Set<?>>() {
+                @Override
+                public void onExtract(Set<?> plugin) {
+                    System.out.println(append("InstanceExtractor<Set<?>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Map<?, ?>>() {
+                @Override
+                public void onExtract(Map<?, ?> plugin) {
+                    System.out.println(append("InstanceExtractor<Map<?, ?>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Collection<Object>>() {
+                @Override
+                public void onExtract(Collection<Object> plugin) {
+                    System.out.println(append("InstanceExtractor<Collection<Object>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<List<Object>>() {
+                @Override
+                public void onExtract(List<Object> plugin) {
+                    System.out.println(append("InstanceExtractor<List<Object>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Set<Object>>() {
+                @Override
+                public void onExtract(Set<Object> plugin) {
+                    System.out.println(append("InstanceExtractor<Set<Object>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Map<Object, Object>>() {
+                @Override
+                public void onExtract(Map<Object, Object> plugin) {
+                    System.out.println(append("InstanceExtractor<Map<Object, Object>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Object[]>() {
+                @Override
+                public void onExtract(Object[] plugin) {
+                    System.out.println(append("InstanceExtractor<Object[]>: ") + Arrays.toString(plugin));
+                }
+            })
+
+            .addExtractor(new InstanceExtractor<Collection<CustomPlugin>>() {
+                @Override
+                public void onExtract(Collection<CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<Collection<CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<List<CustomPlugin>>() {
+                @Override
+                public void onExtract(List<CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<List<CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Set<CustomPlugin>>() {
+                @Override
+                public void onExtract(Set<CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<Set<CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Map<Object, CustomPlugin>>() {
+                @Override
+                public void onExtract(Map<Object, CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<Map<Object, CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<CustomPlugin[]>() {
+                @Override
+                public void onExtract(CustomPlugin[] plugin) {
+                    System.out.println(append("InstanceExtractor<CustomPlugin[]>: ") + Arrays.toString(plugin));
+                }
+            })
+            .addExtractor(new InstanceExtractor<Collection<? extends CustomPlugin>>() {
+                @Override
+                public void onExtract(Collection<? extends CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<Collection<? extends CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<List<? extends CustomPlugin>>() {
+                @Override
+                public void onExtract(List<? extends CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<List<? extends CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Set<? extends CustomPlugin>>() {
+                @Override
+                public void onExtract(Set<? extends CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<Set<? extends CustomPlugin>>: ") + plugin);
+                }
+            })
+            .addExtractor(new InstanceExtractor<Map<Object, ? extends CustomPlugin>>() {
+                @Override
+                public void onExtract(Map<Object, ? extends CustomPlugin> plugin) {
+                    System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
+                }
+            })
             //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 

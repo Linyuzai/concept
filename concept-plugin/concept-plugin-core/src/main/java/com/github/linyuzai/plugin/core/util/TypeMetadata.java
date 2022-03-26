@@ -80,11 +80,7 @@ public class TypeMetadata {
             TypeMetadata metadata = new TypeMetadata();
             metadata.targetType = componentType;
             metadata.targetClass = getTargetClass(componentType);
-            if (metadata.targetClass == null) {
-                metadata.arrayClass = Object.class;
-            } else {
-                metadata.arrayClass = metadata.targetClass;
-            }
+            setArrayClass0(metadata);
             return metadata;
         }
         return null;
@@ -110,8 +106,19 @@ public class TypeMetadata {
         } else {
             metadata.targetType = clazz;
         }
-        metadata.targetClass = getTargetClass(type);
+        metadata.targetClass = getTargetClass(metadata.targetType);
+        if (metadata.isArray()) {
+            setArrayClass0(metadata);
+        }
         return metadata;
+    }
+
+    private static void setArrayClass0(TypeMetadata metadata) {
+        if (metadata.targetClass == null) {
+            metadata.arrayClass = Object.class;
+        } else {
+            metadata.arrayClass = metadata.targetClass;
+        }
     }
 
     public static Class<?> getTargetClass(Type type) {
