@@ -501,7 +501,6 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Object[]>: ") + Arrays.toString(plugin));
                 }
             })
-
             .addExtractor(new InstanceExtractor<Collection<CustomPlugin>>() {
                 @Override
                 public void onExtract(Collection<CustomPlugin> plugin) {

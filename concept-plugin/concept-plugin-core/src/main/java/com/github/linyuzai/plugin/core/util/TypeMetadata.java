@@ -65,6 +65,7 @@ public class TypeMetadata {
                 TypeMetadata metadata = create0(clazz, actualTypeArguments[0]);
                 if (metadata.isMap()) {
                     metadata.targetType = actualTypeArguments[1];
+                    metadata.targetClass = getTargetClass(metadata.targetType);
                 }
                 return metadata;
             }
