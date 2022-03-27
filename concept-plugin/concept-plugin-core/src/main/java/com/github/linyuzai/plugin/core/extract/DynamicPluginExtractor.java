@@ -91,7 +91,7 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
             String charset = ((PluginContent) annotation).charset();
             return getContentInvoker(parameter, charset.isEmpty() ? null : Charset.forName(charset));
         }
-        throw new PluginException(annotation + " has no association with matcher");
+        throw new PluginException(annotation + " has no explicit invoker");
     }
 
     public Invoker getPluginContextInvoker(Parameter parameter) {

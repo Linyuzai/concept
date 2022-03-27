@@ -40,11 +40,14 @@ public class PathFilter extends AbstractPluginFilter<List<String>> {
 
     public boolean matchPath(String path) {
         for (String p : paths) {
-            if (!p.endsWith("/")) {
-                p = p + "/";
+            if (p.startsWith("/")) {
+                p = p.substring(1);
             }
-            p += "**";
-            if (matcher.match(p, path)) {
+            if (p.endsWith("/")) {
+                p = p.substring(0, p.length() - 1);
+            }
+            int lastIndexOf = path.lastIndexOf("/");
+            if (matcher.match(p, lastIndexOf == -1 ? "" : path.substring(0, lastIndexOf))) {
                 return true;
             }
         }

@@ -37,13 +37,10 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
             if (type == Class.class) {
                 return Object.class;
             }
-            if (((Class<?>) type).isAssignableFrom(Class.class)) {
-                return Object.class;
-            }
         } else if (type instanceof ParameterizedType) {
             Type rawType = ((ParameterizedType) type).getRawType();
             if (rawType instanceof Class) {
-                if (Class.class.isAssignableFrom((Class<?>) rawType)) {
+                if (rawType == Class.class) {
                     Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
                     return ReflectionUtils.toClass(arguments[0]);
                 }

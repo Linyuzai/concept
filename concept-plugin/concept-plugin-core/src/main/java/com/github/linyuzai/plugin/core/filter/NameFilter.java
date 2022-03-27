@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@FilterWithResolver(PathNamePluginResolver.class)
 public class NameFilter extends AbstractPluginFilter<List<String>> {
 
     private final Collection<String> names;
@@ -37,7 +39,7 @@ public class NameFilter extends AbstractPluginFilter<List<String>> {
     public boolean matchName(String name) {
         for (String n : names) {
             int lastIndexOf = name.lastIndexOf("/");
-            if (matcher.match(n, name.substring(lastIndexOf + 1))) {
+            if (matcher.match(n, lastIndexOf == -1 ? name : name.substring(lastIndexOf + 1))) {
                 return true;
             }
         }

@@ -9,7 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PluginName {
 
-    String[] value() default {};
-
-    //String[] regex() default {};
+    String[] value();
 }

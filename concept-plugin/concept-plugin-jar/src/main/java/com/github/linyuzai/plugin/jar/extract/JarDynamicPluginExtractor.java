@@ -1,8 +1,10 @@
-package com.github.linyuzai.plugin.jar.match;
+package com.github.linyuzai.plugin.jar.extract;
 
 import com.github.linyuzai.plugin.core.extract.DynamicPluginExtractor;
-import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
-import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
+import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
+import com.github.linyuzai.plugin.jar.match.PluginClass;
+import com.github.linyuzai.plugin.jar.match.PluginClassName;
+import com.github.linyuzai.plugin.jar.match.PluginPackage;
 import lombok.NonNull;
 
 import java.lang.annotation.Annotation;

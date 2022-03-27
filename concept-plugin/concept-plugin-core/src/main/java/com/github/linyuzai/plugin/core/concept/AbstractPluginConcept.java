@@ -37,7 +37,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     public Plugin load(Object o) {
         Plugin plugin = createPlugin(o);
         if (plugin == null) {
-            throw new PluginException("Plugin can not created");
+            throw new PluginException("Plugin can not created: " + o);
         }
         PluginContext context = pluginContextFactory.create(plugin, this);
 

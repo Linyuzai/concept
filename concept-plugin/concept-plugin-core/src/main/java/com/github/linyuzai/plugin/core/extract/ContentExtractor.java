@@ -29,6 +29,7 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
         if (metadata.isArray() && target == byte.class ||
+                target == byte[].class ||
                 target == String.class ||
                 InputStream.class.isAssignableFrom(target)) {
             return new ContentMatcher(annotations);

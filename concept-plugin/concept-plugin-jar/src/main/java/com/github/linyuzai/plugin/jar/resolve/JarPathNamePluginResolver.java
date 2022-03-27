@@ -21,6 +21,7 @@ public class JarPathNamePluginResolver extends AbstractPluginResolver implements
         List<String> filenames = entries.stream()
                 .map(ZipEntry::getName)
                 .map(it -> it.replaceAll(File.separator, "/"))
+                .filter(it -> !it.endsWith("/"))
                 .collect(Collectors.toList());
         context.set(JarPlugin.PATH_NAME, filenames);
     }
