@@ -22,12 +22,12 @@ import com.github.linyuzai.plugin.jar.resolve.JarPropertiesPluginResolver;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JarPluginConcept extends AbstractPluginConcept {
 
     private final Collection<JarPluginClassLoader> classLoaders =
-            Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+            Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public JarPluginConcept(PluginContextFactory pluginContextFactory,
                             PluginEventPublisher pluginEventPublisher,

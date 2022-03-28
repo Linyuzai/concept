@@ -5,13 +5,12 @@ import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.core.extract.PropertiesExtractor;
 import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
-import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
+import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.InputStream;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -34,6 +32,8 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("/concept-plugin")
 public class ConceptPluginController {
+
+    private CustomPlugin plugin;
 
     private String append(String s) {
         StringBuilder builder = new StringBuilder(s);
@@ -642,7 +642,13 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
             })*/
-            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            .addExtractor(new InstanceExtractor<CustomPlugin>() {
+                @Override
+                public void onExtract(CustomPlugin plugin) {
+                    ConceptPluginController.this.plugin = plugin;
+                }
+            })
+            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
@@ -682,7 +688,7 @@ public class ConceptPluginController {
             @PluginClassName("com.github.linyuzai.concept.sample.plugin.CustomPlugin") Set<Class<?>> p3,
 
             //一个 CustomPluginImpl 对象
-            @PluginClass(CustomPluginImpl.class) CustomPlugin p4,
+            @PluginClass(CustomPlugin.class) CustomPlugin p4,
 
             //所有标注了 CustomPluginAnnotation 注解的类
             @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5,
@@ -715,6 +721,11 @@ public class ConceptPluginController {
         System.out.println("@PluginProperties(\"plugin.b\") String: " + p8);
         System.out.println("@PluginPath(\"plugin\") Properties: " + p9);
         System.out.println("@PluginName(\"plugin.json\") String: " + p10);
+    }
+
+    @GetMapping("/run")
+    public void runPlugin() {
+        plugin.run();
     }
 
     @GetMapping("/load")
