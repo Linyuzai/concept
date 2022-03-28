@@ -7,18 +7,36 @@ import lombok.Getter;
 
 import java.util.function.Predicate;
 
+/**
+ * 监听插件位置
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginLocation {
 
+    /**
+     * 路径
+     */
     private String path;
 
+    /**
+     * 过滤器
+     */
     private Predicate<String> filter;
 
+    /**
+     * 触发新建回调
+     */
     private boolean notifyCreate;
 
+    /**
+     * 触发修改回调
+     */
     private boolean notifyModify;
 
+    /**
+     * 触发删除回调
+     */
     private boolean notifyDelete;
 
     public static final class Builder {

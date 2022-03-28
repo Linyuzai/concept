@@ -36,9 +36,10 @@ public class JarPluginConcept extends AbstractPluginConcept {
                             Collection<PluginFactory> pluginFactories,
                             Collection<PluginResolver> pluginResolvers,
                             Collection<PluginFilter> pluginFilters,
-                            Collection<PluginExtractor> pluginExtractors) {
+                            Collection<PluginExtractor> pluginExtractors,
+                            boolean destroyedOnLoaded) {
         super(pluginContextFactory, pluginEventPublisher, pluginFactories,
-                pluginResolvers, pluginFilters, pluginExtractors);
+                pluginResolvers, pluginFilters, pluginExtractors, destroyedOnLoaded);
     }
 
     @Override
@@ -88,7 +89,8 @@ public class JarPluginConcept extends AbstractPluginConcept {
                     pluginFactories,
                     pluginResolvers,
                     pluginFilters,
-                    pluginExtractors);
+                    pluginExtractors,
+                    destroyOnLoaded);
         }
     }
 }

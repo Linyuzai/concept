@@ -14,28 +14,48 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
+/**
+ * 基于 {@link WatchService} 的插件文件自动加载
+ */
 @Getter
 public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
+    /**
+     * {@link PluginConcept}
+     */
     private final PluginConcept pluginConcept;
 
+    /**
+     * 执行线程池
+     */
     private final ExecutorService executor;
 
+    /**
+     * 插件位置
+     */
     private final PluginLocation[] locations;
 
+    /**
+     * 异常处理
+     */
     private final Consumer<Throwable> errorConsumer;
 
+    /**
+     * 在 {@link #start()} 时是否触发一次加载
+     */
     private final boolean loadOnStart;
 
+    /**
+     * {@link WatchService}
+     */
     private WatchService watchService;
+
 
     private final Set<String> notifyCreate = new HashSet<>();
 
     private final Set<String> notifyModify = new HashSet<>();
 
     private final Set<String> notifyDelete = new HashSet<>();
-
-    private final Set<String> files = new HashSet<>();
 
     private boolean running = false;
 
@@ -150,29 +170,15 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     }
 
     public void onFileModified(WatchEvent<Path> watchEvent) {
-        final Path path = watchEvent.context();
-        File file = path.toFile();
-        if (notifyModify.contains(file.getAbsolutePath())) {
-            unload(file);
-            load(file);
-        }
+        //请自行实现
     }
 
     public void onFileDeleted(WatchEvent<Path> watchEvent) {
-        final Path path = watchEvent.context();
-        File file = path.toFile();
-        if (notifyDelete.contains(file.getAbsolutePath())) {
-            unload(file);
-        }
+        //请自行实现
     }
 
     public void load(File file) {
         pluginConcept.load(file);
-        files.add(file.getAbsolutePath());
-    }
-
-    public void unload(File file) {
-        files.remove(file.getAbsolutePath());
     }
 
     public void onError(Throwable e) {

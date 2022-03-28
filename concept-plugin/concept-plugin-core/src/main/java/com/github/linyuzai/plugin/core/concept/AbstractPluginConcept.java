@@ -3,9 +3,7 @@ package com.github.linyuzai.plugin.core.concept;
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
-import com.github.linyuzai.plugin.core.event.DefaultPluginEventPublisher;
-import com.github.linyuzai.plugin.core.event.PluginEventListener;
-import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
+import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
@@ -33,15 +31,23 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected final Collection<PluginExtractor> pluginExtractors;
 
+    protected final boolean destroyOnLoaded;
+
     @Override
     public Plugin load(Object o) {
         Plugin plugin = createPlugin(o);
         if (plugin == null) {
             throw new PluginException("Plugin can not created: " + o);
         }
-        PluginContext context = pluginContextFactory.create(plugin, this);
+
+        pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
         plugin.initialize();
+
+        pluginEventPublisher.publish(new PluginInitializedEvent(plugin));
+
+        PluginContext context = pluginContextFactory.create(plugin, this);
+
         context.initialize();
 
         new PluginResolverChainImpl(pluginResolvers, pluginFilters).next(context);
@@ -50,7 +56,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         }
 
         context.destroy();
-        plugin.destroy();
+
+        if (destroyOnLoaded) {
+            plugin.destroy();
+            pluginEventPublisher.publish(new PluginDestroyedEvent(plugin));
+        }
 
         return plugin;
     }
@@ -80,6 +90,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected final Collection<PluginFilter> pluginFilters = new ArrayList<>();
 
         protected final Collection<PluginExtractor> pluginExtractors = new ArrayList<>();
+
+        protected boolean destroyOnLoaded = true;
 
         protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
                 resolverDefaultImpl = new HashMap<>();
@@ -133,16 +145,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (T) this;
         }
 
-        public T addExtractor(PluginExtractor extractor) {
-            return addExtractors(extractor);
-        }
-
-        public T addExtractors(PluginExtractor... extractors) {
-            return addExtractors(Arrays.asList(extractors));
-        }
-
-        public T addExtractors(Collection<? extends PluginExtractor> extractors) {
-            this.pluginExtractors.addAll(extractors);
+        public T mappingResolver(Class<? extends PluginResolver> resolverClass,
+                                 Class<? extends PluginResolver> resolverImplClass) {
+            resolverDefaultImpl.put(resolverClass, resolverImplClass);
             return (T) this;
         }
 
@@ -159,9 +164,21 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (T) this;
         }
 
-        public T mappingResolver(Class<? extends PluginResolver> resolverClass,
-                                 Class<? extends PluginResolver> resolverImplClass) {
-            resolverDefaultImpl.put(resolverClass, resolverImplClass);
+        public T addExtractor(PluginExtractor extractor) {
+            return addExtractors(extractor);
+        }
+
+        public T addExtractors(PluginExtractor... extractors) {
+            return addExtractors(Arrays.asList(extractors));
+        }
+
+        public T addExtractors(Collection<? extends PluginExtractor> extractors) {
+            this.pluginExtractors.addAll(extractors);
+            return (T) this;
+        }
+
+        public T destroyOnLoaded(boolean destroyOnLoaded) {
+            this.destroyOnLoaded = destroyOnLoaded;
             return (T) this;
         }
 
