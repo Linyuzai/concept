@@ -19,15 +19,17 @@ import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
 import com.github.linyuzai.plugin.jar.resolve.JarByteArrayPluginResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarPathNamePluginResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarPropertiesPluginResolver;
+import lombok.Getter;
 
+import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JarPluginConcept extends AbstractPluginConcept {
 
-    private final Collection<JarPluginClassLoader> classLoaders =
-            Collections.newSetFromMap(new ConcurrentHashMap<>());
+    @Getter
+    private final Map<URL, JarPluginClassLoader> classLoaders = new ConcurrentHashMap<>();
 
     public JarPluginConcept(PluginContextFactory pluginContextFactory,
                             PluginEventPublisher pluginEventPublisher,
@@ -39,16 +41,13 @@ public class JarPluginConcept extends AbstractPluginConcept {
                 pluginResolvers, pluginFilters, pluginExtractors);
     }
 
-    public Collection<JarPluginClassLoader> getClassLoaders() {
-        return classLoaders;
-    }
-
     @Override
     public Plugin load(Object o) {
         Plugin plugin = super.load(o);
         if (plugin instanceof JarPlugin) {
+            URL url = ((JarPlugin) plugin).getUrl();
             JarPluginClassLoader classLoader = ((JarPlugin) plugin).getClassLoader();
-            classLoaders.add(classLoader);
+            classLoaders.put(url, classLoader);
         }
         return plugin;
     }

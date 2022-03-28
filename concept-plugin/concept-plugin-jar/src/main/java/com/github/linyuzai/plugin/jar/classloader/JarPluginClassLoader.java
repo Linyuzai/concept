@@ -26,7 +26,7 @@ public class JarPluginClassLoader extends URLClassLoader {
         try {
             return super.findClass(name);
         } catch (Throwable e) {
-            Collection<JarPluginClassLoader> classLoaders = pluginConcept.getClassLoaders();
+            Collection<JarPluginClassLoader> classLoaders = pluginConcept.getClassLoaders().values();
             for (JarPluginClassLoader classLoader : classLoaders) {
                 if (classLoader == this) {
                     continue;
