@@ -46,7 +46,7 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Propert
             }
         }
         if (propertiesFilter != null) {
-            propertiesFilter.doFilter(map);
+            return propertiesFilter.doFilter(map);
         }
         return map;
     }

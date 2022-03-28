@@ -3,12 +3,15 @@ package com.github.linyuzai.concept.sample.plugin;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.extract.PropertiesExtractor;
 import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
+import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -228,7 +232,7 @@ public class ConceptPluginController {
                     System.out.println(append("PropertiesExtractor<Properties[]>: ") + Arrays.toString(plugin));
                 }
             })*/
-            .addExtractor(new PropertiesExtractor<Collection<Map<String, String>>>() {
+            /*.addExtractor(new PropertiesExtractor<Collection<Map<String, String>>>() {
                 @Override
                 public void onExtract(Collection<Map<String, String>> plugin) {
                     System.out.println(append("PropertiesExtractor<Collection<Map<String, String>>>: ") + plugin);
@@ -257,7 +261,7 @@ public class ConceptPluginController {
                 public void onExtract(Map<String, String>[] plugin) {
                     System.out.println(append("PropertiesExtractor<Map<String, String>[]>: ") + Arrays.toString(plugin));
                 }
-            })
+            })*/
             //Class
             /*.addExtractor(new ClassExtractor<Collection<Class>>() {
                 @Override
@@ -638,7 +642,7 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
             })*/
-            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
@@ -666,6 +670,7 @@ public class ConceptPluginController {
      */
     @OnPluginExtract
     private void onPluginExtract(
+            JarPlugin plugin, PluginContext context,
 
             //所有的 CustomPlugin 类和 properties 文件
             List<Class<? extends CustomPlugin>> p0, Properties p1,
@@ -682,14 +687,34 @@ public class ConceptPluginController {
             //所有标注了 CustomPluginAnnotation 注解的类
             @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5,
 
-            //properties 文件中 concept.plugin 对应的配置
-            @PluginProperties("concept.plugin") Map<String, String> p6,
+            //properties 文件通过 Map 接收
+            @PluginProperties Map<String, String> p6,
+
+            //properties 文件中 plugin.a 的属性值
+            @PluginProperties("plugin.a") String p7,
+
+            //properties 文件中 plugin.b 的属性值
+            @PluginProperties("plugin.b") String p8,
 
             //一个指定目录下的 properties 文件
-            @PluginPath("/resources/concept") Properties p7,
+            @PluginPath("plugin") Properties p9,
 
             //名称为 config.json 的文件内容
-            @PluginName("config.json") String p8) {
+            @PluginName("plugin.json") String p10) {
+
+        System.out.println("onPluginExtract: " + plugin);
+        System.out.println("onPluginExtract: " + context);
+        System.out.println("List<Class<? extends CustomPlugin>>: " + p0);
+        System.out.println("Properties: " + p1);
+        System.out.println("@PluginPackage(\"com.github.linyuzai.concept.sample.plugin\") Collection<? extends CustomPlugin>: " + p2);
+        System.out.println("@PluginClassName(\"com.github.linyuzai.concept.sample.plugin.CustomPlugin\") Set<Class<?>>: " + p3);
+        System.out.println("@PluginClass(CustomPluginImpl.class) CustomPlugin: " + p4);
+        System.out.println("@PluginAnnotation(CustomPluginAnnotation.class) Class<?>[]: " + Arrays.toString(p5));
+        System.out.println("@PluginProperties Map<String, String>: " + p6);
+        System.out.println("@PluginProperties(\"plugin.a\") String: " + p7);
+        System.out.println("@PluginProperties(\"plugin.b\") String: " + p8);
+        System.out.println("@PluginPath(\"plugin\") Properties: " + p9);
+        System.out.println("@PluginName(\"plugin.json\") String: " + p10);
     }
 
     @GetMapping("/load")

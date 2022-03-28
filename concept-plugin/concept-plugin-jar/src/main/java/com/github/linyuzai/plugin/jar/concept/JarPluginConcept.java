@@ -69,7 +69,7 @@ public class JarPluginConcept extends AbstractPluginConcept {
         }
 
         public Builder extractTo(Object callback) {
-            return addExtractors(new JarDynamicPluginExtractor(callback));
+            return addExtractor(new JarDynamicPluginExtractor(callback));
         }
 
         public JarPluginConcept build() {

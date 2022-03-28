@@ -27,7 +27,7 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     public DynamicPluginExtractor(@NonNull Object target) {
         this.target = target;
         Class<?> clazz = this.target.getClass();
-        while (clazz != null) {
+        while (clazz != null && clazz != Object.class) {
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 if (method.isAnnotationPresent(OnPluginExtract.class)) {
