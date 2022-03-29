@@ -16,25 +16,56 @@ import lombok.SneakyThrows;
 
 import java.util.*;
 
+/**
+ * {@link PluginConcept} 抽象类
+ */
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractPluginConcept implements PluginConcept {
 
+    /**
+     * 上下文工厂
+     */
     protected final PluginContextFactory pluginContextFactory;
 
+    /**
+     * 事件发布者
+     */
     protected final PluginEventPublisher pluginEventPublisher;
 
+    /**
+     * 插件工厂
+     */
     protected final Collection<PluginFactory> pluginFactories;
 
+    /**
+     * 插件解析器
+     */
     protected final Collection<PluginResolver> pluginResolvers;
 
+    /**
+     * 插件过滤器
+     */
     protected final Collection<PluginFilter> pluginFilters;
 
+    /**
+     * 插件提取器
+     */
     protected final Collection<PluginExtractor> pluginExtractors;
 
+    /**
+     * 插件加载之后是否销毁
+     */
     protected final boolean destroyOnLoaded;
 
+    /**
+     * 加载插件
+     *
+     * @param o 插件源
+     * @return 插件 {@link Plugin}
+     */
     @Override
     public Plugin load(Object o) {
+        //创建插件
         Plugin plugin = createPlugin(o);
         if (plugin == null) {
             throw new PluginException("Plugin can not created: " + o);
@@ -42,22 +73,30 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
+        //初始化插件
         plugin.initialize();
 
         pluginEventPublisher.publish(new PluginInitializedEvent(plugin));
 
+        //创建上下文
         PluginContext context = pluginContextFactory.create(plugin, this);
 
+        //初始化上下文
         context.initialize();
 
+        //解析插件
         new PluginResolverChainImpl(pluginResolvers, pluginFilters).next(context);
+
+        //提取插件
         for (PluginExtractor extractor : pluginExtractors) {
             extractor.extract(context);
         }
 
+        //销毁上下文
         context.destroy();
 
         if (destroyOnLoaded) {
+            //销毁插件
             plugin.destroy();
             pluginEventPublisher.publish(new PluginDestroyedEvent(plugin));
         }
@@ -65,6 +104,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         return plugin;
     }
 
+    /**
+     * 创建插件。遍历所有的插件工厂尝试创建插件。
+     * 如果没有匹配的工厂则返回 null。
+     *
+     * @param o 插件源
+     * @return 插件 {@link Plugin} 或 null
+     */
     public Plugin createPlugin(Object o) {
         for (PluginFactory factory : pluginFactories) {
             if (factory.support(o, this)) {

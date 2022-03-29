@@ -50,11 +50,19 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      */
     private WatchService watchService;
 
-
+    /**
+     * 需要创建回调的路径
+     */
     private final Set<String> notifyCreate = new HashSet<>();
 
+    /**
+     * 需要修改回调的路径
+     */
     private final Set<String> notifyModify = new HashSet<>();
 
+    /**
+     * 需要删除回调的路径
+     */
     private final Set<String> notifyDelete = new HashSet<>();
 
     private boolean running = false;
@@ -80,12 +88,17 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    /**
+     * 开始监听
+     */
     @Override
     public synchronized void start() {
+        //如果已经开始，直接忽略
         if (running) {
             return;
         }
         running = true;
+        //开始就执行一次加载
         if (loadOnStart) {
             for (PluginLocation location : locations) {
                 File[] list = new File(location.getPath()).listFiles();
@@ -103,6 +116,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                 }
             }
         }
+        //如果没有指定执行器，直接新建一个线程
         if (executor == null) {
             new Thread(this::listen).start();
         } else {
@@ -110,6 +124,9 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    /**
+     * 停止监听
+     */
     @Override
     public synchronized void stop() {
         running = false;
@@ -161,22 +178,43 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    /**
+     * 文件创建
+     *
+     * @param watchEvent 监听到的事件
+     */
     public void onFileCreated(WatchEvent<Path> watchEvent) {
         final Path path = watchEvent.context();
         File file = path.toFile();
+        //如果该路径需要回调
         if (notifyCreate.contains(file.getAbsolutePath())) {
             load(file);
         }
     }
 
+    /**
+     * 文件修改
+     *
+     * @param watchEvent 监听到的事件
+     */
     public void onFileModified(WatchEvent<Path> watchEvent) {
         //请自行实现
     }
 
+    /**
+     * 文件删除
+     *
+     * @param watchEvent 监听到的事件
+     */
     public void onFileDeleted(WatchEvent<Path> watchEvent) {
         //请自行实现
     }
 
+    /**
+     * 加载
+     *
+     * @param file 文件
+     */
     public void load(File file) {
         pluginConcept.load(file);
     }

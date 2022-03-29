@@ -25,7 +25,7 @@ public class PluginLocation {
     private Predicate<String> filter;
 
     /**
-     * 触发新建回调
+     * 触发创建回调
      */
     private boolean notifyCreate;
 

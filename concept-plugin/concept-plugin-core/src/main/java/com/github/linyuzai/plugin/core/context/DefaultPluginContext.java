@@ -7,6 +7,10 @@ import lombok.NonNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * {@link PluginContext} 默认实现。
+ * 通过 {@link LinkedHashMap} 缓存数据。
+ */
 @SuppressWarnings("unchecked")
 public class DefaultPluginContext implements PluginContext {
 

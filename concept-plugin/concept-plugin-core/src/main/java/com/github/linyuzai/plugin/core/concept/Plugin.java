@@ -1,5 +1,8 @@
 package com.github.linyuzai.plugin.core.concept;
 
+/**
+ * 插件抽象
+ */
 public interface Plugin {
 
     String PREFIX = "CONCEPT_PLUGIN@";
@@ -12,9 +15,20 @@ public interface Plugin {
 
     String PROPERTIES = PREFIX + "PROPERTIES";
 
+    /**
+     * 获得 {@link PluginConcept}
+     *
+     * @return {@link PluginConcept}
+     */
     PluginConcept getPluginConcept();
 
+    /**
+     * 初始化
+     */
     void initialize();
 
+    /**
+     * 销毁
+     */
     void destroy();
 }
