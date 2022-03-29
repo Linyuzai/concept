@@ -8,8 +8,21 @@ import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+/**
+ * {@link Plugin} 对象提取器
+ *
+ * @param <T> {@link Plugin} 类型
+ */
 public abstract class PluginObjectExtractor<T extends Plugin> extends AbstractPluginExtractor<T> {
 
+    /**
+     * 如果插件类型为 {@link Plugin} 则返回 {@link PluginObjectMatcher}，
+     * 否则返回 null。
+     *
+     * @param type        插件类型 {@link Type}
+     * @param annotations 注解
+     * @return {@link PluginObjectMatcher} 或 null
+     */
     @Override
     public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
         Class<?> clazz = ReflectionUtils.toClass(type);

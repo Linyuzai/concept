@@ -24,10 +24,23 @@ import java.util.Map;
  */
 public abstract class DynamicPluginExtractor implements PluginExtractor {
 
+    /**
+     * 方法参数对应的插件提取执行器缓存
+     */
     protected final Map<Method, Map<Integer, Invoker>> methodInvokersMap = new LinkedHashMap<>();
 
+    /**
+     * 方法执行对象
+     */
     protected final Object target;
 
+    /**
+     * 遍历所有的方法，
+     * 如果方法上标注了注解 {@link OnPluginExtract}，
+     * 尝试通过该方法的参数 {@link Type} 匹配对应的 {@link PluginExtractor}。
+     *
+     * @param target 方法执行对象
+     */
     public DynamicPluginExtractor(@NonNull Object target) {
         this.target = target;
         Class<?> clazz = this.target.getClass();
@@ -56,6 +69,17 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         }
     }
 
+    /**
+     * 通过 {@link Parameter} 获得一个执行器。
+     * 如果标注了特殊的注解将会直接匹配，
+     * {@link PluginProperties} 返回 {@link PropertiesExtractor} 对应的执行器，
+     * {@link PluginContent} 返回 {@link ContentExtractor} 对应的执行器。
+     * 否则按照 {@link PluginContextExtractor} {@link PluginObjectExtractor}
+     * {@link PropertiesExtractor} {@link ContentExtractor} 的顺序匹配执行器。
+     *
+     * @param parameter 方法参数 {@link Parameter}
+     * @return 插件提取执行器
+     */
     public Invoker getInvoker(Parameter parameter) {
         Annotation[] annotations = parameter.getAnnotations();
         for (Annotation annotation : annotations) {
@@ -82,11 +106,26 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         return null;
     }
 
+    /**
+     * 是否是明确指定的注解
+     *
+     * @param annotation 注解
+     * @return 如果是明确指定的返回 true，否则返回 false
+     */
     public boolean hasExplicitAnnotation(Annotation annotation) {
         return annotation.annotationType() == PluginProperties.class ||
                 annotation.annotationType() == PluginContent.class;
     }
 
+    /**
+     * 根据明确指定的注解获得对应的执行器。
+     * {@link PluginProperties} 返回 {@link PropertiesExtractor} 对应的执行器，
+     * {@link PluginContent} 返回 {@link ContentExtractor} 对应的执行器。
+     *
+     * @param annotation 注解
+     * @param parameter  参数 {@link Parameter}
+     * @return 插件提取执行器
+     */
     public Invoker getExplicitInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginProperties.class) {
             return getPropertiesInvoker(parameter);
@@ -98,6 +137,12 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         throw new PluginException(annotation + " has no explicit invoker");
     }
 
+    /**
+     * 尝试获得 {@link PluginContextExtractor} 对应的执行器。
+     *
+     * @param parameter 参数 {@link Parameter}
+     * @return {@link PluginContextExtractor} 对应的执行器或 null
+     */
     public Invoker getPluginContextInvoker(Parameter parameter) {
         try {
             return new PluginContextExtractor<PluginContext>() {
@@ -122,6 +167,12 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         }
     }
 
+    /**
+     * 尝试获得 {@link PluginObjectExtractor} 对应的执行器。
+     *
+     * @param parameter 参数 {@link Parameter}
+     * @return {@link PluginObjectExtractor} 对应的执行器或 null
+     */
     public Invoker getPluginObjectInvoker(Parameter parameter) {
         try {
             return new PluginObjectExtractor<Plugin>() {
@@ -146,6 +197,12 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         }
     }
 
+    /**
+     * 尝试获得 {@link PropertiesExtractor} 对应的执行器。
+     *
+     * @param parameter 参数 {@link Parameter}
+     * @return {@link PropertiesExtractor} 对应的执行器或 null
+     */
     public Invoker getPropertiesInvoker(Parameter parameter) {
         try {
             return new PropertiesExtractor<Void>() {
@@ -170,6 +227,12 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         }
     }
 
+    /**
+     * 尝试获得 {@link ContentExtractor} 对应的执行器。
+     *
+     * @param parameter 参数 {@link Parameter}
+     * @return {@link ContentExtractor} 对应的执行器或 null
+     */
     public Invoker getContentInvoker(Parameter parameter, Charset charset) {
         try {
             return new ContentExtractor<Void>(charset) {
@@ -194,6 +257,14 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         }
     }
 
+    /**
+     * 提取插件。
+     * 遍历所有的方法和参数，使用对应的执行器提取插件赋值给参数，
+     * 调用对应的方法回调。
+     * 如果方法参数没有匹配到任何插件，则不会回调。
+     *
+     * @param context 上下文 {@link PluginContext}
+     */
     @SneakyThrows
     @Override
     public void extract(PluginContext context) {
@@ -216,6 +287,12 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
         }
     }
 
+    /**
+     * 获得依赖的解析器 {@link PluginResolver}。
+     * 所有执行器中的匹配器依赖的解析器 {@link PluginResolver} 的集合。
+     *
+     * @return 所有依赖的解析器 {@link PluginResolver} 的类
+     */
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends PluginResolver>[] dependencies() {
