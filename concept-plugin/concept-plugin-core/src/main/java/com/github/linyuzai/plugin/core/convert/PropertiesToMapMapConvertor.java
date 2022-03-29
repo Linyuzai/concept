@@ -22,6 +22,12 @@ public class PropertiesToMapMapConvertor extends AbstractPluginConvertor<Map<?, 
      */
     private Class<?> mapClass;
 
+    /**
+     * 将所有的 {@link Properties} 转为 {@link Map}
+     *
+     * @param source value 类型为 {@link Properties} 的 {@link Map}
+     * @return value 类型为 {@link Map} 的 {@link Map}
+     */
     @Override
     public Map<Object, Map<String, String>> doConvert(Map<?, Properties> source) {
         Map<Object, Map<String, String>> map = new LinkedHashMap<>();

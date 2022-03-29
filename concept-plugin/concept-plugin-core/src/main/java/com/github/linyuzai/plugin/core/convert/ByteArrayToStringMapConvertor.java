@@ -27,6 +27,12 @@ public class ByteArrayToStringMapConvertor extends AbstractPluginConvertor<Map<?
         this.charset = Charset.forName(charset);
     }
 
+    /**
+     * 将所有的 byte[] 转为 {@link String}
+     *
+     * @param source value 类型为 byte[] 的 {@link Map}
+     * @return value 类型为 {@link String} 的 {@link Map}
+     */
     @Override
     public Map<Object, String> doConvert(Map<?, byte[]> source) {
         Map<Object, String> map = new LinkedHashMap<>();

@@ -10,6 +10,12 @@ import java.util.Map;
  */
 public class ByteArrayToInputStreamMapConvertor extends AbstractPluginConvertor<Map<?, byte[]>, Map<Object, InputStream>> {
 
+    /**
+     * 将所有的 byte[] 转为 {@link ByteArrayInputStream}
+     *
+     * @param source value 类型为 byte[] 的 {@link Map}
+     * @return value 类型为 {@link ByteArrayInputStream} 的 {@link Map}
+     */
     @Override
     public Map<Object, InputStream> doConvert(Map<?, byte[]> source) {
         Map<Object, InputStream> map = new LinkedHashMap<>();

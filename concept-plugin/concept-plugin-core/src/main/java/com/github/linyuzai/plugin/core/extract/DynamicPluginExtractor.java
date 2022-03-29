@@ -18,6 +18,10 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 动态插件提取器。
+ * 可以根据自己的需求同时提取多个插件。
+ */
 public abstract class DynamicPluginExtractor implements PluginExtractor {
 
     protected final Map<Method, Map<Integer, Invoker>> methodInvokersMap = new LinkedHashMap<>();

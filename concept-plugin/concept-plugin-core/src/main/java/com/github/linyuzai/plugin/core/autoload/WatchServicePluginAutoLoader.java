@@ -141,6 +141,10 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    /**
+     * 开始监听。
+     * 通过 {@link WatchService} 监听目录，当触发文件新增，修改，删除时进行回调。
+     */
     @SuppressWarnings("unchecked")
     @SneakyThrows
     public void listen() {

@@ -15,10 +15,19 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.Charset;
 
+/**
+ * 插件内容提取器。
+ * 支持 byte[] {@link String} {@link InputStream}
+ *
+ * @param <T> 插件类型
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
+    /**
+     * 提取成 {@link String} 时的编码
+     */
     private Charset charset;
 
     public ContentExtractor(String charset) {

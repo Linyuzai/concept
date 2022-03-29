@@ -12,6 +12,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+/**
+ * {@link PluginExtractor} 的抽象类
+ *
+ * @param <T> 插件类型
+ */
 @Getter
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
@@ -21,6 +26,13 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         invoker = getInvoker(getGenericType(), getAnnotations());
     }
 
+    /**
+     * 通过插件类型 {@link Type} 和注解获得执行器
+     *
+     * @param type        插件类型 {@link Type}
+     * @param annotations 注解
+     * @return 插件提取执行器
+     */
     public Invoker getInvoker(Type type, Annotation[] annotations) {
         PluginMatcher matcher = getMatcher(type, annotations);
         if (matcher == null) {
@@ -31,6 +43,11 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         return new Invoker(matcher, convertor, formatter);
     }
 
+    /**
+     * 获得插件类型 {@link Type}
+     *
+     * @return 插件类型的 {@link Type}
+     */
     public Type getGenericType() {
         Type type = getClass().getGenericSuperclass();
         if (type instanceof ParameterizedType) {
@@ -42,23 +59,55 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         throw new PluginException("U may need to try override this method");
     }
 
+    /**
+     * 获得注解
+     *
+     * @return 注解
+     */
     public Annotation[] getAnnotations() {
         return new Annotation[0];
     }
 
+    /**
+     * 根据插件类型 {@link Type} 和注解获得 {@link PluginMatcher}
+     *
+     * @param type        插件类型 {@link Type}
+     * @param annotations 注解
+     * @return 插件匹配器 {@link PluginMatcher}
+     */
     public abstract PluginMatcher getMatcher(Type type, Annotation[] annotations);
 
+    /**
+     * 根据插件类型 {@link Type} 和注解获得 {@link PluginConvertor}
+     *
+     * @param type        插件类型 {@link Type}
+     * @param annotations 注解
+     * @return 插件转换器 {@link PluginConvertor}
+     */
     public PluginConvertor getConvertor(Type type, Annotation[] annotations) {
         return null;
     }
 
+    /**
+     * 根据插件类型 {@link Type} 和注解获得 {@link PluginFormatter}
+     *
+     * @param type        插件类型 {@link Type}
+     * @param annotations 注解
+     * @return 插件格式器 {@link PluginFormatter}
+     */
     public PluginFormatter getFormatter(Type type, Annotation[] annotations) {
         return null;
     }
 
+    /**
+     * 提取插件
+     *
+     * @param context 上下文 {@link PluginContext}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void extract(PluginContext context) {
+        //执行插件提取
         Object invoke = invoker.invoke(context);
         if (invoke == null) {
             return;
@@ -66,8 +115,18 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         onExtract((T) invoke);
     }
 
+    /**
+     * 插件提取回调
+     *
+     * @param plugin 插件对象
+     */
     public abstract void onExtract(T plugin);
 
+    /**
+     * 依赖的解析器 {@link PluginResolver}
+     *
+     * @return 依赖的解析器 {@link PluginResolver} 的类
+     */
     @Override
     public Class<? extends PluginResolver>[] dependencies() {
         return invoker.getMatcher().dependencies();

@@ -58,7 +58,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected final boolean destroyOnLoaded;
 
     /**
-     * 加载插件
+     * 加载插件。
+     * 先通过 {@link PluginFactory} 创建插件 {@link Plugin} 并初始化，
+     * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
+     * 执行插件解析链 {@link PluginResolver}，
+     * 通过 {@link PluginExtractor} 提取插件，
+     * 销毁上下文，销毁插件（如需销毁）。
      *
      * @param o 插件源
      * @return 插件 {@link Plugin}

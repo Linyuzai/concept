@@ -13,6 +13,12 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
      */
     private final Collection<PluginEventListener> listeners = new ArrayList<>();
 
+    /**
+     * 发布事件。
+     * 遍历所有的事件监听器。
+     *
+     * @param event 事件
+     */
     @Override
     public void publish(Object event) {
         for (PluginEventListener listener : listeners) {
