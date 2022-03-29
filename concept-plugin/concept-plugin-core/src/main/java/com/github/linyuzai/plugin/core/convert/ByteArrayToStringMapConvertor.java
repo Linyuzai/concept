@@ -9,12 +9,18 @@ import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * byte[] 转 {@link String} 的转换器
+ */
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ByteArrayToStringMapConvertor extends AbstractPluginConvertor<Map<?, byte[]>, Map<Object, String>> {
 
+    /**
+     * 编码
+     */
     private Charset charset;
 
     public ByteArrayToStringMapConvertor(String charset) {

@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * byte[] 转 {@link InputStream} 的转换器
+ */
 public class ByteArrayToInputStreamMapConvertor extends AbstractPluginConvertor<Map<?, byte[]>, Map<Object, InputStream>> {
 
     @Override

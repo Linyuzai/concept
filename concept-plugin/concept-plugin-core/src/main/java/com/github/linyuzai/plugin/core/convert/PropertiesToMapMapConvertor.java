@@ -9,11 +9,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * {@link Properties} 转 {@link Map} 的转换器
+ */
 @Setter
 @Getter
 @AllArgsConstructor
 public class PropertiesToMapMapConvertor extends AbstractPluginConvertor<Map<?, Properties>, Map<Object, Map<String, String>>> {
 
+    /**
+     * {@link Map} 类型
+     */
     private Class<?> mapClass;
 
     @Override
