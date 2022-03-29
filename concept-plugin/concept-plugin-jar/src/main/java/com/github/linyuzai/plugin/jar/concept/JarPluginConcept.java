@@ -11,7 +11,9 @@ import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
-import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoader;
+import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoaderFactory;
+import com.github.linyuzai.plugin.jar.classloader.PluginClassLoader;
+import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
 import com.github.linyuzai.plugin.jar.extract.JarDynamicPluginExtractor;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
@@ -29,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JarPluginConcept extends AbstractPluginConcept {
 
     @Getter
-    private final Map<URL, JarPluginClassLoader> classLoaders = new ConcurrentHashMap<>();
+    private final Map<URL, PluginClassLoader> pluginClassLoaders = new ConcurrentHashMap<>();
 
     public JarPluginConcept(PluginContextFactory pluginContextFactory,
                             PluginEventPublisher pluginEventPublisher,
@@ -47,15 +49,15 @@ public class JarPluginConcept extends AbstractPluginConcept {
         Plugin plugin = super.load(o);
         if (plugin instanceof JarPlugin) {
             URL url = ((JarPlugin) plugin).getUrl();
-            JarPluginClassLoader classLoader = ((JarPlugin) plugin).getClassLoader();
-            classLoaders.put(url, classLoader);
+            PluginClassLoader classLoader = ((JarPlugin) plugin).getPluginClassLoader();
+            pluginClassLoaders.put(url, classLoader);
         }
         return plugin;
     }
 
     public static class Builder extends AbstractBuilder<Builder> {
 
-        private ClassLoader classLoader;
+        private PluginClassLoaderFactory pluginClassLoaderFactory;
 
         public Builder() {
             mappingResolver(ByteArrayPluginResolver.class, JarByteArrayPluginResolver.class);
@@ -63,8 +65,8 @@ public class JarPluginConcept extends AbstractPluginConcept {
             mappingResolver(PropertiesPluginResolver.class, JarPropertiesPluginResolver.class);
         }
 
-        public Builder classLoader(ClassLoader classLoader) {
-            this.classLoader = classLoader;
+        public Builder pluginClassLoaderFactory(PluginClassLoaderFactory factory) {
+            this.pluginClassLoaderFactory = factory;
             return this;
         }
 
@@ -73,13 +75,13 @@ public class JarPluginConcept extends AbstractPluginConcept {
         }
 
         public JarPluginConcept build() {
-            if (classLoader == null) {
-                classLoader = getClass().getClassLoader();
+            if (pluginClassLoaderFactory == null) {
+                pluginClassLoaderFactory = new JarPluginClassLoaderFactory(getClass().getClassLoader());
             }
 
-            addFactory(new JarPathPluginFactory(classLoader));
-            addFactory(new JarFilePluginFactory(classLoader));
-            addFactory(new JarURLPluginFactory(classLoader));
+            addFactory(new JarPathPluginFactory(pluginClassLoaderFactory));
+            addFactory(new JarFilePluginFactory(pluginClassLoaderFactory));
+            addFactory(new JarURLPluginFactory(pluginClassLoaderFactory));
 
             preBuild();
 

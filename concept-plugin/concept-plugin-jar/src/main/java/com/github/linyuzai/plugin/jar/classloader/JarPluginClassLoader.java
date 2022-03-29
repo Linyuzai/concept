@@ -4,11 +4,10 @@ import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import lombok.Getter;
 
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Collection;
 
 @Getter
-public class JarPluginClassLoader extends URLClassLoader {
+public class JarPluginClassLoader extends PluginClassLoader {
 
     private final JarPluginConcept pluginConcept;
 
@@ -17,22 +16,18 @@ public class JarPluginClassLoader extends URLClassLoader {
         this.pluginConcept = concept;
     }
 
-    public Class<?> superFindClass(String name) throws ClassNotFoundException {
-        return super.findClass(name);
-    }
-
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         try {
             return super.findClass(name);
         } catch (Throwable e) {
-            Collection<JarPluginClassLoader> classLoaders = pluginConcept.getClassLoaders().values();
-            for (JarPluginClassLoader classLoader : classLoaders) {
+            Collection<PluginClassLoader> classLoaders = pluginConcept.getPluginClassLoaders().values();
+            for (PluginClassLoader classLoader : classLoaders) {
                 if (classLoader == this) {
                     continue;
                 }
                 try {
-                    return classLoader.superFindClass(name);
+                    return classLoader.findPluginClass(name);
                 } catch (Throwable ignore) {
                 }
             }
