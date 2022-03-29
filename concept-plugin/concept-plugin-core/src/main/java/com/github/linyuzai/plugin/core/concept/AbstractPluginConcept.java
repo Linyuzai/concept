@@ -81,6 +81,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         //创建上下文
         PluginContext context = pluginContextFactory.create(plugin, this);
 
+        //在上下文中添加事件发布者
+        context.set(PluginEventPublisher.class, pluginEventPublisher);
+
         //初始化上下文
         context.initialize();
 
