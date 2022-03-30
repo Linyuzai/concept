@@ -10,10 +10,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 路径过滤器
+ */
 @Getter
 @FilterWithResolver(PathNamePluginResolver.class)
 public class PathFilter extends AbstractPluginFilter<List<String>> {
 
+    /**
+     * 路径模式
+     */
     private final Collection<String> paths;
 
     private final AntPathMatcher matcher = new AntPathMatcher();
@@ -38,6 +44,12 @@ public class PathFilter extends AbstractPluginFilter<List<String>> {
         return Plugin.PATH_NAME;
     }
 
+    /**
+     * 截取路径，和所有的路径模式匹配
+     *
+     * @param path 全路径名称
+     * @return 如果匹配则返回 true，否则返回 false
+     */
     public boolean matchPath(String path) {
         for (String p : paths) {
             if (p.startsWith("/")) {

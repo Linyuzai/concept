@@ -9,9 +9,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 名称过滤器
+ */
 @FilterWithResolver(PathNamePluginResolver.class)
 public class NameFilter extends AbstractPluginFilter<List<String>> {
 
+    /**
+     * 名称模式
+     */
     private final Collection<String> names;
 
     private final AntPathMatcher matcher = new AntPathMatcher();
@@ -36,6 +42,12 @@ public class NameFilter extends AbstractPluginFilter<List<String>> {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 截取名称，和所有的名称模式匹配
+     *
+     * @param name 全路径名称
+     * @return 如果匹配则返回 true，否则返回 false
+     */
     public boolean matchName(String name) {
         for (String n : names) {
             int lastIndexOf = name.lastIndexOf("/");

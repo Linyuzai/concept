@@ -5,6 +5,9 @@ import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 
 import java.util.*;
 
+/**
+ * {@link Properties} 过滤器
+ */
 public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Properties>> {
 
     private final Collection<String> keys;
