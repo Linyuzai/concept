@@ -10,6 +10,9 @@ import java.util.*;
  */
 public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Properties>> {
 
+    /**
+     * 属性健模式
+     */
     private final Collection<String> keys;
 
     private final AntPathMatcher matcher = new AntPathMatcher(".");
@@ -27,6 +30,12 @@ public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Propertie
         return Plugin.PROPERTIES;
     }
 
+    /**
+     * 遍历所有的 {@link Properties} 并过滤重新重新生成新的 {@link Properties}
+     *
+     * @param plugins 需要过滤的插件
+     * @return 过滤之后的 {@link Properties}
+     */
     @Override
     public Map<Object, Properties> doFilter(Map<Object, Properties> plugins) {
         Map<Object, Properties> map = new LinkedHashMap<>();
@@ -47,6 +56,12 @@ public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Propertie
         return map;
     }
 
+    /**
+     * 匹配属性健模式
+     *
+     * @param key 属性健
+     * @return 如果匹配则返回 true，否则返回 false
+     */
     public boolean matchPropertiesKey(String key) {
         for (String k : keys) {
             if (matcher.match(k, key)) {
