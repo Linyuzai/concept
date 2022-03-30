@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 /**
- * {@link Plugin} 对象提取器
+ * {@link Plugin} 提取器
  *
  * @param <T> {@link Plugin} 类型
  */

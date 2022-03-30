@@ -17,7 +17,7 @@ import java.nio.charset.Charset;
 
 /**
  * 插件内容提取器。
- * 支持 byte[] {@link String} {@link InputStream}
+ * 支持 byte[] {@link String} {@link InputStream}。
  *
  * @param <T> 插件类型
  */

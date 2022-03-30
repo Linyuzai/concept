@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.format.AbstractPluginFormatter;
 import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
+import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.match.PropertiesMatcher;
@@ -17,8 +18,23 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * {@link Properties} 文件提取器。
+ * 支持 {@link Properties} {@link Map}。
+ *
+ * @param <T> 插件类型
+ */
 public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
+    /**
+     * 匹配类型为 {@link Properties} {@link Map}
+     * 及对应类型的 {@link java.util.Collection} {@link java.util.List} {@link java.util.Set}
+     * {@link java.util.Map} 和数组或是添加了 {@link PluginProperties} 注解
+     *
+     * @param metadata    {@link TypeMetadata}
+     * @param annotations 注解
+     * @return {@link ContentMatcher}
+     */
     @Override
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
@@ -34,6 +50,13 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
         return null;
     }
 
+    /**
+     * 根据 {@link Type} 获得 {@link TypeMetadata}。
+     * 特殊情况，如果是 {@link Properties} 由于实现了 {@link Map} 所以需要特殊处理。
+     *
+     * @param type {@link Type}
+     * @return {@link TypeMetadata}
+     */
     @Override
     public TypeMetadata createTypeMetadata(Type type) {
         if (type == Properties.class) {
@@ -45,6 +68,15 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
         return super.createTypeMetadata(type);
     }
 
+    /**
+     * 根据 {@link TypeMetadata} 和注解获得 {@link PluginConvertor}。
+     * 特殊情况，如果是 {@link Properties} 或 {@link Map} 返回 {@link PropertiesToMapMapConvertor}，
+     * {@link String} 并且是一个 {@link Map} 则返回 {@link PropertiesToMapMapConvertor} 作为单个配置的类型。
+     *
+     * @param metadata    {@link TypeMetadata}
+     * @param annotations 注解
+     * @return 插件转换器 {@link PluginConvertor}
+     */
     @Override
     public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
@@ -57,6 +89,15 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
         return super.getConvertor(metadata, annotations);
     }
 
+    /**
+     * 根据 {@link TypeMetadata} 和注解获得 {@link PluginFormatter}。
+     * 特殊情况，如果是 {@link String} 并且是一个 {@link Map} 则返回 {@link MapToObjectFormatter}，
+     * {@link String} 并且是一个 {@link Object} 则返回 {@link PropertiesFormatter}，
+     *
+     * @param metadata    {@link TypeMetadata}
+     * @param annotations 注解
+     * @return 插件格式器 {@link PluginFormatter}
+     */
     @Override
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> target = metadata.getTargetClass();
@@ -69,6 +110,9 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
         return super.getFormatter(metadata, annotations);
     }
 
+    /**
+     * 用于提取单个属性值的格式器
+     */
     public static class PropertiesFormatter extends AbstractPluginFormatter<Map<?, Properties>, String> {
 
         @Override
