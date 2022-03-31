@@ -33,7 +33,7 @@ public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Propertie
     /**
      * 遍历所有的 {@link Properties} 并过滤重新重新生成新的 {@link Properties}
      *
-     * @param plugins 需要过滤的插件
+     * @param plugins 需要过滤的 {@link Properties}
      * @return 过滤之后的 {@link Properties}
      */
     @Override
