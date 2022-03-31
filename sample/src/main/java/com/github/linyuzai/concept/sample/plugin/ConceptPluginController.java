@@ -10,6 +10,7 @@ import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
+import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
@@ -263,7 +264,7 @@ public class ConceptPluginController {
                 }
             })*/
             //Class
-            /*.addExtractor(new ClassExtractor<Collection<Class>>() {
+            .addExtractor(new ClassExtractor<Collection<Class>>() {
                 @Override
                 public void onExtract(Collection<Class> plugin) {
                     System.out.println(append("ClassExtractor<Collection<Class>>: ") + plugin);
@@ -508,7 +509,7 @@ public class ConceptPluginController {
                 public void onExtract(Map<Object, ? extends Class<? extends CustomPlugin>> plugin) {
                     System.out.println(append("ClassExtractor<Map<Object, ? extends Class<? extends CustomPlugin>>>: ") + plugin);
                 }
-            })*/
+            })
             //Instance
             /*.addExtractor(new InstanceExtractor<Collection>() {
                 @Override
@@ -642,12 +643,12 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
             })*/
-            .addExtractor(new InstanceExtractor<CustomPlugin>() {
+            /*.addExtractor(new InstanceExtractor<CustomPlugin>() {
                 @Override
                 public void onExtract(CustomPlugin plugin) {
                     ConceptPluginController.this.plugin = plugin;
                 }
-            })
+            })*/
             //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 
@@ -694,7 +695,7 @@ public class ConceptPluginController {
             @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5,
 
             //properties 文件通过 Map 接收
-            @PluginProperties Map<String, String> p6,
+            @PluginProperties("plugin.map.**") Map<String, String> p6,
 
             //properties 文件中 plugin.a 的属性值
             @PluginProperties("plugin.a") String p7,

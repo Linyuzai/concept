@@ -31,7 +31,7 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
                 public TypeMetadata create(Type type) {
                     TypeMetadata metadata = super.create(type);
                     if (metadata instanceof ArrayTypeMetadata) {
-                        ((ArrayTypeMetadata) metadata).setElementClass(Class.class);
+                        ((ArrayTypeMetadata) metadata).setContainerClass(Class.class);
                     }
                     //metadata.setTargetClass(getTargetClass(metadata.getElementType()));
                     return metadata;

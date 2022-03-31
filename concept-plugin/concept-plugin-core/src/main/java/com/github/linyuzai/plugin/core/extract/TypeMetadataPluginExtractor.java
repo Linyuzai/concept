@@ -138,7 +138,7 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
         } else if (metadata instanceof CollectionTypeMetadata) {
             return new MapToListFormatter(metadata.getContainerClass());
         } else if (metadata instanceof ArrayTypeMetadata) {
-            return new MapToArrayFormatter(metadata.getElementClass());
+            return new MapToArrayFormatter(metadata.getContainerClass());
         } else if (metadata instanceof ObjectTypeMetadata) {
             return new MapToObjectFormatter();
         } else {
