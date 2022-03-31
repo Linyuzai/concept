@@ -41,10 +41,9 @@ public class DefaultTypeMetadataFactory implements TypeMetadataFactory {
             Type componentType = ((GenericArrayType) type).getGenericComponentType();
             ArrayTypeMetadata metadata = new ArrayTypeMetadata();
             metadata.setContainerType(type);
-            Class<?> elementClass = getElementClass(componentType);
-            metadata.setContainerClass(elementClass);
+            metadata.setContainerClass(ReflectionUtils.toClass(componentType));
             metadata.setElementType(componentType);
-            metadata.setElementClass(elementClass);
+            metadata.setElementClass(getElementClass(componentType));
             return metadata;
         }
         return null;
