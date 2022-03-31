@@ -8,9 +8,18 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.*;
 
+/**
+ * 反射相关的工具类
+ */
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
 
+    /**
+     * 将 {@link Type} 转为 {@link Class}
+     *
+     * @param type {@link Type}
+     * @return {@link Class}
+     */
     public static Class<?> toClass(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;

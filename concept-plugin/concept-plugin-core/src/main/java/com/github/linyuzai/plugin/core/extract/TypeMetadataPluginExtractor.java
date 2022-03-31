@@ -3,7 +3,8 @@ package com.github.linyuzai.plugin.core.extract;
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.format.*;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.util.TypeMetadata;
+import com.github.linyuzai.plugin.core.type.*;
+import lombok.Setter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -14,6 +15,9 @@ import java.lang.reflect.Type;
  * @param <T> 插件类型
  */
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
+
+    @Setter
+    protected TypeMetadataFactory typeMetadataFactory;
 
     /**
      * 尝试根据可用的 {@link TypeMetadata} 获得 {@link PluginMatcher}
@@ -74,7 +78,7 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
         if (metadata == null) {
             return null;
         }
-        if (metadata.getTargetClass() == null) {
+        if (metadata.getElementClass() == null) {
             return null;
         }
         return metadata;
@@ -87,7 +91,14 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
      * @return {@link TypeMetadata} 或 null
      */
     public TypeMetadata createTypeMetadata(Type type) {
-        return TypeMetadata.create(type);
+        return getTypeMetadataFactory().create(type);
+    }
+
+    public TypeMetadataFactory getTypeMetadataFactory() {
+        if (typeMetadataFactory == null) {
+            typeMetadataFactory = new DefaultTypeMetadataFactory();
+        }
+        return typeMetadataFactory;
     }
 
     /**
@@ -118,18 +129,20 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
      * @return 插件格式器 {@link PluginFormatter}
      */
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
-        if (metadata.isMap()) {
-            return new MapToMapFormatter(metadata.getMapClass());
-        } else if (metadata.isList()) {
-            return new MapToListFormatter(metadata.getListClass());
-        } else if (metadata.isSet()) {
-            return new MapToSetFormatter(metadata.getSetClass());
-        } else if (metadata.isCollection()) {
-            return new MapToListFormatter(metadata.getCollectionClass());
-        } else if (metadata.isArray()) {
-            return new MapToArrayFormatter(metadata.getArrayClass());
-        } else {
+        if (metadata instanceof MapTypeMetadata) {
+            return new MapToMapFormatter(metadata.getContainerClass());
+        } else if (metadata instanceof ListTypeMetadata) {
+            return new MapToListFormatter(metadata.getContainerClass());
+        } else if (metadata instanceof SetTypeMetadata) {
+            return new MapToSetFormatter(metadata.getContainerClass());
+        } else if (metadata instanceof CollectionTypeMetadata) {
+            return new MapToListFormatter(metadata.getContainerClass());
+        } else if (metadata instanceof ArrayTypeMetadata) {
+            return new MapToArrayFormatter(metadata.getElementClass());
+        } else if (metadata instanceof ObjectTypeMetadata) {
             return new MapToObjectFormatter();
+        } else {
+            return null;
         }
     }
 }

@@ -15,7 +15,7 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
     @Override
     public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();
-        ClassLoader classLoader = plugin.getClassLoader();
+        ClassLoader classLoader = plugin.getPluginClassLoader();
         Map<String, String> classNameMap = context.get(JarPlugin.CLASS_NAME);
         Map<String, Class<?>> classMap = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : classNameMap.entrySet()) {

@@ -10,7 +10,9 @@ import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.match.PropertiesMatcher;
-import com.github.linyuzai.plugin.core.util.TypeMetadata;
+import com.github.linyuzai.plugin.core.type.MapTypeMetadata;
+import com.github.linyuzai.plugin.core.type.ObjectTypeMetadata;
+import com.github.linyuzai.plugin.core.type.TypeMetadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -37,9 +39,9 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
      */
     @Override
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> target = metadata.getTargetClass();
-        if (target == Properties.class || Map.class.isAssignableFrom(target)
-                || metadata.isMap() && target == String.class) {
+        Class<?> elementClass = metadata.getElementClass();
+        if (elementClass == Properties.class || Map.class.isAssignableFrom(elementClass)
+                || metadata instanceof MapTypeMetadata && elementClass == String.class) {
             return new PropertiesMatcher(annotations);
         }
         for (Annotation annotation : annotations) {
@@ -60,10 +62,7 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
     @Override
     public TypeMetadata createTypeMetadata(Type type) {
         if (type == Properties.class) {
-            TypeMetadata metadata = new TypeMetadata();
-            metadata.setTargetType(Properties.class);
-            metadata.setTargetClass(Properties.class);
-            return metadata;
+            return new ObjectTypeMetadata(Properties.class);
         }
         return super.createTypeMetadata(type);
     }
@@ -79,12 +78,12 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
      */
     @Override
     public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> target = metadata.getTargetClass();
-        if (target != Properties.class && Map.class.isAssignableFrom(target)) {
-            return new PropertiesToMapMapConvertor(target);
+        Class<?> elementClass = metadata.getElementClass();
+        if (elementClass != Properties.class && Map.class.isAssignableFrom(elementClass)) {
+            return new PropertiesToMapMapConvertor(elementClass);
         }
-        if (metadata.isMap() && target == String.class) {
-            return new PropertiesToMapMapConvertor(metadata.getMapClass());
+        if (metadata instanceof MapTypeMetadata && elementClass == String.class) {
+            return new PropertiesToMapMapConvertor(metadata.getContainerClass());
         }
         return super.getConvertor(metadata, annotations);
     }
@@ -100,11 +99,11 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
      */
     @Override
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> target = metadata.getTargetClass();
-        if (metadata.isMap() && target == String.class) {
+        Class<?> elementClass = metadata.getElementClass();
+        if (metadata instanceof MapTypeMetadata && elementClass == String.class) {
             return new MapToObjectFormatter();
         }
-        if (metadata.isObject() && target == String.class) {
+        if (metadata instanceof ObjectTypeMetadata && elementClass == String.class) {
             return new PropertiesFormatter();
         }
         return super.getFormatter(metadata, annotations);

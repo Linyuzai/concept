@@ -7,7 +7,8 @@ import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.util.TypeMetadata;
+import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
+import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -45,11 +46,11 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
      */
     @Override
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> target = metadata.getTargetClass();
-        if (metadata.isArray() && target == byte.class ||
-                target == byte[].class ||
-                target == String.class ||
-                InputStream.class.isAssignableFrom(target)) {
+        Class<?> elementClass = metadata.getElementClass();
+        if (metadata instanceof ArrayTypeMetadata && elementClass == byte.class ||
+                elementClass == byte[].class ||
+                elementClass == String.class ||
+                InputStream.class.isAssignableFrom(elementClass)) {
             return new ContentMatcher(annotations);
         }
         return null;
@@ -66,11 +67,11 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
      */
     @Override
     public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> target = metadata.getTargetClass();
-        if (InputStream.class == target) {
+        Class<?> elementClass = metadata.getElementClass();
+        if (InputStream.class == elementClass) {
             return new ByteArrayToInputStreamMapConvertor();
         }
-        if (String.class == target) {
+        if (String.class == elementClass) {
             return new ByteArrayToStringMapConvertor(charset);
         }
         return super.getConvertor(metadata, annotations);
@@ -86,7 +87,7 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
      */
     @Override
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
-        if (metadata.isArray() && metadata.getTargetClass() == byte.class) {
+        if (metadata instanceof ArrayTypeMetadata && metadata.getElementClass() == byte.class) {
             return new MapToObjectFormatter();
         }
         return super.getFormatter(metadata, annotations);
