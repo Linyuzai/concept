@@ -20,10 +20,13 @@ import java.lang.reflect.Type;
 @Getter
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
-    protected final Invoker invoker;
+    protected Invoker invoker;
 
-    public AbstractPluginExtractor() {
-        invoker = getInvoker(getGenericType(), getAnnotations());
+    public Invoker getInvoker() {
+        if (invoker == null) {
+            invoker = getInvoker(getGenericType(), getAnnotations());
+        }
+        return invoker;
     }
 
     /**
@@ -108,7 +111,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     @Override
     public void extract(PluginContext context) {
         //执行插件提取
-        Object invoke = invoker.invoke(context);
+        Object invoke = getInvoker().invoke(context);
         if (invoke == null) {
             return;
         }
@@ -129,6 +132,6 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      */
     @Override
     public Class<? extends PluginResolver>[] dependencies() {
-        return invoker.getMatcher().dependencies();
+        return getInvoker().getMatcher().dependencies();
     }
 }
