@@ -10,18 +10,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @DependOnResolvers(JarClassNamePluginResolver.class)
-public class JarClassPluginResolver extends AbstractPluginResolver {
+public class JarClassPluginResolver extends AbstractPluginResolver<Map<String, String>, Map<String, Class<?>>> {
 
     @Override
-    public void resolve(PluginContext context) {
+    public Map<String, Class<?>> doResolve(Map<String, String> classNameMap, PluginContext context) {
         JarPlugin plugin = context.getPlugin();
         ClassLoader classLoader = plugin.getPluginClassLoader();
-        Map<String, String> classNameMap = context.get(JarPlugin.CLASS_NAME);
         Map<String, Class<?>> classMap = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : classNameMap.entrySet()) {
             classMap.put(entry.getKey(), loadClass(classLoader, entry.getValue()));
         }
-        context.set(JarPlugin.CLASS, classMap);
+        return classMap;
     }
 
     @SneakyThrows
@@ -30,7 +29,12 @@ public class JarClassPluginResolver extends AbstractPluginResolver {
     }
 
     @Override
-    public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.CLASS_NAME);
+    public Object getKey() {
+        return JarPlugin.CLASS_NAME;
+    }
+
+    @Override
+    public Object getResolveKey() {
+        return JarPlugin.CLASS;
     }
 }

@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 @DependOnResolvers(JarPathNamePluginResolver.class)
-public class JarClassNamePluginResolver extends AbstractPluginResolver {
+public class JarClassNamePluginResolver extends AbstractPluginResolver<List<String>, Map<String, String>> {
 
     @Override
-    public void resolve(PluginContext context) {
-        List<String> filenames = context.get(JarPlugin.PATH_NAME);
+    public Map<String, String> doResolve(List<String> filenames, PluginContext context) {
         Map<String, String> classNameMap = new LinkedHashMap<>();
         for (String filename : filenames) {
             if (filename.endsWith(".class")) {
@@ -23,11 +22,16 @@ public class JarClassNamePluginResolver extends AbstractPluginResolver {
                 classNameMap.put(filename, className);
             }
         }
-        context.set(JarPlugin.CLASS_NAME, classNameMap);
+        return classNameMap;
     }
 
     @Override
-    public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.PATH_NAME);
+    public Object getKey() {
+        return JarPlugin.PATH_NAME;
+    }
+
+    @Override
+    public Object getResolveKey() {
+        return JarPlugin.CLASS_NAME;
     }
 }

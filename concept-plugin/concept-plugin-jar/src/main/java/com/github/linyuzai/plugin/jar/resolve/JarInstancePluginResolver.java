@@ -12,11 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @DependOnResolvers(JarClassPluginResolver.class)
-public class JarInstancePluginResolver extends AbstractPluginResolver {
+public class JarInstancePluginResolver extends AbstractPluginResolver<Map<String, Class<?>>, Map<String, Object>> {
 
     @Override
-    public void resolve(PluginContext context) {
-        Map<String, Class<?>> classMap = context.get(JarPlugin.CLASS);
+    public Map<String, Object> doResolve(Map<String, Class<?>> classMap, PluginContext context) {
         Map<String, Object> instanceMap = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classMap.entrySet()) {
             Class<?> value = entry.getValue();
@@ -24,7 +23,7 @@ public class JarInstancePluginResolver extends AbstractPluginResolver {
                 instanceMap.put(entry.getKey(), newInstance(value));
             }
         }
-        context.set(JarPlugin.INSTANCE, instanceMap);
+        return instanceMap;
     }
 
     private boolean canNewInstance(Class<?> clazz) {
@@ -47,7 +46,12 @@ public class JarInstancePluginResolver extends AbstractPluginResolver {
     }
 
     @Override
-    public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.CLASS);
+    public Object getKey() {
+        return JarPlugin.CLASS;
+    }
+
+    @Override
+    public Object getResolveKey() {
+        return JarPlugin.INSTANCE;
     }
 }

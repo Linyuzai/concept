@@ -13,21 +13,25 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 @DependOnResolvers(JarEntryPluginResolver.class)
-public class JarPathNamePluginResolver extends AbstractPluginResolver implements PathNamePluginResolver {
+public class JarPathNamePluginResolver extends AbstractPluginResolver<List<JarEntry>, List<String>>
+        implements PathNamePluginResolver {
 
     @Override
-    public void resolve(PluginContext context) {
-        List<JarEntry> entries = context.get(JarPlugin.ENTRY);
-        List<String> filenames = entries.stream()
+    public List<String> doResolve(List<JarEntry> entries, PluginContext context) {
+        return entries.stream()
                 .map(ZipEntry::getName)
                 .map(it -> it.replaceAll(File.separator, "/"))
                 .filter(it -> !it.endsWith("/"))
                 .collect(Collectors.toList());
-        context.set(JarPlugin.PATH_NAME, filenames);
     }
 
     @Override
-    public boolean support(PluginContext context) {
-        return context.contains(JarPlugin.ENTRY);
+    public Object getKey() {
+        return JarPlugin.ENTRY;
+    }
+
+    @Override
+    public Object getResolveKey() {
+        return JarPlugin.PATH_NAME;
     }
 }

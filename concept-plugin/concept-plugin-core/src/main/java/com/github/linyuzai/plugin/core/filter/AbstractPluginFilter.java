@@ -1,7 +1,9 @@
 package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * {@link PluginFilter} 的抽象类
@@ -12,6 +14,9 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
 
     @Getter
     protected boolean negate;
+
+    @Setter
+    protected Class<? extends PluginResolver> filterWith;
 
     /**
      * 取反
@@ -36,6 +41,20 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
         Object key = getKey();
         T t = doFilter(context.get(key));
         context.set(key, t);
+    }
+
+    /**
+     * 获得插件过滤器 {@link PluginFilter} 需要依赖的插件处理器 {@link PluginResolver}。
+     * 增加缓存操作。
+     *
+     * @return 所需要依赖的插件处理器 {@link PluginResolver} 的类
+     */
+    @Override
+    public Class<? extends PluginResolver> filterWith() {
+        if (filterWith == null) {
+            filterWith = PluginFilter.super.filterWith();
+        }
+        return filterWith;
     }
 
     /**

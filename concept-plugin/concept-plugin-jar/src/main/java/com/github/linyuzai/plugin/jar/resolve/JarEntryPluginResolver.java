@@ -1,14 +1,14 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
-public class JarEntryPluginResolver extends AbstractPluginResolver {
+public class JarEntryPluginResolver implements PluginResolver {
 
     @Override
     public void resolve(PluginContext context) {

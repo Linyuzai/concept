@@ -35,6 +35,13 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Propert
         return Plugin.PROPERTIES;
     }
 
+    /**
+     * 遍历所有的 {@link Properties}，先根据路径和名称过滤；
+     * 如果 {@link PropertiesFilter} 不为 null 则再使用 {@link PropertiesFilter} 过滤。
+     *
+     * @param propertiesMap {@link Properties} 插件 {@link Map}
+     * @return 过滤之后的 {@link Properties}
+     */
     @Override
     public Map<Object, Properties> filter(Map<Object, Properties> propertiesMap) {
         Map<Object, Properties> map = new LinkedHashMap<>();
@@ -52,11 +59,6 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Propert
             return propertiesFilter.doFilter(map);
         }
         return map;
-    }
-
-    @Override
-    public boolean filterWithAnnotation(String pathAndName) {
-        return super.filterWithAnnotation(pathAndName);
     }
 
     @Override
