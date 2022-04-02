@@ -27,10 +27,6 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
         if (typeMetadataFactory == null) {
             typeMetadataFactory = new DefaultTypeMetadataFactory() {
 
-                /*if (metadata instanceof ArrayTypeMetadata) {
-                        ((ArrayTypeMetadata) metadata).setContainerClass(Class.class);
-                    }*/
-                //metadata.setTargetClass(getTargetClass(metadata.getElementType()));
                 @Override
                 public Class<?> getElementClass(Type type) {
                     if (type instanceof Class) {
