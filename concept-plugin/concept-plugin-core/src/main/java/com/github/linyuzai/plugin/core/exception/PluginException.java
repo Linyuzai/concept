@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.exception;
 
 /**
- * 插件异常
+ * 插件异常类
  */
 public class PluginException extends RuntimeException {
 

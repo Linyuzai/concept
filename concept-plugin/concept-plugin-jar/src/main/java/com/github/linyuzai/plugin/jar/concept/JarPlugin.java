@@ -33,17 +33,17 @@ public class JarPlugin implements Plugin {
 
     private JarFile file;
 
-    public JarPlugin(URL url, PluginClassLoader pluginClassLoader, JarPluginConcept concept) {
+    public JarPlugin(URL url, PluginClassLoader classLoader, JarPluginConcept concept) {
         this.url = url;
-        this.pluginClassLoader = pluginClassLoader;
+        this.pluginClassLoader = classLoader;
         this.pluginConcept = concept;
     }
 
     @SneakyThrows
     @Override
     public void initialize() {
-        connection = (JarURLConnection) getUrl().openConnection();
-        file = getConnection().getJarFile();
+        this.connection = (JarURLConnection) getUrl().openConnection();
+        this.file = getConnection().getJarFile();
     }
 
     @Override
@@ -54,5 +54,7 @@ public class JarPlugin implements Plugin {
             } catch (Throwable ignore) {
             }
         }
+        file = null;
+        connection = null;
     }
 }

@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.context;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.LinkedHashMap;
@@ -18,7 +19,8 @@ public class DefaultPluginContext implements PluginContext {
 
     private final Plugin plugin;
 
-    private final Map<Object, Object> map = new LinkedHashMap<>();
+    @Getter
+    private final Map<Object, Object> content = new LinkedHashMap<>();
 
     public DefaultPluginContext(@NonNull PluginConcept concept, @NonNull Plugin plugin) {
         this.concept = concept;
@@ -37,17 +39,17 @@ public class DefaultPluginContext implements PluginContext {
 
     @Override
     public <T> T get(Object key) {
-        return (T) map.get(key);
+        return (T) content.get(key);
     }
 
     @Override
     public void set(Object key, Object value) {
-        map.put(key, value);
+        content.put(key, value);
     }
 
     @Override
     public boolean contains(Object key) {
-        return map.containsKey(key);
+        return content.containsKey(key);
     }
 
     @Override
@@ -57,6 +59,6 @@ public class DefaultPluginContext implements PluginContext {
 
     @Override
     public void destroy() {
-        map.clear();
+        content.clear();
     }
 }

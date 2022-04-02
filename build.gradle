@@ -21,38 +21,16 @@ test {
 allprojects {
     ext {
         set('springBootVersion', "2.6.3")
-    }
-    ext {
         set('springDependencyManagementVersion', "1.0.11.RELEASE")
-    }
-    ext {
         set('springCloudVersion', "3.1.1")
-    }
-    ext {
         set('springCloudDependencyManagementVersion', "2021.0.1")
-    }
-    ext {
         set('kotlinVersion', "1.5.10")
-    }
-    ext {
         set('dokkaVersion', "1.6.0")
-    }
-    ext {
         set('reactorVersion', "3.4.1")
-    }
-    ext {
         set('coroutinesVersion', "1.5.0")
-    }
-    ext {
         set('cglibVersion', "3.3.0")
-    }
-    ext {
         set('okhttpVersion', "4.9.3")
-    }
-    ext {
         set('lombokVersion', "1.18.22")
-    }
-    ext {
         set('junitJupiterVersion', "5.8.1")
     }
 }

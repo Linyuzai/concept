@@ -15,14 +15,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
- * 基于 {@link WatchService} 的插件文件自动加载
+ * 基于 {@link WatchService} 的插件文件自动加载器
  */
 @Getter
 public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
-    /**
-     * {@link PluginConcept}
-     */
     private final PluginConcept pluginConcept;
 
     /**
@@ -45,9 +42,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      */
     private final boolean loadOnStart;
 
-    /**
-     * {@link WatchService}
-     */
     private WatchService watchService;
 
     /**
@@ -112,7 +106,8 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                 } else {
                     Arrays.stream(list)
                             .map(File::getAbsolutePath)
-                            .filter(location.getFilter()).forEach(pluginConcept::load);
+                            .filter(location.getFilter())
+                            .forEach(pluginConcept::load);
                 }
             }
         }
