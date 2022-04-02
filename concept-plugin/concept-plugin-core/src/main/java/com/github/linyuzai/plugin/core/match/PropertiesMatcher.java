@@ -10,6 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * {@link Properties} 匹配器
+ */
 @DependOnResolvers(PropertiesPluginResolver.class)
 public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Properties>> {
 

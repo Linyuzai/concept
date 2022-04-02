@@ -4,6 +4,9 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.AllArgsConstructor;
 
+/**
+ * 插件 {@link Plugin} 匹配器
+ */
 @AllArgsConstructor
 public class PluginObjectMatcher implements PluginMatcher {
 

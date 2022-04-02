@@ -8,6 +8,9 @@ import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 内容匹配器
+ */
 @DependOnResolvers(ByteArrayPluginResolver.class)
 public class ContentMatcher extends AbstractPluginMatcher<Map<Object, byte[]>> {
 

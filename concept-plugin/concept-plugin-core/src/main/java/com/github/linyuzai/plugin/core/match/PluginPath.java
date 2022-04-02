@@ -5,9 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 用于匹配插件路径
+ */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PluginPath {
 
+    /**
+     * 路径
+     *
+     * @return 路径
+     */
     String[] value();
 }
