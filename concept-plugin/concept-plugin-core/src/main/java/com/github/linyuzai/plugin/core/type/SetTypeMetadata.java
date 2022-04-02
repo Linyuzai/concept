@@ -1,4 +1,7 @@
 package com.github.linyuzai.plugin.core.type;
 
+/**
+ * {@link java.util.Set} 类型的 {@link TypeMetadata}
+ */
 public class SetTypeMetadata extends AbstractTypeMetadata {
 }

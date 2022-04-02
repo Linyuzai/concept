@@ -11,7 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link TypeMetadataFactory} 的默认实现
+ */
 public class DefaultTypeMetadataFactory implements TypeMetadataFactory {
+
     @Override
     public TypeMetadata create(Type type) {
         if (type instanceof Class) {

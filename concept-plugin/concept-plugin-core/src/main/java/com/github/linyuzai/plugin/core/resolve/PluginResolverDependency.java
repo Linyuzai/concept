@@ -10,9 +10,16 @@ package com.github.linyuzai.plugin.core.resolve;
  */
 public interface PluginResolverDependency {
 
+    /**
+     * 获得依赖的所有解析器类。
+     * 默认情况下，会尝试通过类上标记的注解 {@link DependOnResolvers} 来获得。
+     *
+     * @return 依赖的所有解析器类
+     */
     @SuppressWarnings("unchecked")
     default Class<? extends PluginResolver>[] dependencies() {
         Class<?> clazz = getClass();
+        //当前类有就用当前类的配置，否则查找其父类上的配置
         while (clazz != null) {
             DependOnResolvers annotation = clazz.getAnnotation(DependOnResolvers.class);
             if (annotation != null) {
