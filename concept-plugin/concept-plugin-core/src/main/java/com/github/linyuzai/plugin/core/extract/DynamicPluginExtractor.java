@@ -282,7 +282,9 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
                 matched = true;
             }
             if (matched) {
-                entry.getKey().invoke(target, values);
+                Method method = entry.getKey();
+                method.invoke(target, values);
+                context.publish(new DynamicPluginExtractedEvent(context, this, values, method, target));
             }
         }
     }

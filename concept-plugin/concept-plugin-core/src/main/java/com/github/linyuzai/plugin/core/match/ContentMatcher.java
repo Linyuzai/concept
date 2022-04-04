@@ -40,7 +40,7 @@ public class ContentMatcher extends AbstractPluginMatcher<Map<Object, byte[]>> {
     }
 
     @Override
-    public boolean isEmpty(Map<Object, byte[]> filter) {
-        return filter.isEmpty();
+    public boolean isEmpty(Map<Object, byte[]> filtered) {
+        return filtered.isEmpty();
     }
 }

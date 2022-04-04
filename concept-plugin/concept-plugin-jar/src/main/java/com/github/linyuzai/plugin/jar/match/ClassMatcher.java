@@ -32,7 +32,7 @@ public class ClassMatcher extends AbstractJarPluginMatcher<Map<String, Class<?>>
     }
 
     @Override
-    public boolean isEmpty(Map<String, Class<?>> filter) {
-        return filter.isEmpty();
+    public boolean isEmpty(Map<String, Class<?>> filtered) {
+        return filtered.isEmpty();
     }
 }

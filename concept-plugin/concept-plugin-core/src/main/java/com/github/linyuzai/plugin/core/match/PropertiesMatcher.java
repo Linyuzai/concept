@@ -62,7 +62,7 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Propert
     }
 
     @Override
-    public boolean isEmpty(Map<Object, Properties> filter) {
-        return filter.isEmpty();
+    public boolean isEmpty(Map<Object, Properties> filtered) {
+        return filtered.isEmpty();
     }
 }

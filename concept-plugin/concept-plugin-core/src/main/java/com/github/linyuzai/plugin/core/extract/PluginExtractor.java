@@ -50,17 +50,17 @@ public interface PluginExtractor extends PluginResolverDependency {
          */
         public Object invoke(PluginContext context) {
             //匹配插件
-            Object match = matcher.match(context);
-            if (match == null) {
+            Object matched = matcher.match(context);
+            if (matched == null) {
                 return null;
             }
             //转换插件
-            Object convert = convertor == null ? match : convertor.convert(match);
-            if (convert == null) {
+            Object converted = convertor == null ? matched : convertor.convert(matched, context);
+            if (converted == null) {
                 return null;
             }
             //格式化插件
-            return formatter == null ? convert : formatter.format(convert);
+            return formatter == null ? converted : formatter.format(converted, context);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.filter.NameFilter;
 import com.github.linyuzai.plugin.core.filter.PathFilter;
 import lombok.Getter;
@@ -45,12 +46,20 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
 
     @Override
     public Object match(PluginContext context) {
-        T source = context.get(getKey());
-        T filter = filter(source);
-        if (isEmpty(filter)) {
+        Object key = getKey();
+        T source = context.get(key);
+        if (source == null) {
+            throw new PluginException("Plugin can not be matched with key: " + key);
+        }
+        T filtered = filter(source);
+        if (filtered == null) {
             return null;
         }
-        return filter;
+        if (isEmpty(filtered)) {
+            return null;
+        }
+        context.publish(new PluginMatchedEvent(context, this, key, source, filtered));
+        return filtered;
     }
 
     /**
@@ -87,8 +96,8 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
     /**
      * 过滤后的插件是否为空
      *
-     * @param filter 过滤后的插件
+     * @param filtered 过滤后的插件
      * @return 如果为空返回 true 否则返回 false
      */
-    public abstract boolean isEmpty(T filter);
+    public abstract boolean isEmpty(T filtered);
 }

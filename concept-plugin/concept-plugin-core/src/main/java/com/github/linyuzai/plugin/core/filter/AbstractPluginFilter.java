@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,8 +40,13 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
     @Override
     public void filter(PluginContext context) {
         Object key = getKey();
-        T t = doFilter(context.get(key));
-        context.set(key, t);
+        T original = context.get(key);
+        if (original == null) {
+            throw new PluginException("No plugin can be filtered with key: " + key);
+        }
+        T filtered = doFilter(original);
+        context.set(key, filtered);
+        context.publish(new PluginFilteredEvent(context, this, original, filtered));
     }
 
     /**
@@ -77,9 +83,9 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
     /**
      * 以泛型的方式过滤
      *
-     * @param plugins 需要过滤的插件
+     * @param original 需要过滤的插件
      * @return 过滤之后的插件
      */
-    public abstract T doFilter(T plugins);
+    public abstract T doFilter(T original);
 
 }

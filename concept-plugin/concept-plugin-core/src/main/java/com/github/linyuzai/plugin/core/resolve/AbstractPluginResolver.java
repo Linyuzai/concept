@@ -21,7 +21,7 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
         R resolved = doResolve(depended, context);
         Object resolvedKey = getResolvedKey();
         context.set(resolvedKey, resolved);
-        context.publish(new PluginResolvedEvent(context, dependedKey, depended, resolvedKey, resolved));
+        context.publish(new PluginResolvedEvent(context, this, dependedKey, depended, resolvedKey, resolved));
     }
 
     /**

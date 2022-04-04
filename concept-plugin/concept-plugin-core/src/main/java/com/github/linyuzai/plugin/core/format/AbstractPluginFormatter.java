@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.core.format;
 
+import com.github.linyuzai.plugin.core.context.PluginContext;
+
 /**
  * {@link PluginFormatter} 的抽象类
  *
@@ -16,8 +18,11 @@ public abstract class AbstractPluginFormatter<T, R> implements PluginFormatter {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Object format(Object source) {
-        return doFormat((T) source);
+    public Object format(Object source, PluginContext context) {
+        T original = (T) source;
+        R formatted = doFormat(original);
+        context.publish(new PluginFormattedEvent(context, this, original, formatted));
+        return formatted;
     }
 
     /**

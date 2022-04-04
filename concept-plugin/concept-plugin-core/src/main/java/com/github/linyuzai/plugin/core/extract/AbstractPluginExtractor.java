@@ -116,6 +116,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
             return;
         }
         onExtract((T) invoke);
+        context.publish(new PluginExtractedEvent(context, this, invoke));
     }
 
     /**

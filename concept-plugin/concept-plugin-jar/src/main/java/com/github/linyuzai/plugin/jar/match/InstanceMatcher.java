@@ -32,7 +32,7 @@ public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object
     }
 
     @Override
-    public boolean isEmpty(Map<String, Object> filter) {
-        return filter.isEmpty();
+    public boolean isEmpty(Map<String, Object> filtered) {
+        return filtered.isEmpty();
     }
 }
