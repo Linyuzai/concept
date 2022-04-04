@@ -16,7 +16,7 @@ public class MapToMapFormatter extends AbstractPluginFormatter<Map<?, ?>, Map<Ob
     /**
      * {@link Map} 的类型
      */
-    private Class<?> mapClass;
+    private final Class<?> mapClass;
 
     public MapToMapFormatter() {
         this(Map.class);

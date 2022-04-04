@@ -7,9 +7,11 @@ import com.github.linyuzai.plugin.jar.classloader.PluginClassLoader;
 import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.net.URL;
 
+@Getter
 @AllArgsConstructor
 public abstract class JarPluginFactory implements PluginFactory {
 

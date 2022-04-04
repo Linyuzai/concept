@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
-import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -17,7 +16,6 @@ import java.lang.reflect.Type;
  *
  * @param <T> 插件类型
  */
-@Getter
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
     protected Invoker invoker;

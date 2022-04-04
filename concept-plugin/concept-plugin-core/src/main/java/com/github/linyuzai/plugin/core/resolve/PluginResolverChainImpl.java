@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.core.resolve;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * 插件解析链 {@link PluginResolverChain} 的实现
  */
+@Getter
 @AllArgsConstructor
 public class PluginResolverChainImpl implements PluginResolverChain {
 

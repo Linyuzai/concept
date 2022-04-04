@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.match.PluginContent;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
@@ -32,6 +33,7 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     /**
      * 方法执行对象
      */
+    @Getter
     protected final Object target;
 
     /**

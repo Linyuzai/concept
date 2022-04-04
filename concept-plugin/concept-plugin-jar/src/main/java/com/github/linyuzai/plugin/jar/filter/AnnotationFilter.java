@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @FilterWithResolver(JarClassPluginResolver.class)
 public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
-    private Collection<Class<? extends Annotation>> annotationClasses;
+    private final Collection<Class<? extends Annotation>> annotationClasses;
 
     @SafeVarargs
     public AnnotationFilter(Class<? extends Annotation>... annotationClasses) {

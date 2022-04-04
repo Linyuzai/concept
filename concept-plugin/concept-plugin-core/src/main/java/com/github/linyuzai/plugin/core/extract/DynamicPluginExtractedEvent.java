@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 public class DynamicPluginExtractedEvent extends PluginExtractedEvent {
 
     private final Method method;
+
     private final Object object;
 
     public DynamicPluginExtractedEvent(PluginContext context,

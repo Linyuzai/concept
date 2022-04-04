@@ -17,7 +17,7 @@ public class MapToSetFormatter extends AbstractPluginFormatter<Map<?, ?>, Set<Ob
     /**
      * {@link Set} 的类型
      */
-    private Class<?> setClass;
+    private final Class<?> setClass;
 
     public MapToSetFormatter() {
         this(Set.class);

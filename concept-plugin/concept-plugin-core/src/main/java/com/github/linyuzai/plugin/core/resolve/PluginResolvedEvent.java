@@ -8,9 +8,13 @@ import lombok.Getter;
 public class PluginResolvedEvent extends PluginContextEvent {
 
     private final PluginResolver resolver;
+
     private final Object dependedKey;
+
     private final Object depended;
+
     private final Object resolvedKey;
+
     private final Object resolved;
 
     public PluginResolvedEvent(PluginContext context,

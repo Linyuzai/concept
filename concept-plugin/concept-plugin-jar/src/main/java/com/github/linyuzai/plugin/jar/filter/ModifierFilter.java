@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @FilterWithResolver(JarClassPluginResolver.class)
 public class ModifierFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
-    private Collection<Function<Integer, Boolean>> functions;
+    private final Collection<Function<Integer, Boolean>> functions;
 
     @SafeVarargs
     public ModifierFilter(Function<Integer, Boolean>... functions) {

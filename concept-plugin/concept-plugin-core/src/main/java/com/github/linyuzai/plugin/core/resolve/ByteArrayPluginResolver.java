@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
@@ -15,6 +16,7 @@ import java.io.InputStream;
  * @param <T> 未解析的插件类型
  * @param <R> 解析后的插件类型
  */
+@Getter
 @AllArgsConstructor
 @DependOnResolvers(PathNamePluginResolver.class)
 public abstract class ByteArrayPluginResolver<T, R> extends AbstractPluginResolver<T, R> {

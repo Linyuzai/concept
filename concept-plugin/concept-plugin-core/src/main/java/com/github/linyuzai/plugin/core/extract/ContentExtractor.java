@@ -10,7 +10,9 @@ import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -22,6 +24,8 @@ import java.nio.charset.Charset;
  *
  * @param <T> 插件类型
  */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T> {

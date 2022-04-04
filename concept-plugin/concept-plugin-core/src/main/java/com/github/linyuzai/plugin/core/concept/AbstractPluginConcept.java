@@ -12,6 +12,7 @@ import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolverChainImpl;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.*;
@@ -19,6 +20,7 @@ import java.util.*;
 /**
  * {@link PluginConcept} 抽象类
  */
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractPluginConcept implements PluginConcept {
 

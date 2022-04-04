@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.event;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * {@link PluginEventPublisher} 默认实现
@@ -29,5 +30,9 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     @Override
     public void register(Collection<? extends PluginEventListener> listeners) {
         this.listeners.addAll(listeners);
+    }
+
+    public Collection<PluginEventListener> getPluginEventListeners() {
+        return Collections.unmodifiableCollection(listeners);
     }
 }

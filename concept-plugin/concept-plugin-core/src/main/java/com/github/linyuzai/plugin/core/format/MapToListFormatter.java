@@ -17,7 +17,7 @@ public class MapToListFormatter extends AbstractPluginFormatter<Map<?, ?>, List<
     /**
      * {@link List} 的类型
      */
-    private Class<?> listClass;
+    private final Class<?> listClass;
 
     public MapToListFormatter() {
         this(List.class);

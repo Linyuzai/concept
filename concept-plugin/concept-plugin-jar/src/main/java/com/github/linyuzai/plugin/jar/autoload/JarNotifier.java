@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.jar.autoload;
 
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
+import lombok.Getter;
 
 import java.net.URL;
 import java.nio.file.StandardWatchEventKinds;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+@Getter
 public class JarNotifier implements BiConsumer<String, WatchEvent.Kind<?>> {
 
     private final JarPluginConcept concept;

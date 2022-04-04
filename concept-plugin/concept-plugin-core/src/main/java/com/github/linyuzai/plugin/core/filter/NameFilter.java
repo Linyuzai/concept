@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.core.filter;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 /**
  * 名称过滤器
  */
+@Getter
 @FilterWithResolver(PathNamePluginResolver.class)
 public class NameFilter extends AbstractPluginFilter<List<String>> {
 

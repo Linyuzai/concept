@@ -8,10 +8,10 @@ import java.lang.reflect.Type;
 public interface TypeMetadataFactory {
 
     /**
-     * 创建
+     * 创建 {@link TypeMetadata}
      *
      * @param type 泛型 {@link Type}
-     * @return {@link TypeMetadata} 或 null
+     * @return {@link TypeMetadata} 实例或 null
      */
     TypeMetadata create(Type type);
 }

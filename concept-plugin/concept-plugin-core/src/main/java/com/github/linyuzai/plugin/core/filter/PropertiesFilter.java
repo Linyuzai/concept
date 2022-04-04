@@ -2,12 +2,14 @@ package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
+import lombok.Getter;
 
 import java.util.*;
 
 /**
  * {@link Properties} 过滤器
  */
+@Getter
 public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Properties>> {
 
     /**

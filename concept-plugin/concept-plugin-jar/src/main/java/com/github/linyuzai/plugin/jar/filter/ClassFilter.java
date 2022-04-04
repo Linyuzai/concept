@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @FilterWithResolver(JarClassPluginResolver.class)
 public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
-    private Collection<Class<?>> classes;
+    private final Collection<Class<?>> classes;
 
     public ClassFilter(Class<?>... classes) {
         this(Arrays.asList(classes));

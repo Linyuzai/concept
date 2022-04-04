@@ -18,7 +18,7 @@ public class MapToArrayFormatter extends AbstractPluginFormatter<Map<?, ?>, Obje
     /**
      * 数组的类型
      */
-    private Class<?> arrayClass;
+    private final Class<?> arrayClass;
 
     /**
      * 格式化，根据数组类型实例化并添加 {@link Map} 的 value

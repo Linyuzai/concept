@@ -3,17 +3,19 @@ package com.github.linyuzai.plugin.core.match;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 插件 {@link Plugin} 匹配器
  */
+@Getter
 @AllArgsConstructor
 public class PluginObjectMatcher implements PluginMatcher {
 
     /**
      * 插件类
      */
-    private final Class<?> clazz;
+    private final Class<?> pluginClass;
 
     public PluginObjectMatcher() {
         this(Plugin.class);
@@ -28,7 +30,7 @@ public class PluginObjectMatcher implements PluginMatcher {
     @Override
     public Object match(PluginContext context) {
         Plugin plugin = context.getPlugin();
-        if (clazz.isInstance(plugin)) {
+        if (pluginClass.isInstance(plugin)) {
             return plugin;
         }
         return null;

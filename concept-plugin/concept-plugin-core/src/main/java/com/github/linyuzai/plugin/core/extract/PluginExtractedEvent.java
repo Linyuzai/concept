@@ -8,6 +8,7 @@ import lombok.Getter;
 public class PluginExtractedEvent extends PluginContextEvent {
 
     private final PluginExtractor extractor;
+
     private final Object extracted;
 
     public PluginExtractedEvent(PluginContext context, PluginExtractor extractor, Object extracted) {
