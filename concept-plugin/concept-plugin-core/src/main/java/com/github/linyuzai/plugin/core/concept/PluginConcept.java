@@ -14,19 +14,9 @@ public interface PluginConcept {
     Plugin create(Object o);
 
     /**
-     * 加载插件
-     *
-     * @param plugin 插件
-     */
-    void load(Plugin plugin);
-
-    /**
      * 创建并加载插件
      *
      * @param o 插件源
      */
-    default void load(Object o) {
-        Plugin plugin = create(o);
-        load(plugin);
-    }
+    void load(Object o);
 }

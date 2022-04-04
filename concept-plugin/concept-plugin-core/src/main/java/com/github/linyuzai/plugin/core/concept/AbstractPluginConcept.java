@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
-import com.github.linyuzai.plugin.core.factory.DefaultPluginFactory;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
@@ -61,11 +60,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      */
     @Override
     public Plugin create(Object o) {
+        if (o instanceof Plugin) {
+            return (Plugin) o;
+        }
         Plugin plugin = create0(o);
         if (plugin == null) {
             throw new PluginException("Plugin can not create: " + o);
         }
-        pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
         return plugin;
     }
 
@@ -77,13 +78,16 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 通过 {@link PluginExtractor} 提取插件，
      * 销毁上下文，销毁插件。
      *
-     * @param plugin 插件实例
+     * @param o 插件源
      */
     @Override
-    public void load(Plugin plugin) {
+    public void load(Object o) {
+        Plugin plugin = create(o);
         if (plugin == null) {
             throw new PluginException("Plugin is null");
         }
+
+        pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
         //初始化插件
         plugin.initialize();
@@ -241,8 +245,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             }
 
             pluginEventPublisher.register(pluginEventListeners);
-
-            addFactory(new DefaultPluginFactory());
 
             List<PluginResolver> customResolvers = new ArrayList<>(pluginResolvers);
             pluginResolvers.clear();

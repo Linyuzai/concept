@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -12,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -19,8 +19,6 @@ import java.util.function.Consumer;
  */
 @Getter
 public class WatchServicePluginAutoLoader implements PluginAutoLoader {
-
-    private final PluginConcept pluginConcept;
 
     /**
      * 执行线程池
@@ -32,6 +30,12 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      */
     private final PluginLocation[] locations;
 
+    private final Consumer<String> createConsumer;
+
+    private final Consumer<String> modifyConsumer;
+
+    private final Consumer<String> deleteConsumer;
+
     /**
      * 异常处理
      */
@@ -40,7 +44,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     /**
      * 在 {@link #start()} 时是否触发一次加载
      */
-    private final boolean loadOnStart;
+    private final WatchEvent.Kind<?> notifyOnStart;
 
     private WatchService watchService;
 
@@ -61,14 +65,20 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private boolean running = false;
 
-    private WatchServicePluginAutoLoader(PluginConcept concept, ExecutorService executor,
-                                         Consumer<Throwable> consumer, boolean loadOnStart,
+    private WatchServicePluginAutoLoader(ExecutorService executor,
+                                         Consumer<String> createConsumer,
+                                         Consumer<String> modifyConsumer,
+                                         Consumer<String> deleteConsumer,
+                                         Consumer<Throwable> errorConsumer,
+                                         WatchEvent.Kind<?> notifyOnStart,
                                          PluginLocation... locations) {
-        this.pluginConcept = concept;
         this.executor = executor;
         this.locations = locations;
-        this.errorConsumer = consumer;
-        this.loadOnStart = loadOnStart;
+        this.createConsumer = createConsumer;
+        this.modifyConsumer = modifyConsumer;
+        this.deleteConsumer = deleteConsumer;
+        this.errorConsumer = errorConsumer;
+        this.notifyOnStart = notifyOnStart;
         for (PluginLocation location : this.locations) {
             if (location.isNotifyCreate()) {
                 notifyCreate.add(location.getPath());
@@ -92,30 +102,42 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             return;
         }
         running = true;
-        //开始就执行一次加载
-        if (loadOnStart) {
-            for (PluginLocation location : locations) {
-                File[] list = new File(location.getPath()).listFiles();
-                if (list == null) {
-                    continue;
-                }
-                if (location.getFilter() == null) {
-                    Arrays.stream(list)
-                            .map(File::getAbsolutePath)
-                            .forEach(pluginConcept::load);
-                } else {
-                    Arrays.stream(list)
-                            .map(File::getAbsolutePath)
-                            .filter(location.getFilter())
-                            .forEach(pluginConcept::load);
-                }
-            }
+        //开始就执行一次回调
+        if (notifyOnStart == StandardWatchEventKinds.ENTRY_CREATE) {
+            notifyOnStart0(createConsumer);
+        } else if (notifyOnStart == StandardWatchEventKinds.ENTRY_MODIFY) {
+            notifyOnStart0(modifyConsumer);
+        } else if (notifyOnStart == StandardWatchEventKinds.ENTRY_DELETE) {
+            notifyOnStart0(deleteConsumer);
         }
+
         //如果没有指定执行器，直接新建一个线程
         if (executor == null) {
             new Thread(this::listen).start();
         } else {
             executor.execute(this::listen);
+        }
+    }
+
+    private void notifyOnStart0(Consumer<String> consumer) {
+        if (consumer == null) {
+            return;
+        }
+        for (PluginLocation location : locations) {
+            File[] list = new File(location.getPath()).listFiles();
+            if (list == null) {
+                continue;
+            }
+            if (location.getFilter() == null) {
+                Arrays.stream(list)
+                        .map(File::getAbsolutePath)
+                        .forEach(consumer);
+            } else {
+                Arrays.stream(list)
+                        .map(File::getAbsolutePath)
+                        .filter(location.getFilter())
+                        .forEach(consumer);
+            }
         }
     }
 
@@ -185,9 +207,16 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     public void onFileCreated(WatchEvent<Path> watchEvent) {
         final Path path = watchEvent.context();
         File file = path.toFile();
+        String p = file.getAbsolutePath();
         //如果该路径需要回调
-        if (notifyCreate.contains(file.getAbsolutePath())) {
-            load(file);
+        if (notifyCreate.contains(p)) {
+            onCreateNotify(p);
+        }
+    }
+
+    public void onCreateNotify(String path) {
+        if (createConsumer != null) {
+            createConsumer.accept(path);
         }
     }
 
@@ -197,7 +226,19 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      * @param watchEvent 监听到的事件
      */
     public void onFileModified(WatchEvent<Path> watchEvent) {
-        //请自行实现
+        final Path path = watchEvent.context();
+        File file = path.toFile();
+        String p = file.getAbsolutePath();
+        //如果该路径需要回调
+        if (notifyModify.contains(p)) {
+            onModifyNotify(p);
+        }
+    }
+
+    public void onModifyNotify(String path) {
+        if (modifyConsumer != null) {
+            modifyConsumer.accept(path);
+        }
     }
 
     /**
@@ -206,16 +247,19 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      * @param watchEvent 监听到的事件
      */
     public void onFileDeleted(WatchEvent<Path> watchEvent) {
-        //请自行实现
+        final Path path = watchEvent.context();
+        File file = path.toFile();
+        String p = file.getAbsolutePath();
+        //如果该路径需要回调
+        if (notifyDelete.contains(p)) {
+            onDeleteNotify(p);
+        }
     }
 
-    /**
-     * 加载
-     *
-     * @param file 文件
-     */
-    public void load(File file) {
-        pluginConcept.load(file);
+    public void onDeleteNotify(String path) {
+        if (deleteConsumer != null) {
+            deleteConsumer.accept(path);
+        }
     }
 
     public void onError(Throwable e) {
@@ -226,22 +270,21 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     public static class Builder {
 
-        private PluginConcept concept;
-
         private ExecutorService executor;
 
         private PluginLocation[] locations;
 
-        private Consumer<Throwable> consumer;
+        private Consumer<String> createConsumer;
 
-        private boolean loadOnStart = true;
+        private Consumer<String> modifyConsumer;
 
-        public Builder pluginConcept(PluginConcept concept) {
-            this.concept = concept;
-            return this;
-        }
+        private Consumer<String> deleteConsumer;
 
-        public Builder executorService(ExecutorService executor) {
+        private Consumer<Throwable> errorConsumer;
+
+        private WatchEvent.Kind<?> notifyOnStart = StandardWatchEventKinds.ENTRY_CREATE;
+
+        public Builder executor(ExecutorService executor) {
             this.executor = executor;
             return this;
         }
@@ -251,24 +294,60 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             return this;
         }
 
-        public Builder errorConsumer(Consumer<Throwable> consumer) {
-            this.consumer = consumer;
+        public Builder onCreate(Consumer<String> consumer) {
+            this.createConsumer = consumer;
             return this;
         }
 
-        public Builder loadOnStart(boolean loadOnStart) {
-            this.loadOnStart = loadOnStart;
+        public Builder onCreate(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
+            this.createConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_CREATE);
+            return this;
+        }
+
+        public Builder onModify(Consumer<String> consumer) {
+            this.modifyConsumer = consumer;
+            return this;
+        }
+
+        public Builder onModify(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
+            this.modifyConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_MODIFY);
+            return this;
+        }
+
+        public Builder onDelete(Consumer<String> consumer) {
+            this.deleteConsumer = consumer;
+            return this;
+        }
+
+        public Builder onDelete(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
+            this.deleteConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_DELETE);
+            return this;
+        }
+
+        public Builder onNotify(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
+            this.createConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_CREATE);
+            this.modifyConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_MODIFY);
+            this.deleteConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_DELETE);
+            return this;
+        }
+
+        public Builder onError(Consumer<Throwable> consumer) {
+            this.errorConsumer = consumer;
+            return this;
+        }
+
+        public Builder notifyOnStart(WatchEvent.Kind<?> notifyOnStart) {
+            this.notifyOnStart = notifyOnStart;
             return this;
         }
 
         public WatchServicePluginAutoLoader build() {
-            if (concept == null) {
-                throw new PluginException("PluginConcept is null");
-            }
             if (locations == null || locations.length == 0) {
                 throw new PluginException("No path watched");
             }
-            return new WatchServicePluginAutoLoader(concept, executor, consumer, loadOnStart, locations);
+            return new WatchServicePluginAutoLoader(executor,
+                    createConsumer, modifyConsumer, deleteConsumer,
+                    errorConsumer, notifyOnStart, locations);
         }
     }
 }

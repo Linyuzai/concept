@@ -57,4 +57,9 @@ public class JarPlugin implements Plugin {
         file = null;
         connection = null;
     }
+
+    @Override
+    public String toString() {
+        return "JarPlugin(" + url + ")";
+    }
 }

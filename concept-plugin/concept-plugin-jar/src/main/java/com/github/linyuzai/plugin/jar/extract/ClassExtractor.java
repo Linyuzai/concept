@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.jar.extract;
 
 import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import com.github.linyuzai.plugin.core.type.DefaultTypeMetadataFactory;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadataFactory;

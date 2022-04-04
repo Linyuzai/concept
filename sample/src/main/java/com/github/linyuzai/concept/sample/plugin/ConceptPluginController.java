@@ -8,10 +8,10 @@ import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
+import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
-import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
@@ -653,13 +653,14 @@ public class ConceptPluginController {
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
-            .pluginConcept(concept)
             .locations(new PluginLocation.Builder()
                     .path("/Users/tanghanzheng/concept/plugin/")
                     .filter(it -> it.endsWith(".jar"))
                     .build())
-            .executorService(Executors.newSingleThreadExecutor())
-            .errorConsumer(e -> log.error("Plugin auto load error", e))
+            .executor(Executors.newSingleThreadExecutor())
+            //.onCreate(concept::load)
+            .onNotify(new JarNotifier(concept))
+            .onError(e -> log.error("Plugin auto load error", e))
             .build();
 
     @PostConstruct

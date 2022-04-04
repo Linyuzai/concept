@@ -44,11 +44,13 @@ public class JarPluginConcept extends AbstractPluginConcept {
     }
 
     @Override
-    public void load(Plugin plugin) {
+    public void load(Object o) {
+        Plugin plugin = create(o);
         super.load(plugin);
         if (plugin instanceof JarPlugin) {
-            URL url = ((JarPlugin) plugin).getUrl();
-            PluginClassLoader classLoader = ((JarPlugin) plugin).getPluginClassLoader();
+            JarPlugin jarPlugin = (JarPlugin) plugin;
+            URL url = jarPlugin.getUrl();
+            PluginClassLoader classLoader = jarPlugin.getPluginClassLoader();
             pluginClassLoaders.put(url, classLoader);
         }
     }
