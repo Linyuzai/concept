@@ -46,12 +46,12 @@ public class JarInstancePluginResolver extends AbstractPluginResolver<Map<String
     }
 
     @Override
-    public Object getKey() {
+    public Object getDependedKey() {
         return JarPlugin.CLASS;
     }
 
     @Override
-    public Object getResolveKey() {
+    public Object getResolvedKey() {
         return JarPlugin.INSTANCE;
     }
 }

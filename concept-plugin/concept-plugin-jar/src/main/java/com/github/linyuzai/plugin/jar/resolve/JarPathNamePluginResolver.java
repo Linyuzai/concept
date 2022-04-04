@@ -26,12 +26,12 @@ public class JarPathNamePluginResolver extends AbstractPluginResolver<List<JarEn
     }
 
     @Override
-    public Object getKey() {
+    public Object getDependedKey() {
         return JarPlugin.ENTRY;
     }
 
     @Override
-    public Object getResolveKey() {
+    public Object getResolvedKey() {
         return JarPlugin.PATH_NAME;
     }
 }

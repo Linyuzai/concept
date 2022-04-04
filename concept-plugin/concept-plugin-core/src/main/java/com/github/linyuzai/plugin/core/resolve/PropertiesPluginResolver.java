@@ -21,12 +21,12 @@ public abstract class PropertiesPluginResolver extends AbstractPluginResolver<Li
     }
 
     @Override
-    public Object getKey() {
+    public Object getDependedKey() {
         return Plugin.PROPERTIES_NAME;
     }
 
     @Override
-    public Object getResolveKey() {
+    public Object getResolvedKey() {
         return Plugin.PROPERTIES;
     }
 

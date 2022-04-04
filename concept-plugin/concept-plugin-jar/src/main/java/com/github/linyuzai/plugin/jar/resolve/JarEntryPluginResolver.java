@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.resolve.PluginResolvedEvent;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
@@ -16,6 +17,7 @@ public class JarEntryPluginResolver implements PluginResolver {
         List<JarEntry> entries = plugin.getFile()
                 .stream().collect(Collectors.toList());
         context.set(JarPlugin.ENTRY, entries);
+        context.publish(new PluginResolvedEvent(context, JarPlugin.ENTRY, entries));
     }
 
     @Override

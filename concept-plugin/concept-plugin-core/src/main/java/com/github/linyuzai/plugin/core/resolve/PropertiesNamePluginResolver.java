@@ -17,12 +17,12 @@ public class PropertiesNamePluginResolver extends AbstractPluginResolver<List<St
     }
 
     @Override
-    public Object getKey() {
+    public Object getDependedKey() {
         return Plugin.PATH_NAME;
     }
 
     @Override
-    public Object getResolveKey() {
+    public Object getResolvedKey() {
         return Plugin.PROPERTIES_NAME;
     }
 }

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 
 /**
  * {@link PluginResolver} 抽象类
@@ -12,9 +13,15 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
 
     @Override
     public void resolve(PluginContext context) {
-        T plugin = context.get(getKey());
-        R resolve = doResolve(plugin, context);
-        context.set(getResolveKey(), resolve);
+        Object dependedKey = getDependedKey();
+        T depended = context.get(dependedKey);
+        if (depended == null) {
+            throw new PluginException("No plugin can be resolved with key: " + dependedKey);
+        }
+        R resolved = doResolve(depended, context);
+        Object resolvedKey = getResolvedKey();
+        context.set(resolvedKey, resolved);
+        context.publish(new PluginResolvedEvent(context, dependedKey, depended, resolvedKey, resolved));
     }
 
     /**
@@ -25,7 +32,7 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      */
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(getKey());
+        return context.contains(getDependedKey());
     }
 
     /**
@@ -42,12 +49,12 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      *
      * @return 未解析的插件的 key
      */
-    public abstract Object getKey();
+    public abstract Object getDependedKey();
 
     /**
      * 解析后插件的 key
      *
      * @return 解析后插件的 key
      */
-    public abstract Object getResolveKey();
+    public abstract Object getResolvedKey();
 }

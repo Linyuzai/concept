@@ -26,12 +26,12 @@ public class JarClassNamePluginResolver extends AbstractPluginResolver<List<Stri
     }
 
     @Override
-    public Object getKey() {
+    public Object getDependedKey() {
         return JarPlugin.PATH_NAME;
     }
 
     @Override
-    public Object getResolveKey() {
+    public Object getResolvedKey() {
         return JarPlugin.CLASS_NAME;
     }
 }

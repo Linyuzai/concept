@@ -29,12 +29,12 @@ public abstract class ByteArrayPluginResolver<T, R> extends AbstractPluginResolv
     }
 
     @Override
-    public Object getKey() {
+    public Object getDependedKey() {
         return Plugin.PATH_NAME;
     }
 
     @Override
-    public Object getResolveKey() {
+    public Object getResolvedKey() {
         return Plugin.BYTE_ARRAY;
     }
 
