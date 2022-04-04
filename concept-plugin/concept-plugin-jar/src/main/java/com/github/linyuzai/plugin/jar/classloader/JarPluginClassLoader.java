@@ -11,8 +11,8 @@ public class JarPluginClassLoader extends PluginClassLoader {
 
     private final JarPluginConcept pluginConcept;
 
-    public JarPluginClassLoader(URL url, ClassLoader parent, JarPluginConcept concept) {
-        super(new URL[]{url}, parent);
+    public JarPluginClassLoader(URL[] urls, ClassLoader parent, JarPluginConcept concept) {
+        super(urls, parent);
         this.pluginConcept = concept;
     }
 

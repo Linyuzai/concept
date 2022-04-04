@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.context;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -35,6 +36,14 @@ public class DefaultPluginContext implements PluginContext {
     @Override
     public <P extends Plugin> P getPlugin() {
         return (P) plugin;
+    }
+
+    @Override
+    public void publish(Object event) {
+        PluginEventPublisher publisher = get(PluginEventPublisher.class);
+        if (publisher != null) {
+            publisher.publish(event);
+        }
     }
 
     @Override

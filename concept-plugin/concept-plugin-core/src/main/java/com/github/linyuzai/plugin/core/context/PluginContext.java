@@ -25,6 +25,8 @@ public interface PluginContext {
      */
     <P extends Plugin> P getPlugin();
 
+    void publish(Object event);
+
     /**
      * 通过 key 获得 value。
      *

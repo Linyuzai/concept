@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 
 import java.net.URL;
 
+
 @AllArgsConstructor
 public class JarPluginClassLoaderFactory implements PluginClassLoaderFactory {
 
@@ -12,6 +13,6 @@ public class JarPluginClassLoaderFactory implements PluginClassLoaderFactory {
 
     @Override
     public PluginClassLoader create(URL url, JarPluginConcept concept) {
-        return new JarPluginClassLoader(url, parent, concept);
+        return new JarPluginClassLoader(new URL[]{url}, parent, concept);
     }
 }

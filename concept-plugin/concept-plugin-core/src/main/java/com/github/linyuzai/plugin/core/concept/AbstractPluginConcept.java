@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.factory.DefaultPluginFactory;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
@@ -53,30 +54,36 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected final Collection<PluginExtractor> pluginExtractors;
 
     /**
-     * 插件加载之后是否销毁
-     */
-    protected final boolean destroyOnLoaded;
-
-    /**
-     * 加载插件。
-     * 先通过 {@link PluginFactory} 创建插件 {@link Plugin} 并初始化，
-     * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
-     * 执行插件解析链 {@link PluginResolver}，
-     * 通过 {@link PluginExtractor} 提取插件，
-     * 销毁上下文，销毁插件（如需销毁）。
+     * 创建插件，如创建失败则抛出异常
      *
      * @param o 插件源
      * @return 插件 {@link Plugin}
      */
     @Override
-    public Plugin load(Object o) {
-        //创建插件
-        Plugin plugin = createPlugin(o);
+    public Plugin create(Object o) {
+        Plugin plugin = create0(o);
         if (plugin == null) {
-            throw new PluginException("Plugin can not created: " + o);
+            throw new PluginException("Plugin can not create: " + o);
         }
-
         pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
+        return plugin;
+    }
+
+    /**
+     * 加载插件。
+     * 初始化插件 {@link Plugin#initialize()}，
+     * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
+     * 执行插件解析链 {@link PluginResolver}，
+     * 通过 {@link PluginExtractor} 提取插件，
+     * 销毁上下文，销毁插件。
+     *
+     * @param plugin 插件实例
+     */
+    @Override
+    public void load(Plugin plugin) {
+        if (plugin == null) {
+            throw new PluginException("Plugin is null");
+        }
 
         //初始化插件
         plugin.initialize();
@@ -103,13 +110,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         //销毁上下文
         context.destroy();
 
-        if (destroyOnLoaded) {
-            //销毁插件
-            plugin.destroy();
-            pluginEventPublisher.publish(new PluginDestroyedEvent(plugin));
-        }
-
-        return plugin;
+        plugin.destroy();
+        pluginEventPublisher.publish(new PluginDestroyedEvent(plugin));
     }
 
     /**
@@ -119,7 +121,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      * @return 插件 {@link Plugin} 或 null
      */
-    public Plugin createPlugin(Object o) {
+    private Plugin create0(Object o) {
         for (PluginFactory factory : pluginFactories) {
             if (factory.support(o, this)) {
                 return factory.create(o, this);
@@ -144,8 +146,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected final Collection<PluginFilter> pluginFilters = new ArrayList<>();
 
         protected final Collection<PluginExtractor> pluginExtractors = new ArrayList<>();
-
-        protected boolean destroyOnLoaded = true;
 
         protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
                 resolverDefaultImpl = new HashMap<>();
@@ -231,11 +231,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (T) this;
         }
 
-        public T destroyOnLoaded(boolean destroyOnLoaded) {
-            this.destroyOnLoaded = destroyOnLoaded;
-            return (T) this;
-        }
-
         protected void preBuild() {
             if (pluginContextFactory == null) {
                 pluginContextFactory = new DefaultPluginContextFactory();
@@ -246,6 +241,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             }
 
             pluginEventPublisher.register(pluginEventListeners);
+
+            addFactory(new DefaultPluginFactory());
 
             List<PluginResolver> customResolvers = new ArrayList<>(pluginResolvers);
             pluginResolvers.clear();

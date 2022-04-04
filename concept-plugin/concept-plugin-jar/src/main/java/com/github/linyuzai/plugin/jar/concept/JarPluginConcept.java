@@ -38,21 +38,19 @@ public class JarPluginConcept extends AbstractPluginConcept {
                             Collection<PluginFactory> pluginFactories,
                             Collection<PluginResolver> pluginResolvers,
                             Collection<PluginFilter> pluginFilters,
-                            Collection<PluginExtractor> pluginExtractors,
-                            boolean destroyedOnLoaded) {
+                            Collection<PluginExtractor> pluginExtractors) {
         super(pluginContextFactory, pluginEventPublisher, pluginFactories,
-                pluginResolvers, pluginFilters, pluginExtractors, destroyedOnLoaded);
+                pluginResolvers, pluginFilters, pluginExtractors);
     }
 
     @Override
-    public Plugin load(Object o) {
-        Plugin plugin = super.load(o);
+    public void load(Plugin plugin) {
+        super.load(plugin);
         if (plugin instanceof JarPlugin) {
             URL url = ((JarPlugin) plugin).getUrl();
             PluginClassLoader classLoader = ((JarPlugin) plugin).getPluginClassLoader();
             pluginClassLoaders.put(url, classLoader);
         }
-        return plugin;
     }
 
     public static class Builder extends AbstractBuilder<Builder> {
@@ -91,8 +89,7 @@ public class JarPluginConcept extends AbstractPluginConcept {
                     pluginFactories,
                     pluginResolvers,
                     pluginFilters,
-                    pluginExtractors,
-                    destroyOnLoaded);
+                    pluginExtractors);
         }
     }
 }
