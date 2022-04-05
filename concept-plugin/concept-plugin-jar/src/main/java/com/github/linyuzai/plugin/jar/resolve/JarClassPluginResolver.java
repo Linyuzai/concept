@@ -9,9 +9,19 @@ import lombok.SneakyThrows;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 类解析器
+ */
 @DependOnResolvers(JarClassNamePluginResolver.class)
 public class JarClassPluginResolver extends AbstractPluginResolver<Map<String, String>, Map<String, Class<?>>> {
 
+    /**
+     * 对于所有的类名使用类加载器进行加载
+     *
+     * @param classNameMap 类名
+     * @param context      上下文 {@link PluginContext}
+     * @return 类
+     */
     @Override
     public Map<String, Class<?>> doResolve(Map<String, String> classNameMap, PluginContext context) {
         JarPlugin plugin = context.getPlugin();

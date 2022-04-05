@@ -9,8 +9,16 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
+/**
+ * {@link JarEntry} 解析器
+ */
 public class JarEntryPluginResolver implements PluginResolver {
 
+    /**
+     * 从 {@link java.util.jar.JarFile} 中获得 {@link JarEntry}
+     *
+     * @param context 上下文 {@link PluginContext}
+     */
     @Override
     public void resolve(PluginContext context) {
         JarPlugin plugin = context.getPlugin();

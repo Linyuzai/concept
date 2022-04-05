@@ -8,6 +8,9 @@ import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 实例匹配器
+ */
 @DependOnResolvers(JarInstancePluginResolver.class)
 public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object>> {
 
@@ -20,6 +23,12 @@ public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object
         return JarPlugin.INSTANCE;
     }
 
+    /**
+     * 是对应类的实例并基于注解匹配
+     *
+     * @param instances 实例
+     * @return 匹配之后的实例
+     */
     public Map<String, Object> filter(Map<String, Object> instances) {
         Map<String, Object> map = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : instances.entrySet()) {

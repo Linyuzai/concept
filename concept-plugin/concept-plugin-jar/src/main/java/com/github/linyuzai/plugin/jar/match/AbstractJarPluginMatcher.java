@@ -9,17 +9,37 @@ import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * 针对 jar 的插件匹配器
+ *
+ * @param <T> 插件类型
+ */
 @Getter
 public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<T> {
 
+    /**
+     * 类型
+     */
     protected final Class<?> target;
 
+    /**
+     * 包名过滤器
+     */
     protected PackageFilter packageFilter;
 
+    /**
+     * 类名过滤器
+     */
     protected ClassNameFilter classNameFilter;
 
+    /**
+     * 类过滤器
+     */
     protected ClassFilter classFilter;
 
+    /**
+     * 注解过滤器
+     */
     protected AnnotationFilter annotationFilter;
 
     public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations) {
@@ -50,6 +70,13 @@ public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<
         }
     }
 
+    /**
+     * 结合类相关的注解进行过滤
+     *
+     * @param pathAndName 路径和名称
+     * @param clazz       类
+     * @return 是否匹配
+     */
     public boolean filterWithAnnotation(String pathAndName, Class<?> clazz) {
         if (!filterWithAnnotation(pathAndName)) {
             return false;

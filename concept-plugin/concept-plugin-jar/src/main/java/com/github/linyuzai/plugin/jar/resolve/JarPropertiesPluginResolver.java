@@ -11,9 +11,19 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 
+/**
+ * jar 中 {@link Properties} 解析器
+ */
 @DependOnResolvers(PropertiesNamePluginResolver.class)
 public class JarPropertiesPluginResolver extends PropertiesPluginResolver {
 
+    /**
+     * 通过 {@link java.util.jar.JarFile#getInputStream(ZipEntry)} 来加载 {@link Properties}
+     *
+     * @param context        上下文 {@link PluginContext}
+     * @param propertiesName 名称
+     * @return {@link Properties}
+     */
     @SneakyThrows
     @Override
     public Properties load(PluginContext context, String propertiesName) {

@@ -12,10 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PluginPath {
 
-    /**
-     * 路径
-     *
-     * @return 路径
-     */
     String[] value();
 }

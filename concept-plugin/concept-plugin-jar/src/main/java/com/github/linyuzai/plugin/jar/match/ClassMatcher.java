@@ -8,6 +8,9 @@ import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 类匹配器
+ */
 @DependOnResolvers(JarClassPluginResolver.class)
 public class ClassMatcher extends AbstractJarPluginMatcher<Map<String, Class<?>>> {
 
@@ -20,6 +23,12 @@ public class ClassMatcher extends AbstractJarPluginMatcher<Map<String, Class<?>>
         return JarPlugin.CLASS;
     }
 
+    /**
+     * 是对应的类或其子类并基于注解匹配
+     *
+     * @param classes 类
+     * @return 匹配之后的类
+     */
     public Map<String, Class<?>> filter(Map<String, Class<?>> classes) {
         Map<String, Class<?>> map = new LinkedHashMap<>();
         for (Map.Entry<String, Class<?>> entry : classes.entrySet()) {

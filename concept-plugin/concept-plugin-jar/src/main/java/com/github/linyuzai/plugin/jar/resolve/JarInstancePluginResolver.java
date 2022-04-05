@@ -11,9 +11,19 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 实例解析器
+ */
 @DependOnResolvers(JarClassPluginResolver.class)
 public class JarInstancePluginResolver extends AbstractPluginResolver<Map<String, Class<?>>, Map<String, Object>> {
 
+    /**
+     * 对所有的类尝试实例化
+     *
+     * @param classMap 类
+     * @param context  上下文 {@link PluginContext}
+     * @return 实例
+     */
     @Override
     public Map<String, Object> doResolve(Map<String, Class<?>> classMap, PluginContext context) {
         Map<String, Object> instanceMap = new LinkedHashMap<>();
@@ -26,6 +36,14 @@ public class JarInstancePluginResolver extends AbstractPluginResolver<Map<String
         return instanceMap;
     }
 
+    /**
+     * 是否可以实例化。
+     * 如果是接口或是抽象类则不能实例化，
+     * 如果不存在 0 个参数的构造器则不能实例化。
+     *
+     * @param clazz 类
+     * @return 如果可以实例化返回 true 否则返回 false
+     */
     private boolean canNewInstance(Class<?> clazz) {
         int modifiers = clazz.getModifiers();
         if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)) {
@@ -39,6 +57,12 @@ public class JarInstancePluginResolver extends AbstractPluginResolver<Map<String
         return false;
     }
 
+    /**
+     * 通过 0 参数的构造器进行实例化
+     *
+     * @param clazz 类
+     * @return 实例
+     */
     @SneakyThrows
     private Object newInstance(Class<?> clazz) {
         Constructor<?> constructor = clazz.getConstructor();

@@ -12,10 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PluginName {
 
-    /**
-     * 名称
-     *
-     * @return 名称
-     */
     String[] value();
 }

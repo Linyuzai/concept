@@ -12,10 +12,20 @@ import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+/**
+ * 路径名称解析器
+ */
 @DependOnResolvers(JarEntryPluginResolver.class)
 public class JarPathNamePluginResolver extends AbstractPluginResolver<List<JarEntry>, List<String>>
         implements PathNamePluginResolver {
 
+    /**
+     * 获得 {@link JarEntry} 的名称并且处理分隔符
+     *
+     * @param entries {@link JarEntry}
+     * @param context 上下文 {@link PluginContext}
+     * @return 路径名称
+     */
     @Override
     public List<String> doResolve(List<JarEntry> entries, PluginContext context) {
         return entries.stream()

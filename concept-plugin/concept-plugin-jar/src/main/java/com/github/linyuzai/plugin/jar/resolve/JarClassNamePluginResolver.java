@@ -9,9 +9,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 类名解析器
+ */
 @DependOnResolvers(JarPathNamePluginResolver.class)
 public class JarClassNamePluginResolver extends AbstractPluginResolver<List<String>, Map<String, String>> {
 
+    /**
+     * 将所有 .class 结尾的文件过滤出来，
+     * 将路径处理成类名
+     *
+     * @param filenames 文件名
+     * @param context   上下文 {@link PluginContext}
+     * @return 类名
+     */
     @Override
     public Map<String, String> doResolve(List<String> filenames, PluginContext context) {
         Map<String, String> classNameMap = new LinkedHashMap<>();
