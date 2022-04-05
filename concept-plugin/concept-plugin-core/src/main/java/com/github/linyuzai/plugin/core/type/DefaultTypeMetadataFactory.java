@@ -110,7 +110,7 @@ public class DefaultTypeMetadataFactory implements TypeMetadataFactory {
             metadata.setElementClass(getElementClass(componentType));
             return metadata;
         } else {
-            return new ObjectTypeMetadata(cClass);
+            return new ObjectTypeMetadata(cType, cClass);
         }
     }
 

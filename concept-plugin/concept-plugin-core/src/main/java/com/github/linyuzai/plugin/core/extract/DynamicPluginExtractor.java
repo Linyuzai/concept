@@ -271,21 +271,31 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
     @Override
     public void extract(PluginContext context) {
         for (Map.Entry<Method, Map<Integer, Invoker>> entry : methodInvokersMap.entrySet()) {
+            Method method = entry.getKey();
             Map<Integer, Invoker> matcherMap = entry.getValue();
             Object[] values = new Object[matcherMap.size()];
             boolean matched = false;
             for (Map.Entry<Integer, Invoker> methodEntry : matcherMap.entrySet()) {
+                Integer index = methodEntry.getKey();
                 Invoker invoker = methodEntry.getValue();
-                Object invoke = invoker.invoke(context);
-                if (invoke == null) {
+                Object invoked;
+                try {
+                    invoked = invoker.invoke(context);
+                } catch (Throwable e) {
+                    throw new PluginException("Invoke error on " + method.getName() + ", param " + index, e);
+                }
+                if (invoked == null) {
                     continue;
                 }
-                values[methodEntry.getKey()] = invoke;
+                values[index] = invoked;
                 matched = true;
             }
             if (matched) {
-                Method method = entry.getKey();
-                method.invoke(target, values);
+                try {
+                    method.invoke(target, values);
+                } catch (Throwable e) {
+                    throw new PluginException("Invoke error on " + method.getName() + ", args " + Arrays.toString(values), e);
+                }
                 context.publish(new DynamicPluginExtractedEvent(context, this, values, method, target));
             }
         }

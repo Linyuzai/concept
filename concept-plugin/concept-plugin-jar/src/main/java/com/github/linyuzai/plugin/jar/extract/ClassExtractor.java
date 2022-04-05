@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.jar.extract;
 import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.DefaultTypeMetadataFactory;
+import com.github.linyuzai.plugin.core.type.ObjectTypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadataFactory;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
@@ -29,6 +30,11 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
      */
     @Override
     public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
+        if (metadata instanceof ObjectTypeMetadata) {
+            if (metadata.getContainerClass() != Class.class) {
+                return null;
+            }
+        }
         Class<?> elementClass = metadata.getElementClass();
         return new ClassMatcher(elementClass, annotations);
     }

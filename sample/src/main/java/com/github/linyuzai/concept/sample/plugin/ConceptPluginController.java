@@ -11,7 +11,7 @@ import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
-import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
+import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -55,7 +56,7 @@ public class ConceptPluginController {
             //.addFilter(new PathFilter("plugin"))
             //.addFilter(new NameFilter("*.json"))
             .addFilter(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
-            //.addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
+            .addFilter(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter(CustomPluginAnnotation.class))
             /*.addExtractor(new PluginContextExtractor<PluginContext>() {
                 @Override
@@ -264,7 +265,7 @@ public class ConceptPluginController {
                 }
             })*/
             //Class
-            .addExtractor(new ClassExtractor<Collection<Class>>() {
+            /*.addExtractor(new ClassExtractor<Collection<Class>>() {
                 @Override
                 public void onExtract(Collection<Class> plugin) {
                     System.out.println(append("ClassExtractor<Collection<Class>>: ") + plugin);
@@ -509,7 +510,7 @@ public class ConceptPluginController {
                 public void onExtract(Map<Object, ? extends Class<? extends CustomPlugin>> plugin) {
                     System.out.println(append("ClassExtractor<Map<Object, ? extends Class<? extends CustomPlugin>>>: ") + plugin);
                 }
-            })
+            })*/
             //Instance
             /*.addExtractor(new InstanceExtractor<Collection>() {
                 @Override
@@ -649,7 +650,7 @@ public class ConceptPluginController {
                     ConceptPluginController.this.plugin = plugin;
                 }
             })*/
-            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
@@ -692,6 +693,8 @@ public class ConceptPluginController {
             //一个 CustomPluginImpl 对象
             @PluginClass(CustomPlugin.class) CustomPlugin p4,
 
+            Class<? extends CustomPlugin> p4_1,
+
             //所有标注了 CustomPluginAnnotation 注解的类
             @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5,
 
@@ -717,8 +720,9 @@ public class ConceptPluginController {
         System.out.println("@PluginPackage(\"com.github.linyuzai.concept.sample.plugin\") Collection<? extends CustomPlugin>: " + p2);
         System.out.println("@PluginClassName(\"com.github.linyuzai.concept.sample.plugin.CustomPlugin\") Set<Class<?>>: " + p3);
         System.out.println("@PluginClass(CustomPluginImpl.class) CustomPlugin: " + p4);
+        System.out.println("Class<? extends CustomPlugin>: " + p4_1);
         System.out.println("@PluginAnnotation(CustomPluginAnnotation.class) Class<?>[]: " + Arrays.toString(p5));
-        System.out.println("@PluginProperties Map<String, String>: " + p6);
+        System.out.println("@PluginProperties(\"plugin.map.**\") Map<String, String>: " + p6);
         System.out.println("@PluginProperties(\"plugin.a\") String: " + p7);
         System.out.println("@PluginProperties(\"plugin.b\") String: " + p8);
         System.out.println("@PluginPath(\"plugin\") Properties: " + p9);

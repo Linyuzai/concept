@@ -62,7 +62,7 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
     @Override
     public TypeMetadata createTypeMetadata(Type type) {
         if (type == Properties.class) {
-            return new ObjectTypeMetadata(Properties.class);
+            return new ObjectTypeMetadata(Properties.class, Properties.class);
         }
         return super.createTypeMetadata(type);
     }
