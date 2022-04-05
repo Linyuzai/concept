@@ -4,6 +4,8 @@ import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.event.PluginDestroyedEvent;
+import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
@@ -11,6 +13,7 @@ import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
+import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
@@ -644,13 +647,21 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
             })*/
-            /*.addExtractor(new InstanceExtractor<CustomPlugin>() {
+            .addExtractor(new InstanceExtractor<CustomPlugin>() {
                 @Override
                 public void onExtract(CustomPlugin plugin) {
                     ConceptPluginController.this.plugin = plugin;
                 }
-            })*/
-            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            })
+            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            .addEventListener(new PluginEventListener() {
+                @Override
+                public void onEvent(Object event) {
+                    if (event instanceof PluginDestroyedEvent) {
+                        System.out.println("Load finished: " + ((PluginDestroyedEvent) event).getPlugin());
+                    }
+                }
+            })
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()

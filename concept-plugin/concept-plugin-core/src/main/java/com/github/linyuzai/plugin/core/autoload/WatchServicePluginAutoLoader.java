@@ -8,11 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 基于 {@link WatchService} 的插件文件自动加载器
@@ -28,7 +30,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     /**
      * 插件位置
      */
-    private final PluginLocation[] locations;
+    private final Map<String, PluginLocation> locationMap;
 
     /**
      * 新增回调
@@ -57,21 +59,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private WatchService watchService;
 
-    /**
-     * 需要创建回调的路径
-     */
-    private final Set<String> notifyCreate = new HashSet<>();
-
-    /**
-     * 需要修改回调的路径
-     */
-    private final Set<String> notifyModify = new HashSet<>();
-
-    /**
-     * 需要删除回调的路径
-     */
-    private final Set<String> notifyDelete = new HashSet<>();
-
     private boolean running = false;
 
     private WatchServicePluginAutoLoader(ExecutorService executor,
@@ -82,23 +69,13 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                                          WatchEvent.Kind<?> notifyOnStart,
                                          PluginLocation... locations) {
         this.executor = executor;
-        this.locations = locations;
         this.createConsumer = createConsumer;
         this.modifyConsumer = modifyConsumer;
         this.deleteConsumer = deleteConsumer;
         this.errorConsumer = errorConsumer;
         this.notifyOnStart = notifyOnStart;
-        for (PluginLocation location : this.locations) {
-            if (location.isNotifyCreate()) {
-                notifyCreate.add(location.getPath());
-            }
-            if (location.isNotifyModify()) {
-                notifyModify.add(location.getPath());
-            }
-            if (location.isNotifyDelete()) {
-                notifyDelete.add(location.getPath());
-            }
-        }
+        this.locationMap = Arrays.stream(locations)
+                .collect(Collectors.toMap(PluginLocation::getPath, Function.identity()));
     }
 
     /**
@@ -132,7 +109,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         if (consumer == null) {
             return;
         }
-        for (PluginLocation location : locations) {
+        for (PluginLocation location : locationMap.values()) {
             File[] list = new File(location.getPath()).listFiles();
             if (list == null) {
                 continue;
@@ -176,9 +153,10 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     public void listen() {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             this.watchService = watchService;
-            for (PluginLocation location : locations) {
+            for (PluginLocation location : locationMap.values()) {
                 final Path path = Paths.get(location.getPath());
-                path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+                path.register(watchService,
+                        StandardWatchEventKinds.ENTRY_CREATE,
                         StandardWatchEventKinds.ENTRY_MODIFY,
                         StandardWatchEventKinds.ENTRY_DELETE);
             }
@@ -190,14 +168,16 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                         if (kind == StandardWatchEventKinds.OVERFLOW) {
                             continue;
                         }
+                        String dir = key.watchable().toString();
+                        PluginLocation location = locationMap.get(dir);
                         if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                            onFileCreated((WatchEvent<Path>) watchEvent);
+                            onFileCreated((WatchEvent<Path>) watchEvent, location);
                         }
                         if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                            onFileModified((WatchEvent<Path>) watchEvent);
+                            onFileModified((WatchEvent<Path>) watchEvent, location);
                         }
                         if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                            onFileDeleted((WatchEvent<Path>) watchEvent);
+                            onFileDeleted((WatchEvent<Path>) watchEvent, location);
                         }
                     }
                     key.reset();
@@ -208,19 +188,29 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    public void onWatchEvent(WatchEvent<Path> watchEvent, PluginLocation location, Consumer<String> consumer) {
+        if (location == null) {
+            return;
+        }
+        String path = new File(location.getPath(), watchEvent.context().toString()).getAbsolutePath();
+        Predicate<String> filter = location.getFilter();
+        if (filter == null || filter.test(path)) {
+            consumer.accept(path);
+        }
+    }
+
     /**
      * 文件创建
      *
      * @param watchEvent 监听到的事件
      */
-    public void onFileCreated(WatchEvent<Path> watchEvent) {
-        final Path path = watchEvent.context();
-        File file = path.toFile();
-        String p = file.getAbsolutePath();
-        //如果该路径需要回调
-        if (notifyCreate.contains(p)) {
-            onCreateNotify(p);
-        }
+    public void onFileCreated(WatchEvent<Path> watchEvent, PluginLocation location) {
+        onWatchEvent(watchEvent, location, (path) -> {
+            //如果该路径需要回调
+            if (location.isNotifyCreate()) {
+                onCreateNotify(path);
+            }
+        });
     }
 
     public void onCreateNotify(String path) {
@@ -234,14 +224,13 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      *
      * @param watchEvent 监听到的事件
      */
-    public void onFileModified(WatchEvent<Path> watchEvent) {
-        final Path path = watchEvent.context();
-        File file = path.toFile();
-        String p = file.getAbsolutePath();
-        //如果该路径需要回调
-        if (notifyModify.contains(p)) {
-            onModifyNotify(p);
-        }
+    public void onFileModified(WatchEvent<Path> watchEvent, PluginLocation location) {
+        onWatchEvent(watchEvent, location, (path) -> {
+            //如果该路径需要回调
+            if (location.isNotifyModify()) {
+                onModifyNotify(path);
+            }
+        });
     }
 
     public void onModifyNotify(String path) {
@@ -255,14 +244,13 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      *
      * @param watchEvent 监听到的事件
      */
-    public void onFileDeleted(WatchEvent<Path> watchEvent) {
-        final Path path = watchEvent.context();
-        File file = path.toFile();
-        String p = file.getAbsolutePath();
-        //如果该路径需要回调
-        if (notifyDelete.contains(p)) {
-            onDeleteNotify(p);
-        }
+    public void onFileDeleted(WatchEvent<Path> watchEvent, PluginLocation location) {
+        onWatchEvent(watchEvent, location, (path) -> {
+            //如果该路径需要回调
+            if (location.isNotifyDelete()) {
+                onDeleteNotify(path);
+            }
+        });
     }
 
     public void onDeleteNotify(String path) {

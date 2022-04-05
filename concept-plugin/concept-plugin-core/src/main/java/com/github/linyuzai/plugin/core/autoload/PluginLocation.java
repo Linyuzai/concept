@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.File;
 import java.util.function.Predicate;
 
 /**
@@ -74,6 +75,9 @@ public class PluginLocation {
         public PluginLocation build() {
             if (path == null || path.isEmpty()) {
                 throw new PluginException("Path is null or empty");
+            }
+            if (path.endsWith(File.separator)) {
+                path = path.substring(0, path.length() - 1);
             }
             return new PluginLocation(path, filter, notifyCreate, notifyModify, notifyDelete);
         }
