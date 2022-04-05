@@ -32,6 +32,11 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
         this.listeners.addAll(listeners);
     }
 
+    /**
+     * 获得所有事件监听器 {@link PluginEventListener} 的不可变集合
+     *
+     * @return {@link PluginEventListener} 的不可变集合
+     */
     public Collection<PluginEventListener> getPluginEventListeners() {
         return Collections.unmodifiableCollection(listeners);
     }

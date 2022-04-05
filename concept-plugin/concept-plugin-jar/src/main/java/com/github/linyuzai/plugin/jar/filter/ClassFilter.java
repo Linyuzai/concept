@@ -12,11 +12,17 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 类过滤器
+ */
 @Getter
 @AllArgsConstructor
 @FilterWithResolver(JarClassPluginResolver.class)
 public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
+    /**
+     * 类
+     */
     private final Collection<Class<?>> classes;
 
     public ClassFilter(Class<?>... classes) {
@@ -35,6 +41,11 @@ public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
         return JarPlugin.CLASS;
     }
 
+    /**
+     * 是否是对应的类或其子类
+     * @param c 类
+     * @return 如果是是对应的类或其子类返回 true 否则返回 false
+     */
     public boolean matchClass(Class<?> c) {
         for (Class<?> clazz : classes) {
             if (clazz.isAssignableFrom(c)) {

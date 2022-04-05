@@ -11,7 +11,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 public abstract class AbstractPluginFormatter<T, R> implements PluginFormatter {
 
     /**
-     * 格式化
+     * 格式化并发布 {@link PluginFormattedEvent} 事件
      *
      * @param source 被格式化的对象
      * @return 格式化后的对象

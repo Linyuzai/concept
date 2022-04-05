@@ -10,6 +10,9 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.jar.JarFile;
 
+/**
+ * 基于 jar 的插件
+ */
 @Getter
 public class JarPlugin implements Plugin {
 
@@ -23,8 +26,14 @@ public class JarPlugin implements Plugin {
 
     public static final String INSTANCE = JAR_PREFIX + "INSTANCE";
 
+    /**
+     * 资源的 URL
+     */
     private final URL url;
 
+    /**
+     * 插件类加载器
+     */
     private final PluginClassLoader pluginClassLoader;
 
     private final PluginConcept pluginConcept;
@@ -39,6 +48,9 @@ public class JarPlugin implements Plugin {
         this.pluginConcept = concept;
     }
 
+    /**
+     * 初始化，通过 {@link JarURLConnection} 来读取 jar 内容
+     */
     @SneakyThrows
     @Override
     public void initialize() {
@@ -46,6 +58,9 @@ public class JarPlugin implements Plugin {
         this.file = getConnection().getJarFile();
     }
 
+    /**
+     * 关闭资源文件的引用，但是不清理类加载
+     */
     @Override
     public void destroy() {
         if (file != null) {

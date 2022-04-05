@@ -15,11 +15,6 @@ public interface Plugin {
 
     String PROPERTIES = PREFIX + "PROPERTIES";
 
-    /**
-     * 获得 {@link PluginConcept}
-     *
-     * @return {@link PluginConcept}
-     */
     PluginConcept getPluginConcept();
 
     /**

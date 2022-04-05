@@ -10,6 +10,13 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
  */
 public abstract class AbstractPluginConvertor<T, R> implements PluginConvertor {
 
+    /**
+     * 转换并发布 {@link PluginConvertedEvent} 事件
+     *
+     * @param source  转换前对象
+     * @param context 上下文 {@link PluginContext}
+     * @return 转换后对象
+     */
     @SuppressWarnings("unchecked")
     @Override
     public Object convert(Object source, PluginContext context) {
@@ -19,5 +26,11 @@ public abstract class AbstractPluginConvertor<T, R> implements PluginConvertor {
         return converted;
     }
 
+    /**
+     * 基于泛型转换
+     *
+     * @param source 转换前对象
+     * @return 转换后对象
+     */
     public abstract R doConvert(T source);
 }

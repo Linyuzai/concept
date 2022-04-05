@@ -43,7 +43,8 @@ public interface PluginExtractor extends PluginResolverDependency {
         private PluginFormatter formatter;
 
         /**
-         * 执行插件提取
+         * 执行插件提取。
+         * 包括匹配，转换，格式化三个步骤。
          *
          * @param context 上下文 {@link PluginContext}
          * @return 插件对象

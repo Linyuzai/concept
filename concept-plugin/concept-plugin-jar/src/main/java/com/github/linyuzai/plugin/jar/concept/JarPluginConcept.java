@@ -28,8 +28,14 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 基于 jar 的 {@link com.github.linyuzai.plugin.core.concept.PluginConcept}
+ */
 public class JarPluginConcept extends AbstractPluginConcept {
 
+    /**
+     * 所有的类加载器
+     */
     @Getter
     private final Map<URL, PluginClassLoader> pluginClassLoaders = new ConcurrentHashMap<>();
 
@@ -43,6 +49,12 @@ public class JarPluginConcept extends AbstractPluginConcept {
                 pluginResolvers, pluginFilters, pluginExtractors);
     }
 
+    /**
+     * 加载，
+     * 将类加载器进行缓存。
+     *
+     * @param o 插件源
+     */
     @Override
     public void load(Object o) {
         Plugin plugin = create(o);

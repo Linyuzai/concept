@@ -30,19 +30,28 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      */
     private final PluginLocation[] locations;
 
+    /**
+     * 新增回调
+     */
     private final Consumer<String> createConsumer;
 
+    /**
+     * 修改回调
+     */
     private final Consumer<String> modifyConsumer;
 
+    /**
+     * 删除回调
+     */
     private final Consumer<String> deleteConsumer;
 
     /**
-     * 异常处理
+     * 异常回调
      */
     private final Consumer<Throwable> errorConsumer;
 
     /**
-     * 在 {@link #start()} 时是否触发一次加载
+     * 在 {@link #start()} 时触发一次回调
      */
     private final WatchEvent.Kind<?> notifyOnStart;
 

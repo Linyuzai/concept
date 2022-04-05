@@ -33,7 +33,8 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
     /**
      * 过滤。
      * 通过 key 获得插件数据，
-     * 过滤之后重新设置。
+     * 过滤之后重新设置，
+     * 发布 {@link PluginFilteredEvent} 事件。
      *
      * @param context 上下文 {@link PluginContext}
      */

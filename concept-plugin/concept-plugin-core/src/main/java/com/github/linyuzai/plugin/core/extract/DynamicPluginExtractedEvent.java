@@ -5,11 +5,20 @@ import lombok.Getter;
 
 import java.lang.reflect.Method;
 
+/**
+ * 动态插件提取事件
+ */
 @Getter
 public class DynamicPluginExtractedEvent extends PluginExtractedEvent {
 
+    /**
+     * 回调方法
+     */
     private final Method method;
 
+    /**
+     * 方法执行对象
+     */
     private final Object object;
 
     public DynamicPluginExtractedEvent(PluginContext context,

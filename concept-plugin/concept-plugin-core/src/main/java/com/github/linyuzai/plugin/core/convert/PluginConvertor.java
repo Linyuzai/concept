@@ -11,8 +11,8 @@ public interface PluginConvertor {
     /**
      * 转换
      *
-     * @param source 转换前数据
-     * @return 转换后的数据
+     * @param source 转换前对象
+     * @return 转换后对象
      */
     Object convert(Object source, PluginContext context);
 }

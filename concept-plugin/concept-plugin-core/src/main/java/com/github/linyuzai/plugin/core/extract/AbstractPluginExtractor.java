@@ -18,6 +18,9 @@ import java.lang.reflect.Type;
  */
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
+    /**
+     * 插件提取执行器
+     */
     protected Invoker invoker;
 
     public Invoker getInvoker() {
@@ -45,7 +48,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     }
 
     /**
-     * 获得插件类型 {@link Type}
+     * 获得插件类型 {@link Type}，用于做插件匹配
      *
      * @return 插件类型的 {@link Type}
      */
@@ -61,7 +64,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     }
 
     /**
-     * 获得注解
+     * 获得注解，用于做插件匹配
      *
      * @return 注解
      */
@@ -101,7 +104,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     }
 
     /**
-     * 提取插件
+     * 提取插件并发布 {@link PluginExtractedEvent} 事件
      *
      * @param context 上下文 {@link PluginContext}
      */

@@ -14,7 +14,7 @@ public interface PluginConcept {
     Plugin create(Object o);
 
     /**
-     * 创建并加载插件
+     * 加载插件
      *
      * @param o 插件源
      */

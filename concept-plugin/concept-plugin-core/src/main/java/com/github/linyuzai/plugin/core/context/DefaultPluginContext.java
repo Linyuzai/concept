@@ -38,6 +38,12 @@ public class DefaultPluginContext implements PluginContext {
         return (P) plugin;
     }
 
+    /**
+     * 发布事件。
+     * 尝试获得 {@link PluginEventPublisher} 并发布事件。
+     *
+     * @param event 事件
+     */
     @Override
     public void publish(Object event) {
         PluginEventPublisher publisher = get(PluginEventPublisher.class);

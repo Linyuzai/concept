@@ -6,10 +6,16 @@ import lombok.Getter;
 
 import java.net.URL;
 
+/**
+ * {@link JarPluginClassLoader} 的工厂
+ */
 @Getter
 @AllArgsConstructor
 public class JarPluginClassLoaderFactory implements PluginClassLoaderFactory {
 
+    /**
+     * 父类加载器
+     */
     private ClassLoader parent;
 
     @Override

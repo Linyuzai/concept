@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.jar.factory;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
@@ -8,6 +7,9 @@ import lombok.SneakyThrows;
 
 import java.net.URL;
 
+/**
+ * 支持文件路径的 {@link JarPlugin} 工厂
+ */
 public class JarPathPluginFactory extends JarPluginFactory {
 
     public JarPathPluginFactory(PluginClassLoaderFactory pluginClassLoaderFactory) {
@@ -20,7 +22,7 @@ public class JarPathPluginFactory extends JarPluginFactory {
     }
 
     @Override
-    public Plugin doCreate(Object o, JarPluginConcept concept) {
+    public JarPlugin doCreate(Object o, JarPluginConcept concept) {
         URL url = parseURL((String) o);
         return new JarPlugin(url, createPluginClassLoader(url, concept), concept);
     }

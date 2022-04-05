@@ -12,10 +12,16 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 包名过滤器
+ */
 @Getter
 @FilterWithResolver(JarClassNamePluginResolver.class)
 public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
 
+    /**
+     * 包名
+     */
     private final Collection<String> packages;
 
     private final AntPathMatcher matcher = new AntPathMatcher(".");
@@ -41,6 +47,12 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
         return JarPlugin.CLASS_NAME;
     }
 
+    /**
+     * 类的包名是否匹配
+     *
+     * @param className 类名
+     * @return 如果包名匹配返回 true 否则返回 false
+     */
     public boolean matchPackage(String className) {
         for (String p : packages) {
             int lastIndexOf = className.lastIndexOf(".");

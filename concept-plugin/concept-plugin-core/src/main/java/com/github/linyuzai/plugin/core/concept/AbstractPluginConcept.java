@@ -74,6 +74,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     /**
      * 加载插件。
+     * 创建插件，
      * 初始化插件 {@link Plugin#initialize()}，
      * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
      * 执行插件解析链 {@link PluginResolver}，

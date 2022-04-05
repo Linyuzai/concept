@@ -11,6 +11,11 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
  */
 public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
 
+    /**
+     * 解析并发布 {@link PluginResolvedEvent} 事件
+     *
+     * @param context 上下文 {@link PluginContext}
+     */
     @Override
     public void resolve(PluginContext context) {
         Object dependedKey = getDependedKey();

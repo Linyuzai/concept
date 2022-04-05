@@ -16,6 +16,9 @@ import java.lang.reflect.Type;
  */
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
 
+    /**
+     * {@link TypeMetadata} 工厂
+     */
     @Setter
     protected TypeMetadataFactory typeMetadataFactory;
 

@@ -12,11 +12,17 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 类名过滤器
+ */
 @Getter
 @AllArgsConstructor
 @FilterWithResolver(JarClassNamePluginResolver.class)
 public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
 
+    /**
+     * 类名
+     */
     private final Collection<String> classNames;
 
     public ClassNameFilter(String... classNames) {
@@ -35,6 +41,12 @@ public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
         return JarPlugin.CLASS_NAME;
     }
 
+    /**
+     * 类名是否匹配
+     *
+     * @param className 类名
+     * @return 如果类名匹配返回 true 否则返回 false
+     */
     public boolean matchClassName(String className) {
         for (String name : classNames) {
             if (className.equals(name)) {

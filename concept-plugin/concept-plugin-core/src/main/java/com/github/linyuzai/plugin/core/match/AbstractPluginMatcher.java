@@ -44,6 +44,12 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
         }
     }
 
+    /**
+     * 匹配并发布 {@link PluginMatchedEvent} 事件
+     *
+     * @param context 上下文 {@link PluginContext}
+     * @return 匹配到的插件对象
+     */
     @Override
     public Object match(PluginContext context) {
         Object key = getKey();

@@ -7,10 +7,5 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
  */
 public interface PluginEvent {
 
-    /**
-     * 获得插件 {@link Plugin}
-     *
-     * @return {@link Plugin}
-     */
     Plugin getPlugin();
 }

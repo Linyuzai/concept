@@ -18,6 +18,9 @@ import java.util.Properties;
 @DependOnResolvers(PropertiesPluginResolver.class)
 public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Properties>> {
 
+    /**
+     * {@link Properties} 过滤器
+     */
     private PropertiesFilter propertiesFilter;
 
     public PropertiesMatcher(Annotation[] annotations) {
