@@ -43,6 +43,7 @@ public class ClassFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
     /**
      * 是否是对应的类或其子类
+     *
      * @param c 类
      * @return 如果是是对应的类或其子类返回 true 否则返回 false
      */

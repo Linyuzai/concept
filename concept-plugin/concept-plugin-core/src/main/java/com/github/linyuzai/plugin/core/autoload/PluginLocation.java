@@ -47,26 +47,56 @@ public class PluginLocation {
         private boolean notifyModify = true;
         private boolean notifyDelete = true;
 
+        /**
+         * 设置监听的路径
+         *
+         * @param path 监听的路径
+         * @return {@link Builder}
+         */
         public Builder path(String path) {
             this.path = path;
             return this;
         }
 
+        /**
+         * 设置文件名过滤器
+         *
+         * @param filter 文件名过滤器
+         * @return {@link Builder}
+         */
         public Builder filter(Predicate<String> filter) {
             this.filter = filter;
             return this;
         }
 
+        /**
+         * 设置是否监听文件新增
+         *
+         * @param notifyCreate 是否监听文件新增
+         * @return {@link Builder}
+         */
         public Builder notifyCreate(boolean notifyCreate) {
             this.notifyCreate = notifyCreate;
             return this;
         }
 
+        /**
+         * 设置是否监听文件修改
+         *
+         * @param notifyModify 是否监听文件修改
+         * @return {@link Builder}
+         */
         public Builder notifyModify(boolean notifyModify) {
             this.notifyModify = notifyModify;
             return this;
         }
 
+        /**
+         * 设置是否监听文件删除
+         *
+         * @param notifyDelete 是否监听文件删除
+         * @return {@link Builder}
+         */
         public Builder notifyDelete(boolean notifyDelete) {
             this.notifyDelete = notifyDelete;
             return this;

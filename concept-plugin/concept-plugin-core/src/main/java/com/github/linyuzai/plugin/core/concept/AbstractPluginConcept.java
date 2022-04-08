@@ -157,82 +157,191 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
                 resolverDefaultImpl = new HashMap<>();
 
+        /**
+         * 设置上下文工厂
+         *
+         * @param contextFactory 上下文工厂
+         * @return {@link T}
+         */
         public T contextFactory(PluginContextFactory contextFactory) {
             this.pluginContextFactory = contextFactory;
             return (T) this;
         }
 
+        /**
+         * 设置事件发布者
+         *
+         * @param eventPublisher 事件发布者
+         * @return {@link T}
+         */
         public T eventPublisher(PluginEventPublisher eventPublisher) {
             this.pluginEventPublisher = eventPublisher;
             return (T) this;
         }
 
+        /**
+         * 添加事件监听器
+         *
+         * @param listener 事件监听器
+         * @return {@link T}
+         */
         public T addEventListener(PluginEventListener listener) {
             return addEventListeners(listener);
         }
 
+        /**
+         * 添加事件监听器
+         *
+         * @param listeners 事件监听器
+         * @return {@link T}
+         */
         public T addEventListeners(PluginEventListener... listeners) {
             return addEventListeners(Arrays.asList(listeners));
         }
 
+        /**
+         * 添加事件监听器
+         *
+         * @param listeners 事件监听器
+         * @return {@link T}
+         */
         public T addEventListeners(Collection<? extends PluginEventListener> listeners) {
             this.pluginEventListeners.addAll(listeners);
             return (T) this;
         }
 
+        /**
+         * 添加插件工厂
+         *
+         * @param factory 插件工厂
+         * @return {@link T}
+         */
         public T addFactory(PluginFactory factory) {
             return addFactories(factory);
         }
 
+        /**
+         * 添加插件工厂
+         *
+         * @param factories 插件工厂
+         * @return {@link T}
+         */
         public T addFactories(PluginFactory... factories) {
             return addFactories(Arrays.asList(factories));
         }
 
+        /**
+         * 添加插件工厂
+         *
+         * @param factories 插件工厂
+         * @return {@link T}
+         */
         public T addFactories(Collection<? extends PluginFactory> factories) {
             this.pluginFactories.addAll(factories);
             return (T) this;
         }
 
-        public void addResolver(PluginResolver resolver) {
-            addResolvers(resolver);
+        /**
+         * 添加插件解析器
+         *
+         * @param resolver 插件解析器
+         * @return {@link T}
+         */
+        public T addResolver(PluginResolver resolver) {
+            return addResolvers(resolver);
         }
 
+        /**
+         * 添加插件解析器
+         *
+         * @param resolvers 插件解析器
+         * @return {@link T}
+         */
         public T addResolvers(PluginResolver... resolvers) {
             return addResolvers(Arrays.asList(resolvers));
         }
 
+        /**
+         * 添加插件解析器
+         *
+         * @param resolvers 插件解析器
+         * @return {@link T}
+         */
         public T addResolvers(Collection<? extends PluginResolver> resolvers) {
             this.pluginResolvers.addAll(resolvers);
             return (T) this;
         }
 
+        /**
+         * 添加插件解析器实现映射
+         *
+         * @param resolverClass     插件解析器类
+         * @param resolverImplClass 插件解析器实现类
+         * @return {@link T}
+         */
         public T mappingResolver(Class<? extends PluginResolver> resolverClass,
                                  Class<? extends PluginResolver> resolverImplClass) {
             resolverDefaultImpl.put(resolverClass, resolverImplClass);
             return (T) this;
         }
 
+        /**
+         * 添加插件过滤器
+         *
+         * @param filter 插件过滤器
+         * @return {@link T}
+         */
         public T addFilter(PluginFilter filter) {
             return addFilters(filter);
         }
 
+        /**
+         * 添加插件过滤器
+         *
+         * @param filters 插件过滤器
+         * @return {@link T}
+         */
         public T addFilters(PluginFilter... filters) {
             return addFilters(Arrays.asList(filters));
         }
 
+        /**
+         * 添加插件过滤器
+         *
+         * @param filters 插件过滤器
+         * @return {@link T}
+         */
         public T addFilters(Collection<? extends PluginFilter> filters) {
             this.pluginFilters.addAll(filters);
             return (T) this;
         }
 
+        /**
+         * 添加插件提取器
+         *
+         * @param extractor 插件提取器
+         * @return {@link T}
+         */
         public T addExtractor(PluginExtractor extractor) {
             return addExtractors(extractor);
         }
 
+        /**
+         * 添加插件提取器
+         *
+         * @param extractors 插件提取器
+         * @return {@link T}
+         */
         public T addExtractors(PluginExtractor... extractors) {
             return addExtractors(Arrays.asList(extractors));
         }
 
+        /**
+         * 添加插件提取器
+         *
+         * @param extractors 插件提取器
+         * @return {@link T}
+         */
         public T addExtractors(Collection<? extends PluginExtractor> extractors) {
             this.pluginExtractors.addAll(extractors);
             return (T) this;
@@ -256,22 +365,37 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             addResolversDependOnExtractors(pluginExtractors);
         }
 
+        /**
+         * 遍历插件提取器，添加插件提取器依赖的插件解析器
+         *
+         * @param extractors 插件提取器
+         */
         @SneakyThrows
         private void addResolversDependOnExtractors(Collection<? extends PluginExtractor> extractors) {
             for (PluginExtractor extractor : extractors) {
+                //插件提取器依赖的插件解析器
                 Class<? extends PluginResolver>[] dependencies = extractor.dependencies();
                 for (Class<? extends PluginResolver> dependency : dependencies) {
+                    //已经存在
                     if (containsResolver(dependency)) {
                         continue;
                     }
+                    //获得对应的实现类
                     Class<? extends PluginResolver> implOrDefault =
                             resolverDefaultImpl.getOrDefault(dependency, dependency);
+                    //实例化
                     PluginResolver resolver = implOrDefault.newInstance();
+                    //添加该插件解析器依赖的解析器
                     addResolversWithDependencies(Collections.singletonList(resolver));
                 }
             }
         }
 
+        /**
+         * 遍历插件解析器，添加插件解析器依赖的插件解析器。
+         *
+         * @param resolvers 插件解析器
+         */
         @SneakyThrows
         private void addResolversWithDependencies(Collection<? extends PluginResolver> resolvers) {
             if (resolvers.isEmpty()) {
@@ -280,8 +404,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             pluginResolvers.addAll(resolvers);
             Set<Class<? extends PluginResolver>> unfounded = new HashSet<>();
             for (PluginResolver resolver : resolvers) {
+                //插件解析器依赖的插件解析器
                 Class<? extends PluginResolver>[] dependencies = resolver.dependencies();
                 for (Class<? extends PluginResolver> dependency : dependencies) {
+                    //已经存在
                     if (containsResolver(dependency)) {
                         continue;
                     }
@@ -290,16 +416,26 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             }
             List<PluginResolver> unfoundedPluginResolvers = new ArrayList<>();
             if (!unfounded.isEmpty()) {
+                //遍历需要但是还没有的插件解析器类
                 for (Class<? extends PluginResolver> dependency : unfounded) {
+                    //获得对应的实现类
                     Class<? extends PluginResolver> implOrDefault =
                             resolverDefaultImpl.getOrDefault(dependency, dependency);
+                    //实例化
                     PluginResolver instance = implOrDefault.newInstance();
                     unfoundedPluginResolvers.add(instance);
                 }
+                //添加这些新实例化的插件解析器依赖的插件解析器
                 addResolversWithDependencies(unfoundedPluginResolvers);
             }
         }
 
+        /**
+         * 目标插件解析器类是否已经存在
+         *
+         * @param target 目标插件解析器类
+         * @return 如果已经存在返回 true 否则返回 false
+         */
         private boolean containsResolver(Class<? extends PluginResolver> target) {
             for (PluginResolver resolver : pluginResolvers) {
                 if (target.isInstance(resolver)) {

@@ -13,6 +13,7 @@ import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
+import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.extract.InstanceExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
@@ -651,6 +652,13 @@ public class ConceptPluginController {
                 @Override
                 public void onExtract(CustomPlugin plugin) {
                     ConceptPluginController.this.plugin = plugin;
+                }
+            })
+            .addExtractor(new ClassExtractor<Class<? extends CustomPlugin>>() {
+
+                @Override
+                public void onExtract(Class<? extends CustomPlugin> plugin) {
+
                 }
             })
             //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数

@@ -77,11 +77,23 @@ public class JarPluginConcept extends AbstractPluginConcept {
             mappingResolver(PropertiesPluginResolver.class, JarPropertiesPluginResolver.class);
         }
 
+        /**
+         * 设置插件类加载器工厂
+         *
+         * @param factory 插件类加载器工厂
+         * @return {@link Builder}
+         */
         public Builder pluginClassLoaderFactory(PluginClassLoaderFactory factory) {
             this.pluginClassLoaderFactory = factory;
             return this;
         }
 
+        /**
+         * 动态匹配插件
+         *
+         * @param callback 回调对象
+         * @return {@link Builder}
+         */
         public Builder extractTo(Object callback) {
             return addExtractor(new JarDynamicPluginExtractor(callback));
         }

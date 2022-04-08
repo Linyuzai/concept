@@ -281,46 +281,100 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
         private WatchEvent.Kind<?> notifyOnStart = StandardWatchEventKinds.ENTRY_CREATE;
 
+        /**
+         * 设置监听文件目录的线程池
+         *
+         * @param executor 监听文件目录的线程池
+         * @return {@link Builder}
+         */
         public Builder executor(ExecutorService executor) {
             this.executor = executor;
             return this;
         }
 
+        /**
+         * 设置插件位置信息
+         *
+         * @param locations 插件位置信息
+         * @return {@link Builder}
+         */
         public Builder locations(PluginLocation... locations) {
             this.locations = locations;
             return this;
         }
 
+        /**
+         * 设置插件新增时的回调
+         *
+         * @param consumer 插件新增时的回调
+         * @return {@link Builder}
+         */
         public Builder onCreate(Consumer<String> consumer) {
             this.createConsumer = consumer;
             return this;
         }
 
+        /**
+         * 设置插件新增时的回调
+         *
+         * @param consumer 插件新增时的回调
+         * @return {@link Builder}
+         */
         public Builder onCreate(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
             this.createConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_CREATE);
             return this;
         }
 
+        /**
+         * 设置插件修改时的回调
+         *
+         * @param consumer 插件修改时的回调
+         * @return {@link Builder}
+         */
         public Builder onModify(Consumer<String> consumer) {
             this.modifyConsumer = consumer;
             return this;
         }
 
+        /**
+         * 设置插件修改时的回调
+         *
+         * @param consumer 插件修改时的回调
+         * @return {@link Builder}
+         */
         public Builder onModify(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
             this.modifyConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_MODIFY);
             return this;
         }
 
+        /**
+         * 设置插件删除时的回调
+         *
+         * @param consumer 插件删除时的回调
+         * @return {@link Builder}
+         */
         public Builder onDelete(Consumer<String> consumer) {
             this.deleteConsumer = consumer;
             return this;
         }
 
+        /**
+         * 设置插件删除时的回调
+         *
+         * @param consumer 插件删除时的回调
+         * @return {@link Builder}
+         */
         public Builder onDelete(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
             this.deleteConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_DELETE);
             return this;
         }
 
+        /**
+         * 设置插件新增，修改，删除时的回调
+         *
+         * @param consumer 插件新增，修改，删除时的回调
+         * @return {@link Builder}
+         */
         public Builder onNotify(BiConsumer<String, WatchEvent.Kind<?>> consumer) {
             this.createConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_CREATE);
             this.modifyConsumer = path -> consumer.accept(path, StandardWatchEventKinds.ENTRY_MODIFY);
@@ -328,11 +382,23 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             return this;
         }
 
+        /**
+         * 设置插件加载异常时的回调
+         *
+         * @param consumer 插件加载异常时的回调
+         * @return {@link Builder}
+         */
         public Builder onError(Consumer<Throwable> consumer) {
             this.errorConsumer = consumer;
             return this;
         }
 
+        /**
+         * 设置开始监听时是否立即触发一次回调
+         *
+         * @param notifyOnStart 开始监听时是否立即触发一次回调
+         * @return {@link Builder}
+         */
         public Builder notifyOnStart(WatchEvent.Kind<?> notifyOnStart) {
             this.notifyOnStart = notifyOnStart;
             return this;
