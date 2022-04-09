@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
+import java.util.Map;
+
 /**
  * 插件概念
  */
@@ -17,6 +19,28 @@ public interface PluginConcept {
      * 加载插件
      *
      * @param o 插件源
+     * @return 插件 {@link Plugin}
      */
-    void load(Object o);
+    Plugin load(Object o);
+
+    /**
+     * 卸载插件
+     *
+     * @param o 插件源
+     */
+    Plugin unload(Object o);
+
+    /**
+     * 发布事件
+     *
+     * @param event 事件
+     */
+    void publish(Object event);
+
+    /**
+     * 获得所有的加载的插件
+     *
+     * @return 所有的加载的插件
+     */
+    Map<Object, Plugin> getPlugins();
 }

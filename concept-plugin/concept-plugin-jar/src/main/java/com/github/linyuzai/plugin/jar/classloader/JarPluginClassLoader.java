@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.jar.classloader;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import lombok.Getter;
 
@@ -32,15 +34,18 @@ public class JarPluginClassLoader extends PluginClassLoader {
         try {
             return super.findClass(name);
         } catch (Throwable e) {
-            Collection<PluginClassLoader> classLoaders = pluginConcept.getPluginClassLoaders().values();
-            for (PluginClassLoader classLoader : classLoaders) {
-                //忽略本身
-                if (classLoader == this) {
-                    continue;
-                }
-                try {
-                    return classLoader.findPluginClass(name);
-                } catch (Throwable ignore) {
+            Collection<Plugin> plugins = pluginConcept.getPlugins().values();
+            for (Plugin plugin : plugins) {
+                if (plugin instanceof JarPlugin) {
+                    PluginClassLoader classLoader = ((JarPlugin) plugin).getPluginClassLoader();
+                    //忽略本身
+                    if (classLoader == this) {
+                        continue;
+                    }
+                    try {
+                        return classLoader.findPluginClass(name);
+                    } catch (Throwable ignore) {
+                    }
                 }
             }
         }

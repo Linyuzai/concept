@@ -17,13 +17,15 @@ public interface Plugin {
 
     PluginConcept getPluginConcept();
 
+    Object getId();
+
     /**
      * 初始化
      */
-    void initialize();
+    void load();
 
     /**
      * 销毁
      */
-    void destroy();
+    void release();
 }

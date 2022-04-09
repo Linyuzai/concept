@@ -48,21 +48,26 @@ public class JarPlugin implements Plugin {
         this.pluginConcept = concept;
     }
 
+    @Override
+    public Object getId() {
+        return getUrl();
+    }
+
     /**
-     * 初始化，通过 {@link JarURLConnection} 来读取 jar 内容
+     * 加载，通过 {@link JarURLConnection} 来读取 jar 内容
      */
     @SneakyThrows
     @Override
-    public void initialize() {
+    public void load() {
         this.connection = (JarURLConnection) getUrl().openConnection();
         this.file = getConnection().getJarFile();
     }
 
     /**
-     * 关闭资源文件的引用，但是不清理类加载
+     * 释放资源，关闭资源文件的引用
      */
     @Override
-    public void destroy() {
+    public void release() {
         if (file != null) {
             try {
                 file.close();

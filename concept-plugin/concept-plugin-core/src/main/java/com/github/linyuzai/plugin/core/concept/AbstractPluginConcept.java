@@ -10,49 +10,71 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolverChainImpl;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link PluginConcept} 抽象类
  */
-@Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractPluginConcept implements PluginConcept {
 
     /**
      * 上下文工厂
      */
+    @Getter
     protected final PluginContextFactory pluginContextFactory;
 
     /**
      * 事件发布者
      */
+    @Getter
     protected final PluginEventPublisher pluginEventPublisher;
 
     /**
      * 插件工厂
      */
+    @Getter
     protected final Collection<PluginFactory> pluginFactories;
 
     /**
      * 插件解析器
      */
+    @Getter
     protected final Collection<PluginResolver> pluginResolvers;
 
     /**
      * 插件过滤器
      */
+    @Getter
     protected final Collection<PluginFilter> pluginFilters;
 
     /**
      * 插件提取器
      */
+    @Getter
     protected final Collection<PluginExtractor> pluginExtractors;
+
+    /**
+     * 插件缓存
+     */
+    protected final Map<Object, Plugin> pluginMap = new ConcurrentHashMap<>();
+
+    protected AbstractPluginConcept(PluginContextFactory pluginContextFactory,
+                                    PluginEventPublisher pluginEventPublisher,
+                                    Collection<PluginFactory> pluginFactories,
+                                    Collection<PluginResolver> pluginResolvers,
+                                    Collection<PluginFilter> pluginFilters,
+                                    Collection<PluginExtractor> pluginExtractors) {
+        this.pluginContextFactory = pluginContextFactory;
+        this.pluginEventPublisher = pluginEventPublisher;
+        this.pluginFactories = pluginFactories;
+        this.pluginResolvers = pluginResolvers;
+        this.pluginFilters = pluginFilters;
+        this.pluginExtractors = pluginExtractors;
+    }
 
     /**
      * 创建插件，如创建失败则抛出异常
@@ -73,18 +95,34 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     /**
+     * 创建插件。遍历所有的插件工厂尝试创建插件。
+     * 如果没有匹配的工厂则返回 null。
+     *
+     * @param o 插件源
+     * @return 插件 {@link Plugin} 或 null
+     */
+    private Plugin create0(Object o) {
+        for (PluginFactory factory : pluginFactories) {
+            if (factory.support(o, this)) {
+                return factory.create(o, this);
+            }
+        }
+        return null;
+    }
+
+    /**
      * 加载插件。
-     * 创建插件，
-     * 初始化插件 {@link Plugin#initialize()}，
+     * 用过 {@link PluginFactory} 创建插件，
+     * 加载插件 {@link Plugin#load()}，
      * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
      * 执行插件解析链 {@link PluginResolver}，
      * 通过 {@link PluginExtractor} 提取插件，
-     * 销毁上下文，销毁插件。
+     * 销毁上下文，释放插件资源。
      *
      * @param o 插件源
      */
     @Override
-    public void load(Object o) {
+    public Plugin load(Object o) {
         Plugin plugin = create(o);
         if (plugin == null) {
             throw new PluginException("Plugin is null");
@@ -93,9 +131,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
         //初始化插件
-        plugin.initialize();
+        plugin.load();
 
-        pluginEventPublisher.publish(new PluginInitializedEvent(plugin));
+        pluginEventPublisher.publish(new PluginLoadedEvent(plugin));
 
         //创建上下文
         PluginContext context = pluginContextFactory.create(plugin, this);
@@ -117,24 +155,44 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         //销毁上下文
         context.destroy();
 
-        plugin.destroy();
-        pluginEventPublisher.publish(new PluginDestroyedEvent(plugin));
+        plugin.release();
+        pluginEventPublisher.publish(new PluginReleasedEvent(plugin));
+
+        pluginMap.put(plugin.getId(), plugin);
+        return plugin;
     }
 
     /**
-     * 创建插件。遍历所有的插件工厂尝试创建插件。
-     * 如果没有匹配的工厂则返回 null。
+     * 卸载插件。
+     * 通过插件的 id 或插件本身移除对应的插件
      *
      * @param o 插件源
-     * @return 插件 {@link Plugin} 或 null
      */
-    private Plugin create0(Object o) {
-        for (PluginFactory factory : pluginFactories) {
-            if (factory.support(o, this)) {
-                return factory.create(o, this);
+    @Override
+    public Plugin unload(Object o) {
+        Plugin plugin = pluginMap.remove(o);
+        if (plugin == null) {
+            if (o instanceof Plugin) {
+                if (pluginMap.values().remove(o)) {
+                    pluginEventPublisher.publish(new PluginUnloadedEvent((Plugin) o));
+                    return (Plugin) o;
+                }
             }
+        } else {
+            pluginEventPublisher.publish(new PluginUnloadedEvent(plugin));
+            return plugin;
         }
         return null;
+    }
+
+    @Override
+    public void publish(Object event) {
+        pluginEventPublisher.publish(event);
+    }
+
+    @Override
+    public Map<Object, Plugin> getPlugins() {
+        return pluginMap;
     }
 
     @SuppressWarnings("unchecked")

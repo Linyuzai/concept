@@ -3,11 +3,11 @@ package com.github.linyuzai.plugin.core.event;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 
 /**
- * 插件销毁事件
+ * 插件释放事件
  */
-public class PluginDestroyedEvent extends AbstractPluginEvent {
+public class PluginReleasedEvent extends AbstractPluginEvent {
 
-    public PluginDestroyedEvent(Plugin plugin) {
+    public PluginReleasedEvent(Plugin plugin) {
         super(plugin);
     }
 }
