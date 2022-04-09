@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.event.PluginDestroyedEvent;
+import com.github.linyuzai.plugin.core.event.PluginReleasedEvent;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.match.PluginName;
@@ -665,18 +665,23 @@ public class ConceptPluginController {
             .addEventListener(new PluginEventListener() {
                 @Override
                 public void onEvent(Object event) {
-                    if (event instanceof PluginDestroyedEvent) {
-                        System.out.println("Load finished: " + ((PluginDestroyedEvent) event).getPlugin());
+                    if (event instanceof PluginReleasedEvent) {
+                        System.out.println("Load finished: " + ((PluginReleasedEvent) event).getPlugin());
                     }
                 }
             })
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
-            .locations(new PluginLocation.Builder()
-                    .path("/Users/tanghanzheng/concept/plugin/")
-                    .filter(it -> it.endsWith(".jar"))
-                    .build())
+            .locations(
+                    new PluginLocation.Builder()
+                            .path("/Users/concept/plugin")
+                            .filter(it -> it.endsWith(".jar"))
+                            .build(),
+                    new PluginLocation.Builder()
+                            .path("/Users/concept/plugin2")
+                            .filter(it -> it.endsWith(".jar"))
+                            .build())
             .executor(Executors.newSingleThreadExecutor())
             //.onCreate(concept::load)
             .onNotify(new JarNotifier(concept))
