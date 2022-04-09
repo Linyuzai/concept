@@ -18,7 +18,13 @@ import java.util.function.Consumer;
 public class PluginLoadLogger implements PluginEventListener {
 
     @NonNull
-    private final Consumer<String> consumer;
+    private final Consumer<String> infoLogger;
+
+    private final boolean logDetail;
+
+    public PluginLoadLogger(@NonNull Consumer<String> infoLogger) {
+        this(infoLogger, false);
+    }
 
     @Override
     public void onEvent(Object event) {
@@ -26,25 +32,25 @@ public class PluginLoadLogger implements PluginEventListener {
             Plugin plugin = ((PluginEvent) event).getPlugin();
             if (event instanceof PluginAutoEvent) {
                 if (event instanceof PluginAutoLoadEvent) {
-                    log("Auto load " + plugin);
+                    info("Auto load " + plugin);
                 } else if (event instanceof PluginAutoReloadEvent) {
-                    log("Auto reload " + plugin);
+                    info("Auto reload " + plugin);
                 } else if (event instanceof PluginAutoUnloadEvent) {
-                    log("Auto unload " + plugin);
+                    info("Auto unload " + plugin);
                 }
             } else if (event instanceof PluginContextEvent) {
 
             } else {
                 if (event instanceof PluginCreatedEvent) {
-                    log("Create " + plugin);
+                    info("Create " + plugin);
                 } else if (event instanceof PluginPreparedEvent) {
-                    log("Prepare " + plugin);
+                    info("Prepare " + plugin);
                 } else if (event instanceof PluginReleasedEvent) {
-                    log("Release " + plugin);
+                    info("Release " + plugin);
                 } else if (event instanceof PluginLoadedEvent) {
-                    log("Load " + plugin);
+                    info("Load " + plugin);
                 } else if (event instanceof PluginUnloadedEvent) {
-                    log("Unload " + plugin);
+                    info("Unload " + plugin);
                 }
             }
         }
@@ -54,7 +60,7 @@ public class PluginLoadLogger implements PluginEventListener {
         return "Plugin >> " + msg;
     }
 
-    public void log(String msg) {
-        consumer.accept(appendTag(msg));
+    public void info(String msg) {
+        infoLogger.accept(appendTag(msg));
     }
 }
