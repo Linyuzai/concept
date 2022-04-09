@@ -20,12 +20,12 @@ public interface Plugin {
     Object getId();
 
     /**
-     * 初始化
+     * 准备
      */
-    void load();
+    void prepare();
 
     /**
-     * 销毁
+     * 释放
      */
     void release();
 }

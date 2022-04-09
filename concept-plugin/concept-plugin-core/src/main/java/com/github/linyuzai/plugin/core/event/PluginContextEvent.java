@@ -7,7 +7,7 @@ import lombok.Getter;
  * 附带上下文 {@link PluginContext} 的插件事件
  */
 @Getter
-public class PluginContextEvent extends AbstractPluginEvent {
+public abstract class PluginContextEvent extends AbstractPluginEvent {
 
     private final PluginContext context;
 

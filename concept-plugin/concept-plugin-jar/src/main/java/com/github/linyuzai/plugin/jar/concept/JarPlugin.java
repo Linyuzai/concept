@@ -54,11 +54,11 @@ public class JarPlugin implements Plugin {
     }
 
     /**
-     * 加载，通过 {@link JarURLConnection} 来读取 jar 内容
+     * 准备，通过 {@link JarURLConnection} 来读取 jar 内容
      */
     @SneakyThrows
     @Override
-    public void load() {
+    public void prepare() {
         this.connection = (JarURLConnection) getUrl().openConnection();
         this.file = getConnection().getJarFile();
     }

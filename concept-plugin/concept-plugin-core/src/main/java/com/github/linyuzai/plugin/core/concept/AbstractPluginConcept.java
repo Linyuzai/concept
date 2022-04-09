@@ -113,7 +113,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 加载插件。
      * 用过 {@link PluginFactory} 创建插件，
-     * 加载插件 {@link Plugin#load()}，
+     * 准备插件 {@link Plugin#prepare()}，
      * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
      * 执行插件解析链 {@link PluginResolver}，
      * 通过 {@link PluginExtractor} 提取插件，
@@ -130,10 +130,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
-        //初始化插件
-        plugin.load();
+        //准备插件
+        plugin.prepare();
 
-        pluginEventPublisher.publish(new PluginLoadedEvent(plugin));
+        pluginEventPublisher.publish(new PluginPreparedEvent(plugin));
 
         //创建上下文
         PluginContext context = pluginContextFactory.create(plugin, this);
@@ -159,6 +159,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         pluginEventPublisher.publish(new PluginReleasedEvent(plugin));
 
         pluginMap.put(plugin.getId(), plugin);
+
+        pluginEventPublisher.publish(new PluginLoadedEvent(plugin));
+
         return plugin;
     }
 

@@ -10,6 +10,7 @@ import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
+import com.github.linyuzai.plugin.core.util.PluginLoadLogger;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
@@ -662,14 +663,7 @@ public class ConceptPluginController {
                 }
             })
             //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
-            .addEventListener(new PluginEventListener() {
-                @Override
-                public void onEvent(Object event) {
-                    if (event instanceof PluginReleasedEvent) {
-                        System.out.println("Load finished: " + ((PluginReleasedEvent) event).getPlugin());
-                    }
-                }
-            })
+            .addEventListener(new PluginLoadLogger(log::info))
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
