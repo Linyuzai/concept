@@ -19,48 +19,43 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * {@link PluginConcept} 抽象类
  */
+@Getter
 public abstract class AbstractPluginConcept implements PluginConcept {
 
     /**
      * 上下文工厂
      */
-    @Getter
     protected final PluginContextFactory pluginContextFactory;
 
     /**
      * 事件发布者
      */
-    @Getter
     protected final PluginEventPublisher pluginEventPublisher;
 
     /**
      * 插件工厂
      */
-    @Getter
     protected final Collection<PluginFactory> pluginFactories;
 
     /**
      * 插件解析器
      */
-    @Getter
     protected final Collection<PluginResolver> pluginResolvers;
 
     /**
      * 插件过滤器
      */
-    @Getter
     protected final Collection<PluginFilter> pluginFilters;
 
     /**
      * 插件提取器
      */
-    @Getter
     protected final Collection<PluginExtractor> pluginExtractors;
 
     /**
      * 插件缓存
      */
-    protected final Map<Object, Plugin> pluginMap = new ConcurrentHashMap<>();
+    protected final Map<Object, Plugin> plugins = new ConcurrentHashMap<>();
 
     protected AbstractPluginConcept(PluginContextFactory pluginContextFactory,
                                     PluginEventPublisher pluginEventPublisher,
@@ -159,7 +154,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         plugin.release();
         pluginEventPublisher.publish(new PluginReleasedEvent(plugin));
 
-        pluginMap.put(plugin.getId(), plugin);
+        plugins.put(plugin.getId(), plugin);
 
         pluginEventPublisher.publish(new PluginLoadedEvent(plugin));
 
@@ -174,10 +169,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      */
     @Override
     public Plugin unload(Object o) {
-        Plugin plugin = pluginMap.remove(o);
+        Plugin plugin = plugins.remove(o);
         if (plugin == null) {
             if (o instanceof Plugin) {
-                if (pluginMap.values().remove(o)) {
+                if (plugins.values().remove(o)) {
                     pluginEventPublisher.publish(new PluginUnloadedEvent((Plugin) o));
                     return (Plugin) o;
                 }
@@ -189,19 +184,36 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         return null;
     }
 
+    /**
+     * 插件是否加载
+     *
+     * @param o 插件 id 或插件对象
+     * @return 如果加载返回 true 否则返回 false
+     */
     @Override
     public boolean isLoad(Object o) {
-        return pluginMap.containsKey(o) || (o instanceof Plugin && pluginMap.containsValue(o));
+        return plugins.containsKey(o) || (o instanceof Plugin && plugins.containsValue(o));
     }
 
+    /**
+     * 发布事件
+     *
+     * @param event 事件
+     */
     @Override
     public void publish(Object event) {
         pluginEventPublisher.publish(event);
     }
 
+    /**
+     * 获得插件
+     *
+     * @param id 插件 id
+     * @return 插件或 null
+     */
     @Override
-    public Map<Object, Plugin> getPlugins() {
-        return pluginMap;
+    public Plugin getPlugin(Object id) {
+        return plugins.get(id);
     }
 
     @SuppressWarnings("unchecked")

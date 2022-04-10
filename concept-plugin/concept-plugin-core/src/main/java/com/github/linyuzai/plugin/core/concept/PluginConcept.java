@@ -40,6 +40,14 @@ public interface PluginConcept {
     void publish(Object event);
 
     /**
+     * 获得插件
+     *
+     * @param id 插件 id
+     * @return 插件或 null
+     */
+    Plugin getPlugin(Object id);
+
+    /**
      * 获得所有的加载的插件
      *
      * @return 所有的加载的插件
