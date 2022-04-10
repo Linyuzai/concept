@@ -16,11 +16,6 @@ public class PluginMatchedEvent extends PluginContextEvent {
     private final PluginMatcher matcher;
 
     /**
-     * key
-     */
-    private final Object key;
-
-    /**
      * 原始对象
      */
     private final Object original;
@@ -32,12 +27,10 @@ public class PluginMatchedEvent extends PluginContextEvent {
 
     public PluginMatchedEvent(PluginContext context,
                               PluginMatcher matcher,
-                              Object key,
                               Object original,
                               Object matched) {
         super(context);
         this.matcher = matcher;
-        this.key = key;
         this.original = original;
         this.matched = matched;
     }

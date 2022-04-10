@@ -74,58 +74,31 @@ public class DefaultTypeMetadataFactory implements TypeMetadataFactory {
      */
     public TypeMetadata create(Type cType, Class<?> cClass, Type eType) {
         if (Map.class.isAssignableFrom(cClass)) {
-            MapTypeMetadata metadata = new MapTypeMetadata();
-            metadata.setContainerType(cType);
-            metadata.setContainerClass(cClass);
-            metadata.setElementType(eType);
-            metadata.setElementClass(getElementClass(eType));
-            return metadata;
+            return create0(new MapTypeMetadata(), cType, cClass, eType);
         } else if (List.class.isAssignableFrom(cClass)) {
-            ListTypeMetadata metadata = new ListTypeMetadata();
-            metadata.setContainerType(cType);
-            metadata.setContainerClass(cClass);
-            metadata.setElementType(eType);
-            metadata.setElementClass(getElementClass(eType));
-            return metadata;
+            return create0(new ListTypeMetadata(), cType, cClass, eType);
         } else if (Set.class.isAssignableFrom(cClass)) {
-            SetTypeMetadata metadata = new SetTypeMetadata();
-            metadata.setContainerType(cType);
-            metadata.setContainerClass(cClass);
-            metadata.setElementType(eType);
-            metadata.setElementClass(getElementClass(eType));
-            return metadata;
+            return create0(new SetTypeMetadata(), cType, cClass, eType);
         } else if (Collection.class.isAssignableFrom(cClass)) {
-            CollectionTypeMetadata metadata = new CollectionTypeMetadata();
-            metadata.setContainerType(cType);
-            metadata.setContainerClass(cClass);
-            metadata.setElementType(eType);
-            metadata.setElementClass(getElementClass(eType));
-            return metadata;
+            return create0(new CollectionTypeMetadata(), cType, cClass, eType);
         } else if (cClass.isArray()) {
-            ArrayTypeMetadata metadata = new ArrayTypeMetadata();
             Class<?> componentType = cClass.getComponentType();
-            metadata.setContainerType(cType);
-            metadata.setContainerClass(componentType);//数组使用元素类型
-            metadata.setElementType(componentType);
-            metadata.setElementClass(getElementClass(componentType));
-            return metadata;
+            //数组使用元素类型
+            return create0(new ArrayTypeMetadata(), cType, componentType, componentType);
         } else {
-            return new ObjectTypeMetadata(cType, cClass);
+            return create0(new ObjectTypeMetadata(), cType, cClass, cType);
         }
     }
 
+    public TypeMetadata create0(AbstractTypeMetadata metadata, Type cType, Class<?> cClass, Type eType) {
+        metadata.setContainerType(cType);
+        metadata.setContainerClass(cClass);
+        metadata.setElementType(eType);
+        metadata.setElementClass(getElementClass(eType));
+        return metadata;
+    }
+
     public Class<?> getElementClass(Type type) {
-        /*if (type instanceof Class) {
-            return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) type).getRawType();
-            return ReflectionUtils.toClass(rawType);
-        } else if (type instanceof WildcardType) {
-            Type[] upperBounds = ((WildcardType) type).getUpperBounds();
-            if (upperBounds.length > 0) {
-                return ReflectionUtils.toClass(upperBounds[0]);
-            }
-        }*/
         return ReflectionUtils.toClass(type);
     }
 }

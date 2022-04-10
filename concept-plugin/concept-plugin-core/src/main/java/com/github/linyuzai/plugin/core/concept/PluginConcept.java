@@ -30,6 +30,8 @@ public interface PluginConcept {
      */
     Plugin unload(Object o);
 
+    boolean isLoad(Object o);
+
     /**
      * 发布事件
      *

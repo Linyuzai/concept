@@ -145,7 +145,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         context.initialize();
 
         //解析插件
-        new PluginResolverChainImpl(pluginResolvers, pluginFilters).next(context);
+        new PluginResolverChainImpl(new ArrayList<>(pluginResolvers), new ArrayList<>(pluginFilters))
+                .next(context);
 
         //提取插件
         for (PluginExtractor extractor : pluginExtractors) {
@@ -186,6 +187,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return plugin;
         }
         return null;
+    }
+
+    @Override
+    public boolean isLoad(Object o) {
+        return pluginMap.containsKey(o) || (o instanceof Plugin && pluginMap.containsValue(o));
     }
 
     @Override

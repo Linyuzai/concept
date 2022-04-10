@@ -64,7 +64,7 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
         if (isEmpty(filtered)) {
             return null;
         }
-        context.publish(new PluginMatchedEvent(context, this, key, source, filtered));
+        context.publish(new PluginMatchedEvent(context, this, source, filtered));
         return filtered;
     }
 
