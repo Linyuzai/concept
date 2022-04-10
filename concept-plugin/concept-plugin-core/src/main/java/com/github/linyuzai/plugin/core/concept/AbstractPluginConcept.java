@@ -211,15 +211,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected PluginEventPublisher pluginEventPublisher;
 
-        protected final Collection<PluginEventListener> pluginEventListeners = new ArrayList<>();
+        protected final List<PluginEventListener> pluginEventListeners = new ArrayList<>();
 
-        protected final Collection<PluginFactory> pluginFactories = new ArrayList<>();
+        protected final List<PluginFactory> pluginFactories = new ArrayList<>();
 
-        protected final Collection<PluginResolver> pluginResolvers = new ArrayList<>();
+        protected final List<PluginResolver> pluginResolvers = new ArrayList<>();
 
-        protected final Collection<PluginFilter> pluginFilters = new ArrayList<>();
+        protected final List<PluginFilter> pluginFilters = new ArrayList<>();
 
-        protected final Collection<PluginExtractor> pluginExtractors = new ArrayList<>();
+        protected final List<PluginExtractor> pluginExtractors = new ArrayList<>();
 
         protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
                 resolverDefaultImpl = new HashMap<>();
@@ -468,7 +468,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             if (resolvers.isEmpty()) {
                 return;
             }
-            pluginResolvers.addAll(resolvers);
+            for (PluginResolver resolver : resolvers) {
+                pluginResolvers.add(0, resolver);
+            }
+
             Set<Class<? extends PluginResolver>> unfounded = new HashSet<>();
             for (PluginResolver resolver : resolvers) {
                 //插件解析器依赖的插件解析器
