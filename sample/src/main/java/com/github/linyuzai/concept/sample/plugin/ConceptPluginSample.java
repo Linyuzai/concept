@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
+import com.github.linyuzai.plugin.core.util.PluginLoadLogger;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
@@ -24,6 +25,7 @@ public class ConceptPluginSample {
     private final JarPluginConcept concept = new JarPluginConcept.Builder()
             //添加类提取器
             .extractTo(this)
+            .addEventListener(new PluginLoadLogger(log::info))
             .build();
 
     @OnPluginExtract
@@ -45,6 +47,7 @@ public class ConceptPluginSample {
                     .path("/Users/concept/plugin/")
                     .filter(it -> it.endsWith(".jar"))
                     .build())
+            //
             .executor(Executors.newSingleThreadExecutor())
             //.onCreate(concept::load)
             .onNotify(new JarNotifier(concept))

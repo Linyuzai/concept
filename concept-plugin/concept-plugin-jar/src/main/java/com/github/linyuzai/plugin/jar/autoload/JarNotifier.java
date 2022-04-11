@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.jar.autoload;
 
 import com.github.linyuzai.plugin.core.autoload.PluginNotifier;
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 
 import java.net.URL;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class JarNotifier extends PluginNotifier {
      */
     private final Map<String, URL> pathUrlMapping = new ConcurrentHashMap<>();
 
-    public JarNotifier(PluginConcept concept) {
+    public JarNotifier(JarPluginConcept concept) {
         super(concept);
     }
 
