@@ -649,19 +649,19 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
             })*/
-            /*.addExtractor(new InstanceExtractor<CustomPlugin>() {
+            .addExtractor(new InstanceExtractor<CustomPlugin>() {
                 @Override
                 public void onExtract(CustomPlugin plugin) {
                     ConceptPluginController.this.plugin = plugin;
                 }
-            })*/
+            })
             /*.addExtractor(new ClassExtractor<Class<? extends CustomPlugin>>() {
 
                 @Override
                 public void onExtract(Class<? extends CustomPlugin> plugin) {
                 }
             })*/
-            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .addEventListener(new PluginLoadLogger(log::info))
             .build();
 
@@ -753,6 +753,6 @@ public class ConceptPluginController {
 
     @GetMapping("/load")
     public void loadPlugin() {
-        concept.load("/Users/tanghanzheng/concept/plugin/sample-0.0.1-SNAPSHOT-plain.jar");
+        concept.load("/Users/concept/plugin/sample-0.0.1-SNAPSHOT-plain.jar");
     }
 }

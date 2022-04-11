@@ -17,12 +17,6 @@ public class PluginLoadLogger implements PluginEventListener {
     @NonNull
     private final Consumer<String> infoLogger;
 
-    private final boolean logDetail;
-
-    public PluginLoadLogger(@NonNull Consumer<String> infoLogger) {
-        this(infoLogger, false);
-    }
-
     @Override
     public void onEvent(Object event) {
         if (event instanceof PluginEvent) {

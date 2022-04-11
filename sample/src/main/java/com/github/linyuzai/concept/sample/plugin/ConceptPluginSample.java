@@ -42,7 +42,7 @@ public class ConceptPluginSample {
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
             .locations(new PluginLocation.Builder()
-                    .path("/Users/tanghanzheng/concept/plugin/")
+                    .path("/Users/concept/plugin/")
                     .filter(it -> it.endsWith(".jar"))
                     .build())
             .executor(Executors.newSingleThreadExecutor())
@@ -51,6 +51,9 @@ public class ConceptPluginSample {
             .onError(e -> log.error("Plugin auto load error", e))
             .build();
 
+    /**
+     *
+     */
     @PostConstruct
     private void start() {
         loader.start();
