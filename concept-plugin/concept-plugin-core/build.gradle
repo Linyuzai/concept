@@ -23,4 +23,4 @@ test {
     useJUnitPlatform()
 }
 
-//apply from: 'publish.gradle'
+apply from: '../publish.gradle'
