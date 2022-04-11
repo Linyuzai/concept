@@ -15,7 +15,7 @@ import java.lang.annotation.Annotation;
  * @param <T> 插件类型
  */
 @Getter
-public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<T> {
+public abstract class JarPluginMatcher<T> extends AbstractPluginMatcher<T> {
 
     /**
      * 类型
@@ -42,7 +42,7 @@ public abstract class AbstractJarPluginMatcher<T> extends AbstractPluginMatcher<
      */
     protected AnnotationFilter annotationFilter;
 
-    public AbstractJarPluginMatcher(Class<?> target, Annotation[] annotations) {
+    public JarPluginMatcher(Class<?> target, Annotation[] annotations) {
         super(annotations);
         this.target = target;
         for (Annotation annotation : annotations) {

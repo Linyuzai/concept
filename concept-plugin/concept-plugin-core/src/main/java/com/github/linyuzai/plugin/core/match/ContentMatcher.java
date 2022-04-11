@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.ByteArrayResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 
 import java.lang.annotation.Annotation;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * 内容匹配器
  */
-@DependOnResolvers(ByteArrayPluginResolver.class)
+@DependOnResolvers(ByteArrayResolver.class)
 public class ContentMatcher extends AbstractPluginMatcher<Map<Object, byte[]>> {
 
     public ContentMatcher(Annotation[] annotations) {

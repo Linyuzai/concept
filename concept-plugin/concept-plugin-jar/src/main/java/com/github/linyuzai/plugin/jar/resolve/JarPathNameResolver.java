@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.jar.resolve;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
-import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PathNameResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 import java.io.File;
@@ -15,9 +15,9 @@ import java.util.zip.ZipEntry;
 /**
  * 路径名称解析器
  */
-@DependOnResolvers(JarEntryPluginResolver.class)
-public class JarPathNamePluginResolver extends AbstractPluginResolver<List<JarEntry>, List<String>>
-        implements PathNamePluginResolver {
+@DependOnResolvers(JarEntryResolver.class)
+public class JarPathNameResolver extends AbstractPluginResolver<List<JarEntry>, List<String>>
+        implements PathNameResolver {
 
     /**
      * 获得 {@link JarEntry} 的名称并且处理分隔符

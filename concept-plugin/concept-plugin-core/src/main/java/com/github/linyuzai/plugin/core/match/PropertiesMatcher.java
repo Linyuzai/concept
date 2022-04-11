@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.core.match;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.filter.PropertiesFilter;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
-import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
@@ -15,7 +15,7 @@ import java.util.Properties;
  * {@link Properties} 匹配器
  */
 @Getter
-@DependOnResolvers(PropertiesPluginResolver.class)
+@DependOnResolvers(PropertiesResolver.class)
 public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Properties>> {
 
     /**

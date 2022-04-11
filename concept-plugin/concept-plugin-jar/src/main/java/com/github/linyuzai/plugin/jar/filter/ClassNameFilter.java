@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.jar.filter;
 import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.jar.resolve.JarClassNamePluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @AllArgsConstructor
-@FilterWithResolver(JarClassNamePluginResolver.class)
+@FilterWithResolver(JarClassNameResolver.class)
 public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
 
     /**

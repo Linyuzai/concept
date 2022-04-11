@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.jar.resolve.JarClassNamePluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * 包名过滤器
  */
 @Getter
-@FilterWithResolver(JarClassNamePluginResolver.class)
+@FilterWithResolver(JarClassNameResolver.class)
 public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
 
     /**

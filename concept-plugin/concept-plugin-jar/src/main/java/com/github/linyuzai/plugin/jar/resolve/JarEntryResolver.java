@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * {@link JarEntry} 解析器
  */
-public class JarEntryPluginResolver implements PluginResolver {
+public class JarEntryResolver implements PluginResolver {
 
     /**
      * 从 {@link java.util.jar.JarFile} 中获得 {@link JarEntry}

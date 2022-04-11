@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * 类解析器
  */
-@DependOnResolvers(JarClassNamePluginResolver.class)
-public class JarClassPluginResolver extends AbstractPluginResolver<Map<String, String>, Map<String, Class<?>>> {
+@DependOnResolvers(JarClassNameResolver.class)
+public class JarClassResolver extends AbstractPluginResolver<Map<String, String>, Map<String, Class<?>>> {
 
     /**
      * 对于所有的类名使用类加载器进行加载

@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
-import com.github.linyuzai.plugin.core.resolve.PropertiesNamePluginResolver;
-import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PropertiesNameResolver;
+import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.SneakyThrows;
 
@@ -14,8 +14,8 @@ import java.util.zip.ZipEntry;
 /**
  * jar 中 {@link Properties} 解析器
  */
-@DependOnResolvers(PropertiesNamePluginResolver.class)
-public class JarPropertiesPluginResolver extends PropertiesPluginResolver {
+@DependOnResolvers(PropertiesNameResolver.class)
+public class JarPropertiesResolver extends PropertiesResolver {
 
     /**
      * 通过 {@link java.util.jar.JarFile#getInputStream(ZipEntry)} 来加载 {@link Properties}

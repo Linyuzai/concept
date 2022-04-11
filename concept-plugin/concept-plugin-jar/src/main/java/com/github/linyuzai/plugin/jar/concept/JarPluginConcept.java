@@ -6,19 +6,19 @@ import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
-import com.github.linyuzai.plugin.core.resolve.ByteArrayPluginResolver;
-import com.github.linyuzai.plugin.core.resolve.PathNamePluginResolver;
+import com.github.linyuzai.plugin.core.resolve.ByteArrayResolver;
+import com.github.linyuzai.plugin.core.resolve.PathNameResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
-import com.github.linyuzai.plugin.core.resolve.PropertiesPluginResolver;
+import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoaderFactory;
 import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
-import com.github.linyuzai.plugin.jar.extract.JarDynamicPluginExtractor;
+import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
-import com.github.linyuzai.plugin.jar.resolve.JarByteArrayPluginResolver;
-import com.github.linyuzai.plugin.jar.resolve.JarPathNamePluginResolver;
-import com.github.linyuzai.plugin.jar.resolve.JarPropertiesPluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarByteArrayResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarPathNameResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarPropertiesResolver;
 import java.util.Collection;
 
 /**
@@ -41,9 +41,9 @@ public class JarPluginConcept extends AbstractPluginConcept {
         private PluginClassLoaderFactory pluginClassLoaderFactory;
 
         public Builder() {
-            mappingResolver(ByteArrayPluginResolver.class, JarByteArrayPluginResolver.class);
-            mappingResolver(PathNamePluginResolver.class, JarPathNamePluginResolver.class);
-            mappingResolver(PropertiesPluginResolver.class, JarPropertiesPluginResolver.class);
+            mappingResolver(ByteArrayResolver.class, JarByteArrayResolver.class);
+            mappingResolver(PathNameResolver.class, JarPathNameResolver.class);
+            mappingResolver(PropertiesResolver.class, JarPropertiesResolver.class);
         }
 
         /**
@@ -64,7 +64,7 @@ public class JarPluginConcept extends AbstractPluginConcept {
          * @return {@link Builder}
          */
         public Builder extractTo(Object callback) {
-            return addExtractor(new JarDynamicPluginExtractor(callback));
+            return addExtractor(new JarDynamicExtractor(callback));
         }
 
         public JarPluginConcept build() {

@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 /**
  * {@link java.util.Properties} 名称解析器
  */
-@DependOnResolvers(PathNamePluginResolver.class)
-public class PropertiesNamePluginResolver extends AbstractPluginResolver<List<String>, List<String>> {
+@DependOnResolvers(PathNameResolver.class)
+public class PropertiesNameResolver extends AbstractPluginResolver<List<String>, List<String>> {
 
     /**
      * 过滤文件名称中 .properties 为后缀的名称

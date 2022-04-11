@@ -11,8 +11,8 @@ import java.util.Properties;
 /**
  * {@link Properties} 解析器
  */
-@DependOnResolvers(PropertiesNamePluginResolver.class)
-public abstract class PropertiesPluginResolver extends AbstractPluginResolver<List<String>, Map<String, Properties>> {
+@DependOnResolvers(PropertiesNameResolver.class)
+public abstract class PropertiesResolver extends AbstractPluginResolver<List<String>, Map<String, Properties>> {
 
     /**
      * 将所有名称对象的文件都加载到 {@link Properties} 对象中

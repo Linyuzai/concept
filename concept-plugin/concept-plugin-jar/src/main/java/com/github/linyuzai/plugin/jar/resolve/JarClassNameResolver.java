@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * 类名解析器
  */
-@DependOnResolvers(JarPathNamePluginResolver.class)
-public class JarClassNamePluginResolver extends AbstractPluginResolver<List<String>, Map<String, String>> {
+@DependOnResolvers(JarPathNameResolver.class)
+public class JarClassNameResolver extends AbstractPluginResolver<List<String>, Map<String, String>> {
 
     /**
      * 将所有 .class 结尾的文件过滤出来，

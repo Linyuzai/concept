@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.jar.resolve.JarInstancePluginResolver;
+import com.github.linyuzai.plugin.jar.resolve.JarInstanceResolver;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashMap;
@@ -11,8 +11,8 @@ import java.util.Map;
 /**
  * 实例匹配器
  */
-@DependOnResolvers(JarInstancePluginResolver.class)
-public class InstanceMatcher extends AbstractJarPluginMatcher<Map<String, Object>> {
+@DependOnResolvers(JarInstanceResolver.class)
+public class InstanceMatcher extends JarPluginMatcher<Map<String, Object>> {
 
     public InstanceMatcher(Class<?> target, Annotation[] annotations) {
         super(target, annotations);

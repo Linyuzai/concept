@@ -23,7 +23,7 @@ import java.util.Map;
  * 动态插件提取器。
  * 可以根据自己的需求同时提取多个插件。
  */
-public abstract class DynamicPluginExtractor implements PluginExtractor {
+public abstract class DynamicExtractor implements PluginExtractor {
 
     /**
      * 方法参数对应的插件提取执行器缓存
@@ -43,7 +43,7 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
      *
      * @param target 方法执行对象
      */
-    public DynamicPluginExtractor(@NonNull Object target) {
+    public DynamicExtractor(@NonNull Object target) {
         this.target = target;
         Class<?> clazz = this.target.getClass();
         while (clazz != null && clazz != Object.class) {
@@ -296,7 +296,7 @@ public abstract class DynamicPluginExtractor implements PluginExtractor {
                 } catch (Throwable e) {
                     throw new PluginException("Invoke error on " + method.getName() + ", args " + Arrays.toString(values), e);
                 }
-                context.publish(new DynamicPluginExtractedEvent(context, this, values, method, target));
+                context.publish(new DynamicExtractedEvent(context, this, values, method, target));
             }
         }
     }

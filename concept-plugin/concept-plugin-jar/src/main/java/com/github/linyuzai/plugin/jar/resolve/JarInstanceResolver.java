@@ -14,8 +14,8 @@ import java.util.Map;
 /**
  * 实例解析器
  */
-@DependOnResolvers(JarClassPluginResolver.class)
-public class JarInstancePluginResolver extends AbstractPluginResolver<Map<String, Class<?>>, Map<String, Object>> {
+@DependOnResolvers(JarClassResolver.class)
+public class JarInstanceResolver extends AbstractPluginResolver<Map<String, Class<?>>, Map<String, Object>> {
 
     /**
      * 对所有的类尝试实例化

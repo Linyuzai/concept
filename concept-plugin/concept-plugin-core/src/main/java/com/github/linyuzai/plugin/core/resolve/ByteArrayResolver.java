@@ -18,15 +18,15 @@ import java.io.InputStream;
  */
 @Getter
 @AllArgsConstructor
-@DependOnResolvers(PathNamePluginResolver.class)
-public abstract class ByteArrayPluginResolver<T, R> extends AbstractPluginResolver<T, R> {
+@DependOnResolvers(PathNameResolver.class)
+public abstract class ByteArrayResolver<T, R> extends AbstractPluginResolver<T, R> {
 
     /**
      * 缓存大小
      */
     private final int bufferSize;
 
-    public ByteArrayPluginResolver() {
+    public ByteArrayResolver() {
         this(-1);
     }
 

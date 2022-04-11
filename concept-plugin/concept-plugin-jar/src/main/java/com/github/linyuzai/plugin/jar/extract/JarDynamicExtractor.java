@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.jar.extract;
 
-import com.github.linyuzai.plugin.core.extract.DynamicPluginExtractor;
+import com.github.linyuzai.plugin.core.extract.DynamicExtractor;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
 import com.github.linyuzai.plugin.jar.match.PluginClassName;
@@ -14,9 +14,9 @@ import java.lang.reflect.Type;
 /**
  * 基于 jar 的动态插件提取器
  */
-public class JarDynamicPluginExtractor extends DynamicPluginExtractor {
+public class JarDynamicExtractor extends DynamicExtractor {
 
-    public JarDynamicPluginExtractor(@NonNull Object target) {
+    public JarDynamicExtractor(@NonNull Object target) {
         super(target);
     }
 
