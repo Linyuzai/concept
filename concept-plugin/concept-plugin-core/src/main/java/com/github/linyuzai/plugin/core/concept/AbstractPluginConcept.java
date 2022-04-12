@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.extract.DynamicExtractor;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
@@ -424,6 +425,16 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         public T addExtractors(Collection<? extends PluginExtractor> extractors) {
             this.pluginExtractors.addAll(extractors);
             return (T) this;
+        }
+
+        /**
+         * 动态匹配插件
+         *
+         * @param callback 回调对象
+         * @return {@link T}
+         */
+        public T extractTo(Object callback) {
+            return addExtractor(new DynamicExtractor(callback));
         }
 
         protected void preBuild() {
