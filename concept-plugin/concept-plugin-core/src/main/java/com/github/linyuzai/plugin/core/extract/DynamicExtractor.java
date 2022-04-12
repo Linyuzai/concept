@@ -23,7 +23,7 @@ import java.util.Map;
  * 动态插件提取器。
  * 可以根据自己的需求同时提取多个插件。
  */
-public abstract class DynamicExtractor implements PluginExtractor {
+public class DynamicExtractor implements PluginExtractor {
 
     /**
      * 方法参数对应的插件提取执行器缓存

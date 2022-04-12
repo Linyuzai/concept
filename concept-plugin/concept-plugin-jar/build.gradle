@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    //compile "com.github.linyuzai:concept-plugin-core:${conceptPluginVersion}"
     compileOnly project(':concept-plugin:concept-plugin-core')
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
