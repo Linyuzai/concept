@@ -57,7 +57,7 @@ public class PluginResolverChainImpl implements PluginResolverChain {
                 }
             }
         }
-        //如果所有解析器都解析完成支持返回
+        //如果所有解析器都解析完成，直接返回
         //如果没有支持解析的解析器，直接返回，防止无限循环
         if (resolvers.isEmpty() || resolvers.size() == size) {
             return;
