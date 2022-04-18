@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Getter
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class DiscoveryMessage extends AbstractMessage {
     private final int port;
 
     @Override
-    public byte[] bytes() {
-        return (host + ":" + port).getBytes(StandardCharsets.UTF_8);
+    public <T> T getPayload() {
+        return null;
     }
 }

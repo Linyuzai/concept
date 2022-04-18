@@ -1,23 +1,20 @@
 package com.github.linyuzai.connection.loadbalance.websocket.standard;
 
+import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint("/concept-ws/{user}/{type}/{token}")
-public class StandardWebSocketServerEndpoint implements WebSocketEndpoint {
+@ServerEndpoint(ConnectionProxy.ENDPOINT_PREFIX + "{type}")
+public class StandardWebSocketProxyEndpoint implements WebSocketEndpoint {
 
     @OnOpen
-    public void onOpen(Session session,
-                       @PathParam(value = "user") String user,
-                       @PathParam(value = "type") String type,
-                       @PathParam(value = "token") String token) {
+    public void onOpen(Session session, @PathParam(value = "type") String type) {
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put("user", user);
-        metadata.put("type", type);
-        metadata.put("token", token);
+        metadata.put(ConnectionProxy.HEADER, type);
         add(session, metadata);
     }
 

@@ -1,32 +1,31 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Objects;
+import java.util.Map;
 
 @Getter
-@Setter
-public abstract class AbstractConnection implements Connection {
+@RequiredArgsConstructor
+public abstract class AbstractConnection implements Connection, ConnectionLoadBalanceConceptAware {
 
-    private String host;
+    private final Map<String, String> metadata;
 
-    private int post;
+    private ConnectionLoadBalanceConcept concept;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof AbstractConnection) {
-            AbstractConnection that = (AbstractConnection) o;
-            return post == that.post && Objects.equals(host, that.host);
-        }
-        return false;
+    public void setConnectionLoadBalanceConcept(ConnectionLoadBalanceConcept concept) {
+        this.concept = concept;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(host, post);
+    public void send(Message message) {
+        MessageEncoder encoder = getConcept().getMessageEncoder();
+        byte[] bytes = encoder.encode(message);
+        doSend(bytes);
     }
+
+    public abstract void doSend(byte[] bytes);
 }
