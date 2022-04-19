@@ -1,13 +1,13 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageFactoryAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyConnectionMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
-import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelectorAdapter;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import lombok.Getter;
@@ -24,44 +24,40 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     private final ConnectionProxy connectionProxy;
 
-    private final MessageFactoryAdapter messageFactoryAdapter;
-
     private final MessageEncoder messageEncoder;
 
     private final MessageDecoder messageDecoder;
 
-    private final ConnectionSelectorAdapter connectionSelectorAdapter;
+    private final List<MessageFactory> messageFactories;
+
+    private final List<ConnectionSelector> connectionSelectors;
 
     public AbstractConnectionLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
                                                 ConnectionProxy connectionProxy,
-                                                ConnectionSelectorAdapter connectionSelectorAdapter,
-                                                MessageFactoryAdapter messageFactoryAdapter,
                                                 MessageEncoder messageEncoder,
-                                                MessageDecoder messageDecoder) {
+                                                MessageDecoder messageDecoder,
+                                                List<MessageFactory> messageFactories,
+                                                List<ConnectionSelector> connectionSelectors) {
         this.connectionServerProvider = applyAware(connectionServerProvider);
         this.connectionProxy = applyAware(connectionProxy);
-        this.connectionSelectorAdapter = applyAware(connectionSelectorAdapter);
-        this.messageFactoryAdapter = applyAware(messageFactoryAdapter);
         this.messageEncoder = applyAware(messageEncoder);
         this.messageDecoder = applyAware(messageDecoder);
+        this.messageFactories = applyAware(messageFactories);
+        this.connectionSelectors = applyAware(connectionSelectors);
     }
 
     private <T> T applyAware(T o) {
         if (o instanceof ConnectionLoadBalanceConceptAware) {
             ((ConnectionLoadBalanceConceptAware) o).setConnectionLoadBalanceConcept(this);
+        } else if (o instanceof Collection) {
+            ((Collection<?>) o).forEach(this::applyAware);
         }
         return o;
     }
 
     @Override
     public void initialize() {
-        List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
-        ConnectionServer client = connectionServerProvider.getClient();
-        for (ConnectionServer server : servers) {
-            Connection connection = connectionProxy.proxy(server);
-            add(connection);
-            connection.send(createMessage(client));
-        }
+        proxyOnServer(true);
     }
 
     @Override
@@ -94,14 +90,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         } else {
             if (connection.isProxy()) {
                 if (decode.isProxy()) {
-                    if (hasProxyConnection(decode)) {
-                        //已经存在对应的服务连接
-                        return;
-                    }
-                    //TODO 反向连接
-                    connectionProxy.proxy(decode.getPayload());
+                    //反向连接
+                    proxyOnMessage(decode);
                 } else {
-                    //TODO 代理消息转发
+                    //代理消息转发
                     send(decode);
                 }
             } else {
@@ -110,8 +102,32 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
-    public boolean hasProxyConnection(Message message) {
+    public void proxyOnServer(boolean sendMessage) {
+        List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
+        ConnectionServer client = connectionServerProvider.getClient();
+        for (ConnectionServer server : servers) {
+            if (containsProxyConnection(server.getInstanceId())) {
+                continue;
+            }
+            Connection connection = connectionProxy.proxy(server);
+            add(connection);
+            if (sendMessage) {
+                connection.send(createMessage(client));
+            }
+        }
+    }
+
+    public void proxyOnMessage(Message message) {
         String instanceId = message.getHeaders().get(ConnectionServer.INSTANCE_ID);
+        if (containsProxyConnection(instanceId)) {
+            //已经存在对应的服务连接
+            return;
+        }
+        Connection proxy = connectionProxy.proxy(message.getPayload());
+        add(proxy);
+    }
+
+    public boolean containsProxyConnection(String instanceId) {
         if (instanceId == null || instanceId.isEmpty()) {
             return false;
         }
@@ -144,30 +160,107 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void send(Object msg) {
         Message message = createMessage(msg);
-        ConnectionSelector selector = connectionSelectorAdapter.getConnectionSelector(message);
+        ConnectionSelector selector = getConnectionSelector(message);
         Connection connection;
         List<Connection> list = new ArrayList<>(connections.values());
         if (selector == null) {
-            if (list.size() > 1) {
-                connection = new Connections(list);
-            } else if (list.size() == 1) {
-                connection = list.get(0);
-            } else {
-                return;
-            }
+            connection = Connections.of(list);
         } else {
             connection = selector.select(message, list);
         }
+        if (connection == null) {
+            return;
+        }
         //添加转发标记，防止其他服务再次转发
-        message.getHeaders().put("forward", "");
+        String forward = message.getHeaders().get(Message.FORWARD);
+        String instanceId = connectionServerProvider.getClient().getInstanceId();
+        String newForward;
+        if (forward == null) {
+            newForward = instanceId;
+        } else {
+            newForward = forward + " > " + instanceId;
+        }
+        message.getHeaders().put(Message.FORWARD, newForward);
         connection.send(message);
+    }
+
+    public ConnectionSelector getConnectionSelector(Message message) {
+        for (ConnectionSelector connectionSelector : connectionSelectors) {
+            if (connectionSelector.support(message)) {
+                return connectionSelector;
+            }
+        }
+        return null;
     }
 
     public Message createMessage(Object msg) {
         if (msg instanceof Message) {
             return (Message) msg;
         }
-        MessageFactory messageFactory = messageFactoryAdapter.getMessageFactory(msg);
-        return messageFactory.create(msg);
+        MessageFactory messageFactory = getMessageFactory(msg);
+        if (messageFactory == null) {
+            throw new ConnectionLoadBalanceException("No MessageFactory available with " + msg);
+        }
+        Message message = messageFactory.create(msg);
+        if (message == null) {
+            throw new ConnectionLoadBalanceException("Message can not be created with " + msg);
+        }
+        return message;
+    }
+
+    public MessageFactory getMessageFactory(Object msg) {
+        for (MessageFactory messageFactory : messageFactories) {
+            if (messageFactory.support(msg)) {
+                return messageFactory;
+            }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static class AbstractBuilder<T extends AbstractBuilder<T>> {
+
+        protected ConnectionServerProvider connectionServerProvider;
+
+        protected ConnectionProxy connectionProxy;
+
+        protected MessageEncoder messageEncoder;
+
+        protected MessageDecoder messageDecoder;
+
+        protected List<MessageFactory> messageFactories = new ArrayList<>();
+
+        protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
+
+        public T connectionServerProvider(ConnectionServerProvider connectionServerProvider) {
+            this.connectionServerProvider = connectionServerProvider;
+            return (T) this;
+        }
+
+        public void preBuild() {
+            if (connectionServerProvider == null) {
+                throw new ConnectionLoadBalanceException("ConnectionServerProvider is null");
+            }
+            if (connectionProxy == null) {
+                throw new ConnectionLoadBalanceException("ConnectionProxy is null");
+            }
+            if (messageEncoder == null) {
+
+            }
+            if (messageDecoder == null) {
+
+            }
+
+            boolean containsProxyConnectionMessageFactory = false;
+            for (MessageFactory messageFactory : messageFactories) {
+                if (messageFactory instanceof ProxyConnectionMessageFactory) {
+                    containsProxyConnectionMessageFactory = true;
+                    break;
+                }
+            }
+            if (!containsProxyConnectionMessageFactory) {
+                messageFactories.add(0, new ProxyConnectionMessageFactory());
+            }
+        }
     }
 }

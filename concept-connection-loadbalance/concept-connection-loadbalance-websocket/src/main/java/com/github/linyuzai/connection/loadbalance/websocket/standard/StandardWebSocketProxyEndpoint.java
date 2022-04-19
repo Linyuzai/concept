@@ -8,13 +8,13 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint(ConnectionProxy.ENDPOINT_PREFIX + "{type}")
+@ServerEndpoint(StandardWebSocketConnectionProxy.ENDPOINT_PREFIX + "{type}")
 public class StandardWebSocketProxyEndpoint implements WebSocketEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "type") String type) {
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put(ConnectionProxy.HEADER, type);
+        metadata.put(ConnectionProxy.FLAG, type);
         add(session, metadata);
     }
 

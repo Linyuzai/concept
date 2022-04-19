@@ -6,16 +6,14 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint("/concept-ws/{user}/{type}/{token}")
+@ServerEndpoint("/concept-ws/{type}/{token}")
 public class StandardWebSocketServerEndpoint implements WebSocketEndpoint {
 
     @OnOpen
     public void onOpen(Session session,
-                       @PathParam(value = "user") String user,
                        @PathParam(value = "type") String type,
                        @PathParam(value = "token") String token) {
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put("user", user);
         metadata.put("type", type);
         metadata.put("token", token);
         add(session, metadata);

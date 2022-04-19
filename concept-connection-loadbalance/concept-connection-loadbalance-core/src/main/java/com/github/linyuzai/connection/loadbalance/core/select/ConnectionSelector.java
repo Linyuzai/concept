@@ -8,6 +8,8 @@ import java.util.Collection;
 
 public interface ConnectionSelector {
 
+    ConnectionSelector broadcast(boolean broadcast);
+
     boolean support(Message message);
 
     Connection select(Message message, Collection<Connection> connections);

@@ -18,6 +18,6 @@ public interface Connection extends ProxyMarker {
 
     @Override
     default boolean isProxy() {
-        return getMetadata().containsKey(ConnectionProxy.HEADER);
+        return getMetadata().containsKey(ConnectionProxy.FLAG);
     }
 }

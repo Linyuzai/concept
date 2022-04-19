@@ -43,4 +43,14 @@ public class Connections implements Connection {
             }
         }
     }
+
+    public static Connection of(Collection<? extends Connection> connections) {
+        if (connections == null || connections.isEmpty()) {
+            return null;
+        } else if (connections.size() == 1) {
+            return connections.iterator().next();
+        } else {
+            return new Connections(connections);
+        }
+    }
 }

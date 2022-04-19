@@ -4,8 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 public interface ConnectionProxy {
-    String ENDPOINT_PREFIX = "/concept-ws-proxy/";
-    String HEADER = "proxy";
+    String FLAG = "concept-connection-proxy";
     Connection proxy(ConnectionServer server);
 
 

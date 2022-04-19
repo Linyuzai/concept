@@ -3,13 +3,13 @@ package com.github.linyuzai.connection.loadbalance.core.proxy;
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessage;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
-public class ProxyMessage extends AbstractMessage {
+public class ProxyConnectionMessage extends AbstractMessage {
 
     private final ConnectionServer server;
 
-    public ProxyMessage(ConnectionServer server) {
+    public ProxyConnectionMessage(ConnectionServer server) {
         this.server = server;
-        getHeaders().put(ConnectionProxy.HEADER, "connection-server");
+        getHeaders().put(ConnectionProxy.FLAG, "connection-server");
     }
 
     @SuppressWarnings("unchecked")

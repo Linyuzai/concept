@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
 import java.util.Map;
 
 public interface Message extends ProxyMarker {
+    String FORWARD = "concept-connection-forward";
 
     Map<String, String> getHeaders();
 
@@ -13,6 +14,6 @@ public interface Message extends ProxyMarker {
 
     @Override
     default boolean isProxy() {
-        return getHeaders().containsKey(ConnectionProxy.HEADER);
+        return getHeaders().containsKey(ConnectionProxy.FLAG);
     }
 }

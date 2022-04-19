@@ -5,9 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.proxy.AbstractConnectionP
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import javax.websocket.ContainerProvider;
@@ -19,6 +17,8 @@ import java.util.Map;
 
 @Getter
 public class StandardWebSocketConnectionProxy extends AbstractConnectionProxy {
+
+    public static final String ENDPOINT_PREFIX = "/concept-ws-standard-proxy/";
 
     public static final String TYPE = "-standard";
 
@@ -40,7 +40,7 @@ public class StandardWebSocketConnectionProxy extends AbstractConnectionProxy {
         URI uri = new URI(protocol + "://" + getHost(server) + ":" + getPort(server) + ENDPOINT_PREFIX + type);
         Session session = container.connectToServer(StandardWebSocketClientEndpoint.class, uri);
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put(ConnectionProxy.HEADER, TYPE);
+        metadata.put(ConnectionProxy.FLAG, TYPE);
         metadata.put(ConnectionServer.INSTANCE_ID, server.getInstanceId());
         return new WebSocketConnection(session, metadata);
     }
