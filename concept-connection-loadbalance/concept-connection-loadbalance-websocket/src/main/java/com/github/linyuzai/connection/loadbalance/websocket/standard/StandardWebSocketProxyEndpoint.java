@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.standard;
 
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.websocket.proxy.WebSocketConnectionProxy;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -8,7 +9,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint(StandardWebSocketConnectionProxy.ENDPOINT_PREFIX + "{type}")
+@ServerEndpoint(WebSocketConnectionProxy.ENDPOINT_PREFIX + "{type}")
 public class StandardWebSocketProxyEndpoint implements WebSocketEndpoint {
 
     @OnOpen

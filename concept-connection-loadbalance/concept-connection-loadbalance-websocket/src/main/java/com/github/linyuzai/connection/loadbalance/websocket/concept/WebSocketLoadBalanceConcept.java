@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
@@ -14,16 +15,11 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
     private static WebSocketLoadBalanceConcept instance;
 
-    public WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
-                                       ConnectionProxy connectionProxy,
-                                       MessageEncoder messageEncoder,
-                                       MessageDecoder messageDecoder,
-                                       List<MessageFactory> messageFactories,
-                                       List<ConnectionSelector> connectionSelectors) {
-        super(connectionServerProvider, connectionProxy, messageEncoder, messageDecoder,
-                messageFactories, connectionSelectors);
+    public WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionProxy connectionProxy, MessageEncoder messageEncoder, MessageDecoder messageDecoder, List<MessageFactory> messageFactories, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors) {
+        super(connectionServerProvider, connectionProxy, messageEncoder, messageDecoder, messageFactories, connectionFactories, connectionSelectors);
         instance = this;
     }
+
 
     public static WebSocketLoadBalanceConcept getInstance() {
         return instance;
@@ -39,6 +35,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
                     messageEncoder,
                     messageDecoder,
                     messageFactories,
+                    connectionFactories,
                     connectionSelectors);
         }
     }

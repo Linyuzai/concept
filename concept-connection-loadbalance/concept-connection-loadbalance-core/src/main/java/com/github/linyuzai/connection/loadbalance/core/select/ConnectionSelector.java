@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.select;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.discovery.DiscoveryConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 import java.util.Collection;

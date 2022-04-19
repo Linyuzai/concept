@@ -18,31 +18,35 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
 
-    private final Map<Object, Connection> connections = new ConcurrentHashMap<>();
+    protected final Map<Object, Connection> connections = new ConcurrentHashMap<>();
 
-    private final ConnectionServerProvider connectionServerProvider;
+    protected final ConnectionServerProvider connectionServerProvider;
 
-    private final ConnectionProxy connectionProxy;
+    protected final ConnectionProxy connectionProxy;
 
-    private final MessageEncoder messageEncoder;
+    protected final MessageEncoder messageEncoder;
 
-    private final MessageDecoder messageDecoder;
+    protected final MessageDecoder messageDecoder;
 
-    private final List<MessageFactory> messageFactories;
+    protected final List<MessageFactory> messageFactories;
 
-    private final List<ConnectionSelector> connectionSelectors;
+    protected final List<ConnectionFactory> connectionFactories;
+
+    protected final List<ConnectionSelector> connectionSelectors;
 
     public AbstractConnectionLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
                                                 ConnectionProxy connectionProxy,
                                                 MessageEncoder messageEncoder,
                                                 MessageDecoder messageDecoder,
                                                 List<MessageFactory> messageFactories,
+                                                List<ConnectionFactory> connectionFactories,
                                                 List<ConnectionSelector> connectionSelectors) {
         this.connectionServerProvider = applyAware(connectionServerProvider);
         this.connectionProxy = applyAware(connectionProxy);
         this.messageEncoder = applyAware(messageEncoder);
         this.messageDecoder = applyAware(messageDecoder);
         this.messageFactories = applyAware(messageFactories);
+        this.connectionFactories = applyAware(connectionFactories);
         this.connectionSelectors = applyAware(connectionSelectors);
     }
 
@@ -71,8 +75,35 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
+    public Connection create(Object o, Map<String, String> metadata) {
+        ConnectionFactory factory = getConnectionFactory(o, metadata);
+        if (factory == null) {
+            throw new ConnectionLoadBalanceException("No MessageFactory available with " + o);
+        }
+        Connection connection = factory.create(o, metadata);
+        if (connection == null) {
+            throw new ConnectionLoadBalanceException("Message can not be created with " + o);
+        }
+        return connection;
+    }
+
+    @Override
+    public void add(Object o, Map<String, String> metadata) {
+        add(create(o, metadata));
+    }
+
+    @Override
     public void add(Connection connection) {
         connections.put(connection.getId(), applyAware(connection));
+    }
+
+    public ConnectionFactory getConnectionFactory(Object con, Map<String, String> metadata) {
+        for (ConnectionFactory connectionFactory : connectionFactories) {
+            if (connectionFactory.support(con, metadata)) {
+                return connectionFactory;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -109,7 +140,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (containsProxyConnection(server.getInstanceId())) {
                 continue;
             }
-            Connection connection = connectionProxy.proxy(server);
+            Connection connection = connectionProxy.proxy(server, this);
             add(connection);
             if (sendMessage) {
                 connection.send(createMessage(client));
@@ -123,7 +154,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             //已经存在对应的服务连接
             return;
         }
-        Connection proxy = connectionProxy.proxy(message.getPayload());
+        Connection proxy = connectionProxy.proxy(message.getPayload(), this);
         add(proxy);
     }
 
@@ -229,6 +260,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         protected MessageDecoder messageDecoder;
 
         protected List<MessageFactory> messageFactories = new ArrayList<>();
+
+        protected List<ConnectionFactory> connectionFactories = new ArrayList<>();
 
         protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
 

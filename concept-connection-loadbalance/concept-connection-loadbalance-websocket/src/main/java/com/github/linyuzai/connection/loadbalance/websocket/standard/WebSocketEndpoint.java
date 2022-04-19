@@ -10,8 +10,7 @@ import java.util.Map;
 public interface WebSocketEndpoint {
 
     default void add(Session session, Map<String, String> metadata) {
-        Connection connection = new WebSocketConnection(session, metadata);
-        WebSocketLoadBalanceConcept.getInstance().add(connection);
+        WebSocketLoadBalanceConcept.getInstance().add(session, metadata);
     }
 
     default void remove(Session session) {

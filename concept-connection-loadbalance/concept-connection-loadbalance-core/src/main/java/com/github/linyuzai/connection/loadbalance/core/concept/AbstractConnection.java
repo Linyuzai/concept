@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.Getter;
@@ -9,20 +10,17 @@ import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class AbstractConnection implements Connection, ConnectionLoadBalanceConceptAware {
+public abstract class AbstractConnection implements Connection {
 
     private final Map<String, String> metadata;
 
-    private ConnectionLoadBalanceConcept concept;
+    private final MessageEncoder messageEncoder;
 
-    @Override
-    public void setConnectionLoadBalanceConcept(ConnectionLoadBalanceConcept concept) {
-        this.concept = concept;
-    }
+    private final MessageDecoder messageDecoder;
 
     @Override
     public void send(Message message) {
-        MessageEncoder encoder = getConcept().getMessageEncoder();
+        MessageEncoder encoder = getMessageEncoder();
         byte[] bytes = encoder.encode(message);
         doSend(bytes);
     }

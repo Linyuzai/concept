@@ -16,6 +16,10 @@ public interface ConnectionLoadBalanceConcept {
 
     void destroy();
 
+    Connection create(Object o, Map<String, String> metadata);
+
+    void add(Object o, Map<String, String> metadata);
+
     void add(Connection connection);
 
     void remove(Object id);
