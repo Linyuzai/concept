@@ -31,6 +31,7 @@ allprojects {
         set('cglibVersion', "3.3.0")
         set('okhttpVersion', "4.9.3")
         set('jacksonVersion', "2.13.1")
+        set('nettyVersion', "4.1.72.Final")
         set('lombokVersion', "1.18.22")
         set('junitJupiterVersion', "5.8.1")
     }

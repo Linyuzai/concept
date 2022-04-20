@@ -332,7 +332,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return (T) this;
         }
 
-        public void preBuild() {
+        protected void preBuild() {
             if (connectionServerProvider == null) {
                 throw new ConnectionLoadBalanceException("ConnectionServerProvider is null");
             }
