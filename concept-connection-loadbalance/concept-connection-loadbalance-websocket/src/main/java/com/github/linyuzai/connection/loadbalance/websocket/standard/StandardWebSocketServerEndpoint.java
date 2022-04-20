@@ -11,6 +11,7 @@ public class StandardWebSocketServerEndpoint implements WebSocketEndpoint {
 
     @OnOpen
     public void onOpen(Session session,
+                       EndpointConfig config,
                        @PathParam(value = "type") String type,
                        @PathParam(value = "token") String token) {
         Map<String, String> metadata = new LinkedHashMap<>();
@@ -20,7 +21,7 @@ public class StandardWebSocketServerEndpoint implements WebSocketEndpoint {
     }
 
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(Session session, CloseReason reason) {
         remove(session);
     }
 

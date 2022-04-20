@@ -1,15 +1,20 @@
 package com.github.linyuzai.connection.loadbalance.core.proxy;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import lombok.NonNull;
 
 import java.util.Map;
 
-public abstract class ProxyConnectionFactory implements ConnectionFactory {
+public abstract class ProxyConnectionFactory extends AbstractConnectionFactory {
 
-    @Override
-    public boolean support(Object o, Map<String, String> metadata) {
-        return metadata.containsKey(ConnectionProxy.FLAG) && support(o);
+    public ProxyConnectionFactory(@NonNull MessageEncoder messageEncoder, @NonNull MessageDecoder messageDecoder) {
+        super(messageEncoder, messageDecoder);
     }
 
-    public abstract boolean support(Object o);
+    @Override
+    public boolean support(Map<String, String> metadata) {
+        return hasProxyFlag(metadata);
+    }
 }

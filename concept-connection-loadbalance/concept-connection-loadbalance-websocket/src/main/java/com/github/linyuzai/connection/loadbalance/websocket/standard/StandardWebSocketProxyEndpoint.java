@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.standard;
 
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
 import com.github.linyuzai.connection.loadbalance.websocket.proxy.WebSocketConnectionProxy;
 
 import javax.websocket.*;
@@ -15,7 +15,7 @@ public class StandardWebSocketProxyEndpoint implements WebSocketEndpoint {
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "type") String type) {
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put(ConnectionProxy.FLAG, type);
+        metadata.put(ProxyMarker.FLAG, type);
         add(session, metadata);
     }
 

@@ -25,7 +25,7 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
         List<Connection> list = new ArrayList<>();
         List<Connection> proxyList = new ArrayList<>();
         for (Connection connection : connections) {
-            if (connection.isProxy()) {
+            if (connection.hasProxyFlag()) {
                 proxyList.add(connection);
             } else {
                 list.add(connection);

@@ -1,10 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.event.DefaultConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyConnectionMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -24,30 +26,26 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     protected final ConnectionProxy connectionProxy;
 
-    protected final MessageEncoder messageEncoder;
-
-    protected final MessageDecoder messageDecoder;
-
-    protected final List<MessageFactory> messageFactories;
-
     protected final List<ConnectionFactory> connectionFactories;
 
     protected final List<ConnectionSelector> connectionSelectors;
 
+    protected final List<MessageFactory> messageFactories;
+
+    protected final ConnectionEventPublisher eventPublisher;
+
     public AbstractConnectionLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
                                                 ConnectionProxy connectionProxy,
-                                                MessageEncoder messageEncoder,
-                                                MessageDecoder messageDecoder,
-                                                List<MessageFactory> messageFactories,
                                                 List<ConnectionFactory> connectionFactories,
-                                                List<ConnectionSelector> connectionSelectors) {
+                                                List<ConnectionSelector> connectionSelectors,
+                                                List<MessageFactory> messageFactories,
+                                                ConnectionEventPublisher eventPublisher) {
         this.connectionServerProvider = applyAware(connectionServerProvider);
         this.connectionProxy = applyAware(connectionProxy);
-        this.messageEncoder = applyAware(messageEncoder);
-        this.messageDecoder = applyAware(messageDecoder);
-        this.messageFactories = applyAware(messageFactories);
         this.connectionFactories = applyAware(connectionFactories);
         this.connectionSelectors = applyAware(connectionSelectors);
+        this.messageFactories = applyAware(messageFactories);
+        this.eventPublisher = applyAware(eventPublisher);
     }
 
     private <T> T applyAware(T o) {
@@ -114,13 +112,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void message(Object id, byte[] message) {
-        Message decode = messageDecoder.decode(message);
-        Connection connection = get(id);
+        Connection connection = getConnection(id);
         if (connection == null) {
             //TODO
         } else {
-            if (connection.isProxy()) {
-                if (decode.isProxy()) {
+            MessageDecoder decoder = connection.getMessageDecoder();
+            Message decode = decoder.decode(message);
+            if (connection.hasProxyFlag()) {
+                if (decode.hasProxyFlag()) {
                     //反向连接
                     proxyOnMessage(decode);
                 } else {
@@ -163,7 +162,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return false;
         }
         for (Connection connection : connections.values()) {
-            if (connection.isProxy()) {
+            if (connection.hasProxyFlag()) {
                 String exist = connection.getMetadata().get(ConnectionServer.INSTANCE_ID);
                 if (instanceId.equals(exist)) {
                     return true;
@@ -175,7 +174,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void error(Object id, Throwable e) {
-        Connection connection = get(id);
+        Connection connection = getConnection(id);
         if (connection == null) {
 
         } else {
@@ -184,7 +183,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public Connection get(Object id) {
+    public Connection getConnection(Object id) {
         return connections.get(id);
     }
 
@@ -213,6 +212,17 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         message.getHeaders().put(Message.FORWARD, newForward);
         connection.send(message);
+    }
+
+    @Override
+    public void send(Object msg, Map<String, String> headers) {
+        if (headers == null) {
+            send(msg);
+            return;
+        }
+        Message message = createMessage(msg);
+        message.getHeaders().putAll(headers);
+        send(message);
     }
 
     public ConnectionSelector getConnectionSelector(Message message) {
@@ -248,6 +258,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         return null;
     }
 
+    @Override
+    public void publish(Object event) {
+        eventPublisher.publish(event);
+    }
+
     @SuppressWarnings("unchecked")
     public static class AbstractBuilder<T extends AbstractBuilder<T>> {
 
@@ -255,18 +270,65 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected ConnectionProxy connectionProxy;
 
-        protected MessageEncoder messageEncoder;
-
-        protected MessageDecoder messageDecoder;
-
-        protected List<MessageFactory> messageFactories = new ArrayList<>();
-
         protected List<ConnectionFactory> connectionFactories = new ArrayList<>();
 
         protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
 
-        public T connectionServerProvider(ConnectionServerProvider connectionServerProvider) {
-            this.connectionServerProvider = connectionServerProvider;
+        protected List<MessageFactory> messageFactories = new ArrayList<>();
+
+        protected ConnectionEventPublisher eventPublisher;
+
+        public T connectionServerProvider(ConnectionServerProvider provider) {
+            this.connectionServerProvider = provider;
+            return (T) this;
+        }
+
+        public T connectionProxy(ConnectionProxy proxy) {
+            this.connectionProxy = proxy;
+            return (T) this;
+        }
+
+        public T eventPublisher(ConnectionEventPublisher publisher) {
+            this.eventPublisher = publisher;
+            return (T) this;
+        }
+
+        public T addConnectionFactory(ConnectionFactory factory) {
+            return addConnectionFactories(factory);
+        }
+
+        public T addConnectionFactories(ConnectionFactory... factories) {
+            return addConnectionFactories(Arrays.asList(factories));
+        }
+
+        public T addConnectionFactories(Collection<? extends ConnectionFactory> factories) {
+            this.connectionFactories.addAll(factories);
+            return (T) this;
+        }
+
+        public T addConnectionSelector(ConnectionSelector selector) {
+            return addConnectionSelectors(selector);
+        }
+
+        public T addConnectionSelectors(ConnectionSelector... selectors) {
+            return addConnectionSelectors(Arrays.asList(selectors));
+        }
+
+        public T addConnectionSelectors(Collection<? extends ConnectionSelector> selectors) {
+            this.connectionSelectors.addAll(selectors);
+            return (T) this;
+        }
+
+        public T addMessageFactory(MessageFactory factory) {
+            return addMessageFactories(factory);
+        }
+
+        public T addMessageFactories(MessageFactory... factories) {
+            return addMessageFactories(Arrays.asList(factories));
+        }
+
+        public T addMessageFactories(Collection<? extends MessageFactory> factories) {
+            this.messageFactories.addAll(factories);
             return (T) this;
         }
 
@@ -276,12 +338,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
             if (connectionProxy == null) {
                 throw new ConnectionLoadBalanceException("ConnectionProxy is null");
-            }
-            if (messageEncoder == null) {
-
-            }
-            if (messageDecoder == null) {
-
             }
 
             boolean containsProxyConnectionMessageFactory = false;
@@ -293,6 +349,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
             if (!containsProxyConnectionMessageFactory) {
                 messageFactories.add(0, new ProxyConnectionMessageFactory());
+            }
+
+            messageFactories.add(new ObjectMessageFactory());
+
+            if (eventPublisher == null) {
+                eventPublisher = new DefaultConnectionEventPublisher();
             }
         }
     }

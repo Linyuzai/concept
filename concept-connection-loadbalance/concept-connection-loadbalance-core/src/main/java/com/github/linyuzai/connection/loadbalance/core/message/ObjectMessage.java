@@ -3,13 +3,13 @@ package com.github.linyuzai.connection.loadbalance.core.message;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class StringMessage extends AbstractMessage {
+public class ObjectMessage extends AbstractMessage {
 
-    private String s;
+    private Object o;
 
     @SuppressWarnings("unchecked")
     @Override
-    public String getPayload() {
-        return s;
+    public <T> T getPayload() {
+        return (T) o;
     }
 }

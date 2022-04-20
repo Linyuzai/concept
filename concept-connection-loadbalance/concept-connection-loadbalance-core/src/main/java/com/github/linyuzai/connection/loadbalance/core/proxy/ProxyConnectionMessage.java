@@ -9,7 +9,7 @@ public class ProxyConnectionMessage extends AbstractMessage {
 
     public ProxyConnectionMessage(ConnectionServer server) {
         this.server = server;
-        getHeaders().put(ConnectionProxy.FLAG, "connection-server");
+        getHeaders().put(ProxyMarker.FLAG, "connection-server");
     }
 
     @SuppressWarnings("unchecked")

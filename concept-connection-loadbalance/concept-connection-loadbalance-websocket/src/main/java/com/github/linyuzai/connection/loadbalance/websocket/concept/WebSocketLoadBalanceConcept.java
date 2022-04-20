@@ -2,12 +2,12 @@ package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.websocket.proxy.ProxyWebSocketConnectionFactory;
 
 import java.util.List;
 
@@ -15,11 +15,10 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
     private static WebSocketLoadBalanceConcept instance;
 
-    public WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionProxy connectionProxy, MessageEncoder messageEncoder, MessageDecoder messageDecoder, List<MessageFactory> messageFactories, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors) {
-        super(connectionServerProvider, connectionProxy, messageEncoder, messageDecoder, messageFactories, connectionFactories, connectionSelectors);
+    private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionProxy connectionProxy, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
+        super(connectionServerProvider, connectionProxy, connectionFactories, connectionSelectors, messageFactories, eventPublisher);
         instance = this;
     }
-
 
     public static WebSocketLoadBalanceConcept getInstance() {
         return instance;
@@ -29,14 +28,17 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
         public WebSocketLoadBalanceConcept build() {
             preBuild();
+
+            connectionFactories.add(new WebSocketConnectionFactory());
+            connectionFactories.add(new ProxyWebSocketConnectionFactory());
+
             return new WebSocketLoadBalanceConcept(
                     connectionServerProvider,
                     connectionProxy,
-                    messageEncoder,
-                    messageDecoder,
-                    messageFactories,
                     connectionFactories,
-                    connectionSelectors);
+                    connectionSelectors,
+                    messageFactories,
+                    eventPublisher);
         }
     }
 }

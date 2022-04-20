@@ -2,5 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.proxy;
 
 public interface ProxyMarker {
 
-    boolean isProxy();
+    String FLAG = "concept-connection-proxy";
+
+    boolean hasProxyFlag();
 }

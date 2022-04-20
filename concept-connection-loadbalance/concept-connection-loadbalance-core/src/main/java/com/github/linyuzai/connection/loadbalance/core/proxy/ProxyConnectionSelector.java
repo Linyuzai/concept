@@ -18,13 +18,13 @@ public class ProxyConnectionSelector implements ConnectionSelector {
 
     @Override
     public boolean support(Message message) {
-        return message.isProxy();
+        return message.hasProxyFlag();
     }
 
     @Override
     public Connection select(Message message, Collection<Connection> connections) {
         List<Connection> list = connections.stream()
-                .filter(Connection::isProxy)
+                .filter(Connection::hasProxyFlag)
                 .collect(Collectors.toList());
         return Connections.of(list);
     }

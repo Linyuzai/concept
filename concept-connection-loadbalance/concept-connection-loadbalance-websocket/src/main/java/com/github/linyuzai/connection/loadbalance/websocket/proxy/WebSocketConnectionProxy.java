@@ -3,7 +3,7 @@ package com.github.linyuzai.connection.loadbalance.websocket.proxy;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.proxy.AbstractConnectionProxy;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.standard.StandardWebSocketClientEndpoint;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class WebSocketConnectionProxy extends AbstractConnectionProxy {
         URI uri = new URI(protocol + "://" + getHost(server) + ":" + getPort(server) + ENDPOINT_PREFIX + TYPE);
         Session session = container.connectToServer(StandardWebSocketClientEndpoint.class, uri);
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put(ConnectionProxy.FLAG, TYPE);
+        metadata.put(ProxyMarker.FLAG, TYPE);
         metadata.put(ConnectionServer.INSTANCE_ID, server.getInstanceId());
         return concept.create(session, metadata);
     }

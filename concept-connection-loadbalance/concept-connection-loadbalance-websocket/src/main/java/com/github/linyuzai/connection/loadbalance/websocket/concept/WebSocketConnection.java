@@ -1,6 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import lombok.*;
 
 import javax.websocket.Session;
@@ -12,8 +14,12 @@ public class WebSocketConnection extends AbstractConnection {
 
     private final Session session;
 
-    public WebSocketConnection(Session session, Map<String, String> metadata) {
-        super(metadata);
+
+    public WebSocketConnection(Session session,
+                               Map<String, String> metadata,
+                               MessageEncoder encoder,
+                               MessageDecoder decoder) {
+        super(metadata, encoder, decoder);
         this.session = session;
     }
 

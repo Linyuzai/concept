@@ -1,13 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
-import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
-
-import java.util.List;
 import java.util.Map;
 
 public interface ConnectionLoadBalanceConcept {
@@ -28,21 +20,13 @@ public interface ConnectionLoadBalanceConcept {
 
     void error(Object id, Throwable e);
 
-    Connection get(Object id);
+    void send(Object msg);
 
-    void send(Object message);
+    void send(Object msg, Map<String, String> headers);
+
+    void publish(Object event);
+
+    Connection getConnection(Object id);
 
     Map<Object, Connection> getConnections();
-
-    ConnectionServerProvider getConnectionServerProvider();
-
-    ConnectionProxy getConnectionProxy();
-
-    MessageEncoder getMessageEncoder();
-
-    MessageDecoder getMessageDecoder();
-
-    List<MessageFactory> getMessageFactories();
-
-    List<ConnectionSelector> getConnectionSelectors();
 }
