@@ -6,7 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.Getter;
 
 @Getter
-public class ConnectionProxyEvent extends AbstractConnectionEvent {
+public class ConnectionProxyEvent extends AbstractConnectionEvent implements ProxyConnectionEvent {
 
     private final ConnectionServer connectionServer;
 

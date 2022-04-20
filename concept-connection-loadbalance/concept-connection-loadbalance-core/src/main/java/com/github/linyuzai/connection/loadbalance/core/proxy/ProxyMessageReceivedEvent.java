@@ -6,11 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.Getter;
 
 @Getter
-public class ProxyMessageSentEvent extends AbstractConnectionEvent implements ProxyConnectionEvent {
+public class ProxyMessageReceivedEvent extends AbstractConnectionEvent implements ProxyConnectionEvent {
 
     private final Message message;
 
-    public ProxyMessageSentEvent(Connection connection, Message message) {
+    public ProxyMessageReceivedEvent(Connection connection, Message message) {
         super(connection);
         this.message = message;
     }

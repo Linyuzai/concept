@@ -6,10 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxyEvent;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyConnectionMessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMessageSentEvent;
+import com.github.linyuzai.connection.loadbalance.core.proxy.*;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
@@ -95,7 +92,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void add(Connection connection) {
         connections.put(connection.getId(), applyAware(connection));
-        publish(new ConnectionAddedEvent(connection));
+        if (connection.hasProxyFlag()) {
+            publish(new ProxyConnectionAddedEvent(connection));
+        } else {
+            publish(new ConnectionAddedEvent(connection));
+        }
     }
 
     public ConnectionFactory getConnectionFactory(Object con, Map<String, String> metadata) {
@@ -113,7 +114,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (connection == null) {
             return;
         }
-        publish(new ConnectionRemovedEvent(connection));
+        if (connection.hasProxyFlag()) {
+            publish(new ProxyConnectionRemovedEvent(connection));
+        } else {
+            publish(new ConnectionRemovedEvent(connection));
+        }
     }
 
     @Override
@@ -126,6 +131,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             Message decode = decoder.decode(message);
             if (connection.hasProxyFlag()) {
                 if (decode.hasProxyFlag()) {
+                    publish(new ProxyMessageReceivedEvent(connection, decode));
                     //反向连接
                     proxyOnMessage(decode);
                 } else {
@@ -133,7 +139,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     send(decode);
                 }
             } else {
-                //TODO 前端消息上来
+                publish(new MessageReceivedEvent(connection, decode));
             }
         }
     }
