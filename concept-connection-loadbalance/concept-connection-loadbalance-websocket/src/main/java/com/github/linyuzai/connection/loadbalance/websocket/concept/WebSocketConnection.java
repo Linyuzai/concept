@@ -14,12 +14,13 @@ public class WebSocketConnection extends AbstractConnection {
 
     private final Session session;
 
+    public WebSocketConnection(Session session) {
+        this(session, null);
+    }
 
     public WebSocketConnection(Session session,
-                               Map<String, String> metadata,
-                               MessageEncoder encoder,
-                               MessageDecoder decoder) {
-        super(metadata, encoder, decoder);
+                               Map<String, String> metadata) {
+        super(metadata);
         this.session = session;
     }
 

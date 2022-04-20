@@ -3,20 +3,29 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
 public abstract class AbstractConnection implements Connection {
 
-    private final Map<String, String> metadata;
+    private final Map<String, String> metadata = new LinkedHashMap<>();
 
-    private final MessageEncoder messageEncoder;
+    @NonNull
+    private MessageEncoder messageEncoder;
 
-    private final MessageDecoder messageDecoder;
+    @NonNull
+    private MessageDecoder messageDecoder;
+
+    public AbstractConnection(Map<String, String> metadata) {
+        if (metadata != null) {
+            this.metadata.putAll(metadata);
+        }
+    }
 
     @Override
     public void send(Message message) {

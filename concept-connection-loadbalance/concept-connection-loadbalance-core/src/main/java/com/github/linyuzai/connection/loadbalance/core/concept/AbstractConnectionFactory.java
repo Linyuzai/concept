@@ -13,10 +13,8 @@ import java.util.Map;
 @AllArgsConstructor
 public abstract class AbstractConnectionFactory implements ConnectionFactory {
 
-    @NonNull
     protected MessageEncoder messageEncoder;
 
-    @NonNull
     protected MessageDecoder messageDecoder;
 
     @Override

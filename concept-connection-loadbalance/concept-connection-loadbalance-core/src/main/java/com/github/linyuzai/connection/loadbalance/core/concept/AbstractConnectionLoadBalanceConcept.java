@@ -1,14 +1,15 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.core.event.DefaultConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxyEvent;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyConnectionMessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMessageSentEvent;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
@@ -82,6 +83,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (connection == null) {
             throw new ConnectionLoadBalanceException("Message can not be created with " + o);
         }
+        publish(new ConnectionCreatedEvent(connection));
         return connection;
     }
 
@@ -93,6 +95,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void add(Connection connection) {
         connections.put(connection.getId(), applyAware(connection));
+        publish(new ConnectionAddedEvent(connection));
     }
 
     public ConnectionFactory getConnectionFactory(Object con, Map<String, String> metadata) {
@@ -107,14 +110,17 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void remove(Object id) {
         Connection connection = connections.remove(id);
-
+        if (connection == null) {
+            return;
+        }
+        publish(new ConnectionRemovedEvent(connection));
     }
 
     @Override
     public void message(Object id, byte[] message) {
         Connection connection = getConnection(id);
         if (connection == null) {
-            //TODO
+            publish(new UnknownMessageEvent(id, message));
         } else {
             MessageDecoder decoder = connection.getMessageDecoder();
             Message decode = decoder.decode(message);
@@ -140,6 +146,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 continue;
             }
             Connection connection = connectionProxy.proxy(server, this);
+            publish(new ConnectionProxyEvent(connection, server));
             add(connection);
             if (sendMessage) {
                 connection.send(createMessage(client));
@@ -176,9 +183,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void error(Object id, Throwable e) {
         Connection connection = getConnection(id);
         if (connection == null) {
-
+            publish(new UnknownErrorEvent(id, e));
         } else {
-
+            publish(new ConnectionErrorEvent(connection, e));
         }
     }
 
@@ -199,6 +206,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             connection = selector.select(message, list);
         }
         if (connection == null) {
+            publish(new DeadMessageEvent(message));
             return;
         }
         //添加转发标记，防止其他服务再次转发
@@ -212,6 +220,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         message.getHeaders().put(Message.FORWARD, newForward);
         connection.send(message);
+        if (message.hasProxyFlag()) {
+            publish(new ProxyMessageSentEvent(connection, message));
+        } else {
+            publish(new MessageSentEvent(connection, message));
+        }
     }
 
     @Override
