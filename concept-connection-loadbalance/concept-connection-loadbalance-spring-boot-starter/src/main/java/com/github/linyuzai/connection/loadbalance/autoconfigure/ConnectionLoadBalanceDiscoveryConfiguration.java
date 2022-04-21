@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
+package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionServerProvider;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({DiscoveryClient.class, Registration.class})
-public class WebSocketDiscoveryConfiguration {
+public class ConnectionLoadBalanceDiscoveryConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
