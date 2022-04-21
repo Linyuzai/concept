@@ -1,11 +1,11 @@
-package com.github.linyuzai.connection.loadbalance.websocket.proxy;
+package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.proxy.AbstractConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.websocket.standard.StandardWebSocketClientEndpoint;
+import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketClientEndpoint;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -17,31 +17,40 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
-public class WebSocketConnectionProxy extends AbstractConnectionProxy {
+public class JavaxWebSocketConnectionProxy extends AbstractConnectionProxy {
 
     public static final String ENDPOINT_PREFIX = "/concept-ws-proxy/";
 
-    private final String TYPE = "standard";
+    public static final String TYPE = "standard";
+
+    private static ConnectionLoadBalanceConcept concept;
+
+    public static ConnectionLoadBalanceConcept getConcept() {
+        return concept;
+    }
 
     private final String protocol;
 
-    public WebSocketConnectionProxy() {
+    public JavaxWebSocketConnectionProxy() {
         this("ws");
     }
 
-    public WebSocketConnectionProxy(String protocol) {
+    public JavaxWebSocketConnectionProxy(String protocol) {
         this.protocol = protocol;
     }
 
     @SneakyThrows
     @Override
     public Connection proxy(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
+        JavaxWebSocketConnectionProxy.concept = concept;
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         URI uri = new URI(protocol + "://" + getHost(server) + ":" + getPort(server) + ENDPOINT_PREFIX + TYPE);
-        Session session = container.connectToServer(StandardWebSocketClientEndpoint.class, uri);
+        Session session = container.connectToServer(JavaxWebSocketClientEndpoint.class, uri);
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put(ProxyMarker.FLAG, TYPE);
         metadata.put(ConnectionServer.INSTANCE_ID, server.getInstanceId());
         return concept.create(session, metadata);
     }
+
+
 }

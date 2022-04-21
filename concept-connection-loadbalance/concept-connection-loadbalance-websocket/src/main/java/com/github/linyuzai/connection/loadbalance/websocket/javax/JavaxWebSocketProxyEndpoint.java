@@ -1,7 +1,6 @@
-package com.github.linyuzai.connection.loadbalance.websocket.standard;
+package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
-import com.github.linyuzai.connection.loadbalance.websocket.proxy.WebSocketConnectionProxy;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -9,8 +8,8 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint(WebSocketConnectionProxy.ENDPOINT_PREFIX + "{type}")
-public class StandardWebSocketProxyEndpoint implements WebSocketEndpoint {
+@ServerEndpoint(JavaxWebSocketConnectionProxy.ENDPOINT_PREFIX + "{type}")
+public class JavaxWebSocketProxyEndpoint implements JavaxWebSocketEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "type") String type) {
@@ -31,6 +30,6 @@ public class StandardWebSocketProxyEndpoint implements WebSocketEndpoint {
 
     @OnError
     public void onError(Session session, Throwable e) {
-        error(session, e);
+        //error(session, e);
     }
 }

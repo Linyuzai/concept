@@ -1,13 +1,11 @@
-package com.github.linyuzai.connection.loadbalance.websocket.standard;
+package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
 import javax.websocket.*;
 import java.util.Map;
 
-public interface WebSocketEndpoint {
+public interface JavaxWebSocketEndpoint {
 
     default void add(Session session, Map<String, String> metadata) {
         WebSocketLoadBalanceConcept.getInstance().add(session, metadata);

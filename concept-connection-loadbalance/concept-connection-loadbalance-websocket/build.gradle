@@ -15,7 +15,9 @@ repositories {
 dependencies {
     compileOnly project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
 
-    compileOnly 'javax.websocket:javax.websocket-api:1.1'
+    compileOnly "javax.websocket:javax.websocket-api:${javaxWebsocketVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

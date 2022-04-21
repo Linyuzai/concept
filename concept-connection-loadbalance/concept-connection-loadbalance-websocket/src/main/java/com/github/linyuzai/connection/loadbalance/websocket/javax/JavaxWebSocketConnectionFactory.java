@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.websocket.concept;
+package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
@@ -11,13 +11,13 @@ import lombok.NonNull;
 import javax.websocket.Session;
 import java.util.Map;
 
-public class WebSocketConnectionFactory extends AbstractConnectionFactory {
+public class JavaxWebSocketConnectionFactory extends AbstractConnectionFactory {
 
-    public WebSocketConnectionFactory() {
+    public JavaxWebSocketConnectionFactory() {
         this(new JacksonMessageEncoder(), new StringMessageDecoder());
     }
 
-    public WebSocketConnectionFactory(@NonNull MessageEncoder messageEncoder, @NonNull MessageDecoder messageDecoder) {
+    public JavaxWebSocketConnectionFactory(@NonNull MessageEncoder messageEncoder, @NonNull MessageDecoder messageDecoder) {
         super(messageEncoder, messageDecoder);
     }
 
@@ -28,7 +28,7 @@ public class WebSocketConnectionFactory extends AbstractConnectionFactory {
 
     @Override
     public Connection create(Object o, Map<String, String> metadata) {
-        WebSocketConnection connection = new WebSocketConnection((Session) o, metadata);
+        JavaxWebSocketConnection connection = new JavaxWebSocketConnection((Session) o, metadata);
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);
         return connection;

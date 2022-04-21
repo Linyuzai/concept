@@ -38,21 +38,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                                                 List<ConnectionSelector> connectionSelectors,
                                                 List<MessageFactory> messageFactories,
                                                 ConnectionEventPublisher eventPublisher) {
-        this.connectionServerProvider = applyAware(connectionServerProvider);
-        this.connectionProxy = applyAware(connectionProxy);
-        this.connectionFactories = applyAware(connectionFactories);
-        this.connectionSelectors = applyAware(connectionSelectors);
-        this.messageFactories = applyAware(messageFactories);
-        this.eventPublisher = applyAware(eventPublisher);
-    }
-
-    private <T> T applyAware(T o) {
-        if (o instanceof ConnectionLoadBalanceConceptAware) {
-            ((ConnectionLoadBalanceConceptAware) o).setConnectionLoadBalanceConcept(this);
-        } else if (o instanceof Collection) {
-            ((Collection<?>) o).forEach(this::applyAware);
-        }
-        return o;
+        this.connectionServerProvider = connectionServerProvider;
+        this.connectionProxy = connectionProxy;
+        this.connectionFactories = connectionFactories;
+        this.connectionSelectors = connectionSelectors;
+        this.messageFactories = messageFactories;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -91,7 +82,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void add(Connection connection) {
-        connections.put(connection.getId(), applyAware(connection));
+        connections.put(connection.getId(), connection);
         if (connection.hasProxyFlag()) {
             publish(new ProxyConnectionAddedEvent(connection));
         } else {

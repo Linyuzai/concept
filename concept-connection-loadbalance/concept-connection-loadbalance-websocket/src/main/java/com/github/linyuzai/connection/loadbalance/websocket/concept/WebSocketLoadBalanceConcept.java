@@ -7,7 +7,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
-import com.github.linyuzai.connection.loadbalance.websocket.proxy.ProxyWebSocketConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxProxyWebSocketConnectionFactory;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
         public WebSocketLoadBalanceConcept build() {
             preBuild();
 
-            connectionFactories.add(new WebSocketConnectionFactory());
-            connectionFactories.add(new ProxyWebSocketConnectionFactory());
+            connectionFactories.add(new JavaxWebSocketConnectionFactory());
+            connectionFactories.add(new JavaxProxyWebSocketConnectionFactory());
 
             return new WebSocketLoadBalanceConcept(
                     connectionServerProvider,

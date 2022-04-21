@@ -7,7 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.proxy.WebSocketConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionProxy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ public class WebSocketLoadBalanceConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ConnectionProxy connectionProxy() {
-        return new WebSocketConnectionProxy();
+        return new JavaxWebSocketConnectionProxy();
     }
 
     @Bean
