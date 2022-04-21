@@ -3,11 +3,11 @@ package com.github.linyuzai.connection.loadbalance.websocket.javax;
 import javax.websocket.*;
 
 @ClientEndpoint
-public class JavaxWebSocketClientEndpoint implements JavaxWebSocketEndpoint {
+public class JavaxWebSocketClientEndpoint {
 
     @OnClose
     public void onClose(Session session) {
-        JavaxWebSocketConnectionProxy.getConcept().remove(session.getId());
+        JavaxWebSocketConnectionProxy.getConcept().close(session.getId());
     }
 
     @OnMessage

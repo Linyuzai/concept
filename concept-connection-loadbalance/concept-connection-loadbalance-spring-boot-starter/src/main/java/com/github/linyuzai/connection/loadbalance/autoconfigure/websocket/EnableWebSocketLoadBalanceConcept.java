@@ -8,7 +8,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({WebSocketDiscoveryConfiguration.class, WebSocketLoadBalanceConfiguration.class})
+@Import({ReactiveWebSocketConfiguration.class,
+        WebSocketDiscoveryConfiguration.class,
+        WebSocketLoadBalanceConfiguration.class})
 public @interface EnableWebSocketLoadBalanceConcept {
 
 }

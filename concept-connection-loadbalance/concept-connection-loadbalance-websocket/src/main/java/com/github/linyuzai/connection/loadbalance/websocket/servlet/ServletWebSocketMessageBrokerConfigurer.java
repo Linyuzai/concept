@@ -1,14 +1,11 @@
-package com.github.linyuzai.connection.loadbalance.websocket.web;
+package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
-import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
 
-import java.util.List;
-
-public class SpringWebSocketMessageBrokerConfigurer implements WebSocketMessageBrokerConfigurer {
+public class ServletWebSocketMessageBrokerConfigurer implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {

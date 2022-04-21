@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -8,28 +9,28 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint(JavaxWebSocketConnectionProxy.ENDPOINT_PREFIX + "{type}")
-public class JavaxWebSocketProxyEndpoint implements JavaxWebSocketEndpoint {
+@ServerEndpoint(WebSocketLoadBalanceConcept.ENDPOINT_PREFIX + "{type}")
+public class JavaxWebSocketProxyEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "type") String type) {
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put(ProxyMarker.FLAG, type);
-        add(session, metadata);
+        WebSocketLoadBalanceConcept.getInstance().open(session, metadata);
     }
 
     @OnClose
     public void onClose(Session session) {
-        remove(session);
+        WebSocketLoadBalanceConcept.getInstance().close(session.getId());
     }
 
     @OnMessage
     public void onMessage(Session session, byte[] message) {
-        message(session, message);
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), message);
     }
 
     @OnError
     public void onError(Session session, Throwable e) {
-        //error(session, e);
+        WebSocketLoadBalanceConcept.getInstance().error(session.getId(), e);
     }
 }

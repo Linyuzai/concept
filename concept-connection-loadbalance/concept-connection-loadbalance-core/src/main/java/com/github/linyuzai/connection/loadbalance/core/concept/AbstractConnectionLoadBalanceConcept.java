@@ -71,22 +71,21 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (connection == null) {
             throw new ConnectionLoadBalanceException("Message can not be created with " + o);
         }
-        publish(new ConnectionCreatedEvent(connection));
         return connection;
     }
 
     @Override
-    public void add(Object o, Map<String, String> metadata) {
-        add(create(o, metadata));
+    public void open(Object o, Map<String, String> metadata) {
+        open(create(o, metadata));
     }
 
     @Override
-    public void add(Connection connection) {
+    public void open(Connection connection) {
         connections.put(connection.getId(), connection);
         if (connection.hasProxyFlag()) {
             publish(new ProxyConnectionAddedEvent(connection));
         } else {
-            publish(new ConnectionAddedEvent(connection));
+            publish(new ConnectionOpenEvent(connection));
         }
     }
 
@@ -100,7 +99,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void remove(Object id) {
+    public void close(Object id) {
         Connection connection = connections.remove(id);
         if (connection == null) {
             return;
@@ -108,7 +107,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (connection.hasProxyFlag()) {
             publish(new ProxyConnectionRemovedEvent(connection));
         } else {
-            publish(new ConnectionRemovedEvent(connection));
+            publish(new ConnectionCloseEvent(connection));
         }
     }
 
@@ -130,7 +129,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     send(decode);
                 }
             } else {
-                publish(new MessageReceivedEvent(connection, decode));
+                publish(new MessageReceiveEvent(connection, decode));
             }
         }
     }
@@ -144,7 +143,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
             Connection connection = connectionProxy.proxy(server, this);
             publish(new ConnectionProxyEvent(connection, server));
-            add(connection);
+            open(connection);
             if (sendMessage) {
                 connection.send(createMessage(client));
             }
@@ -158,7 +157,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return;
         }
         Connection proxy = connectionProxy.proxy(message.getPayload(), this);
-        add(proxy);
+        open(proxy);
     }
 
     public boolean containsProxyConnection(String instanceId) {
@@ -220,7 +219,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (message.hasProxyFlag()) {
             publish(new ProxyMessageSentEvent(connection, message));
         } else {
-            publish(new MessageSentEvent(connection, message));
+            publish(new MessageSendEvent(connection, message));
         }
     }
 

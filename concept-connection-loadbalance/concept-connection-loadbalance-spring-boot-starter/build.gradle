@@ -18,8 +18,9 @@ dependencies {
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-discovery')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
 
-    compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
     compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"

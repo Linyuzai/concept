@@ -5,11 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.Getter;
 
 @Getter
-public class MessageReceivedEvent extends AbstractConnectionEvent {
+public class MessageSendEvent extends AbstractConnectionEvent {
 
     private final Message message;
 
-    public MessageReceivedEvent(Connection connection, Message message) {
+    public MessageSendEvent(Connection connection, Message message) {
         super(connection);
         this.message = message;
     }

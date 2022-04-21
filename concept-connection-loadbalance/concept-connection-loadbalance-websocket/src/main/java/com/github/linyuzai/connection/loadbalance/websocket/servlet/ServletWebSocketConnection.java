@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.websocket.web;
+package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import lombok.SneakyThrows;
@@ -7,15 +7,15 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
 
-public class SpringWebSocketConnection extends AbstractConnection {
+public class ServletWebSocketConnection extends AbstractConnection {
 
     private final WebSocketSession session;
 
-    public SpringWebSocketConnection(WebSocketSession session) {
+    public ServletWebSocketConnection(WebSocketSession session) {
         this.session = session;
     }
 
-    public SpringWebSocketConnection(Map<String, String> metadata, WebSocketSession session) {
+    public ServletWebSocketConnection(Map<String, String> metadata, WebSocketSession session) {
         super(metadata);
         this.session = session;
     }

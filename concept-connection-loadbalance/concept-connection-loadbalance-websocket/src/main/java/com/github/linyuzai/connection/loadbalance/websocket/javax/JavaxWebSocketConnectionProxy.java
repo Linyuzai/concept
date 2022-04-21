@@ -5,7 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.proxy.AbstractConnectionProxy;
 import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketClientEndpoint;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -18,8 +18,6 @@ import java.util.Map;
 
 @Getter
 public class JavaxWebSocketConnectionProxy extends AbstractConnectionProxy {
-
-    public static final String ENDPOINT_PREFIX = "/concept-ws-proxy/";
 
     public static final String TYPE = "standard";
 
@@ -44,7 +42,7 @@ public class JavaxWebSocketConnectionProxy extends AbstractConnectionProxy {
     public Connection proxy(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
         JavaxWebSocketConnectionProxy.concept = concept;
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        URI uri = new URI(protocol + "://" + getHost(server) + ":" + getPort(server) + ENDPOINT_PREFIX + TYPE);
+        URI uri = new URI(protocol + "://" + getHost(server) + ":" + getPort(server) + WebSocketLoadBalanceConcept.ENDPOINT_PREFIX + TYPE);
         Session session = container.connectToServer(JavaxWebSocketClientEndpoint.class, uri);
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put(ProxyMarker.FLAG, TYPE);

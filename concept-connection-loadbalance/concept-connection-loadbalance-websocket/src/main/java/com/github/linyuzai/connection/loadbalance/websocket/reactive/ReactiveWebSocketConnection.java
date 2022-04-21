@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectio
 import lombok.AllArgsConstructor;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 import java.util.Map;
@@ -25,7 +26,13 @@ public class ReactiveWebSocketConnection extends AbstractConnection {
 
     @Override
     public void doSend(byte[] bytes) {
-        //sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY, session.bufferFactory().wrap(bytes)));
+        session.send(Flux.just(createMessage(bytes))).subscribe();
+        //sender.next();
+    }
+
+    public WebSocketMessage createMessage(byte[] bytes) {
+        return new WebSocketMessage(WebSocketMessage.Type.BINARY,
+                session.bufferFactory().wrap(bytes));
     }
 
     @Override

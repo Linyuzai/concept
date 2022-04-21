@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.websocket.web;
+package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.AllArgsConstructor;
@@ -6,13 +6,13 @@ import lombok.NonNull;
 import org.springframework.web.socket.*;
 
 @AllArgsConstructor
-public class SpringLoadBalanceWebSocketHandler implements WebSocketHandler {
+public class ServletLoadBalanceWebSocketHandler implements WebSocketHandler {
 
     private final WebSocketLoadBalanceConcept concept;
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        concept.add(session, null);
+        concept.open(session, null);
     }
 
     @Override
@@ -30,12 +30,12 @@ public class SpringLoadBalanceWebSocketHandler implements WebSocketHandler {
 
     @Override
     public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-
+        concept.error(session.getId(), exception);
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) throws Exception {
-
+        concept.close(session.getId());
     }
 
     @Override

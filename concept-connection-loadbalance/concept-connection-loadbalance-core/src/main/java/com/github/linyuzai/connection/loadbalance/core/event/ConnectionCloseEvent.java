@@ -2,9 +2,9 @@ package com.github.linyuzai.connection.loadbalance.core.event;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 
-public class ConnectionAddedEvent extends AbstractConnectionEvent {
+public class ConnectionCloseEvent extends AbstractConnectionEvent {
 
-    public ConnectionAddedEvent(Connection connection) {
+    public ConnectionCloseEvent(Connection connection) {
         super(connection);
     }
 }

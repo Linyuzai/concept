@@ -13,7 +13,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxProxyWebS
 import java.util.List;
 
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
-
+    public static final String ENDPOINT_PREFIX = "/concept-ws-proxy/";
     private static WebSocketLoadBalanceConcept instance;
 
     private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionProxy connectionProxy, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
