@@ -19,7 +19,7 @@ public class ReactiveWebSocketConnection extends AbstractConnection {
         this.session = session;
     }
 
-    public ReactiveWebSocketConnection(Map<String, String> metadata, WebSocketSession session) {
+    public ReactiveWebSocketConnection(WebSocketSession session, Map<Object, Object> metadata) {
         super(metadata);
         this.session = session;
     }

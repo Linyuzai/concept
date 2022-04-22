@@ -1,22 +1,30 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
+
 import javax.websocket.*;
 
 @ClientEndpoint
 public class JavaxWebSocketClientEndpoint {
 
+    @OnOpen
+    public void onOpen(Session session) {
+        WebSocketLoadBalanceConcept.getInstance().open(session, null, Connection.Type.SUBSCRIBER);
+    }
+
     @OnClose
     public void onClose(Session session) {
-        JavaxWebSocketConnectionProxy.getConcept().close(session.getId());
+        WebSocketLoadBalanceConcept.getInstance().close(session.getId(), Connection.Type.SUBSCRIBER);
     }
 
     @OnMessage
     public void onMessage(Session session, byte[] message) {
-        JavaxWebSocketConnectionProxy.getConcept().message(session.getId(), message);
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), message, Connection.Type.SUBSCRIBER);
     }
 
     @OnError
     public void onError(Session session, Throwable e) {
-        JavaxWebSocketConnectionProxy.getConcept().error(session.getId(), e);
+        WebSocketLoadBalanceConcept.getInstance().error(session.getId(), e, Connection.Type.SUBSCRIBER);
     }
 }

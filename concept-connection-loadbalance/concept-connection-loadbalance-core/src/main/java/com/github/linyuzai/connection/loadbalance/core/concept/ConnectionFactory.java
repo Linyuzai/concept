@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface ConnectionFactory {
 
-    boolean support(Object o, Map<String, String> metadata);
+    boolean support(Object o, Map<Object, Object> metadata);
 
-    Connection create(Object o, Map<String, String> metadata);
+    Connection create(Object o, Map<Object, Object> metadata);
 }

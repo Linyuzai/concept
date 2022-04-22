@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.proxy;
+package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;

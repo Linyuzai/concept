@@ -4,7 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectio
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionFactory;
@@ -13,11 +13,11 @@ import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxProxyWebS
 import java.util.List;
 
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
-    public static final String ENDPOINT_PREFIX = "/concept-ws-proxy/";
+    public static final String ENDPOINT_PREFIX = "/concept-websocket-loadbalance/";
     private static WebSocketLoadBalanceConcept instance;
 
-    private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionProxy connectionProxy, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
-        super(connectionServerProvider, connectionProxy, connectionFactories, connectionSelectors, messageFactories, eventPublisher);
+    private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionSubscriber connectionSubscriber, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
+        super(connectionServerProvider, connectionSubscriber, connectionFactories, connectionSelectors, messageFactories, eventPublisher);
         instance = this;
     }
 
@@ -35,7 +35,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
             return new WebSocketLoadBalanceConcept(
                     connectionServerProvider,
-                    connectionProxy,
+                    connectionSubscriber,
                     connectionFactories,
                     connectionSelectors,
                     messageFactories,

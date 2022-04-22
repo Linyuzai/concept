@@ -13,7 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 public abstract class AbstractConnection implements Connection {
 
-    private final Map<String, String> metadata = new LinkedHashMap<>();
+    private final Map<Object, Object> metadata = new LinkedHashMap<>();
 
     @NonNull
     private MessageEncoder messageEncoder;
@@ -21,7 +21,7 @@ public abstract class AbstractConnection implements Connection {
     @NonNull
     private MessageDecoder messageDecoder;
 
-    public AbstractConnection(Map<String, String> metadata) {
+    public AbstractConnection(Map<Object, Object> metadata) {
         if (metadata != null) {
             this.metadata.putAll(metadata);
         }

@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.proxy;
+package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -14,7 +14,7 @@ public abstract class ProxyConnectionFactory extends AbstractConnectionFactory {
     }
 
     @Override
-    public boolean support(Map<String, String> metadata) {
+    public boolean support(Map<Object, Object> metadata) {
         return hasProxyFlag(metadata);
     }
 }

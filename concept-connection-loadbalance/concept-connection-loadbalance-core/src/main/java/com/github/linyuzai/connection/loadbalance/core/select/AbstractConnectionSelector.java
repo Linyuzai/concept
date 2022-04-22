@@ -21,21 +21,12 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
     }
 
     @Override
-    public Connection select(Message message, Collection<Connection> connections) {
-        List<Connection> list = new ArrayList<>();
-        List<Connection> proxyList = new ArrayList<>();
-        for (Connection connection : connections) {
-            if (connection.hasProxyFlag()) {
-                proxyList.add(connection);
-            } else {
-                list.add(connection);
-            }
-        }
+    public Connection select(Message message, Collection<Connection> clients, Collection<Connection> observables) {
         Connection select;
-        if (list.isEmpty()) {
+        if (clients.isEmpty()) {
             select = null;
         } else {
-            select = doSelect(message, list);
+            select = doSelect(message, clients);
         }
 
         if (message.getHeaders().containsKey(Message.FORWARD)) {
@@ -45,19 +36,18 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
 
         if (select == null) {
             //没有对应的连接，直接进行转发
-            return Connections.of(proxyList);
+            return Connections.of(observables);
         }
 
         if (broadcast) {
             //广播
-            List<Connection> combine = new ArrayList<>(proxyList);
+            List<Connection> combine = new ArrayList<>(observables);
             combine.add(0, select);
             return Connections.of(combine);
         } else {
             //单播
             return select;
         }
-
     }
 
     public abstract Connection doSelect(Message message, Collection<Connection> connections);

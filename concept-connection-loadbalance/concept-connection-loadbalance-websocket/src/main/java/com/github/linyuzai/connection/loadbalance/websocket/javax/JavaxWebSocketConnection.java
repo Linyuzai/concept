@@ -17,7 +17,7 @@ public class JavaxWebSocketConnection extends AbstractConnection {
     }
 
     public JavaxWebSocketConnection(Session session,
-                                    Map<String, String> metadata) {
+                                    Map<Object, Object> metadata) {
         super(metadata);
         this.session = session;
     }

@@ -15,7 +15,7 @@ public class ServletWebSocketConnection extends AbstractConnection {
         this.session = session;
     }
 
-    public ServletWebSocketConnection(Map<String, String> metadata, WebSocketSession session) {
+    public ServletWebSocketConnection(WebSocketSession session, Map<Object, Object> metadata) {
         super(metadata);
         this.session = session;
     }

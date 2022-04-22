@@ -11,5 +11,5 @@ public interface ConnectionSelector {
 
     boolean support(Message message);
 
-    Connection select(Message message, Collection<Connection> connections);
+    Connection select(Message message, Collection<Connection> clients, Collection<Connection> observables);
 }

@@ -6,10 +6,10 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.proxy.*;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
 import lombok.Getter;
 
 import java.util.*;
@@ -18,11 +18,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
 
-    protected final Map<Object, Connection> connections = new ConcurrentHashMap<>();
+    protected final Map<Object, Connection> clientConnections = new ConcurrentHashMap<>();
+
+    protected final Map<Object, Connection> subscriberConnections = new ConcurrentHashMap<>();
+
+    protected final Map<Object, Connection> observableConnections = new ConcurrentHashMap<>();
 
     protected final ConnectionServerProvider connectionServerProvider;
 
-    protected final ConnectionProxy connectionProxy;
+    protected final ConnectionSubscriber connectionSubscriber;
 
     protected final List<ConnectionFactory> connectionFactories;
 
@@ -33,13 +37,13 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected final ConnectionEventPublisher eventPublisher;
 
     public AbstractConnectionLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
-                                                ConnectionProxy connectionProxy,
+                                                ConnectionSubscriber connectionSubscriber,
                                                 List<ConnectionFactory> connectionFactories,
                                                 List<ConnectionSelector> connectionSelectors,
                                                 List<MessageFactory> messageFactories,
                                                 ConnectionEventPublisher eventPublisher) {
         this.connectionServerProvider = connectionServerProvider;
-        this.connectionProxy = connectionProxy;
+        this.connectionSubscriber = connectionSubscriber;
         this.connectionFactories = connectionFactories;
         this.connectionSelectors = connectionSelectors;
         this.messageFactories = messageFactories;
@@ -48,21 +52,24 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void initialize() {
-        proxyOnServer(true);
+        subscribe();
     }
 
     @Override
     public void destroy() {
-        for (Connection connection : connections.values()) {
-            try {
-                connection.close();
-            } catch (Throwable ignore) {
+        for (Connection.Type type : Connection.Type.values()) {
+            Map<Object, Connection> connections = getConnections(type);
+            for (Connection connection : connections.values()) {
+                try {
+                    connection.close();
+                } catch (Throwable ignore) {
+                }
             }
         }
     }
 
     @Override
-    public Connection create(Object o, Map<String, String> metadata) {
+    public Connection create(Object o, Map<Object, Object> metadata) {
         ConnectionFactory factory = getConnectionFactory(o, metadata);
         if (factory == null) {
             throw new ConnectionLoadBalanceException("No MessageFactory available with " + o);
@@ -75,21 +82,30 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void open(Object o, Map<String, String> metadata) {
-        open(create(o, metadata));
+    public Connection open(Object o, Map<Object, Object> metadata, Connection.Type type) {
+        Connection connection = create(o, metadata);
+        open(connection, type);
+        return connection;
     }
 
     @Override
-    public void open(Connection connection) {
-        connections.put(connection.getId(), connection);
-        if (connection.hasProxyFlag()) {
-            publish(new ProxyConnectionAddedEvent(connection));
-        } else {
-            publish(new ConnectionOpenEvent(connection));
+    public void open(Connection connection, Connection.Type type) {
+        switch (type) {
+            case CLIENT:
+                clientConnections.put(connection.getId(), connection);
+                publish(new ConnectionOpenEvent(connection));
+            case SUBSCRIBER:
+                subscriberConnections.put(connection.getId(), connection);
+                //TODO
+                //publish(new ProxyConnectionAddedEvent(connection));
+            case OBSERVABLE:
+                observableConnections.put(connection.getId(), connection);
+                //TODO
+                //publish(new ProxyConnectionAddedEvent(connection));
         }
     }
 
-    public ConnectionFactory getConnectionFactory(Object con, Map<String, String> metadata) {
+    public ConnectionFactory getConnectionFactory(Object con, Map<Object, Object> metadata) {
         for (ConnectionFactory connectionFactory : connectionFactories) {
             if (connectionFactory.support(con, metadata)) {
                 return connectionFactory;
@@ -99,85 +115,86 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void close(Object id) {
-        Connection connection = connections.remove(id);
+    public void close(Object id, Connection.Type type) {
+        Connection connection = getConnections0(type).remove(id);
         if (connection == null) {
+            //UnknownConnectionClose
             return;
         }
         if (connection.hasProxyFlag()) {
-            publish(new ProxyConnectionRemovedEvent(connection));
+            publish(new ProxyConnectionCloseEvent(connection));
         } else {
             publish(new ConnectionCloseEvent(connection));
         }
     }
 
     @Override
-    public void message(Object id, byte[] message) {
-        Connection connection = getConnection(id);
+    public void message(Object id, byte[] message, Connection.Type type) {
+        Connection connection = getConnection(id, type);
         if (connection == null) {
             publish(new UnknownMessageEvent(id, message));
         } else {
             MessageDecoder decoder = connection.getMessageDecoder();
             Message decode = decoder.decode(message);
-            if (connection.hasProxyFlag()) {
-                if (decode.hasProxyFlag()) {
-                    publish(new ProxyMessageReceivedEvent(connection, decode));
-                    //反向连接
-                    proxyOnMessage(decode);
-                } else {
-                    //代理消息转发
+            switch (type) {
+                case CLIENT:
+                    publish(new MessageReceiveEvent(connection, decode));
+                    break;
+                case SUBSCRIBER:
+                    //转发
                     send(decode);
-                }
-            } else {
-                publish(new MessageReceiveEvent(connection, decode));
+                    break;
+                case OBSERVABLE:
+                    //TODO
+                    //publish(new ProxyMessageReceiveEvent(connection, decode));
+                    //反向连接
+                    subscribe(decode.getPayload(), false);
+                    break;
             }
         }
     }
 
-    public void proxyOnServer(boolean sendMessage) {
+    public void subscribe() {
         List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
-        ConnectionServer client = connectionServerProvider.getClient();
         for (ConnectionServer server : servers) {
-            if (containsProxyConnection(server.getInstanceId())) {
-                continue;
-            }
-            Connection connection = connectionProxy.proxy(server, this);
-            publish(new ConnectionProxyEvent(connection, server));
-            open(connection);
-            if (sendMessage) {
-                connection.send(createMessage(client));
-            }
+            subscribe(server, true);
         }
     }
 
-    public void proxyOnMessage(Message message) {
-        String instanceId = message.getHeaders().get(ConnectionServer.INSTANCE_ID);
-        if (containsProxyConnection(instanceId)) {
+    public void subscribe(ConnectionServer server, boolean reply) {
+        if (containsSubscriberConnection(server)) {
             //已经存在对应的服务连接
             return;
         }
-        Connection proxy = connectionProxy.proxy(message.getPayload(), this);
-        open(proxy);
+        Connection subscriber = connectionSubscriber.subscribe(server, this);
+        if (subscriber == null) {
+            publish(new ProxyConnectionOpenErrorEvent(server));
+            return;
+        }
+        open(subscriber, Connection.Type.SUBSCRIBER);
+        publish(new ProxyConnectionOpenEvent(subscriber, server));
+        if (reply) {
+            subscriber.send(createMessage(connectionServerProvider.getClient()));
+        }
     }
 
-    public boolean containsProxyConnection(String instanceId) {
-        if (instanceId == null || instanceId.isEmpty()) {
+    public boolean containsSubscriberConnection(ConnectionServer server) {
+        if (server == null) {
             return false;
         }
-        for (Connection connection : connections.values()) {
-            if (connection.hasProxyFlag()) {
-                String exist = connection.getMetadata().get(ConnectionServer.INSTANCE_ID);
-                if (instanceId.equals(exist)) {
-                    return true;
-                }
+        for (Connection connection : subscriberConnections.values()) {
+            ConnectionServer exist = (ConnectionServer) connection.getMetadata()
+                    .get(ConnectionServer.class);
+            if (server.getInstanceId().equals(exist.getInstanceId())) {
+                return true;
             }
         }
         return false;
     }
 
     @Override
-    public void error(Object id, Throwable e) {
-        Connection connection = getConnection(id);
+    public void error(Object id, Throwable e, Connection.Type type) {
+        Connection connection = getConnection(id, type);
         if (connection == null) {
             publish(new UnknownErrorEvent(id, e));
         } else {
@@ -186,8 +203,26 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public Connection getConnection(Object id) {
-        return connections.get(id);
+    public Connection getConnection(Object id, Connection.Type type) {
+        return getConnections0(type).get(id);
+    }
+
+    @Override
+    public Map<Object, Connection> getConnections(Connection.Type type) {
+        return Collections.unmodifiableMap(getConnections0(type));
+    }
+
+    private Map<Object, Connection> getConnections0(Connection.Type type) {
+        switch (type) {
+            case CLIENT:
+                return clientConnections;
+            case SUBSCRIBER:
+                return subscriberConnections;
+            case OBSERVABLE:
+                return observableConnections;
+            default:
+                return Collections.emptyMap();
+        }
     }
 
     @Override
@@ -195,11 +230,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
         Connection connection;
-        List<Connection> list = new ArrayList<>(connections.values());
+        List<Connection> clients = new ArrayList<>(clientConnections.values());
+        List<Connection> observables = new ArrayList<>(observableConnections.values());
         if (selector == null) {
-            connection = Connections.of(list);
+            connection = Connections.of(clients, observables);
         } else {
-            connection = selector.select(message, list);
+            connection = selector.select(message, clients, observables);
         }
         if (connection == null) {
             publish(new DeadMessageEvent(message));
@@ -217,7 +253,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         message.getHeaders().put(Message.FORWARD, newForward);
         connection.send(message);
         if (message.hasProxyFlag()) {
-            publish(new ProxyMessageSentEvent(connection, message));
+            publish(new ProxyMessageSendEvent(connection, message));
         } else {
             publish(new MessageSendEvent(connection, message));
         }
@@ -277,7 +313,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected ConnectionServerProvider connectionServerProvider;
 
-        protected ConnectionProxy connectionProxy;
+        protected ConnectionSubscriber connectionSubscriber;
 
         protected List<ConnectionFactory> connectionFactories = new ArrayList<>();
 
@@ -292,8 +328,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return (T) this;
         }
 
-        public T connectionProxy(ConnectionProxy proxy) {
-            this.connectionProxy = proxy;
+        public T connectionProxy(ConnectionSubscriber proxy) {
+            this.connectionSubscriber = proxy;
             return (T) this;
         }
 
@@ -345,7 +381,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (connectionServerProvider == null) {
                 throw new ConnectionLoadBalanceException("ConnectionServerProvider is null");
             }
-            if (connectionProxy == null) {
+            if (connectionSubscriber == null) {
                 throw new ConnectionLoadBalanceException("ConnectionProxy is null");
             }
 

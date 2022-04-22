@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.proxy;
+package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;

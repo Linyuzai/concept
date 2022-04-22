@@ -27,7 +27,7 @@ public class JavaxWebSocketConnectionFactory extends AbstractConnectionFactory {
     }
 
     @Override
-    public Connection create(Object o, Map<String, String> metadata) {
+    public Connection create(Object o, Map<Object, Object> metadata) {
         JavaxWebSocketConnection connection = new JavaxWebSocketConnection((Session) o, metadata);
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);

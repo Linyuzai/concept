@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.proxy;
+package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 public interface ProxyMarker {
 

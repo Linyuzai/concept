@@ -3,11 +3,11 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionProxy;
+import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionSubscriber;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +20,8 @@ public class WebSocketLoadBalanceConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConnectionProxy connectionProxy() {
-        return new JavaxWebSocketConnectionProxy();
+    public ConnectionSubscriber connectionProxy() {
+        return new JavaxWebSocketConnectionSubscriber();
     }
 
     @Bean
@@ -34,7 +34,7 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnMissingBean
     public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(
             ConnectionServerProvider provider,
-            ConnectionProxy proxy,
+            ConnectionSubscriber proxy,
             List<ConnectionFactory> connectionFactories,
             List<ConnectionSelector> connectionSelectors,
             List<MessageFactory> messageFactories,

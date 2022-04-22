@@ -8,17 +8,17 @@ public interface ConnectionLoadBalanceConcept {
 
     void destroy();
 
-    Connection create(Object o, Map<String, String> metadata);
+    Connection create(Object o, Map<Object, Object> metadata);
 
-    void open(Object o, Map<String, String> metadata);
+    Connection open(Object o, Map<Object, Object> metadata, Connection.Type type);
 
-    void open(Connection connection);
+    void open(Connection connection, Connection.Type type);
 
-    void close(Object id);
+    void close(Object id, Connection.Type type);
 
-    void message(Object id, byte[] message);
+    void message(Object id, byte[] message, Connection.Type type);
 
-    void error(Object id, Throwable e);
+    void error(Object id, Throwable e, Connection.Type type);
 
     void send(Object msg);
 
@@ -26,7 +26,7 @@ public interface ConnectionLoadBalanceConcept {
 
     void publish(Object event);
 
-    Connection getConnection(Object id);
+    Connection getConnection(Object id, Connection.Type type);
 
-    Map<Object, Connection> getConnections();
+    Map<Object, Connection> getConnections(Connection.Type type);
 }

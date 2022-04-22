@@ -3,9 +3,9 @@ package com.github.linyuzai.connection.loadbalance.websocket.javax;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
-import com.github.linyuzai.connection.loadbalance.core.proxy.JacksonProxyConnectionMessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.proxy.JacksonProxyConnectionMessageEncoder;
-import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonProxyConnectionMessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonProxyConnectionMessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ProxyConnectionFactory;
 import lombok.NonNull;
 
 import javax.websocket.Session;
@@ -27,7 +27,7 @@ public class JavaxProxyWebSocketConnectionFactory extends ProxyConnectionFactory
     }
 
     @Override
-    public Connection create(Object o, Map<String, String> metadata) {
+    public Connection create(Object o, Map<Object, Object> metadata) {
         JavaxWebSocketConnection connection = new JavaxWebSocketConnection((Session) o, metadata);
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);

@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
-import com.github.linyuzai.connection.loadbalance.core.proxy.ProxyMarker;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ProxyMarker;
 
 import java.util.Map;
 

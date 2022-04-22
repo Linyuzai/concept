@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class Connections implements Connection {
     }
 
     @Override
-    public Map<String, String> getMetadata() {
+    public Map<Object, Object> getMetadata() {
         Connection connection = get();
         return connection == null ? null : connection.getMetadata();
     }
@@ -69,13 +70,24 @@ public class Connections implements Connection {
         }
     }
 
-    public static Connection of(Collection<? extends Connection> connections) {
-        if (connections == null || connections.isEmpty()) {
+    @SafeVarargs
+    public static Connection of(Collection<? extends Connection>... connections) {
+        if (connections == null || connections.length == 0) {
             return null;
-        } else if (connections.size() == 1) {
-            return connections.iterator().next();
+        }
+        Collection<Connection> combine = new ArrayList<>();
+        for (Collection<? extends Connection> cons : connections) {
+            if (cons == null || cons.isEmpty()) {
+                continue;
+            }
+            combine.addAll(cons);
+        }
+        if (combine.isEmpty()) {
+            return null;
+        } else if (combine.size() == 1) {
+            return combine.iterator().next();
         } else {
-            return new Connections(connections);
+            return new Connections(combine);
         }
     }
 }
