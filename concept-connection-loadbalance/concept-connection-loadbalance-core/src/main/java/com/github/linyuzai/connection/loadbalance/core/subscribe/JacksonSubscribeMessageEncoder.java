@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonMessageEncoder;
 
-public class JacksonProxyConnectionMessageEncoder extends JacksonMessageEncoder {
+public class JacksonSubscribeMessageEncoder extends JacksonMessageEncoder {
 
-    public JacksonProxyConnectionMessageEncoder(ObjectMapper objectMapper) {
+    public JacksonSubscribeMessageEncoder(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
-    public JacksonProxyConnectionMessageEncoder() {
+    public JacksonSubscribeMessageEncoder() {
         this(new ObjectMapper().activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.EVERYTHING));

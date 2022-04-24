@@ -8,11 +8,11 @@ import org.springframework.web.reactive.socket.WebSocketHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReactiveLoadBalanceWebSocketHandlerMapping extends SimpleUrlHandlerMapping {
+public class ReactiveWebSocketLoadBalanceHandlerMapping extends SimpleUrlHandlerMapping {
 
-    public ReactiveLoadBalanceWebSocketHandlerMapping(WebSocketLoadBalanceConcept concept) {
+    public ReactiveWebSocketLoadBalanceHandlerMapping(WebSocketLoadBalanceConcept concept) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(WebSocketLoadBalanceConcept.ENDPOINT_PREFIX + "**", new ReactiveLoadBalanceWebSocketHandler(concept));
+        map.put(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT_PREFIX + "**", new ReactiveWebSocketLoadBalanceHandler(concept));
         setUrlMap(map);
         setOrder(Ordered.HIGHEST_PRECEDENCE);
     }

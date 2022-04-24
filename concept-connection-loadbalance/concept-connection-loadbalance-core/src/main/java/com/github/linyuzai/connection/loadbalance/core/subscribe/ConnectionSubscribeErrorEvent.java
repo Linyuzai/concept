@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ProxyConnectionOpenErrorEvent implements ProxyConnectionEvent {
+public class ConnectionSubscribeErrorEvent {
 
     private final ConnectionServer connectionServer;
 }

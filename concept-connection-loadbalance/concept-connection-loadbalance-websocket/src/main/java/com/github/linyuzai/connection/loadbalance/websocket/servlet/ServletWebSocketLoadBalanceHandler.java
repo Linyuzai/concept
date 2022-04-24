@@ -6,37 +6,36 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.socket.*;
 
+import java.util.Objects;
+
 @AllArgsConstructor
-public class ServletLoadBalanceWebSocketHandler implements WebSocketHandler {
+public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
 
     protected final WebSocketLoadBalanceConcept concept;
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        concept.open(session, null, Connection.Type.CLIENT);
+        ServletWebSocketConnection connection =
+                new ServletWebSocketConnection(session, Connection.Type.OBSERVABLE);
+        connection.getMetadata().put(Connection.URI, Objects.requireNonNull(session.getUri()).toString());
+        concept.open(connection);
     }
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
-        if (message instanceof PingMessage) {
-            concept.message(session.getId(), ((PingMessage) message).getPayload().array(), Connection.Type.CLIENT);
-        } else if (message instanceof PongMessage) {
-            concept.message(session.getId(), ((PongMessage) message).getPayload().array(), Connection.Type.CLIENT);
-        } else if (message instanceof BinaryMessage) {
-            concept.message(session.getId(), ((BinaryMessage) message).getPayload().array(), Connection.Type.CLIENT);
-        } else if (message instanceof TextMessage) {
-            concept.message(session.getId(), ((TextMessage) message).asBytes(), Connection.Type.CLIENT);
+        if (message instanceof BinaryMessage) {
+            concept.message(session.getId(), Connection.Type.OBSERVABLE, ((BinaryMessage) message).getPayload().array());
         }
     }
 
     @Override
     public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-        concept.error(session.getId(), exception, Connection.Type.CLIENT);
+        concept.error(session.getId(), Connection.Type.OBSERVABLE, exception);
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) throws Exception {
-        concept.close(session.getId(), Connection.Type.CLIENT);
+        concept.close(session.getId(), Connection.Type.OBSERVABLE, closeStatus);
     }
 
     @Override

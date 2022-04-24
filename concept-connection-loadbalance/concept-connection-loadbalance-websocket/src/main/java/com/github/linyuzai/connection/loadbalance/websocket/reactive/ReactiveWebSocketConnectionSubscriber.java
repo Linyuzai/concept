@@ -1,8 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
@@ -10,7 +8,6 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.exception.WebSocketLoadBalanceException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.socket.client.StandardWebSocketClient;
 
 import java.net.URI;
@@ -26,9 +23,12 @@ public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSu
     public Connection doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept) {
         StandardWebSocketClient client = new StandardWebSocketClient();
         URI uri = getUri(server);
-        Con connection = new Con();
-        ReactiveSubscribeWebSocketHandler handler =
-                new ReactiveSubscribeWebSocketHandler(concept, server, connection);
+        ReactiveWebSocketConnection connection = new ReactiveWebSocketConnection(Connection.Type.SUBSCRIBER);
+        connection.getMetadata().put(ConnectionServer.class, server);
+        setDefaultMessageEncoder(connection);
+        setDefaultMessageDecoder(connection);
+        ReactiveWebSocketSubscriberHandler handler =
+                new ReactiveWebSocketSubscriberHandler(concept, server, connection);
         client.execute(uri, handler).subscribe();
         return connection;
     }
@@ -63,34 +63,38 @@ public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSu
 
         @Override
         public Object getId() {
-            if (connection == null) {
-                throw new WebSocketLoadBalanceException("Connection is not open");
-            }
+            checkConnectionOpen();
             return connection.getId();
         }
 
         @Override
+        public String getType() {
+            checkConnectionOpen();
+            return connection.getType();
+        }
+
+        @Override
         public Map<Object, Object> getMetadata() {
-            if (connection == null) {
-                throw new WebSocketLoadBalanceException("Connection is not open");
-            }
+            checkConnectionOpen();
             return connection.getMetadata();
         }
 
         @Override
         public MessageEncoder getMessageEncoder() {
-            if (connection == null) {
-                throw new WebSocketLoadBalanceException("Connection is not open");
-            }
+            checkConnectionOpen();
             return connection.getMessageEncoder();
         }
 
         @Override
         public MessageDecoder getMessageDecoder() {
+            checkConnectionOpen();
+            return connection.getMessageDecoder();
+        }
+
+        public void checkConnectionOpen() {
             if (connection == null) {
                 throw new WebSocketLoadBalanceException("Connection is not open");
             }
-            return connection.getMessageDecoder();
         }
 
         @Override

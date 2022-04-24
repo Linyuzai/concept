@@ -1,4 +1,4 @@
-package com.github.linyuzai.concept.sample.connection.loadbalance.websocket.javax;
+package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
@@ -9,32 +9,31 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint("/concept-ws/{type}/{token}")
+@ServerEndpoint(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "{type}")
 public class JavaxWebSocketServerEndpoint {
 
     @OnOpen
     public void onOpen(Session session,
                        EndpointConfig config,
-                       @PathParam(value = "type") String type,
-                       @PathParam(value = "token") String token) {
+                       @PathParam(value = "type") String type) {
         Map<Object, Object> metadata = new LinkedHashMap<>();
+        metadata.put(Connection.URI, session.getRequestURI().toString());
         metadata.put("type", type);
-        metadata.put("token", token);
-        WebSocketLoadBalanceConcept.getInstance().open(session, metadata, Connection.Type.CLIENT);
+        WebSocketLoadBalanceConcept.getInstance().open(session, metadata);
     }
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        WebSocketLoadBalanceConcept.getInstance().close(session.getId(), Connection.Type.CLIENT);
+        WebSocketLoadBalanceConcept.getInstance().close(session.getId(), Connection.Type.CLIENT, reason);
     }
 
     @OnMessage
     public void onMessage(Session session, byte[] message) {
-        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), message, Connection.Type.CLIENT);
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
     }
 
     @OnError
     public void onError(Session session, Throwable e) {
-        WebSocketLoadBalanceConcept.getInstance().error(session.getId(), e, Connection.Type.CLIENT);
+        WebSocketLoadBalanceConcept.getInstance().error(session.getId(), Connection.Type.CLIENT, e);
     }
 }

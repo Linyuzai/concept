@@ -10,23 +10,28 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
-public class ReactiveLoadBalanceWebSocketHandler implements WebSocketHandler {
+public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
 
     private WebSocketLoadBalanceConcept concept;
 
     @NonNull
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        //session.getHandshakeInfo().getUri();
         Mono<Void> send = session.send(Flux.create(sink -> {
-            concept.open(session, null, Connection.Type.CLIENT);
+            ReactiveWebSocketConnection connection =
+                    new ReactiveWebSocketConnection(Connection.Type.OBSERVABLE);
+            connection.getMetadata().put(Connection.URI, session.getHandshakeInfo().getUri().toString());
+            connection.accept(session, sink);
+            concept.open(connection);
         }));
 
         Mono<Void> receive = session.receive().map(it -> it.getPayload().asByteBuffer().array())
-                .doOnNext(it -> concept.message(session.getId(), it, Connection.Type.CLIENT))
-                .doOnError(it -> concept.error(session.getId(), it, Connection.Type.CLIENT))
+                .doOnNext(it -> concept.message(session.getId(), Connection.Type.OBSERVABLE, it))
+                .doOnError(it -> concept.error(session.getId(), Connection.Type.OBSERVABLE, it))
                 .then();
 
         return Mono.zip(send, receive).then();
     }
+
+
 }

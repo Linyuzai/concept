@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty.handler;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -17,7 +18,7 @@ public class WebSocketLoadBalanceHandler extends SimpleChannelInboundHandler<Bin
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame msg) throws Exception {
-        concept.message(ctx.channel().id(), msg.content().array());
+        concept.message(ctx.channel().id(), Connection.Type.CLIENT, msg.content().array());
     }
 
     @Override
@@ -28,13 +29,13 @@ public class WebSocketLoadBalanceHandler extends SimpleChannelInboundHandler<Bin
 
     @Override
     public void channelInactive(@NonNull ChannelHandlerContext ctx) throws Exception {
-        concept.close(ctx.channel().id());
+        concept.close(ctx.channel().id(), Connection.Type.CLIENT, null);
         super.channelInactive(ctx);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        concept.error(ctx.channel().id(), cause);
+        concept.error(ctx.channel().id(), Connection.Type.CLIENT, cause);
         super.exceptionCaught(ctx, cause);
     }
 }

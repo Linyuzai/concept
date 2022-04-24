@@ -6,13 +6,13 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 @AllArgsConstructor
-public class ServletLoadBalanceWebSocketConfigurer implements WebSocketConfigurer {
+public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 
     private WebSocketLoadBalanceConcept concept;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new ServletLoadBalanceWebSocketHandler(concept),
-                WebSocketLoadBalanceConcept.ENDPOINT_PREFIX + "**");
+        registry.addHandler(new ServletWebSocketServerHandler(concept),
+                WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**");
     }
 }

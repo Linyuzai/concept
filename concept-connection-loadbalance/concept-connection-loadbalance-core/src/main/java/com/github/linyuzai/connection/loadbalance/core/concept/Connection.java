@@ -3,13 +3,16 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ProxyMarker;
 
 import java.util.Map;
 
-public interface Connection extends ProxyMarker {
+public interface Connection {
+
+    String URI = "uri";
 
     Object getId();
+
+    String getType();
 
     Map<Object, Object> getMetadata();
 
@@ -21,28 +24,23 @@ public interface Connection extends ProxyMarker {
 
     void close();
 
-    @Override
-    default boolean hasProxyFlag() {
-        return getMetadata().containsKey(ProxyMarker.FLAG);
-    }
-
-    enum Type {
+    class Type {
 
         /**
          * 普通的连接
          */
-        CLIENT,
+        public static final String CLIENT = "Connection@client";
 
         /**
          * 用于监听其他服务的连接
          * 接收转发的消息
          */
-        SUBSCRIBER,
+        public static final String SUBSCRIBER = "Connection@subcriber";
 
         /**
          * 用于被其他服务监听的连接
          * 转发消息
          */
-        OBSERVABLE
+        public static final String OBSERVABLE = "Connection@observable";
     }
 }

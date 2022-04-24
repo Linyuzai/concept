@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
+import com.github.linyuzai.connection.loadbalance.core.exception.NoConnectionTypeException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
@@ -11,6 +12,7 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,11 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
 
-    protected final Map<Object, Connection> clientConnections = new ConcurrentHashMap<>();
-
-    protected final Map<Object, Connection> subscriberConnections = new ConcurrentHashMap<>();
-
-    protected final Map<Object, Connection> observableConnections = new ConcurrentHashMap<>();
+    protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();
 
     protected final ConnectionServerProvider connectionServerProvider;
 
@@ -57,15 +55,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void destroy() {
-        for (Connection.Type type : Connection.Type.values()) {
-            Map<Object, Connection> connections = getConnections(type);
-            for (Connection connection : connections.values()) {
-                try {
-                    connection.close();
-                } catch (Throwable ignore) {
-                }
-            }
-        }
+        connections.values()
+                .stream()
+                .flatMap(it -> it.values().stream())
+                .forEach(it -> {
+                    try {
+                        it.close();
+                    } catch (Throwable ignore) {
+                    }
+                });
     }
 
     @Override
@@ -82,27 +80,21 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public Connection open(Object o, Map<Object, Object> metadata, Connection.Type type) {
+    public Connection open(Object o, Map<Object, Object> metadata) {
         Connection connection = create(o, metadata);
-        open(connection, type);
+        open(connection);
         return connection;
     }
 
     @Override
-    public void open(Connection connection, Connection.Type type) {
-        switch (type) {
-            case CLIENT:
-                clientConnections.put(connection.getId(), connection);
-                publish(new ConnectionOpenEvent(connection));
-            case SUBSCRIBER:
-                subscriberConnections.put(connection.getId(), connection);
-                //TODO
-                //publish(new ProxyConnectionAddedEvent(connection));
-            case OBSERVABLE:
-                observableConnections.put(connection.getId(), connection);
-                //TODO
-                //publish(new ProxyConnectionAddedEvent(connection));
+    public void open(Connection connection) {
+        String type = connection.getType();
+        if (type == null) {
+            throw new NoConnectionTypeException(connection);
         }
+        connections.computeIfAbsent(type, k -> new ConcurrentHashMap<>())
+                .put(connection.getId(), connection);
+        publish(new ConnectionOpenEvent(connection));
     }
 
     public ConnectionFactory getConnectionFactory(Object con, Map<Object, Object> metadata) {
@@ -115,42 +107,51 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void close(Object id, Connection.Type type) {
-        Connection connection = getConnections0(type).remove(id);
+    public void close(Object id, String type, Object reason) {
+        close(getConnections0(type).remove(id), reason);
+    }
+
+    @Override
+    public void close(Connection connection, Object reason) {
         if (connection == null) {
             //UnknownConnectionClose
             return;
         }
-        if (connection.hasProxyFlag()) {
-            publish(new ProxyConnectionCloseEvent(connection));
+        publish(new ConnectionCloseEvent(connection, reason));
+    }
+
+    @Override
+    public void message(Object id, String type, byte[] message) {
+        Connection connection = getConnection(id, type);
+        if (connection == null) {
+            publish(new UnknownMessageEvent(id, type, message));
         } else {
-            publish(new ConnectionCloseEvent(connection));
+            message(connection, message);
         }
     }
 
     @Override
-    public void message(Object id, byte[] message, Connection.Type type) {
-        Connection connection = getConnection(id, type);
-        if (connection == null) {
-            publish(new UnknownMessageEvent(id, message));
-        } else {
-            MessageDecoder decoder = connection.getMessageDecoder();
-            Message decode = decoder.decode(message);
-            switch (type) {
-                case CLIENT:
-                    publish(new MessageReceiveEvent(connection, decode));
-                    break;
-                case SUBSCRIBER:
-                    //转发
-                    send(decode);
-                    break;
-                case OBSERVABLE:
-                    //TODO
-                    //publish(new ProxyMessageReceiveEvent(connection, decode));
-                    //反向连接
-                    subscribe(decode.getPayload(), false);
-                    break;
-            }
+    public void message(@NonNull Connection connection, byte[] message) {
+        String type = connection.getType();
+        if (type == null) {
+            throw new NoConnectionTypeException(connection);
+        }
+        MessageDecoder decoder = connection.getMessageDecoder();
+        Message decode = decoder.decode(message);
+        switch (type) {
+            case Connection.Type.CLIENT:
+                publish(new MessageReceiveEvent(connection, decode));
+                break;
+            case Connection.Type.SUBSCRIBER:
+                //转发
+                send(decode);
+                break;
+            case Connection.Type.OBSERVABLE:
+                //TODO
+                //publish(new ProxyMessageReceiveEvent(connection, decode));
+                //反向连接
+                subscribe(decode.getPayload(), false);
+                break;
         }
     }
 
@@ -168,11 +169,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         Connection subscriber = connectionSubscriber.subscribe(server, this);
         if (subscriber == null) {
-            publish(new ProxyConnectionOpenErrorEvent(server));
+            publish(new ConnectionSubscribeErrorEvent(server));
             return;
         }
-        open(subscriber, Connection.Type.SUBSCRIBER);
-        publish(new ProxyConnectionOpenEvent(subscriber, server));
+        open(subscriber);
         if (reply) {
             subscriber.send(createMessage(connectionServerProvider.getClient()));
         }
@@ -182,7 +182,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (server == null) {
             return false;
         }
-        for (Connection connection : subscriberConnections.values()) {
+        Collection<Connection> subscriberConnections =
+                getConnections0(Connection.Type.SUBSCRIBER).values();
+        for (Connection connection : subscriberConnections) {
             ConnectionServer exist = (ConnectionServer) connection.getMetadata()
                     .get(ConnectionServer.class);
             if (server.getInstanceId().equals(exist.getInstanceId())) {
@@ -193,36 +195,32 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void error(Object id, Throwable e, Connection.Type type) {
+    public void error(Object id, String type, Throwable e) {
         Connection connection = getConnection(id, type);
         if (connection == null) {
-            publish(new UnknownErrorEvent(id, e));
+            publish(new UnknownErrorEvent(id, type, e));
         } else {
-            publish(new ConnectionErrorEvent(connection, e));
+            error(connection, e);
         }
     }
 
     @Override
-    public Connection getConnection(Object id, Connection.Type type) {
+    public void error(@NonNull Connection connection, Throwable e) {
+        publish(new ConnectionErrorEvent(connection, e));
+    }
+
+    @Override
+    public Connection getConnection(Object id, String type) {
         return getConnections0(type).get(id);
     }
 
     @Override
-    public Map<Object, Connection> getConnections(Connection.Type type) {
+    public Map<Object, Connection> getConnections(String type) {
         return Collections.unmodifiableMap(getConnections0(type));
     }
 
-    private Map<Object, Connection> getConnections0(Connection.Type type) {
-        switch (type) {
-            case CLIENT:
-                return clientConnections;
-            case SUBSCRIBER:
-                return subscriberConnections;
-            case OBSERVABLE:
-                return observableConnections;
-            default:
-                return Collections.emptyMap();
-        }
+    private Map<Object, Connection> getConnections0(String type) {
+        return connections.getOrDefault(type, Collections.emptyMap());
     }
 
     @Override
@@ -230,8 +228,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
         Connection connection;
-        List<Connection> clients = new ArrayList<>(clientConnections.values());
-        List<Connection> observables = new ArrayList<>(observableConnections.values());
+        List<Connection> clients = new ArrayList<>(getConnections0(Connection.Type.CLIENT).values());
+        List<Connection> observables = new ArrayList<>(getConnections0(Connection.Type.OBSERVABLE).values());
         if (selector == null) {
             connection = Connections.of(clients, observables);
         } else {
@@ -252,11 +250,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         message.getHeaders().put(Message.FORWARD, newForward);
         connection.send(message);
-        if (message.hasProxyFlag()) {
-            publish(new ProxyMessageSendEvent(connection, message));
-        } else {
-            publish(new MessageSendEvent(connection, message));
-        }
+        publish(new MessageSendEvent(connection, message));
     }
 
     @Override
@@ -383,17 +377,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
             if (connectionSubscriber == null) {
                 throw new ConnectionLoadBalanceException("ConnectionProxy is null");
-            }
-
-            boolean containsProxyConnectionMessageFactory = false;
-            for (MessageFactory messageFactory : messageFactories) {
-                if (messageFactory instanceof ProxyConnectionMessageFactory) {
-                    containsProxyConnectionMessageFactory = true;
-                    break;
-                }
-            }
-            if (!containsProxyConnectionMessageFactory) {
-                messageFactories.add(0, new ProxyConnectionMessageFactory());
             }
 
             messageFactories.add(new ObjectMessageFactory());

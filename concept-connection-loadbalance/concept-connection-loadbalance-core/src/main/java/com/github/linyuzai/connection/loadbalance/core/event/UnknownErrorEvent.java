@@ -11,8 +11,8 @@ public class UnknownErrorEvent implements ConnectionEvent {
 
     private final Throwable error;
 
-    public UnknownErrorEvent(Object id, Throwable e) {
-        this.connection = new IdConnection(id);
+    public UnknownErrorEvent(Object id, String type, Throwable e) {
+        this.connection = new IdConnection(id, type);
         this.error = e;
     }
 }

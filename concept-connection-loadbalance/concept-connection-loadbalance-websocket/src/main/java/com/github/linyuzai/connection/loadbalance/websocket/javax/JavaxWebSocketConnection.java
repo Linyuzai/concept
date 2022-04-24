@@ -12,13 +12,15 @@ public class JavaxWebSocketConnection extends AbstractConnection {
 
     private final Session session;
 
-    public JavaxWebSocketConnection(Session session) {
+    public JavaxWebSocketConnection(Session session, String type) {
+        super(type);
         this.session = session;
     }
 
     public JavaxWebSocketConnection(Session session,
+                                    String type,
                                     Map<Object, Object> metadata) {
-        super(metadata);
+        super(type, metadata);
         this.session = session;
     }
 

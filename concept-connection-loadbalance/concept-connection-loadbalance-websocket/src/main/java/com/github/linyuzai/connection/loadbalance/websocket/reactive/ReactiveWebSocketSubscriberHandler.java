@@ -7,38 +7,33 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @Getter
 @AllArgsConstructor
-public class ReactiveSubscribeWebSocketHandler implements WebSocketHandler {
+public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {
 
     private WebSocketLoadBalanceConcept concept;
 
     private ConnectionServer connectionServer;
 
-    private Consumer<Connection> connectionConsumer;
+    private BiConsumer<WebSocketSession, FluxSink<WebSocketMessage>> sessionConsumer;
 
     @NonNull
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        //session.getHandshakeInfo().getUri();
-        Mono<Void> send = session.send(Flux.create(sink -> {
-            Map<Object, Object> metadata = new LinkedHashMap<>();
-            metadata.put(ConnectionServer.class, connectionServer);
-            Connection open = concept.open(session, metadata, Connection.Type.SUBSCRIBER);
-            connectionConsumer.accept(open);
-        }));
+        Mono<Void> send = session.send(Flux.create(sink ->
+                sessionConsumer.accept(session, sink)));
 
         Mono<Void> receive = session.receive().map(it -> it.getPayload().asByteBuffer().array())
-                .doOnNext(it -> concept.message(session.getId(), it, Connection.Type.SUBSCRIBER))
-                .doOnError(it -> concept.error(session.getId(), it, Connection.Type.SUBSCRIBER))
+                .doOnNext(it -> concept.message(session.getId(), Connection.Type.SUBSCRIBER, it))
+                .doOnError(it -> concept.error(session.getId(), Connection.Type.SUBSCRIBER, it))
                 .then();
 
         return Mono.zip(send, receive).then();

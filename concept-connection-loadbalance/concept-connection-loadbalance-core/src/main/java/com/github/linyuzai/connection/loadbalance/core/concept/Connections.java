@@ -32,6 +32,12 @@ public class Connections implements Connection {
     }
 
     @Override
+    public String getType() {
+        Connection connection = get();
+        return connection == null ? null : connection.getType();
+    }
+
+    @Override
     public Map<Object, Object> getMetadata() {
         Connection connection = get();
         return connection == null ? null : connection.getMetadata();
@@ -52,11 +58,7 @@ public class Connections implements Connection {
     @Override
     public void send(Message message) {
         for (Connection connection : connections) {
-            try {
-                connection.send(message);
-            } catch (Throwable ignore) {
-
-            }
+            connection.send(message);
         }
     }
 

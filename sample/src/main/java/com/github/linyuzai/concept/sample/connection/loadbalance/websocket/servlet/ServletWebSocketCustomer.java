@@ -1,7 +1,7 @@
 package com.github.linyuzai.concept.sample.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletLoadBalanceWebSocketHandler;
+import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketLoadBalanceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -17,6 +17,6 @@ public class ServletWebSocketCustomer implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new ServletLoadBalanceWebSocketHandler(concept), "/ws/**");
+        registry.addHandler(new ServletWebSocketLoadBalanceHandler(concept), "/ws/**");
     }
 }

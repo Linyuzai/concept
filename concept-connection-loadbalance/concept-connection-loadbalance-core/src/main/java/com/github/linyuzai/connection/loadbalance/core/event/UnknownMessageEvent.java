@@ -11,8 +11,8 @@ public class UnknownMessageEvent implements ConnectionEvent {
 
     private final byte[] message;
 
-    public UnknownMessageEvent(Object id, byte[] message) {
-        this.connection = new IdConnection(id);
+    public UnknownMessageEvent(Object id, String type, byte[] message) {
+        this.connection = new IdConnection(id, type);
         this.message = message;
     }
 }

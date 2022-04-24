@@ -11,12 +11,13 @@ public class ServletWebSocketConnection extends AbstractConnection {
 
     private final WebSocketSession session;
 
-    public ServletWebSocketConnection(WebSocketSession session) {
+    public ServletWebSocketConnection(WebSocketSession session, String type) {
+        super(type);
         this.session = session;
     }
 
-    public ServletWebSocketConnection(WebSocketSession session, Map<Object, Object> metadata) {
-        super(metadata);
+    public ServletWebSocketConnection(WebSocketSession session, String type, Map<Object, Object> metadata) {
+        super(type, metadata);
         this.session = session;
     }
 

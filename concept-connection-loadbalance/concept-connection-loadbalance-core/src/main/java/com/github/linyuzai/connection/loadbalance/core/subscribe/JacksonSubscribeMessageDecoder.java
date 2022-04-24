@@ -4,18 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonMessageEncoder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 @Getter
 @AllArgsConstructor
-public class JacksonProxyConnectionMessageDecoder implements MessageDecoder {
+public class JacksonSubscribeMessageDecoder implements MessageDecoder {
 
     private ObjectMapper objectMapper;
 
-    public JacksonProxyConnectionMessageDecoder() {
+    public JacksonSubscribeMessageDecoder() {
         this(new ObjectMapper().activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.EVERYTHING));

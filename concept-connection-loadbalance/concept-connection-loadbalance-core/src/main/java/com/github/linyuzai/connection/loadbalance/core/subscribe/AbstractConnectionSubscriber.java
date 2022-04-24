@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.net.URI;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Getter
 public abstract class AbstractConnectionSubscriber implements ConnectionSubscriber {
@@ -16,10 +14,6 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     private final String portKey = "concept-connection-port";
 
     private final String protocol;
-
-    public AbstractConnectionSubscriber() {
-        this("ws");
-    }
 
     public AbstractConnectionSubscriber(String protocol) {
         this.protocol = protocol;
@@ -50,14 +44,6 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     public URI getUri(ConnectionServer server) {
         return new URI(getProtocol() + "://" + getHost(server) + ":" + getPort(server) +
                 getEndpointPrefix() + getType());
-    }
-
-    @Deprecated
-    public Map<String, String> newMetadata(ConnectionServer server) {
-        Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put(ProxyMarker.FLAG, getType());
-        metadata.put(ConnectionServer.INSTANCE_ID, server.getInstanceId());
-        return metadata;
     }
 
     public abstract String getEndpointPrefix();

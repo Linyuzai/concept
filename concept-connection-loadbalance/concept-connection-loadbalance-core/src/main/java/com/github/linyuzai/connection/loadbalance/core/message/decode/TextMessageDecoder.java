@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.message.decode;
 
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.message.StringMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.TextMessage;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -9,17 +9,17 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @AllArgsConstructor
-public class StringMessageDecoder implements MessageDecoder {
+public class TextMessageDecoder implements MessageDecoder {
 
     @NonNull
     private Charset charset;
 
-    public StringMessageDecoder() {
+    public TextMessageDecoder() {
         this(StandardCharsets.UTF_8);
     }
 
     @Override
     public Message decode(byte[] message) {
-        return new StringMessage(new String(message, charset));
+        return new TextMessage(new String(message, charset));
     }
 }

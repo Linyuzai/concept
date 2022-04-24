@@ -10,10 +10,11 @@ import java.util.Map;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public abstract class AbstractConnection implements Connection {
 
     private final Map<Object, Object> metadata = new LinkedHashMap<>();
+
+    private final String type;
 
     @NonNull
     private MessageEncoder messageEncoder;
@@ -21,7 +22,12 @@ public abstract class AbstractConnection implements Connection {
     @NonNull
     private MessageDecoder messageDecoder;
 
-    public AbstractConnection(Map<Object, Object> metadata) {
+    public AbstractConnection(String type) {
+        this.type = type;
+    }
+
+    public AbstractConnection(String type, Map<Object, Object> metadata) {
+        this.type = type;
         if (metadata != null) {
             this.metadata.putAll(metadata);
         }

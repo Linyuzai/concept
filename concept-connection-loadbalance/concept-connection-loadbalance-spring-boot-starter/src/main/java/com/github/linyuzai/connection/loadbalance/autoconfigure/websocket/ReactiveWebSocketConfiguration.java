@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveLoadBalanceWebSocketHandlerMapping;
+import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketLoadBalanceHandlerMapping;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -16,7 +16,7 @@ public class ReactiveWebSocketConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(WebSocketHandlerAdapter.class)
-    public ReactiveLoadBalanceWebSocketHandlerMapping reactiveLoadBalanceWebSocketHandlerMapping(WebSocketLoadBalanceConcept concept) {
-        return new ReactiveLoadBalanceWebSocketHandlerMapping(concept);
+    public ReactiveWebSocketLoadBalanceHandlerMapping reactiveLoadBalanceWebSocketHandlerMapping(WebSocketLoadBalanceConcept concept) {
+        return new ReactiveWebSocketLoadBalanceHandlerMapping(concept);
     }
 }

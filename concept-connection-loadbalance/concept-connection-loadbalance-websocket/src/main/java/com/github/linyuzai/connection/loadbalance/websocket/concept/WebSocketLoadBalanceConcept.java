@@ -8,12 +8,13 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionFactory;
-import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxProxyWebSocketConnectionFactory;
 
 import java.util.List;
 
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
-    public static final String ENDPOINT_PREFIX = "/concept-websocket-loadbalance/";
+    public static final String SUBSCRIBER_ENDPOINT_PREFIX = "/concept-websocket-subscriber/";
+
+    public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket/";
     private static WebSocketLoadBalanceConcept instance;
 
     private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionSubscriber connectionSubscriber, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
@@ -31,7 +32,6 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
             preBuild();
 
             connectionFactories.add(new JavaxWebSocketConnectionFactory());
-            connectionFactories.add(new JavaxProxyWebSocketConnectionFactory());
 
             return new WebSocketLoadBalanceConcept(
                     connectionServerProvider,

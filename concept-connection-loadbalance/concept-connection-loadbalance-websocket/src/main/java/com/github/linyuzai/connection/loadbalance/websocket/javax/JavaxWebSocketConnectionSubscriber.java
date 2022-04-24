@@ -17,8 +17,19 @@ import java.net.URI;
 @NoArgsConstructor
 public class JavaxWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber {
 
+    private Class<?> clientClass = JavaxWebSocketSubscriberEndpoint.class;
+
     public JavaxWebSocketConnectionSubscriber(String protocol) {
         super(protocol);
+    }
+
+    public JavaxWebSocketConnectionSubscriber(Class<?> clientClass) {
+        this.clientClass = clientClass;
+    }
+
+    public JavaxWebSocketConnectionSubscriber(String protocol, Class<?> clientClass) {
+        super(protocol);
+        this.clientClass = clientClass;
     }
 
     @SneakyThrows
@@ -26,16 +37,16 @@ public class JavaxWebSocketConnectionSubscriber extends WebSocketConnectionSubsc
     public Connection doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept) {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         URI uri = getUri(server);
-        Session session = container.connectToServer(JavaxWebSocketClientEndpoint.class, uri);
-        Connection connection = concept.getConnection(session.getId(), Connection.Type.SUBSCRIBER);
-        if (connection != null) {
-            connection.getMetadata().put(ConnectionServer.class, server);
-        }
+        Session session = container.connectToServer(clientClass, uri);
+        JavaxWebSocketConnection connection = new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER);
+        connection.getMetadata().put(ConnectionServer.class, server);
+        setDefaultMessageEncoder(connection);
+        setDefaultMessageDecoder(connection);
         return connection;
     }
 
     @Override
     public String getType() {
-        return "standard";
+        return "javax";
     }
 }
