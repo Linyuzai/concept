@@ -10,6 +10,7 @@ import lombok.NonNull;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ServletWebSocketConnectionFactory extends AbstractConnectionFactory {
 
@@ -28,8 +29,12 @@ public class ServletWebSocketConnectionFactory extends AbstractConnectionFactory
 
     @Override
     public Connection create(Object o, Map<Object, Object> metadata) {
+        WebSocketSession session = (WebSocketSession) o;
         ServletWebSocketConnection connection =
-                new ServletWebSocketConnection((WebSocketSession) o, Connection.Type.CLIENT, metadata);
+                new ServletWebSocketConnection(session, Connection.Type.CLIENT, metadata);
+        if (!connection.getMetadata().containsKey(Connection.URI)) {
+            connection.getMetadata().put(Connection.URI, Objects.requireNonNull(session.getUri()).toString());
+        }
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);
         return connection;

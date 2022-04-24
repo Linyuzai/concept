@@ -17,7 +17,6 @@ public class JavaxWebSocketServerEndpoint {
                        EndpointConfig config,
                        @PathParam(value = "type") String type) {
         Map<Object, Object> metadata = new LinkedHashMap<>();
-        metadata.put(Connection.URI, session.getRequestURI().toString());
         metadata.put("type", type);
         WebSocketLoadBalanceConcept.getInstance().open(session, metadata);
     }

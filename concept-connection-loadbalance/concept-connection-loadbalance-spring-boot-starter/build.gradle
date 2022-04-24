@@ -20,6 +20,7 @@ dependencies {
 
     compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

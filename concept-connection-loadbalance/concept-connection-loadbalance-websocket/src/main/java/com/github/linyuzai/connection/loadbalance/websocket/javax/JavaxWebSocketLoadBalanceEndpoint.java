@@ -6,20 +6,16 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscrib
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
 import javax.websocket.*;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT_PREFIX + "{subtype}")
 public class JavaxWebSocketLoadBalanceEndpoint {
 
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "subtype") String subtype) {
-        Map<Object, Object> metadata = new LinkedHashMap<>();
-        metadata.put(Connection.URI, session.getRequestURI().toString());
+    public void onOpen(Session session) {
         JavaxWebSocketConnection connection =
-                new JavaxWebSocketConnection(session, Connection.Type.OBSERVABLE, metadata);
+                new JavaxWebSocketConnection(session, Connection.Type.OBSERVABLE);
+        connection.getMetadata().put(Connection.URI, session.getRequestURI().toString());
         connection.setMessageEncoder(new JacksonSubscribeMessageEncoder());
         connection.setMessageDecoder(new JacksonSubscribeMessageDecoder());
         WebSocketLoadBalanceConcept.getInstance().open(connection);

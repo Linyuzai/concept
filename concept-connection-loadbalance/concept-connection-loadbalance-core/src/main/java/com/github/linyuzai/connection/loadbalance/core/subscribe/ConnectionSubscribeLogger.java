@@ -31,4 +31,8 @@ public class ConnectionSubscribeLogger implements ConnectionEventListener {
     public String appendTag(String msg) {
         return "LBWebsocket >> " + msg;
     }
+
+    public void info(String msg) {
+        logger.accept(appendTag(msg));
+    }
 }

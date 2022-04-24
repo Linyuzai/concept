@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
+package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
 import com.github.linyuzai.connection.loadbalance.core.event.DefaultConnectionEventPublisher;
 import lombok.AllArgsConstructor;

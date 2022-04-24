@@ -28,10 +28,15 @@ public class JavaxWebSocketConnectionFactory extends AbstractConnectionFactory {
 
     @Override
     public Connection create(Object o, Map<Object, Object> metadata) {
+        Session session = (Session) o;
         JavaxWebSocketConnection connection =
-                new JavaxWebSocketConnection((Session) o, Connection.Type.CLIENT, metadata);
+                new JavaxWebSocketConnection(session, Connection.Type.CLIENT, metadata);
+        if (!connection.getMetadata().containsKey(Connection.URI)) {
+            connection.getMetadata().put(Connection.URI, session.getRequestURI().toString());
+        }
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);
+
         return connection;
     }
 }

@@ -19,9 +19,8 @@ public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
     public Mono<Void> handle(WebSocketSession session) {
         Mono<Void> send = session.send(Flux.create(sink -> {
             ReactiveWebSocketConnection connection =
-                    new ReactiveWebSocketConnection(Connection.Type.OBSERVABLE);
+                    new ReactiveWebSocketConnection(session, sink, Connection.Type.OBSERVABLE);
             connection.getMetadata().put(Connection.URI, session.getHandshakeInfo().getUri().toString());
-            connection.accept(session, sink);
             concept.open(connection);
         }));
 

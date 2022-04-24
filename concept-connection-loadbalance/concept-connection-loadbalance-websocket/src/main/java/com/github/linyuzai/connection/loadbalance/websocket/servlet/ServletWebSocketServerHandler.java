@@ -6,10 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.socket.*;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-
 @AllArgsConstructor
 public class ServletWebSocketServerHandler implements WebSocketHandler {
 
@@ -17,9 +13,7 @@ public class ServletWebSocketServerHandler implements WebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        Map<Object, Object> metadata = new LinkedHashMap<>();
-        metadata.put(Connection.URI, Objects.requireNonNull(session.getUri()).toString());
-        concept.open(session, metadata);
+        concept.open(session, null);
     }
 
     @Override

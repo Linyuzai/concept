@@ -19,11 +19,14 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
     private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionSubscriber connectionSubscriber, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
         super(connectionServerProvider, connectionSubscriber, connectionFactories, connectionSelectors, messageFactories, eventPublisher);
-        instance = this;
     }
 
     public static WebSocketLoadBalanceConcept getInstance() {
         return instance;
+    }
+
+    public void holdInstance() {
+        instance = this;
     }
 
     public static class Builder extends AbstractBuilder<Builder> {

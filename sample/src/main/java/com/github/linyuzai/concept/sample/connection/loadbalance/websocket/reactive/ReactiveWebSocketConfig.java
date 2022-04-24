@@ -23,9 +23,4 @@ public class ReactiveWebSocketConfig {
         mapping.setUrlMap(map);
         return mapping;
     }
-
-    @Bean
-    public WebSocketHandlerAdapter webSocketHandlerAdapter() {
-        return new WebSocketHandlerAdapter();
-    }
 }

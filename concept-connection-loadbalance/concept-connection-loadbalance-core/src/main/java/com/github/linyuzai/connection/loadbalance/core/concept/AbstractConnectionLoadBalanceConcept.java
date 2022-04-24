@@ -16,7 +16,6 @@ import lombok.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 @Getter
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
@@ -324,8 +323,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return (T) this;
         }
 
-        public T connectionProxy(ConnectionSubscriber proxy) {
-            this.connectionSubscriber = proxy;
+        public T connectionSubscriber(ConnectionSubscriber subscriber) {
+            this.connectionSubscriber = subscriber;
             return (T) this;
         }
 

@@ -9,9 +9,6 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 @AllArgsConstructor
 public class ReactiveWebSocketServerHandler implements WebSocketHandler {
 
@@ -21,9 +18,7 @@ public class ReactiveWebSocketServerHandler implements WebSocketHandler {
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         Mono<Void> send = session.send(Flux.create(sink -> {
-            Map<Object, Object> metadata = new LinkedHashMap<>();
-            metadata.put(Connection.URI, session.getHandshakeInfo().getUri().toString());
-            concept.open(new Object[]{session, sink}, metadata);
+            concept.open(new Object[]{session, sink}, null);
         }));
 
         Mono<Void> receive = session.receive().map(it -> it.getPayload().asByteBuffer().array())
