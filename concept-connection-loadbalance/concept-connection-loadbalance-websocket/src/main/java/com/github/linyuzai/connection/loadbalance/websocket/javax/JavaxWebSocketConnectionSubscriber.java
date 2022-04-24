@@ -12,6 +12,7 @@ import javax.websocket.ContainerProvider;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
+import java.util.function.Consumer;
 
 @Getter
 @NoArgsConstructor
@@ -34,7 +35,7 @@ public class JavaxWebSocketConnectionSubscriber extends WebSocketConnectionSubsc
 
     @SneakyThrows
     @Override
-    public Connection doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept) {
+    public void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<Connection> consumer) {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         URI uri = getUri(server);
         Session session = container.connectToServer(clientClass, uri);
@@ -42,7 +43,7 @@ public class JavaxWebSocketConnectionSubscriber extends WebSocketConnectionSubsc
         connection.getMetadata().put(ConnectionServer.class, server);
         setDefaultMessageEncoder(connection);
         setDefaultMessageDecoder(connection);
-        return connection;
+        consumer.accept(connection);
     }
 
     @Override

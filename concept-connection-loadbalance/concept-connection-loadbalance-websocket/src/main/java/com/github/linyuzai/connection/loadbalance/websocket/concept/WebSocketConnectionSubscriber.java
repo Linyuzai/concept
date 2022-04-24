@@ -8,6 +8,8 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageEncoder;
 
+import java.util.function.Consumer;
+
 public abstract class WebSocketConnectionSubscriber extends AbstractConnectionSubscriber {
 
     public WebSocketConnectionSubscriber() {
@@ -19,11 +21,11 @@ public abstract class WebSocketConnectionSubscriber extends AbstractConnectionSu
     }
 
     @Override
-    public Connection subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
-        return doSubscribe(server, (WebSocketLoadBalanceConcept) concept);
+    public void subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept, Consumer<Connection> consumer) {
+        doSubscribe(server, (WebSocketLoadBalanceConcept) concept, consumer);
     }
 
-    public abstract Connection doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept);
+    public abstract void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<Connection> consumer);
 
     public void setDefaultMessageEncoder(AbstractConnection connection) {
         connection.setMessageEncoder(new JacksonSubscribeMessageEncoder());

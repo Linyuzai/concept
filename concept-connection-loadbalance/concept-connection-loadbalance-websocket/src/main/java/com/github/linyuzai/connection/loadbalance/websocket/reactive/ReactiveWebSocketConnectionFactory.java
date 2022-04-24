@@ -37,10 +37,9 @@ public class ReactiveWebSocketConnectionFactory extends AbstractConnectionFactor
         @SuppressWarnings("unchecked")
         FluxSink<WebSocketMessage> sender = (FluxSink<WebSocketMessage>) ((Object[]) o)[1];
         ReactiveWebSocketConnection connection =
-                new ReactiveWebSocketConnection(Connection.Type.CLIENT, metadata);
+                new ReactiveWebSocketConnection(session, sender, Connection.Type.CLIENT, metadata);
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);
-        connection.accept(session, sender);
         return connection;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonMessageEncoder;
 
@@ -12,9 +11,7 @@ public class JacksonSubscribeMessageEncoder extends JacksonMessageEncoder {
     }
 
     public JacksonSubscribeMessageEncoder() {
-        this(new ObjectMapper().activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.EVERYTHING));
+        this(new ObjectMapper());
     }
 
     @Override

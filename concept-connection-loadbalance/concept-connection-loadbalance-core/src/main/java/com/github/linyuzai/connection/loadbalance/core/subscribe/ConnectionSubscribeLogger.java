@@ -12,6 +12,7 @@ public class ConnectionSubscribeLogger implements ConnectionEventListener {
 
     @Override
     public void onEvent(Object event) {
+
         /*if (event instanceof ProxyConnectionEvent) {
             if (event instanceof ProxyConnectionOpenEvent) {
                 ConnectionServer server = ((ProxyConnectionOpenEvent) event).getConnectionServer();

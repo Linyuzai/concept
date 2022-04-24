@@ -9,11 +9,12 @@ import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.net.URI;
+import java.util.function.Consumer;
 
 public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber {
 
     @Override
-    public Connection doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept) {
+    public void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<Connection> consumer) {
         StandardWebSocketClient client = new StandardWebSocketClient();
         ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept);
         URI uri = getUri(server);
@@ -26,7 +27,7 @@ public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSub
         connection.getMetadata().put(ConnectionServer.class, server);
         setDefaultMessageEncoder(connection);
         setDefaultMessageDecoder(connection);
-        return connection;
+        consumer.accept(connection);
     }
 
     @Override

@@ -16,6 +16,7 @@ import lombok.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @Getter
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
@@ -167,14 +168,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             //已经存在对应的服务连接
             return;
         }
-        Connection subscriber = connectionSubscriber.subscribe(server, this);
-        if (subscriber == null) {
+        try {
+            connectionSubscriber.subscribe(server, this, connection -> {
+                open(connection);
+                if (reply) {
+                    connection.send(createMessage(connectionServerProvider.getClient()));
+                }
+            });
+        } catch (Throwable e) {
             publish(new ConnectionSubscribeErrorEvent(server));
-            return;
-        }
-        open(subscriber);
-        if (reply) {
-            subscriber.send(createMessage(connectionServerProvider.getClient()));
         }
     }
 
@@ -246,7 +248,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (forward == null) {
             newForward = instanceId;
         } else {
-            newForward = forward + " > " + instanceId;
+            newForward = forward + " " + instanceId;
         }
         message.getHeaders().put(Message.FORWARD, newForward);
         connection.send(message);
