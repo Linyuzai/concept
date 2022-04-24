@@ -9,7 +9,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ServerEndpoint(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "{type}")
+@ServerEndpoint(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "/{type}")
 public class JavaxWebSocketServerEndpoint {
 
     @OnOpen

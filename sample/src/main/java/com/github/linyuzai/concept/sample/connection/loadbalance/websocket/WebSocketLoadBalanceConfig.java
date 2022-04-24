@@ -1,6 +1,7 @@
 package com.github.linyuzai.concept.sample.connection.loadbalance.websocket;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.EnableWebSocketLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.ServerType;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@EnableWebSocketLoadBalanceConcept
+@EnableWebSocketLoadBalanceConcept(type = ServerType.AUTO, defaultServer = true)
 public class WebSocketLoadBalanceConfig {
 
     @Bean

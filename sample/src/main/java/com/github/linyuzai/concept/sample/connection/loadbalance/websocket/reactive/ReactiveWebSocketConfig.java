@@ -12,7 +12,7 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+//@Configuration
 public class ReactiveWebSocketConfig {
 
     @Bean

@@ -55,7 +55,7 @@ public enum ServerType {
 
     public String[] getConfigureClassNames(boolean configureDefaultServer) {
         List<Class<?>> classes = new ArrayList<>(Arrays.asList(configureClasses));
-        if (configureDefaultServer) {
+        if (configureDefaultServer && defaultServer != null) {
             classes.add(defaultServer);
         }
         return classes.stream()

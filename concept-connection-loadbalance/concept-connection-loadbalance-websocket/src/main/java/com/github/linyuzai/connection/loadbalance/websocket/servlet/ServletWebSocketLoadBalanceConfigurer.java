@@ -13,6 +13,7 @@ public class ServletWebSocketLoadBalanceConfigurer implements WebSocketConfigure
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new ServletWebSocketLoadBalanceHandler(concept),
-                WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT_PREFIX + "**");
+                        WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
+                .setAllowedOrigins("*");
     }
 }

@@ -12,7 +12,7 @@ public class ReactiveWebSocketLoadBalanceHandlerMapping extends SimpleUrlHandler
 
     public ReactiveWebSocketLoadBalanceHandlerMapping(WebSocketLoadBalanceConcept concept) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT_PREFIX + "**", new ReactiveWebSocketLoadBalanceHandler(concept));
+        map.put(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT + "**", new ReactiveWebSocketLoadBalanceHandler(concept));
         setUrlMap(map);
         setOrder(Ordered.HIGHEST_PRECEDENCE);
     }

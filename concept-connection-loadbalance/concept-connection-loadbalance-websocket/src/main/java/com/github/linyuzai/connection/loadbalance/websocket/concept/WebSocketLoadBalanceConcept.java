@@ -12,9 +12,9 @@ import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocket
 import java.util.List;
 
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
-    public static final String SUBSCRIBER_ENDPOINT_PREFIX = "/concept-websocket-subscriber/";
+    public static final String SUBSCRIBER_ENDPOINT = "/concept-websocket-subscriber";
 
-    public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket/";
+    public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket";
     private static WebSocketLoadBalanceConcept instance;
 
     private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionSubscriber connectionSubscriber, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {

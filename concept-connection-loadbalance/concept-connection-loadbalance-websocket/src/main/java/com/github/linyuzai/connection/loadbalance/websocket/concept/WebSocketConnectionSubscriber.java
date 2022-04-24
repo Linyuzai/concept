@@ -37,6 +37,6 @@ public abstract class WebSocketConnectionSubscriber extends AbstractConnectionSu
 
     @Override
     public String getEndpointPrefix() {
-        return WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT_PREFIX;
+        return WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
     }
 }

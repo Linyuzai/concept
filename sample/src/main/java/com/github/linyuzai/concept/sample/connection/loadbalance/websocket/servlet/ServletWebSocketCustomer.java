@@ -17,6 +17,6 @@ public class ServletWebSocketCustomer implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new ServletWebSocketLoadBalanceHandler(concept), "/ws/**");
+        //registry.addHandler(new ServletWebSocketLoadBalanceHandler(concept), "/ws/**");
     }
 }

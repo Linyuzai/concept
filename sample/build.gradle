@@ -31,10 +31,16 @@ dependencies {
     //compile "com.github.linyuzai:concept-sync-waiting:1.0.0"
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
 
+    //compile "com.github.linyuzai:concept-plugin-jar:1.0.0"
     implementation project(path: ':concept-plugin:concept-plugin-core', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-jar', configuration: 'default')
 
-    //implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
+    implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-discovery', configuration: 'default')
+    implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-websocket', configuration: 'default')
+    implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-spring-boot-starter', configuration: 'default')
+
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     /*implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
@@ -44,13 +50,14 @@ dependencies {
 
     //implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     implementation 'org.apache.httpcomponents:httpclient:4.5.2'
 
     //implementation 'io.springfox:springfox-swagger2:2.9.2'
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 
-    //implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.cloud:spring-cloud-starter'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

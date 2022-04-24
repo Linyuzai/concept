@@ -8,7 +8,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
-@ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT_PREFIX + "{subtype}")
+@ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT + "{subtype}")
 public class JavaxWebSocketLoadBalanceEndpoint {
 
     @OnOpen
