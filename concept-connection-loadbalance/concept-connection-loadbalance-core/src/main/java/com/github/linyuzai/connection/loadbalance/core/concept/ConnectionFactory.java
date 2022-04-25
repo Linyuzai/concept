@@ -6,5 +6,5 @@ public interface ConnectionFactory {
 
     boolean support(Object o, Map<Object, Object> metadata);
 
-    Connection create(Object o, Map<Object, Object> metadata);
+    Connection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept);
 }

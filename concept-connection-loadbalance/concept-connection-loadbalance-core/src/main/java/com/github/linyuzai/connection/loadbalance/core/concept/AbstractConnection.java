@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -14,13 +15,17 @@ public abstract class AbstractConnection implements Connection {
 
     private final Map<Object, Object> metadata = new LinkedHashMap<>();
 
-    private final String type;
+    @Setter(AccessLevel.PRIVATE)
+    private String type;
 
     @NonNull
     private MessageEncoder messageEncoder;
 
     @NonNull
     private MessageDecoder messageDecoder;
+
+    @NonNull
+    private ConnectionLoadBalanceConcept concept;
 
     public AbstractConnection(String type) {
         this.type = type;
@@ -38,6 +43,19 @@ public abstract class AbstractConnection implements Connection {
         MessageEncoder encoder = getMessageEncoder();
         byte[] bytes = encoder.encode(message);
         doSend(bytes);
+    }
+
+    @Override
+    public void redefineType(String type, Redefiner redefiner) {
+        if (this.type.equals(type)) {
+            return;
+        }
+        concept.move(getId(), this.type, type, connection -> {
+            AbstractConnection.this.type = type;
+            if (redefiner != null) {
+                redefiner.onRedefine();
+            }
+        });
     }
 
     public abstract void doSend(byte[] bytes);

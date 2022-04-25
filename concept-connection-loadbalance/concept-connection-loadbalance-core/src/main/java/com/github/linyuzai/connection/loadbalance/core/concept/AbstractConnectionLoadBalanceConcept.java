@@ -16,6 +16,7 @@ import lombok.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @Getter
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
@@ -72,7 +73,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (factory == null) {
             throw new ConnectionLoadBalanceException("No MessageFactory available with " + o);
         }
-        Connection connection = factory.create(o, metadata);
+        Connection connection = factory.create(o, metadata, this);
         if (connection == null) {
             throw new ConnectionLoadBalanceException("Message can not be created with " + o);
         }
@@ -92,8 +93,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (type == null) {
             throw new NoConnectionTypeException(connection);
         }
-        connections.computeIfAbsent(type, k -> new ConcurrentHashMap<>())
-                .put(connection.getId(), connection);
+        putConnection(connection, type);
         publish(new ConnectionOpenEvent(connection));
     }
 
@@ -108,15 +108,16 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void close(Object id, String type, Object reason) {
-        close(getConnections0(type).remove(id), reason);
+        Connection connection = getConnections0(type).remove(id);
+        if (connection == null) {
+            publish(new UnknownCloseEvent(id, type, reason, this));
+            return;
+        }
+        close(connection, reason);
     }
 
     @Override
-    public void close(Connection connection, Object reason) {
-        if (connection == null) {
-            //UnknownConnectionClose
-            return;
-        }
+    public void close(@NonNull Connection connection, Object reason) {
         publish(new ConnectionCloseEvent(connection, reason));
     }
 
@@ -124,7 +125,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void message(Object id, String type, byte[] message) {
         Connection connection = getConnection(id, type);
         if (connection == null) {
-            publish(new UnknownMessageEvent(id, type, message));
+            publish(new UnknownMessageEvent(id, type, message, this));
         } else {
             message(connection, message);
         }
@@ -155,6 +156,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    @Override
     public void subscribe() {
         List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
         for (ConnectionServer server : servers) {
@@ -162,6 +164,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    @Override
     public void subscribe(ConnectionServer server, boolean reply) {
         if (containsSubscriberConnection(server)) {
             //已经存在对应的服务连接
@@ -199,7 +202,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void error(Object id, String type, Throwable e) {
         Connection connection = getConnection(id, type);
         if (connection == null) {
-            publish(new UnknownErrorEvent(id, type, e));
+            publish(new UnknownErrorEvent(id, type, e, this));
         } else {
             error(connection, e);
         }
@@ -218,6 +221,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public Map<Object, Connection> getConnections(String type) {
         return Collections.unmodifiableMap(getConnections0(type));
+    }
+
+    private void putConnection(Connection connection, String type) {
+        connections.computeIfAbsent(type, k -> new ConcurrentHashMap<>())
+                .put(connection.getId(), connection);
     }
 
     private Map<Object, Connection> getConnections0(String type) {
@@ -301,6 +309,25 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void publish(Object event) {
         eventPublisher.publish(event);
+    }
+
+    @Override
+    public void move(Object id, String fromType, String toType, Consumer<Connection> consumer) {
+        Connection connection = getConnections0(fromType).remove(id);
+        if (connection == null) {
+            return;
+        }
+        consumer.accept(connection);
+        if (connection.getType().equals(toType)) {
+            putConnection(connection, toType);
+        } else {
+            throw new IllegalStateException("Change the type of connection or use #redefineType instead");
+        }
+    }
+
+    @Override
+    public void redefineType(@NonNull Connection connection, @NonNull String type, Connection.Redefiner redefiner) {
+        connection.redefineType(type, redefiner);
     }
 
     @SuppressWarnings("unchecked")

@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface Connection {
 
@@ -20,9 +21,18 @@ public interface Connection {
 
     MessageDecoder getMessageDecoder();
 
+    ConnectionLoadBalanceConcept getConcept();
+
+    void redefineType(String type, Redefiner redefiner);
+
     void send(Message message);
 
     void close();
+
+    interface Redefiner {
+
+        void onRedefine();
+    }
 
     class Type {
 
@@ -42,5 +52,11 @@ public interface Connection {
          * 转发消息
          */
         public static final String OBSERVABLE = "Connection@observable";
+
+        /**
+         * 未定义的类型
+         * 用于无法区分的连接类型
+         */
+        public static final String UNDEFINED = "Connection@undefined";
     }
 }

@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.netty.handler;
+package com.github.linyuzai.connection.loadbalance.netty.websocket;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;

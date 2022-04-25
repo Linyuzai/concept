@@ -6,14 +6,14 @@ import com.github.linyuzai.connection.loadbalance.core.concept.IdConnection;
 import lombok.Getter;
 
 @Getter
-public class UnknownErrorEvent implements ConnectionEvent {
+public class UnknownCloseEvent implements ConnectionEvent {
 
     private final Connection connection;
 
-    private final Throwable error;
+    private final Object reason;
 
-    public UnknownErrorEvent(Object id, String type, Throwable e, ConnectionLoadBalanceConcept concept) {
+    public UnknownCloseEvent(Object id, String type, Object reason, ConnectionLoadBalanceConcept concept) {
         this.connection = new IdConnection(id, type, concept);
-        this.error = e;
+        this.reason = reason;
     }
 }

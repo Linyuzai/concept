@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.TextMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonMessageEncoder;
@@ -28,7 +29,7 @@ public class ServletWebSocketConnectionFactory extends AbstractConnectionFactory
     }
 
     @Override
-    public Connection create(Object o, Map<Object, Object> metadata) {
+    public Connection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
         WebSocketSession session = (WebSocketSession) o;
         ServletWebSocketConnection connection =
                 new ServletWebSocketConnection(session, Connection.Type.CLIENT, metadata);
@@ -37,6 +38,7 @@ public class ServletWebSocketConnectionFactory extends AbstractConnectionFactory
         }
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);
+        connection.setConcept(concept);
         return connection;
     }
 }

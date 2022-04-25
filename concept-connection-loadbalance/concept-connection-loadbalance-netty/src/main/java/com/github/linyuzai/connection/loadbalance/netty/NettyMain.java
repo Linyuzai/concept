@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty;
 
-import com.github.linyuzai.connection.loadbalance.netty.handler.WebSocketLoadBalanceHandler;
+import com.github.linyuzai.connection.loadbalance.netty.websocket.WebSocketLoadBalanceHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
