@@ -24,7 +24,7 @@ public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
         if (message instanceof BinaryMessage) {
-            concept.message(session.getId(), Connection.Type.OBSERVABLE, ((BinaryMessage) message).getPayload().array());
+            concept.message(session.getId(), Connection.Type.OBSERVABLE, ((BinaryMessage) message).getPayload());
         }
     }
 

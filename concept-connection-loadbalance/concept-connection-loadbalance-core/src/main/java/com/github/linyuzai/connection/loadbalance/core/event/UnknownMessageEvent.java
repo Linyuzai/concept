@@ -10,9 +10,9 @@ public class UnknownMessageEvent implements ConnectionEvent {
 
     private final Connection connection;
 
-    private final byte[] message;
+    private final Object message;
 
-    public UnknownMessageEvent(Object id, String type, byte[] message, ConnectionLoadBalanceConcept concept) {
+    public UnknownMessageEvent(Object id, String type, Object message, ConnectionLoadBalanceConcept concept) {
         this.connection = new IdConnection(id, type, concept);
         this.message = message;
     }

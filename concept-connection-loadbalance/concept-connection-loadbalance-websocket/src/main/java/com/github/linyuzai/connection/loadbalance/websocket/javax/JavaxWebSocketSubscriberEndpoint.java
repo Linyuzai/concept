@@ -18,7 +18,7 @@ public class JavaxWebSocketSubscriberEndpoint {
     }
 
     @OnMessage
-    public void onMessage(Session session, byte[] message) {
+    public void onMessage(Session session, String message) {
         WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.SUBSCRIBER, message);
     }
 

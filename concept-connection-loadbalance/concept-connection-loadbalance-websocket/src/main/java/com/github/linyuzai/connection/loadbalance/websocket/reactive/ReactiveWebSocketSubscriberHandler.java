@@ -31,7 +31,7 @@ public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {
         Mono<Void> send = session.send(Flux.create(sink ->
                 sessionConsumer.accept(session, sink)));
 
-        Mono<Void> receive = session.receive().map(it -> it.getPayload().asByteBuffer().array())
+        Mono<Void> receive = session.receive().map(WebSocketMessage::getPayload)
                 .doOnNext(it -> concept.message(session.getId(), Connection.Type.SUBSCRIBER, it))
                 .doOnError(it -> concept.error(session.getId(), Connection.Type.SUBSCRIBER, it))
                 .then();

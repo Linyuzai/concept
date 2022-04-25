@@ -25,9 +25,9 @@ public interface ConnectionLoadBalanceConcept {
 
     void close(Connection connection, Object reason);
 
-    void message(Object id, String type, byte[] message);
+    void message(Object id, String type, Object message);
 
-    void message(Connection connection, byte[] message);
+    void message(Connection connection, Object message);
 
     void error(Object id, String type, Throwable e);
 

@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,7 +22,7 @@ public class ReactiveWebSocketServerHandler implements WebSocketHandler {
             concept.open(new Object[]{session, sink}, null);
         }));
 
-        Mono<Void> receive = session.receive().map(it -> it.getPayload().asByteBuffer().array())
+        Mono<Void> receive = session.receive().map(WebSocketMessage::getPayload)
                 .doOnNext(it -> concept.message(session.getId(), Connection.Type.CLIENT, it))
                 .doOnError(it -> concept.error(session.getId(), Connection.Type.CLIENT, it))
                 .then();

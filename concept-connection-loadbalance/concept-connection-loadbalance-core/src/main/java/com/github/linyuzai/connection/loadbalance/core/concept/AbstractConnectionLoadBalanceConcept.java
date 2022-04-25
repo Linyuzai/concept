@@ -123,7 +123,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void message(Object id, String type, byte[] message) {
+    public void message(Object id, String type, Object message) {
         Connection connection = getConnection(id, type);
         if (connection == null) {
             publish(new UnknownMessageEvent(id, type, message, this));
@@ -133,7 +133,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void message(@NonNull Connection connection, byte[] message) {
+    public void message(@NonNull Connection connection, Object message) {
         String type = connection.getType();
         if (type == null) {
             throw new NoConnectionTypeException(connection);
