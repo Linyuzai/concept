@@ -32,6 +32,7 @@ allprojects {
         set('okhttpVersion', "4.9.3")
         set('jacksonVersion', "2.13.1")
         set('nettyVersion', "4.1.72.Final")
+        set('xnioVersion', "3.8.6.Final")
         set('javaxWebsocketVersion', "1.1")
         set('lombokVersion', "1.18.22")
         set('junitJupiterVersion', "5.8.2")

@@ -5,7 +5,9 @@ import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSo
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
+@EnableWebSocket
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class ServletWebSocketDefaultServerConfiguration {

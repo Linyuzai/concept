@@ -15,6 +15,7 @@ repositories {
 dependencies {
     compileOnly project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
 
+    compileOnly "org.jboss.xnio:xnio-api:${xnioVersion}"
     compileOnly "javax.websocket:javax.websocket-api:${javaxWebsocketVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
