@@ -1,7 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
-import lombok.*;
+import lombok.Getter;
+import lombok.SneakyThrows;
 
 import javax.websocket.Session;
 import java.nio.ByteBuffer;

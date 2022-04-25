@@ -5,8 +5,6 @@ import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEnc
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Map;
-
 @Getter
 @AllArgsConstructor
 public abstract class AbstractConnectionFactory implements ConnectionFactory {

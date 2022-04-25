@@ -10,7 +10,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.Getter;
 import lombok.NonNull;
 

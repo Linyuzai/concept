@@ -5,7 +5,6 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 public interface Connection {
 
