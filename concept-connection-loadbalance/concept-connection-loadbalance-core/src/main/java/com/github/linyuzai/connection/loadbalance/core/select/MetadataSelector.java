@@ -24,10 +24,14 @@ public class MetadataSelector extends AbstractConnectionSelector {
 
     @Override
     public Connection doSelect(Message message, Collection<Connection> connections) {
-        String s = message.getHeaders().get(name);
+        String header = message.getHeaders().get(name);
         List<Connection> list = connections.stream()
-                .filter(it -> Objects.equals(it.getMetadata().get(name), s))
+                .filter(it -> match(it.getMetadata().get(name), header))
                 .collect(Collectors.toList());
         return Connections.of(list);
+    }
+
+    public boolean match(Object metadata, String header) {
+        return Objects.equals(metadata, header);
     }
 }

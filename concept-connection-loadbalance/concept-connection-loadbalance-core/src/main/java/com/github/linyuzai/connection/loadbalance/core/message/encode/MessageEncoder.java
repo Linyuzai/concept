@@ -4,5 +4,5 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 public interface MessageEncoder {
 
-    byte[] encode(Message message);
+    Object encode(Message message);
 }

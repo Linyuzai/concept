@@ -1,9 +1,8 @@
-package com.github.linyuzai.connection.loadbalance.netty.handler;
+package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.MessageReceiveEvent;
-import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 public interface MessageHandler extends ConnectionEventListener {
 

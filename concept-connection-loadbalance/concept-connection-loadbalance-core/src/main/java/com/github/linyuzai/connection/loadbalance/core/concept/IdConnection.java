@@ -14,7 +14,17 @@ public class IdConnection extends AbstractConnection {
     }
 
     @Override
-    public void doSend(byte[] bytes) {
+    public void ping(Object ping) {
+
+    }
+
+    @Override
+    public void pong(Object pong) {
+
+    }
+
+    @Override
+    public void doSend(Object message) {
 
     }
 

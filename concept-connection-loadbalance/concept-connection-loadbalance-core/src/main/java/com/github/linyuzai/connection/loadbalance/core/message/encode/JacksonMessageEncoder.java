@@ -18,9 +18,9 @@ public class JacksonMessageEncoder implements MessageEncoder {
 
     @SneakyThrows
     @Override
-    public byte[] encode(Message message) {
+    public String encode(Message message) {
         Object payload = getPayload(message);
-        return objectMapper.writeValueAsBytes(payload);
+        return objectMapper.writeValueAsString(payload);
     }
 
     public Object getPayload(Message message) {

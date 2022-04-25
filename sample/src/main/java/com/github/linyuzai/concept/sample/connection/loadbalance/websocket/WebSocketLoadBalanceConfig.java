@@ -4,6 +4,8 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.Enable
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.ServerType;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.event.*;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageHandler;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +19,16 @@ import java.util.Map;
 @Configuration
 @EnableWebSocketLoadBalanceConcept(type = ServerType.AUTO, defaultServer = true)
 public class WebSocketLoadBalanceConfig {
+
+    @Bean
+    public MessageHandler messageHandler() {
+        return new MessageHandler() {
+            @Override
+            public void onMessage(Message message, Connection connection) {
+                System.out.println("Message " + message.getPayload());
+            }
+        };
+    }
 
     @Bean
     public ConnectionEventListener connectionEventListener() {
