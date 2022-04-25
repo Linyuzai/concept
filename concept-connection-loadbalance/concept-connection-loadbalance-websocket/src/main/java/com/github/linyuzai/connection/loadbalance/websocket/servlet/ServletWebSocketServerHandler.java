@@ -31,12 +31,12 @@ public class ServletWebSocketServerHandler implements WebSocketHandler {
 
     @Override
     public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-        concept.error(session.getId(), Connection.Type.OBSERVABLE, exception);
+        concept.error(session.getId(), Connection.Type.CLIENT, exception);
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) throws Exception {
-        concept.close(session.getId(), Connection.Type.OBSERVABLE, closeStatus);
+        concept.close(session.getId(), Connection.Type.CLIENT, closeStatus);
     }
 
     @Override

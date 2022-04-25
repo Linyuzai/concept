@@ -56,6 +56,28 @@ public class Connections implements Connection {
     }
 
     @Override
+    public ConnectionLoadBalanceConcept getConcept() {
+        ConnectionLoadBalanceConcept concept = null;
+        for (Connection connection : connections) {
+            if (concept == null) {
+                concept = connection.getConcept();
+            } else {
+                if (concept != connection.getConcept()) {
+                    return null;
+                }
+            }
+        }
+        return concept;
+    }
+
+    @Override
+    public void redefineType(String type, Redefiner redefiner) {
+        for (Connection connection : connections) {
+            connection.redefineType(type, redefiner);
+        }
+    }
+
+    @Override
     public void send(Message message) {
         for (Connection connection : connections) {
             connection.send(message);

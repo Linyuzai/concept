@@ -34,7 +34,7 @@ public class ServletWebSocketConnectionFactory extends AbstractConnectionFactory
         ServletWebSocketConnection connection =
                 new ServletWebSocketConnection(session, Connection.Type.CLIENT, metadata);
         if (!connection.getMetadata().containsKey(Connection.URI)) {
-            connection.getMetadata().put(Connection.URI, Objects.requireNonNull(session.getUri()).toString());
+            connection.getMetadata().put(Connection.URI, Objects.requireNonNull(session.getUri()).getPath());
         }
         connection.setMessageEncoder(messageEncoder);
         connection.setMessageDecoder(messageDecoder);

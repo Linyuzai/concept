@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.ApplicationConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -32,14 +33,16 @@ public class WebSocketLoadBalanceConfiguration {
             List<ConnectionFactory> connectionFactories,
             List<ConnectionSelector> connectionSelectors,
             List<MessageFactory> messageFactories,
-            ConnectionEventPublisher publisher) {
+            ConnectionEventPublisher eventPublisher,
+            List<ConnectionEventListener> eventListeners) {
         return new WebSocketLoadBalanceConcept.Builder()
                 .connectionServerProvider(provider)
                 .connectionSubscriber(subscriber)
                 .addConnectionFactories(connectionFactories)
                 .addConnectionSelectors(connectionSelectors)
                 .addMessageFactories(messageFactories)
-                .eventPublisher(publisher)
+                .eventPublisher(eventPublisher)
+                .addEventListeners(eventListeners)
                 .build();
     }
 }

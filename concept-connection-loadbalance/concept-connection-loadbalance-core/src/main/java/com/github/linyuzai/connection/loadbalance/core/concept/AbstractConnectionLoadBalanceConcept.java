@@ -346,6 +346,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected ConnectionEventPublisher eventPublisher;
 
+        protected List<ConnectionEventListener> eventListeners = new ArrayList<>();
+
         public T connectionServerProvider(ConnectionServerProvider provider) {
             this.connectionServerProvider = provider;
             return (T) this;
@@ -358,6 +360,19 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         public T eventPublisher(ConnectionEventPublisher publisher) {
             this.eventPublisher = publisher;
+            return (T) this;
+        }
+
+        public T addEventListener(ConnectionEventListener listener) {
+            return addEventListeners(listener);
+        }
+
+        public T addEventListeners(ConnectionEventListener... listeners) {
+            return addEventListeners(Arrays.asList(listeners));
+        }
+
+        public T addEventListeners(Collection<ConnectionEventListener> listeners) {
+            this.eventListeners.addAll(listeners);
             return (T) this;
         }
 
@@ -413,6 +428,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (eventPublisher == null) {
                 eventPublisher = new DefaultConnectionEventPublisher();
             }
+
+            eventPublisher.register(eventListeners);
         }
     }
 }

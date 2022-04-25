@@ -13,12 +13,17 @@ import java.util.List;
 
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
     public static final String SUBSCRIBER_ENDPOINT = "/concept-websocket-subscriber";
-
     public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket";
     private static WebSocketLoadBalanceConcept instance;
 
-    private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider, ConnectionSubscriber connectionSubscriber, List<ConnectionFactory> connectionFactories, List<ConnectionSelector> connectionSelectors, List<MessageFactory> messageFactories, ConnectionEventPublisher eventPublisher) {
-        super(connectionServerProvider, connectionSubscriber, connectionFactories, connectionSelectors, messageFactories, eventPublisher);
+    private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
+                                        ConnectionSubscriber connectionSubscriber,
+                                        List<ConnectionFactory> connectionFactories,
+                                        List<ConnectionSelector> connectionSelectors,
+                                        List<MessageFactory> messageFactories,
+                                        ConnectionEventPublisher eventPublisher) {
+        super(connectionServerProvider, connectionSubscriber, connectionFactories,
+                connectionSelectors, messageFactories, eventPublisher);
     }
 
     public static WebSocketLoadBalanceConcept getInstance() {
