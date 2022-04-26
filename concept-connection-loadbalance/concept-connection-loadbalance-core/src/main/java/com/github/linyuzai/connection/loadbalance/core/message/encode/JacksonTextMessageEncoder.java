@@ -8,11 +8,11 @@ import lombok.SneakyThrows;
 
 @Getter
 @AllArgsConstructor
-public class JacksonMessageEncoder implements MessageEncoder {
+public class JacksonTextMessageEncoder implements MessageEncoder {
 
     private ObjectMapper objectMapper;
 
-    public JacksonMessageEncoder() {
+    public JacksonTextMessageEncoder() {
         this(new ObjectMapper());
     }
 
@@ -20,6 +20,9 @@ public class JacksonMessageEncoder implements MessageEncoder {
     @Override
     public String encode(Message message) {
         Object payload = getPayload(message);
+        if (payload instanceof String) {
+            return (String) payload;
+        }
         return objectMapper.writeValueAsString(payload);
     }
 

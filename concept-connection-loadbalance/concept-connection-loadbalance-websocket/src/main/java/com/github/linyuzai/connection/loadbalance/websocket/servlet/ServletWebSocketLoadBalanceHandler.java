@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,7 +18,10 @@ public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
         ServletWebSocketConnection connection =
                 new ServletWebSocketConnection(session, Connection.Type.OBSERVABLE);
-        connection.getMetadata().put(Connection.URI, Objects.requireNonNull(session.getUri()).toString());
+        MessageCodecAdapter adapter = concept.getMessageCodecAdapter();
+        connection.setMessageEncoder(adapter.getMessageEncoder(Connection.Type.OBSERVABLE));
+        connection.setMessageDecoder(adapter.getMessageDecoder(Connection.Type.OBSERVABLE));
+        connection.setConcept(concept);
         concept.open(connection);
     }
 

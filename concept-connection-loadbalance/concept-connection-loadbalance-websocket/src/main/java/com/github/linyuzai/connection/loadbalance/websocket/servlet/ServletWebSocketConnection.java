@@ -1,24 +1,35 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.SneakyThrows;
 import org.springframework.web.socket.*;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Objects;
 
-public class ServletWebSocketConnection extends AbstractConnection {
+public class ServletWebSocketConnection extends WebSocketConnection {
 
     private final WebSocketSession session;
 
     public ServletWebSocketConnection(WebSocketSession session, String type) {
         super(type);
         this.session = session;
+        configure();
     }
 
     public ServletWebSocketConnection(WebSocketSession session, String type, Map<Object, Object> metadata) {
         super(type, metadata);
         this.session = session;
+        configure();
+    }
+
+    protected void configure() {
+        if (!getMetadata().containsKey(Connection.URI)) {
+            getMetadata().put(Connection.URI, Objects.requireNonNull(session.getUri()).getPath());
+        }
     }
 
     @Override

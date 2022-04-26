@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.exception.NoConnectionTypeException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -34,18 +35,22 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     protected final List<MessageFactory> messageFactories;
 
+    protected final MessageCodecAdapter messageCodecAdapter;
+
     protected final ConnectionEventPublisher eventPublisher;
 
     public AbstractConnectionLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
                                                 ConnectionSubscriber connectionSubscriber,
                                                 List<ConnectionFactory> connectionFactories,
                                                 List<ConnectionSelector> connectionSelectors,
+                                                MessageCodecAdapter messageCodecAdapter,
                                                 List<MessageFactory> messageFactories,
                                                 ConnectionEventPublisher eventPublisher) {
         this.connectionServerProvider = connectionServerProvider;
         this.connectionSubscriber = connectionSubscriber;
         this.connectionFactories = connectionFactories;
         this.connectionSelectors = connectionSelectors;
+        this.messageCodecAdapter = messageCodecAdapter;
         this.messageFactories = messageFactories;
         this.eventPublisher = eventPublisher;
     }
@@ -90,6 +95,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void open(Connection connection) {
+        //TODO Aware
         String type = connection.getType();
         if (type == null) {
             throw new NoConnectionTypeException(connection);
@@ -342,6 +348,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
 
+        protected MessageCodecAdapter messageCodecAdapter;
+
         protected List<MessageFactory> messageFactories = new ArrayList<>();
 
         protected ConnectionEventPublisher eventPublisher;
@@ -355,24 +363,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         public T connectionSubscriber(ConnectionSubscriber subscriber) {
             this.connectionSubscriber = subscriber;
-            return (T) this;
-        }
-
-        public T eventPublisher(ConnectionEventPublisher publisher) {
-            this.eventPublisher = publisher;
-            return (T) this;
-        }
-
-        public T addEventListener(ConnectionEventListener listener) {
-            return addEventListeners(listener);
-        }
-
-        public T addEventListeners(ConnectionEventListener... listeners) {
-            return addEventListeners(Arrays.asList(listeners));
-        }
-
-        public T addEventListeners(Collection<ConnectionEventListener> listeners) {
-            this.eventListeners.addAll(listeners);
             return (T) this;
         }
 
@@ -402,6 +392,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return (T) this;
         }
 
+        public T messageCodecAdapter(MessageCodecAdapter adapter) {
+            this.messageCodecAdapter = adapter;
+            return (T) this;
+        }
+
         public T addMessageFactory(MessageFactory factory) {
             return addMessageFactories(factory);
         }
@@ -415,12 +410,33 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return (T) this;
         }
 
+        public T eventPublisher(ConnectionEventPublisher publisher) {
+            this.eventPublisher = publisher;
+            return (T) this;
+        }
+
+        public T addEventListener(ConnectionEventListener listener) {
+            return addEventListeners(listener);
+        }
+
+        public T addEventListeners(ConnectionEventListener... listeners) {
+            return addEventListeners(Arrays.asList(listeners));
+        }
+
+        public T addEventListeners(Collection<ConnectionEventListener> listeners) {
+            this.eventListeners.addAll(listeners);
+            return (T) this;
+        }
+
         protected void preBuild() {
             if (connectionServerProvider == null) {
                 throw new ConnectionLoadBalanceException("ConnectionServerProvider is null");
             }
             if (connectionSubscriber == null) {
-                throw new ConnectionLoadBalanceException("ConnectionProxy is null");
+                throw new ConnectionLoadBalanceException("ConnectionSubscriber is null");
+            }
+            if (messageCodecAdapter == null) {
+                throw new ConnectionLoadBalanceException("MessageCodecAdapter is null");
             }
 
             messageFactories.add(new ObjectMessageFactory());

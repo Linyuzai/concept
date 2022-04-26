@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.websocket.exception;
+package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 

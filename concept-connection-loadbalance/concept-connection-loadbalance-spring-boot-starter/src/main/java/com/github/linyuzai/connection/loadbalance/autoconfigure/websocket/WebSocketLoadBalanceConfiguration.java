@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.ApplicationConne
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
@@ -32,6 +33,7 @@ public class WebSocketLoadBalanceConfiguration {
             ConnectionSubscriber subscriber,
             List<ConnectionFactory> connectionFactories,
             List<ConnectionSelector> connectionSelectors,
+            MessageCodecAdapter messageCodecAdapter,
             List<MessageFactory> messageFactories,
             ConnectionEventPublisher eventPublisher,
             List<ConnectionEventListener> eventListeners) {
@@ -40,6 +42,7 @@ public class WebSocketLoadBalanceConfiguration {
                 .connectionSubscriber(subscriber)
                 .addConnectionFactories(connectionFactories)
                 .addConnectionSelectors(connectionSelectors)
+                .messageCodecAdapter(messageCodecAdapter)
                 .addMessageFactories(messageFactories)
                 .eventPublisher(eventPublisher)
                 .addEventListeners(eventListeners)

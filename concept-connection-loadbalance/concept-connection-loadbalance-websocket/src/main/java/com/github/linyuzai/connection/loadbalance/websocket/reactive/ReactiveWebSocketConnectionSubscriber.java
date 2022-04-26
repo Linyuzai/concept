@@ -4,7 +4,8 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.exception.WebSocketLoadBalanceException;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceException;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.reactive.socket.client.*;
@@ -15,7 +16,8 @@ import org.xnio.XnioWorker;
 import java.net.URI;
 import java.util.function.Consumer;
 
-public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber {
+@NoArgsConstructor
+public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<ReactiveWebSocketConnection> {
 
     private static final boolean tomcatPresent;
 
@@ -33,20 +35,27 @@ public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSu
         reactorNettyPresent = ClassUtils.isPresent("reactor.netty.http.websocket.WebsocketInbound", loader);
     }
 
+    public ReactiveWebSocketConnectionSubscriber(String protocol) {
+        super(protocol);
+    }
+
     @Override
-    public void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<Connection> consumer) {
+    public void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<ReactiveWebSocketConnection> consumer) {
         WebSocketClient client = newWebSocketClient();
         ReactiveWebSocketSubscriberHandler handler =
                 new ReactiveWebSocketSubscriberHandler(concept, server, (session, sink) -> {
                     ReactiveWebSocketConnection connection =
                             new ReactiveWebSocketConnection(session, sink, Connection.Type.SUBSCRIBER);
-                    connection.getMetadata().put(ConnectionServer.class, server);
-                    setDefaultMessageEncoder(connection);
-                    setDefaultMessageDecoder(connection);
+                    configureConnection(connection, server, concept);
                     consumer.accept(connection);
                 });
         URI uri = getUri(server);
         client.execute(uri, handler).subscribe();
+    }
+
+    @Override
+    public ReactiveWebSocketConnection doSubscribe(URI uri, WebSocketLoadBalanceConcept concept) {
+        throw new UnsupportedOperationException();
     }
 
     @SneakyThrows

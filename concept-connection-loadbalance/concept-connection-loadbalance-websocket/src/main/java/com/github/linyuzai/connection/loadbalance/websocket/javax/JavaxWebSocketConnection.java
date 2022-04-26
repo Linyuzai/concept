@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -9,13 +10,14 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 @Getter
-public class JavaxWebSocketConnection extends AbstractConnection {
+public class JavaxWebSocketConnection extends WebSocketConnection {
 
     private final Session session;
 
     public JavaxWebSocketConnection(Session session, String type) {
         super(type);
         this.session = session;
+        configure();
     }
 
     public JavaxWebSocketConnection(Session session,
@@ -23,6 +25,13 @@ public class JavaxWebSocketConnection extends AbstractConnection {
                                     Map<Object, Object> metadata) {
         super(type, metadata);
         this.session = session;
+        configure();
+    }
+
+    protected void configure() {
+        if (!getMetadata().containsKey(Connection.URI)) {
+            getMetadata().put(Connection.URI, session.getRequestURI().getPath());
+        }
     }
 
     @Override

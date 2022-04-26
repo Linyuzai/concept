@@ -1,13 +1,17 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.net.URI;
+import java.util.function.Consumer;
 
 @Getter
-public abstract class AbstractConnectionSubscriber implements ConnectionSubscriber {
+public abstract class AbstractConnectionSubscriber<Con extends Connection, Concept extends ConnectionLoadBalanceConcept>
+        implements ConnectionSubscriber {
 
     private final String hostKey = "concept-connection-host";
 
@@ -19,6 +23,13 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         this.protocol = protocol;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public void subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept, Consumer<? extends Connection> consumer) {
+        doSubscribe(server, (Concept) concept, (Consumer<Con>) consumer);
+    }
+
+    public abstract void doSubscribe(ConnectionServer server, Concept concept, Consumer<Con> consumer);
 
     public String getHost(ConnectionServer server) {
         String host = server.getMetadata().get(getHostKey());

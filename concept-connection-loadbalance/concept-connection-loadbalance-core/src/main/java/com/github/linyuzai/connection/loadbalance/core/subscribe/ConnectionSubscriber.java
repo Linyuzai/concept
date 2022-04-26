@@ -7,5 +7,5 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import java.util.function.Consumer;
 
 public interface ConnectionSubscriber {
-    void subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept, Consumer<Connection> consumer);
+    void subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept, Consumer<? extends Connection> consumer);
 }

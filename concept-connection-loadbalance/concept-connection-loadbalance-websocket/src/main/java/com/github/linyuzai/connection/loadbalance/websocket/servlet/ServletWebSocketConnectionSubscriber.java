@@ -1,10 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.exception.WebSocketLoadBalanceException;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceException;
+import lombok.NoArgsConstructor;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
@@ -13,9 +13,9 @@ import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.net.URI;
-import java.util.function.Consumer;
 
-public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber {
+@NoArgsConstructor
+public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<ServletWebSocketConnection> {
 
     private static final boolean javaxPresent;
 
@@ -27,21 +27,19 @@ public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSub
         jettyPresent = ClassUtils.isPresent("org.eclipse.jetty.websocket.client.WebSocketClient", loader);
     }
 
+    public ServletWebSocketConnectionSubscriber(String protocol) {
+        super(protocol);
+    }
+
     @Override
-    public void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<Connection> consumer) {
+    public ServletWebSocketConnection doSubscribe(URI uri, WebSocketLoadBalanceConcept concept) {
         WebSocketClient client = newWebSocketClient();
         ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept);
-        URI uri = getUri(server);
         WebSocketConnectionManager manager =
                 new WebSocketConnectionManager(client, handler, uri.toString());
         manager.start();
         WebSocketSession session = handler.getSession();
-        ServletWebSocketConnection connection =
-                new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER);
-        connection.getMetadata().put(ConnectionServer.class, server);
-        setDefaultMessageEncoder(connection);
-        setDefaultMessageDecoder(connection);
-        consumer.accept(connection);
+        return new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER);
     }
 
     public WebSocketClient newWebSocketClient() {

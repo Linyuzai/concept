@@ -1,15 +1,14 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.Map;
 
-@Getter
-@AllArgsConstructor
-public abstract class AbstractConnectionFactory implements ConnectionFactory {
+public abstract class AbstractConnectionFactory<Con extends Connection, Concept extends ConnectionLoadBalanceConcept> implements ConnectionFactory {
 
-    protected MessageEncoder messageEncoder;
+    @SuppressWarnings("unchecked")
+    @Override
+    public Connection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
+        return doCreate(o, metadata, (Concept) concept);
+    }
 
-    protected MessageDecoder messageDecoder;
+    public abstract Con doCreate(Object o, Map<Object, Object> metadata, Concept concept);
 }
