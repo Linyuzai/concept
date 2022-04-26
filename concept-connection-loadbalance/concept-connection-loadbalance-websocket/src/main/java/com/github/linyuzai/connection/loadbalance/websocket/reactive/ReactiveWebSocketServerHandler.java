@@ -22,7 +22,7 @@ public class ReactiveWebSocketServerHandler implements WebSocketHandler {
             concept.open(new Object[]{session, sink}, null);
         }));
 
-        Mono<Void> receive = session.receive().map(WebSocketMessage::getPayload)
+        Mono<Void> receive = session.receive()
                 .doOnNext(it -> concept.message(session.getId(), Connection.Type.CLIENT, it))
                 .doOnError(it -> concept.error(session.getId(), Connection.Type.CLIENT, it))
                 .then();

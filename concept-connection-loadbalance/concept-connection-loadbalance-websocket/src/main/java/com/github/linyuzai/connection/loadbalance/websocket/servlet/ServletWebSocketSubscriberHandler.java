@@ -22,9 +22,7 @@ public class ServletWebSocketSubscriberHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
-        if (message instanceof BinaryMessage) {
-            concept.message(session.getId(), Connection.Type.SUBSCRIBER, ((BinaryMessage) message).getPayload());
-        }
+        concept.message(session.getId(), Connection.Type.SUBSCRIBER, message);
     }
 
     @Override

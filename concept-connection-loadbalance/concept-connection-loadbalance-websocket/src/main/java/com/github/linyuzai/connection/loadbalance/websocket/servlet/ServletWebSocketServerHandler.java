@@ -18,15 +18,7 @@ public class ServletWebSocketServerHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
-        if (message instanceof TextMessage) {
-            concept.message(session.getId(), Connection.Type.CLIENT, ((TextMessage) message).getPayload());
-        } else if (message instanceof PingMessage) {
-            concept.message(session.getId(), Connection.Type.CLIENT, ((PingMessage) message).getPayload());
-        } else if (message instanceof PongMessage) {
-            concept.message(session.getId(), Connection.Type.CLIENT, ((PongMessage) message).getPayload());
-        } else if (message instanceof BinaryMessage) {
-            concept.message(session.getId(), Connection.Type.CLIENT, ((BinaryMessage) message).getPayload());
-        }
+        concept.message(session.getId(), Connection.Type.CLIENT, message);
     }
 
     @Override

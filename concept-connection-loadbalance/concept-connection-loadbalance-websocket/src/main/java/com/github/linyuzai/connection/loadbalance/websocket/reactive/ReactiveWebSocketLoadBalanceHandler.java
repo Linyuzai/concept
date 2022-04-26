@@ -29,7 +29,7 @@ public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
             concept.open(connection);
         }));
 
-        Mono<Void> receive = session.receive().map(WebSocketMessage::getPayload)
+        Mono<Void> receive = session.receive()
                 .doOnNext(it -> concept.message(session.getId(), Connection.Type.OBSERVABLE, it))
                 .doOnError(it -> concept.error(session.getId(), Connection.Type.OBSERVABLE, it))
                 .then();

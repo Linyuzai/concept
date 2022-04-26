@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.nio.ByteBuffer;
 
 @ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT + "{subtype}")
 public class JavaxWebSocketLoadBalanceEndpoint {
@@ -29,6 +30,16 @@ public class JavaxWebSocketLoadBalanceEndpoint {
 
     @OnMessage
     public void onMessage(Session session, String message) {
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.OBSERVABLE, message);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, PongMessage message) {
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.OBSERVABLE, message);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, ByteBuffer message) {
         WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.OBSERVABLE, message);
     }
 

@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
 import javax.websocket.*;
+import java.nio.ByteBuffer;
 
 @ClientEndpoint
 public class JavaxWebSocketSubscriberEndpoint {
@@ -19,6 +20,16 @@ public class JavaxWebSocketSubscriberEndpoint {
 
     @OnMessage
     public void onMessage(Session session, String message) {
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.SUBSCRIBER, message);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, PongMessage message) {
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.SUBSCRIBER, message);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, ByteBuffer message) {
         WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.SUBSCRIBER, message);
     }
 

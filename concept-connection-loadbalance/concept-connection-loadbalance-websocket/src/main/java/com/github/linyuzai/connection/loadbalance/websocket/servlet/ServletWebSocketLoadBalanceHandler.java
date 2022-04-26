@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.socket.*;
 
-import java.util.Objects;
-
 @AllArgsConstructor
 public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
 
@@ -27,9 +25,7 @@ public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
-        if (message instanceof BinaryMessage) {
-            concept.message(session.getId(), Connection.Type.OBSERVABLE, ((BinaryMessage) message).getPayload());
-        }
+        concept.message(session.getId(), Connection.Type.OBSERVABLE, message);
     }
 
     @Override

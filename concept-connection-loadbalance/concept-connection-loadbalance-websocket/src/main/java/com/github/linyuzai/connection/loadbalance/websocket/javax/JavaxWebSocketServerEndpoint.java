@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,6 +29,16 @@ public class JavaxWebSocketServerEndpoint {
 
     @OnMessage
     public void onMessage(Session session, String message) {
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, PongMessage message) {
+        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, ByteBuffer message) {
         WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
     }
 
