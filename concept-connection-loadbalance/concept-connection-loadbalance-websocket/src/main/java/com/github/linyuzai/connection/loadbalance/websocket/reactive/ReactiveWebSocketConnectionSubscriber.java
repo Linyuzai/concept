@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceException;
@@ -40,22 +39,12 @@ public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSu
     }
 
     @Override
-    public void doSubscribe(ConnectionServer server, WebSocketLoadBalanceConcept concept, Consumer<ReactiveWebSocketConnection> consumer) {
+    public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<ReactiveWebSocketConnection> consumer) {
         WebSocketClient client = newWebSocketClient();
         ReactiveWebSocketSubscriberHandler handler =
-                new ReactiveWebSocketSubscriberHandler(concept, server, (session, sink) -> {
-                    ReactiveWebSocketConnection connection =
-                            new ReactiveWebSocketConnection(session, sink, Connection.Type.SUBSCRIBER);
-                    configureConnection(connection, server, concept);
-                    consumer.accept(connection);
-                });
-        URI uri = getUri(server);
+                new ReactiveWebSocketSubscriberHandler(concept, (session, sink) ->
+                        consumer.accept(new ReactiveWebSocketConnection(session, sink, Connection.Type.SUBSCRIBER)));
         client.execute(uri, handler).subscribe();
-    }
-
-    @Override
-    public ReactiveWebSocketConnection doSubscribe(URI uri, WebSocketLoadBalanceConcept concept) {
-        throw new UnsupportedOperationException();
     }
 
     @SneakyThrows

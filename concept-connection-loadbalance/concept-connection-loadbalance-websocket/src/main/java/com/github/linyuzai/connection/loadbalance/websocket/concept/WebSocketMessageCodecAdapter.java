@@ -23,22 +23,22 @@ public class WebSocketMessageCodecAdapter extends AbstractMessageCodecAdapter {
     }
 
     @Override
-    public MessageEncoder getSubscriberMessageEncoder() {
+    public MessageEncoder getSubscribeMessageEncoder() {
         return new JacksonSubscribeMessageEncoder();
     }
 
     @Override
-    public MessageDecoder getSubscriberMessageDecoder() {
-        return new JacksonForwardMessageDecoder();
+    public MessageDecoder getSubscribeMessageDecoder() {
+        return new JacksonSubscribeMessageDecoder();
     }
 
     @Override
-    public MessageEncoder getObservableMessageEncoder() {
+    public MessageEncoder getForwardMessageEncoder() {
         return new JacksonForwardMessageEncoder();
     }
 
     @Override
-    public MessageDecoder getObservableMessageDecoder() {
-        return new JacksonSubscribeMessageDecoder();
+    public MessageDecoder getForwardMessageDecoder() {
+        return new JacksonForwardMessageDecoder();
     }
 }

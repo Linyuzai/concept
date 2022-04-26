@@ -11,6 +11,7 @@ import javax.websocket.ContainerProvider;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
+import java.util.function.Consumer;
 
 @Getter
 @NoArgsConstructor
@@ -33,10 +34,10 @@ public class JavaxWebSocketConnectionSubscriber extends WebSocketConnectionSubsc
 
     @SneakyThrows
     @Override
-    public JavaxWebSocketConnection doSubscribe(URI uri, WebSocketLoadBalanceConcept concept) {
+    public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<JavaxWebSocketConnection> consumer) {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         Session session = container.connectToServer(clientClass, uri);
-        return new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER);
+        consumer.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
     }
 
     @Override

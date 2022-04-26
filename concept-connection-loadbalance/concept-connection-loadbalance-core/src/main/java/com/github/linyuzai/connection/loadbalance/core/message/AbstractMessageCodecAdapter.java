@@ -12,9 +12,9 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
             case Connection.Type.CLIENT:
                 return getClientMessageEncoder();
             case Connection.Type.SUBSCRIBER:
-                return getSubscriberMessageEncoder();
+                return getSubscribeMessageEncoder();
             case Connection.Type.OBSERVABLE:
-                return getObservableMessageEncoder();
+                return getForwardMessageEncoder();
             default:
                 return getUndefinedTypeMessageEncoder(type);
         }
@@ -26,9 +26,9 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
             case Connection.Type.CLIENT:
                 return getClientMessageDecoder();
             case Connection.Type.SUBSCRIBER:
-                return getSubscriberMessageDecoder();
+                return getForwardMessageDecoder();
             case Connection.Type.OBSERVABLE:
-                return getObservableMessageDecoder();
+                return getSubscribeMessageDecoder();
             default:
                 return getUndefinedTypeMessageDecoder(type);
         }
@@ -49,32 +49,32 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
     public abstract MessageDecoder getClientMessageDecoder();
 
     /**
-     * 订阅者发送服务信息的消息编码器
+     * 订阅时发送服务信息的消息编码器
      *
      * @return 消息编码器
      */
-    public abstract MessageEncoder getSubscriberMessageEncoder();
+    public abstract MessageEncoder getSubscribeMessageEncoder();
 
     /**
-     * 订阅者接收消息转发的消息解码器
+     * 订阅时接收服务信息的消息解码器
      *
      * @return 消息解码器
      */
-    public abstract MessageDecoder getSubscriberMessageDecoder();
+    public abstract MessageDecoder getSubscribeMessageDecoder();
 
     /**
-     * 被观察者转发消息的消息编码器
+     * 转发消息的消息编码器
      *
      * @return 消息编码器
      */
-    public abstract MessageEncoder getObservableMessageEncoder();
+    public abstract MessageEncoder getForwardMessageEncoder();
 
     /**
-     * 被观察者接收服务信息的消息解码器
+     * 接收消息转发的消息解码器
      *
      * @return 消息解码器
      */
-    public abstract MessageDecoder getObservableMessageDecoder();
+    public abstract MessageDecoder getForwardMessageDecoder();
 
     public MessageEncoder getUndefinedTypeMessageEncoder(String type) {
         throw new UnsupportedOperationException();

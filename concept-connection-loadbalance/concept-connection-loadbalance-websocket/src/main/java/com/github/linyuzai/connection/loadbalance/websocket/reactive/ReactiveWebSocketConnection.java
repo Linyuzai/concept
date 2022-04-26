@@ -1,13 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
 
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -22,25 +21,22 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
         super(type);
         this.session = session;
         this.sender = sender;
-        configure();
     }
 
     public ReactiveWebSocketConnection(WebSocketSession session, FluxSink<WebSocketMessage> sender, String type, Map<Object, Object> metadata) {
         super(type, metadata);
         this.session = session;
         this.sender = sender;
-        configure();
-    }
-
-    protected void configure() {
-        if (!getMetadata().containsKey(Connection.URI)) {
-            getMetadata().put(Connection.URI, session.getHandshakeInfo().getUri().getPath());
-        }
     }
 
     @Override
     public Object getId() {
         return session.getId();
+    }
+
+    @Override
+    public URI getUri() {
+        return session.getHandshakeInfo().getUri();
     }
 
     @Override

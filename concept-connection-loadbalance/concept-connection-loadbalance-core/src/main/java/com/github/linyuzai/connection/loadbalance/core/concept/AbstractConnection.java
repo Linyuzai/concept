@@ -20,19 +20,19 @@ import java.util.Map;
 @Setter
 public abstract class AbstractConnection implements Connection {
 
-    private final Map<Object, Object> metadata = new LinkedHashMap<>();
+    protected final Map<Object, Object> metadata = new LinkedHashMap<>();
 
     @Setter(AccessLevel.PRIVATE)
-    private String type;
+    protected String type;
 
     @NonNull
-    private MessageEncoder messageEncoder;
+    protected MessageEncoder messageEncoder;
 
     @NonNull
-    private MessageDecoder messageDecoder;
+    protected MessageDecoder messageDecoder;
 
     @NonNull
-    private ConnectionLoadBalanceConcept concept;
+    protected ConnectionLoadBalanceConcept concept;
 
     public AbstractConnection(String type) {
         this.type = type;

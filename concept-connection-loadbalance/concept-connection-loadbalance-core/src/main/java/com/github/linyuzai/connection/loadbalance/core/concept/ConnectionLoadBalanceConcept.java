@@ -1,6 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 import java.util.Map;

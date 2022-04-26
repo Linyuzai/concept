@@ -2,6 +2,8 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import lombok.Getter;
 
+import java.net.URI;
+
 @Getter
 public class IdConnection extends AbstractConnection {
 
@@ -26,6 +28,11 @@ public class IdConnection extends AbstractConnection {
     @Override
     public void doSend(Object message) {
 
+    }
+
+    @Override
+    public URI getUri() {
+        return null;
     }
 
     @Override

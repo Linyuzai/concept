@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +19,6 @@ import java.util.function.BiConsumer;
 public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {
 
     private WebSocketLoadBalanceConcept concept;
-
-    private ConnectionServer connectionServer;
 
     private BiConsumer<WebSocketSession, FluxSink<WebSocketMessage>> sessionConsumer;
 

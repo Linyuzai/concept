@@ -4,15 +4,16 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 
+import java.net.URI;
 import java.util.Map;
 
 public interface Connection {
 
-    String URI = "uri";
-
     Object getId();
 
     String getType();
+
+    URI getUri();
 
     Map<Object, Object> getMetadata();
 

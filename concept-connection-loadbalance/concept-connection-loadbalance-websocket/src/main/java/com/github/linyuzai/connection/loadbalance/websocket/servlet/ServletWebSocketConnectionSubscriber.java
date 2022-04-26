@@ -6,13 +6,13 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceException;
 import lombok.NoArgsConstructor;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.net.URI;
+import java.util.function.Consumer;
 
 @NoArgsConstructor
 public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<ServletWebSocketConnection> {
@@ -32,14 +32,12 @@ public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSub
     }
 
     @Override
-    public ServletWebSocketConnection doSubscribe(URI uri, WebSocketLoadBalanceConcept concept) {
+    public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<ServletWebSocketConnection> consumer) {
         WebSocketClient client = newWebSocketClient();
-        ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept);
-        WebSocketConnectionManager manager =
-                new WebSocketConnectionManager(client, handler, uri.toString());
+        ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
+                consumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
+        WebSocketConnectionManager manager = new WebSocketConnectionManager(client, handler, uri.toString());
         manager.start();
-        WebSocketSession session = handler.getSession();
-        return new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER);
     }
 
     public WebSocketClient newWebSocketClient() {

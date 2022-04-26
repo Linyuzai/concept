@@ -2,22 +2,22 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.*;
 
-@RequiredArgsConstructor
-public class ServletWebSocketSubscriberHandler implements WebSocketHandler {
+import java.util.function.Consumer;
 
-    @Getter
-    private WebSocketSession session;
+@AllArgsConstructor
+public class ServletWebSocketSubscriberHandler implements WebSocketHandler {
 
     private final WebSocketLoadBalanceConcept concept;
 
+    private final Consumer<WebSocketSession> consumer;
+
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        this.session = session;
+        consumer.accept(session);
     }
 
     @Override

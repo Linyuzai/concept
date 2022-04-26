@@ -1,11 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import javax.websocket.PongMessage;
 import javax.websocket.Session;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -17,7 +18,6 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     public JavaxWebSocketConnection(Session session, String type) {
         super(type);
         this.session = session;
-        configure();
     }
 
     public JavaxWebSocketConnection(Session session,
@@ -25,13 +25,6 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
                                     Map<Object, Object> metadata) {
         super(type, metadata);
         this.session = session;
-        configure();
-    }
-
-    protected void configure() {
-        if (!getMetadata().containsKey(Connection.URI)) {
-            getMetadata().put(Connection.URI, session.getRequestURI().getPath());
-        }
     }
 
     @Override
@@ -40,9 +33,17 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
+    public URI getUri() {
+        return session.getRequestURI();
+    }
+
+    @SneakyThrows
+    @Override
     public void doSend(Object message) {
         if (message instanceof String) {
             session.getAsyncRemote().sendText((String) message);
+        } else if (message instanceof PongMessage) {
+            session.getAsyncRemote().sendPing(((PongMessage) message).getApplicationData());
         } else if (message instanceof byte[]) {
             session.getAsyncRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
         } else if (message instanceof ByteBuffer) {

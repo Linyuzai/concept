@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 @Getter
@@ -38,9 +40,15 @@ public class Connections implements Connection {
     }
 
     @Override
+    public URI getUri() {
+        Connection connection = get();
+        return connection == null ? null : connection.getUri();
+    }
+
+    @Override
     public Map<Object, Object> getMetadata() {
         Connection connection = get();
-        return connection == null ? null : connection.getMetadata();
+        return connection == null ? Collections.emptyMap() : connection.getMetadata();
     }
 
     @Override

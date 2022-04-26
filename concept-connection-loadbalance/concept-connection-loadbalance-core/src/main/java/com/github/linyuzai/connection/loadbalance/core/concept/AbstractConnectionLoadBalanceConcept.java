@@ -46,13 +46,23 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                                                 MessageCodecAdapter messageCodecAdapter,
                                                 List<MessageFactory> messageFactories,
                                                 ConnectionEventPublisher eventPublisher) {
-        this.connectionServerProvider = connectionServerProvider;
-        this.connectionSubscriber = connectionSubscriber;
-        this.connectionFactories = connectionFactories;
-        this.connectionSelectors = connectionSelectors;
-        this.messageCodecAdapter = messageCodecAdapter;
-        this.messageFactories = messageFactories;
-        this.eventPublisher = eventPublisher;
+        this.connectionServerProvider = applyAware(connectionServerProvider);
+        this.connectionSubscriber = applyAware(connectionSubscriber);
+        this.connectionFactories = applyAware(connectionFactories);
+        this.connectionSelectors = applyAware(connectionSelectors);
+        this.messageCodecAdapter = applyAware(messageCodecAdapter);
+        this.messageFactories = applyAware(messageFactories);
+        this.eventPublisher = applyAware(eventPublisher);
+    }
+
+    public <T> T applyAware(T o) {
+        if (o instanceof ConnectionLoadBalanceConceptAware) {
+            ((ConnectionLoadBalanceConceptAware) o).setConnectionLoadBalanceConcept(this);
+        }
+        if (o instanceof Collection) {
+            ((Collection<?>) o).forEach(this::applyAware);
+        }
+        return o;
     }
 
     @Override
@@ -95,7 +105,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void open(Connection connection) {
-        //TODO Aware
+        applyAware(connection);
         String type = connection.getType();
         if (type == null) {
             throw new NoConnectionTypeException(connection);
@@ -301,7 +311,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (message == null) {
             throw new ConnectionLoadBalanceException("Message can not be created with " + msg);
         }
-        return message;
+        return applyAware(message);
     }
 
     public MessageFactory getMessageFactory(Object msg) {
@@ -315,7 +325,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void publish(Object event) {
-        eventPublisher.publish(event);
+        eventPublisher.publish(applyAware(event));
     }
 
     @Override
