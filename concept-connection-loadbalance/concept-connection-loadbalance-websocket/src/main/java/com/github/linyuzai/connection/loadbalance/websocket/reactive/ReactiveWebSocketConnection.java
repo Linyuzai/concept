@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
+import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -42,52 +44,57 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
     @Override
     public void doSend(Object message) {
         //session.send(Flux.just(createMessage(bytes))).subscribe();
-        if (message instanceof String) {
+        if (message instanceof WebSocketMessage) {
+            sender.next((WebSocketMessage) message);
+        } else if (message instanceof String) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.TEXT,
                     session.bufferFactory().wrap(((String) message)
                             .getBytes(StandardCharsets.UTF_8))));
         } else if (message instanceof DataBuffer) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
                     (DataBuffer) message));
-        } else if (message instanceof byte[]) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
-                    session.bufferFactory().wrap((byte[]) message)));
         } else if (message instanceof ByteBuffer) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
                     session.bufferFactory().wrap((ByteBuffer) message)));
+        } else if (message instanceof byte[]) {
+            sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
+                    session.bufferFactory().wrap((byte[]) message)));
+        } else {
+            throw new IllegalArgumentException(message.toString());
         }
     }
 
     @Override
-    public boolean payloadSupportPingOrPong(Object payload) {
-        return payload instanceof byte[] || payload instanceof ByteBuffer || payload instanceof DataBuffer;
-    }
-
-    @Override
-    public void ping(Object ping) {
-        if (ping instanceof byte[]) {
+    public void ping(PingMessage ping) {
+        Object payload = ping.getPayload();
+        if (payload instanceof DataBuffer) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                    session.bufferFactory().wrap((byte[]) ping)));
-        } else if (ping instanceof ByteBuffer) {
+                    (DataBuffer) payload));
+        } else if (payload instanceof ByteBuffer) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                    session.bufferFactory().wrap((ByteBuffer) ping)));
-        } else if (ping instanceof DataBuffer) {
+                    session.bufferFactory().wrap((ByteBuffer) payload)));
+        } else if (payload instanceof byte[]) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                    (DataBuffer) ping));
+                    session.bufferFactory().wrap((byte[]) payload)));
+        } else {
+            throw new IllegalArgumentException(payload.toString());
         }
     }
 
     @Override
-    public void pong(Object pong) {
-        if (pong instanceof byte[]) {
+    public void pong(PongMessage pong) {
+        Object payload = pong.getPayload();
+        if (payload instanceof DataBuffer) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                    session.bufferFactory().wrap((byte[]) pong)));
-        } else if (pong instanceof ByteBuffer) {
+                    (DataBuffer) payload));
+        } else if (payload instanceof ByteBuffer) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                    session.bufferFactory().wrap((ByteBuffer) pong)));
-        } else if (pong instanceof DataBuffer) {
+                    session.bufferFactory().wrap((ByteBuffer) payload)));
+        } else if (payload instanceof byte[]) {
             sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                    (DataBuffer) pong));
+                    session.bufferFactory().wrap((byte[]) payload)));
+        } else {
+            throw new IllegalArgumentException(payload.toString());
         }
     }
 

@@ -1,6 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
@@ -11,8 +10,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -46,27 +43,11 @@ public abstract class AbstractConnection implements Connection {
     }
 
     @Override
-    public void send(Message message) {
+    public void send(@NonNull Message message) {
         if (message instanceof PingMessage) {
-            Object payload = message.getPayload();
-            Object ping = payload instanceof String ?
-                    ((String) payload).getBytes(StandardCharsets.UTF_8)
-                    : payload;
-            if (payloadSupportPingOrPong(ping)) {
-                ping(ping);
-            } else {
-                throw new ConnectionLoadBalanceException("Can not send ping " + payload);
-            }
+            ping((PingMessage) message);
         } else if (message instanceof PongMessage) {
-            Object payload = message.getPayload();
-            Object pong = payload instanceof String ?
-                    ((String) payload).getBytes(StandardCharsets.UTF_8)
-                    : payload;
-            if (payloadSupportPingOrPong(pong)) {
-                pong(pong);
-            } else {
-                throw new ConnectionLoadBalanceException("Can not send pong " + payload);
-            }
+            pong((PongMessage) message);
         } else {
             MessageEncoder encoder = getMessageEncoder();
             Object encode = encoder.encode(message);
@@ -74,13 +55,9 @@ public abstract class AbstractConnection implements Connection {
         }
     }
 
-    public boolean payloadSupportPingOrPong(Object payload) {
-        return payload instanceof byte[] || payload instanceof ByteBuffer;
-    }
+    public abstract void ping(PingMessage ping);
 
-    public abstract void ping(Object ping);
-
-    public abstract void pong(Object pong);
+    public abstract void pong(PongMessage pong);
 
     @Override
     public void redefineType(String type, Redefiner redefiner) {

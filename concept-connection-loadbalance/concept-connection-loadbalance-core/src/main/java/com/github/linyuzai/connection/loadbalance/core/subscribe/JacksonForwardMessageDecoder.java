@@ -28,9 +28,9 @@ public class JacksonForwardMessageDecoder implements MessageDecoder {
         if (message instanceof String) {
             return new TextMessage((String) message);
         } else if (message instanceof byte[]) {
-            return new BinaryMessage((byte[]) message);
+            return new BinaryMessage(ByteBuffer.wrap((byte[]) message));
         } else if (message instanceof ByteBuffer) {
-            return new BinaryMessage(((ByteBuffer) message).array());
+            return new BinaryMessage(((ByteBuffer) message));
         } else {
             throw new MessageDecodeException(message);
         }

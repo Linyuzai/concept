@@ -1,10 +1,11 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
+import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -42,12 +43,10 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     public void doSend(Object message) {
         if (message instanceof String) {
             session.getAsyncRemote().sendText((String) message);
-        } else if (message instanceof PongMessage) {
-            session.getAsyncRemote().sendPing(((PongMessage) message).getApplicationData());
-        } else if (message instanceof byte[]) {
-            session.getAsyncRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
         } else if (message instanceof ByteBuffer) {
             session.getAsyncRemote().sendBinary((ByteBuffer) message);
+        } else if (message instanceof byte[]) {
+            session.getAsyncRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
         } else {
             session.getAsyncRemote().sendObject(message);
         }
@@ -55,21 +54,27 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
 
     @SneakyThrows
     @Override
-    public void ping(Object ping) {
-        if (ping instanceof byte[]) {
-            session.getAsyncRemote().sendPing(ByteBuffer.wrap((byte[]) ping));
-        } else if (ping instanceof ByteBuffer) {
-            session.getAsyncRemote().sendPing((ByteBuffer) ping);
+    public void ping(PingMessage ping) {
+        Object payload = ping.getPayload();
+        if (payload instanceof ByteBuffer) {
+            session.getAsyncRemote().sendPing((ByteBuffer) payload);
+        } else if (payload instanceof byte[]) {
+            session.getAsyncRemote().sendPing(ByteBuffer.wrap((byte[]) payload));
+        } else {
+            throw new IllegalArgumentException(payload.toString());
         }
     }
 
     @SneakyThrows
     @Override
-    public void pong(Object pong) {
-        if (pong instanceof byte[]) {
-            session.getAsyncRemote().sendPong(ByteBuffer.wrap((byte[]) pong));
-        } else if (pong instanceof ByteBuffer) {
-            session.getAsyncRemote().sendPong((ByteBuffer) pong);
+    public void pong(PongMessage pong) {
+        Object payload = pong.getPayload();
+        if (payload instanceof ByteBuffer) {
+            session.getAsyncRemote().sendPong((ByteBuffer) payload);
+        } else if (payload instanceof byte[]) {
+            session.getAsyncRemote().sendPong(ByteBuffer.wrap((byte[]) payload));
+        } else {
+            throw new IllegalArgumentException(payload.toString());
         }
     }
 

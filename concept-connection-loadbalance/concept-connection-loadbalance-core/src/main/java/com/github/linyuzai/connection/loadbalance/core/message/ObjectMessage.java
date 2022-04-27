@@ -1,15 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
-import lombok.AllArgsConstructor;
+public class ObjectMessage extends AbstractMessage<Object> {
 
-@AllArgsConstructor
-public class ObjectMessage extends AbstractMessage {
-
-    private Object o;
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getPayload() {
-        return (T) o;
+    public ObjectMessage(Object payload) {
+        super(payload);
     }
 }

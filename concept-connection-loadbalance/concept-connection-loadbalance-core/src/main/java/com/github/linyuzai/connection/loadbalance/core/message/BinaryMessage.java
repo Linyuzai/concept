@@ -1,14 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
-import lombok.AllArgsConstructor;
+import java.nio.ByteBuffer;
 
-@AllArgsConstructor
-public class BinaryMessage extends AbstractMessage {
+public class BinaryMessage extends AbstractMessage<ByteBuffer> {
 
-    private byte[] bytes;
-
-    @Override
-    public byte[] getPayload() {
-        return bytes;
+    public BinaryMessage(ByteBuffer payload) {
+        super(payload);
     }
 }
