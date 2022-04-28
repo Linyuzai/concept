@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.event.TypeRedefineEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
@@ -64,12 +65,14 @@ public abstract class AbstractConnection implements Connection {
         if (this.type.equals(type)) {
             return;
         }
+        String oldType = this.type;
         concept.move(getId(), this.type, type, connection -> {
             AbstractConnection.this.type = type;
             if (redefiner != null) {
                 redefiner.onRedefine();
             }
         });
+        concept.publish(new TypeRedefineEvent(this, oldType));
     }
 
     public abstract void doSend(Object message);

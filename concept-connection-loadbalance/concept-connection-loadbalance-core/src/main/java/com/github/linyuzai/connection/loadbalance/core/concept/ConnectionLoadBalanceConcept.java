@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -45,5 +46,5 @@ public interface ConnectionLoadBalanceConcept {
 
     Connection getConnection(Object id, String type);
 
-    Map<Object, Connection> getConnections(String type);
+    Collection<Connection> getConnections(String type);
 }

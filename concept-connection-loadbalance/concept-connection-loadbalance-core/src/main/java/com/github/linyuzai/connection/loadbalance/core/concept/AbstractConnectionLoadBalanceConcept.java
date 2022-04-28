@@ -69,6 +69,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void initialize() {
         subscribe();
+        publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 
     @Override
@@ -82,6 +83,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     } catch (Throwable ignore) {
                     }
                 });
+        publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
     @Override
@@ -126,7 +128,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void close(Object id, String type, Object reason) {
-        Connection connection = getConnections0(type).get(id);
+        Connection connection = getConnectionMapByType(type).get(id);
         if (connection == null) {
             publish(new UnknownCloseEvent(id, type, reason, this));
             return;
@@ -136,7 +138,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void close(@NonNull Connection connection, Object reason) {
-        getConnections0(connection.getType()).remove(connection.getId());
+        getConnectionMapByType(connection.getType()).remove(connection.getId());
         publish(new ConnectionCloseEvent(connection, reason));
     }
 
@@ -179,7 +181,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 exist.close();
             } catch (Throwable ignore) {
             }
-            close(exist, "Resubscribe");
+            close(exist, "ReSubscribe");
         }
         try {
             connectionSubscriber.subscribe(server, this, connection -> {
@@ -198,7 +200,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return null;
         }
         Collection<Connection> subscriberConnections =
-                getConnections0(Connection.Type.SUBSCRIBER).values();
+                getConnectionMapByType(Connection.Type.SUBSCRIBER).values();
         for (Connection connection : subscriberConnections) {
             ConnectionServer exist = (ConnectionServer) connection.getMetadata()
                     .get(ConnectionServer.class);
@@ -226,12 +228,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public Connection getConnection(Object id, String type) {
-        return getConnections0(type).get(id);
+        return getConnectionMapByType(type).get(id);
     }
 
     @Override
-    public Map<Object, Connection> getConnections(String type) {
-        return Collections.unmodifiableMap(getConnections0(type));
+    public Collection<Connection> getConnections(String type) {
+        return Collections.unmodifiableCollection(getConnectionMapByType(type).values());
     }
 
     private void putConnection(Connection connection, String type) {
@@ -239,7 +241,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 .put(connection.getId(), connection);
     }
 
-    private Map<Object, Connection> getConnections0(String type) {
+    private Map<Object, Connection> getConnectionMapByType(String type) {
         return connections.getOrDefault(type, Collections.emptyMap());
     }
 
@@ -248,8 +250,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
         Connection connection;
-        List<Connection> clients = new ArrayList<>(getConnections0(Connection.Type.CLIENT).values());
-        List<Connection> observables = new ArrayList<>(getConnections0(Connection.Type.OBSERVABLE).values());
+        List<Connection> clients = new ArrayList<>(getConnectionMapByType(Connection.Type.CLIENT).values());
+        List<Connection> observables = new ArrayList<>(getConnectionMapByType(Connection.Type.OBSERVABLE).values());
         if (selector == null) {
             connection = Connections.of(clients, observables);
         } else {
@@ -324,7 +326,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void move(Object id, String fromType, String toType, Consumer<Connection> consumer) {
-        Connection connection = getConnections0(fromType).remove(id);
+        Connection connection = getConnectionMapByType(fromType).remove(id);
         if (connection == null) {
             return;
         }
