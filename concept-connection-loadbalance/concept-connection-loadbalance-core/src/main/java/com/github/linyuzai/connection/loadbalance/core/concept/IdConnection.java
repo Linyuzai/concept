@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
 import java.net.URI;
@@ -16,12 +18,12 @@ public class IdConnection extends AbstractConnection {
     }
 
     @Override
-    public void ping(Object ping) {
+    public void ping(PingMessage ping) {
 
     }
 
     @Override
-    public void pong(Object pong) {
+    public void pong(PongMessage pong) {
 
     }
 

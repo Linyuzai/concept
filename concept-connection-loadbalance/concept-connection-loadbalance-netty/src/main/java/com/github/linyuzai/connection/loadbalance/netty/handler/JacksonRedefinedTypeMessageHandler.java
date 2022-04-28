@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.connection.loadbalance.netty.handler;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
@@ -25,15 +26,16 @@ public abstract class JacksonRedefinedTypeMessageHandler implements RedefinedTyp
 
     @Override
     public SubscribeMessage tryDecode(byte[] bytes) {
-        Message message = messageDecoder.decode(bytes);
-        return (SubscribeMessage) message;
+        //Message message = messageDecoder.decode(bytes);
+        //return (SubscribeMessage) message;
     }
 
     @Override
     public void onObservableTypeRedefined(Connection connection) {
         if (connection instanceof AbstractConnection) {
-            ((AbstractConnection) connection).setMessageEncoder(messageEncoder);
-            ((AbstractConnection) connection).setMessageDecoder(messageDecoder);
+            //((AbstractConnection) connection).setMessageEncoder(messageEncoder);
+            //((AbstractConnection) connection).setMessageDecoder(messageDecoder);
         }
     }
 }
+*/

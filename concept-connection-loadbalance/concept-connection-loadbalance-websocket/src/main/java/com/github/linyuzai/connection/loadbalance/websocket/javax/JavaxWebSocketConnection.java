@@ -55,27 +55,13 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     @SneakyThrows
     @Override
     public void ping(PingMessage ping) {
-        Object payload = ping.getPayload();
-        if (payload instanceof ByteBuffer) {
-            session.getAsyncRemote().sendPing((ByteBuffer) payload);
-        } else if (payload instanceof byte[]) {
-            session.getAsyncRemote().sendPing(ByteBuffer.wrap((byte[]) payload));
-        } else {
-            throw new IllegalArgumentException(payload.toString());
-        }
+        session.getAsyncRemote().sendPing(ping.getPayload());
     }
 
     @SneakyThrows
     @Override
     public void pong(PongMessage pong) {
-        Object payload = pong.getPayload();
-        if (payload instanceof ByteBuffer) {
-            session.getAsyncRemote().sendPong((ByteBuffer) payload);
-        } else if (payload instanceof byte[]) {
-            session.getAsyncRemote().sendPong(ByteBuffer.wrap((byte[]) payload));
-        } else {
-            throw new IllegalArgumentException(payload.toString());
-        }
+        session.getAsyncRemote().sendPong(pong.getPayload());
     }
 
     @SneakyThrows

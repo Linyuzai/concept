@@ -66,36 +66,14 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
 
     @Override
     public void ping(PingMessage ping) {
-        Object payload = ping.getPayload();
-        if (payload instanceof DataBuffer) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                    (DataBuffer) payload));
-        } else if (payload instanceof ByteBuffer) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                    session.bufferFactory().wrap((ByteBuffer) payload)));
-        } else if (payload instanceof byte[]) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                    session.bufferFactory().wrap((byte[]) payload)));
-        } else {
-            throw new IllegalArgumentException(payload.toString());
-        }
+        sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
+                session.bufferFactory().wrap(ping.getPayload())));
     }
 
     @Override
     public void pong(PongMessage pong) {
-        Object payload = pong.getPayload();
-        if (payload instanceof DataBuffer) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                    (DataBuffer) payload));
-        } else if (payload instanceof ByteBuffer) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                    session.bufferFactory().wrap((ByteBuffer) payload)));
-        } else if (payload instanceof byte[]) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                    session.bufferFactory().wrap((byte[]) payload)));
-        } else {
-            throw new IllegalArgumentException(payload.toString());
-        }
+        sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
+                session.bufferFactory().wrap(pong.getPayload())));
     }
 
     @Override

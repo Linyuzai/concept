@@ -3,6 +3,8 @@ package com.github.linyuzai.connection.loadbalance.core.select;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connections;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -27,6 +29,11 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
             select = null;
         } else {
             select = doSelect(message, clients);
+        }
+
+        if (message instanceof PingMessage || message instanceof PongMessage) {
+            //ping pong 不转发
+            return select;
         }
 
         if (message.getHeaders().containsKey(Message.FORWARD)) {

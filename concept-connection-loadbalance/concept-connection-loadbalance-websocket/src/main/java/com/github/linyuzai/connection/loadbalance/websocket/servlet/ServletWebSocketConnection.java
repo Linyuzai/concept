@@ -56,27 +56,13 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     @SneakyThrows
     @Override
     public void ping(PingMessage ping) {
-        Object payload = ping.getPayload();
-        if (payload instanceof ByteBuffer) {
-            session.sendMessage(new org.springframework.web.socket.PingMessage((ByteBuffer) payload));
-        } else if (payload instanceof byte[]) {
-            session.sendMessage(new org.springframework.web.socket.PingMessage(ByteBuffer.wrap((byte[]) payload)));
-        } else {
-            throw new IllegalArgumentException(payload.toString());
-        }
+        session.sendMessage(new org.springframework.web.socket.PingMessage(ping.getPayload()));
     }
 
     @SneakyThrows
     @Override
     public void pong(PongMessage pong) {
-        Object payload = pong.getPayload();
-        if (payload instanceof ByteBuffer) {
-            session.sendMessage(new org.springframework.web.socket.PongMessage((ByteBuffer) payload));
-        } else if (payload instanceof byte[]) {
-            session.sendMessage(new org.springframework.web.socket.PongMessage(ByteBuffer.wrap((byte[]) payload)));
-        } else {
-            throw new IllegalArgumentException(payload.toString());
-        }
+        session.sendMessage(new org.springframework.web.socket.PongMessage(pong.getPayload()));
     }
 
     @SneakyThrows

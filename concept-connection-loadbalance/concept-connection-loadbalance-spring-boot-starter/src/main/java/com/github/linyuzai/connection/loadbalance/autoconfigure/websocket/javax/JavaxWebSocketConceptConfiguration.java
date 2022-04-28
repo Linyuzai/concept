@@ -1,9 +1,11 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketMessageCodecAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -23,5 +25,11 @@ public class JavaxWebSocketConceptConfiguration {
     @ConditionalOnMissingBean
     public ConnectionSubscriber connectionSubscriber() {
         return new JavaxWebSocketConnectionSubscriber();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MessageCodecAdapter messageCodecAdapter() {
+        return new JavaxWebSocketMessageCodecAdapter();
     }
 }

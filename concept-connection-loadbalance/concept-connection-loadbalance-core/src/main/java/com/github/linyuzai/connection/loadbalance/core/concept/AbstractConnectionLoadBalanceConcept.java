@@ -3,15 +3,13 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.exception.NoConnectionTypeException;
-import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.Getter;
 import lombok.NonNull;
@@ -57,7 +55,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     public <T> T applyAware(T o) {
         if (o instanceof ConnectionLoadBalanceConceptAware) {
-            ((ConnectionLoadBalanceConceptAware) o).setConnectionLoadBalanceConcept(this);
+            @SuppressWarnings("unchecked")
+            ConnectionLoadBalanceConceptAware<? super AbstractConnectionLoadBalanceConcept> aware =
+                    (ConnectionLoadBalanceConceptAware<? super AbstractConnectionLoadBalanceConcept>) o;
+            aware.setConnectionLoadBalanceConcept(this);
         }
         if (o instanceof Collection) {
             ((Collection<?>) o).forEach(this::applyAware);
@@ -156,20 +157,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         MessageDecoder decoder = connection.getMessageDecoder();
         Message decode = decoder.decode(message);
-        switch (type) {
-            case Connection.Type.CLIENT:
-                publish(new MessageReceiveEvent(connection, decode));
-                break;
-            case Connection.Type.SUBSCRIBER:
-                //转发
-                send(decode);
-                break;
-            case Connection.Type.OBSERVABLE:
-                //TODO
-                //publish(new ProxyMessageReceiveEvent(connection, decode));
-                //反向连接
-                subscribe(decode.getPayload(), false);
-                break;
+        if (decode instanceof PingMessage) {
+            publish(new PingMessageEvent(connection, (PingMessage) decode));
+        } else if (decode instanceof PongMessage) {
+            publish(new PongMessageEvent(connection, (PongMessage) decode));
+        } else {
+            publish(new MessageReceiveEvent(connection, decode));
         }
     }
 
@@ -182,7 +175,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void subscribe(ConnectionServer server, boolean reply) {
+    public void subscribe(ConnectionServer server, boolean sendServerMsg) {
         if (containsSubscriberConnection(server)) {
             //已经存在对应的服务连接
             return;
@@ -190,7 +183,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         try {
             connectionSubscriber.subscribe(server, this, connection -> {
                 open(connection);
-                if (reply) {
+                if (sendServerMsg) {
                     connection.send(createMessage(connectionServerProvider.getClient()));
                 }
             });
@@ -454,6 +447,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (eventPublisher == null) {
                 eventPublisher = new DefaultConnectionEventPublisher();
             }
+
+            eventListeners.add(0, new ConnectionSubscribeHandler());
+            eventListeners.add(0, new MessageForwardHandler());
 
             eventPublisher.register(eventListeners);
         }

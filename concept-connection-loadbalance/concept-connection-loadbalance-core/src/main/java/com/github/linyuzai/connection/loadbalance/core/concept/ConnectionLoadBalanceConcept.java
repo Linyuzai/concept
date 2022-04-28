@@ -13,7 +13,7 @@ public interface ConnectionLoadBalanceConcept {
 
     void subscribe();
 
-    void subscribe(ConnectionServer server, boolean reply);
+    void subscribe(ConnectionServer server, boolean sendServerMsg);
 
     Connection create(Object o, Map<Object, Object> metadata);
 
