@@ -1,20 +1,18 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
-import com.github.linyuzai.connection.loadbalance.core.event.MessageReceiveEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEventListener;
 
-public class ConnectionSubscribeHandler implements ConnectionEventListener {
+public class ConnectionSubscribeHandler implements MessageReceiveEventListener {
 
     @Override
-    public void onEvent(Object event) {
-        if (event instanceof MessageReceiveEvent) {
-            Message message = ((MessageReceiveEvent) event).getMessage();
-            Connection connection = ((MessageReceiveEvent) event).getConnection();
-            if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
-                connection.getConcept().subscribe(message.getPayload(), false);
-            }
-        }
+    public String getConnectionType() {
+        return Connection.Type.OBSERVABLE;
+    }
+
+    @Override
+    public void onMessage(Message message, Connection connection) {
+        connection.getConcept().subscribe(message.getPayload(), false);
     }
 }

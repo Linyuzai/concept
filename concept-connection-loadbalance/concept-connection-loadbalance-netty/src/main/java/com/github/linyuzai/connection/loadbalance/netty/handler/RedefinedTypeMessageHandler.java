@@ -10,6 +10,8 @@ public interface RedefinedTypeMessageHandler extends MessageHandler {
 
     @Override
     default void onMessage(Message message, Connection connection) {
+        /*Object payload = message.getPayload();
+
         if (message instanceof BinaryMessage) {
             byte[] payload = message.getPayload();
             try {
@@ -22,7 +24,7 @@ public interface RedefinedTypeMessageHandler extends MessageHandler {
                 return;
             } catch (Throwable ignore) {
             }
-        }
+        }*/
         onClientMessage(message, connection);
     }
 

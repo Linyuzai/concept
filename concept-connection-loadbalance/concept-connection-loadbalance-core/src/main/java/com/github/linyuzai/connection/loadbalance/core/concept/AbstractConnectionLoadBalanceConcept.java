@@ -126,7 +126,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void close(Object id, String type, Object reason) {
-        Connection connection = getConnections0(type).remove(id);
+        Connection connection = getConnections0(type).get(id);
         if (connection == null) {
             publish(new UnknownCloseEvent(id, type, reason, this));
             return;
@@ -136,6 +136,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void close(@NonNull Connection connection, Object reason) {
+        getConnections0(connection.getType()).remove(connection.getId());
         publish(new ConnectionCloseEvent(connection, reason));
     }
 
@@ -157,13 +158,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         MessageDecoder decoder = connection.getMessageDecoder();
         Message decode = decoder.decode(message);
-        if (decode instanceof PingMessage) {
-            publish(new PingMessageEvent(connection, (PingMessage) decode));
-        } else if (decode instanceof PongMessage) {
-            publish(new PongMessageEvent(connection, (PongMessage) decode));
-        } else {
-            publish(new MessageReceiveEvent(connection, decode));
-        }
+        publish(new MessageReceiveEvent(connection, decode));
     }
 
     @Override
@@ -176,9 +171,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void subscribe(ConnectionServer server, boolean sendServerMsg) {
-        if (containsSubscriberConnection(server)) {
-            //已经存在对应的服务连接
-            return;
+        Connection exist = getSubscriberConnection(server);
+        if (exist != null) {
+            //已经存在对应的服务连接，断开之前的连接
+            //可能是之前的连接已经断了，重新连接
+            try {
+                exist.close();
+            } catch (Throwable ignore) {
+            }
+            close(exist, "Resubscribe");
         }
         try {
             connectionSubscriber.subscribe(server, this, connection -> {
@@ -192,9 +193,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
-    public boolean containsSubscriberConnection(ConnectionServer server) {
+    public Connection getSubscriberConnection(ConnectionServer server) {
         if (server == null) {
-            return false;
+            return null;
         }
         Collection<Connection> subscriberConnections =
                 getConnections0(Connection.Type.SUBSCRIBER).values();
@@ -202,10 +203,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             ConnectionServer exist = (ConnectionServer) connection.getMetadata()
                     .get(ConnectionServer.class);
             if (server.getInstanceId().equals(exist.getInstanceId())) {
-                return true;
+                return connection;
             }
         }
-        return false;
+        return null;
     }
 
     @Override
