@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadB
 import com.github.linyuzai.connection.loadbalance.core.exception.NoConnectionTypeException;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.select.AllConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
@@ -167,21 +168,25 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void subscribe() {
         List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
         for (ConnectionServer server : servers) {
-            subscribe(server, true);
+            subscribe(server, false, true);
         }
     }
 
     @Override
-    public void subscribe(ConnectionServer server, boolean sendServerMsg) {
+    public void subscribe(ConnectionServer server, boolean reSubscribe, boolean sendServerMsg) {
         Connection exist = getSubscriberConnection(server);
         if (exist != null) {
-            //已经存在对应的服务连接，断开之前的连接
-            //可能是之前的连接已经断了，重新连接
-            try {
-                exist.close();
-            } catch (Throwable ignore) {
+            if (reSubscribe) {
+                //已经存在对应的服务连接，断开之前的连接
+                //可能是之前的连接已经断了，重新连接
+                try {
+                    exist.close();
+                } catch (Throwable ignore) {
+                }
+                close(exist, "ReSubscribe");
+            } else {
+                return;
             }
-            close(exist, "ReSubscribe");
         }
         try {
             connectionSubscriber.subscribe(server, this, connection -> {
@@ -249,28 +254,19 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void send(Object msg) {
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
-        Connection connection;
+        if (selector == null) {
+            throw new ConnectionLoadBalanceException("No connection selector");
+        }
         List<Connection> clients = new ArrayList<>(getConnectionMapByType(Connection.Type.CLIENT).values());
         List<Connection> observables = new ArrayList<>(getConnectionMapByType(Connection.Type.OBSERVABLE).values());
-        if (selector == null) {
-            connection = Connections.of(clients, observables);
-        } else {
-            connection = selector.select(message, clients, observables);
-        }
+        Connection connection = selector.select(message, clients, observables);
         if (connection == null) {
             publish(new DeadMessageEvent(message));
             return;
         }
         //添加转发标记，防止其他服务再次转发
-        String forward = message.getHeaders().get(Message.FORWARD);
         String instanceId = connectionServerProvider.getClient().getInstanceId();
-        String newForward;
-        if (forward == null) {
-            newForward = instanceId;
-        } else {
-            newForward = forward + " " + instanceId;
-        }
-        message.getHeaders().put(Message.FORWARD, newForward);
+        message.getHeaders().put(Message.FORWARD, instanceId);
         connection.send(message);
         publish(new MessageSendEvent(connection, message));
     }
@@ -444,6 +440,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (messageCodecAdapter == null) {
                 throw new ConnectionLoadBalanceException("MessageCodecAdapter is null");
             }
+
+            connectionSelectors.add(new AllConnectionSelector());
 
             messageFactories.add(new ObjectMessageFactory());
 

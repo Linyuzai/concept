@@ -1,21 +1,16 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
-@AllArgsConstructor
+@Setter
 public abstract class AbstractMessage<T> implements Message {
 
-    private final Map<String, String> headers = new LinkedHashMap<>();
+    private Map<String, String> headers = new LinkedHashMap<>();
 
-    private final T payload;
-
-    @SuppressWarnings("unchecked")
-    public T getPayload() {
-        return payload;
-    }
+    private T payload;
 }

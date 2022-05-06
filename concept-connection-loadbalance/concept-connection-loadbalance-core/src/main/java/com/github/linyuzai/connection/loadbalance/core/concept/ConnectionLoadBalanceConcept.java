@@ -14,7 +14,7 @@ public interface ConnectionLoadBalanceConcept {
 
     void subscribe();
 
-    void subscribe(ConnectionServer server, boolean sendServerMsg);
+    void subscribe(ConnectionServer server, boolean reSubscribe, boolean sendServerMsg);
 
     Connection create(Object o, Map<Object, Object> metadata);
 

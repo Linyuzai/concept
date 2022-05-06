@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.JacksonTextMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.SampleMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTextMessageEncoder;
@@ -36,6 +37,6 @@ public class WebSocketMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override
     public MessageDecoder getForwardMessageDecoder() {
-        return new SampleMessageDecoder();
+        return new JacksonTextMessageDecoder();
     }
 }

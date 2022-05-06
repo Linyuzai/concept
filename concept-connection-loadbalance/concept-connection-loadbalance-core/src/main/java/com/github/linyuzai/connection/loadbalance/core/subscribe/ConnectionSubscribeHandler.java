@@ -13,6 +13,6 @@ public class ConnectionSubscribeHandler implements MessageReceiveEventListener {
 
     @Override
     public void onMessage(Message message, Connection connection) {
-        connection.getConcept().subscribe(message.getPayload(), false);
+        connection.getConcept().subscribe(message.getPayload(), false, false);
     }
 }
