@@ -15,3 +15,4 @@
 - [一个注解实现下载接口](../../wiki/Concept-Download)
 - [异步回调转为同步返回](../../wiki/Concept-Sync-Waiting)
 - [动态加载外部jar中的Class](../../wiki/Concept-Plugin)
+- [一个注解实现WebSocket集群方案](../../wiki/Concept-Connection-Loadbalance)
