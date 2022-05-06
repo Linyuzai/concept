@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import javax.websocket.Session;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -64,9 +65,8 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
         session.getAsyncRemote().sendPong(pong.getPayload());
     }
 
-    @SneakyThrows
     @Override
-    public void close() {
+    public void doClose() throws IOException {
         session.close();
     }
 }

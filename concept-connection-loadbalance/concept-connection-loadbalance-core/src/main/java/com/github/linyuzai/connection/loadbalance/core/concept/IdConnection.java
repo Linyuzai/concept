@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Getter
@@ -38,7 +39,7 @@ public class IdConnection extends AbstractConnection {
     }
 
     @Override
-    public void close() {
+    public void doClose() throws IOException {
 
     }
 }

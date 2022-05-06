@@ -94,12 +94,7 @@ public class Connections implements Connection {
 
     @Override
     public void close() {
-        for (Connection connection : connections) {
-            try {
-                connection.close();
-            } catch (Throwable ignore) {
-            }
-        }
+        connections.forEach(Connection::close);
     }
 
     @SafeVarargs

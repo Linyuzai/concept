@@ -78,12 +78,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         connections.values()
                 .stream()
                 .flatMap(it -> it.values().stream())
-                .forEach(it -> {
-                    try {
-                        it.close();
-                    } catch (Throwable ignore) {
-                    }
-                });
+                .forEach(Connection::close);
         publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
@@ -179,10 +174,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (reSubscribe) {
                 //已经存在对应的服务连接，断开之前的连接
                 //可能是之前的连接已经断了，重新连接
-                try {
-                    exist.close();
-                } catch (Throwable ignore) {
-                }
+                exist.close();
                 close(exist, "ReSubscribe");
             } else {
                 return;

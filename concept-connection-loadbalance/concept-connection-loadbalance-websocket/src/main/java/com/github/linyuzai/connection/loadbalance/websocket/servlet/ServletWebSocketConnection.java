@@ -9,6 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -65,9 +66,8 @@ public class ServletWebSocketConnection extends WebSocketConnection {
         session.sendMessage(new org.springframework.web.socket.PongMessage(pong.getPayload()));
     }
 
-    @SneakyThrows
     @Override
-    public void close() {
+    public void doClose() throws IOException {
         session.close();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -77,7 +78,7 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void close() {
+    public void doClose() throws IOException {
         sender.complete();
         session.close().subscribe();
     }
