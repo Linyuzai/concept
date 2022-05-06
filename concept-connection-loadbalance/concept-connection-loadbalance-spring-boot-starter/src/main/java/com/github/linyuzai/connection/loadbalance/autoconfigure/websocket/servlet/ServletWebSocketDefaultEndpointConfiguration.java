@@ -10,7 +10,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 @EnableWebSocket
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class ServletWebSocketDefaultServerConfiguration {
+public class ServletWebSocketDefaultEndpointConfiguration {
 
     @Bean
     public ServletWebSocketServerConfigurer servletWebSocketServerConfigurer(WebSocketLoadBalanceConcept concept) {

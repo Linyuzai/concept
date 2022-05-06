@@ -44,11 +44,7 @@ public abstract class AbstractConnectionSubscriber<Con extends Connection, Conce
         if (port == null || port.isEmpty()) {
             return server.getPort();
         }
-        try {
-            return Integer.parseInt(port);
-        } catch (Throwable ignore) {
-            return server.getPort();
-        }
+        return Integer.parseInt(port);
     }
 
     @SneakyThrows

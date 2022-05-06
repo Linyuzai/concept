@@ -9,8 +9,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ConnectionSubscribeMonitor;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ScheduledExecutorConnectionSubscribeMonitor;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,5 +50,14 @@ public class WebSocketLoadBalanceConfiguration {
                 .eventPublisher(eventPublisher)
                 .addEventListeners(eventListeners)
                 .build();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "concept.websocket.load-balance.subscriber.auto-subscribe.enabled", havingValue = "true", matchIfMissing = true)
+    public ConnectionSubscribeMonitor connectionAutoSubscriber(WebSocketLoadBalanceConcept concept,
+                                                               WebSocketLoadBalanceProperties properties) {
+        return new ScheduledExecutorConnectionSubscribeMonitor(concept,
+                properties.getSubscriber().getMonitor().getPeriod());
     }
 }

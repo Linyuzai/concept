@@ -69,7 +69,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void initialize() {
-        subscribe();
+        subscribe(false, true);
         publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 
@@ -160,10 +160,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void subscribe() {
+    public void subscribe(boolean reSubscribe, boolean sendServerMsg) {
         List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
         for (ConnectionServer server : servers) {
-            subscribe(server, false, true);
+            subscribe(server, reSubscribe, sendServerMsg);
         }
     }
 

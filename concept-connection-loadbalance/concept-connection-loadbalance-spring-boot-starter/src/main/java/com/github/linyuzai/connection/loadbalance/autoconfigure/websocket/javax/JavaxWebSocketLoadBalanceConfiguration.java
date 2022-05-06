@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.javax;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketLoadBalanceEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;

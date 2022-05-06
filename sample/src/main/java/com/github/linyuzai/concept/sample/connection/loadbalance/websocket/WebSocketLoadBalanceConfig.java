@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@EnableWebSocketLoadBalanceConcept(type = ServerType.AUTO, defaultServer = true)
+@EnableWebSocketLoadBalanceConcept
 public class WebSocketLoadBalanceConfig {
 
     @Bean

@@ -1,13 +1,13 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.javax.JavaxWebSocketConceptConfiguration;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.javax.JavaxWebSocketDefaultServerConfiguration;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.javax.JavaxWebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.javax.JavaxWebSocketLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.reactive.ReactiveWebSocketConceptConfiguration;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.reactive.ReactiveWebSocketDefaultServerConfiguration;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.reactive.ReactiveWebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.reactive.ReactiveWebSocketLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.servlet.ServletWebSocketConceptConfiguration;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.servlet.ServletWebSocketDefaultServerConfiguration;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.servlet.ServletWebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.servlet.ServletWebSocketLoadBalanceConfiguration;
 import lombok.Getter;
 
@@ -21,42 +21,46 @@ public enum ServerType {
     /**
      * 根据当前环境自动进行默认配置
      */
-    AUTO(null),
+    AUTO,
 
     /**
      * 使用 javax 配置默认服务
      */
-    JAVAX(JavaxWebSocketDefaultServerConfiguration.class,
+    JAVAX(JavaxWebSocketDefaultEndpointConfiguration.class,
             JavaxWebSocketConceptConfiguration.class,
             JavaxWebSocketLoadBalanceConfiguration.class),
 
     /**
      * 使用 servlet 配置默认服务
      */
-    SERVLET(ServletWebSocketDefaultServerConfiguration.class,
+    SERVLET(ServletWebSocketDefaultEndpointConfiguration.class,
             ServletWebSocketConceptConfiguration.class,
             ServletWebSocketLoadBalanceConfiguration.class),
 
     /**
      * 使用 reactive 配置默认服务
      */
-    REACTIVE(ReactiveWebSocketDefaultServerConfiguration.class,
+    REACTIVE(ReactiveWebSocketDefaultEndpointConfiguration.class,
             ReactiveWebSocketConceptConfiguration.class,
             ReactiveWebSocketLoadBalanceConfiguration.class);
 
-    private final Class<?> defaultServer;
+    private final Class<?> defaultEndpoint;
 
     private final Class<?>[] configureClasses;
 
-    ServerType(Class<?> defaultServer, Class<?>... configureClasses) {
-        this.defaultServer = defaultServer;
+    ServerType() {
+        this(null);
+    }
+
+    ServerType(Class<?> defaultEndpoint, Class<?>... configureClasses) {
+        this.defaultEndpoint = defaultEndpoint;
         this.configureClasses = configureClasses;
     }
 
-    public String[] getConfigureClassNames(boolean configureDefaultServer) {
+    public String[] getConfigurations(boolean enableDefaultEndpoint) {
         List<Class<?>> classes = new ArrayList<>(Arrays.asList(configureClasses));
-        if (configureDefaultServer && defaultServer != null) {
-            classes.add(defaultServer);
+        if (enableDefaultEndpoint && defaultEndpoint != null) {
+            classes.add(defaultEndpoint);
         }
         return classes.stream()
                 .map(Class::getName)

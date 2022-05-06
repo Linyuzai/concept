@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.reactive;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketConnectionFactory;
@@ -21,7 +22,7 @@ public class ReactiveWebSocketConceptConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConnectionSubscriber connectionSubscriber() {
-        return new ReactiveWebSocketConnectionSubscriber();
+    public ConnectionSubscriber connectionSubscriber(WebSocketLoadBalanceProperties properties) {
+        return new ReactiveWebSocketConnectionSubscriber(properties.getSubscriber().getProtocol());
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class JavaxWebSocketDefaultServerConfiguration {
+public class JavaxWebSocketDefaultEndpointConfiguration {
 
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {

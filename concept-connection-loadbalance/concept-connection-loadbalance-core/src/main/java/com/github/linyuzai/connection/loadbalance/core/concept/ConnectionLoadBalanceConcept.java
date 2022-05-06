@@ -12,7 +12,7 @@ public interface ConnectionLoadBalanceConcept {
 
     void destroy();
 
-    void subscribe();
+    void subscribe(boolean reSubscribe, boolean sendServerMsg);
 
     void subscribe(ConnectionServer server, boolean reSubscribe, boolean sendServerMsg);
 

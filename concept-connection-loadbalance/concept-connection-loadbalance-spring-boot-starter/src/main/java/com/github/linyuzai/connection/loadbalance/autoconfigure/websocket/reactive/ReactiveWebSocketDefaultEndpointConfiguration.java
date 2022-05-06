@@ -9,7 +9,7 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-public class ReactiveWebSocketDefaultServerConfiguration {
+public class ReactiveWebSocketDefaultEndpointConfiguration {
 
     @Bean
     public WebSocketHandlerAdapter webSocketHandlerAdapter() {
