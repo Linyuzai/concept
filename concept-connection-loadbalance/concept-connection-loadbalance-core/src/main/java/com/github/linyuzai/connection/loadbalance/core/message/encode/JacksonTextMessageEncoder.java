@@ -12,8 +12,18 @@ public class JacksonTextMessageEncoder implements MessageEncoder {
 
     private ObjectMapper objectMapper;
 
+    private boolean messageAsPayload;
+
     public JacksonTextMessageEncoder() {
-        this(new ObjectMapper());
+        this(new ObjectMapper(), false);
+    }
+
+    public JacksonTextMessageEncoder(boolean messageAsPayload) {
+        this(new ObjectMapper(), messageAsPayload);
+    }
+
+    public JacksonTextMessageEncoder(ObjectMapper objectMapper) {
+        this(objectMapper, false);
     }
 
     @SneakyThrows
@@ -27,6 +37,10 @@ public class JacksonTextMessageEncoder implements MessageEncoder {
     }
 
     public Object getPayload(Message message) {
-        return message.getPayload();
+        if (messageAsPayload) {
+            return message;
+        } else {
+            return message.getPayload();
+        }
     }
 }

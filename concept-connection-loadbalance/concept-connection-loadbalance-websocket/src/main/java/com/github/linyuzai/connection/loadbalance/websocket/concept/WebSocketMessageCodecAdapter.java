@@ -31,7 +31,7 @@ public class WebSocketMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override
     public MessageEncoder getForwardMessageEncoder() {
-        return new JacksonTextMessageEncoder();
+        return new JacksonTextMessageEncoder(true);
     }
 
     @Override

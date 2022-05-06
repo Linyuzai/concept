@@ -8,14 +8,49 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AutoPongHandler implements ConnectionEventListener {
+
+    private final static long DEFAULT_TIMEOUT_AND_PERIOD = 3 * 60 * 1000;
 
     private final Map<Connection, Long> last = new ConcurrentHashMap<>();
 
     private ConnectionLoadBalanceConcept concept;
 
+    private final ScheduledExecutorService executor;
+
+    private final long timeout;
+
+    private final long period;
+
     private volatile boolean running = true;
+
+    public AutoPongHandler() {
+        this(Executors.newSingleThreadScheduledExecutor(), DEFAULT_TIMEOUT_AND_PERIOD, DEFAULT_TIMEOUT_AND_PERIOD);
+    }
+
+    public AutoPongHandler(long timeout, long period) {
+        this(Executors.newSingleThreadScheduledExecutor(), timeout, period);
+    }
+
+    public AutoPongHandler(ScheduledExecutorService executor) {
+        this(executor, DEFAULT_TIMEOUT_AND_PERIOD, DEFAULT_TIMEOUT_AND_PERIOD);
+    }
+
+    public AutoPongHandler(ScheduledExecutorService executor, long timeout, long period) {
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("timeout must > 0");
+        }
+        if (period <= 0) {
+            throw new IllegalArgumentException("period must > 0");
+        }
+        this.executor = executor;
+        this.timeout = timeout;
+        this.period = period;
+    }
 
     @Override
     public void onEvent(Object event) {
@@ -36,12 +71,12 @@ public class AutoPongHandler implements ConnectionEventListener {
     }
 
     public void start() {
-        new Thread(() -> {
+        executor.scheduleAtFixedRate(() -> {
             while (running) {
                 try {
                     long now = System.currentTimeMillis();
                     for (Map.Entry<Connection, Long> next : last.entrySet()) {
-                        if (now - next.getValue() > 3 * 60 * 1000) {
+                        if (now - next.getValue() > timeout) {
                             concept.close(next.getKey(), "NoReply");
                         }
                     }
@@ -49,15 +84,14 @@ public class AutoPongHandler implements ConnectionEventListener {
                     for (Connection connection : connections) {
                         connection.send(createPingMessage());
                     }
-                    Thread.sleep(30 * 1000);
-                } catch (InterruptedException ignore) {
+                } catch (Throwable ignore) {
                     if (running) {
                         start();
                     }
                     break;
                 }
             }
-        }).start();
+        }, 0, period, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {

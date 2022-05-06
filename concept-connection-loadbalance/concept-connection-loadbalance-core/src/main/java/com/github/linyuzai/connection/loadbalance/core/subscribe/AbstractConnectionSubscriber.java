@@ -54,10 +54,11 @@ public abstract class AbstractConnectionSubscriber<Con extends Connection, Conce
     @SneakyThrows
     public URI getUri(ConnectionServer server) {
         return new URI(getProtocol() + "://" + getHost(server) + ":" + getPort(server) +
-                getEndpointPrefix() + getType());
+                getEndpointPrefix());
     }
 
     public abstract String getEndpointPrefix();
 
+    @Deprecated
     public abstract String getType();
 }

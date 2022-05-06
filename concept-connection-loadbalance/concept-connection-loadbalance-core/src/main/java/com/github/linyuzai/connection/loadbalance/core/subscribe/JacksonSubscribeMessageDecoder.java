@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeException;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -20,20 +19,25 @@ public class JacksonSubscribeMessageDecoder implements MessageDecoder {
     private ObjectMapper objectMapper;
 
     public JacksonSubscribeMessageDecoder() {
-        this(new ObjectMapper()
+        /*this(new ObjectMapper()
                 .registerModule(new SimpleModule()
-                        .addAbstractTypeMapping(ConnectionServer.class, ConnectionServerImpl.class)));
+                        .addAbstractTypeMapping(ConnectionServer.class, ConnectionServerImpl.class)));*/
+        this(new ObjectMapper());
+    }
+
+    @Override
+    public Message decode(Object message) {
+        return new SubscribeMessage(parse(message));
     }
 
     @SneakyThrows
-    @Override
-    public Message decode(Object message) {
+    public ConnectionServer parse(Object message) {
         if (message instanceof String) {
-            return objectMapper.readValue((String) message, SubscribeMessage.class);
+            return objectMapper.readValue((String) message, ConnectionServerImpl.class);
         } else if (message instanceof byte[]) {
-            return objectMapper.readValue((byte[]) message, SubscribeMessage.class);
+            return objectMapper.readValue((byte[]) message, ConnectionServerImpl.class);
         } else if (message instanceof ByteBuffer) {
-            return objectMapper.readValue(((ByteBuffer) message).array(), SubscribeMessage.class);
+            return objectMapper.readValue(((ByteBuffer) message).array(), ConnectionServerImpl.class);
         } else {
             throw new MessageDecodeException(message);
         }

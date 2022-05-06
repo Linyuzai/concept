@@ -9,4 +9,6 @@ import lombok.Getter;
 public class ConnectionSubscribeErrorEvent {
 
     private final ConnectionServer connectionServer;
+
+    private final Throwable error;
 }

@@ -7,6 +7,4 @@ public interface ConnectionServerProvider {
     ConnectionServer getClient();
 
     List<ConnectionServer> getConnectionServers();
-
-
 }

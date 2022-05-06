@@ -7,7 +7,7 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
 
-@ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT + "{subtype}")
+@ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
 public class JavaxWebSocketLoadBalanceEndpoint {
 
     @OnOpen

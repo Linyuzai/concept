@@ -18,26 +18,7 @@ test {
     useJUnitPlatform()
 }
 
-allprojects {
-    ext {
-        set('springBootVersion', "2.6.3")
-        set('springDependencyManagementVersion', "1.0.11.RELEASE")
-        set('springCloudVersion', "3.1.1")
-        set('springCloudDependencyManagementVersion', "2021.0.1")
-        set('kotlinVersion', "1.6.10")
-        set('dokkaVersion', "1.6.0")
-        set('reactorVersion', "3.4.1")
-        set('coroutinesVersion', "1.5.0")
-        set('cglibVersion', "3.3.0")
-        set('okhttpVersion', "4.9.3")
-        set('jacksonVersion', "2.13.1")
-        set('nettyVersion', "4.1.72.Final")
-        set('xnioVersion', "3.8.6.Final")
-        set('javaxWebsocketVersion', "1.1")
-        set('lombokVersion', "1.18.22")
-        set('junitJupiterVersion', "5.8.2")
-    }
-}
+apply from: 'allprojects.gradle'
 
 /*apply from: 'github.gradle'
 

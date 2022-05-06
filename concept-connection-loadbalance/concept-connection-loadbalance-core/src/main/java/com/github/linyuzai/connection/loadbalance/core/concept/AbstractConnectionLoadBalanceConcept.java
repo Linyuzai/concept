@@ -191,7 +191,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 }
             });
         } catch (Throwable e) {
-            publish(new ConnectionSubscribeErrorEvent(server));
+            publish(new ConnectionSubscribeErrorEvent(server, e));
         }
     }
 

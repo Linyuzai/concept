@@ -5,8 +5,6 @@ import java.util.Map;
 
 public interface ConnectionServer {
 
-    String INSTANCE_ID = "instance-id";
-
     String getInstanceId();
 
     String getServiceId();
