@@ -54,8 +54,9 @@ public class WebSocketLoadBalanceConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(name = "concept.websocket.load-balance.subscriber.auto-subscribe.enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionSubscribeMonitor connectionAutoSubscriber(WebSocketLoadBalanceConcept concept,
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
+            name = "enabled", havingValue = "true", matchIfMissing = true)
+    public ConnectionSubscribeMonitor connectionSubscribeMonitor(WebSocketLoadBalanceConcept concept,
                                                                WebSocketLoadBalanceProperties properties) {
         return new ScheduledExecutorConnectionSubscribeMonitor(concept,
                 properties.getSubscriber().getMonitor().getPeriod());

@@ -16,15 +16,6 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
 
     @Override
     public String @NonNull [] selectImports(@NonNull AnnotationMetadata metadata) {
-        /*Map<String, Object> attributes = metadata
-                .getAnnotationAttributes(EnableWebSocketLoadBalanceConcept.class.getName());
-        if (attributes == null) {
-            throw new IllegalArgumentException("@EnableWebSocketLoadBalanceConcept not found");
-        }*/
-        //ServerType type = (ServerType) attributes.get("type");
-        //boolean autoSubscribe = (boolean) attributes.get("autoSubscribe");
-        //boolean defaultServer = (boolean) attributes.get("defaultServer");
-
         ServerType type = environment.getProperty("concept-websocket.load-balance.server.type",
                 ServerType.class, ServerType.AUTO);
         if (type == ServerType.AUTO) {

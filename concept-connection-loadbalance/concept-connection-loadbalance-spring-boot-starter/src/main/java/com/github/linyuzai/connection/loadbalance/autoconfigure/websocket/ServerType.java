@@ -19,26 +19,26 @@ import java.util.List;
 public enum ServerType {
 
     /**
-     * 根据当前环境自动进行默认配置
+     * 根据当前环境自动进行配置
      */
     AUTO,
 
     /**
-     * 使用 javax 配置默认服务
+     * 使用 javax 配置
      */
     JAVAX(JavaxWebSocketDefaultEndpointConfiguration.class,
             JavaxWebSocketConceptConfiguration.class,
             JavaxWebSocketLoadBalanceConfiguration.class),
 
     /**
-     * 使用 servlet 配置默认服务
+     * 使用 servlet 配置
      */
     SERVLET(ServletWebSocketDefaultEndpointConfiguration.class,
             ServletWebSocketConceptConfiguration.class,
             ServletWebSocketLoadBalanceConfiguration.class),
 
     /**
-     * 使用 reactive 配置默认服务
+     * 使用 reactive 配置
      */
     REACTIVE(ReactiveWebSocketDefaultEndpointConfiguration.class,
             ReactiveWebSocketConceptConfiguration.class,
