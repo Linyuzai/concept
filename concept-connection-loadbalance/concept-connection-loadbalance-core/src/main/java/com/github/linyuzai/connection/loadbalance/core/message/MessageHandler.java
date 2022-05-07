@@ -10,6 +10,4 @@ public interface MessageHandler extends MessageReceiveEventListener {
     default String getConnectionType() {
         return Connection.Type.CLIENT;
     }
-
-    void onMessage(Message message, Connection connection);
 }

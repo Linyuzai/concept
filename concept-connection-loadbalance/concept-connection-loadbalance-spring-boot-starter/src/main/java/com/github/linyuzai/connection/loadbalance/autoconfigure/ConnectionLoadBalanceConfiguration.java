@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionS
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,8 @@ public class ConnectionLoadBalanceConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber",
+            name = "logger", havingValue = "true", matchIfMissing = true)
     public ConnectionSubscribeLogger connectionSubscribeLogger() {
         return new ConnectionSubscribeLogger(log::info, log::error);
     }

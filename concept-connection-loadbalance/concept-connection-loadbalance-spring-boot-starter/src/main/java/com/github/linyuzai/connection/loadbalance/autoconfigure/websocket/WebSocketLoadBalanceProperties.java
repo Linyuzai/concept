@@ -89,7 +89,7 @@ public class WebSocketLoadBalanceProperties {
         /**
          * 是否启用心跳
          */
-        private boolean enabled = false;
+        private boolean enabled = true;
 
         /**
          * 是否服务发心跳给客户端
