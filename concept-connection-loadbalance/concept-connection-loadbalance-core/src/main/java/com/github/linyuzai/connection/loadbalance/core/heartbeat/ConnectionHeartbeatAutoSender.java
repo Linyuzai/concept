@@ -4,7 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 
 import java.util.concurrent.ScheduledExecutorService;
 
-public class ConnectionHeartbeatAutoSender extends ScheduleExecutorConnectionHeartbeatAutoSupport {
+public class ConnectionHeartbeatAutoSender extends ScheduledExecutorConnectionHeartbeatAutoSupport {
 
     public ConnectionHeartbeatAutoSender(ConnectionLoadBalanceConcept concept,
                                          String connectionType,

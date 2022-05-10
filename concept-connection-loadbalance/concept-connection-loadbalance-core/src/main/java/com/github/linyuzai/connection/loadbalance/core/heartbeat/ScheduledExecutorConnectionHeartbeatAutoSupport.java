@@ -5,16 +5,16 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public abstract class ScheduleExecutorConnectionHeartbeatAutoSupport extends ConnectionHeartbeatAutoSupport {
+public abstract class ScheduledExecutorConnectionHeartbeatAutoSupport extends ConnectionHeartbeatAutoSupport {
 
     private final ScheduledExecutorService executor;
 
     private final long period;
 
-    public ScheduleExecutorConnectionHeartbeatAutoSupport(ConnectionLoadBalanceConcept concept,
-                                                          String connectionType,
-                                                          long timeout, long period,
-                                                          ScheduledExecutorService executor) {
+    public ScheduledExecutorConnectionHeartbeatAutoSupport(ConnectionLoadBalanceConcept concept,
+                                                           String connectionType,
+                                                           long timeout, long period,
+                                                           ScheduledExecutorService executor) {
         super(concept, connectionType, timeout);
         this.executor = executor;
         this.period = period;
