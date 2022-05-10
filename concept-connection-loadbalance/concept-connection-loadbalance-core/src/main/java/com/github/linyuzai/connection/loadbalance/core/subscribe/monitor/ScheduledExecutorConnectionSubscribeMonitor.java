@@ -1,44 +1,50 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe.monitor;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptDestroyEvent;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
-public class ScheduledExecutorConnectionSubscribeMonitor implements ConnectionSubscribeMonitor {
+public class ScheduledExecutorConnectionSubscribeMonitor implements ConnectionSubscribeMonitor, ConnectionEventListener {
 
-    private final ConnectionLoadBalanceConcept concept;
+    private ConnectionLoadBalanceConcept concept;
 
+    @NonNull
     private final ScheduledExecutorService executor;
 
     private final long period;
 
-    public ScheduledExecutorConnectionSubscribeMonitor(ConnectionLoadBalanceConcept concept, long period) {
-        this(concept, Executors.newSingleThreadScheduledExecutor(), period);
-    }
-
-    private volatile ScheduledFuture<?> future;
-
-    @Override
     public void start() {
-        if (future == null) {
-            future = executor.scheduleAtFixedRate(this::subscribe, 0, period, TimeUnit.MILLISECONDS);
-        }
+        executor.scheduleAtFixedRate(this::subscribe, period, period, TimeUnit.MILLISECONDS);
     }
 
     public void subscribe() {
-        concept.subscribe(false, false);
+        try {
+            concept.subscribe(false, false);
+        } catch (Throwable e) {
+            //TODO
+        }
+    }
+
+    public void stop() {
+        if (!executor.isShutdown()) {
+            executor.shutdown();
+        }
     }
 
     @Override
-    public void stop() {
-        if (future != null && !future.isCancelled()) {
-            future.cancel(true);
-            future = null;
+    public void onEvent(Object event) {
+        if (event instanceof ConnectionLoadBalanceConceptInitializeEvent) {
+            this.concept = ((ConnectionLoadBalanceConceptInitializeEvent) event).getConcept();
+            start();
+        } else if (event instanceof ConnectionLoadBalanceConceptDestroyEvent) {
+            stop();
         }
     }
 }

@@ -4,7 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import lombok.Getter;
 
 @Getter
-public class ConnectionCloseErrorEvent extends AbstractConnectionEvent {
+public class ConnectionCloseErrorEvent extends AbstractConnectionEvent implements ErrorEvent {
 
     private final Throwable error;
 

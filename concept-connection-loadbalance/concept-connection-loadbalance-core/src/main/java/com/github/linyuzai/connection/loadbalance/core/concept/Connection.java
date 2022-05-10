@@ -57,6 +57,7 @@ public interface Connection {
          * 未定义的类型
          * 用于无法区分的连接类型
          */
+        @Deprecated
         public static final String UNDEFINED = "Connection@undefined";
     }
 }

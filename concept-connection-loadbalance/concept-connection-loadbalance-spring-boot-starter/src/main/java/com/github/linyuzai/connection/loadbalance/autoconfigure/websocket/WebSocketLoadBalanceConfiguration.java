@@ -11,6 +11,8 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerPr
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ConnectionSubscribeMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ScheduledExecutorConnectionSubscribeMonitor;
+import com.github.linyuzai.connection.loadbalance.core.utils.ScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.utils.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -54,11 +56,18 @@ public class WebSocketLoadBalanceConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
+        return new SingleThreadScheduledExecutorServiceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionSubscribeMonitor connectionSubscribeMonitor(WebSocketLoadBalanceConcept concept,
-                                                               WebSocketLoadBalanceProperties properties) {
-        return new ScheduledExecutorConnectionSubscribeMonitor(concept,
+    public ConnectionSubscribeMonitor connectionSubscribeMonitor(ScheduledExecutorServiceFactory factory,
+                                                                 WebSocketLoadBalanceProperties properties) {
+        return new ScheduledExecutorConnectionSubscribeMonitor(
+                factory.create(ConnectionSubscribeMonitor.class),
                 properties.getSubscriber().getMonitor().getPeriod());
     }
 }

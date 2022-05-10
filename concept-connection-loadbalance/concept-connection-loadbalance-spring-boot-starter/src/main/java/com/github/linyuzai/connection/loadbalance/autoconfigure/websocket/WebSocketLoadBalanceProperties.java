@@ -99,11 +99,6 @@ public class WebSocketLoadBalanceProperties {
         private boolean serverToClient = false;
 
         /**
-         * 服务收到ping时是否自动回应pong
-         */
-        private boolean autoPong = true;
-
-        /**
          * ping帧
          */
         private String pingFrame = "";

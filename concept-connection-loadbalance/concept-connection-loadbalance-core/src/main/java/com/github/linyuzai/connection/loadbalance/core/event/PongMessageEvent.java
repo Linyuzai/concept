@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
+@Deprecated
 @Getter
 public class PongMessageEvent extends AbstractConnectionEvent {
 

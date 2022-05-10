@@ -57,8 +57,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public <T> T applyAware(T o) {
         if (o instanceof ConnectionLoadBalanceConceptAware) {
             @SuppressWarnings("unchecked")
-            ConnectionLoadBalanceConceptAware<? super AbstractConnectionLoadBalanceConcept> aware =
-                    (ConnectionLoadBalanceConceptAware<? super AbstractConnectionLoadBalanceConcept>) o;
+            ConnectionLoadBalanceConceptAware<? super ConnectionLoadBalanceConcept> aware =
+                    (ConnectionLoadBalanceConceptAware<? super ConnectionLoadBalanceConcept>) o;
             aware.setConnectionLoadBalanceConcept(this);
         }
         if (o instanceof Collection) {
@@ -104,11 +104,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void open(Connection connection) {
-        applyAware(connection);
         String type = connection.getType();
         if (type == null) {
             throw new NoConnectionTypeException(connection);
         }
+        applyAware(connection);
         putConnection(connection, type);
         publish(new ConnectionOpenEvent(connection));
     }
