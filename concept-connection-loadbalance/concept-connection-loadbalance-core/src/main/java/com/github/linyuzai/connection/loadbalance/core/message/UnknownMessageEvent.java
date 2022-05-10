@@ -11,10 +11,10 @@ public class UnknownMessageEvent implements ConnectionEvent, MessageEvent {
 
     private final Connection connection;
 
-    private final Object message;
+    private final Message message;
 
     public UnknownMessageEvent(Object id, String type, Object message, ConnectionLoadBalanceConcept concept) {
         this.connection = new IdConnection(id, type, concept);
-        this.message = message;
+        this.message = new ObjectMessage(message);
     }
 }
