@@ -7,7 +7,6 @@ import com.github.linyuzai.connection.loadbalance.core.message.*;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,11 +32,14 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
         } else if (event instanceof ConnectionEvent) {
             Connection connection = ((ConnectionEvent) event).getConnection();
             if (connection.getType().equals(connectionType)) {
-                if (event instanceof ConnectionCloseEvent || event instanceof ConnectionCloseErrorEvent) {
+                if (event instanceof ConnectionOpenEvent) {
+                    last.put(connection.getId(), System.currentTimeMillis());
+                } else if (event instanceof ConnectionCloseEvent || event instanceof ConnectionCloseErrorEvent) {
                     last.remove(connection.getId());
                 } else if (event instanceof MessageReceiveEvent) {
                     Message message = ((MessageReceiveEvent) event).getMessage();
                     if (isPingMessage(message)) {
+                        System.out.println("receive ping");
                         //last.put(connection.getId(), System.currentTimeMillis());
                         //connection.send(createPongMessage());
                         //concept.publish(new HeartbeatReplyEvent(connection));
@@ -69,10 +71,12 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
 
     public void closeTimeout() {
         long now = System.currentTimeMillis();
-        for (Map.Entry<Object, Long> next : last.entrySet()) {
-            if (now - next.getValue() > timeout) {
+        Collection<Connection> connections = concept.getConnections(connectionType);
+        for (Connection connection : connections) {
+            Long l = last.get(connection.getId());
+            if (l == null || now - l > timeout) {
                 try {
-                    concept.close(next.getKey(), connectionType, "NoReply");
+                    concept.close(connection, "HeartbeatTimeout");
                 } catch (Throwable ignore) {
                     //会发布关闭异常事件
                 }

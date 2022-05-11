@@ -92,23 +92,6 @@ public class WebSocketLoadBalanceProperties {
         private boolean enabled = true;
 
         /**
-         * 是否服务发心跳给客户端
-         *
-         * 默认由客户端发心跳
-         */
-        private boolean serverToClient = true;
-
-        /**
-         * ping帧
-         */
-        private String pingFrame = "";
-
-        /**
-         * pong帧
-         */
-        private String pongFrame = "";
-
-        /**
          * 心跳超时时间
          */
         private long timeout = 3 * 60 * 1000;

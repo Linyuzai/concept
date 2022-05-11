@@ -5,9 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoReplier;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoSender;
-import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoSupport;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -60,41 +58,21 @@ public class WebSocketLoadBalanceConfiguration {
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
-        String type = heartbeat.isServerToClient() ? Connection.Type.OBSERVABLE : Connection.Type.SUBSCRIBER;
-        return new ConnectionHeartbeatAutoSender(type,
+        return new ConnectionHeartbeatAutoSender(Connection.Type.OBSERVABLE,
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
                 factory.create(ConnectionHeartbeatAutoSender.class));
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.heartbeat",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoReplier loadBalanceConnectionHeartbeatAutoReplier(
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
-        String type = heartbeat.isServerToClient() ? Connection.Type.SUBSCRIBER : Connection.Type.OBSERVABLE;
-        return new ConnectionHeartbeatAutoReplier(type,
-                heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatAutoReplier.class));
-    }
-
-    @Bean
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoSupport clientConnectionHeartbeatAutoSupport(
+    public ConnectionHeartbeatAutoSender clientConnectionHeartbeatSender(
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
-        if (heartbeat.isServerToClient()) {
-            return new ConnectionHeartbeatAutoSender(Connection.Type.CLIENT,
-                    heartbeat.getTimeout(), heartbeat.getPeriod(),
-                    factory.create(ConnectionHeartbeatAutoSender.class));
-        } else {
-            return new ConnectionHeartbeatAutoReplier(Connection.Type.CLIENT,
-                    heartbeat.getTimeout(), heartbeat.getPeriod(),
-                    factory.create(ConnectionHeartbeatAutoReplier.class));
-        }
+        return new ConnectionHeartbeatAutoSender(Connection.Type.CLIENT,
+                heartbeat.getTimeout(), heartbeat.getPeriod(),
+                factory.create(ConnectionHeartbeatAutoSender.class));
     }
 
     @Bean(destroyMethod = "destroy")
