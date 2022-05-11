@@ -96,7 +96,7 @@ public class WebSocketLoadBalanceProperties {
          *
          * 默认由客户端发心跳
          */
-        private boolean serverToClient = false;
+        private boolean serverToClient = true;
 
         /**
          * ping帧

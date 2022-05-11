@@ -32,13 +32,13 @@ public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAd
         public Message decode(Object message) {
             if (message instanceof WebSocketMessage) {
                 if (message instanceof org.springframework.web.socket.TextMessage) {
-                    return new TextMessage(((org.springframework.web.socket.TextMessage) message).getPayload());
+                    return decoder.decode(((org.springframework.web.socket.TextMessage) message).getPayload());
                 } else if (message instanceof org.springframework.web.socket.PingMessage) {
                     return new BinaryPingMessage(((org.springframework.web.socket.PingMessage) message).getPayload());
                 } else if (message instanceof org.springframework.web.socket.PongMessage) {
                     return new BinaryPongMessage(((org.springframework.web.socket.PongMessage) message).getPayload());
                 } else if (message instanceof org.springframework.web.socket.BinaryMessage) {
-                    return new BinaryMessage(((org.springframework.web.socket.BinaryMessage) message).getPayload());
+                    return decoder.decode(((org.springframework.web.socket.BinaryMessage) message).getPayload());
                 }
             }
             return decoder.decode(message);

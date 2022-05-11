@@ -23,7 +23,7 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
             ((ServletWebSocketHandlerRegistry) registry).setUrlPathHelper(helper);
         }
         registry.addHandler(new ServletWebSocketServerHandler(concept),
-                WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "/**")
+                WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**")
                 .setAllowedOrigins("*");
     }
 
@@ -33,7 +33,7 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
         public @NonNull String resolveAndCacheLookupPath(@NonNull HttpServletRequest request) {
             String path = super.resolveAndCacheLookupPath(request);
             if (path.startsWith(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX)) {
-                return WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "/**";
+                return WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**";
             }
             return path;
         }

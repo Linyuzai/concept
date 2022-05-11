@@ -14,7 +14,12 @@ public class DefaultConnectionEventPublisher implements ConnectionEventPublisher
     @Override
     public void publish(Object event) {
         for (ConnectionEventListener listener : listeners) {
-            listener.onEvent(event);
+            try {
+                listener.onEvent(event);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                //TODO
+            }
         }
     }
 

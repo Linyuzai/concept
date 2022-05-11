@@ -35,7 +35,12 @@ public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSub
     public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<ServletWebSocketConnection> consumer) {
         WebSocketClient client = newWebSocketClient();
         ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
-                consumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
+                consumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER) {
+                    @Override
+                    public URI getUri() {
+                        return uri;
+                    }
+                }));
         WebSocketConnectionManager manager = new WebSocketConnectionManager(client, handler, uri.toString());
         manager.start();
     }

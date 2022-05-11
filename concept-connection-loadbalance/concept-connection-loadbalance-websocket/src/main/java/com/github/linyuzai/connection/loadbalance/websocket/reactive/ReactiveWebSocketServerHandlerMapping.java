@@ -11,7 +11,7 @@ public class ReactiveWebSocketServerHandlerMapping extends SimpleUrlHandlerMappi
 
     public ReactiveWebSocketServerHandlerMapping(WebSocketLoadBalanceConcept concept) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "/**", new ReactiveWebSocketServerHandler(concept));
+        map.put(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**", new ReactiveWebSocketServerHandler(concept));
         setUrlMap(map);
     }
 }

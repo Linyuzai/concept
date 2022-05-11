@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ScheduledExecutorConnectionSubscribeMonitor implements ConnectionSubscribeMonitor, ConnectionEventListener {
 
-    private final ConnectionLoadBalanceConcept concept;
+    private ConnectionLoadBalanceConcept concept;
 
     @NonNull
     private final ScheduledExecutorService executor;
@@ -27,6 +27,7 @@ public class ScheduledExecutorConnectionSubscribeMonitor implements ConnectionSu
     public void subscribe() {
         try {
             concept.subscribe(false, false);
+            concept.publish(new SubscribeMonitorEvent());
         } catch (Throwable e) {
             //TODO
         }
@@ -41,6 +42,7 @@ public class ScheduledExecutorConnectionSubscribeMonitor implements ConnectionSu
     @Override
     public void onEvent(Object event) {
         if (event instanceof ConnectionLoadBalanceConceptInitializeEvent) {
+            concept = ((ConnectionLoadBalanceConceptInitializeEvent) event).getConcept();
             start();
         } else if (event instanceof ConnectionLoadBalanceConceptDestroyEvent) {
             stop();

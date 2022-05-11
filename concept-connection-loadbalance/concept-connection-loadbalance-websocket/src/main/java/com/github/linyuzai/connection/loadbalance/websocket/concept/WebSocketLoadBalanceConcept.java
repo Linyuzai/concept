@@ -14,7 +14,7 @@ import java.util.List;
 
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
     public static final String SUBSCRIBER_ENDPOINT = "/concept-websocket-subscriber";
-    public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket";
+    public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket/";
     private static WebSocketLoadBalanceConcept instance;
 
     private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,

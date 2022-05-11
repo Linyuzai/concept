@@ -9,7 +9,7 @@ public class NoConnectionTypeException extends ConnectionLoadBalanceException {
     private final Connection connection;
 
     public NoConnectionTypeException(Connection connection) {
-        super("Connection type is null");
+        super("Connection(" + connection.getUri() + ") type is null");
         this.connection = connection;
     }
 }

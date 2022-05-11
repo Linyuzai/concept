@@ -7,6 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.*;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
 
     private final Map<Object, Long> last = new ConcurrentHashMap<>();
 
-    private final ConnectionLoadBalanceConcept concept;
+    private ConnectionLoadBalanceConcept concept;
 
     private final String connectionType;
 
@@ -25,6 +26,7 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
     @Override
     public void onEvent(Object event) {
         if (event instanceof ConnectionLoadBalanceConceptInitializeEvent) {
+            concept = ((ConnectionLoadBalanceConceptInitializeEvent) event).getConcept();
             onInitialize();
         } else if (event instanceof ConnectionLoadBalanceConceptDestroyEvent) {
             onDestroy();
@@ -36,8 +38,9 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
                 } else if (event instanceof MessageReceiveEvent) {
                     Message message = ((MessageReceiveEvent) event).getMessage();
                     if (isPingMessage(message)) {
-                        last.put(connection.getId(), System.currentTimeMillis());
-                        connection.send(createPongMessage());
+                        //last.put(connection.getId(), System.currentTimeMillis());
+                        //connection.send(createPongMessage());
+                        //concept.publish(new HeartbeatReplyEvent(connection));
                     } else if (isPongMessage(message)) {
                         last.put(connection.getId(), System.currentTimeMillis());
                     }
@@ -57,9 +60,11 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
             try {
                 connection.send(message);
             } catch (Throwable e) {
+                e.printStackTrace();
                 //TODO
             }
         }
+        concept.publish(new HeartbeatSendEvent(connections, connectionType));
     }
 
     public void closeTimeout() {
@@ -85,9 +90,11 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
 
     public Message createPingMessage() {
         return new BinaryPingMessage(ByteBuffer.allocate(0));
+        //return new BinaryPingMessage(ByteBuffer.wrap("ping".getBytes(StandardCharsets.UTF_8)));
     }
 
     public Message createPongMessage() {
         return new BinaryPongMessage(ByteBuffer.allocate(0));
+        //return new BinaryPongMessage(ByteBuffer.wrap("pong".getBytes(StandardCharsets.UTF_8)));
     }
 }

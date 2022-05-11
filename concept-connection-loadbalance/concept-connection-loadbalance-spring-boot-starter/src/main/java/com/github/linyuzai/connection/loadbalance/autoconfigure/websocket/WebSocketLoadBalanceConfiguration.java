@@ -35,6 +35,68 @@ public class WebSocketLoadBalanceConfiguration {
         return new ApplicationConnectionEventPublisher(publisher);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
+        return new SingleThreadScheduledExecutorServiceFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
+            name = "enabled", havingValue = "true", matchIfMissing = true)
+    public ConnectionSubscribeMonitor connectionSubscribeMonitor(
+            ScheduledExecutorServiceFactory factory,
+            WebSocketLoadBalanceProperties properties) {
+        return new ScheduledExecutorConnectionSubscribeMonitor(
+                factory.create(ConnectionSubscribeMonitor.class),
+                properties.getSubscriber().getMonitor().getPeriod());
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.heartbeat",
+            name = "enabled", havingValue = "true", matchIfMissing = true)
+    public ConnectionHeartbeatAutoSender loadBalanceConnectionHeartbeatAutoSender(
+            ScheduledExecutorServiceFactory factory,
+            WebSocketLoadBalanceProperties properties) {
+        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
+        String type = heartbeat.isServerToClient() ? Connection.Type.OBSERVABLE : Connection.Type.SUBSCRIBER;
+        return new ConnectionHeartbeatAutoSender(type,
+                heartbeat.getTimeout(), heartbeat.getPeriod(),
+                factory.create(ConnectionHeartbeatAutoSender.class));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.heartbeat",
+            name = "enabled", havingValue = "true", matchIfMissing = true)
+    public ConnectionHeartbeatAutoReplier loadBalanceConnectionHeartbeatAutoReplier(
+            ScheduledExecutorServiceFactory factory,
+            WebSocketLoadBalanceProperties properties) {
+        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
+        String type = heartbeat.isServerToClient() ? Connection.Type.SUBSCRIBER : Connection.Type.OBSERVABLE;
+        return new ConnectionHeartbeatAutoReplier(type,
+                heartbeat.getTimeout(), heartbeat.getPeriod(),
+                factory.create(ConnectionHeartbeatAutoReplier.class));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.server.heartbeat",
+            name = "enabled", havingValue = "true", matchIfMissing = true)
+    public ConnectionHeartbeatAutoSupport clientConnectionHeartbeatAutoSupport(
+            ScheduledExecutorServiceFactory factory,
+            WebSocketLoadBalanceProperties properties) {
+        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
+        if (heartbeat.isServerToClient()) {
+            return new ConnectionHeartbeatAutoSender(Connection.Type.CLIENT,
+                    heartbeat.getTimeout(), heartbeat.getPeriod(),
+                    factory.create(ConnectionHeartbeatAutoSender.class));
+        } else {
+            return new ConnectionHeartbeatAutoReplier(Connection.Type.CLIENT,
+                    heartbeat.getTimeout(), heartbeat.getPeriod(),
+                    factory.create(ConnectionHeartbeatAutoReplier.class));
+        }
+    }
+
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
     public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(
@@ -56,70 +118,5 @@ public class WebSocketLoadBalanceConfiguration {
                 .eventPublisher(eventPublisher)
                 .addEventListeners(eventListeners)
                 .build();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
-        return new SingleThreadScheduledExecutorServiceFactory();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionSubscribeMonitor connectionSubscribeMonitor(WebSocketLoadBalanceConcept concept,
-                                                                 ScheduledExecutorServiceFactory factory,
-                                                                 WebSocketLoadBalanceProperties properties) {
-        return new ScheduledExecutorConnectionSubscribeMonitor(concept,
-                factory.create(ConnectionSubscribeMonitor.class),
-                properties.getSubscriber().getMonitor().getPeriod());
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.heartbeat",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoSender loadBalanceConnectionHeartbeatAutoSender(
-            WebSocketLoadBalanceConcept concept,
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
-        String type = heartbeat.isServerToClient() ? Connection.Type.OBSERVABLE : Connection.Type.SUBSCRIBER;
-        return new ConnectionHeartbeatAutoSender(concept, type,
-                heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatAutoSender.class));
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.heartbeat",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoReplier loadBalanceConnectionHeartbeatAutoReplier(
-            WebSocketLoadBalanceConcept concept,
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
-        String type = heartbeat.isServerToClient() ? Connection.Type.SUBSCRIBER : Connection.Type.OBSERVABLE;
-        return new ConnectionHeartbeatAutoReplier(concept, type,
-                heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatAutoReplier.class));
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.server.heartbeat",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoSupport clientConnectionHeartbeatAutoSupport(
-            WebSocketLoadBalanceConcept concept,
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
-        if (heartbeat.isServerToClient()) {
-            return new ConnectionHeartbeatAutoSender(concept, Connection.Type.CLIENT,
-                    heartbeat.getTimeout(), heartbeat.getPeriod(),
-                    factory.create(ConnectionHeartbeatAutoSender.class));
-        } else {
-            return new ConnectionHeartbeatAutoReplier(concept, Connection.Type.CLIENT,
-                    heartbeat.getTimeout(), heartbeat.getPeriod(),
-                    factory.create(ConnectionHeartbeatAutoReplier.class));
-        }
     }
 }
