@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketCon
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import java.io.IOException;
 import java.net.URI;
@@ -66,7 +67,16 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void doClose() throws IOException {
-        session.close();
+    public void doClose(String reason) throws IOException {
+        if (reason == null) {
+            session.close();
+        } else {
+            session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, reason));
+        }
+    }
+
+    @Override
+    public boolean isOpen() {
+        return session.isOpen();
     }
 }

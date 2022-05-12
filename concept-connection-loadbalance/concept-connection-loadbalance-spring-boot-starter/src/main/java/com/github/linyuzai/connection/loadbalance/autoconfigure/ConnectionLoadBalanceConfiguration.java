@@ -3,7 +3,8 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionServerProvider;
-import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,7 +13,6 @@ import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@CommonsLog
 @Configuration(proxyBeanMethods = false)
 public class ConnectionLoadBalanceConfiguration {
 
@@ -27,6 +27,7 @@ public class ConnectionLoadBalanceConfiguration {
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber",
             name = "logger", havingValue = "true", matchIfMissing = true)
     public ConnectionSubscribeLogger connectionSubscribeLogger() {
+        Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
         return new ConnectionSubscribeLogger(log::info, log::error);
     }
 }

@@ -29,6 +29,8 @@ public interface Connection {
 
     void close();
 
+    void close(String reason);
+
     boolean isAlive();
 
     void setAlive(boolean alive);

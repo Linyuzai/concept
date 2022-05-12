@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
@@ -11,7 +12,6 @@ import reactor.core.publisher.FluxSink;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class ReactiveWebSocketConnection extends WebSocketConnection {
@@ -48,18 +48,13 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
         if (message instanceof WebSocketMessage) {
             sender.next((WebSocketMessage) message);
         } else if (message instanceof String) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.TEXT,
-                    session.bufferFactory().wrap(((String) message)
-                            .getBytes(StandardCharsets.UTF_8))));
+            sender.next(session.textMessage((String) message));
         } else if (message instanceof DataBuffer) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
-                    (DataBuffer) message));
+            sender.next(session.binaryMessage(factory -> (DataBuffer) message));
         } else if (message instanceof ByteBuffer) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
-                    session.bufferFactory().wrap((ByteBuffer) message)));
+            sender.next(session.binaryMessage(factory -> factory.wrap((ByteBuffer) message)));
         } else if (message instanceof byte[]) {
-            sender.next(new WebSocketMessage(WebSocketMessage.Type.BINARY,
-                    session.bufferFactory().wrap((byte[]) message)));
+            sender.next(session.binaryMessage(factory -> factory.wrap((byte[]) message)));
         } else {
             throw new IllegalArgumentException(message.toString());
         }
@@ -67,19 +62,26 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
 
     @Override
     public void ping(PingMessage ping) {
-        sender.next(new WebSocketMessage(WebSocketMessage.Type.PING,
-                session.bufferFactory().wrap(ping.getPayload())));
+        sender.next(session.pingMessage(factory -> factory.wrap(ping.getPayload())));
     }
 
     @Override
     public void pong(PongMessage pong) {
-        sender.next(new WebSocketMessage(WebSocketMessage.Type.PONG,
-                session.bufferFactory().wrap(pong.getPayload())));
+        sender.next(session.pongMessage(factory -> factory.wrap(pong.getPayload())));
     }
 
     @Override
-    public void doClose() throws IOException {
+    public void doClose(String reason) throws IOException {
         sender.complete();
-        session.close().subscribe();
+        if (reason == null) {
+            session.close().subscribe();
+        } else {
+            session.close(new CloseStatus(CloseStatus.NORMAL.getCode(), reason)).subscribe();
+        }
+    }
+
+    @Override
+    public boolean isOpen() {
+        return session.isOpen();
     }
 }

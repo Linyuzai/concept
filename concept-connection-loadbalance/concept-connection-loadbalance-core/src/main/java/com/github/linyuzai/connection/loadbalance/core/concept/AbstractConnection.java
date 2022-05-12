@@ -88,14 +88,19 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void close() {
+        close(null);
+    }
+
+    @Override
+    public void close(String reason) {
         try {
-            doClose();
+            doClose(reason);
         } catch (Throwable e) {
             concept.publish(new ConnectionCloseErrorEvent(this, e));
         }
     }
 
-    public abstract void doClose() throws IOException;
+    public abstract void doClose(String reason) throws IOException;
 
     public abstract void doSend(Object message);
 }

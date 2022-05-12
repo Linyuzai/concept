@@ -1,10 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.ApplicationConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.LoggerEventPublishErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.event.EventPublishErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoSender;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
@@ -16,6 +18,7 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.Schedul
 import com.github.linyuzai.connection.loadbalance.core.utils.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.utils.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,8 +32,15 @@ public class WebSocketLoadBalanceConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConnectionEventPublisher connectionEventPublisher(ApplicationEventPublisher publisher) {
-        return new ApplicationConnectionEventPublisher(publisher);
+    public EventPublishErrorHandler eventPublishErrorHandler() {
+        return new LoggerEventPublishErrorHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConnectionEventPublisher connectionEventPublisher(ApplicationEventPublisher publisher,
+                                                             EventPublishErrorHandler errorHandler) {
+        return new ApplicationConnectionEventPublisher(publisher, errorHandler);
     }
 
     @Bean

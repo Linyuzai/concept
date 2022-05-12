@@ -4,10 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.SneakyThrows;
-import org.springframework.web.socket.BinaryMessage;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -67,7 +64,16 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void doClose() throws IOException {
-        session.close();
+    public void doClose(String reason) throws IOException {
+        if (reason == null) {
+            session.close();
+        } else {
+            session.close(new CloseStatus(CloseStatus.NORMAL.getCode(),reason));
+        }
+    }
+
+    @Override
+    public boolean isOpen() {
+        return session.isOpen();
     }
 }

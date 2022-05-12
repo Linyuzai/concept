@@ -39,7 +39,7 @@ public class IdConnection extends AbstractConnection {
     }
 
     @Override
-    public void doClose() throws IOException {
+    public void doClose(String reason) throws IOException {
 
     }
 }

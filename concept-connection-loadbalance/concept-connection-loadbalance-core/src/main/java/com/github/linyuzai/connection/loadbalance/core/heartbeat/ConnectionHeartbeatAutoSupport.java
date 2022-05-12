@@ -63,13 +63,7 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
             long lastHeartbeat = connection.getLastHeartbeat();
             if (now - lastHeartbeat > timeout) {
                 connection.setAlive(false);
-                try {
-                    connection.close();
-                    //TODO 会自动触发
-                    concept.onClose(connection, "HeartbeatTimeout");
-                } catch (Throwable ignore) {
-                    //会发布关闭异常事件
-                }
+                connection.close("HeartbeatTimeout");
             }
         }
     }
@@ -80,6 +74,5 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
 
     public Message createPingMessage() {
         return new BinaryPingMessage(ByteBuffer.allocate(0));
-        //return new BinaryPingMessage(ByteBuffer.wrap("ping".getBytes(StandardCharsets.UTF_8)));
     }
 }

@@ -24,4 +24,6 @@ public abstract class WebSocketConnection extends AbstractConnection
         setMessageDecoder(adapter.getMessageDecoder(getType()));
         setConcept(concept);
     }
+
+    public abstract boolean isOpen();
 }
