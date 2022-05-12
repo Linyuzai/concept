@@ -13,22 +13,22 @@ public class ServletWebSocketServerHandler implements WebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        concept.open(session, null);
+        concept.onOpen(session, null);
     }
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
-        concept.message(session.getId(), Connection.Type.CLIENT, message);
+        concept.onMessage(session.getId(), Connection.Type.CLIENT, message);
     }
 
     @Override
     public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-        concept.error(session.getId(), Connection.Type.CLIENT, exception);
+        concept.onError(session.getId(), Connection.Type.CLIENT, exception);
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) throws Exception {
-        concept.close(session.getId(), Connection.Type.CLIENT, closeStatus);
+        concept.onClose(session.getId(), Connection.Type.CLIENT, closeStatus);
     }
 
     @Override

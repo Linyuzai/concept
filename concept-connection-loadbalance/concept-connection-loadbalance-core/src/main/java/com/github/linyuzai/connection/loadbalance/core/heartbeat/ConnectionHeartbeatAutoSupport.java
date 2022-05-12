@@ -8,13 +8,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventListener {
-
-    private final Map<Object, Long> last = new ConcurrentHashMap<>();
 
     private ConnectionLoadBalanceConcept concept;
 
@@ -32,19 +28,11 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
         } else if (event instanceof ConnectionEvent) {
             Connection connection = ((ConnectionEvent) event).getConnection();
             if (connection.getType().equals(connectionType)) {
-                if (event instanceof ConnectionOpenEvent) {
-                    last.put(connection.getId(), System.currentTimeMillis());
-                } else if (event instanceof ConnectionCloseEvent || event instanceof ConnectionCloseErrorEvent) {
-                    last.remove(connection.getId());
-                } else if (event instanceof MessageReceiveEvent) {
+                if (event instanceof MessageReceiveEvent) {
                     Message message = ((MessageReceiveEvent) event).getMessage();
-                    if (isPingMessage(message)) {
-                        System.out.println("receive ping");
-                        //last.put(connection.getId(), System.currentTimeMillis());
-                        //connection.send(createPongMessage());
-                        //concept.publish(new HeartbeatReplyEvent(connection));
-                    } else if (isPongMessage(message)) {
-                        last.put(connection.getId(), System.currentTimeMillis());
+                    if (isPongMessage(message)) {
+                        connection.setLastHeartbeat(System.currentTimeMillis());
+                        connection.setAlive(true);
                     }
                 }
             }
@@ -62,8 +50,7 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
             try {
                 connection.send(message);
             } catch (Throwable e) {
-                e.printStackTrace();
-                //TODO
+                concept.publish(new HeartbeatSendErrorEvent(connection, e));
             }
         }
         concept.publish(new HeartbeatSendEvent(connections, connectionType));
@@ -73,19 +60,18 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
         long now = System.currentTimeMillis();
         Collection<Connection> connections = concept.getConnections(connectionType);
         for (Connection connection : connections) {
-            Long l = last.get(connection.getId());
-            if (l == null || now - l > timeout) {
+            long lastHeartbeat = connection.getLastHeartbeat();
+            if (now - lastHeartbeat > timeout) {
+                connection.setAlive(false);
                 try {
-                    concept.close(connection, "HeartbeatTimeout");
+                    connection.close();
+                    //TODO 会自动触发
+                    concept.onClose(connection, "HeartbeatTimeout");
                 } catch (Throwable ignore) {
                     //会发布关闭异常事件
                 }
             }
         }
-    }
-
-    public boolean isPingMessage(Message message) {
-        return message instanceof PingMessage;
     }
 
     public boolean isPongMessage(Message message) {
@@ -95,10 +81,5 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
     public Message createPingMessage() {
         return new BinaryPingMessage(ByteBuffer.allocate(0));
         //return new BinaryPingMessage(ByteBuffer.wrap("ping".getBytes(StandardCharsets.UTF_8)));
-    }
-
-    public Message createPongMessage() {
-        return new BinaryPongMessage(ByteBuffer.allocate(0));
-        //return new BinaryPongMessage(ByteBuffer.wrap("pong".getBytes(StandardCharsets.UTF_8)));
     }
 }

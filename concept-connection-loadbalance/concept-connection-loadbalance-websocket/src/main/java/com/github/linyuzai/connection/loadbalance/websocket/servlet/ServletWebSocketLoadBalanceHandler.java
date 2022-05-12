@@ -14,22 +14,22 @@ public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
         ServletWebSocketConnection connection = new ServletWebSocketConnection(session, Connection.Type.OBSERVABLE);
-        concept.open(connection);
+        concept.onOpen(connection);
     }
 
     @Override
     public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws Exception {
-        concept.message(session.getId(), Connection.Type.OBSERVABLE, message);
+        concept.onMessage(session.getId(), Connection.Type.OBSERVABLE, message);
     }
 
     @Override
     public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-        concept.error(session.getId(), Connection.Type.OBSERVABLE, exception);
+        concept.onError(session.getId(), Connection.Type.OBSERVABLE, exception);
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus closeStatus) throws Exception {
-        concept.close(session.getId(), Connection.Type.OBSERVABLE, closeStatus);
+        concept.onClose(session.getId(), Connection.Type.OBSERVABLE, closeStatus);
     }
 
     @Override

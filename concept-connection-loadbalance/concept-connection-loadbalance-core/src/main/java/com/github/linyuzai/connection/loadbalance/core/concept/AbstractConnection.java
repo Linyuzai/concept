@@ -34,8 +34,12 @@ public abstract class AbstractConnection implements Connection {
     @NonNull
     protected ConnectionLoadBalanceConcept concept;
 
+    protected boolean alive;
+
+    protected long lastHeartbeat;
+
     public AbstractConnection(String type) {
-        this.type = type;
+        this(type, null);
     }
 
     public AbstractConnection(String type, Map<Object, Object> metadata) {
@@ -43,10 +47,15 @@ public abstract class AbstractConnection implements Connection {
         if (metadata != null) {
             this.metadata.putAll(metadata);
         }
+        this.alive = true;
+        this.lastHeartbeat = System.currentTimeMillis();
     }
 
     @Override
     public void send(@NonNull Message message) {
+        if (!isAlive()) {
+            return;
+        }
         if (message instanceof PingMessage) {
             ping((PingMessage) message);
         } else if (message instanceof PongMessage) {

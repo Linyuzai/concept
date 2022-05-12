@@ -69,7 +69,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void initialize() {
-        subscribe(false, true);
+        subscribe(true);
         publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 
@@ -96,14 +96,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public Connection open(Object o, Map<Object, Object> metadata) {
+    public Connection onOpen(Object o, Map<Object, Object> metadata) {
         Connection connection = create(o, metadata);
-        open(connection);
+        onOpen(connection);
         return connection;
     }
 
     @Override
-    public void open(Connection connection) {
+    public void onOpen(Connection connection) {
         String type = connection.getType();
         if (type == null) {
             throw new NoConnectionTypeException(connection);
@@ -123,33 +123,33 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void close(Object id, String type, Object reason) {
+    public void onClose(Object id, String type, Object reason) {
         Connection connection = getConnectionMapByType(type).get(id);
         if (connection == null) {
             publish(new UnknownCloseEvent(id, type, reason, this));
             return;
         }
-        close(connection, reason);
+        onClose(connection, reason);
     }
 
     @Override
-    public void close(@NonNull Connection connection, Object reason) {
+    public void onClose(@NonNull Connection connection, Object reason) {
         getConnectionMapByType(connection.getType()).remove(connection.getId());
         publish(new ConnectionCloseEvent(connection, reason));
     }
 
     @Override
-    public void message(Object id, String type, Object message) {
+    public void onMessage(Object id, String type, Object message) {
         Connection connection = getConnection(id, type);
         if (connection == null) {
             publish(new UnknownMessageEvent(id, type, message, this));
         } else {
-            message(connection, message);
+            onMessage(connection, message);
         }
     }
 
     @Override
-    public void message(@NonNull Connection connection, Object message) {
+    public void onMessage(@NonNull Connection connection, Object message) {
         String type = connection.getType();
         if (type == null) {
             throw new NoConnectionTypeException(connection);
@@ -160,29 +160,27 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void subscribe(boolean reSubscribe, boolean sendServerMsg) {
+    public void subscribe(boolean sendServerMsg) {
         List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
         for (ConnectionServer server : servers) {
-            subscribe(server, reSubscribe, sendServerMsg);
+            subscribe(server, sendServerMsg);
         }
     }
 
     @Override
-    public void subscribe(ConnectionServer server, boolean reSubscribe, boolean sendServerMsg) {
+    public void subscribe(ConnectionServer server, boolean sendServerMsg) {
         Connection exist = getSubscriberConnection(server);
         if (exist != null) {
-            if (reSubscribe) {
-                //已经存在对应的服务连接，断开之前的连接
-                //可能是之前的连接已经断了，重新连接
-                exist.close();
-                close(exist, "ReSubscribe");
-            } else {
+            if (exist.isAlive()) {
                 return;
+            } else {
+                exist.close();
+                onClose(exist, "NotAlive");
             }
         }
         try {
             connectionSubscriber.subscribe(server, this, connection -> {
-                open(connection);
+                onOpen(connection);
                 if (sendServerMsg) {
                     connection.send(createMessage(connectionServerProvider.getClient()));
                 }
@@ -209,17 +207,17 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void error(Object id, String type, Throwable e) {
+    public void onError(Object id, String type, Throwable e) {
         Connection connection = getConnection(id, type);
         if (connection == null) {
             publish(new UnknownErrorEvent(id, type, e, this));
         } else {
-            error(connection, e);
+            onError(connection, e);
         }
     }
 
     @Override
-    public void error(@NonNull Connection connection, Throwable e) {
+    public void onError(@NonNull Connection connection, Throwable e) {
         publish(new ConnectionErrorEvent(connection, e));
     }
 

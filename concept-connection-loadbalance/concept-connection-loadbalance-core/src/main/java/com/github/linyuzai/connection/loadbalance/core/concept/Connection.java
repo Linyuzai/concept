@@ -29,6 +29,14 @@ public interface Connection {
 
     void close();
 
+    boolean isAlive();
+
+    void setAlive(boolean alive);
+
+    long getLastHeartbeat();
+
+    void setLastHeartbeat(long lastHeartbeat);
+
     interface Redefiner {
 
         void onRedefine();

@@ -20,12 +20,12 @@ public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
         Mono<Void> send = session.send(Flux.create(sink -> {
             ReactiveWebSocketConnection connection =
                     new ReactiveWebSocketConnection(session, sink, Connection.Type.OBSERVABLE);
-            concept.open(connection);
+            concept.onOpen(connection);
         }));
 
         Mono<Void> receive = session.receive()
-                .doOnNext(it -> concept.message(session.getId(), Connection.Type.OBSERVABLE, it))
-                .doOnError(it -> concept.error(session.getId(), Connection.Type.OBSERVABLE, it))
+                .doOnNext(it -> concept.onMessage(session.getId(), Connection.Type.OBSERVABLE, it))
+                .doOnError(it -> concept.onError(session.getId(), Connection.Type.OBSERVABLE, it))
                 .then();
 
         return Mono.zip(send, receive).then();

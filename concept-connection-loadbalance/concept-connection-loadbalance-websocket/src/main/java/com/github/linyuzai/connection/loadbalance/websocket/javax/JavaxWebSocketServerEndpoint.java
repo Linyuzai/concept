@@ -19,31 +19,31 @@ public class JavaxWebSocketServerEndpoint {
                        @PathParam(value = "type") String type) {
         Map<Object, Object> metadata = new LinkedHashMap<>();
         metadata.put("type", type);
-        WebSocketLoadBalanceConcept.getInstance().open(session, metadata);
+        WebSocketLoadBalanceConcept.getInstance().onOpen(session, metadata);
     }
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        WebSocketLoadBalanceConcept.getInstance().close(session.getId(), Connection.Type.CLIENT, reason);
+        WebSocketLoadBalanceConcept.getInstance().onClose(session.getId(), Connection.Type.CLIENT, reason);
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
-        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
+        WebSocketLoadBalanceConcept.getInstance().onMessage(session.getId(), Connection.Type.CLIENT, message);
     }
 
     @OnMessage
     public void onMessage(Session session, PongMessage message) {
-        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
+        WebSocketLoadBalanceConcept.getInstance().onMessage(session.getId(), Connection.Type.CLIENT, message);
     }
 
     @OnMessage
     public void onMessage(Session session, ByteBuffer message) {
-        WebSocketLoadBalanceConcept.getInstance().message(session.getId(), Connection.Type.CLIENT, message);
+        WebSocketLoadBalanceConcept.getInstance().onMessage(session.getId(), Connection.Type.CLIENT, message);
     }
 
     @OnError
     public void onError(Session session, Throwable e) {
-        WebSocketLoadBalanceConcept.getInstance().error(session.getId(), Connection.Type.CLIENT, e);
+        WebSocketLoadBalanceConcept.getInstance().onError(session.getId(), Connection.Type.CLIENT, e);
     }
 }

@@ -26,7 +26,7 @@ public class ScheduledExecutorConnectionSubscribeMonitor implements ConnectionSu
 
     public void subscribe() {
         try {
-            concept.subscribe(false, false);
+            concept.subscribe(false);
             concept.publish(new SubscribeMonitorEvent());
         } catch (Throwable e) {
             //TODO

@@ -12,27 +12,27 @@ public interface ConnectionLoadBalanceConcept {
 
     void destroy();
 
-    void subscribe(boolean reSubscribe, boolean sendServerMsg);
+    void subscribe(boolean sendServerMsg);
 
-    void subscribe(ConnectionServer server, boolean reSubscribe, boolean sendServerMsg);
+    void subscribe(ConnectionServer server, boolean sendServerMsg);
 
     Connection create(Object o, Map<Object, Object> metadata);
 
-    Connection open(Object o, Map<Object, Object> metadata);
+    Connection onOpen(Object o, Map<Object, Object> metadata);
 
-    void open(Connection connection);
+    void onOpen(Connection connection);
 
-    void close(Object id, String type, Object reason);
+    void onClose(Object id, String type, Object reason);
 
-    void close(Connection connection, Object reason);
+    void onClose(Connection connection, Object reason);
 
-    void message(Object id, String type, Object message);
+    void onMessage(Object id, String type, Object message);
 
-    void message(Connection connection, Object message);
+    void onMessage(Connection connection, Object message);
 
-    void error(Object id, String type, Throwable e);
+    void onError(Object id, String type, Throwable e);
 
-    void error(Connection connection, Throwable e);
+    void onError(Connection connection, Throwable e);
 
     void send(Object msg);
 

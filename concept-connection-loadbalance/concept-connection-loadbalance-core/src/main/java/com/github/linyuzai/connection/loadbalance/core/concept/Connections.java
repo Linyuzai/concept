@@ -8,10 +8,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @AllArgsConstructor
@@ -95,6 +92,40 @@ public class Connections implements Connection {
     @Override
     public void close() {
         connections.forEach(Connection::close);
+    }
+
+    @Override
+    public boolean isAlive() {
+        Set<Boolean> set = new HashSet<>();
+        for (Connection connection : connections) {
+            set.add(connection.isAlive());
+            if (set.size() > 1) {
+                throw new UnsupportedOperationException();
+            }
+        }
+        if (set.isEmpty()) {
+            return false;
+        }
+        return set.iterator().next();
+    }
+
+    @Override
+    public void setAlive(boolean alive) {
+        for (Connection connection : connections) {
+            connection.setAlive(alive);
+        }
+    }
+
+    @Override
+    public long getLastHeartbeat() {
+        return -1;
+    }
+
+    @Override
+    public void setLastHeartbeat(long lastHeartbeat) {
+        for (Connection connection : connections) {
+            connection.setLastHeartbeat(lastHeartbeat);
+        }
     }
 
     @SafeVarargs

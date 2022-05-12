@@ -18,24 +18,24 @@ public class WebSocketLoadBalanceHandler extends SimpleChannelInboundHandler<Bin
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame msg) throws Exception {
-        concept.message(ctx.channel().id(), Connection.Type.CLIENT, msg.content().array());
+        concept.onMessage(ctx.channel().id(), Connection.Type.CLIENT, msg.content().array());
     }
 
     @Override
     public void channelActive(@NonNull ChannelHandlerContext ctx) throws Exception {
-        concept.open(ctx.channel(), new LinkedHashMap<>());
+        concept.onOpen(ctx.channel(), new LinkedHashMap<>());
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(@NonNull ChannelHandlerContext ctx) throws Exception {
-        concept.close(ctx.channel().id(), Connection.Type.CLIENT, null);
+        concept.onClose(ctx.channel().id(), Connection.Type.CLIENT, null);
         super.channelInactive(ctx);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        concept.error(ctx.channel().id(), Connection.Type.CLIENT, cause);
+        concept.onError(ctx.channel().id(), Connection.Type.CLIENT, cause);
         super.exceptionCaught(ctx, cause);
     }
 }
