@@ -50,10 +50,9 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionSubscribeMonitor connectionSubscribeMonitor(
+    public ScheduledExecutorConnectionSubscribeMonitor scheduledExecutorConnectionSubscribeMonitor(
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
         return new ScheduledExecutorConnectionSubscribeMonitor(
