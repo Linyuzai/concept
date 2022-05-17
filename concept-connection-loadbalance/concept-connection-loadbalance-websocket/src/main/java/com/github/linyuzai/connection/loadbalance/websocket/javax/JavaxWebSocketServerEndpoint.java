@@ -7,8 +7,6 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @ServerEndpoint(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "{type}")
 public class JavaxWebSocketServerEndpoint {
@@ -17,9 +15,7 @@ public class JavaxWebSocketServerEndpoint {
     public void onOpen(Session session,
                        EndpointConfig config,
                        @PathParam(value = "type") String type) {
-        Map<Object, Object> metadata = new LinkedHashMap<>();
-        metadata.put("type", type);
-        WebSocketLoadBalanceConcept.getInstance().onOpen(session, metadata);
+        WebSocketLoadBalanceConcept.getInstance().onOpen(session, null);
     }
 
     @OnClose

@@ -6,7 +6,6 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketCon
 import lombok.SneakyThrows;
 import org.springframework.web.socket.*;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -63,12 +62,13 @@ public class ServletWebSocketConnection extends WebSocketConnection {
         session.sendMessage(new org.springframework.web.socket.PongMessage(pong.getPayload()));
     }
 
+    @SneakyThrows
     @Override
-    public void doClose(String reason) throws IOException {
+    public void close(String reason) {
         if (reason == null) {
             session.close();
         } else {
-            session.close(new CloseStatus(CloseStatus.NORMAL.getCode(),reason));
+            session.close(new CloseStatus(CloseStatus.NORMAL.getCode(), reason));
         }
     }
 

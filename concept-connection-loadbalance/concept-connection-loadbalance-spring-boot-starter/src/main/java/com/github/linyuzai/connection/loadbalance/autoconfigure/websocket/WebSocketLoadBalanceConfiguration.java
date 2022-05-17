@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
@@ -67,7 +68,8 @@ public class WebSocketLoadBalanceConfiguration {
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
-        return new ConnectionHeartbeatAutoSender(Connection.Type.OBSERVABLE,
+        return new ConnectionHeartbeatAutoSender(
+                Arrays.asList(Connection.Type.SUBSCRIBER, Connection.Type.OBSERVABLE),
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
                 factory.create(ConnectionHeartbeatAutoSender.class));
     }

@@ -4,17 +4,16 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEvent;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.connection.loadbalance.core.utils.ConnectionLoadBalanceLogger;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-@AllArgsConstructor
-public class ConnectionSubscribeLogger implements ConnectionEventListener {
+public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger implements ConnectionEventListener {
 
-    private Consumer<String> info;
-
-    private BiConsumer<String, Throwable> error;
+    public ConnectionSubscribeLogger(Consumer<String> info, BiConsumer<String, Throwable> error) {
+        super(info, error);
+    }
 
     @Override
     public void onEvent(Object event) {
@@ -56,17 +55,5 @@ public class ConnectionSubscribeLogger implements ConnectionEventListener {
 
     public String getReason(Object reason) {
         return reason == null ? "" : ", " + reason;
-    }
-
-    public String appendTag(String msg) {
-        return "LBWebsocket >> " + msg;
-    }
-
-    public void info(String msg) {
-        info.accept(appendTag(msg));
-    }
-
-    public void error(String msg, Throwable e) {
-        error.accept(appendTag(msg), e);
     }
 }

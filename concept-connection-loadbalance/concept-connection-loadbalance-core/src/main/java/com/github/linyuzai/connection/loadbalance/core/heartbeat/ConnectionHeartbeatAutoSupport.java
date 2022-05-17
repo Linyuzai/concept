@@ -14,7 +14,7 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
 
     private ConnectionLoadBalanceConcept concept;
 
-    private final String connectionType;
+    private final Collection<String> connectionTypes;
 
     private final long timeout;
 
@@ -27,12 +27,14 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
             onDestroy();
         } else if (event instanceof ConnectionEvent) {
             Connection connection = ((ConnectionEvent) event).getConnection();
-            if (connection.getType().equals(connectionType)) {
-                if (event instanceof MessageReceiveEvent) {
-                    Message message = ((MessageReceiveEvent) event).getMessage();
-                    if (isPongMessage(message)) {
-                        connection.setLastHeartbeat(System.currentTimeMillis());
-                        connection.setAlive(true);
+            for (String connectionType : connectionTypes) {
+                if (connection.getType().equals(connectionType)) {
+                    if (event instanceof MessageReceiveEvent) {
+                        Message message = ((MessageReceiveEvent) event).getMessage();
+                        if (isPongMessage(message)) {
+                            connection.setLastHeartbeat(System.currentTimeMillis());
+                            connection.setAlive(true);
+                        }
                     }
                 }
             }
@@ -44,26 +46,30 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
     public abstract void onDestroy();
 
     public void sendPing() {
-        Collection<Connection> connections = concept.getConnections(connectionType);
-        Message message = createPingMessage();
-        for (Connection connection : connections) {
-            try {
-                connection.send(message);
-            } catch (Throwable e) {
-                concept.publish(new HeartbeatSendErrorEvent(connection, e));
+        for (String connectionType : connectionTypes) {
+            Collection<Connection> connections = concept.getConnections(connectionType);
+            Message message = createPingMessage();
+            for (Connection connection : connections) {
+                try {
+                    connection.send(message);
+                } catch (Throwable e) {
+                    concept.publish(new HeartbeatSendErrorEvent(connection, e));
+                }
             }
+            concept.publish(new HeartbeatSendEvent(connections, connectionType));
         }
-        concept.publish(new HeartbeatSendEvent(connections, connectionType));
     }
 
     public void closeTimeout() {
         long now = System.currentTimeMillis();
-        Collection<Connection> connections = concept.getConnections(connectionType);
-        for (Connection connection : connections) {
-            long lastHeartbeat = connection.getLastHeartbeat();
-            if (now - lastHeartbeat > timeout) {
-                connection.setAlive(false);
-                connection.close("HeartbeatTimeout");
+        for (String connectionType : connectionTypes) {
+            Collection<Connection> connections = concept.getConnections(connectionType);
+            for (Connection connection : connections) {
+                long lastHeartbeat = connection.getLastHeartbeat();
+                if (now - lastHeartbeat > timeout) {
+                    connection.setAlive(false);
+                    connection.close("HeartbeatTimeout");
+                }
             }
         }
     }

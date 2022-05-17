@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.heartbeat;
 
+import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -9,10 +10,10 @@ public abstract class ScheduledExecutorConnectionHeartbeatAutoSupport extends Co
 
     private final long period;
 
-    public ScheduledExecutorConnectionHeartbeatAutoSupport(String connectionType,
+    public ScheduledExecutorConnectionHeartbeatAutoSupport(Collection<String> connectionTypes,
                                                            long timeout, long period,
                                                            ScheduledExecutorService executor) {
-        super(connectionType, timeout);
+        super(connectionTypes, timeout);
         this.executor = executor;
         this.period = period;
     }

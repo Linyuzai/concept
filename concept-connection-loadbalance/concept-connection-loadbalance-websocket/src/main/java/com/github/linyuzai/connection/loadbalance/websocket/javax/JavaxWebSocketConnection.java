@@ -8,7 +8,6 @@ import lombok.SneakyThrows;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -40,7 +39,6 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
         return session.getRequestURI();
     }
 
-    @SneakyThrows
     @Override
     public void doSend(Object message) {
         if (message instanceof String) {
@@ -66,8 +64,9 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
         session.getAsyncRemote().sendPong(pong.getPayload());
     }
 
+    @SneakyThrows
     @Override
-    public void doClose(String reason) throws IOException {
+    public void close(String reason) {
         if (reason == null) {
             session.close();
         } else {

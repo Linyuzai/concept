@@ -1,6 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionCloseErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.TypeRedefineEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
@@ -12,7 +11,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -90,17 +88,6 @@ public abstract class AbstractConnection implements Connection {
     public void close() {
         close(null);
     }
-
-    @Override
-    public void close(String reason) {
-        try {
-            doClose(reason);
-        } catch (Throwable e) {
-            concept.publish(new ConnectionCloseErrorEvent(this, e));
-        }
-    }
-
-    public abstract void doClose(String reason) throws IOException;
 
     public abstract void doSend(Object message);
 }

@@ -77,7 +77,12 @@ public class WebSocketLoadBalanceProperties {
             private boolean enabled = true;
 
             /**
-             * 订阅监控周期
+             * 是否打印订阅监控日志
+             */
+            private boolean logger = true;
+
+            /**
+             * 订阅监控周期，毫秒
              */
             private long period = 30 * 1000;
         }
@@ -92,12 +97,12 @@ public class WebSocketLoadBalanceProperties {
         private boolean enabled = true;
 
         /**
-         * 心跳超时时间
+         * 心跳超时时间，毫秒
          */
         private long timeout = 3 * 60 * 1000;
 
         /**
-         * 心跳周期
+         * 心跳周期，毫秒
          */
         private long period = 60 * 1000;
     }

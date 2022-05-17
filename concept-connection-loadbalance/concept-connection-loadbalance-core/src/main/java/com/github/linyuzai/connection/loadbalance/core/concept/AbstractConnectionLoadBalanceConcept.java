@@ -174,8 +174,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             if (exist.isAlive()) {
                 return;
             } else {
-                exist.close();
-                onClose(exist, "NotAlive");
+                exist.close("NotAlive");
             }
         }
         try {

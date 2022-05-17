@@ -16,12 +16,12 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
 
     @Override
     public String @NonNull [] selectImports(@NonNull AnnotationMetadata metadata) {
-        ServerType type = environment.getProperty("concept-websocket.load-balance.server.type",
+        ServerType type = environment.getProperty("concept.websocket.load-balance.server.type",
                 ServerType.class, ServerType.AUTO);
         if (type == ServerType.AUTO) {
             type = deduceServerType();
         }
-        boolean enableDefaultEndpoint = environment.getProperty("concept-websocket.load-balance.server.default-endpoint.enabled",
+        boolean enableDefaultEndpoint = environment.getProperty("concept.websocket.load-balance.server.default-endpoint.enabled",
                 boolean.class, true);
         return type.getConfigurations(enableDefaultEndpoint);
     }

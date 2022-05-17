@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.SubscribeMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionServerProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,5 +30,13 @@ public class ConnectionLoadBalanceConfiguration {
     public ConnectionSubscribeLogger connectionSubscribeLogger() {
         Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
         return new ConnectionSubscribeLogger(log::info, log::error);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
+            name = "logger", havingValue = "true", matchIfMissing = true)
+    public SubscribeMonitorLogger subscribeMonitorLogger() {
+        Log log = LogFactory.getLog(SubscribeMonitorLogger.class);
+        return new SubscribeMonitorLogger(log::info, log::error);
     }
 }

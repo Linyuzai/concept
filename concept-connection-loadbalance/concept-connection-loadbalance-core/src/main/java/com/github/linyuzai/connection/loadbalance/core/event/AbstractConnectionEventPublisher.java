@@ -26,7 +26,7 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
     }
 
     public void handlePublishError(Object event, Throwable e) {
-        //消息发送失败会关闭连接
+        //业务异常会关闭连接
         errorHandler.onEventPublishError(event, e);
     }
 
