@@ -6,9 +6,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 import java.util.Collection;
 
-public class AllConnectionSelector extends AbstractConnectionSelector {
+public class AllSelector extends AbstractConnectionSelector {
 
-    public AllConnectionSelector() {
+    public AllSelector() {
         broadcast(true);
     }
 

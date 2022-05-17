@@ -5,7 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadB
 import com.github.linyuzai.connection.loadbalance.core.exception.NoConnectionTypeException;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.select.AllConnectionSelector;
+import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
@@ -245,6 +245,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         //添加转发标记，防止其他服务再次转发
         String instanceId = connectionServerProvider.getClient().getInstanceId();
         message.getHeaders().put(Message.FORWARD, instanceId);
+        publish(new MessagePrepareEvent(connection, message));
         connection.send(message);
         publish(new MessageSendEvent(connection, message));
     }
@@ -419,7 +420,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 throw new ConnectionLoadBalanceException("MessageCodecAdapter is null");
             }
 
-            connectionSelectors.add(new AllConnectionSelector());
+            connectionSelectors.add(new AllSelector());
 
             messageFactories.add(new ObjectMessageFactory());
 
