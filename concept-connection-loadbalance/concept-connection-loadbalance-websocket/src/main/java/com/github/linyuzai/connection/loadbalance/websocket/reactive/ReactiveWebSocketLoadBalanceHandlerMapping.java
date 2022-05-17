@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import org.springframework.core.Ordered;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 
@@ -12,8 +11,8 @@ public class ReactiveWebSocketLoadBalanceHandlerMapping extends SimpleUrlHandler
 
     public ReactiveWebSocketLoadBalanceHandlerMapping(WebSocketLoadBalanceConcept concept) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT + "**", new ReactiveWebSocketLoadBalanceHandler(concept));
+        map.put(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT, new ReactiveWebSocketLoadBalanceHandler(concept));
         setUrlMap(map);
-        setOrder(Ordered.HIGHEST_PRECEDENCE);
+        setOrder(100);
     }
 }

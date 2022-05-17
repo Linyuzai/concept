@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.logger;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
-import lombok.AllArgsConstructor;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -14,6 +13,6 @@ public class ErrorLogger extends ConnectionLoadBalanceLogger implements ErrorHan
 
     @Override
     public void onError(Throwable e, Object o) {
-        error("", e);
+        error("Exception occurred", e);
     }
 }
