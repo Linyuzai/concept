@@ -1,10 +1,11 @@
-package com.github.linyuzai.connection.loadbalance.core.concept;
+package com.github.linyuzai.connection.loadbalance.core.utils;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.net.URI;
 
 @Getter
@@ -39,7 +40,7 @@ public class IdConnection extends AbstractConnection {
     }
 
     @Override
-    public void doClose(String reason) throws IOException {
+    public void close(String reason) {
 
     }
 }

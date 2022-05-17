@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,8 +12,6 @@ import java.util.List;
 public class AbstractConnectionEventPublisher implements ConnectionEventPublisher {
 
     private final List<ConnectionEventListener> listeners;
-
-    private final EventPublishErrorHandler errorHandler;
 
     @Override
     public void publish(Object event) {
@@ -25,9 +24,13 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
         }
     }
 
+    @SneakyThrows
     public void handlePublishError(Object event, Throwable e) {
+        if (event instanceof EventPublishErrorEvent) {
+            throw ((EventPublishErrorEvent) event).getError();
+        }
         //业务异常会关闭连接
-        errorHandler.onEventPublishError(event, e);
+        publish(new EventPublishErrorEvent(event, e));
     }
 
     @Override

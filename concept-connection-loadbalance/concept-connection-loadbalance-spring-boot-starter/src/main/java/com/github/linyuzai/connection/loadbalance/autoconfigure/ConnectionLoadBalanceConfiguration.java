@@ -1,8 +1,13 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.SubscribeMonitorLogger;
+import com.github.linyuzai.connection.loadbalance.core.utils.ScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.utils.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionServerProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,6 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.Registration;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +28,25 @@ public class ConnectionLoadBalanceConfiguration {
     @ConditionalOnClass({DiscoveryClient.class, Registration.class})
     public ConnectionServerProvider connectionServerProvider(DiscoveryClient client, Registration registration) {
         return new DiscoveryConnectionServerProvider(client, registration);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ErrorHandler errorHandler() {
+        Log log = LogFactory.getLog(ErrorLogger.class);
+        return new ErrorLogger(log::info, log::error);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConnectionEventPublisher connectionEventPublisher(ApplicationEventPublisher publisher) {
+        return new ApplicationConnectionEventPublisher(publisher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
+        return new SingleThreadScheduledExecutorServiceFactory();
     }
 
     @Bean

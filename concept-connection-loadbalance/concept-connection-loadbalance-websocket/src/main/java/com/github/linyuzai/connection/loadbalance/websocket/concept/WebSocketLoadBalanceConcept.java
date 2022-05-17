@@ -25,7 +25,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
                                         List<MessageFactory> messageFactories,
                                         ConnectionEventPublisher eventPublisher) {
         super(connectionServerProvider, connectionSubscriber, connectionFactories,
-                connectionSelectors, messageCodecAdapter, messageFactories, eventPublisher);
+                connectionSelectors, messageFactories, messageCodecAdapter, eventPublisher);
     }
 
     public static WebSocketLoadBalanceConcept getInstance() {

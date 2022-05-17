@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.utils;
+package com.github.linyuzai.connection.loadbalance.core.logger;
 
 import lombok.AllArgsConstructor;
 

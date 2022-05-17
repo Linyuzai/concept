@@ -4,7 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEvent;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.core.utils.ConnectionLoadBalanceLogger;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoadBalanceLogger;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

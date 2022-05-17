@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe.monitor;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
-import com.github.linyuzai.connection.loadbalance.core.utils.ConnectionLoadBalanceLogger;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoadBalanceLogger;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

@@ -1,5 +1,7 @@
-package com.github.linyuzai.connection.loadbalance.core.concept;
+package com.github.linyuzai.connection.loadbalance.core.utils;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
@@ -49,15 +51,36 @@ public class Connections implements Connection {
     }
 
     @Override
+    public void setMessageEncoder(MessageEncoder encoder) {
+        for (Connection connection : connections) {
+            connection.setMessageEncoder(encoder);
+        }
+    }
+
+    @Override
     public MessageEncoder getMessageEncoder() {
         Connection connection = get();
         return connection == null ? null : connection.getMessageEncoder();
     }
 
     @Override
+    public void setMessageDecoder(MessageDecoder decoder) {
+        for (Connection connection : connections) {
+            connection.setMessageDecoder(decoder);
+        }
+    }
+
+    @Override
     public MessageDecoder getMessageDecoder() {
         Connection connection = get();
         return connection == null ? null : connection.getMessageDecoder();
+    }
+
+    @Override
+    public void setConcept(ConnectionLoadBalanceConcept concept) {
+        for (Connection connection : connections) {
+            connection.setConcept(concept);
+        }
     }
 
     @Override

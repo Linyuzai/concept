@@ -2,8 +2,8 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
-import com.github.linyuzai.connection.loadbalance.core.exception.NoConnectionTypeException;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -14,12 +14,14 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Getter
+@RequiredArgsConstructor
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
 
     protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();
@@ -37,22 +39,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected final MessageCodecAdapter messageCodecAdapter;
 
     protected final ConnectionEventPublisher eventPublisher;
-
-    public AbstractConnectionLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
-                                                ConnectionSubscriber connectionSubscriber,
-                                                List<ConnectionFactory> connectionFactories,
-                                                List<ConnectionSelector> connectionSelectors,
-                                                MessageCodecAdapter messageCodecAdapter,
-                                                List<MessageFactory> messageFactories,
-                                                ConnectionEventPublisher eventPublisher) {
-        this.connectionServerProvider = connectionServerProvider;
-        this.connectionSubscriber = connectionSubscriber;
-        this.connectionFactories = connectionFactories;
-        this.connectionSelectors = connectionSelectors;
-        this.messageCodecAdapter = messageCodecAdapter;
-        this.messageFactories = messageFactories;
-        this.eventPublisher = eventPublisher;
-    }
 
     @Override
     public void initialize() {
@@ -73,11 +59,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public Connection create(Object o, Map<Object, Object> metadata) {
         ConnectionFactory factory = getConnectionFactory(o, metadata);
         if (factory == null) {
-            throw new ConnectionLoadBalanceException("No MessageFactory available with " + o);
+            throw new ConnectionLoadBalanceException("No ConnectionFactory available with " + o);
         }
         Connection connection = factory.create(o, metadata, this);
         if (connection == null) {
-            throw new ConnectionLoadBalanceException("Message can not be created with " + o);
+            throw new ConnectionLoadBalanceException("Connection can not be created with " + o);
         }
         return connection;
     }
@@ -92,9 +78,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void onOpen(Connection connection) {
         String type = connection.getType();
-        if (type == null) {
-            throw new NoConnectionTypeException(connection);
-        }
         connection.setConcept(this);
         connection.setMessageEncoder(messageCodecAdapter.getMessageEncoder(type));
         connection.setMessageDecoder(messageCodecAdapter.getMessageDecoder(type));
@@ -139,12 +122,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void onMessage(@NonNull Connection connection, Object message) {
-        String type = connection.getType();
-        if (type == null) {
-            throw new NoConnectionTypeException(connection);
+        Message decode;
+        try {
+            MessageDecoder decoder = connection.getMessageDecoder();
+            decode = decoder.decode(message);
+        } catch (Throwable e) {
+            publish(new MessageDecodeErrorEvent(connection, e));
+            return;
         }
-        MessageDecoder decoder = connection.getMessageDecoder();
-        Message decode = decoder.decode(message);
         publish(new MessageReceiveEvent(connection, decode));
     }
 
@@ -232,9 +217,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void send(Object msg) {
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
-        if (selector == null) {
-            throw new ConnectionLoadBalanceException("No connection selector");
-        }
         List<Connection> clients = new ArrayList<>(getConnectionMapByType(Connection.Type.CLIENT).values());
         List<Connection> observables = new ArrayList<>(getConnectionMapByType(Connection.Type.OBSERVABLE).values());
         Connection connection = selector.select(message, clients, observables);
