@@ -17,9 +17,15 @@ public interface Connection {
 
     Map<Object, Object> getMetadata();
 
+    void setMessageEncoder(MessageEncoder encoder);
+
     MessageEncoder getMessageEncoder();
 
+    void setMessageDecoder(MessageDecoder decoder);
+
     MessageDecoder getMessageDecoder();
+
+    void setConcept(ConnectionLoadBalanceConcept concept);
 
     ConnectionLoadBalanceConcept getConcept();
 

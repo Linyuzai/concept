@@ -45,26 +45,13 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                                                 MessageCodecAdapter messageCodecAdapter,
                                                 List<MessageFactory> messageFactories,
                                                 ConnectionEventPublisher eventPublisher) {
-        this.connectionServerProvider = applyAware(connectionServerProvider);
-        this.connectionSubscriber = applyAware(connectionSubscriber);
-        this.connectionFactories = applyAware(connectionFactories);
-        this.connectionSelectors = applyAware(connectionSelectors);
-        this.messageCodecAdapter = applyAware(messageCodecAdapter);
-        this.messageFactories = applyAware(messageFactories);
-        this.eventPublisher = applyAware(eventPublisher);
-    }
-
-    public <T> T applyAware(T o) {
-        if (o instanceof ConnectionLoadBalanceConceptAware) {
-            @SuppressWarnings("unchecked")
-            ConnectionLoadBalanceConceptAware<? super ConnectionLoadBalanceConcept> aware =
-                    (ConnectionLoadBalanceConceptAware<? super ConnectionLoadBalanceConcept>) o;
-            aware.setConnectionLoadBalanceConcept(this);
-        }
-        if (o instanceof Collection) {
-            ((Collection<?>) o).forEach(this::applyAware);
-        }
-        return o;
+        this.connectionServerProvider = connectionServerProvider;
+        this.connectionSubscriber = connectionSubscriber;
+        this.connectionFactories = connectionFactories;
+        this.connectionSelectors = connectionSelectors;
+        this.messageCodecAdapter = messageCodecAdapter;
+        this.messageFactories = messageFactories;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -108,7 +95,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (type == null) {
             throw new NoConnectionTypeException(connection);
         }
-        applyAware(connection);
+        connection.setConcept(this);
+        connection.setMessageEncoder(messageCodecAdapter.getMessageEncoder(type));
+        connection.setMessageDecoder(messageCodecAdapter.getMessageDecoder(type));
         putConnection(connection, type);
         publish(new ConnectionOpenEvent(connection));
     }
@@ -292,7 +281,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (message == null) {
             throw new ConnectionLoadBalanceException("Message can not be created with " + msg);
         }
-        return applyAware(message);
+        return message;
     }
 
     public MessageFactory getMessageFactory(Object msg) {
@@ -306,7 +295,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void publish(Object event) {
-        eventPublisher.publish(applyAware(event));
+        eventPublisher.publish(event);
     }
 
     @Override
