@@ -7,6 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPubl
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoSender;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
@@ -65,21 +66,23 @@ public class WebSocketLoadBalanceConfiguration {
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
     public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(
+            ConnectionRepository repository,
             ConnectionServerProvider provider,
             ConnectionSubscriber subscriber,
             List<ConnectionFactory> connectionFactories,
             List<ConnectionSelector> connectionSelectors,
-            MessageCodecAdapter messageCodecAdapter,
             List<MessageFactory> messageFactories,
+            MessageCodecAdapter messageCodecAdapter,
             ConnectionEventPublisher eventPublisher,
             List<ConnectionEventListener> eventListeners) {
         return new WebSocketLoadBalanceConcept.Builder()
+                .connectionRepository(repository)
                 .connectionServerProvider(provider)
                 .connectionSubscriber(subscriber)
                 .addConnectionFactories(connectionFactories)
                 .addConnectionSelectors(connectionSelectors)
-                .messageCodecAdapter(messageCodecAdapter)
                 .addMessageFactories(messageFactories)
+                .messageCodecAdapter(messageCodecAdapter)
                 .eventPublisher(eventPublisher)
                 .addEventListeners(eventListeners)
                 .build();

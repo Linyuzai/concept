@@ -3,6 +3,8 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure;
 import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.SubscribeMonitorLogger;
@@ -22,6 +24,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
 public class ConnectionLoadBalanceConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConnectionRepository connectionRepository() {
+        return new DefaultConnectionRepository();
+    }
 
     @Bean
     @ConditionalOnMissingBean

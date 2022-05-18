@@ -11,6 +11,8 @@ public interface Connection {
 
     Object getId();
 
+    void setType(String type);
+
     String getType();
 
     URI getUri();
@@ -29,8 +31,6 @@ public interface Connection {
 
     ConnectionLoadBalanceConcept getConcept();
 
-    void redefineType(String type, Redefiner redefiner);
-
     void send(Message message);
 
     void close();
@@ -46,11 +46,6 @@ public interface Connection {
     long getLastHeartbeat();
 
     void setLastHeartbeat(long lastHeartbeat);
-
-    interface Redefiner {
-
-        void onRedefine();
-    }
 
     class Type {
 

@@ -8,6 +8,7 @@ import lombok.NonNull;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -32,6 +33,11 @@ public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {
                 .doOnNext(it -> concept.onMessage(session.getId(), Connection.Type.SUBSCRIBER, it))
                 .doOnError(it -> concept.onError(session.getId(), Connection.Type.SUBSCRIBER, it))
                 .then();
+
+        @SuppressWarnings("all")
+        Disposable disposable = session.closeStatus()
+                .doOnError(it -> concept.onError(session.getId(), Connection.Type.SUBSCRIBER, it))
+                .subscribe(it -> concept.onClose(session.getId(), Connection.Type.SUBSCRIBER, it));
 
         return Mono.zip(send, receive).then();
     }

@@ -5,6 +5,8 @@ import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadB
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
@@ -17,14 +19,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 @Getter
 @RequiredArgsConstructor
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
 
-    protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();
+    protected final ConnectionRepository connectionRepository;
 
     protected final ConnectionServerProvider connectionServerProvider;
 
@@ -48,10 +48,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void destroy() {
-        connections.values()
-                .stream()
-                .flatMap(it -> it.values().stream())
-                .forEach(Connection::close);
+        connectionRepository.stream().forEach(connection -> connection.close("ServerStop"));
         publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
@@ -81,7 +78,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         connection.setConcept(this);
         connection.setMessageEncoder(messageCodecAdapter.getMessageEncoder(type));
         connection.setMessageDecoder(messageCodecAdapter.getMessageDecoder(type));
-        putConnection(connection, type);
+        connectionRepository.add(connection);
         publish(new ConnectionOpenEvent(connection));
     }
 
@@ -96,7 +93,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void onClose(Object id, String type, Object reason) {
-        Connection connection = getConnectionMapByType(type).get(id);
+        Connection connection = connectionRepository.get(id, type);
         if (connection == null) {
             publish(new UnknownCloseEvent(id, type, reason, this));
             return;
@@ -106,8 +103,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void onClose(@NonNull Connection connection, Object reason) {
-        getConnectionMapByType(connection.getType()).remove(connection.getId());
-        publish(new ConnectionCloseEvent(connection, reason));
+        if (connectionRepository.remove(connection) != null) {
+            publish(new ConnectionCloseEvent(connection, reason));
+        }
     }
 
     @Override
@@ -167,9 +165,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         if (server == null) {
             return null;
         }
-        Collection<Connection> subscriberConnections =
-                getConnectionMapByType(Connection.Type.SUBSCRIBER).values();
-        for (Connection connection : subscriberConnections) {
+        Collection<Connection> connections = connectionRepository.select(Connection.Type.SUBSCRIBER);
+        for (Connection connection : connections) {
             ConnectionServer exist = (ConnectionServer) connection.getMetadata()
                     .get(ConnectionServer.class);
             if (server.getInstanceId().equals(exist.getInstanceId())) {
@@ -196,30 +193,19 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public Connection getConnection(Object id, String type) {
-        return getConnectionMapByType(type).get(id);
+        return connectionRepository.get(id, type);
     }
 
     @Override
     public Collection<Connection> getConnections(String type) {
-        return Collections.unmodifiableCollection(getConnectionMapByType(type).values());
-    }
-
-    private void putConnection(Connection connection, String type) {
-        connections.computeIfAbsent(type, k -> new ConcurrentHashMap<>())
-                .put(connection.getId(), connection);
-    }
-
-    private Map<Object, Connection> getConnectionMapByType(String type) {
-        return connections.getOrDefault(type, Collections.emptyMap());
+        return connectionRepository.select(type);
     }
 
     @Override
     public void send(Object msg) {
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
-        List<Connection> clients = new ArrayList<>(getConnectionMapByType(Connection.Type.CLIENT).values());
-        List<Connection> observables = new ArrayList<>(getConnectionMapByType(Connection.Type.OBSERVABLE).values());
-        Connection connection = selector.select(message, clients, observables);
+        Connection connection = selector.select(message, connectionRepository, this);
         if (connection == null) {
             publish(new DeadMessageEvent(message));
             return;
@@ -281,27 +267,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         eventPublisher.publish(event);
     }
 
-    @Override
-    public void move(Object id, String fromType, String toType, Consumer<Connection> consumer) {
-        Connection connection = getConnectionMapByType(fromType).remove(id);
-        if (connection == null) {
-            return;
-        }
-        consumer.accept(connection);
-        if (connection.getType().equals(toType)) {
-            putConnection(connection, toType);
-        } else {
-            throw new IllegalStateException("Change the type of connection or use #redefineType instead");
-        }
-    }
-
-    @Override
-    public void redefineType(@NonNull Connection connection, @NonNull String type, Connection.Redefiner redefiner) {
-        connection.redefineType(type, redefiner);
-    }
-
     @SuppressWarnings("unchecked")
     public static class AbstractBuilder<T extends AbstractBuilder<T>> {
+
+        protected ConnectionRepository connectionRepository;
 
         protected ConnectionServerProvider connectionServerProvider;
 
@@ -318,6 +287,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         protected ConnectionEventPublisher eventPublisher;
 
         protected List<ConnectionEventListener> eventListeners = new ArrayList<>();
+
+        public T connectionRepository(ConnectionRepository repository) {
+            this.connectionRepository = repository;
+            return (T) this;
+        }
 
         public T connectionServerProvider(ConnectionServerProvider provider) {
             this.connectionServerProvider = provider;
@@ -400,6 +374,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
             if (messageCodecAdapter == null) {
                 throw new ConnectionLoadBalanceException("MessageCodecAdapter is null");
+            }
+
+            if (connectionRepository == null) {
+                connectionRepository = new DefaultConnectionRepository();
             }
 
             connectionSelectors.add(new AllSelector());

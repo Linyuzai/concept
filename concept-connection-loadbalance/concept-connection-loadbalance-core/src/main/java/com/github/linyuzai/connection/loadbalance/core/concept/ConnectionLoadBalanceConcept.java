@@ -40,10 +40,6 @@ public interface ConnectionLoadBalanceConcept {
 
     void publish(Object event);
 
-    void move(Object id, String fromType, String toType, Consumer<Connection> consumer);
-
-    void redefineType(Connection connection, String type, Connection.Redefiner redefiner);
-
     Connection getConnection(Object id, String type);
 
     Collection<Connection> getConnections(String type);

@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
@@ -17,15 +18,17 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
     public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket/";
     private static WebSocketLoadBalanceConcept instance;
 
-    private WebSocketLoadBalanceConcept(ConnectionServerProvider connectionServerProvider,
-                                        ConnectionSubscriber connectionSubscriber,
-                                        List<ConnectionFactory> connectionFactories,
-                                        List<ConnectionSelector> connectionSelectors,
-                                        MessageCodecAdapter messageCodecAdapter,
-                                        List<MessageFactory> messageFactories,
-                                        ConnectionEventPublisher eventPublisher) {
-        super(connectionServerProvider, connectionSubscriber, connectionFactories,
-                connectionSelectors, messageFactories, messageCodecAdapter, eventPublisher);
+    public WebSocketLoadBalanceConcept(ConnectionRepository connectionRepository,
+                                       ConnectionServerProvider connectionServerProvider,
+                                       ConnectionSubscriber connectionSubscriber,
+                                       List<ConnectionFactory> connectionFactories,
+                                       List<ConnectionSelector> connectionSelectors,
+                                       List<MessageFactory> messageFactories,
+                                       MessageCodecAdapter messageCodecAdapter,
+                                       ConnectionEventPublisher eventPublisher) {
+        super(connectionRepository, connectionServerProvider, connectionSubscriber,
+                connectionFactories, connectionSelectors, messageFactories,
+                messageCodecAdapter, eventPublisher);
     }
 
     public static WebSocketLoadBalanceConcept getInstance() {
@@ -46,15 +49,18 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
             preBuild();
 
-            connectionFactories.add(new JavaxWebSocketConnectionFactory());
+            if (connectionFactories.isEmpty()) {
+                connectionFactories.add(new JavaxWebSocketConnectionFactory());
+            }
 
             return new WebSocketLoadBalanceConcept(
+                    connectionRepository,
                     connectionServerProvider,
                     connectionSubscriber,
                     connectionFactories,
                     connectionSelectors,
-                    messageCodecAdapter,
                     messageFactories,
+                    messageCodecAdapter,
                     eventPublisher);
         }
     }

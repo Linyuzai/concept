@@ -4,10 +4,14 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.function.Consumer;
 
 @AllArgsConstructor
 public class ReactiveWebSocketServerHandler implements WebSocketHandler {
@@ -24,6 +28,11 @@ public class ReactiveWebSocketServerHandler implements WebSocketHandler {
                 .doOnNext(it -> concept.onMessage(session.getId(), Connection.Type.CLIENT, it))
                 .doOnError(it -> concept.onError(session.getId(), Connection.Type.CLIENT, it))
                 .then();
+
+        @SuppressWarnings("all")
+        Disposable disposable = session.closeStatus()
+                .doOnError(it -> concept.onError(session.getId(), Connection.Type.CLIENT, it))
+                .subscribe(it -> concept.onClose(session.getId(), Connection.Type.CLIENT, it));
 
         return Mono.zip(send, receive).then();
     }

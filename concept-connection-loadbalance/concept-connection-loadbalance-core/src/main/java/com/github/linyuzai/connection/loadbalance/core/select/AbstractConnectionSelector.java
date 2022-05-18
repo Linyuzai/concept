@@ -1,6 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.core.select;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.utils.Connections;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
@@ -14,16 +16,9 @@ import java.util.List;
 @Getter
 public abstract class AbstractConnectionSelector implements ConnectionSelector {
 
-    private boolean broadcast;
-
     @Override
-    public ConnectionSelector broadcast(boolean broadcast) {
-        this.broadcast = broadcast;
-        return this;
-    }
-
-    @Override
-    public Connection select(Message message, Collection<Connection> clients, Collection<Connection> observables) {
+    public Connection select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept) {
+        Collection<Connection> clients = repository.select(Connection.Type.CLIENT);
         Connection select;
         if (clients.isEmpty()) {
             select = null;
@@ -41,12 +36,17 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
             return select;
         }
 
+        Collection<Connection> observables = repository.select(Connection.Type.OBSERVABLE);
+
         if (select == null) {
             //没有对应的连接，直接进行转发
             return Connections.of(observables);
         }
 
-        if (broadcast) {
+        String broadcast = message.getHeaders()
+                .getOrDefault(Message.BROADCAST, Boolean.TRUE.toString());
+
+        if (Boolean.parseBoolean(broadcast)) {
             //广播
             List<Connection> combine = new ArrayList<>(observables);
             combine.add(0, select);

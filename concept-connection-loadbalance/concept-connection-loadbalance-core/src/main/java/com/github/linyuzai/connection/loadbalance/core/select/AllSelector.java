@@ -8,10 +8,6 @@ import java.util.Collection;
 
 public class AllSelector extends AbstractConnectionSelector {
 
-    public AllSelector() {
-        broadcast(true);
-    }
-
     @Override
     public boolean support(Message message) {
         return true;

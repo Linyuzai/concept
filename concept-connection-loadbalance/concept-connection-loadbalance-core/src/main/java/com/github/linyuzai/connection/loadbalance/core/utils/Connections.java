@@ -33,6 +33,13 @@ public class Connections implements Connection {
     }
 
     @Override
+    public void setType(String type) {
+        for (Connection connection : connections) {
+            connection.setType(type);
+        }
+    }
+
+    @Override
     public String getType() {
         Connection connection = get();
         return connection == null ? null : connection.getType();
@@ -96,13 +103,6 @@ public class Connections implements Connection {
             }
         }
         return concept;
-    }
-
-    @Override
-    public void redefineType(String type, Redefiner redefiner) {
-        for (Connection connection : connections) {
-            connection.redefineType(type, redefiner);
-        }
     }
 
     @Override

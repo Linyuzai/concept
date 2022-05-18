@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,8 +29,11 @@ public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
                 .doOnError(it -> concept.onError(session.getId(), Connection.Type.OBSERVABLE, it))
                 .then();
 
+        @SuppressWarnings("all")
+        Disposable disposable = session.closeStatus()
+                .doOnError(it -> concept.onError(session.getId(), Connection.Type.OBSERVABLE, it))
+                .subscribe(it -> concept.onClose(session.getId(), Connection.Type.OBSERVABLE, it));
+
         return Mono.zip(send, receive).then();
     }
-
-
 }

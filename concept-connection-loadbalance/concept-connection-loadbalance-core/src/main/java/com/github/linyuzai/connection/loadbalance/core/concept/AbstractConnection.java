@@ -1,12 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.event.TypeRedefineEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -20,7 +18,6 @@ public abstract class AbstractConnection implements Connection {
 
     protected final Map<Object, Object> metadata = new LinkedHashMap<>();
 
-    @Setter(AccessLevel.PRIVATE)
     protected String type;
 
     @NonNull
@@ -68,21 +65,6 @@ public abstract class AbstractConnection implements Connection {
     public abstract void ping(PingMessage ping);
 
     public abstract void pong(PongMessage pong);
-
-    @Override
-    public void redefineType(String type, Redefiner redefiner) {
-        if (this.type.equals(type)) {
-            return;
-        }
-        String oldType = this.type;
-        concept.move(getId(), this.type, type, connection -> {
-            AbstractConnection.this.type = type;
-            if (redefiner != null) {
-                redefiner.onRedefine();
-            }
-        });
-        concept.publish(new TypeRedefineEvent(this, oldType));
-    }
 
     @Override
     public void close() {
