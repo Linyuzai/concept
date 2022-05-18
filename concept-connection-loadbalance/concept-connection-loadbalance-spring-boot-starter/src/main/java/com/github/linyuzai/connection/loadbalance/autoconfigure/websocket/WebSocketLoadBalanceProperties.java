@@ -99,7 +99,7 @@ public class WebSocketLoadBalanceProperties {
         /**
          * 心跳超时时间，毫秒
          */
-        private long timeout = 3 * 60 * 1000;
+        private long timeout = 3 * 60 * 1000 + 30 * 1000;
 
         /**
          * 心跳周期，毫秒

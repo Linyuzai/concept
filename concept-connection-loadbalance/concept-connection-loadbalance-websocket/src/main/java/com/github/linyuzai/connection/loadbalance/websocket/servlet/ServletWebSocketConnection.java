@@ -65,11 +65,7 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     @SneakyThrows
     @Override
     public void close(int code, String reason) {
-        if (reason == null) {
-            session.close();
-        } else {
-            session.close(new CloseStatus(code, reason));
-        }
+        session.close(new CloseStatus(code, reason));
     }
 
     @Override

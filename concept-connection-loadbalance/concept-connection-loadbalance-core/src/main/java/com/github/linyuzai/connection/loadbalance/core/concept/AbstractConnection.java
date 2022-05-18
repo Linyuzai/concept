@@ -86,7 +86,7 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void close() {
-        close(null);
+        close("");
     }
 
     @Override

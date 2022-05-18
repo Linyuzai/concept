@@ -67,11 +67,7 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     @SneakyThrows
     @Override
     public void close(int code, String reason) {
-        if (reason == null) {
-            session.close();
-        } else {
-            session.close(new CloseReason(CloseReason.CloseCodes.getCloseCode(code), reason));
-        }
+        session.close(new CloseReason(CloseReason.CloseCodes.getCloseCode(code), reason));
     }
 
     @Override
