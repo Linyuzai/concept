@@ -64,11 +64,11 @@ public class ServletWebSocketConnection extends WebSocketConnection {
 
     @SneakyThrows
     @Override
-    public void close(String reason) {
+    public void close(int code, String reason) {
         if (reason == null) {
             session.close();
         } else {
-            session.close(new CloseStatus(CloseStatus.NORMAL.getCode(), reason));
+            session.close(new CloseStatus(code, reason));
         }
     }
 

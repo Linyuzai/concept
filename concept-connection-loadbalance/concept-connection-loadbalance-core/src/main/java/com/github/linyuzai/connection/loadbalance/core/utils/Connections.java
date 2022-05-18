@@ -125,6 +125,13 @@ public class Connections implements Connection {
     }
 
     @Override
+    public void close(int code, String reason) {
+        for (Connection connection : connections) {
+            connection.close(code, reason);
+        }
+    }
+
+    @Override
     public boolean isAlive() {
         Set<Boolean> set = new HashSet<>();
         for (Connection connection : connections) {

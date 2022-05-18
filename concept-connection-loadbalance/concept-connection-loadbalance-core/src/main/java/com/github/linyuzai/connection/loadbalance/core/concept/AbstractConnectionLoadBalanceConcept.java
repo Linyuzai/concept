@@ -142,7 +142,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public void subscribe(ConnectionServer server, boolean sendServerMsg) {
+    public synchronized void subscribe(ConnectionServer server, boolean sendServerMsg) {
         Connection exist = getSubscriberConnection(server);
         if (exist != null) {
             if (exist.isAlive()) {

@@ -40,7 +40,7 @@ public class IdConnection extends AbstractConnection {
     }
 
     @Override
-    public void close(String reason) {
+    public void close(int code, String reason) {
 
     }
 }

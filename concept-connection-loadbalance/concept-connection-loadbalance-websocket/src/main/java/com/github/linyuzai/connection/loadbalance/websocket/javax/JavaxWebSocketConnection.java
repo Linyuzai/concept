@@ -66,11 +66,11 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
 
     @SneakyThrows
     @Override
-    public void close(String reason) {
+    public void close(int code, String reason) {
         if (reason == null) {
             session.close();
         } else {
-            session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, reason));
+            session.close(new CloseReason(CloseReason.CloseCodes.getCloseCode(code), reason));
         }
     }
 

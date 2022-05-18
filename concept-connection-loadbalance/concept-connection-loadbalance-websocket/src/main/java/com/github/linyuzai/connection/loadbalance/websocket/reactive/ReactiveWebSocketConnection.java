@@ -70,12 +70,12 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void close(String reason) {
+    public void close(int code, String reason) {
         sender.complete();
         if (reason == null) {
             session.close().subscribe();
         } else {
-            session.close(new CloseStatus(CloseStatus.NORMAL.getCode(), reason)).subscribe();
+            session.close(new CloseStatus(code, reason)).subscribe();
         }
     }
 

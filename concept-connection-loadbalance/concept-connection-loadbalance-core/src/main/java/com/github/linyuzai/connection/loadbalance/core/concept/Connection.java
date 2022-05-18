@@ -37,6 +37,8 @@ public interface Connection {
 
     void close(String reason);
 
+    void close(int code, String reason);
+
     boolean isAlive();
 
     void setAlive(boolean alive);
