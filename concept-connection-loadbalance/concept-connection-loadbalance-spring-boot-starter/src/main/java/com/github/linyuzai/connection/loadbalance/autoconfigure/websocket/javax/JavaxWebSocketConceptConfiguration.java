@@ -25,7 +25,7 @@ public class JavaxWebSocketConceptConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ConnectionSubscriber connectionSubscriber(WebSocketLoadBalanceProperties properties) {
-        return new JavaxWebSocketConnectionSubscriber(properties.getSubscriber().getProtocol());
+        return new JavaxWebSocketConnectionSubscriber(properties.getLoadBalance().getProtocol());
     }
 
     @Bean

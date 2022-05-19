@@ -92,7 +92,7 @@ public class WebSocketLoadBalanceProperties {
             /**
              * 订阅监控周期，毫秒
              */
-            private long period = 30 * 1000;
+            private long period = 30000;
         }
     }
 
@@ -107,11 +107,11 @@ public class WebSocketLoadBalanceProperties {
         /**
          * 心跳超时时间，毫秒
          */
-        private long timeout = 3 * 60 * 1000 + 30 * 1000;
+        private long timeout = 210000;
 
         /**
          * 心跳周期，毫秒
          */
-        private long period = 60 * 1000;
+        private long period = 60000;
     }
 }

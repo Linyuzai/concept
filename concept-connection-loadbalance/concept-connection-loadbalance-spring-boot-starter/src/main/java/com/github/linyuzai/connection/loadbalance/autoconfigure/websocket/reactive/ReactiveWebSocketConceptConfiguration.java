@@ -25,7 +25,7 @@ public class ReactiveWebSocketConceptConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ConnectionSubscriber connectionSubscriber(WebSocketLoadBalanceProperties properties) {
-        return new ReactiveWebSocketConnectionSubscriber(properties.getSubscriber().getProtocol());
+        return new ReactiveWebSocketConnectionSubscriber(properties.getLoadBalance().getProtocol());
     }
 
     @Bean
