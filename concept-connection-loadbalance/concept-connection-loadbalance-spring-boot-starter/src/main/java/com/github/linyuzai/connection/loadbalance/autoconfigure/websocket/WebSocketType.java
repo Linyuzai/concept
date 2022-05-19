@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
-public enum ServerType {
+public enum WebSocketType {
 
     /**
      * 根据当前环境自动进行配置
@@ -48,11 +48,11 @@ public enum ServerType {
 
     private final Class<?>[] configureClasses;
 
-    ServerType() {
+    WebSocketType() {
         this(null);
     }
 
-    ServerType(Class<?> defaultEndpoint, Class<?>... configureClasses) {
+    WebSocketType(Class<?> defaultEndpoint, Class<?>... configureClasses) {
         this.defaultEndpoint = defaultEndpoint;
         this.configureClasses = configureClasses;
     }

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 public class WebSocketDefaultEndpointConfiguration {
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.server.default-endpoint.path-selector",
+    @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.path-selector",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public PathSelector pathSelector() {
         return new DefaultEndpointPathSelector();

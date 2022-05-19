@@ -7,7 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepo
 import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.SubscribeMonitorLogger;
+import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.extension.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionServerProvider;
@@ -58,7 +58,7 @@ public class ConnectionLoadBalanceConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber",
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance",
             name = "logger", havingValue = "true", matchIfMissing = true)
     public ConnectionSubscribeLogger connectionSubscribeLogger() {
         Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
@@ -66,10 +66,10 @@ public class ConnectionLoadBalanceConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
             name = "logger", havingValue = "true", matchIfMissing = true)
-    public SubscribeMonitorLogger subscribeMonitorLogger() {
-        Log log = LogFactory.getLog(SubscribeMonitorLogger.class);
-        return new SubscribeMonitorLogger(log::info, log::error);
+    public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
+        Log log = LogFactory.getLog(LoadBalanceMonitorLogger.class);
+        return new LoadBalanceMonitorLogger(log::info, log::error);
     }
 }

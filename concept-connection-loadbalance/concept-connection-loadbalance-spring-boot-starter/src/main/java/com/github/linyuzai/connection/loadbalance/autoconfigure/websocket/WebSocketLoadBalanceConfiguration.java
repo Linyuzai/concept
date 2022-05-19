@@ -11,8 +11,8 @@ import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepo
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ConnectionSubscribeMonitor;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ScheduledExecutorConnectionSubscribeMonitor;
+import com.github.linyuzai.connection.loadbalance.core.monitor.ConnectionLoadBalanceMonitor;
+import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
@@ -28,23 +28,23 @@ import java.util.List;
 public class WebSocketLoadBalanceConfiguration {
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.monitor",
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ScheduledExecutorConnectionSubscribeMonitor scheduledExecutorConnectionSubscribeMonitor(
+    public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
-        return new ScheduledExecutorConnectionSubscribeMonitor(
-                factory.create(ConnectionSubscribeMonitor.class),
-                properties.getSubscriber().getMonitor().getPeriod());
+        return new ScheduledConnectionLoadBalanceMonitor(
+                factory.create(ConnectionLoadBalanceMonitor.class),
+                properties.getLoadBalance().getMonitor().getPeriod());
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.subscriber.heartbeat",
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatAutoSender loadBalanceConnectionHeartbeatAutoSender(
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getSubscriber().getHeartbeat();
+        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getLoadBalance().getHeartbeat();
         return new ConnectionHeartbeatAutoSender(
                 Arrays.asList(Connection.Type.SUBSCRIBER, Connection.Type.OBSERVABLE),
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
@@ -52,7 +52,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.server.heartbeat",
+    @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatAutoSender clientConnectionHeartbeatSender(
             ScheduledExecutorServiceFactory factory,

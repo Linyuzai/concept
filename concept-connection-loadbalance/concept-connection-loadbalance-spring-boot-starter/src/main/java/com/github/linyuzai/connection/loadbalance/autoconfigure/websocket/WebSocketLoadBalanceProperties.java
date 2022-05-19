@@ -4,8 +4,13 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
-@ConfigurationProperties(prefix = "concept.websocket.load-balance")
+@ConfigurationProperties(prefix = "concept.websocket")
 public class WebSocketLoadBalanceProperties {
+
+    /**
+     * 类型
+     */
+    private WebSocketType type = WebSocketType.AUTO;
 
     /**
      * 服务配置
@@ -15,15 +20,10 @@ public class WebSocketLoadBalanceProperties {
     /**
      * 订阅配置
      */
-    private SubscriberProperties subscriber = new SubscriberProperties();
+    private LoadBalanceProperties loadBalance = new LoadBalanceProperties();
 
     @Data
     public static class ServerProperties {
-
-        /**
-         * 服务类型
-         */
-        private ServerType type = ServerType.AUTO;
 
         /**
          * 默认服务配置
@@ -54,7 +54,7 @@ public class WebSocketLoadBalanceProperties {
     }
 
     @Data
-    public static class SubscriberProperties {
+    public static class LoadBalanceProperties {
 
         /**
          * 订阅协议

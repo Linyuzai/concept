@@ -16,21 +16,21 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
 
     @Override
     public String @NonNull [] selectImports(@NonNull AnnotationMetadata metadata) {
-        ServerType type = environment.getProperty("concept.websocket.load-balance.server.type",
-                ServerType.class, ServerType.AUTO);
-        if (type == ServerType.AUTO) {
+        WebSocketType type = environment.getProperty("concept.websocket.type",
+                WebSocketType.class, WebSocketType.AUTO);
+        if (type == WebSocketType.AUTO) {
             type = deduceServerType();
         }
-        boolean enableDefaultEndpoint = environment.getProperty("concept.websocket.load-balance.server.default-endpoint.enabled",
+        boolean enableDefaultEndpoint = environment.getProperty("concept.websocket.server.default-endpoint.enabled",
                 boolean.class, true);
         return type.getConfigurations(enableDefaultEndpoint);
     }
 
-    private ServerType deduceServerType() {
+    private WebSocketType deduceServerType() {
         if (isServletWebApplication()) {
-            return ServerType.SERVLET;
+            return WebSocketType.SERVLET;
         } else if (isReactiveWebApplication()) {
-            return ServerType.REACTIVE;
+            return WebSocketType.REACTIVE;
         }
         throw new IllegalArgumentException("Server type can not deduce");
     }
