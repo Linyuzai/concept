@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.servlet;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.WebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointConfigurer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketServerConfigurer;
@@ -14,7 +15,7 @@ import java.util.List;
 @EnableWebSocket
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class ServletWebSocketDefaultEndpointConfiguration {
+public class ServletWebSocketDefaultEndpointConfiguration extends WebSocketDefaultEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean

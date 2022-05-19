@@ -13,7 +13,7 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerPr
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ConnectionSubscribeMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.ScheduledExecutorConnectionSubscribeMonitor;
-import com.github.linyuzai.connection.loadbalance.core.utils.ScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

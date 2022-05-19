@@ -8,8 +8,8 @@ import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnect
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.monitor.SubscribeMonitorLogger;
-import com.github.linyuzai.connection.loadbalance.core.utils.ScheduledExecutorServiceFactory;
-import com.github.linyuzai.connection.loadbalance.core.utils.SingleThreadScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.extension.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.discovery.DiscoveryConnectionServerProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

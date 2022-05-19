@@ -42,6 +42,14 @@ public class WebSocketLoadBalanceProperties {
              * 是否启用默认服务
              */
             private boolean enabled = true;
+
+            private PathSelectorProperties pathSelector = new PathSelectorProperties();
+
+            @Data
+            public static class PathSelectorProperties {
+
+                private boolean enabled = false;
+            }
         }
     }
 

@@ -10,6 +10,8 @@ import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -73,5 +75,15 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     @Override
     public boolean isOpen() {
         return session.isOpen();
+    }
+
+    @Override
+    public void parseQueryParameterMap(Map<String, String> map) {
+        for (Map.Entry<String, List<String>> entry : session.getRequestParameterMap().entrySet()) {
+            List<String> value = entry.getValue();
+            if (!value.isEmpty()) {
+                map.put(entry.getKey(), value.get(0));
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.reactive;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.WebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointConfigurer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketServerHandlerMapping;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-public class ReactiveWebSocketDefaultEndpointConfiguration {
+public class ReactiveWebSocketDefaultEndpointConfiguration extends WebSocketDefaultEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
