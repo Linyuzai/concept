@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.ScopeHelper;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
@@ -7,27 +8,62 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPubl
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoSender;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
 
     @Bean
+    public WebSocketScopeHelper webSocketScopeHelper(ScopeHelper helper) {
+        return new WebSocketScopeHelper(helper);
+    }
+
+    @Bean
+    @WebSocketScope
+    @ConditionalOnMissingBean
+    public ConnectionRepository connectionRepository() {
+        return new DefaultConnectionRepository();
+    }
+
+    @Bean
+    @WebSocketScope
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance",
+            name = "logger", havingValue = "true", matchIfMissing = true)
+    public ConnectionSubscribeLogger connectionSubscribeLogger() {
+        Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
+        return new ConnectionSubscribeLogger(log::info, log::error);
+    }
+
+    @Bean
+    @WebSocketScope
+    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
+            name = "logger", havingValue = "true", matchIfMissing = true)
+    public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
+        Log log = LogFactory.getLog(LoadBalanceMonitorLogger.class);
+        return new LoadBalanceMonitorLogger(log::info, log::error);
+    }
+
+    @Bean
+    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
@@ -39,6 +75,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
+    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatAutoSender loadBalanceConnectionHeartbeatAutoSender(
@@ -52,6 +89,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
+    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatAutoSender clientConnectionHeartbeatSender(
@@ -65,26 +103,17 @@ public class WebSocketLoadBalanceConfiguration {
 
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
-    public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(
-            ConnectionRepository repository,
-            ConnectionServerProvider provider,
-            ConnectionSubscriber subscriber,
-            List<ConnectionFactory> connectionFactories,
-            List<ConnectionSelector> connectionSelectors,
-            List<MessageFactory> messageFactories,
-            MessageCodecAdapter messageCodecAdapter,
-            ConnectionEventPublisher eventPublisher,
-            List<ConnectionEventListener> eventListeners) {
+    public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(WebSocketScopeHelper helper) {
         return new WebSocketLoadBalanceConcept.Builder()
-                .connectionRepository(repository)
-                .connectionServerProvider(provider)
-                .connectionSubscriber(subscriber)
-                .addConnectionFactories(connectionFactories)
-                .addConnectionSelectors(connectionSelectors)
-                .addMessageFactories(messageFactories)
-                .messageCodecAdapter(messageCodecAdapter)
-                .eventPublisher(eventPublisher)
-                .addEventListeners(eventListeners)
+                .connectionRepository(helper.getBean(ConnectionRepository.class))
+                .connectionServerProvider(helper.getBean(ConnectionServerProvider.class))
+                .connectionSubscriber(helper.getBean(ConnectionSubscriber.class))
+                .addConnectionFactories(helper.getBeans(ConnectionFactory.class))
+                .addConnectionSelectors(helper.getBeans(ConnectionSelector.class))
+                .addMessageFactories(helper.getBeans(MessageFactory.class))
+                .messageCodecAdapter(helper.getBean(MessageCodecAdapter.class))
+                .eventPublisher(helper.getBean(ConnectionEventPublisher.class))
+                .addEventListeners(helper.getBeans(ConnectionEventListener.class))
                 .build();
     }
 }
