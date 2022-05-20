@@ -17,6 +17,8 @@ public class ScopeHelper {
 
     private GenericApplicationContext context;
 
+    //TODO 通过数量判断是否必须加注解
+
     @SafeVarargs
     public final <T> T getBean(Class<T> clazz, Class<? extends Annotation>... scopes) {
         for (Class<? extends Annotation> scope : scopes) {

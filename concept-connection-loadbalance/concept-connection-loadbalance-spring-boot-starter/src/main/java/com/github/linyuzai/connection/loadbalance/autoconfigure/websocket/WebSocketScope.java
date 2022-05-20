@@ -7,6 +7,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Scope("websocket")
+@Scope(WebSocketScope.NAME)
 public @interface WebSocketScope {
+
+    String NAME = "websocket";
 }
