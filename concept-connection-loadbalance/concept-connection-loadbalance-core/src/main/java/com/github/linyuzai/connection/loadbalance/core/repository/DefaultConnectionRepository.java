@@ -20,12 +20,12 @@ public class DefaultConnectionRepository implements ConnectionRepository {
 
     @Override
     public Collection<Connection> select(String type) {
-        return connections.getOrDefault(type, Collections.emptyMap()).values();
+        return Collections.unmodifiableCollection(connections.getOrDefault(type, Collections.emptyMap()).values());
     }
 
     @Override
     public Collection<Connection> all() {
-        return stream().collect(Collectors.toList());
+        return Collections.unmodifiableCollection(stream().collect(Collectors.toList()));
     }
 
     @Override
