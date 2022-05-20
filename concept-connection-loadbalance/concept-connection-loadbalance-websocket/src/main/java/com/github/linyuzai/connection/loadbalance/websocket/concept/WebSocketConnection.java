@@ -20,7 +20,14 @@ public abstract class WebSocketConnection extends AbstractConnection {
         super(type, metadata);
     }
 
+    public abstract URI getUri();
+
     public abstract boolean isOpen();
+
+    @Override
+    public void close(String reason) {
+        close(1000, reason);
+    }
 
     public String getQueryParameter(String name) {
         checkQueryParameterMap();

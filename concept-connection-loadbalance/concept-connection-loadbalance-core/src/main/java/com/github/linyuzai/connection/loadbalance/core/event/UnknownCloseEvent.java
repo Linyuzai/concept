@@ -13,7 +13,11 @@ public class UnknownCloseEvent implements ConnectionEvent {
     private final Object reason;
 
     public UnknownCloseEvent(Object id, String type, Object reason, ConnectionLoadBalanceConcept concept) {
-        this.connection = new IdConnection(id, type, concept);
+        this(new IdConnection(id, type, concept), reason);
+    }
+
+    public UnknownCloseEvent(Connection connection, Object reason) {
+        this.connection = connection;
         this.reason = reason;
     }
 }

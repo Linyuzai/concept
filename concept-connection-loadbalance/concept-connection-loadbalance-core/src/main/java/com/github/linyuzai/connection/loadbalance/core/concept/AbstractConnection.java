@@ -71,10 +71,5 @@ public abstract class AbstractConnection implements Connection {
         close("");
     }
 
-    @Override
-    public void close(String reason) {
-        close(1000, reason);
-    }
-
     public abstract void doSend(Object message);
 }
