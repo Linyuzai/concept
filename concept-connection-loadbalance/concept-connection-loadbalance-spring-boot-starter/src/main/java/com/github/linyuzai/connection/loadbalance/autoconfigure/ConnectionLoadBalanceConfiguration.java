@@ -30,8 +30,8 @@ public class ConnectionLoadBalanceConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ScopeHelper scopeHelper(GenericApplicationContext context) {
-        return new ScopeHelper(context);
+    public ScopeHelper scopeHelper(GenericApplicationContext context, List<ScopeName> sns) {
+        return new ScopeHelper(context, sns);
     }
 
     @Bean

@@ -1,6 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -12,15 +11,22 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 public class ScopeHelper {
 
-    private GenericApplicationContext context;
+    private final GenericApplicationContext context;
 
-    //TODO 通过数量判断是否必须加注解
+    private final boolean ignoreScope;
+
+    public ScopeHelper(GenericApplicationContext context, List<ScopeName> sns) {
+        this.context = context;
+        this.ignoreScope = sns.size() <= 1;
+    }
 
     @SafeVarargs
     public final <T> T getBean(Class<T> clazz, Class<? extends Annotation>... scopes) {
+        if (ignoreScope) {
+            return context.getBean(clazz);
+        }
         for (Class<? extends Annotation> scope : scopes) {
             List<String> names = new ArrayList<>();
             List<T> beans = new ArrayList<>();
@@ -53,6 +59,9 @@ public class ScopeHelper {
 
     @SafeVarargs
     public final <T> List<T> getBeans(Class<T> clazz, Class<? extends Annotation>... scopes) {
+        if (ignoreScope) {
+            return new ArrayList<>(context.getBeansOfType(clazz).values());
+        }
         List<T> beans = new ArrayList<>();
         for (Class<? extends Annotation> scope : scopes) {
             Scope annotation = AnnotationUtils.findAnnotation(scope, Scope.class);
