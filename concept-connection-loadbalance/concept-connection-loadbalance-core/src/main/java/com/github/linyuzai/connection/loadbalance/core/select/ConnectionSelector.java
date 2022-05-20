@@ -5,9 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 
+import java.util.Collection;
+
 public interface ConnectionSelector {
 
     boolean support(Message message);
 
-    Connection select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept);
+    Collection<Connection> select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept);
 }

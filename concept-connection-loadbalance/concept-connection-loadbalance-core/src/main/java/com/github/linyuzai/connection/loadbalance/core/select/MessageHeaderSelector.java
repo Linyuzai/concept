@@ -1,13 +1,11 @@
 package com.github.linyuzai.connection.loadbalance.core.select;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.extension.Connections;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -22,12 +20,11 @@ public abstract class MessageHeaderSelector extends AbstractConnectionSelector {
     }
 
     @Override
-    public Connection doSelect(Message message, Collection<Connection> connections) {
+    public Collection<Connection> doSelect(Message message, Collection<Connection> connections) {
         String header = message.getHeaders().get(name);
-        List<Connection> list = connections.stream()
+        return connections.stream()
                 .filter(it -> match(it, header))
                 .collect(Collectors.toList());
-        return Connections.of(list);
     }
 
     public abstract boolean match(Connection connection, String header);

@@ -7,11 +7,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
 @Getter
-public class IdConnection extends AbstractConnection {
+public class UnknownConnection extends AbstractConnection {
 
     private final Object id;
 
-    public IdConnection(Object id, String type, ConnectionLoadBalanceConcept concept) {
+    public UnknownConnection(Object id, String type, ConnectionLoadBalanceConcept concept) {
         super(type);
         setConcept(concept);
         this.id = id;

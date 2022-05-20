@@ -3,7 +3,6 @@ package com.github.linyuzai.connection.loadbalance.core.select;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
-import com.github.linyuzai.connection.loadbalance.core.extension.Connections;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
@@ -11,17 +10,18 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
 public abstract class AbstractConnectionSelector implements ConnectionSelector {
 
     @Override
-    public Connection select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept) {
+    public Collection<Connection> select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept) {
         Collection<Connection> clients = repository.select(Connection.Type.CLIENT);
-        Connection select;
+        Collection<Connection> select;
         if (clients.isEmpty()) {
-            select = null;
+            select = Collections.emptyList();
         } else {
             select = doSelect(message, clients);
         }
@@ -40,7 +40,7 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
 
         if (select == null) {
             //没有对应的连接，直接进行转发
-            return Connections.of(observables);
+            return observables;
         }
 
         String broadcast = message.getHeaders()
@@ -48,14 +48,15 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
 
         if (Boolean.parseBoolean(broadcast)) {
             //广播
-            List<Connection> combine = new ArrayList<>(observables);
-            combine.add(0, select);
-            return Connections.of(combine);
+            List<Connection> combine = new ArrayList<>(select.size() + observables.size());
+            combine.addAll(select);
+            combine.addAll(observables);
+            return combine;
         } else {
             //单播
             return select;
         }
     }
 
-    public abstract Connection doSelect(Message message, Collection<Connection> connections);
+    public abstract Collection<Connection> doSelect(Message message, Collection<Connection> connections);
 }

@@ -2,7 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.event;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.extension.IdConnection;
+import com.github.linyuzai.connection.loadbalance.core.extension.UnknownConnection;
 import lombok.Getter;
 
 /**
@@ -16,7 +16,7 @@ public class UnknownCloseEvent implements ConnectionEvent {
     private final Object reason;
 
     public UnknownCloseEvent(Object id, String type, Object reason, ConnectionLoadBalanceConcept concept) {
-        this.connection = new IdConnection(id, type, concept);
+        this.connection = new UnknownConnection(id, type, concept);
         this.reason = reason;
     }
 }

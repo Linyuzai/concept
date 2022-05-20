@@ -153,8 +153,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         Collection<Connection> connections = connectionRepository.select(Connection.Type.SUBSCRIBER);
         for (Connection connection : connections) {
-            ConnectionServer exist = (ConnectionServer) connection.getMetadata()
-                    .get(ConnectionServer.class);
+            ConnectionServer exist = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
             if (server.getInstanceId().equals(exist.getInstanceId())) {
                 return connection;
             }
@@ -363,8 +362,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void send(Object msg) {
         Message message = createMessage(msg);
         ConnectionSelector selector = getConnectionSelector(message);
-        Connection connection = selector.select(message, connectionRepository, this);
-        if (connection == null) {
+        Collection<Connection> connections = selector.select(message, connectionRepository, this);
+        if (connections == null || connections.isEmpty()) {
             publish(new DeadMessageEvent(message));
             return;
         }
@@ -372,9 +371,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         //记录转发服务，方便扩展消息追踪
         String instanceId = connectionServerProvider.getClient().getInstanceId();
         message.getHeaders().put(Message.FORWARD, instanceId);
-        publish(new MessagePrepareEvent(connection, message));
-        connection.send(message);
-        publish(new MessageSendEvent(connection, message));
+        publish(new MessagePrepareEvent(message, connections));
+        for (Connection connection : connections) {
+            try {
+                connection.send(message);
+            } catch (Throwable e) {
+                publish(new MessageSendErrorEvent(connection, message, e));
+            }
+        }
+        publish(new MessageSendEvent(message, connections));
     }
 
     @Override

@@ -11,6 +11,9 @@ import lombok.NonNull;
 
 import java.util.*;
 
+/**
+ * 多连接组合连接
+ */
 @Getter
 @AllArgsConstructor
 public class Connections implements Connection {
