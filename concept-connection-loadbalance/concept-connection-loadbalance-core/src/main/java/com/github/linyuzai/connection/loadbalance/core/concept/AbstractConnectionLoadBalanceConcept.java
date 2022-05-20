@@ -101,6 +101,22 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    /**
+     * 尝试订阅服务实例
+     * <p>
+     * 当对应的连接存在时
+     * <p>
+     * 如果存活 {@link Connection#isAlive()} 就不进行重复订阅
+     * <p>
+     * 否则关闭之前的连接并重新订阅
+     * <p>
+     * 加锁防止主动订阅和被动订阅冲突
+     * <p>
+     * 当接收到服务实例信息时会反向订阅 {@link ConnectionSubscribeHandler}
+     *
+     * @param server        需要订阅的服务实例
+     * @param sendServerMsg 是否发送服务实例消息
+     */
     @Override
     public synchronized void subscribe(ConnectionServer server, boolean sendServerMsg) {
         Connection exist = getSubscriberConnection(server);
@@ -113,7 +129,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
         try {
             connectionSubscriber.subscribe(server, this, connection -> {
-                onOpen(connection);
+                onEstablish(connection);
                 if (sendServerMsg) {
                     connection.send(createMessage(connectionServerProvider.getClient()));
                 }
@@ -123,6 +139,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    /**
+     * 获得订阅了对应服务实例的连接
+     * <p>
+     * 如不存在则返回 null
+     *
+     * @param server 服务实例
+     * @return 对应的连接或 null
+     */
     public Connection getSubscriberConnection(ConnectionServer server) {
         if (server == null) {
             return null;
@@ -177,9 +201,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     @Override
-    public Connection onOpen(Object o, Map<Object, Object> metadata) {
+    public Connection onEstablish(Object o, Map<Object, Object> metadata) {
         Connection connection = create(o, metadata);
-        onOpen(connection);
+        onEstablish(connection);
         return connection;
     }
 
@@ -190,20 +214,31 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      * <p>
      * 将连接添加到连接仓库 {@link ConnectionRepository}
      * <p>
-     * 发布 {@link ConnectionOpenEvent} 事件
+     * 发布 {@link ConnectionEstablishEvent} 事件
      *
      * @param connection 连接
      */
     @Override
-    public void onOpen(Connection connection) {
+    public void onEstablish(Connection connection) {
         String type = connection.getType();
         connection.setConcept(this);
         connection.setMessageEncoder(messageCodecAdapter.getMessageEncoder(type));
         connection.setMessageDecoder(messageCodecAdapter.getMessageDecoder(type));
         connectionRepository.add(connection);
-        publish(new ConnectionOpenEvent(connection));
+        publish(new ConnectionEstablishEvent(connection));
     }
 
+    /**
+     * 当连接关闭时调用
+     * <p>
+     * 当连接仓库 {@link ConnectionRepository} 中不存在对应的连接
+     * <p>
+     * 将会发布 {@link UnknownCloseEvent} 事件
+     *
+     * @param id     连接 id
+     * @param type   连接类型
+     * @param reason 关闭原因
+     */
     @Override
     public void onClose(Object id, String type, Object reason) {
         Connection connection = connectionRepository.get(id, type);
@@ -214,15 +249,31 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         onClose(connection, reason);
     }
 
+    /**
+     * 当连接关闭时调用
+     * <p>
+     * 发布 {@link ConnectionCloseEvent} 事件
+     *
+     * @param connection 连接
+     * @param reason     关闭原因
+     */
     @Override
     public void onClose(@NonNull Connection connection, Object reason) {
-        if (connectionRepository.remove(connection) == null) {
-            publish(new UnknownCloseEvent(connection, reason));
-        } else {
-            publish(new ConnectionCloseEvent(connection, reason));
-        }
+        connectionRepository.remove(connection);
+        publish(new ConnectionCloseEvent(connection, reason));
     }
 
+    /**
+     * 当连接接收消息时调用
+     * <p>
+     * 当连接仓库 {@link ConnectionRepository} 中不存在对应的连接
+     * <p>
+     * 将会发布 {@link UnknownMessageEvent} 事件
+     *
+     * @param id      连接 id
+     * @param type    连接类型
+     * @param message 消息数据
+     */
     @Override
     public void onMessage(Object id, String type, Object message) {
         Connection connection = connectionRepository.get(id, type);
@@ -233,6 +284,18 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    /**
+     * 当连接接收消息时调用
+     * <p>
+     * 发布 {@link MessageReceiveEvent} 事件
+     * <p>
+     * 当消息解码失败时
+     * <p>
+     * 发布 {@link MessageDecodeErrorEvent} 事件
+     *
+     * @param connection 连接
+     * @param message    消息数据
+     */
     @Override
     public void onMessage(@NonNull Connection connection, Object message) {
         Message decode;
@@ -246,6 +309,16 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         publish(new MessageReceiveEvent(connection, decode));
     }
 
+    /**
+     * 当连接异常时调用
+     * 当连接仓库 {@link ConnectionRepository} 中不存在对应的连接
+     * <p>
+     * 将会发布 {@link UnknownErrorEvent} 事件
+     *
+     * @param id   连接 id
+     * @param type 连接类型
+     * @param e    异常
+     */
     @Override
     public void onError(Object id, String type, Throwable e) {
         Connection connection = connectionRepository.get(id, type);
@@ -256,11 +329,36 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    /**
+     * 当连接异常时调用
+     * <p>
+     * 发布 {@link ConnectionErrorEvent} 事件
+     *
+     * @param connection 连接
+     * @param e          异常
+     */
     @Override
     public void onError(@NonNull Connection connection, Throwable e) {
         publish(new ConnectionErrorEvent(connection, e));
     }
 
+    /**
+     * 将消息包装成 {@link Message}
+     * <p>
+     * 适配对应的连接选择器 {@link ConnectionSelector}
+     * <p>
+     * 选择连接并标记消息被转发 {@link Message#FORWARD}
+     * <p>
+     * 发布 {@link MessagePrepareEvent} 事件
+     * <p>
+     * 执行发送消息
+     * <p>
+     * 发布 {@link MessageSendEvent} 事件
+     * <p>
+     * 如果连接选择器为选择任何连接则发布 {@link DeadMessageEvent} 事件
+     *
+     * @param msg 消息
+     */
     @Override
     public void send(Object msg) {
         Message message = createMessage(msg);
@@ -271,6 +369,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return;
         }
         //添加转发标记，防止其他服务再次转发
+        //记录转发服务，方便扩展消息追踪
         String instanceId = connectionServerProvider.getClient().getInstanceId();
         message.getHeaders().put(Message.FORWARD, instanceId);
         publish(new MessagePrepareEvent(connection, message));
@@ -289,6 +388,16 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         send(message);
     }
 
+    /**
+     * 创建消息
+     * <p>
+     * 如果已经是 {@link Message} 则直接返回
+     * <p>
+     * 通过适配消息工厂 {@link MessageFactory} 创建消息
+     *
+     * @param msg 消息数据
+     * @return {@link Message} 实例
+     */
     public Message createMessage(Object msg) {
         if (msg instanceof Message) {
             return (Message) msg;
@@ -304,6 +413,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         return message;
     }
 
+    /**
+     * 适配消息工厂 {@link MessageFactory}
+     *
+     * @param msg 消息数据
+     * @return 消息工厂
+     */
     public MessageFactory getMessageFactory(Object msg) {
         for (MessageFactory messageFactory : messageFactories) {
             if (messageFactory.support(msg)) {
@@ -313,6 +428,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         return null;
     }
 
+    /**
+     * 适配连接选择器 {@link ConnectionSelector}
+     *
+     * @param message 消息
+     * @return 连接选择器
+     */
     public ConnectionSelector getConnectionSelector(Message message) {
         for (ConnectionSelector connectionSelector : connectionSelectors) {
             if (connectionSelector.support(message)) {
@@ -359,78 +480,180 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected List<ConnectionEventListener> eventListeners = new ArrayList<>();
 
+        /**
+         * 设置连接仓库
+         *
+         * @param repository 连接仓库
+         * @return Builder
+         */
         public T connectionRepository(ConnectionRepository repository) {
             this.connectionRepository = repository;
             return (T) this;
         }
 
+        /**
+         * 设置服务实例提供者
+         *
+         * @param provider 服务实例提供者
+         * @return Builder
+         */
         public T connectionServerProvider(ConnectionServerProvider provider) {
             this.connectionServerProvider = provider;
             return (T) this;
         }
 
+        /**
+         * 设置连接订阅者
+         *
+         * @param subscriber 连接订阅者
+         * @return Builder
+         */
         public T connectionSubscriber(ConnectionSubscriber subscriber) {
             this.connectionSubscriber = subscriber;
             return (T) this;
         }
 
+        /**
+         * 添加连接工厂
+         *
+         * @param factory 连接工厂
+         * @return Builder
+         */
         public T addConnectionFactory(ConnectionFactory factory) {
             return addConnectionFactories(factory);
         }
 
+        /**
+         * 添加连接工厂
+         *
+         * @param factories 连接工厂
+         * @return Builder
+         */
         public T addConnectionFactories(ConnectionFactory... factories) {
             return addConnectionFactories(Arrays.asList(factories));
         }
 
+        /**
+         * 添加连接工厂
+         *
+         * @param factories 连接工厂
+         * @return Builder
+         */
         public T addConnectionFactories(Collection<? extends ConnectionFactory> factories) {
             this.connectionFactories.addAll(factories);
             return (T) this;
         }
 
+        /**
+         * 添加连接选择器
+         *
+         * @param selector 连接选择器
+         * @return Builder
+         */
         public T addConnectionSelector(ConnectionSelector selector) {
             return addConnectionSelectors(selector);
         }
 
+        /**
+         * 添加连接选择器
+         *
+         * @param selectors 连接选择器
+         * @return Builder
+         */
         public T addConnectionSelectors(ConnectionSelector... selectors) {
             return addConnectionSelectors(Arrays.asList(selectors));
         }
 
+        /**
+         * 添加连接选择器
+         *
+         * @param selectors 连接选择器
+         * @return Builder
+         */
         public T addConnectionSelectors(Collection<? extends ConnectionSelector> selectors) {
             this.connectionSelectors.addAll(selectors);
             return (T) this;
         }
 
+        /**
+         * 设置消息编解码适配器
+         *
+         * @param adapter 消息编解码适配器
+         * @return Builder
+         */
         public T messageCodecAdapter(MessageCodecAdapter adapter) {
             this.messageCodecAdapter = adapter;
             return (T) this;
         }
 
+        /**
+         * 添加消息工厂
+         *
+         * @param factory 消息工厂
+         * @return Builder
+         */
         public T addMessageFactory(MessageFactory factory) {
             return addMessageFactories(factory);
         }
 
+        /**
+         * 添加消息工厂
+         *
+         * @param factories 消息工厂
+         * @return Builder
+         */
         public T addMessageFactories(MessageFactory... factories) {
             return addMessageFactories(Arrays.asList(factories));
         }
 
+        /**
+         * 添加消息工厂
+         *
+         * @param factories 消息工厂
+         * @return Builder
+         */
         public T addMessageFactories(Collection<? extends MessageFactory> factories) {
             this.messageFactories.addAll(factories);
             return (T) this;
         }
 
+        /**
+         * 设置事件发布者
+         *
+         * @param publisher 事件发布者
+         * @return Builder
+         */
         public T eventPublisher(ConnectionEventPublisher publisher) {
             this.eventPublisher = publisher;
             return (T) this;
         }
 
+        /**
+         * 添加事件监听器
+         *
+         * @param listener 事件监听器
+         * @return Builder
+         */
         public T addEventListener(ConnectionEventListener listener) {
             return addEventListeners(listener);
         }
 
+        /**
+         * 添加事件监听器
+         *
+         * @param listeners 事件监听器
+         * @return Builder
+         */
         public T addEventListeners(ConnectionEventListener... listeners) {
             return addEventListeners(Arrays.asList(listeners));
         }
 
+        /**
+         * 添加事件监听器
+         *
+         * @param listeners 事件监听器
+         * @return Builder
+         */
         public T addEventListeners(Collection<ConnectionEventListener> listeners) {
             this.eventListeners.addAll(listeners);
             return (T) this;
@@ -451,15 +674,19 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 connectionRepository = new DefaultConnectionRepository();
             }
 
+            //添加一个全选器在最后
             connectionSelectors.add(new AllSelector());
 
+            //添加一个任意对象的消息工厂
             messageFactories.add(new ObjectMessageFactory());
 
             if (eventPublisher == null) {
                 eventPublisher = new DefaultConnectionEventPublisher();
             }
 
+            //添加连接反向订阅处理器
             eventListeners.add(0, new ConnectionSubscribeHandler());
+            //添加消息转发处理器
             eventListeners.add(0, new MessageForwardHandler());
 
             eventPublisher.register(eventListeners);

@@ -5,6 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.extension.IdConnection;
 import lombok.Getter;
 
+/**
+ * 未知连接关闭事件
+ */
 @Getter
 public class UnknownCloseEvent implements ConnectionEvent {
 
@@ -13,11 +16,7 @@ public class UnknownCloseEvent implements ConnectionEvent {
     private final Object reason;
 
     public UnknownCloseEvent(Object id, String type, Object reason, ConnectionLoadBalanceConcept concept) {
-        this(new IdConnection(id, type, concept), reason);
-    }
-
-    public UnknownCloseEvent(Connection connection, Object reason) {
-        this.connection = connection;
+        this.connection = new IdConnection(id, type, concept);
         this.reason = reason;
     }
 }

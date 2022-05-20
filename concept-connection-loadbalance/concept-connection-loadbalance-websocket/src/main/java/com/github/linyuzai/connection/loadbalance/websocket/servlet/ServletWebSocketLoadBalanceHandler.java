@@ -14,7 +14,7 @@ public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
         ServletWebSocketConnection connection = new ServletWebSocketConnection(session, Connection.Type.OBSERVABLE);
-        concept.onOpen(connection);
+        concept.onEstablish(connection);
     }
 
     @Override

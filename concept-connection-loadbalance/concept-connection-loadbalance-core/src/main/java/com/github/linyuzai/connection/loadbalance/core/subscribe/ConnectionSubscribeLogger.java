@@ -17,8 +17,8 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
 
     @Override
     public void onEvent(Object event) {
-        if (event instanceof ConnectionOpenEvent) {
-            Connection connection = ((ConnectionOpenEvent) event).getConnection();
+        if (event instanceof ConnectionEstablishEvent) {
+            Connection connection = ((ConnectionEstablishEvent) event).getConnection();
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
                 info("Subscribe on " + server.getInstanceId());

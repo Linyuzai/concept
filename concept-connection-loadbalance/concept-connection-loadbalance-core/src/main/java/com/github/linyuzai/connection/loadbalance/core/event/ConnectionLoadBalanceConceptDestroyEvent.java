@@ -4,6 +4,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * {@link ConnectionLoadBalanceConcept} 销毁事件
+ */
 @Getter
 @AllArgsConstructor
 public class ConnectionLoadBalanceConceptDestroyEvent {

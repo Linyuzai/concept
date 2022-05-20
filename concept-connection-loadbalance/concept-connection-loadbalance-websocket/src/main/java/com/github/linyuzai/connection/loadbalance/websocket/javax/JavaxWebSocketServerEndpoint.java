@@ -15,7 +15,7 @@ public class JavaxWebSocketServerEndpoint {
     public void onOpen(Session session,
                        EndpointConfig config,
                        @PathParam(value = "type") String type) {
-        WebSocketLoadBalanceConcept.getInstance().onOpen(session, null);
+        WebSocketLoadBalanceConcept.getInstance().onEstablish(session, null);
     }
 
     @OnClose

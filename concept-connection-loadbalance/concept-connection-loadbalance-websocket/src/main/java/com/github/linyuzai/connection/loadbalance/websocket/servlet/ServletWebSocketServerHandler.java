@@ -13,7 +13,7 @@ public class ServletWebSocketServerHandler implements WebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        concept.onOpen(session, null);
+        concept.onEstablish(session, null);
     }
 
     @Override

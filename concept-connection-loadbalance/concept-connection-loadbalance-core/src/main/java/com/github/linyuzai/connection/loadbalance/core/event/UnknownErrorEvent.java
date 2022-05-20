@@ -5,6 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.extension.IdConnection;
 import lombok.Getter;
 
+/**
+ * 未知连接异常事件
+ */
 @Getter
 public class UnknownErrorEvent implements ConnectionEvent, ErrorEvent {
 

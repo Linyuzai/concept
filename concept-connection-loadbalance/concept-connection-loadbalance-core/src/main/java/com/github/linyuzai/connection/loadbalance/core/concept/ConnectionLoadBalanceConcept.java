@@ -4,7 +4,6 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * 连接负载均衡概念
@@ -52,14 +51,14 @@ public interface ConnectionLoadBalanceConcept {
      * @param metadata 元数据
      * @return 连接
      */
-    Connection onOpen(Object o, Map<Object, Object> metadata);
+    Connection onEstablish(Object o, Map<Object, Object> metadata);
 
     /**
      * 当连接建立时调用
      *
      * @param connection 连接
      */
-    void onOpen(Connection connection);
+    void onEstablish(Connection connection);
 
     /**
      * 当连接关闭时调用

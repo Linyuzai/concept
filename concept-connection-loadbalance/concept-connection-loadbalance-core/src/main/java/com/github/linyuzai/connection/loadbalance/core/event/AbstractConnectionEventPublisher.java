@@ -7,12 +7,24 @@ import lombok.SneakyThrows;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 事件发布者抽象类
+ */
 @Getter
 @AllArgsConstructor
 public class AbstractConnectionEventPublisher implements ConnectionEventPublisher {
 
     private final List<ConnectionEventListener> listeners;
 
+    /**
+     * 发布事件
+     * <p>
+     * 发布异常会被重新发布 {@link EventPublishErrorEvent} 事件
+     * <p>
+     * 再次异常将会直接抛出异常
+     *
+     * @param event 事件
+     */
     @Override
     public void publish(Object event) {
         for (ConnectionEventListener listener : listeners) {

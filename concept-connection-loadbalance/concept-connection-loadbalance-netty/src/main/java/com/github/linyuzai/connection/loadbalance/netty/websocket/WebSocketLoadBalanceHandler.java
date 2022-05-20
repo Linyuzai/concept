@@ -23,7 +23,7 @@ public class WebSocketLoadBalanceHandler extends SimpleChannelInboundHandler<Bin
 
     @Override
     public void channelActive(@NonNull ChannelHandlerContext ctx) throws Exception {
-        concept.onOpen(ctx.channel(), new LinkedHashMap<>());
+        concept.onEstablish(ctx.channel(), new LinkedHashMap<>());
         super.channelActive(ctx);
     }
 
