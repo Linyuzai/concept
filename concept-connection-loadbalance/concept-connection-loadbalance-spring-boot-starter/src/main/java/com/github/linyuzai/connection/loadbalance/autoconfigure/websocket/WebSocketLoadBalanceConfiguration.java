@@ -5,7 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatAutoSender;
+import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
@@ -78,27 +78,27 @@ public class WebSocketLoadBalanceConfiguration {
     @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoSender loadBalanceConnectionHeartbeatAutoSender(
+    public ConnectionHeartbeatManager loadBalanceConnectionHeartbeatManager(
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getLoadBalance().getHeartbeat();
-        return new ConnectionHeartbeatAutoSender(
+        return new ConnectionHeartbeatManager(
                 Arrays.asList(Connection.Type.SUBSCRIBER, Connection.Type.OBSERVABLE),
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatAutoSender.class));
+                factory.create(ConnectionHeartbeatManager.class));
     }
 
     @Bean
     @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatAutoSender clientConnectionHeartbeatSender(
+    public ConnectionHeartbeatManager clientConnectionHeartbeatManager(
             ScheduledExecutorServiceFactory factory,
             WebSocketLoadBalanceProperties properties) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
-        return new ConnectionHeartbeatAutoSender(Connection.Type.CLIENT,
+        return new ConnectionHeartbeatManager(Connection.Type.CLIENT,
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatAutoSender.class));
+                factory.create(ConnectionHeartbeatManager.class));
     }
 
     @Bean(destroyMethod = "destroy")

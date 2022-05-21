@@ -1,0 +1,21 @@
+package com.github.linyuzai.connection.loadbalance.core.monitor;
+
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoadBalanceLogger;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+public class LoadBalanceMonitorLogger extends ConnectionLoadBalanceLogger implements ConnectionEventListener {
+
+    public LoadBalanceMonitorLogger(Consumer<String> info, BiConsumer<String, Throwable> error) {
+        super(info, error);
+    }
+
+    @Override
+    public void onEvent(Object event) {
+        if (event instanceof LoadBalanceMonitorEvent) {
+            info("Start running load-balance monitor");
+        }
+    }
+}

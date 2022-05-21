@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * 日志支持类
+ */
 @AllArgsConstructor
 public class ConnectionLoadBalanceLogger {
 

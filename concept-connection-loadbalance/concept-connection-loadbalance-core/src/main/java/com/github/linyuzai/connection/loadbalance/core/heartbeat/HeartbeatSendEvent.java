@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import java.util.Collection;
 
+/**
+ * 心跳发送事件
+ */
 @Getter
 @AllArgsConstructor
 public class HeartbeatSendEvent implements HeartbeatEvent {

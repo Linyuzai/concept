@@ -35,6 +35,8 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
             //已经被其他服务转发的就不再转发
             return select;
         }
+        //添加转发标记，防止其他服务再次转发
+        message.getHeaders().put(Message.FORWARD, Boolean.TRUE.toString());
 
         Collection<Connection> observables = repository.select(Connection.Type.OBSERVABLE);
 

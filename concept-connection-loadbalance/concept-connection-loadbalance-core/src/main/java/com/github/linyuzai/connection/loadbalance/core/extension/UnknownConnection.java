@@ -6,6 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
 
+/**
+ * 未知连接
+ * <p>
+ * 用于表示在连接仓库中未找到的连接
+ */
 @Getter
 public class UnknownConnection extends AbstractConnection {
 

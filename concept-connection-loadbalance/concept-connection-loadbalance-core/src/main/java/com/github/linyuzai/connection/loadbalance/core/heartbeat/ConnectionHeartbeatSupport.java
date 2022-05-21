@@ -9,13 +9,22 @@ import lombok.RequiredArgsConstructor;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
+/**
+ * 心跳管理支持类
+ */
 @RequiredArgsConstructor
-public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventListener {
+public abstract class ConnectionHeartbeatSupport implements ConnectionEventListener {
 
     private ConnectionLoadBalanceConcept concept;
 
+    /**
+     * 连接类型
+     */
     private final Collection<String> connectionTypes;
 
+    /**
+     * 心跳超时时间
+     */
     private final long timeout;
 
     @Override
@@ -25,26 +34,48 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
             onInitialize();
         } else if (event instanceof ConnectionLoadBalanceConceptDestroyEvent) {
             onDestroy();
-        } else if (event instanceof ConnectionEvent) {
-            Connection connection = ((ConnectionEvent) event).getConnection();
-            for (String connectionType : connectionTypes) {
-                if (connection.getType().equals(connectionType)) {
-                    if (event instanceof MessageReceiveEvent) {
-                        Message message = ((MessageReceiveEvent) event).getMessage();
-                        if (isPongMessage(message)) {
-                            connection.setLastHeartbeat(System.currentTimeMillis());
-                            connection.setAlive(true);
-                        }
-                    }
-                }
+        } else if (event instanceof MessageReceiveEvent) {
+            Connection connection = ((MessageReceiveEvent) event).getConnection();
+            Message message = ((MessageReceiveEvent) event).getMessage();
+            //如果是 pong 则更新最后心跳时间
+            if (isTypeMatched(connection.getType()) && isPongMessage(message)) {
+                connection.setLastHeartbeat(System.currentTimeMillis());
+                connection.setAlive(true);
             }
         }
     }
 
+    /**
+     * 连接类型是否匹配
+     *
+     * @param type 连接类型
+     * @return 连接类型是否匹配
+     */
+    public boolean isTypeMatched(String type) {
+        if (type == null) {
+            return false;
+        }
+        for (String connectionType : connectionTypes) {
+            if (type.equals(connectionType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 初始化
+     */
     public abstract void onInitialize();
 
+    /**
+     * 销毁
+     */
     public abstract void onDestroy();
 
+    /**
+     * 发送 ping
+     */
     public void sendPing() {
         for (String connectionType : connectionTypes) {
             Collection<Connection> connections = concept.getConnections(connectionType);
@@ -60,6 +91,9 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
         }
     }
 
+    /**
+     * 关闭心跳超时的连接
+     */
     public void closeTimeout() {
         long now = System.currentTimeMillis();
         for (String connectionType : connectionTypes) {
@@ -74,10 +108,21 @@ public abstract class ConnectionHeartbeatAutoSupport implements ConnectionEventL
         }
     }
 
+    /**
+     * 是否是 pong
+     *
+     * @param message 消息
+     * @return 是否是 pong
+     */
     public boolean isPongMessage(Message message) {
         return message instanceof PongMessage;
     }
 
+    /**
+     * 创建 ping 消息
+     *
+     * @return ping 消息
+     */
     public Message createPingMessage() {
         return new BinaryPingMessage(ByteBuffer.allocate(0));
     }

@@ -119,11 +119,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public synchronized void subscribe(ConnectionServer server, boolean sendServerMsg) {
+        //需要判断是否已经订阅对应的服务
         Connection exist = getSubscriberConnection(server);
         if (exist != null) {
             if (exist.isAlive()) {
+                //如果连接还存活则直接返回
                 return;
             } else {
+                //否则关闭连接
                 exist.close("NotAlive");
             }
         }
@@ -367,10 +370,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             publish(new DeadMessageEvent(message));
             return;
         }
-        //添加转发标记，防止其他服务再次转发
-        //记录转发服务，方便扩展消息追踪
-        String instanceId = connectionServerProvider.getClient().getInstanceId();
-        message.getHeaders().put(Message.FORWARD, instanceId);
         publish(new MessagePrepareEvent(message, connections));
         for (Connection connection : connections) {
             try {
