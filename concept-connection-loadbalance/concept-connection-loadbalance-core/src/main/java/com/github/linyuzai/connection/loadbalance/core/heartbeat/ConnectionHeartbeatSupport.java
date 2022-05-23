@@ -124,6 +124,6 @@ public abstract class ConnectionHeartbeatSupport implements ConnectionEventListe
      * @return ping 消息
      */
     public Message createPingMessage() {
-        return new BinaryPingMessage(ByteBuffer.allocate(0));
+        return new BinaryPingMessage();
     }
 }

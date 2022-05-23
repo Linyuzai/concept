@@ -1,13 +1,12 @@
 package com.github.linyuzai.concept.sample.connection.loadbalance.websocket;
 
-import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.EnableWebSocketLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.websocket.ServerType;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageHandler;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.websocket.EnableWebSocketLoadBalanceConcept;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,7 +37,7 @@ public class WebSocketLoadBalanceConfig {
                 if (event instanceof ConnectionEvent) {
                     Connection connection = ((ConnectionEvent) event).getConnection();
                     if (Connection.Type.CLIENT.equals(connection.getType())) {
-                        if (event instanceof ConnectionOpenEvent) {
+                        if (event instanceof ConnectionEstablishEvent) {
                             System.out.println("Open " + connection.getMetadata());
                         } else if (event instanceof ConnectionCloseEvent) {
                             System.out.println("Close " + connection.getMetadata());

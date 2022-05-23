@@ -35,7 +35,7 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void setType(String type) {
+    public void setType(@NonNull String type) {
         for (Connection connection : connections) {
             connection.setType(type);
         }
@@ -80,7 +80,7 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void setConcept(ConnectionLoadBalanceConcept concept) {
+    public void setConcept(@NonNull ConnectionLoadBalanceConcept concept) {
         for (Connection connection : connections) {
             connection.setConcept(concept);
         }
@@ -102,7 +102,7 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void send(Message message) {
+    public void send(@NonNull Message message) {
         for (Connection connection : connections) {
             connection.send(message);
         }

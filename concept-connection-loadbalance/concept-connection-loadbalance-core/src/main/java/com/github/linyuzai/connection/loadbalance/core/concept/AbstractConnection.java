@@ -18,6 +18,7 @@ public abstract class AbstractConnection implements Connection {
 
     protected final Map<Object, Object> metadata = new LinkedHashMap<>();
 
+    @NonNull
     protected String type;
 
     @NonNull
@@ -29,7 +30,7 @@ public abstract class AbstractConnection implements Connection {
     @NonNull
     protected ConnectionLoadBalanceConcept concept;
 
-    protected boolean alive;
+    protected volatile boolean alive;
 
     protected long lastHeartbeat;
 
@@ -37,7 +38,7 @@ public abstract class AbstractConnection implements Connection {
         this(type, null);
     }
 
-    public AbstractConnection(String type, Map<Object, Object> metadata) {
+    public AbstractConnection(@NonNull String type, Map<Object, Object> metadata) {
         this.type = type;
         if (metadata != null) {
             this.metadata.putAll(metadata);

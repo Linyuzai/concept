@@ -3,8 +3,8 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import lombok.NonNull;
 
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -25,7 +25,7 @@ public interface Connection {
      * @param type 连接类型
      * @see Type
      */
-    void setType(String type);
+    void setType(@NonNull String type);
 
     /**
      * 获得该连接的类型
@@ -75,7 +75,7 @@ public interface Connection {
      *
      * @param concept {@link ConnectionLoadBalanceConcept}
      */
-    void setConcept(ConnectionLoadBalanceConcept concept);
+    void setConcept(@NonNull ConnectionLoadBalanceConcept concept);
 
     /**
      * 获得 {@link ConnectionLoadBalanceConcept}
@@ -89,7 +89,7 @@ public interface Connection {
      *
      * @param message 消息
      */
-    void send(Message message);
+    void send(@NonNull Message message);
 
     /**
      * 关闭连接
