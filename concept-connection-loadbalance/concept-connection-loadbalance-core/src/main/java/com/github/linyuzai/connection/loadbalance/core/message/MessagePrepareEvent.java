@@ -6,6 +6,11 @@ import lombok.Getter;
 
 import java.util.Collection;
 
+/**
+ * 消息准备事件
+ * <p>
+ * 在消息还未发送时发布
+ */
 @Getter
 public class MessagePrepareEvent implements MessageEvent {
 

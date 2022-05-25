@@ -4,6 +4,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 
+/**
+ * 消息编解码适配器的抽象类
+ */
 public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter {
 
     @Override

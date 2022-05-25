@@ -25,6 +25,9 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import java.util.List;
 
+/**
+ * 连接负载均衡配置
+ */
 @Configuration(proxyBeanMethods = false)
 public class ConnectionLoadBalanceConfiguration {
 

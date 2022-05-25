@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 默认的连接仓库
+ */
 public class DefaultConnectionRepository implements ConnectionRepository {
 
     protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();

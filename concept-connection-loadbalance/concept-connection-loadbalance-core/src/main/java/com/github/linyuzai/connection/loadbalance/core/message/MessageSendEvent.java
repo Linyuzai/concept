@@ -6,6 +6,11 @@ import lombok.Getter;
 
 import java.util.Collection;
 
+/**
+ * 消息发送事件
+ * <p>
+ * 在消息发送之后发布
+ */
 @Getter
 public class MessageSendEvent implements MessageEvent {
 

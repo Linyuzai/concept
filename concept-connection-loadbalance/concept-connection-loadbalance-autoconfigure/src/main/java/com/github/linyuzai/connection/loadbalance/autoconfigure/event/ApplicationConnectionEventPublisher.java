@@ -4,6 +4,9 @@ import com.github.linyuzai.connection.loadbalance.core.event.DefaultConnectionEv
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 
+/**
+ * 支持 {@link org.springframework.context.event.EventListener} 的事件发布器
+ */
 @AllArgsConstructor
 public class ApplicationConnectionEventPublisher extends DefaultConnectionEventPublisher {
 

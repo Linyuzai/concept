@@ -5,6 +5,9 @@ import lombok.Data;
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * {@link ConnectionServer} 的默认实现
+ */
 @Data
 public class ConnectionServerImpl implements ConnectionServer {
 

@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 基于 Spring Cloud 服务发现的服务实例提供者
+ */
 @Getter
 public class DiscoveryConnectionServerProvider implements ConnectionServerProvider {
 
@@ -20,6 +23,9 @@ public class DiscoveryConnectionServerProvider implements ConnectionServerProvid
 
     private final Registration registration;
 
+    /**
+     * 本服务信息
+     */
     private final ConnectionServer client;
 
     public DiscoveryConnectionServerProvider(DiscoveryClient discoveryClient, Registration registration) {
@@ -28,6 +34,11 @@ public class DiscoveryConnectionServerProvider implements ConnectionServerProvid
         this.client = new ServiceInstanceConnectionServer(registration);
     }
 
+    /**
+     * 获得所有除自身外的服务实例
+     *
+     * @return 所有除自身外的服务实例
+     */
     @Override
     public List<ConnectionServer> getConnectionServers() {
         List<ConnectionServer> servers = new ArrayList<>();

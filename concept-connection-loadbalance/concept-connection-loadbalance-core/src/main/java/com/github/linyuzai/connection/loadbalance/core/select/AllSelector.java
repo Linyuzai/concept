@@ -5,6 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 import java.util.Collection;
 
+/**
+ * 不进行过滤的选择器
+ */
 public class AllSelector extends AbstractConnectionSelector {
 
     @Override

@@ -8,6 +8,9 @@ import lombok.Getter;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+/**
+ * 基于消息头的选择器
+ */
 @Getter
 @AllArgsConstructor
 public abstract class MessageHeaderSelector extends AbstractConnectionSelector {

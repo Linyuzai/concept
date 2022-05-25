@@ -6,6 +6,11 @@ import lombok.Setter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 消息抽象类
+ *
+ * @param <T> 消息体类型
+ */
 @Getter
 @Setter
 public abstract class AbstractMessage<T> implements Message {

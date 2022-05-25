@@ -9,6 +9,12 @@ import lombok.SneakyThrows;
 import java.net.URI;
 import java.util.function.Consumer;
 
+/**
+ * 来接订阅者的抽象类
+ *
+ * @param <Con>     连接类型
+ * @param <Concept> 概念类型
+ */
 @Getter
 public abstract class AbstractConnectionSubscriber<Con extends Connection, Concept extends ConnectionLoadBalanceConcept>
         implements ConnectionSubscriber {
@@ -31,6 +37,16 @@ public abstract class AbstractConnectionSubscriber<Con extends Connection, Conce
 
     public abstract void doSubscribe(ConnectionServer server, Concept concept, Consumer<Con> consumer);
 
+    /**
+     * 获得对应服务的连接 host
+     * <p>
+     * 如果手动定义了值则使用手动定义的
+     * <p>
+     * 否则使用服务的 host
+     *
+     * @param server 服务实例
+     * @return 对应服务的连接 host
+     */
     public String getHost(ConnectionServer server) {
         String host = server.getMetadata().get(getHostKey());
         if (host == null || host.isEmpty()) {
@@ -39,6 +55,16 @@ public abstract class AbstractConnectionSubscriber<Con extends Connection, Conce
         return host;
     }
 
+    /**
+     * 获得对应服务的连接 port
+     * <p>
+     * 如果手动定义了值则使用手动定义的
+     * <p>
+     * 否则使用服务的 port
+     *
+     * @param server 服务实例
+     * @return 对应服务的连接 port
+     */
     public int getPort(ConnectionServer server) {
         String port = server.getMetadata().get(getPortKey());
         if (port == null || port.isEmpty()) {
@@ -47,13 +73,24 @@ public abstract class AbstractConnectionSubscriber<Con extends Connection, Conce
         return Integer.parseInt(port);
     }
 
+    /**
+     * 拼接对应服务实例连接的 {@link URI}
+     *
+     * @param server 服务实例
+     * @return 对应的 {@link URI}
+     */
     @SneakyThrows
     public URI getUri(ConnectionServer server) {
         return new URI(getProtocol() + "://" + getHost(server) + ":" + getPort(server) +
-                getEndpointPrefix());
+                getEndpoint());
     }
 
-    public abstract String getEndpointPrefix();
+    /**
+     * 获得端点路径
+     *
+     * @return 端点路径
+     */
+    public abstract String getEndpoint();
 
     @Deprecated
     public abstract String getType();

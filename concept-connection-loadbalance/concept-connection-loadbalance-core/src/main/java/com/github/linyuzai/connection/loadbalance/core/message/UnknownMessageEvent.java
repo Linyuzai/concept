@@ -6,6 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.extension.UnknownConnecti
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEvent;
 import lombok.Getter;
 
+/**
+ * 未知消息
+ * <p>
+ * 当对应的连接不存在连接仓库中时发布
+ */
 @Getter
 public class UnknownMessageEvent implements ConnectionEvent, MessageEvent {
 

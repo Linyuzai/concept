@@ -4,6 +4,9 @@ import lombok.NoArgsConstructor;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 二进制消息
+ */
 @NoArgsConstructor
 public class BinaryMessage extends AbstractMessage<ByteBuffer> {
 

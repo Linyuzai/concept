@@ -9,6 +9,11 @@ import lombok.SneakyThrows;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 将字符串转为 {@link TextMessage} 的解码器
+ * <p>
+ * 用于消息转发
+ */
 @AllArgsConstructor
 public class JacksonTextMessageDecoder implements MessageDecoder {
 

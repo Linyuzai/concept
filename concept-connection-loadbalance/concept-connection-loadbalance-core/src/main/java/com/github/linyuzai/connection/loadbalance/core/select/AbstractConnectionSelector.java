@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/***
+ * 连接选择器的抽象类
+ */
 @Getter
 public abstract class AbstractConnectionSelector implements ConnectionSelector {
 

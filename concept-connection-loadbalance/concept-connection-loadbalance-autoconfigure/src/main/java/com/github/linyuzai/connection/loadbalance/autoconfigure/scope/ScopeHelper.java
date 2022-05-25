@@ -11,6 +11,17 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 连接域帮助器
+ * <p>
+ * 可以获得指定连接域中的对象
+ * <p>
+ * 如同时自动配置 ws 和 rsocket
+ * <p>
+ * 需要对每个组件标注范围域来保证不会注入混乱
+ * <p>
+ * {@link ConnectionScope} 支持任意的连接域
+ */
 public class ScopeHelper {
 
     private final GenericApplicationContext context;

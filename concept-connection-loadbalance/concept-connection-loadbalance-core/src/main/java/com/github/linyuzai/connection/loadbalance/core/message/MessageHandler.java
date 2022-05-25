@@ -4,6 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 
 import java.sql.Types;
 
+/**
+ * 消息处理器
+ * <p>
+ * 用于接收客户端的消息
+ */
 public interface MessageHandler extends MessageReceiveEventListener {
 
     @Override

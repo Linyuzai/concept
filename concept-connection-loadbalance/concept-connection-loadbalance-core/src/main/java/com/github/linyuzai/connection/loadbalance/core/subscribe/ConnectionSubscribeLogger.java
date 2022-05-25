@@ -9,6 +9,9 @@ import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoadBala
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * 连接订阅日志
+ */
 public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger implements ConnectionEventListener {
 
     public ConnectionSubscribeLogger(Consumer<String> info, BiConsumer<String, Throwable> error) {

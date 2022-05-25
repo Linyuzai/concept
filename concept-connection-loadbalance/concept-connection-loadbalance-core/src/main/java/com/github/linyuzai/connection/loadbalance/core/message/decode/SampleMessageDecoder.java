@@ -6,6 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.TextMessage;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 简单的消息解码器
+ * <p>
+ * 用于客户端消息接收
+ */
 public class SampleMessageDecoder implements MessageDecoder {
 
     @Override

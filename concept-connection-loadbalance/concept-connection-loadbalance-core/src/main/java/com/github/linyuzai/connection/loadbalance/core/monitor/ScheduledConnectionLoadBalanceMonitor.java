@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 通过定时任务周期性的触发监控
+ */
 @RequiredArgsConstructor
 public class ScheduledConnectionLoadBalanceMonitor implements ConnectionLoadBalanceMonitor, ConnectionEventListener {
 

@@ -29,7 +29,7 @@ public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnectio
     public abstract void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<T> consumer);
 
     @Override
-    public String getEndpointPrefix() {
+    public String getEndpoint() {
         return WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
     }
 }

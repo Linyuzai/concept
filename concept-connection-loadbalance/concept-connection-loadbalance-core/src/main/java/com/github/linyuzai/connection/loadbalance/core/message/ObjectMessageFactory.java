@@ -1,5 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
+/**
+ * {@link ObjectMessage} 的消息工厂
+ */
 public class ObjectMessageFactory implements MessageFactory {
 
     @Override

@@ -5,6 +5,9 @@ import org.springframework.cloud.context.scope.GenericScope;
 
 import java.util.List;
 
+/**
+ * 注册所有的连接域
+ */
 public class ConnectionScopeRegister extends CustomScopeConfigurer {
 
     public ConnectionScopeRegister(List<ScopeName> sns) {

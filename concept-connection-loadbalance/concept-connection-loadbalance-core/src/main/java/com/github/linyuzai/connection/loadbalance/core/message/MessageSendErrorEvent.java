@@ -5,6 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.event.AbstractConnectionE
 import com.github.linyuzai.connection.loadbalance.core.event.ErrorEvent;
 import lombok.Getter;
 
+/**
+ * 消息发送异常事件
+ */
 @Getter
 public class MessageSendErrorEvent extends AbstractConnectionEvent implements MessageEvent, ErrorEvent {
 

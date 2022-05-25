@@ -12,6 +12,9 @@ import lombok.SneakyThrows;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 连接订阅消息解码器
+ */
 @Getter
 @AllArgsConstructor
 public class JacksonSubscribeMessageDecoder implements MessageDecoder {
