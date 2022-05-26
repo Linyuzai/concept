@@ -45,7 +45,7 @@ public abstract class WebSocketConnection extends AbstractConnection {
         return queryParameterMap;
     }
 
-    public void checkQueryParameterMap() {
+    protected void checkQueryParameterMap() {
         if (queryParameterMap == null) {
             synchronized (parseQueryParameterMapLock) {
                 if (queryParameterMap == null) {
@@ -56,7 +56,7 @@ public abstract class WebSocketConnection extends AbstractConnection {
         }
     }
 
-    public void parseQueryParameterMap(Map<String, String> map) {
+    protected void parseQueryParameterMap(Map<String, String> map) {
         URI uri = getUri();
         if (uri == null) {
             return;

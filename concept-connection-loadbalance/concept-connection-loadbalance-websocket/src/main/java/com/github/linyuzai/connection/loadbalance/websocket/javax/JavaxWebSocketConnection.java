@@ -81,7 +81,7 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void parseQueryParameterMap(Map<String, String> map) {
+    protected void parseQueryParameterMap(Map<String, String> map) {
         for (Map.Entry<String, List<String>> entry : session.getRequestParameterMap().entrySet()) {
             List<String> value = entry.getValue();
             if (!value.isEmpty()) {

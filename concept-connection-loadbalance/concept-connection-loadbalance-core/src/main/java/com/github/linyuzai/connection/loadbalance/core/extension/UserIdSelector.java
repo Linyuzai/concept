@@ -5,7 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.MetadataSelector;
 /**
  * 用户连接选择器
  * <p>
- * 配合 {@link UserIdMessage} 使用
+ * 配合 {@link UserMessage} 使用
  */
 public class UserIdSelector extends MetadataSelector {
 
