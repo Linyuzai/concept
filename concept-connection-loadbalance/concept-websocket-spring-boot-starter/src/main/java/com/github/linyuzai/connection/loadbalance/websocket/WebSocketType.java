@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * ws 类型
+ */
 @Getter
 public enum WebSocketType {
 

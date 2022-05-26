@@ -8,6 +8,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTex
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 
+/**
+ * ws 消息编解码适配器
+ */
 public class WebSocketMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override

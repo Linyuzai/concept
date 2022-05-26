@@ -26,15 +26,25 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
         return type.getConfigurations(enableDefaultEndpoint);
     }
 
+    /**
+     * 推断服务类型
+     *
+     * @return 应用的类型
+     */
     private WebSocketType deduceServerType() {
         if (isServletWebApplication()) {
             return WebSocketType.SERVLET;
         } else if (isReactiveWebApplication()) {
             return WebSocketType.REACTIVE;
         }
-        throw new IllegalArgumentException("Server type can not deduce");
+        throw new IllegalArgumentException("WebSocket type can not deduce");
     }
 
+    /**
+     * 是否是 Servlet 环境
+     *
+     * @return 是否是 Servlet 环境
+     */
     private boolean isServletWebApplication() {
         if (environment instanceof ConfigurableWebEnvironment) {
             return true;
@@ -45,6 +55,11 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
         return false;
     }
 
+    /**
+     * 是否是 Reactive 环境
+     *
+     * @return 是否是 Reactive 环境
+     */
     private boolean isReactiveWebApplication() {
         if (environment instanceof ConfigurableReactiveWebEnvironment) {
             return true;

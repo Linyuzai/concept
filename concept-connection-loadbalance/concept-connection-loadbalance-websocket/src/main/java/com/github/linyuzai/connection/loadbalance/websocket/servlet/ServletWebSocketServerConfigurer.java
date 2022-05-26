@@ -11,6 +11,9 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 import java.util.List;
 
+/**
+ * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketConfigurer}
+ */
 @RequiredArgsConstructor
 public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 

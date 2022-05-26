@@ -15,6 +15,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.BiConsumer;
 
+/**
+ * 基于 {@link ReactiveWebSocketConnection} 转发消息客户端的 {@link WebSocketHandler}
+ */
 @Getter
 @AllArgsConstructor
 public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {

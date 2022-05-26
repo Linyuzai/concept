@@ -8,6 +8,9 @@ import org.springframework.web.socket.*;
 
 import java.util.function.Consumer;
 
+/**
+ * 基于 {@link ServletWebSocketConnection} 转发消息客户端的 {@link WebSocketHandler}
+ */
 @AllArgsConstructor
 public class ServletWebSocketSubscriberHandler implements WebSocketHandler {
 

@@ -13,8 +13,17 @@ import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocket
 
 import java.util.List;
 
+/**
+ * ws 负载均衡概念
+ */
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
+    /**
+     * 服务间订阅端点
+     */
     public static final String SUBSCRIBER_ENDPOINT = "/concept-websocket-subscriber";
+    /**
+     * 默认服务端点的前缀
+     */
     public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket/";
     private static WebSocketLoadBalanceConcept instance;
 

@@ -6,6 +6,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageCodecAdapter;
 import lombok.AllArgsConstructor;
 
+/**
+ * 用于 {@link JavaxWebSocketConnection} 的消息编解码适配器
+ */
 public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override

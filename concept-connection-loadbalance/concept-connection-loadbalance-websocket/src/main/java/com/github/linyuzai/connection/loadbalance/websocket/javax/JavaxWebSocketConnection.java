@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 基于 {@link Session} 的 {@link WebSocketConnection} 实现
+ */
 @Getter
 public class JavaxWebSocketConnection extends WebSocketConnection {
 

@@ -13,6 +13,9 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+/**
+ * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现
+ */
 public class ReactiveWebSocketConnection extends WebSocketConnection {
 
     private final WebSocketSession session;

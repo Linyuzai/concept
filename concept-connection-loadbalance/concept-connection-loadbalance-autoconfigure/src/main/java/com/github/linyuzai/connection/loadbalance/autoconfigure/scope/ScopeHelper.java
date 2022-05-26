@@ -21,6 +21,8 @@ import java.util.List;
  * 需要对每个组件标注范围域来保证不会注入混乱
  * <p>
  * {@link ConnectionScope} 支持任意的连接域
+ * <p>
+ * 精确子域优先于 {@link ConnectionScope}
  */
 public class ScopeHelper {
 

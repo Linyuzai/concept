@@ -7,6 +7,9 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import javax.websocket.Session;
 import java.util.Map;
 
+/**
+ * {@link JavaxWebSocketConnection} 连接工厂
+ */
 public class JavaxWebSocketConnectionFactory extends WebSocketConnectionFactory<JavaxWebSocketConnection> {
 
     @Override

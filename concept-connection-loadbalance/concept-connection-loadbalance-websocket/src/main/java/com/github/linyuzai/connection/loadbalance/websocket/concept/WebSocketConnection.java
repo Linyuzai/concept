@@ -6,8 +6,14 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * ws 连接
+ */
 public abstract class WebSocketConnection extends AbstractConnection {
 
+    /**
+     * 连接参数
+     */
     private volatile Map<String, String> queryParameterMap;
 
     private final Object parseQueryParameterMapLock = new Object();

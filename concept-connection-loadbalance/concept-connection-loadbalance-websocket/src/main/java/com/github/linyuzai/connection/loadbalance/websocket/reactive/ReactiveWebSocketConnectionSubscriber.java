@@ -15,6 +15,9 @@ import org.xnio.XnioWorker;
 import java.net.URI;
 import java.util.function.Consumer;
 
+/**
+ * {@link ReactiveWebSocketConnection} 的连接订阅者
+ */
 @NoArgsConstructor
 public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<ReactiveWebSocketConnection> {
 

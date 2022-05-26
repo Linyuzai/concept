@@ -6,6 +6,9 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import javax.websocket.*;
 import java.nio.ByteBuffer;
 
+/**
+ * 基于 {@link JavaxWebSocketConnection} 转发消息客户端的端点配置
+ */
 @ClientEndpoint
 public class JavaxWebSocketSubscriberEndpoint {
 

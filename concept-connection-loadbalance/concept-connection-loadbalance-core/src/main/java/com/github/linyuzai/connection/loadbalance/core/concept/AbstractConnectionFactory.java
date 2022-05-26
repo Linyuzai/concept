@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * 连接工厂的抽象类
  *
- * @param <Con>     连接类型
+ * @param <Con>     连接类
  * @param <Concept> {@link ConnectionLoadBalanceConcept} 类型
  */
 public abstract class AbstractConnectionFactory<Con extends Connection, Concept extends ConnectionLoadBalanceConcept> implements ConnectionFactory {

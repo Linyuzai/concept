@@ -6,6 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnect
 import java.net.URI;
 import java.util.function.Consumer;
 
+/**
+ * ws 连接订阅者
+ *
+ * @param <T> 连接类
+ */
 public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnection>
         extends AbstractConnectionSubscriber<T, WebSocketLoadBalanceConcept> {
 

@@ -3,6 +3,9 @@ package com.github.linyuzai.connection.loadbalance.websocket;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * ws 配置
+ */
 @Data
 @ConfigurationProperties(prefix = "concept.websocket")
 public class WebSocketLoadBalanceProperties {
@@ -26,7 +29,7 @@ public class WebSocketLoadBalanceProperties {
     public static class ServerProperties {
 
         /**
-         * 默认服务配置
+         * 默认服务端点配置
          */
         private DefaultEndpointProperties defaultEndpoint = new DefaultEndpointProperties();
 
@@ -39,7 +42,7 @@ public class WebSocketLoadBalanceProperties {
         public static class DefaultEndpointProperties {
 
             /**
-             * 是否启用默认服务
+             * 是否启用默认服务端点
              */
             private boolean enabled = true;
 

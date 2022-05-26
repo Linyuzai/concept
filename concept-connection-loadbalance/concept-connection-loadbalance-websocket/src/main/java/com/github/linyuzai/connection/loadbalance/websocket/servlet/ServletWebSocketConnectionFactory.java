@@ -7,6 +7,9 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
 
+/**
+ * {@link ServletWebSocketConnection} 连接工厂
+ */
 public class ServletWebSocketConnectionFactory extends WebSocketConnectionFactory<ServletWebSocketConnection> {
 
     @Override

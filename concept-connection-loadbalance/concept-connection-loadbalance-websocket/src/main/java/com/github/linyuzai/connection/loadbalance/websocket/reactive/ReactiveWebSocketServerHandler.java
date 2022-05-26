@@ -10,6 +10,9 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * 基于 {@link ReactiveWebSocketConnection} 默认服务的 {@link WebSocketHandler}
+ */
 @AllArgsConstructor
 public class ReactiveWebSocketServerHandler implements WebSocketHandler {
 

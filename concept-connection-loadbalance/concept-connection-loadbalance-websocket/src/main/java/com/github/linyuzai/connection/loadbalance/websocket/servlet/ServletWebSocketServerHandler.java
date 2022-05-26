@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.socket.*;
 
+/**
+ * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketHandler}
+ */
 @AllArgsConstructor
 public class ServletWebSocketServerHandler implements WebSocketHandler {
 

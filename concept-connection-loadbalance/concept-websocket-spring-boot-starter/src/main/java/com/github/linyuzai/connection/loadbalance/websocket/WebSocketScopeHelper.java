@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+/**
+ * ws 连接域帮助器
+ * <p>
+ * 通过 {@link WebSocketScope} {@link ConnectionScope} 的顺序获得对象
+ */
 @AllArgsConstructor
 public class WebSocketScopeHelper {
 

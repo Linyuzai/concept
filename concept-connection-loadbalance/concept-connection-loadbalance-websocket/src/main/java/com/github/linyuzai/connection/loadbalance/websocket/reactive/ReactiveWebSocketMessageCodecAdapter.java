@@ -8,6 +8,9 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMes
 import lombok.AllArgsConstructor;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 
+/**
+ * 用于 {@link ReactiveWebSocketConnection} 的消息编解码适配器
+ */
 public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override

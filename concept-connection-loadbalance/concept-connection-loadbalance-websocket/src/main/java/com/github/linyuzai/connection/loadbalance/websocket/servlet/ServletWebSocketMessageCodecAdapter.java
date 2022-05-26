@@ -6,6 +6,9 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMes
 import lombok.AllArgsConstructor;
 import org.springframework.web.socket.WebSocketMessage;
 
+/**
+ * 用于 {@link ServletWebSocketConnection} 的消息编解码适配器
+ */
 public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override

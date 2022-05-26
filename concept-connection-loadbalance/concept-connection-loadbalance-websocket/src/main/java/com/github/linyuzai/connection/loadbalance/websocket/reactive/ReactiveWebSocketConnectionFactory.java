@@ -9,6 +9,9 @@ import reactor.core.publisher.FluxSink;
 
 import java.util.Map;
 
+/**
+ * {@link ReactiveWebSocketConnection} 连接工厂
+ */
 public class ReactiveWebSocketConnectionFactory extends WebSocketConnectionFactory<ReactiveWebSocketConnection> {
 
     @Override

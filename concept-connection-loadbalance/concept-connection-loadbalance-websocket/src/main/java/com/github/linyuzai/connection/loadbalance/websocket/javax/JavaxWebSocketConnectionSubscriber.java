@@ -13,6 +13,9 @@ import javax.websocket.WebSocketContainer;
 import java.net.URI;
 import java.util.function.Consumer;
 
+/**
+ * {@link JavaxWebSocketConnection} 的连接订阅者
+ */
 @Getter
 @NoArgsConstructor
 public class JavaxWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<JavaxWebSocketConnection> {

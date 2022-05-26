@@ -14,6 +14,9 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import java.net.URI;
 import java.util.function.Consumer;
 
+/**
+ * {@link ServletWebSocketConnection} 的连接订阅者
+ */
 @NoArgsConstructor
 public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<ServletWebSocketConnection> {
 

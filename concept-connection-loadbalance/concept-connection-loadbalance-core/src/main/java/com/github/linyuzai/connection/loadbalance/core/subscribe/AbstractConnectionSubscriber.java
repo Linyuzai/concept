@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 /**
  * 来接订阅者的抽象类
  *
- * @param <Con>     连接类型
+ * @param <Con>     连接类
  * @param <Concept> 概念类型
  */
 @Getter
