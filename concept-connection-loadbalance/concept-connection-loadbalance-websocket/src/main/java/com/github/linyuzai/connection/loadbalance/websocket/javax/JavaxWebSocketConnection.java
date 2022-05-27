@@ -10,7 +10,6 @@ import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -71,8 +70,13 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
 
     @SneakyThrows
     @Override
-    public void close(int code, String reason) {
-        session.close(new CloseReason(CloseReason.CloseCodes.getCloseCode(code), reason));
+    public void doClose(Object reason) {
+        session.close((CloseReason) reason);
+    }
+
+    @Override
+    public CloseReason getCloseReason(int code, String reason) {
+        return new CloseReason(CloseReason.CloseCodes.getCloseCode(code), reason);
     }
 
     @Override

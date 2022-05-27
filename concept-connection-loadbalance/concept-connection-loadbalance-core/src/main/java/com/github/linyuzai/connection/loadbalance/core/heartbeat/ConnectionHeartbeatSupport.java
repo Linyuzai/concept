@@ -2,11 +2,15 @@ package com.github.linyuzai.connection.loadbalance.core.heartbeat;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.event.*;
-import com.github.linyuzai.connection.loadbalance.core.message.*;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptDestroyEvent;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
+import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEvent;
+import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.RequiredArgsConstructor;
 
-import java.nio.ByteBuffer;
 import java.util.Collection;
 
 /**
@@ -103,6 +107,7 @@ public abstract class ConnectionHeartbeatSupport implements ConnectionEventListe
                 if (now - lastHeartbeat > timeout) {
                     connection.setAlive(false);
                     connection.close("HeartbeatTimeout");
+                    concept.publish(new HeartbeatTimeoutEvent(connection));
                 }
             }
         }

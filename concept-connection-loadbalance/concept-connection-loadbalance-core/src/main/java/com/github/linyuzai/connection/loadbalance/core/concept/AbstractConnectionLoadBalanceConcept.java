@@ -261,8 +261,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void onClose(@NonNull Connection connection, Object reason) {
-        connectionRepository.remove(connection);
-        publish(new ConnectionCloseEvent(connection, reason));
+        Connection remove = connectionRepository.remove(connection);
+        if (remove != null) {
+            publish(new ConnectionCloseEvent(remove, reason));
+        }
     }
 
     /**

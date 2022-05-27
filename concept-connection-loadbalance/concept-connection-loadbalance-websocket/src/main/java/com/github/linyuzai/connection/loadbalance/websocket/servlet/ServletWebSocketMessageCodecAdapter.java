@@ -1,6 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
-import com.github.linyuzai.connection.loadbalance.core.message.*;
+import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageCodecAdapter;
 import lombok.AllArgsConstructor;

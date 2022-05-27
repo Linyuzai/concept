@@ -90,7 +90,7 @@ public class WebSocketLoadBalanceProperties {
             /**
              * 是否打印订阅监控日志
              */
-            private boolean logger = true;
+            private boolean logger = false;
 
             /**
              * 订阅监控周期，毫秒

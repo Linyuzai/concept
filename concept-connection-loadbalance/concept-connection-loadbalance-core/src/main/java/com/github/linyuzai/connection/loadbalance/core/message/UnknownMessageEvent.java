@@ -2,8 +2,8 @@ package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.extension.UnknownConnection;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEvent;
+import com.github.linyuzai.connection.loadbalance.core.extension.UnknownConnection;
 import lombok.Getter;
 
 /**

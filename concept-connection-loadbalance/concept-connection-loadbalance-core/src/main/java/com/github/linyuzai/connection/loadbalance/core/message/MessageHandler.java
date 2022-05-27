@@ -2,8 +2,6 @@ package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 
-import java.sql.Types;
-
 /**
  * 消息处理器
  * <p>
