@@ -43,7 +43,12 @@ public class UnknownConnection extends AbstractConnection {
     }
 
     @Override
-    public void close(int code, String reason) {
+    public void doClose(Object reason) {
 
+    }
+
+    @Override
+    public Object getCloseReason(int code, String reason) {
+        return null;
     }
 }

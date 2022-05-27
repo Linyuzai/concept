@@ -89,7 +89,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void destroy() {
-        connectionRepository.stream().forEach(connection -> connection.close("ServerStop"));
+        //Spring会帮忙调用close方法
+        //connectionRepository.stream().forEach(connection -> connection.close("ServerStop"));
         publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
