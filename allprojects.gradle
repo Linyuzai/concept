@@ -6,7 +6,7 @@ allprojects {
         set('springCloudDependencyManagementVersion', "2021.0.1")
         set('kotlinVersion', "1.6.10")
         set('dokkaVersion', "1.6.0")
-        set('reactorVersion', "3.4.1")
+        set('reactorVersion', "3.4.14")
         set('coroutinesVersion', "1.5.0")
         set('cglibVersion', "3.3.0")
         set('okhttpVersion', "4.9.3")
