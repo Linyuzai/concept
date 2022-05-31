@@ -18,7 +18,7 @@ public class LoadBalanceMonitorLogger extends ConnectionLoadBalanceLogger implem
     @Override
     public void onEvent(Object event) {
         if (event instanceof LoadBalanceMonitorEvent) {
-            info("Start running load-balance monitor");
+            info("Start running monitor for load balance");
         }
     }
 }

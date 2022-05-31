@@ -34,24 +34,21 @@ public abstract class AbstractConnectionSelector implements ConnectionSelector {
             return select;
         }
 
-        if (message.getHeaders().containsKey(Message.FORWARD)) {
+        if (message.isForward()) {
             //已经被其他服务转发的就不再转发
             return select;
         }
         //添加转发标记，防止其他服务再次转发
-        message.getHeaders().put(Message.FORWARD, Boolean.TRUE.toString());
+        message.setForward(true);
 
         Collection<Connection> observables = repository.select(Connection.Type.OBSERVABLE);
 
-        if (select == null) {
+        if (select == null || select.isEmpty()) {
             //没有对应的连接，直接进行转发
             return observables;
         }
 
-        String broadcast = message.getHeaders()
-                .getOrDefault(Message.BROADCAST, Boolean.TRUE.toString());
-
-        if (Boolean.parseBoolean(broadcast)) {
+        if (message.isBroadcast()) {
             //广播
             List<Connection> combine = new ArrayList<>(select.size() + observables.size());
             combine.addAll(select);

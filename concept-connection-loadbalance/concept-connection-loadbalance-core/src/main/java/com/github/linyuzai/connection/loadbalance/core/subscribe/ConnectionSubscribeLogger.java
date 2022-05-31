@@ -27,14 +27,14 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
             Connection connection = ((ConnectionEstablishEvent) event).getConnection();
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
-                info("Subscribe on " + server.getInstanceId());
+                info("Subscribe on " + getServer(server));
             } else if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
 
             }
         } else if (event instanceof ConnectionSubscribeErrorEvent) {
             ConnectionServer server = ((ConnectionSubscribeErrorEvent) event).getConnectionServer();
             Throwable e = ((ConnectionSubscribeErrorEvent) event).getError();
-            error("Error subscribe " + server.getInstanceId(), e);
+            error("Error subscribe " + getServer(server), e);
         } else if (event instanceof MessageReceiveEvent) {
             Connection connection = ((MessageReceiveEvent) event).getConnection();
             if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
@@ -45,14 +45,14 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
             Object reason = ((ConnectionCloseEvent) event).getReason();
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
-                info("Unsubscribe on " + server.getInstanceId() + getReason(reason));
+                info("Unsubscribe on " + getServer(server) + getReason(reason));
             }
         } else if (event instanceof ConnectionErrorEvent) {
             Connection connection = ((ConnectionErrorEvent) event).getConnection();
             Throwable e = ((ConnectionErrorEvent) event).getError();
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
-                error("Error subscribe " + server.getInstanceId(), e);
+                error("Error subscribe " + getServer(server), e);
             } else if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
                 error("Error observed", e);
             }

@@ -31,4 +31,12 @@ public interface Message {
      * @return 消息体
      */
     <T> T getPayload();
+
+    boolean isBroadcast();
+
+    void setBroadcast(boolean broadcast);
+
+    boolean isForward();
+
+    void setForward(boolean forward);
 }

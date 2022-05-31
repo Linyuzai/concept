@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.logger;
 
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.AllArgsConstructor;
 
 import java.util.function.BiConsumer;
@@ -14,6 +15,10 @@ public class ConnectionLoadBalanceLogger {
     private Consumer<String> info;
 
     private BiConsumer<String, Throwable> error;
+
+    public String getServer(ConnectionServer server) {
+        return server.getServiceId() + ":" + server.getHost() + ":" + server.getPort();
+    }
 
     public String appendTag(String msg) {
         return "LBWebSocket >> " + msg;

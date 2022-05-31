@@ -20,6 +20,7 @@ public class UserMessage extends ObjectMessage {
 
     public UserMessage(Object payload, Collection<String> userIds) {
         super(payload);
+        setBroadcast(false);
         getHeaders().put(UserIdSelector.KEY, String.join(",", userIds));
     }
 }
