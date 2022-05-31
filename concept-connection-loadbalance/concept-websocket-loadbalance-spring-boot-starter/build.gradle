@@ -14,9 +14,9 @@ repositories {
 
 dependencies {
 
-    //compile 'com.github.linyuzai:concept-connection-loadbalance-core:1.0.0'
-    //compile 'com.github.linyuzai:concept-connection-loadbalance-websocket:1.0.0'
-    //compile 'com.github.linyuzai:concept-connection-loadbalance-autoconfigure:1.0.0'
+    //compile 'com.github.linyuzai:concept-connection-loadbalance-core:1.0.1'
+    //compile 'com.github.linyuzai:concept-connection-loadbalance-websocket:1.0.1'
+    //compile 'com.github.linyuzai:concept-connection-loadbalance-autoconfigure:1.0.1'
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure')

@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
-import java.util.List;
-
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 public class ReactiveWebSocketDefaultEndpointConfiguration extends WebSocketDefaultEndpointConfiguration {
