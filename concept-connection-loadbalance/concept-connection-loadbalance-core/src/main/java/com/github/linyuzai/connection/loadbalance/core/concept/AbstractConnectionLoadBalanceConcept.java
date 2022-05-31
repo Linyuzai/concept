@@ -10,7 +10,7 @@ import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnect
 import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
@@ -35,7 +35,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     /**
      * 服务实例提供者
      */
-    protected final ConnectionServerProvider connectionServerProvider;
+    protected final ConnectionServerManager connectionServerManager;
 
     /**
      * 连接订阅者
@@ -96,7 +96,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public void subscribe(boolean sendServerMsg) {
-        List<ConnectionServer> servers = connectionServerProvider.getConnectionServers();
+        List<ConnectionServer> servers = connectionServerManager.getConnectionServers();
         for (ConnectionServer server : servers) {
             subscribe(server, sendServerMsg);
         }
@@ -135,7 +135,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             connectionSubscriber.subscribe(server, this, connection -> {
                 onEstablish(connection);
                 if (sendServerMsg) {
-                    connection.send(createMessage(connectionServerProvider.getClient()));
+                    connection.send(createMessage(connectionServerManager.getLocal()));
                 }
             });
         } catch (Throwable e) {
@@ -158,7 +158,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Collection<Connection> connections = connectionRepository.select(Connection.Type.SUBSCRIBER);
         for (Connection connection : connections) {
             ConnectionServer exist = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
-            if (server.getInstanceId().equals(exist.getInstanceId())) {
+            if (connectionServerManager.isEqual(server, exist)) {
                 return connection;
             }
         }
@@ -471,7 +471,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected ConnectionRepository connectionRepository;
 
-        protected ConnectionServerProvider connectionServerProvider;
+        protected ConnectionServerManager connectionServerManager;
 
         protected ConnectionSubscriber connectionSubscriber;
 
@@ -501,11 +501,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         /**
          * 设置服务实例提供者
          *
-         * @param provider 服务实例提供者
+         * @param manager 服务实例提供者
          * @return Builder
          */
-        public T connectionServerProvider(ConnectionServerProvider provider) {
-            this.connectionServerProvider = provider;
+        public T connectionServerManager(ConnectionServerManager manager) {
+            this.connectionServerManager = manager;
             return (T) this;
         }
 
@@ -667,7 +667,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         protected void preBuild() {
-            if (connectionServerProvider == null) {
+            if (connectionServerManager == null) {
                 throw new ConnectionLoadBalanceException("ConnectionServerProvider is null");
             }
             if (connectionSubscriber == null) {

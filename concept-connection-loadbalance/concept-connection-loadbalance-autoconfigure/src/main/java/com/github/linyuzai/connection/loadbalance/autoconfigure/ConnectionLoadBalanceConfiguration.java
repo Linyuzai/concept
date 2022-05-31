@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
-import com.github.linyuzai.connection.loadbalance.autoconfigure.discovery.DiscoveryConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.discovery.DiscoveryConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.event.ApplicationConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ConnectionScope;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ConnectionScopeRegister;
@@ -11,7 +11,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPubl
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.extension.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -46,8 +46,9 @@ public class ConnectionLoadBalanceConfiguration {
     @ConnectionScope
     @ConditionalOnMissingBean
     @ConditionalOnClass({DiscoveryClient.class, Registration.class})
-    public ConnectionServerProvider connectionServerProvider(DiscoveryClient client, Registration registration) {
-        return new DiscoveryConnectionServerProvider(client, registration);
+    public ConnectionServerManager connectionServerProvider(DiscoveryClient client,
+                                                            Registration registration) {
+        return new DiscoveryConnectionServerManager(client, registration);
     }
 
     @Bean

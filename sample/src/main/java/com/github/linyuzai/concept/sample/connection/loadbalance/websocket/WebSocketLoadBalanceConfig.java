@@ -5,7 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageHandler;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.websocket.EnableWebSocketLoadBalanceConcept;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,10 +51,30 @@ public class WebSocketLoadBalanceConfig {
     }
 
     @Bean
-    public ConnectionServerProvider connectionServerProvider() {
-        return new ConnectionServerProvider() {
+    public ConnectionServerManager connectionServerProvider() {
+        return new ConnectionServerManager() {
             @Override
-            public ConnectionServer getClient() {
+            public void add(ConnectionServer server) {
+
+            }
+
+            @Override
+            public void remove(ConnectionServer server) {
+
+            }
+
+            @Override
+            public void clear() {
+
+            }
+
+            @Override
+            public boolean isEqual(ConnectionServer server1, ConnectionServer server2) {
+                return false;
+            }
+
+            @Override
+            public ConnectionServer getLocal() {
                 return new ConnectionServer() {
                     @Override
                     public String getInstanceId() {

@@ -15,7 +15,7 @@ import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnecti
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
@@ -66,8 +66,9 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
+            WebSocketLoadBalanceProperties properties,
+            WebSocketScopeHelper helper) {
+        ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
         return new ScheduledConnectionLoadBalanceMonitor(
                 factory.create(ConnectionLoadBalanceMonitor.class),
                 properties.getLoadBalance().getMonitor().getPeriod());
@@ -78,9 +79,10 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(prefix = "concept.websocket.load-balance.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatManager loadBalanceConnectionHeartbeatManager(
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
+            WebSocketLoadBalanceProperties properties,
+            WebSocketScopeHelper helper) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getLoadBalance().getHeartbeat();
+        ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
         return new ConnectionHeartbeatManager(
                 Arrays.asList(Connection.Type.SUBSCRIBER, Connection.Type.OBSERVABLE),
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
@@ -92,9 +94,10 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatManager clientConnectionHeartbeatManager(
-            ScheduledExecutorServiceFactory factory,
-            WebSocketLoadBalanceProperties properties) {
+            WebSocketLoadBalanceProperties properties,
+            WebSocketScopeHelper helper) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
+        ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
         return new ConnectionHeartbeatManager(Connection.Type.CLIENT,
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
                 factory.create(ConnectionHeartbeatManager.class));
@@ -105,7 +108,7 @@ public class WebSocketLoadBalanceConfiguration {
     public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(WebSocketScopeHelper helper) {
         return new WebSocketLoadBalanceConcept.Builder()
                 .connectionRepository(helper.getBean(ConnectionRepository.class))
-                .connectionServerProvider(helper.getBean(ConnectionServerProvider.class))
+                .connectionServerManager(helper.getBean(ConnectionServerManager.class))
                 .connectionSubscriber(helper.getBean(ConnectionSubscriber.class))
                 .addConnectionFactories(helper.getBeans(ConnectionFactory.class))
                 .addConnectionSelectors(helper.getBeans(ConnectionSelector.class))

@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Scope(ConnectionScope.NAME)
 public @interface ConnectionScope {
 
-    String NAME = "connection";
+    String NAME = "Concept@connection";
 }

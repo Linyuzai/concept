@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Scope(WebSocketScope.NAME)
 public @interface WebSocketScope {
 
-    String NAME = "websocket";
+    String NAME = "Concept@websocket";
 }

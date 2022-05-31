@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.discovery;
 
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.cloud.client.ServiceInstance;
@@ -17,7 +17,7 @@ import java.util.Map;
  * 基于 Spring Cloud 服务发现的服务实例提供者
  */
 @Getter
-public class DiscoveryConnectionServerProvider implements ConnectionServerProvider {
+public class DiscoveryConnectionServerManager implements ConnectionServerManager {
 
     private final DiscoveryClient discoveryClient;
 
@@ -26,12 +26,32 @@ public class DiscoveryConnectionServerProvider implements ConnectionServerProvid
     /**
      * 本服务信息
      */
-    private final ConnectionServer client;
+    private final ConnectionServer local;
 
-    public DiscoveryConnectionServerProvider(DiscoveryClient discoveryClient, Registration registration) {
+    public DiscoveryConnectionServerManager(DiscoveryClient discoveryClient, Registration registration) {
         this.discoveryClient = discoveryClient;
         this.registration = registration;
-        this.client = new ServiceInstanceConnectionServer(registration);
+        this.local = new ServiceInstanceConnectionServer(registration);
+    }
+
+    @Override
+    public void add(ConnectionServer server) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void remove(ConnectionServer server) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isEqual(ConnectionServer server1, ConnectionServer server2) {
+        return server1.getHost().equals(server2.getHost()) && server1.getPort() == server2.getPort();
     }
 
     /**
@@ -45,7 +65,7 @@ public class DiscoveryConnectionServerProvider implements ConnectionServerProvid
         List<ServiceInstance> instances = discoveryClient.getInstances(registration.getServiceId());
         for (ServiceInstance instance : instances) {
             ConnectionServer server = newConnectionServer(instance);
-            if (client.getInstanceId().equals(server.getInstanceId())) {
+            if (isEqual(local, server)) {
                 continue;
             }
             servers.add(server);

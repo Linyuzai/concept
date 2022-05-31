@@ -9,8 +9,6 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistration;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import java.util.List;
-
 /**
  * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketConfigurer}
  */
@@ -19,7 +17,7 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 
     private final WebSocketLoadBalanceConcept concept;
 
-    private final List<DefaultEndpointConfigurer> configurers;
+    private final DefaultEndpointConfigurer configurer;
 
     private final PrefixUrlPathHelper helper = new PrefixUrlPathHelper(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX);
 
@@ -31,6 +29,8 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
         WebSocketHandlerRegistration registration = registry.addHandler(new ServletWebSocketServerHandler(concept),
                         WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**")
                 .setAllowedOrigins("*");
-        configurers.forEach(it -> it.configure(registration));
+        if (configurer != null) {
+            configurer.configure(registration);
+        }
     }
 }

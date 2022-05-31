@@ -7,7 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapt
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerProvider;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionFactory;
 
@@ -28,14 +28,14 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
     private static WebSocketLoadBalanceConcept instance;
 
     public WebSocketLoadBalanceConcept(ConnectionRepository connectionRepository,
-                                       ConnectionServerProvider connectionServerProvider,
+                                       ConnectionServerManager connectionServerManager,
                                        ConnectionSubscriber connectionSubscriber,
                                        List<ConnectionFactory> connectionFactories,
                                        List<ConnectionSelector> connectionSelectors,
                                        List<MessageFactory> messageFactories,
                                        MessageCodecAdapter messageCodecAdapter,
                                        ConnectionEventPublisher eventPublisher) {
-        super(connectionRepository, connectionServerProvider, connectionSubscriber,
+        super(connectionRepository, connectionServerManager, connectionSubscriber,
                 connectionFactories, connectionSelectors, messageFactories,
                 messageCodecAdapter, eventPublisher);
     }
@@ -64,7 +64,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
             return new WebSocketLoadBalanceConcept(
                     connectionRepository,
-                    connectionServerProvider,
+                    connectionServerManager,
                     connectionSubscriber,
                     connectionFactories,
                     connectionSelectors,
