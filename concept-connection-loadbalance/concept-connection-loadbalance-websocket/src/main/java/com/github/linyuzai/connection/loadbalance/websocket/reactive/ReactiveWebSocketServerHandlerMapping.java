@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
-import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointConfigurer;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
@@ -14,13 +14,14 @@ import java.util.Map;
  */
 public class ReactiveWebSocketServerHandlerMapping extends SimpleUrlHandlerMapping {
 
-    public ReactiveWebSocketServerHandlerMapping(WebSocketLoadBalanceConcept concept, DefaultEndpointConfigurer configurer) {
+    public ReactiveWebSocketServerHandlerMapping(WebSocketLoadBalanceConcept concept,
+                                                 DefaultEndpointCustomizer customizer) {
         Map<String, WebSocketHandler> map = new HashMap<>();
         map.put(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**", new ReactiveWebSocketServerHandler(concept));
         setUrlMap(map);
         setOrder(100);
-        if (configurer != null) {
-            configurer.configure(this);
+        if (customizer != null) {
+            customizer.customize(this);
         }
     }
 }

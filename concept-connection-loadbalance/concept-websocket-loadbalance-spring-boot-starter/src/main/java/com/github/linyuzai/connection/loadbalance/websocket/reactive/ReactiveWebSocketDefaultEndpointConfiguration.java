@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointConfigurer;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -24,7 +24,7 @@ public class ReactiveWebSocketDefaultEndpointConfiguration extends WebSocketDefa
     @ConditionalOnMissingBean
     public ReactiveWebSocketServerHandlerMapping reactiveWebSocketServerHandlerMapping(
             WebSocketLoadBalanceConcept concept,
-            @Autowired(required = false) DefaultEndpointConfigurer configurer) {
-        return new ReactiveWebSocketServerHandlerMapping(concept, configurer);
+            @Autowired(required = false) DefaultEndpointCustomizer customizer) {
+        return new ReactiveWebSocketServerHandlerMapping(concept, customizer);
     }
 }

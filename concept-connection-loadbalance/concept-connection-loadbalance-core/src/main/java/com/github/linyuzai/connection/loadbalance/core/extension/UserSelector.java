@@ -7,11 +7,11 @@ import com.github.linyuzai.connection.loadbalance.core.select.MetadataSelector;
  * <p>
  * 配合 {@link UserMessage} 使用
  */
-public class UserIdSelector extends MetadataSelector {
+public class UserSelector extends MetadataSelector {
 
     public static final String KEY = "user-id";
 
-    public UserIdSelector() {
+    public UserSelector() {
         super(KEY);
     }
 }

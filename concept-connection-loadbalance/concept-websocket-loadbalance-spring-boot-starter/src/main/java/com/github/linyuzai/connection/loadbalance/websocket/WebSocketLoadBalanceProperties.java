@@ -46,11 +46,31 @@ public class WebSocketLoadBalanceProperties {
              */
             private boolean enabled = true;
 
+            /**
+             * 路径选择器
+             */
             private PathSelectorProperties pathSelector = new PathSelectorProperties();
+
+            /**
+             * 用户选择器
+             */
+            private UserSelectorProperties userSelector = new UserSelectorProperties();
 
             @Data
             public static class PathSelectorProperties {
 
+                /**
+                 * 是否启用路径选择
+                 */
+                private boolean enabled = false;
+            }
+
+            @Data
+            public static class UserSelectorProperties {
+
+                /**
+                 * 是否启用用户选择
+                 */
                 private boolean enabled = false;
             }
         }

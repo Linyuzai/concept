@@ -10,7 +10,7 @@ import java.util.Collection;
  * <p>
  * 可以给某个用于发送消息
  * <p>
- * 配合 {@link UserIdSelector} 使用
+ * 配合 {@link UserSelector} 使用
  */
 public class UserMessage extends ObjectMessage {
 
@@ -21,6 +21,6 @@ public class UserMessage extends ObjectMessage {
     public UserMessage(Object payload, Collection<String> userIds) {
         super(payload);
         setBroadcast(false);
-        getHeaders().put(UserIdSelector.KEY, String.join(",", userIds));
+        getHeaders().put(UserSelector.KEY, String.join(",", userIds));
     }
 }

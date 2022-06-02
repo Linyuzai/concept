@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
-import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointConfigurer;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 
     private final WebSocketLoadBalanceConcept concept;
 
-    private final DefaultEndpointConfigurer configurer;
+    private final DefaultEndpointCustomizer customizer;
 
     private final PrefixUrlPathHelper helper = new PrefixUrlPathHelper(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX);
 
@@ -29,8 +29,8 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
         WebSocketHandlerRegistration registration = registry.addHandler(new ServletWebSocketServerHandler(concept),
                         WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**")
                 .setAllowedOrigins("*");
-        if (configurer != null) {
-            configurer.configure(registration);
+        if (customizer != null) {
+            customizer.customize(registration);
         }
     }
 }

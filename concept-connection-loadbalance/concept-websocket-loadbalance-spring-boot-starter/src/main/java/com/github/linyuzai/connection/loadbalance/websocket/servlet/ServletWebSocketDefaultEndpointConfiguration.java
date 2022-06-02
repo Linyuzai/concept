@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointConfigurer;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,7 +19,7 @@ public class ServletWebSocketDefaultEndpointConfiguration extends WebSocketDefau
     @ConditionalOnMissingBean
     public ServletWebSocketServerConfigurer servletWebSocketServerConfigurer(
             WebSocketLoadBalanceConcept concept,
-            @Autowired(required = false) DefaultEndpointConfigurer configurer) {
-        return new ServletWebSocketServerConfigurer(concept, configurer);
+            @Autowired(required = false) DefaultEndpointCustomizer customizer) {
+        return new ServletWebSocketServerConfigurer(concept, customizer);
     }
 }
