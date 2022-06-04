@@ -9,7 +9,7 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ScopeName;
 import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
-import com.github.linyuzai.connection.loadbalance.core.extension.SingleThreadScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.extension.SampleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import org.apache.commons.logging.Log;
@@ -70,6 +70,6 @@ public class ConnectionLoadBalanceConfiguration {
     @ConnectionScope
     @ConditionalOnMissingBean
     public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
-        return new SingleThreadScheduledExecutorServiceFactory();
+        return new SampleThreadScheduledExecutorServiceFactory();
     }
 }
