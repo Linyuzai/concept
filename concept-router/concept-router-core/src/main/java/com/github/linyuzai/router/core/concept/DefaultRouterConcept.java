@@ -1,29 +1,50 @@
 package com.github.linyuzai.router.core.concept;
 
-import com.github.linyuzai.router.core.locator.RouteLocator;
-import com.github.linyuzai.router.core.matcher.RouteMatcher;
-import com.github.linyuzai.router.core.repository.RouteRepository;
+import com.github.linyuzai.router.core.locator.RouterLocator;
+import com.github.linyuzai.router.core.matcher.RouterMatcher;
+import com.github.linyuzai.router.core.repository.RouterRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class DefaultRouterConcept implements RouterConcept {
 
-    private RouteRepository repository;
+    private RouterRepository repository;
 
-    private RouteMatcher matcher;
+    private RouterMatcher matcher;
 
-    private RouteLocator locator;
+    private RouterLocator locator;
 
     @Override
-    public Route.Location route(Route.Source source, Collection<? extends Route.Location> locations) {
-        Route route = matcher.match(source, repository.all());
-        if (route == null) {
+    public Router.Location route(Router.Source source, Collection<? extends Router.Location> locations) {
+        Router router = matcher.match(source, repository.all());
+        if (router == null) {
             return null;
         }
-        return locator.locate(route, locations);
+        return locator.locate(router, locations);
+    }
+
+    @Override
+    public List<Router> routers() {
+        return repository.all();
+    }
+
+    @Override
+    public void add(Router router) {
+        repository.add(router);
+    }
+
+    @Override
+    public void update(Router router) {
+        repository.update(router);
+    }
+
+    @Override
+    public void delete(String id) {
+        repository.remove(id);
     }
 }

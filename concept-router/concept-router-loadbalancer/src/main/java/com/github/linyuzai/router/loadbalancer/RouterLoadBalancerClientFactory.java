@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 @AllArgsConstructor
-public class ConceptRouterLoadBalancerClientFactory extends LoadBalancerClientFactory {
+public class RouterLoadBalancerClientFactory extends LoadBalancerClientFactory {
 
     private final LoadBalancerClientFactory factory;
 
@@ -25,7 +25,7 @@ public class ConceptRouterLoadBalancerClientFactory extends LoadBalancerClientFa
 
     @Override
     public ReactiveLoadBalancer<ServiceInstance> getInstance(String serviceId) {
-        return new ConceptRouterReactorLoadbalancer(serviceId, factory, factory.getInstance(serviceId), concept);
+        return new RouterReactorLoadbalancer(serviceId, factory, factory.getInstance(serviceId), concept);
     }
 
     @Override

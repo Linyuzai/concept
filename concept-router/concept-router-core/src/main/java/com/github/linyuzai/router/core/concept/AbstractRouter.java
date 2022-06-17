@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractRoute implements Route {
+public abstract class AbstractRouter implements Router {
 
     private String id;
 
@@ -15,7 +15,7 @@ public abstract class AbstractRoute implements Route {
 
     private String port;
 
-    private boolean force;
+    private boolean forced;
 
     private boolean enabled;
 }

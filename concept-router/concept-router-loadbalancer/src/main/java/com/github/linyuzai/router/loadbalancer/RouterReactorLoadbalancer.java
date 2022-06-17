@@ -1,6 +1,6 @@
 package com.github.linyuzai.router.loadbalancer;
 
-import com.github.linyuzai.router.core.concept.Route;
+import com.github.linyuzai.router.core.concept.Router;
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.client.ServiceInstance;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ConceptRouterReactorLoadbalancer implements ReactorServiceInstanceLoadBalancer {
+public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBalancer {
 
     private final String serviceId;
 
@@ -25,7 +25,7 @@ public class ConceptRouterReactorLoadbalancer implements ReactorServiceInstanceL
 
     static final Response<ServiceInstance> NOT_MATCH = new EmptyResponse();
 
-    public ConceptRouterReactorLoadbalancer(
+    public RouterReactorLoadbalancer(
             String serviceId,
             LoadBalancerClientFactory factory,
             ReactiveLoadBalancer<ServiceInstance> loadBalancer,
@@ -54,14 +54,14 @@ public class ConceptRouterReactorLoadbalancer implements ReactorServiceInstanceL
     }
 
     private Response<ServiceInstance> getInstanceResponse(Request<RequestDataContext> request, List<ServiceInstance> instances) {
-        List<ServiceInstanceRouteLocation> locations = instances.stream()
-                .map(ServiceInstanceRouteLocation::new)
+        List<ServiceInstanceRouterLocation> locations = instances.stream()
+                .map(ServiceInstanceRouterLocation::new)
                 .collect(Collectors.toList());
-        Route.Location location = concept.route(new RequestRouteSource(serviceId, request), locations);
+        Router.Location location = concept.route(new RequestRouterSource(serviceId, request), locations);
         if (location == null) {
             return NOT_MATCH;
         } else {
-            ServiceInstanceRouteLocation l = (ServiceInstanceRouteLocation) location;
+            ServiceInstanceRouterLocation l = (ServiceInstanceRouterLocation) location;
             ServiceInstance instance = l.getServiceInstance();
             if (instance == null) {
                 return new EmptyResponse();

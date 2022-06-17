@@ -19,6 +19,7 @@ include 'concept-properties-refresh:concept-properties-refresh-core'
 include 'concept-router'
 include 'concept-router:concept-router-core'
 include 'concept-router:concept-router-loadbalancer'
+include 'concept-router:concept-router-spring-boot-starter'
 include 'concept-sync-waiting'
 include 'sample'
 

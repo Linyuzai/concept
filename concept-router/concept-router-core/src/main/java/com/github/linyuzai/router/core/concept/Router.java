@@ -1,6 +1,6 @@
 package com.github.linyuzai.router.core.concept;
 
-public interface Route {
+public interface Router {
 
     String getId();
 

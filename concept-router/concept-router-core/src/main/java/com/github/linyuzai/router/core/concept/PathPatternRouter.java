@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PathPatternRoute extends AbstractRoute {
+public class PathPatternRouter extends AbstractRouter {
 
     private String pathPattern;
 }

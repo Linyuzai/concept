@@ -15,7 +15,7 @@ public class LoadBalancerClientFactoryEnhancer implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         if (bean instanceof LoadBalancerClientFactory) {
-            return new ConceptRouterLoadBalancerClientFactory((LoadBalancerClientFactory) bean, concept);
+            return new RouterLoadBalancerClientFactory((LoadBalancerClientFactory) bean, concept);
         }
         return bean;
     }
