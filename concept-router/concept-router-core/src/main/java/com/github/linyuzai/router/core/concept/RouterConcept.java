@@ -1,6 +1,5 @@
 package com.github.linyuzai.router.core.concept;
 
-
 import java.util.Collection;
 import java.util.List;
 
@@ -15,4 +14,6 @@ public interface RouterConcept {
     void update(Router router);
 
     void delete(String id);
+
+    void publish(Object event);
 }

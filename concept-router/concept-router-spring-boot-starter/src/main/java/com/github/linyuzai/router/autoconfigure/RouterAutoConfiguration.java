@@ -5,6 +5,9 @@ import com.github.linyuzai.router.autoconfigure.management.RouterConvertor;
 import com.github.linyuzai.router.autoconfigure.management.RouterManagementController;
 import com.github.linyuzai.router.core.concept.DefaultRouterConcept;
 import com.github.linyuzai.router.core.concept.RouterConcept;
+import com.github.linyuzai.router.core.event.DefaultRouterEventPublisher;
+import com.github.linyuzai.router.core.event.RouterEventListener;
+import com.github.linyuzai.router.core.event.RouterEventPublisher;
 import com.github.linyuzai.router.core.locator.RouterLocator;
 import com.github.linyuzai.router.core.matcher.RouterMatcher;
 import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
@@ -15,6 +18,8 @@ import com.github.linyuzai.router.loadbalancer.LoadbalancerServiceLocator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class RouterAutoConfiguration {
@@ -40,10 +45,17 @@ public class RouterAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public RouterEventPublisher routerEventPublisher(List<RouterEventListener> listeners) {
+        return new DefaultRouterEventPublisher(listeners);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public RouterConcept routerConcept(RouterRepository repository,
                                        RouterMatcher matcher,
-                                       RouterLocator locator) {
-        return new DefaultRouterConcept(repository, matcher, locator);
+                                       RouterLocator locator,
+                                       RouterEventPublisher eventPublisher) {
+        return new DefaultRouterConcept(repository, matcher, locator, eventPublisher);
     }
 
     @Bean

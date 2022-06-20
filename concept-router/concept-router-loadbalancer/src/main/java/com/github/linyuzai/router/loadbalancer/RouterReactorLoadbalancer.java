@@ -21,7 +21,7 @@ public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBala
 
     private final ReactiveLoadBalancer<ServiceInstance> loadBalancer;
 
-    private RouterConcept concept;
+    private final RouterConcept concept;
 
     static final Response<ServiceInstance> NOT_MATCH = new EmptyResponse();
 
