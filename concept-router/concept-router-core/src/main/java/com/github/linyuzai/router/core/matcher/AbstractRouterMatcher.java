@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class AbstractRouterMatcher implements RouterMatcher {
+
     @Override
     public Router match(Router.Source source, Collection<? extends Router> routes) {
         return doMatch(getServiceId(source), getPath(source), routes);
@@ -23,6 +24,7 @@ public abstract class AbstractRouterMatcher implements RouterMatcher {
         if (router != null && router.isEnabled()) {
             return router;
         }
+
         int matchedLength = -1;
         for (Map.Entry<String, PathPatternRouter> entry : map.entrySet()) {
             String key = entry.getKey();

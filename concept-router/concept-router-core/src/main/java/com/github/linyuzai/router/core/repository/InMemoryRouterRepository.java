@@ -1,5 +1,6 @@
 package com.github.linyuzai.router.core.repository;
 
+import com.github.linyuzai.router.core.concept.AbstractRouter;
 import com.github.linyuzai.router.core.concept.PathPatternRouter;
 import com.github.linyuzai.router.core.concept.Router;
 import com.github.linyuzai.router.core.exception.RouterException;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryRouterRepository implements RouterRepository {
 
-    protected final Map<String, Router> routeMap = new ConcurrentHashMap<>();
+    protected final Map<String, Router> routerMap = new ConcurrentHashMap<>();
 
     protected final Map<String, Router> pathPatternMap = new ConcurrentHashMap<>();
 
@@ -21,20 +22,24 @@ public class InMemoryRouterRepository implements RouterRepository {
     @Override
     public void update(Collection<? extends Router> routes) {
         for (Router router : routes) {
-            PathPatternRouter r = (PathPatternRouter) router;
-            Router exist = pathPatternMap.get(r.getPathPattern());
-            if (exist != null && !exist.getId().equals(r.getId())) {
+            PathPatternRouter ppr = (PathPatternRouter) router;
+            Router exist = pathPatternMap.get(ppr.getPathPattern());
+            if (exist != null && !exist.getId().equals(ppr.getId())) {
                 throw new RouterException("Path pattern duplicated");
             }
-            routeMap.put(router.getId(), router);
-            pathPatternMap.put(r.getPathPattern(), r);
+            Router r = routerMap.get(ppr.getId());
+            if (r != null) {
+                pathPatternMap.remove(((PathPatternRouter) r).getPathPattern());
+            }
+            routerMap.put(router.getId(), router);
+            pathPatternMap.put(ppr.getPathPattern(), ppr);
         }
     }
 
     @Override
     public void remove(Collection<? extends String> ids) {
         for (String id : ids) {
-            Router remove = routeMap.remove(id);
+            Router remove = routerMap.remove(id);
             if (remove == null) {
                 continue;
             }
@@ -45,24 +50,30 @@ public class InMemoryRouterRepository implements RouterRepository {
 
     @Override
     public Router get(String id) {
-        return routeMap.get(id);
+        return routerMap.get(id);
     }
 
     @Override
     public List<Router> list(Collection<? extends String> ids) {
         List<Router> routers = new ArrayList<>();
         for (String id : ids) {
-            Router router = routeMap.get(id);
+            Router router = routerMap.get(id);
             if (router == null) {
                 continue;
             }
             routers.add(router);
         }
-        return routers;
+        return sort(routers);
     }
 
     @Override
     public List<Router> all() {
-        return Collections.unmodifiableList(new ArrayList<>(routeMap.values()));
+        return Collections.unmodifiableList(sort(new ArrayList<>(routerMap.values())));
+    }
+
+    protected List<Router> sort(List<Router> routers) {
+        routers.sort((o1, o2) ->
+                (int) (((AbstractRouter) o2).getTimestamp() - ((AbstractRouter) o1).getTimestamp()));
+        return routers;
     }
 }

@@ -13,6 +13,11 @@ repositories {
 }
 
 dependencies {
+
+    compileOnly "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    compileOnly "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"

@@ -20,28 +20,70 @@ public class RouterManagementController {
     private RouterConvertor convertor;
 
     @PostMapping("/add")
-    public void add(@RequestBody RouterVO router) {
-        concept.add(convertor.vo2do(router));
+    public ResultVO add(@RequestBody RouterVO router) {
+        try {
+            router.setId(null);
+            concept.add(convertor.vo2do(router));
+            return ResultVO.builder()
+                    .success(true)
+                    .build();
+        } catch (Throwable e) {
+            return ResultVO.builder()
+                    .success(false)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @PutMapping("/update")
-    public void update(@RequestBody RouterVO router) {
-        if (!StringUtils.hasText(router.getId())) {
-            throw new RouterException("Id is null");
+    public ResultVO update(@RequestBody RouterVO router) {
+        try {
+            if (!StringUtils.hasText(router.getId())) {
+                throw new RouterException("Id is null");
+            }
+            concept.update(convertor.vo2do(router));
+            return ResultVO.builder()
+                    .success(true)
+                    .build();
+        } catch (Throwable e) {
+            return ResultVO.builder()
+                    .success(false)
+                    .message(e.getMessage())
+                    .build();
         }
-        concept.update(convertor.vo2do(router));
     }
 
     @DeleteMapping("/delete")
-    public void delete(@RequestParam String id) {
-        concept.delete(id);
+    public ResultVO delete(@RequestParam String id) {
+        try {
+            concept.delete(id);
+            return ResultVO.builder()
+                    .success(true)
+                    .build();
+        } catch (Throwable e) {
+            return ResultVO.builder()
+                    .success(false)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @GetMapping("/list")
-    public List<RouterVO> list() {
-        return concept.routers()
-                .stream()
-                .map(convertor::do2vo)
-                .collect(Collectors.toList());
+    public ResultVO list() {
+        try {
+            List<RouterVO> vos = concept.routers()
+                    .stream()
+                    .map(convertor::do2vo)
+                    .collect(Collectors.toList());
+            return ResultVO.builder()
+                    .success(true)
+                    .object(vos)
+                    .build();
+        } catch (Throwable e) {
+            return ResultVO.builder()
+                    .success(false)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 }

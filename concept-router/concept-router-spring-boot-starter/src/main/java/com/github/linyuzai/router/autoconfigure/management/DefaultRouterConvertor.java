@@ -40,6 +40,7 @@ public class DefaultRouterConvertor implements RouterConvertor {
         router.setPort(serverAddresses.length > 1 ? serverAddresses[1] : "*");
         router.setForced(vo.getForced());
         router.setEnabled(vo.getEnabled());
+        router.setTimestamp(System.currentTimeMillis());
         return router;
     }
 }

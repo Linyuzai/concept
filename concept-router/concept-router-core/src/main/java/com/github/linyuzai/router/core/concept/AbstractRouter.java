@@ -18,4 +18,6 @@ public abstract class AbstractRouter implements Router {
     private boolean forced;
 
     private boolean enabled;
+
+    private long timestamp;
 }

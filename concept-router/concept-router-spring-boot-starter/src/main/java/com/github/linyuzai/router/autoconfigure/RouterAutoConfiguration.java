@@ -7,7 +7,7 @@ import com.github.linyuzai.router.core.concept.DefaultRouterConcept;
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.core.locator.RouterLocator;
 import com.github.linyuzai.router.core.matcher.RouterMatcher;
-import com.github.linyuzai.router.core.repository.InMemoryRouterRepository;
+import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
 import com.github.linyuzai.router.core.repository.RouterRepository;
 import com.github.linyuzai.router.loadbalancer.LoadBalancerClientFactoryEnhancer;
 import com.github.linyuzai.router.loadbalancer.LoadbalancerRequestMatcher;
@@ -19,10 +19,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RouterAutoConfiguration {
 
-    @Bean
+    @SuppressWarnings("all")
+    @Bean(initMethod = "initialize")
     @ConditionalOnMissingBean
     public RouterRepository routerRepository() {
-        return new InMemoryRouterRepository();
+        return new JacksonLocalRouterRepository();
     }
 
     @Bean
