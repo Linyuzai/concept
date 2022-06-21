@@ -2,4 +2,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.github.linyuzai.router.autoconfigure.RouterLoadbalancerAutoConfiguration,\
 com.github.linyuzai.router.autoconfigure.RouterAutoConfiguration,\
 com.github.linyuzai.router.autoconfigure.RouterLoadbalancerAutoConfiguration.RouterEnhancerAutoConfiguration,\
-com.github.linyuzai.router.autoconfigure.RouterManagementAutoConfiguration
+com.github.linyuzai.router.autoconfigure.RouterManagementAutoConfiguration,\
+com.github.linyuzai.router.autoconfigure.RouterManagementAutoConfiguration.WebMvcRouterManagementAutoConfiguration,\
+com.github.linyuzai.router.autoconfigure.RouterManagementAutoConfiguration.WebFluxRouterManagementAutoConfiguration

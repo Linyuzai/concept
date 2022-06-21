@@ -1,5 +1,6 @@
 package com.github.linyuzai.router.autoconfigure;
 
+import com.github.linyuzai.router.autoconfigure.properties.RouterProperties;
 import com.github.linyuzai.router.core.concept.DefaultRouterConcept;
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.core.event.DefaultRouterEventPublisher;
@@ -12,12 +13,16 @@ import com.github.linyuzai.router.core.repository.RouterRepository;
 import com.github.linyuzai.router.core.utils.RouterLogger;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
 @CommonsLog
+@ConditionalOnProperty(name = "concept.router.enabled", havingValue = "true", matchIfMissing = true)
+@EnableConfigurationProperties(RouterProperties.class)
 @Configuration(proxyBeanMethods = false)
 public class RouterAutoConfiguration {
 

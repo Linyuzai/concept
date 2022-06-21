@@ -35,9 +35,18 @@ public class DefaultRouterConvertor implements RouterConvertor {
         }
         router.setServiceId(vo.getServiceId());
         router.setPathPattern(vo.getPathPattern());
-        String[] serverAddresses = vo.getServerAddress().split(":");
-        router.setHost(serverAddresses[0]);
-        router.setPort(serverAddresses.length > 1 ? serverAddresses[1] : "*");
+        if (vo.getServerAddress().contains(":")) {
+            String[] serverAddresses = vo.getServerAddress().split(":");
+            router.setHost(serverAddresses[0]);
+            router.setPort(serverAddresses.length > 1 ? serverAddresses[1] : "*");
+        } else if (vo.getServerAddress().contains("：")) {
+            String[] serverAddresses = vo.getServerAddress().split("：");
+            router.setHost(serverAddresses[0]);
+            router.setPort(serverAddresses.length > 1 ? serverAddresses[1] : "*");
+        } else {
+            router.setHost(vo.getServerAddress());
+            router.setPort("*");
+        }
         router.setForced(vo.getForced());
         router.setEnabled(vo.getEnabled());
         router.setTimestamp(System.currentTimeMillis());

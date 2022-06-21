@@ -44,22 +44,22 @@ public class RouterLogger implements RouterEventListener {
     }
 
     public String notMatch(RequestRouterSource source) {
-        return "No router matched for url path " + source.getUri().getPath();
+        return "No router matched for url path '" + source.getUri().getPath() + "'";
     }
 
     public String matched(RequestRouterSource source, ServiceRequestRouter router) {
-        return "Url path " + getSource(source) + " match router " + getRouter(router);
+        return "Url path '" + getSource(source) + "' match router '" + getRouter(router) + "'";
     }
 
     public String notLocate(ServiceRequestRouter router) {
-        return "No service located for router " + getRouter(router);
+        return "No service located for router '" + getRouter(router) + "'";
     }
 
     public String located(ServiceRouterLocation location, ServiceRequestRouter router) {
         if (location.getHost() == null) {
-            return "Service unavailable for router" + getRouter(router);
+            return "Service unavailable for router '" + getRouter(router) + "'";
         }
-        return "Router " + getRouter(router) + " locate service " + getLocation(location);
+        return "Router '" + getRouter(router) + "' locate service '" + getLocation(location) + "'";
     }
 
     public String getSource(RequestRouterSource source) {

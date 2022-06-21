@@ -18,8 +18,12 @@ dependencies {
     compileOnly project(':concept-router:concept-router-loadbalancer')
 
     compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
+    compileOnly "org.springframework.cloud:spring-cloud-loadbalancer:${springCloudVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
-    compileOnly "org.springframework:spring-web:${springWebVersion}"
+    //compileOnly "org.springframework:spring-web:${springWebVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
