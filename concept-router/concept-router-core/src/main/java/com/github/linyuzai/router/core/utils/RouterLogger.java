@@ -56,8 +56,10 @@ public class RouterLogger implements RouterEventListener {
     }
 
     public String located(ServiceRouterLocation location, ServiceRequestRouter router) {
+        if (location.getHost() == null) {
+            return "Service unavailable for router" + getRouter(router);
+        }
         return "Router " + getRouter(router) + " locate service " + getLocation(location);
-
     }
 
     public String getSource(RequestRouterSource source) {
@@ -77,7 +79,7 @@ public class RouterLogger implements RouterEventListener {
         if (!"*".equals(router.getPort())) {
             builder.append(":").append(router.getPort());
         }
-        return router.getPathPattern() + " => " + builder.toString();
+        return router.getPathPattern() + " => " + builder;
     }
 
     public String appendTag(String msg) {

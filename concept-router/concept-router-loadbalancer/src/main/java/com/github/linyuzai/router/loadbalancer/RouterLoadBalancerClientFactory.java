@@ -8,6 +8,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerProperties;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactiveLoadBalancer;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification;
+import org.springframework.cloud.loadbalancer.core.ReactorServiceInstanceLoadBalancer;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
@@ -25,7 +26,11 @@ public class RouterLoadBalancerClientFactory extends LoadBalancerClientFactory {
 
     @Override
     public ReactiveLoadBalancer<ServiceInstance> getInstance(String serviceId) {
-        return new RouterReactorLoadbalancer(serviceId, factory, factory.getInstance(serviceId), concept);
+        ReactiveLoadBalancer<ServiceInstance> instance = factory.getInstance(serviceId);
+        if (instance instanceof RouterReactorLoadbalancer) {
+            return instance;
+        }
+        return new RouterReactorLoadbalancer(serviceId, factory, instance, concept);
     }
 
     @Override
@@ -58,9 +63,17 @@ public class RouterLoadBalancerClientFactory extends LoadBalancerClientFactory {
         factory.destroy();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getInstance(String name, Class<T> type) {
-        return factory.getInstance(name, type);
+        T instance = factory.getInstance(name, type);
+        if (ReactorServiceInstanceLoadBalancer.class.isAssignableFrom(type)) {
+            if (instance instanceof RouterReactorLoadbalancer) {
+                return instance;
+            }
+            return (T) new RouterReactorLoadbalancer(name, factory, (ReactiveLoadBalancer<ServiceInstance>) instance, concept);
+        }
+        return instance;
     }
 
     @Override
@@ -83,8 +96,20 @@ public class RouterLoadBalancerClientFactory extends LoadBalancerClientFactory {
         return factory.getInstance(name, type);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Map<String, T> getInstances(String name, Class<T> type) {
-        return factory.getInstances(name, type);
+        Map<String, T> instances = factory.getInstances(name, type);
+        if (ReactorServiceInstanceLoadBalancer.class.isAssignableFrom(type)) {
+            for (Map.Entry<String, T> entry : instances.entrySet()) {
+                T value = entry.getValue();
+                if (value instanceof RouterReactorLoadbalancer) {
+                    continue;
+                }
+                entry.setValue((T) new RouterReactorLoadbalancer(name, factory,
+                        (ReactiveLoadBalancer<ServiceInstance>) value, concept));
+            }
+        }
+        return instances;
     }
 }
