@@ -13,8 +13,8 @@ import com.github.linyuzai.router.core.matcher.RouterMatcher;
 import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
 import com.github.linyuzai.router.core.repository.RouterRepository;
 import com.github.linyuzai.router.loadbalancer.LoadBalancerClientFactoryEnhancer;
-import com.github.linyuzai.router.loadbalancer.LoadbalancerRequestMatcher;
-import com.github.linyuzai.router.loadbalancer.LoadbalancerServiceLocator;
+import com.github.linyuzai.router.loadbalancer.LoadbalancerRequestRouterMatcher;
+import com.github.linyuzai.router.loadbalancer.LoadbalancerServiceRouterLocator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,13 +34,13 @@ public class RouterAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RouterMatcher routerMatcher() {
-        return new LoadbalancerRequestMatcher();
+        return new LoadbalancerRequestRouterMatcher();
     }
 
     @Bean
     @ConditionalOnMissingBean
     public RouterLocator routerLocator() {
-        return new LoadbalancerServiceLocator();
+        return new LoadbalancerServiceRouterLocator();
     }
 
     @Bean

@@ -1,7 +1,6 @@
 package com.github.linyuzai.router.loadbalancer;
 
-import com.github.linyuzai.router.core.concept.AbstractRouter;
-import com.github.linyuzai.router.core.concept.Router;
+import com.github.linyuzai.router.core.concept.RequestRouterSource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.cloud.client.loadbalancer.Request;
@@ -11,7 +10,7 @@ import java.net.URI;
 
 @Getter
 @AllArgsConstructor
-public class RequestRouterSource extends AbstractRouter.Source {
+public class LoadbalancerRequestRouterSource implements RequestRouterSource {
 
     private String serviceId;
 

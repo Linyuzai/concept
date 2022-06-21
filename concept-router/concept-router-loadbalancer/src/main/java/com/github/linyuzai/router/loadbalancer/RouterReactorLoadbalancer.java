@@ -54,14 +54,15 @@ public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBala
     }
 
     private Response<ServiceInstance> getInstanceResponse(Request<RequestDataContext> request, List<ServiceInstance> instances) {
-        List<ServiceInstanceRouterLocation> locations = instances.stream()
-                .map(ServiceInstanceRouterLocation::new)
+        List<LoadbalancerServiceRouterLocation> locations = instances.stream()
+                .map(LoadbalancerServiceRouterLocation::new)
                 .collect(Collectors.toList());
-        Router.Location location = concept.route(new RequestRouterSource(serviceId, request), locations);
+        Router.Source source = new LoadbalancerRequestRouterSource(serviceId, request);
+        Router.Location location = concept.route(source, locations);
         if (location == null) {
             return NOT_MATCH;
         } else {
-            ServiceInstanceRouterLocation l = (ServiceInstanceRouterLocation) location;
+            LoadbalancerServiceRouterLocation l = (LoadbalancerServiceRouterLocation) location;
             ServiceInstance instance = l.getServiceInstance();
             if (instance == null) {
                 return new EmptyResponse();
@@ -70,5 +71,4 @@ public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBala
             }
         }
     }
-
 }

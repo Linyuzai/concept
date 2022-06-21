@@ -6,7 +6,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RouterMatchedEvent implements RouterEvent {
+public class RouterLocateEvent implements RouterEvent {
+
+    private Router.Location location;
 
     private Router router;
 }

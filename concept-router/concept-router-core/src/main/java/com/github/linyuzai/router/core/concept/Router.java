@@ -4,6 +4,12 @@ public interface Router {
 
     String getId();
 
+    boolean isForced();
+
+    boolean isEnabled();
+
+    long getTimestamp();
+
     interface Source {
 
     }

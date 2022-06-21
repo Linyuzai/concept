@@ -1,7 +1,8 @@
 package com.github.linyuzai.router.core.concept;
 
 import com.github.linyuzai.router.core.event.RouterEventPublisher;
-import com.github.linyuzai.router.core.event.RouterMatchedEvent;
+import com.github.linyuzai.router.core.event.RouterLocateEvent;
+import com.github.linyuzai.router.core.event.RouterMatchEvent;
 import com.github.linyuzai.router.core.locator.RouterLocator;
 import com.github.linyuzai.router.core.matcher.RouterMatcher;
 import com.github.linyuzai.router.core.repository.RouterRepository;
@@ -26,11 +27,13 @@ public class DefaultRouterConcept implements RouterConcept {
     @Override
     public Router.Location route(Router.Source source, Collection<? extends Router.Location> locations) {
         Router router = matcher.match(source, repository.all());
+        publish(new RouterMatchEvent(source, router));
         if (router == null) {
             return null;
         }
-        publish(new RouterMatchedEvent(router));
-        return locator.locate(router, locations);
+        Router.Location location = locator.locate(router, locations);
+        publish(new RouterLocateEvent(location, router));
+        return location;
     }
 
     @Override
