@@ -49,7 +49,7 @@
                     <el-button-group style="float: right;margin-left: 20px">
                         <el-button @click="openRouterDialog()" icon="el-icon-plus"></el-button>
                         <el-button @click="refreshRouters()" icon="el-icon-refresh"></el-button>
-                        <el-button @click="help()" icon="el-icon-warning-outline"></el-button>
+                        <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
                     </el-button-group>
                     <el-input placeholder="搜索匹配路径" style="width: 200px;float: right"
                               v-model="routerSearch"></el-input>
@@ -273,8 +273,12 @@
             }
         },
         methods: {
-            help() {
-                this.$alert('帮助', '帮助', {});
+            explain() {
+                let content =
+                    "本产品主要用于多人开发时提高接口调试效率<br/>" +
+                    "正式服务请在打包时排除该库<br/>" +
+                    "或使用 'concept.router.enabled=false' 禁用该功能"
+                this.$alert(content, '说明', {dangerouslyUseHTMLString: true});
             },
             buildUrl(path) {
                 let p = this.prefix;
