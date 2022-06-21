@@ -13,5 +13,5 @@ public class PathPatternRouter extends AbstractRouter implements ServiceRequestR
 
     private String host;
 
-    private int port;
+    private String port;
 }
