@@ -1,5 +1,6 @@
 package com.github.linyuzai.router.core.locator;
 
+import com.github.linyuzai.router.core.concept.Router;
 import com.github.linyuzai.router.core.concept.ServiceRequestRouter;
 import com.github.linyuzai.router.core.concept.ServiceRouterLocation;
 
@@ -8,7 +9,7 @@ import java.util.Collection;
 public abstract class ServiceRequestRouterLocator extends AbstractRouterLocator<ServiceRequestRouter, ServiceRouterLocation> {
 
     @Override
-    public ServiceRouterLocation doLocate(ServiceRequestRouter router, Collection<? extends ServiceRouterLocation> locations) {
+    public Router.Location doLocate(ServiceRequestRouter router, Collection<? extends ServiceRouterLocation> locations) {
         for (ServiceRouterLocation location : locations) {
             if (matchServiceId(location, router) &&
                     matchHost(location, router) &&
@@ -19,7 +20,7 @@ public abstract class ServiceRequestRouterLocator extends AbstractRouterLocator<
         if (router.isForced()) {
             return getForcedLocation();
         }
-        return null;
+        return Router.Location.UNMATCHED;
     }
 
     public boolean matchServiceId(ServiceRouterLocation location, ServiceRequestRouter router) {
@@ -36,5 +37,5 @@ public abstract class ServiceRequestRouterLocator extends AbstractRouterLocator<
                 location.getPort() == Integer.parseInt(router.getPort());
     }
 
-    public abstract ServiceRouterLocation getForcedLocation();
+    public abstract Router.Location getForcedLocation();
 }

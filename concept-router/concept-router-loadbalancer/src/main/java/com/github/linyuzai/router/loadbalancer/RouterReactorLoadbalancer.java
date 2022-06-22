@@ -59,16 +59,14 @@ public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBala
                 .collect(Collectors.toList());
         Router.Source source = new LoadbalancerRequestRouterSource(serviceId, request);
         Router.Location location = concept.route(source, locations);
-        if (location == null) {
+        if (location == Router.Location.UNMATCHED) {
             return NOT_MATCH;
+        } else if (location == Router.Location.UNAVAILABLE) {
+            return new EmptyResponse();
         } else {
             LoadbalancerServiceRouterLocation l = (LoadbalancerServiceRouterLocation) location;
             ServiceInstance instance = l.getServiceInstance();
-            if (instance == null) {
-                return new EmptyResponse();
-            } else {
-                return new DefaultResponse(instance);
-            }
+            return new DefaultResponse(instance);
         }
     }
 }

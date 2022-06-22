@@ -16,5 +16,10 @@ public interface Router {
 
     interface Location {
 
+        Location UNMATCHED = new Location() {
+        };
+
+        Location UNAVAILABLE = new Location() {
+        };
     }
 }

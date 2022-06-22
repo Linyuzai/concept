@@ -1,5 +1,7 @@
 package com.github.linyuzai.router.autoconfigure;
 
+import com.github.linyuzai.router.autoconfigure.annotation.ConditionalOnRouterEnabled;
+import com.github.linyuzai.router.autoconfigure.matcher.AntPathRequestRouterMatcher;
 import com.github.linyuzai.router.autoconfigure.event.ApplicationRouterEventPublisher;
 import com.github.linyuzai.router.autoconfigure.properties.RouterProperties;
 import com.github.linyuzai.router.core.concept.DefaultRouterConcept;
@@ -7,6 +9,7 @@ import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.core.event.RouterEventListener;
 import com.github.linyuzai.router.core.event.RouterEventPublisher;
 import com.github.linyuzai.router.core.locator.RouterLocator;
+import com.github.linyuzai.router.core.locator.ForceUnavailableServiceRouterLocator;
 import com.github.linyuzai.router.core.matcher.RouterMatcher;
 import com.github.linyuzai.router.core.repository.InMemoryRouterRepository;
 import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
@@ -17,9 +20,9 @@ import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @CommonsLog
-@ConditionalOnProperty(name = "concept.router.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnRouterEnabled
 @EnableConfigurationProperties(RouterProperties.class)
 @Configuration(proxyBeanMethods = false)
 public class RouterAutoConfiguration {
@@ -72,6 +75,18 @@ public class RouterAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public RouterMatcher routerMatcher() {
+        return new AntPathRequestRouterMatcher();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RouterLocator routerLocator() {
+        return new ForceUnavailableServiceRouterLocator();
+    }
+
+    @Bean
     public RouterLogger routerLogger() {
         return new RouterLogger(log::info, log::error);
     }
@@ -89,6 +104,11 @@ public class RouterAutoConfiguration {
                                        RouterMatcher matcher,
                                        RouterLocator locator,
                                        RouterEventPublisher eventPublisher) {
-        return new DefaultRouterConcept(repository, matcher, locator, eventPublisher);
+        return new DefaultRouterConcept.Builder()
+                .repository(repository)
+                .matcher(matcher)
+                .locator(locator)
+                .eventPublisher(eventPublisher)
+                .build();
     }
 }

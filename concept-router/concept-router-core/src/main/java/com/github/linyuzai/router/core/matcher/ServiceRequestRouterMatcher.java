@@ -1,6 +1,7 @@
 package com.github.linyuzai.router.core.matcher;
 
 import com.github.linyuzai.router.core.concept.RequestRouterSource;
+import com.github.linyuzai.router.core.concept.Router;
 import com.github.linyuzai.router.core.concept.ServiceRequestRouter;
 
 import java.util.Collection;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 public abstract class ServiceRequestRouterMatcher extends AbstractRouterMatcher<RequestRouterSource, ServiceRequestRouter> {
 
     @Override
-    public ServiceRequestRouter doMatch(RequestRouterSource request, Collection<? extends ServiceRequestRouter> routers) {
+    public Router doMatch(RequestRouterSource request, Collection<? extends ServiceRequestRouter> routers) {
         String serviceId = request.getServiceId();
         String path = request.getUri().getPath();
         Map<String, ServiceRequestRouter> map = routers.stream()

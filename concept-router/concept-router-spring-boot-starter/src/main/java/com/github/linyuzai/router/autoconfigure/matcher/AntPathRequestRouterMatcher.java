@@ -1,9 +1,9 @@
-package com.github.linyuzai.router.loadbalancer;
+package com.github.linyuzai.router.autoconfigure.matcher;
 
 import com.github.linyuzai.router.core.matcher.ServiceRequestRouterMatcher;
 import org.springframework.util.AntPathMatcher;
 
-public class LoadbalancerRequestRouterMatcher extends ServiceRequestRouterMatcher {
+public class AntPathRequestRouterMatcher extends ServiceRequestRouterMatcher {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 

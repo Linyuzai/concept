@@ -13,5 +13,5 @@ public abstract class AbstractRouterMatcher<S extends Router.Source, R extends R
         return doMatch((S) source, routers.stream().map(it -> (R) it).collect(Collectors.toList()));
     }
 
-    public abstract R doMatch(S request, Collection<? extends R> routers);
+    public abstract Router doMatch(S request, Collection<? extends R> routers);
 }

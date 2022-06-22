@@ -13,5 +13,5 @@ public abstract class AbstractRouterLocator<R extends Router, L extends Router.L
         return doLocate((R) router, locations.stream().map(it -> (L) it).collect(Collectors.toList()));
     }
 
-    public abstract L doLocate(R router, Collection<? extends L> locations);
+    public abstract Router.Location doLocate(R router, Collection<? extends L> locations);
 }
