@@ -12,7 +12,10 @@ import com.github.linyuzai.router.core.repository.InMemoryRouterRepository;
 import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
 import com.github.linyuzai.router.core.repository.RouterRepository;
 import com.github.linyuzai.router.core.utils.RouterLogger;
+import lombok.AllArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,7 +34,7 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 public class RouterAutoConfiguration {
 
-    @Bean(initMethod = "initialize", destroyMethod = "destroy")
+    @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
     public RouterRepository routerRepository(Registration registration,
                                              RouterProperties properties) {
@@ -40,15 +43,31 @@ public class RouterAutoConfiguration {
             case MEMORY:
                 return new InMemoryRouterRepository();
             case LOCAL:
-                String path = properties.getRepository().getLocal().getPath();
-                String servicePath = new File(path, registration.getServiceId()).getAbsolutePath();
-                String instancePath = new File(servicePath,
-                        registration.getHost() + "_" + registration.getPort())
-                        .getAbsolutePath();
-                return new JacksonLocalRouterRepository(instancePath);
+                return new JacksonLocalRouterRepository(() -> {
+                    String path = properties.getRepository().getLocal().getPath();
+                    String servicePath = new File(path, registration.getServiceId()).getAbsolutePath();
+                    return new File(servicePath, registration.getHost() + "_" + registration.getPort())
+                            .getAbsolutePath();
+                });
             default:
                 throw new IllegalArgumentException("Repository type must in " +
                         Arrays.toString(RouterProperties.RepositoryProperties.RepositoryType.values()));
+        }
+    }
+
+    @Bean
+    public RouterRepositoryInitializer routerRepositoryInitializer(RouterRepository repository) {
+        return new RouterRepositoryInitializer(repository);
+    }
+
+    @AllArgsConstructor
+    public static class RouterRepositoryInitializer implements ApplicationRunner {
+
+        private RouterRepository routerRepository;
+
+        @Override
+        public void run(ApplicationArguments args) throws Exception {
+            routerRepository.initialize();
         }
     }
 

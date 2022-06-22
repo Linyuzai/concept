@@ -13,18 +13,19 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Supplier;
 
 @Getter
 public class JacksonLocalRouterRepository extends LocalRouterRepository {
 
     private final ObjectMapper objectMapper;
 
-    public JacksonLocalRouterRepository(String path) {
-        this(path, new ObjectMapper());
+    public JacksonLocalRouterRepository(Supplier<String> pathSupplier) {
+        this(new ObjectMapper(), pathSupplier);
     }
 
-    public JacksonLocalRouterRepository(String path, ObjectMapper objectMapper) {
-        super(path);
+    public JacksonLocalRouterRepository(ObjectMapper objectMapper, Supplier<String> pathSupplier) {
+        super(pathSupplier);
         this.objectMapper = config(objectMapper);
     }
 

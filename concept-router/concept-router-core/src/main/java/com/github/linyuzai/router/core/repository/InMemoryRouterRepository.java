@@ -1,6 +1,5 @@
 package com.github.linyuzai.router.core.repository;
 
-import com.github.linyuzai.router.core.concept.AbstractRouter;
 import com.github.linyuzai.router.core.concept.PathPatternRouter;
 import com.github.linyuzai.router.core.concept.Router;
 import com.github.linyuzai.router.core.exception.RouterException;
@@ -72,8 +71,7 @@ public class InMemoryRouterRepository implements RouterRepository {
     }
 
     protected List<Router> sort(List<Router> routers) {
-        routers.sort((o1, o2) ->
-                (int) (((AbstractRouter) o2).getTimestamp() - ((AbstractRouter) o1).getTimestamp()));
+        routers.sort((o1, o2) -> (int) (o2.getTimestamp() - o1.getTimestamp()));
         return routers;
     }
 }

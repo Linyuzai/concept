@@ -1,30 +1,28 @@
 package com.github.linyuzai.router.core.repository;
 
-import com.github.linyuzai.router.core.concept.PathPatternRouter;
 import com.github.linyuzai.router.core.concept.Router;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.*;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public abstract class LocalRouterRepository extends InMemoryRouterRepository {
 
-    private final String path;
+    private volatile String path;
+
+    private final Supplier<String> pathSupplier;
 
     @SneakyThrows
     @Override
     public void initialize() {
         try (FileInputStream fis = new FileInputStream(getFile())) {
             Collection<? extends Router> routers = read(fis);
-            for (Router router : routers) {
-                PathPatternRouter ppr = (PathPatternRouter) router;
-                routerMap.put(ppr.getId(), ppr);
-                pathPatternMap.put(ppr.getPathPattern(), ppr);
-            }
+            add(routers);
         }
     }
 
@@ -32,33 +30,33 @@ public abstract class LocalRouterRepository extends InMemoryRouterRepository {
     @Override
     public void add(Collection<? extends Router> routes) {
         super.add(routes);
-        try (FileOutputStream fos = new FileOutputStream(getFile())) {
-            write(fos, routerMap.values());
-        }
+        overwrite();
     }
-
 
     @SneakyThrows
     @Override
     public void update(Collection<? extends Router> routes) {
         super.update(routes);
-        try (FileOutputStream fos = new FileOutputStream(getFile())) {
-            write(fos, routerMap.values());
-        }
+        overwrite();
     }
 
     @SneakyThrows
     @Override
     public void remove(Collection<? extends String> ids) {
         super.remove(ids);
+        overwrite();
+    }
+
+    @SneakyThrows
+    protected void overwrite() {
         try (FileOutputStream fos = new FileOutputStream(getFile())) {
-            write(fos, routerMap.values());
+            write(fos, all());
         }
     }
 
     @SneakyThrows
     public File getFile() {
-        File parent = new File(path);
+        File parent = new File(getPath());
         if (!parent.exists()) {
             boolean mkdirs = parent.mkdirs();
         }
@@ -67,6 +65,17 @@ public abstract class LocalRouterRepository extends InMemoryRouterRepository {
             boolean newFile = file.createNewFile();
         }
         return file;
+    }
+
+    public String getPath() {
+        if (path == null) {
+            synchronized (this) {
+                if (path == null) {
+                    path = pathSupplier.get();
+                }
+            }
+        }
+        return path;
     }
 
     public abstract Collection<? extends Router> read(InputStream is);
