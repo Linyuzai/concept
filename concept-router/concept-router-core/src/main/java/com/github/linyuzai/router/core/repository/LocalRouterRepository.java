@@ -2,6 +2,7 @@ package com.github.linyuzai.router.core.repository;
 
 import com.github.linyuzai.router.core.concept.PathPatternRouter;
 import com.github.linyuzai.router.core.concept.Router;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -9,19 +10,13 @@ import java.io.*;
 import java.util.Collection;
 
 @Getter
+@AllArgsConstructor
 public abstract class LocalRouterRepository extends InMemoryRouterRepository {
 
     private final String path;
 
-    public LocalRouterRepository() {
-        this(new File(System.getProperty("user.home"), "concept/router").getAbsolutePath());
-    }
-
-    public LocalRouterRepository(String path) {
-        this.path = path;
-    }
-
     @SneakyThrows
+    @Override
     public void initialize() {
         try (FileInputStream fis = new FileInputStream(getFile())) {
             Collection<? extends Router> routers = read(fis);

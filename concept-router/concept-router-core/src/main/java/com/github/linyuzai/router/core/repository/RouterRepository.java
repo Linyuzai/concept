@@ -8,6 +8,14 @@ import java.util.List;
 
 public interface RouterRepository {
 
+    default void initialize(){
+
+    }
+
+    default void destroy() {
+
+    }
+
     default void add(Router... routers) {
         add(Arrays.asList(routers));
     }

@@ -19,12 +19,8 @@ public class JacksonLocalRouterRepository extends LocalRouterRepository {
 
     private final ObjectMapper objectMapper;
 
-    public JacksonLocalRouterRepository() {
-        this.objectMapper = config(new ObjectMapper());
-    }
-
-    public JacksonLocalRouterRepository(ObjectMapper objectMapper) {
-        this.objectMapper = config(objectMapper);
+    public JacksonLocalRouterRepository(String path) {
+        this(path, new ObjectMapper());
     }
 
     public JacksonLocalRouterRepository(String path, ObjectMapper objectMapper) {
