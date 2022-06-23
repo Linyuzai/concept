@@ -9,7 +9,7 @@ import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.core.event.RouterEventListener;
 import com.github.linyuzai.router.core.event.RouterEventPublisher;
 import com.github.linyuzai.router.core.locator.RouterLocator;
-import com.github.linyuzai.router.core.locator.ForceUnavailableServiceRouterLocator;
+import com.github.linyuzai.router.core.locator.DefaultServiceRouterLocator;
 import com.github.linyuzai.router.core.matcher.RouterMatcher;
 import com.github.linyuzai.router.core.repository.InMemoryRouterRepository;
 import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
@@ -22,7 +22,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,7 +82,7 @@ public class RouterAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RouterLocator routerLocator() {
-        return new ForceUnavailableServiceRouterLocator();
+        return new DefaultServiceRouterLocator();
     }
 
     @Bean

@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @ConditionalOnRouterEnabled
+@ConditionalOnClass(LoadBalancerClientFactory.class)
 @Configuration(proxyBeanMethods = false)
 public class RouterLoadbalancerAutoConfiguration {
 
     @Bean
-    @ConditionalOnClass(LoadBalancerClientFactory.class)
     public LoadBalancerClientFactoryEnhancer loadBalancerClientFactoryEnhancer(RouterConcept concept) {
         return new LoadBalancerClientFactoryEnhancer(concept);
     }

@@ -1,6 +1,7 @@
-package com.github.linyuzai.router.ribbon;
+package com.github.linyuzai.router.ribbon.v2;
 
 import com.github.linyuzai.router.core.concept.RouterConcept;
+import com.github.linyuzai.router.ribbon.RouterLoadBalancerClient;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.gateway.config.LoadBalancerProperties;
@@ -13,13 +14,13 @@ import java.util.Objects;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 
-public class RouterLoadBalancerClientFilter extends LoadBalancerClientFilter {
+public class RouterLoadBalancerClientFilterV2 extends LoadBalancerClientFilter {
 
     private final ApplicationContext context;
 
     private final RouterConcept concept;
 
-    public RouterLoadBalancerClientFilter(ApplicationContext context, RouterConcept concept) {
+    public RouterLoadBalancerClientFilterV2(ApplicationContext context, RouterConcept concept) {
         super(context.getBean(LoadBalancerClient.class), context.getBean(LoadBalancerProperties.class));
         this.context = context;
         this.concept = concept;
