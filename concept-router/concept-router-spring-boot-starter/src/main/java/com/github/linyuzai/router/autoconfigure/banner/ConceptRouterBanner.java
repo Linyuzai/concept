@@ -7,6 +7,10 @@ import java.io.InputStream;
 
 public class ConceptRouterBanner {
 
+    private static final String NAME = "Concept Router";
+
+    private static final String VERSION = "v0.5.0";
+
     @SneakyThrows
     public static void print() {
         ClassPathResource resource = new ClassPathResource("concept/router/banner.txt");
@@ -14,7 +18,7 @@ public class ConceptRouterBanner {
             byte[] bytes = new byte[is.available()];
             int read = is.read(bytes);
             String banner = new String(bytes);
-            System.out.println(build(banner, "Concept Router", "v0.5.0"));
+            System.out.println(build(banner, NAME, VERSION));
         }
     }
 
