@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.PathNameResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
-import java.io.File;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
@@ -30,7 +29,9 @@ public class JarPathNameResolver extends AbstractPluginResolver<List<JarEntry>, 
     public List<String> doResolve(List<JarEntry> entries, PluginContext context) {
         return entries.stream()
                 .map(ZipEntry::getName)
-                .map(it -> it.replaceAll(File.separator, "/"))
+                //测试之后win环境中读取也不会存在\\的分隔符
+                //如果有请提bug
+                //.map(it -> it.replaceAll("\\\\", "/"))
                 .filter(it -> !it.endsWith("/"))
                 .collect(Collectors.toList());
     }
