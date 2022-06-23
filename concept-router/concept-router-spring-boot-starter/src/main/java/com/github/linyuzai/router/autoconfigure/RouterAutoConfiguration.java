@@ -1,6 +1,7 @@
 package com.github.linyuzai.router.autoconfigure;
 
 import com.github.linyuzai.router.autoconfigure.annotation.ConditionalOnRouterEnabled;
+import com.github.linyuzai.router.autoconfigure.banner.ConceptRouterBanner;
 import com.github.linyuzai.router.autoconfigure.matcher.AntPathRequestRouterMatcher;
 import com.github.linyuzai.router.autoconfigure.event.ApplicationRouterEventPublisher;
 import com.github.linyuzai.router.autoconfigure.properties.RouterProperties;
@@ -103,6 +104,7 @@ public class RouterAutoConfiguration {
                                        RouterMatcher matcher,
                                        RouterLocator locator,
                                        RouterEventPublisher eventPublisher) {
+        ConceptRouterBanner.print();
         return new DefaultRouterConcept.Builder()
                 .repository(repository)
                 .matcher(matcher)
