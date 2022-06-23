@@ -23,13 +23,14 @@ public class ConceptRouterBanner {
     }
 
     public static String build(String banner, String name, String version) {
-        StringBuilder builder = new StringBuilder(banner);
+        StringBuilder builder = new StringBuilder("\n");
+        builder.append(banner);
         String tag = " :: " + name + " :: ";
         builder.append("\n").append(tag);
         int count = 70 - tag.length() - version.length();
         for (int i = 0; i < count; i++) {
             builder.append(" ");
         }
-        return builder.append(version).toString();
+        return builder.append(version).append("\n").toString();
     }
 }
