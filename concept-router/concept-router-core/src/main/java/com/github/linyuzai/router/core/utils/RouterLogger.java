@@ -24,21 +24,28 @@ public class RouterLogger implements RouterEventListener {
         if (event instanceof RouterMatchEvent) {
             Router.Source source = ((RouterMatchEvent) event).getSource();
             Router router = ((RouterMatchEvent) event).getRouter();
-            if (router == null) {
-                info(notMatch((RequestRouterSource) source));
-            } else {
-                if (source instanceof RequestRouterSource && router instanceof ServiceRequestRouter) {
-                    info(matched((RequestRouterSource) source, (ServiceRequestRouter) router));
+            if (source instanceof RequestRouterSource) {
+                if (router == null) {
+                    info(notMatch((RequestRouterSource) source));
+                } else {
+                    if (router instanceof ServiceRequestRouter) {
+                        info(matched((RequestRouterSource) source, (ServiceRequestRouter) router));
+                    }
                 }
             }
         } else if (event instanceof RouterLocateEvent) {
             Router.Location location = ((RouterLocateEvent) event).getLocation();
             Router router = ((RouterLocateEvent) event).getRouter();
-            if (location == null) {
-                info(notLocate((ServiceRequestRouter) router));
-            }
-            if (location instanceof ServiceRouterLocation && router instanceof ServiceRequestRouter) {
-                info(located((ServiceRouterLocation) location, (ServiceRequestRouter) router));
+            if (router instanceof ServiceRequestRouter) {
+                if (location == Router.Location.UNMATCHED) {
+                    info(notLocate((ServiceRequestRouter) router));
+                } else if (location == Router.Location.UNAVAILABLE) {
+                    info(notAvailable((ServiceRequestRouter) router));
+                } else {
+                    if (location instanceof ServiceRouterLocation) {
+                        info(located((ServiceRouterLocation) location, (ServiceRequestRouter) router));
+                    }
+                }
             }
         }
     }
@@ -55,10 +62,11 @@ public class RouterLogger implements RouterEventListener {
         return "No service located for router '" + getRouter(router) + "'";
     }
 
+    public String notAvailable(ServiceRequestRouter router) {
+        return "Service unavailable for router '" + getRouter(router) + "'";
+    }
+
     public String located(ServiceRouterLocation location, ServiceRequestRouter router) {
-        if (location.getHost() == null) {
-            return "Service unavailable for router '" + getRouter(router) + "'";
-        }
         return "Router '" + getRouter(router) + "' locate service '" + getLocation(location) + "'";
     }
 
