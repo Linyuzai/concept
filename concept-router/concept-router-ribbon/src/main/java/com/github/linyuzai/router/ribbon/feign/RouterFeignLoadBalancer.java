@@ -1,5 +1,6 @@
 package com.github.linyuzai.router.ribbon.feign;
 
+import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.netflix.client.ClientException;
 import com.netflix.client.RequestSpecificRetryHandler;
 import com.netflix.client.RetryHandler;
@@ -19,9 +20,12 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
 
     private final FeignLoadBalancer feignLoadBalancer;
 
-    public RouterFeignLoadBalancer(FeignLoadBalancer feignLoadBalancer) {
+    private final RouterConcept concept;
+
+    public RouterFeignLoadBalancer(FeignLoadBalancer feignLoadBalancer, RouterConcept concept) {
         super(null, new DefaultClientConfigImpl(), null);
         this.feignLoadBalancer = feignLoadBalancer;
+        this.concept = concept;
     }
 
     @Override
