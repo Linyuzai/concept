@@ -17,7 +17,8 @@ import com.github.linyuzai.router.core.repository.JacksonLocalRouterRepository;
 import com.github.linyuzai.router.core.repository.RouterRepository;
 import com.github.linyuzai.router.core.utils.RouterLogger;
 import lombok.AllArgsConstructor;
-import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@CommonsLog
 @ConditionalOnRouterEnabled
 @EnableConfigurationProperties(RouterProperties.class)
 @Configuration(proxyBeanMethods = false)
@@ -88,6 +88,7 @@ public class RouterAutoConfiguration {
 
     @Bean
     public RouterLogger routerLogger() {
+        Log log = LogFactory.getLog(RouterLogger.class);
         return new RouterLogger(log::info, log::error);
     }
 
