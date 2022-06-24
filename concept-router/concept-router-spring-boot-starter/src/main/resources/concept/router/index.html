@@ -27,6 +27,10 @@
             /*width: 16.6%;*/
         }
 
+        .el-form .el-select {
+            width: 100%;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -65,7 +69,15 @@
                                     </div>
                                     <i class="el-icon-warning-outline" v-cloak></i>
                                 </el-tooltip>
-                                <el-input v-model="dialog.router.form.serviceId"></el-input>
+                                <!--<el-input v-model="dialog.router.form.serviceId"></el-input>-->
+                                <el-select allow-create filterable
+                                           v-model="dialog.router.form.serviceId"
+                                           @visible-change="refreshServices">
+                                    <el-option :label="service"
+                                               :key="service"
+                                               :value="service"
+                                               v-for="service in services"></el-option>
+                                </el-select>
                             </el-form-item>
                             <el-form-item label="匹配路径" prop="pathPattern">
                                 <el-tooltip class="item" effect="dark" placement="right">
@@ -133,11 +145,22 @@
                                 </span>
                             </template>
                             <template slot-scope="scope">
-                                <el-input v-if="scope.row.serviceIdInEdit"
+                                <!--<el-input v-if="scope.row.serviceIdInEdit"
                                           v-model="scope.row.serviceId"
                                           @blur="onRouterBlur(scope.row)"
                                           v-focus>
-                                </el-input>
+                                </el-input>-->
+                                <el-select allow-create filterable
+                                           v-if="scope.row.serviceIdInEdit"
+                                           v-model="scope.row.serviceId"
+                                           @visible-change="refreshServices($event,scope.row)"
+                                           @change="onRouterBlur(scope.row)"
+                                           v-focus>
+                                    <el-option :label="service"
+                                               :key="service"
+                                               :value="service"
+                                               v-for="service in services"></el-option>
+                                </el-select>
                                 <span v-else>{{ scope.row.serviceId }}</span>
                             </template>
                         </el-table-column>
@@ -235,6 +258,7 @@
         el: "#concept-router-app",
         data: {
             prefix: '',
+            services: ['*'],
             routerList: [],
             routerSearch: '',
             dialog: {
@@ -289,6 +313,23 @@
                     p = p.substring(0, p.length - 1)
                 }
                 return p + path;
+            },
+            refreshServices(visible, row) {
+                if (visible) {
+                    this.$http.get(this.buildUrl('/concept-router/management/services'))
+                        .then((response) => {
+                            if (response.body.success) {
+                                this.services = response.body.object;
+                            } else {
+                                console.log(response);
+                            }
+                        });
+                } else {
+                    if (row !== undefined) {
+                        row.serviceIdInEdit = false;
+                        this.$forceUpdate();
+                    }
+                }
             },
             refreshRouters() {
                 this.$http.get(this.buildUrl('/concept-router/management/list'))
@@ -469,7 +510,11 @@
         directives: {
             focus: {
                 inserted: function (el) {
-                    el.childNodes[1].focus()
+                    if (el.childNodes[1].childNodes[1] === undefined) {
+                        el.childNodes[1].focus();
+                    } else {
+                        el.childNodes[1].childNodes[1].focus();
+                    }
                 }
             }
         },

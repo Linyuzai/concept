@@ -3,9 +3,12 @@ package com.github.linyuzai.router.autoconfigure.management;
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.core.exception.RouterException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +21,27 @@ public class RouterManagementController {
 
     @Autowired
     private RouterConvertor convertor;
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+    @GetMapping("/services")
+    public ResultVO services() {
+        try {
+            List<String> services = new ArrayList<>(discoveryClient.getServices());
+            services.add(0, "*");
+            return ResultVO.builder()
+                    .success(true)
+                    .object(services)
+                    .build();
+        } catch (Throwable e) {
+            return ResultVO.builder()
+                    .success(false)
+                    .message(e.getMessage())
+                    .object(Collections.emptyList())
+                    .build();
+        }
+    }
 
     @PostMapping("/add")
     public ResultVO add(@RequestBody RouterVO router) {
