@@ -27,7 +27,7 @@ public class RouterManagementAutoConfiguration {
     @ConditionalOnRouterManagementEnabled
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @Configuration(proxyBeanMethods = false)
-    public static class WebMvcRouterManagementAutoConfiguration implements WebMvcConfigurer {
+    public static class WebMvcConfiguration implements WebMvcConfigurer {
 
         @Override
         public void addResourceHandlers(org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
@@ -39,7 +39,7 @@ public class RouterManagementAutoConfiguration {
     @ConditionalOnRouterManagementEnabled
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
     @Configuration(proxyBeanMethods = false)
-    public static class WebFluxRouterManagementAutoConfiguration implements WebFluxConfigurer {
+    public static class WebFluxConfiguration implements WebFluxConfigurer {
 
         @Override
         public void addResourceHandlers(org.springframework.web.reactive.config.ResourceHandlerRegistry registry) {

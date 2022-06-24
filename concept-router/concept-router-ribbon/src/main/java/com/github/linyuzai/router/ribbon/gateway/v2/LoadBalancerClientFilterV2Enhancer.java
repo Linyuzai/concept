@@ -1,4 +1,4 @@
-package com.github.linyuzai.router.ribbon.v2;
+package com.github.linyuzai.router.ribbon.gateway.v2;
 
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import lombok.AllArgsConstructor;

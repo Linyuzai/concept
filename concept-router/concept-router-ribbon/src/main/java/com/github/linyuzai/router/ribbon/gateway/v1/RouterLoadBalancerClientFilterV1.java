@@ -1,4 +1,4 @@
-package com.github.linyuzai.router.ribbon.v1;
+package com.github.linyuzai.router.ribbon.gateway.v1;
 
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.ribbon.RouterLoadBalancerClient;
