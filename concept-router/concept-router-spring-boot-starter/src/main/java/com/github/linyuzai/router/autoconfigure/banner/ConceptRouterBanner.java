@@ -9,7 +9,7 @@ public class ConceptRouterBanner {
 
     private static final String NAME = "Concept Router";
 
-    private static final String VERSION = "v0.5.0";
+    private static final String VERSION = "v0.6.0";
 
     @SneakyThrows
     public static void print() {
