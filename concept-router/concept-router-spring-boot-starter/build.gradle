@@ -14,9 +14,9 @@ repositories {
 
 dependencies {
 
-    //compile 'com.github.linyuzai:concept-router-core:0.5.0'
-    //compile 'com.github.linyuzai:concept-router-loadbalancer:0.5.0'
-    //compile 'com.github.linyuzai:concept-router-ribbon:0.5.0'
+    //compile 'com.github.linyuzai:concept-router-core:0.6.0'
+    //compile 'com.github.linyuzai:concept-router-loadbalancer:0.6.0'
+    //compile 'com.github.linyuzai:concept-router-ribbon:0.6.0'
 
     compileOnly project(':concept-router:concept-router-core')
     compileOnly project(':concept-router:concept-router-loadbalancer')
