@@ -88,7 +88,9 @@
                                     </div>
                                     <i class="el-icon-warning-outline" v-cloak></i>
                                 </el-tooltip>
-                                <el-input v-model="dialog.router.form.pathPattern"></el-input>
+                                <el-input v-model="dialog.router.form.pathPattern"
+                                          name="pathPattern"
+                                          autocomplete></el-input>
                             </el-form-item>
                             <el-form-item label="服务地址" prop="serverAddress">
                                 <el-tooltip class="item" effect="dark" placement="right">
@@ -99,7 +101,9 @@
                                     </div>
                                     <i class="el-icon-warning-outline" v-cloak></i>
                                 </el-tooltip>
-                                <el-input v-model="dialog.router.form.serverAddress"></el-input>
+                                <el-input v-model="dialog.router.form.serverAddress"
+                                          name="serverAddress"
+                                          autocomplete></el-input>
                             </el-form-item>
                             <el-form-item label="强制路由" prop="forced">
                                 <el-switch v-model="dialog.router.form.forced"></el-switch>
@@ -181,6 +185,8 @@
                                 <el-input v-if="scope.row.pathPatternInEdit"
                                           v-model="scope.row.pathPattern"
                                           @blur="onRouterBlur(scope.row)"
+                                          name="pathPattern"
+                                          autocomplete
                                           v-focus>
                                 </el-input>
                                 <span v-else>{{ scope.row.pathPattern }}</span>
@@ -203,6 +209,8 @@
                                 <el-input v-if="scope.row.serverAddressInEdit"
                                           v-model="scope.row.serverAddress"
                                           @blur="onRouterBlur(scope.row)"
+                                          name="serverAddress"
+                                          autocomplete
                                           v-focus>
                                 </el-input>
                                 <span v-else>{{ scope.row.serverAddress }}</span>

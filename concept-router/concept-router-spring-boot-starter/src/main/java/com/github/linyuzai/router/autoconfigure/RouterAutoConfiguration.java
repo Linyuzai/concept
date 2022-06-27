@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -87,6 +88,7 @@ public class RouterAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "concept.router.logger.enabled", havingValue = "true", matchIfMissing = true)
     public RouterLogger routerLogger() {
         Log log = LogFactory.getLog(RouterLogger.class);
         return new RouterLogger(log::info, log::error);

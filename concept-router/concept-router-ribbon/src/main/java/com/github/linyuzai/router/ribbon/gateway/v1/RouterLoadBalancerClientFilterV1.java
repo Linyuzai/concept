@@ -1,6 +1,5 @@
 package com.github.linyuzai.router.ribbon.gateway.v1;
 
-import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.ribbon.RouterLoadBalancerClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,12 +28,9 @@ public class RouterLoadBalancerClientFilterV1 implements GlobalFilter, Ordered {
 
     private final ApplicationContext context;
 
-    private final RouterConcept concept;
-
-    public RouterLoadBalancerClientFilterV1(ApplicationContext context, RouterConcept concept) {
+    public RouterLoadBalancerClientFilterV1(ApplicationContext context) {
         this.loadBalancer = context.getBean(LoadBalancerClient.class);
         this.context = context;
-        this.concept = concept;
     }
 
     public int getOrder() {
@@ -70,14 +66,14 @@ public class RouterLoadBalancerClientFilterV1 implements GlobalFilter, Ordered {
     protected ServiceInstance choose(ServerWebExchange exchange) {
         URI uri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
         String serviceId = Objects.requireNonNull(uri).getHost();
-        return getRouterLoadBalancerClient().choose(serviceId, exchange);
+        return getRouterLoadBalancerClient().choose(serviceId, uri);
     }
 
     protected RouterLoadBalancerClient getRouterLoadBalancerClient() {
         if (loadBalancer instanceof RouterLoadBalancerClient) {
             return (RouterLoadBalancerClient) loadBalancer;
         }
-        return new RouterLoadBalancerClient(context, loadBalancer, concept);
+        return new RouterLoadBalancerClient(context, loadBalancer);
     }
 
     class DelegatingServiceInstance implements ServiceInstance {

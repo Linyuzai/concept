@@ -13,6 +13,8 @@ public class RouterProperties {
 
     private RepositoryProperties repository = new RepositoryProperties();
 
+    private LoggerProperties logger = new LoggerProperties();
+
     private ManagementProperties management = new ManagementProperties();
 
     @Data
@@ -32,6 +34,12 @@ public class RouterProperties {
 
             private String path = new File(System.getProperty("user.home"), "concept/router").getAbsolutePath();
         }
+    }
+
+    @Data
+    public static class LoggerProperties {
+
+        private boolean enabled = true;
     }
 
     @Data

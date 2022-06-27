@@ -2,9 +2,9 @@ package com.github.linyuzai.router.autoconfigure;
 
 import com.github.linyuzai.router.autoconfigure.annotation.ConditionalOnRouterEnabled;
 import com.github.linyuzai.router.core.concept.RouterConcept;
-import com.github.linyuzai.router.ribbon.feign.CachingSpringLoadBalancerFactoryEnhancer;
-import com.github.linyuzai.router.ribbon.gateway.v1.LoadBalancerClientFilterV1Enhancer;
-import com.github.linyuzai.router.ribbon.gateway.v2.LoadBalancerClientFilterV2Enhancer;
+import com.github.linyuzai.router.ribbon.feign.RibbonFeignEnhancer;
+import com.github.linyuzai.router.ribbon.gateway.v1.RibbonGatewayV1Enhancer;
+import com.github.linyuzai.router.ribbon.gateway.v2.RibbonGatewayV2Enhancer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.gateway.config.LoadBalancerProperties;
@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @ConditionalOnRouterEnabled
-@ConditionalOnClass(LoadBalancerClientFilter.class)
 @Configuration(proxyBeanMethods = false)
 public class RouterRibbonAutoConfiguration {
 
@@ -26,9 +25,9 @@ public class RouterRibbonAutoConfiguration {
     public static class GatewayV1Configuration {
 
         @Bean
-        public LoadBalancerClientFilterV1Enhancer loadBalancerClientFilterV1Enhancer(ApplicationContext context,
-                                                                                     RouterConcept concept) {
-            return new LoadBalancerClientFilterV1Enhancer(context, concept);
+        public RibbonGatewayV1Enhancer ribbonGatewayV1Enhancer(ApplicationContext context,
+                                                                          RouterConcept concept) {
+            return new RibbonGatewayV1Enhancer(context, concept);
         }
     }
 
@@ -38,9 +37,9 @@ public class RouterRibbonAutoConfiguration {
     public static class GatewayV2Configuration {
 
         @Bean
-        public LoadBalancerClientFilterV2Enhancer loadBalancerClientFilterV2Enhancer(ApplicationContext context,
-                                                                                     RouterConcept concept) {
-            return new LoadBalancerClientFilterV2Enhancer(context, concept);
+        public RibbonGatewayV2Enhancer ribbonGatewayV2Enhancer(ApplicationContext context,
+                                                                          RouterConcept concept) {
+            return new RibbonGatewayV2Enhancer(context, concept);
         }
     }
 
@@ -50,8 +49,8 @@ public class RouterRibbonAutoConfiguration {
     public static class FeignConfiguration {
 
         @Bean
-        public CachingSpringLoadBalancerFactoryEnhancer cachingSpringLoadBalancerFactoryEnhancer(RouterConcept concept) {
-            return new CachingSpringLoadBalancerFactoryEnhancer(concept);
+        public RibbonFeignEnhancer ribbonFeignEnhancer(RouterConcept concept) {
+            return new RibbonFeignEnhancer(concept);
         }
     }
 }

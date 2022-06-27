@@ -8,7 +8,7 @@ import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
-public class RibbonServiceRouterLocation implements ServiceRouterLocation {
+public class RibbonServerRouterLocation implements ServiceRouterLocation {
 
     @NonNull
     private String serviceId;
