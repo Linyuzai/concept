@@ -28,13 +28,21 @@
             font-weight: bold;
         }
 
-        .el-table-column {
-            /*width: 16.6%;*/
-        }
+        /*.el-table-column {
+            width: 16.6%;
+        }*/
 
         .el-form .el-select {
             width: 100%;
         }
+
+        /*.el-icon-arrow-up, .el-icon-arrow-down {
+            display: none;
+        }
+
+        .el-select .el-input__inner {
+            cursor: text;
+        }*/
 
         [v-cloak] {
             display: none;
@@ -196,14 +204,15 @@
                             <template slot-scope="scope">
                                 <!--<el-input v-if="scope.row.serviceIdInEdit"
                                           v-model="scope.row.serviceId"
-                                          @blur="onRouterBlur(scope.row)"
+                                          @blur="onRouterConfirm(scope.row)"
                                           v-focus>
                                 </el-input>-->
                                 <el-select allow-create filterable
                                            v-if="scope.row.serviceIdInEdit"
                                            v-model="scope.row.serviceId"
+                                           :value="selectServiceId"
                                            @visible-change="refreshServices($event,scope.row)"
-                                           @change="onRouterBlur(scope.row)"
+                                           @change="onRouterConfirm(scope.row)"
                                            v-focus>
                                     <el-option :label="service"
                                                :key="service"
@@ -227,13 +236,15 @@
                                 </span>
                             </template>
                             <template slot-scope="scope">
-                                <el-input v-if="scope.row.pathPatternInEdit"
-                                          v-model="scope.row.pathPattern"
-                                          @blur="onRouterBlur(scope.row)"
-                                          name="pathPattern"
-                                          autocomplete
-                                          v-focus>
-                                </el-input>
+                                <el-form v-if="scope.row.pathPatternInEdit"
+                                         @submit.native.prevent>
+                                    <el-input v-model="scope.row.pathPattern"
+                                              @blur="onRouterConfirm(scope.row)"
+                                              @keyup.enter.native="onRouterConfirm(scope.row)"
+                                              name="pathPattern"
+                                              autocomplete v-focus>
+                                    </el-input>
+                                </el-form>
                                 <span v-else>{{ scope.row.pathPattern }}</span>
                             </template>
                         </el-table-column>
@@ -251,13 +262,15 @@
                                 </span>
                             </template>
                             <template slot-scope="scope">
-                                <el-input v-if="scope.row.serverAddressInEdit"
-                                          v-model="scope.row.serverAddress"
-                                          @blur="onRouterBlur(scope.row)"
-                                          name="serverAddress"
-                                          autocomplete
-                                          v-focus>
-                                </el-input>
+                                <el-form v-if="scope.row.serverAddressInEdit"
+                                         @submit.native.prevent>
+                                    <el-input v-model="scope.row.serverAddress"
+                                              @blur="onRouterConfirm(scope.row)"
+                                              @keyup.enter.native="onRouterConfirm(scope.row)"
+                                              name="serverAddress"
+                                              autocomplete v-focus>
+                                    </el-input>
+                                </el-form>
                                 <span v-else>{{ scope.row.serverAddress }}</span>
                             </template>
                         </el-table-column>
@@ -545,7 +558,7 @@
                 }
                 this.$forceUpdate();
             },
-            onRouterBlur(row) {
+            onRouterConfirm(row) {
                 let update = row.serviceIdInEdit || row.pathPatternInEdit || row.serverAddressInEdit;
                 row.serviceIdInEdit = false;
                 row.pathPatternInEdit = false;
@@ -553,6 +566,33 @@
                 if (update) {
                     let old = this.dialog.router.row;
                     if (row.id === old.id) {
+                        if (row.serviceId === '') {
+                            row.serviceId = old.serviceId;
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: '匹配服务不能为空',
+                                position: 'bottom-right'
+                            });
+                            return;
+                        }
+                        if (row.pathPattern === '') {
+                            row.pathPattern = old.pathPattern;
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: '匹配路径不能为空',
+                                position: 'bottom-right'
+                            });
+                            return;
+                        }
+                        if (row.serverAddress === '') {
+                            row.serverAddress = old.serverAddress;
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: '服务地址不能为空',
+                                position: 'bottom-right'
+                            });
+                            return;
+                        }
                         if (row.serviceId !== old.serviceId ||
                             row.pathPattern !== old.pathPattern ||
                             row.serverAddress !== old.serverAddress) {
