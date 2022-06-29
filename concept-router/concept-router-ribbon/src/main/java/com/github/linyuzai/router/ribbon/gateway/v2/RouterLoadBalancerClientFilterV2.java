@@ -1,10 +1,10 @@
 package com.github.linyuzai.router.ribbon.gateway.v2;
 
-import com.github.linyuzai.router.ribbon.RouterLoadBalancerClient;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.gateway.config.LoadBalancerProperties;
 import org.springframework.cloud.gateway.filter.LoadBalancerClientFilter;
+import org.springframework.cloud.netflix.ribbon.RibbonLoadBalancerClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -13,26 +13,26 @@ import java.util.Objects;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 
+/**
+ * 重写网关拦截器
+ */
 public class RouterLoadBalancerClientFilterV2 extends LoadBalancerClientFilter {
-
-    private final ApplicationContext context;
 
     public RouterLoadBalancerClientFilterV2(ApplicationContext context) {
         super(context.getBean(LoadBalancerClient.class), context.getBean(LoadBalancerProperties.class));
-        this.context = context;
     }
 
+    /**
+     * 调用 {@link RibbonLoadBalancerClient#choose(String, Object)} 方法
+     */
     @Override
     protected ServiceInstance choose(ServerWebExchange exchange) {
         URI uri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
         String serviceId = Objects.requireNonNull(uri).getHost();
-        return getRouterLoadBalancerClient().choose(serviceId, uri);
-    }
-
-    protected RouterLoadBalancerClient getRouterLoadBalancerClient() {
-        if (loadBalancer instanceof RouterLoadBalancerClient) {
-            return (RouterLoadBalancerClient) loadBalancer;
+        if (loadBalancer instanceof RibbonLoadBalancerClient) {
+            return ((RibbonLoadBalancerClient) loadBalancer).choose(serviceId, uri);
+        } else {
+            return loadBalancer.choose(serviceId);
         }
-        return new RouterLoadBalancerClient(context, loadBalancer);
     }
 }

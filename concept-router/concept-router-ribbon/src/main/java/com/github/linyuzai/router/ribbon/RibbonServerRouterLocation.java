@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
+/**
+ * 基于 {@link Server} 的路由位置
+ */
 @Getter
 @AllArgsConstructor
 public class RibbonServerRouterLocation implements ServiceRouterLocation {

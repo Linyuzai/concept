@@ -7,6 +7,9 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Collection;
 
+/**
+ * 基于 Spring 事件的路由事件发布器扩展
+ */
 @Getter
 public class ApplicationRouterEventPublisher extends DefaultRouterEventPublisher {
 

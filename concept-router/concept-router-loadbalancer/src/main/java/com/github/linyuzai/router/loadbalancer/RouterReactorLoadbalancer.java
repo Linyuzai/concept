@@ -13,6 +13,9 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 集成 {@link RouterConcept} 来路由服务的 {@link ReactorLoadBalancer<ServiceInstance>}
+ */
 public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBalancer {
 
     private final String serviceId;
@@ -45,6 +48,7 @@ public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBala
                 .next()
                 .map(it -> getInstanceResponse(request, it))
                 .flatMap(it -> {
+                    //如果未匹配到就用原来的负载均衡器选择服务
                     if (it == NOT_MATCH) {
                         return Mono.from(loadBalancer.choose(request));
                     } else {
@@ -53,6 +57,13 @@ public class RouterReactorLoadbalancer implements ReactorServiceInstanceLoadBala
                 });
     }
 
+    /**
+     * 通过 {@link RouterConcept} 来匹配服务
+     *
+     * @param request   请求
+     * @param instances 服务
+     * @return 匹配到的服务
+     */
     private Response<ServiceInstance> getInstanceResponse(Request<RequestDataContext> request, List<ServiceInstance> instances) {
         List<LoadbalancerServiceRouterLocation> locations = instances.stream()
                 .map(LoadbalancerServiceRouterLocation::new)

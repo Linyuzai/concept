@@ -9,6 +9,9 @@ import org.springframework.cloud.netflix.ribbon.SpringClientFactory;
 import org.springframework.cloud.openfeign.ribbon.CachingSpringLoadBalancerFactory;
 import org.springframework.lang.NonNull;
 
+/**
+ * 增强 {@link CachingSpringLoadBalancerFactory} 和 {@link SpringClientFactory}
+ */
 @AllArgsConstructor
 public class RibbonFeignEnhancer implements BeanPostProcessor {
 

@@ -10,6 +10,9 @@ import org.springframework.cloud.netflix.ribbon.SpringClientFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 
+/**
+ * 增强网关拦截器和 {@link SpringClientFactory}
+ */
 @AllArgsConstructor
 public class RibbonGatewayV2Enhancer implements BeanPostProcessor {
 

@@ -1,6 +1,5 @@
-package com.github.linyuzai.router.ribbon;
+package com.github.linyuzai.router.ribbon.gateway;
 
-import com.github.linyuzai.router.core.concept.RouterConcept;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerRequest;
@@ -10,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 import java.net.URI;
 
+@Deprecated
 public class RouterLoadBalancerClient extends RibbonLoadBalancerClient {
 
     private final LoadBalancerClient client;

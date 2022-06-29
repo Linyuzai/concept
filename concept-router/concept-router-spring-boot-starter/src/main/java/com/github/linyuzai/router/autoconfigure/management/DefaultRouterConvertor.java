@@ -6,6 +6,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
+/**
+ * 视图转换器实现类
+ */
 public class DefaultRouterConvertor implements RouterConvertor {
 
     @Override

@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Router Management Controller
+ */
 @RestController
 @RequestMapping("/concept-router/management")
 public class RouterManagementController {
@@ -25,6 +28,11 @@ public class RouterManagementController {
     @Autowired
     private DiscoveryClient discoveryClient;
 
+    /**
+     * 获得所有服务
+     *
+     * @return 所有服务
+     */
     @GetMapping("/services")
     public ResultVO services() {
         try {
@@ -43,6 +51,12 @@ public class RouterManagementController {
         }
     }
 
+    /**
+     * 添加路由
+     *
+     * @param router 路由
+     * @return 添加结果
+     */
     @PostMapping("/add")
     public ResultVO add(@RequestBody RouterVO router) {
         try {
@@ -59,6 +73,12 @@ public class RouterManagementController {
         }
     }
 
+    /**
+     * 修改路由
+     *
+     * @param router 路由
+     * @return 修改结果
+     */
     @PutMapping("/update")
     public ResultVO update(@RequestBody RouterVO router) {
         try {
@@ -77,6 +97,12 @@ public class RouterManagementController {
         }
     }
 
+    /**
+     * 删除路由
+     *
+     * @param id 路由ID
+     * @return 删除结果
+     */
     @DeleteMapping("/delete")
     public ResultVO delete(@RequestParam String id) {
         try {
@@ -92,6 +118,11 @@ public class RouterManagementController {
         }
     }
 
+    /**
+     * 获得路由列表
+     *
+     * @return 路由列表
+     */
     @GetMapping("/list")
     public ResultVO list() {
         try {

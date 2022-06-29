@@ -7,6 +7,9 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.lang.NonNull;
 
+/**
+ * 增强 {@link LoadBalancerClientFactory}
+ */
 @AllArgsConstructor
 public class LoadBalancerEnhancer implements BeanPostProcessor {
 

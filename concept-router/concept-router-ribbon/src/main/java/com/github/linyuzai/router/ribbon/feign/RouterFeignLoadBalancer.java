@@ -19,6 +19,9 @@ import org.springframework.cloud.openfeign.ribbon.FeignLoadBalancer;
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * {@link FeignLoadBalancer} 的路由扩展
+ */
 public class RouterFeignLoadBalancer extends FeignLoadBalancer {
 
     private final FeignLoadBalancer feignLoadBalancer;
@@ -28,6 +31,9 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
         this.feignLoadBalancer = feignLoadBalancer;
     }
 
+    /**
+     * 在这里将 {@link URI} 传入
+     */
     @Override
     protected void customizeLoadBalancerCommandBuilder(RibbonRequest request, IClientConfig config, LoadBalancerCommand.Builder<RibbonResponse> builder) {
         builder.withServerLocator(request.getLoadBalancerKey());
@@ -55,7 +61,7 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
 
     @Override
     public RibbonResponse executeWithLoadBalancer(RibbonRequest request) throws ClientException {
-        return feignLoadBalancer.executeWithLoadBalancer(new RouterRibbonRequest(request));
+        return super.executeWithLoadBalancer(new RouterRibbonRequest(request));
     }
 
     @Override
@@ -125,6 +131,9 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
         return feignLoadBalancer.handleSameServerRetry(server, currentRetryCount, maxRetries, e);
     }
 
+    /**
+     * 将 {@link URI} 作为 key 的 {@link RibbonRequest}
+     */
     public static class RouterRibbonRequest extends RibbonRequest {
 
         public RouterRibbonRequest(RibbonRequest request) {

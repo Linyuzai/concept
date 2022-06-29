@@ -9,6 +9,9 @@ import org.springframework.cloud.client.loadbalancer.RequestDataContext;
 
 import java.net.URI;
 
+/**
+ * 基于 {@link Request<RequestDataContext>} 的路由来源
+ */
 @Getter
 @AllArgsConstructor
 public class LoadbalancerRequestRouterSource implements RequestRouterSource {

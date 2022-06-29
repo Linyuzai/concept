@@ -5,6 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.File;
 
+/**
+ * 路由配置
+ */
 @Data
 @ConfigurationProperties(prefix = "concept.router")
 public class RouterProperties {
@@ -14,6 +17,8 @@ public class RouterProperties {
     private RepositoryProperties repository = new RepositoryProperties();
 
     private LoggerProperties logger = new LoggerProperties();
+
+    private BannerProperties banner = new BannerProperties();
 
     private ManagementProperties management = new ManagementProperties();
 
@@ -38,6 +43,12 @@ public class RouterProperties {
 
     @Data
     public static class LoggerProperties {
+
+        private boolean enabled = true;
+    }
+
+    @Data
+    public static class BannerProperties {
 
         private boolean enabled = true;
     }

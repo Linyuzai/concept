@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.cloud.client.ServiceInstance;
 
+/**
+ * 基于 {@link ServiceInstance} 的路由位置
+ */
 @Getter
 @AllArgsConstructor
 public class LoadbalancerServiceRouterLocation implements ServiceRouterLocation {

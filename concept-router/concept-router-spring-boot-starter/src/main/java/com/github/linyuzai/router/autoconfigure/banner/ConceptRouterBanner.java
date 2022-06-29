@@ -5,6 +5,9 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
 
+/**
+ * Banner 输出相关
+ */
 public class ConceptRouterBanner {
 
     private static final String NAME = "Concept Router";

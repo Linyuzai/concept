@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * {@link SpringClientFactory} 的路由扩展
+ */
 @AllArgsConstructor
 public class RouterSpringClientFactory extends SpringClientFactory {
 
@@ -34,6 +37,12 @@ public class RouterSpringClientFactory extends SpringClientFactory {
         return factory.getClient(name, clientClass);
     }
 
+    /**
+     * 将 {@link ILoadBalancer} 包装成 {@link RouterILoadBalancer}
+     *
+     * @param name serviceId
+     * @return {@link RouterILoadBalancer}
+     */
     @Override
     public ILoadBalancer getLoadBalancer(String name) {
         return new RouterILoadBalancer(name, factory.getLoadBalancer(name), concept);
@@ -99,6 +108,9 @@ public class RouterSpringClientFactory extends SpringClientFactory {
         return factory.getInstances(name, type);
     }
 
+    /**
+     * 基于 {@link RouterConcept} 的 {@link ILoadBalancer}
+     */
     @AllArgsConstructor
     public static class RouterILoadBalancer implements ILoadBalancer {
 
@@ -113,6 +125,12 @@ public class RouterSpringClientFactory extends SpringClientFactory {
             loadBalancer.addServers(newServers);
         }
 
+        /**
+         * 通过 {@link RouterConcept} 来匹配服务
+         *
+         * @param key {@link URI}
+         * @return 匹配到的服务
+         */
         @Override
         public Server chooseServer(Object key) {
             if (key instanceof URI) {

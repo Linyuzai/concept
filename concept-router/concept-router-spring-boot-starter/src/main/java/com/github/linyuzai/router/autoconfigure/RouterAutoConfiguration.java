@@ -106,8 +106,11 @@ public class RouterAutoConfiguration {
     public RouterConcept routerConcept(RouterRepository repository,
                                        RouterMatcher matcher,
                                        RouterLocator locator,
-                                       RouterEventPublisher eventPublisher) {
-        ConceptRouterBanner.print();
+                                       RouterEventPublisher eventPublisher,
+                                       RouterProperties properties) {
+        if (properties.getBanner().isEnabled()) {
+            ConceptRouterBanner.print();
+        }
         return new DefaultRouterConcept.Builder()
                 .repository(repository)
                 .matcher(matcher)
