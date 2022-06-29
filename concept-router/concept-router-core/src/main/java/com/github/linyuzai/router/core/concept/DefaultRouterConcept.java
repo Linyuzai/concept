@@ -57,6 +57,11 @@ public class DefaultRouterConcept implements RouterConcept {
         Router.Location location = locator.locate(router, locations);
         //发布路由定位事件，位置可能为不可用
         publish(new RouterLocateEvent(location, router));
+        //如果为null则返回不可用
+        //如果自定义定位器返回null则会导致异常
+        if (location == null) {
+            return Router.Location.UNAVAILABLE;
+        }
         return location;
     }
 
