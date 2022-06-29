@@ -16,45 +16,45 @@ public abstract class ServiceRequestRouterMatcher extends AbstractRouterMatcher<
 
     @Override
     public Router doMatch(RequestRouterSource request, Collection<? extends ServiceRequestRouter> routers) {
-        String serviceId = request.getServiceId();
-        String path = request.getUri().getPath();
-        Map<String, ServiceRequestRouter> map = routers.stream()
-                .filter(it -> matchServiceId(serviceId, it))
-                .collect(Collectors.toMap(ServiceRequestRouter::getPathPattern, Function.identity()));
         //如果路径直接匹配上了就直接返回
-        ServiceRequestRouter router = map.get(path);
-        if (router != null && router.isEnabled()) {
-            return router;
+        Map<String, ServiceRequestRouter> map = routers.stream()
+                .filter(it -> matchServiceId(request, it))
+                .collect(Collectors.toMap(ServiceRequestRouter::getPathPattern, Function.identity()));
+        String path = request.getUri().getPath();
+        ServiceRequestRouter matched = map.get(path);
+        if (matched != null && matched.isEnabled()) {
+            return matched;
         }
+
         //通过路径匹配模式来匹配
-        for (ServiceRequestRouter srr : map.values()) {
-            String pathPattern = srr.getPathPattern();
+        for (ServiceRequestRouter router : routers) {
+            String pathPattern = router.getPathPattern();
             //路由启用并且能匹配上
-            if (srr.isEnabled() && matchPattern(path, pathPattern)) {
-                if (router == null) {
-                    router = srr;
+            if (router.isEnabled() && matchPattern(path, pathPattern)) {
+                if (matched == null) {
+                    matched = router;
                 } else {
                     //如果之前有匹配上的路由
                     //将两个路由匹配模式进行比较，使用更精确的路由
-                    if (comparePattern(path, srr.getPathPattern(), router.getPathPattern())) {
-                        router = srr;
+                    if (comparePattern(path, router.getPathPattern(), matched.getPathPattern())) {
+                        matched = router;
                     }
                 }
             }
         }
-        return router;
+        return matched;
     }
 
     /**
      * 等于 '*' 或是全等（忽略大小写）
      *
-     * @param serviceId serviceId
-     * @param router    路由
+     * @param request 请求
+     * @param router  路由
      * @return 服务是否匹配
      */
-    public boolean matchServiceId(String serviceId, ServiceRequestRouter router) {
+    public boolean matchServiceId(RequestRouterSource request, ServiceRequestRouter router) {
         return "*".equals(router.getServiceId()) ||
-                serviceId.equalsIgnoreCase(router.getServiceId());
+                request.getServiceId().equalsIgnoreCase(router.getServiceId());
     }
 
     /**
