@@ -24,8 +24,8 @@ dependencies {
 
     compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
     compileOnly "org.springframework.cloud:spring-cloud-loadbalancer:${springCloudVersion}"
-    compileOnly 'org.springframework.cloud:spring-cloud-starter-gateway:2.2.5.RELEASE'
-    compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.5.RELEASE'
+    //compileOnly 'org.springframework.cloud:spring-cloud-starter-gateway:2.2.5.RELEASE'
+    //compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.5.RELEASE'
     compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
     //compileOnly "org.springframework:spring-web:${springWebVersion}"
     compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"

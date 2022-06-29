@@ -99,17 +99,12 @@
         <el-main style="height: 100%;padding: 15px 0">
             <el-container style="height: 100%;border-top: 1px solid #eee;">
                 <el-header style="text-align: left; font-size: 12px;padding-top: 20px;">
-                    <el-input placeholder="前缀配置"
-                              style="width: 300px;"
-                              v-model="prefix">
-                    </el-input>
+                    <el-input placeholder="搜索匹配路径" v-model="routerSearch" style="width: 200px"></el-input>
                     <el-button-group style="float: right;margin-left: 20px">
                         <el-button @click="openRouterDialog()" icon="el-icon-plus"></el-button>
                         <el-button @click="refreshRouters()" icon="el-icon-refresh"></el-button>
                         <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
                     </el-button-group>
-                    <el-input placeholder="搜索匹配路径" style="width: 200px;float: right"
-                              v-model="routerSearch"></el-input>
                     <el-dialog :title="dialog.router.title"
                                :visible.sync="dialog.router.visible">
                         <el-form :model="dialog.router.form" :rules="dialog.router.rules"

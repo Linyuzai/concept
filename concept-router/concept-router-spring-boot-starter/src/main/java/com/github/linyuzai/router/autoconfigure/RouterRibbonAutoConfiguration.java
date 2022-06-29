@@ -7,9 +7,6 @@ import com.github.linyuzai.router.ribbon.gateway.v1.RibbonGatewayV1Enhancer;
 import com.github.linyuzai.router.ribbon.gateway.v2.RibbonGatewayV2Enhancer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.cloud.gateway.config.LoadBalancerProperties;
-import org.springframework.cloud.gateway.filter.LoadBalancerClientFilter;
-import org.springframework.cloud.openfeign.ribbon.CachingSpringLoadBalancerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class RouterRibbonAutoConfiguration {
 
     @ConditionalOnRouterEnabled
-    @ConditionalOnClass(LoadBalancerClientFilter.class)
+    @ConditionalOnClass(name = "org.springframework.cloud.gateway.filter.LoadBalancerClientFilter")
     @ConditionalOnMissingClass("org.springframework.cloud.gateway.config.LoadBalancerProperties")
     @Configuration(proxyBeanMethods = false)
     public static class GatewayV1Configuration {
@@ -32,7 +29,9 @@ public class RouterRibbonAutoConfiguration {
     }
 
     @ConditionalOnRouterEnabled
-    @ConditionalOnClass({LoadBalancerClientFilter.class, LoadBalancerProperties.class})
+    @ConditionalOnClass(name = {
+            "org.springframework.cloud.gateway.filter.LoadBalancerClientFilter",
+            "org.springframework.cloud.gateway.config.LoadBalancerProperties"})
     @Configuration(proxyBeanMethods = false)
     public static class GatewayV2Configuration {
 
@@ -44,7 +43,7 @@ public class RouterRibbonAutoConfiguration {
     }
 
     @ConditionalOnRouterEnabled
-    @ConditionalOnClass(CachingSpringLoadBalancerFactory.class)
+    @ConditionalOnClass(name = "org.springframework.cloud.openfeign.ribbon.CachingSpringLoadBalancerFactory")
     @Configuration(proxyBeanMethods = false)
     public static class FeignConfiguration {
 
