@@ -15,6 +15,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Supplier;
 
+/**
+ * 基于 Jackson 的 json 文件路由仓库
+ */
 @Getter
 public class JacksonLocalRouterRepository extends LocalRouterRepository {
 
@@ -37,6 +40,7 @@ public class JacksonLocalRouterRepository extends LocalRouterRepository {
     @SneakyThrows
     @Override
     public Collection<? extends Router> read(InputStream is) {
+        //初始化没有数据时直接返回空列表
         if (is.available() == 0) {
             return Collections.emptyList();
         }

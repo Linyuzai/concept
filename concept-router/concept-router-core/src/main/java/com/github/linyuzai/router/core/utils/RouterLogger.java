@@ -12,6 +12,9 @@ import lombok.AllArgsConstructor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * 路由日志
+ */
 @AllArgsConstructor
 public class RouterLogger implements RouterEventListener {
 
@@ -19,6 +22,11 @@ public class RouterLogger implements RouterEventListener {
 
     private BiConsumer<String, Throwable> error;
 
+    /**
+     * 在路由匹配和定位时打印日志
+     *
+     * @param event 路由事件
+     */
     @Override
     public void onEvent(Object event) {
         if (event instanceof RouterMatchEvent) {

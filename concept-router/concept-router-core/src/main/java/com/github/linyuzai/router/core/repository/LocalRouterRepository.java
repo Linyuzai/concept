@@ -9,12 +9,23 @@ import java.io.*;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+/**
+ * 基于本地文件的路由仓库
+ */
 @Getter
 @RequiredArgsConstructor
 public abstract class LocalRouterRepository extends InMemoryRouterRepository {
 
+    /**
+     * 文件目录
+     */
     private volatile String path;
 
+    /**
+     * 文件目录提供者，懒加载并且缓存到 path
+     * <p>
+     * 懒加载是由于当端口配置在配置中心上时，晚一点才能拿到端口
+     */
     private final Supplier<String> pathSupplier;
 
     @SneakyThrows
@@ -47,6 +58,9 @@ public abstract class LocalRouterRepository extends InMemoryRouterRepository {
         overwrite();
     }
 
+    /**
+     * 覆盖文件
+     */
     @SneakyThrows
     protected void overwrite() {
         try (FileOutputStream fos = new FileOutputStream(getFile())) {

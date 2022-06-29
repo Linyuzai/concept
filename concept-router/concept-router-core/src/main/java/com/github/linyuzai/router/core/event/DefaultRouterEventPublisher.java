@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * 路由事件发布器的默认实现
+ */
 @NoArgsConstructor
 public class DefaultRouterEventPublisher implements RouterEventPublisher {
 

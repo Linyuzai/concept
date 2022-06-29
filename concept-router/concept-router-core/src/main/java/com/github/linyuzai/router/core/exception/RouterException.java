@@ -1,5 +1,8 @@
 package com.github.linyuzai.router.core.exception;
 
+/**
+ * 路由异常
+ */
 public class RouterException extends RuntimeException {
 
     public RouterException(String message) {
