@@ -1,5 +1,6 @@
 package com.github.linyuzai.router.autoconfigure.banner;
 
+import com.github.linyuzai.router.autoconfigure.version.RouterVersion;
 import lombok.SneakyThrows;
 import org.springframework.core.io.ClassPathResource;
 
@@ -12,8 +13,6 @@ public class ConceptRouterBanner {
 
     private static final String NAME = "Concept Router";
 
-    private static final String VERSION = "v0.7.0";
-
     @SneakyThrows
     public static void print() {
         ClassPathResource resource = new ClassPathResource("concept/router/banner.txt");
@@ -21,7 +20,7 @@ public class ConceptRouterBanner {
             byte[] bytes = new byte[is.available()];
             int read = is.read(bytes);
             String banner = new String(bytes);
-            System.out.println(build(banner, NAME, VERSION));
+            System.out.println(build(banner, NAME, RouterVersion.NAME));
         }
     }
 

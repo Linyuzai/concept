@@ -86,7 +86,7 @@
                     CONCEPT ROUTER
                 </span>
                 <span style="color: #909399;font-weight: lighter;font-size:14px">
-                    v0.7.0
+                    {{version}}
                 </span>
             </h1>
             <a href="https://github.com/Linyuzai/concept" target="_blank" class="github-corner"
@@ -325,6 +325,7 @@
         el: "#concept-router-app",
         data: {
             prefix: '',
+            version: '',
             services: ['*'],
             routerList: [],
             routerSearch: '',
@@ -380,6 +381,16 @@
                     p = p.substring(0, p.length - 1)
                 }
                 return p + path;
+            },
+            getVersion() {
+                this.$http.get(this.buildUrl('/concept-router/management/version'))
+                    .then((response) => {
+                        if (response.body.success) {
+                            this.version = response.body.object;
+                        } else {
+                            console.log(response);
+                        }
+                    });
             },
             refreshServices(visible, row) {
                 if (visible) {
@@ -617,6 +628,7 @@
         },
         computed: {},
         mounted: function () {
+            this.getVersion();
             this.refreshRouters();
         }
     });

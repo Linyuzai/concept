@@ -1,5 +1,6 @@
 package com.github.linyuzai.router.autoconfigure.management;
 
+import com.github.linyuzai.router.autoconfigure.version.RouterVersion;
 import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.core.exception.RouterException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,19 @@ public class RouterManagementController {
 
     @Autowired
     private DiscoveryClient discoveryClient;
+
+    /**
+     * 获得版本
+     *
+     * @return 版本
+     */
+    @GetMapping("/version")
+    public ResultVO version() {
+        return ResultVO.builder()
+                .success(true)
+                .object(RouterVersion.NAME)
+                .build();
+    }
 
     /**
      * 获得所有服务
