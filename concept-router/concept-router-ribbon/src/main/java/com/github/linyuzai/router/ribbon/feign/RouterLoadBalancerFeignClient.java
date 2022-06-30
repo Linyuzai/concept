@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.router.ribbon.feign;
 
 import com.github.linyuzai.router.core.utils.Reflector;
@@ -133,3 +134,4 @@ public class RouterLoadBalancerFeignClient extends LoadBalancerFeignClient {
 
     }
 }
+*/

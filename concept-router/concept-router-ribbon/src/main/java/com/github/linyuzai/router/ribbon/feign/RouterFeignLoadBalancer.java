@@ -12,8 +12,6 @@ import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerStats;
 import com.netflix.loadbalancer.reactive.LoadBalancerCommand;
 import com.netflix.servo.monitor.Timer;
-import feign.Client;
-import feign.Request;
 import org.springframework.cloud.openfeign.ribbon.FeignLoadBalancer;
 
 import java.io.IOException;
@@ -36,7 +34,7 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
      */
     @Override
     protected void customizeLoadBalancerCommandBuilder(RibbonRequest request, IClientConfig config, LoadBalancerCommand.Builder<RibbonResponse> builder) {
-        builder.withServerLocator(request.getLoadBalancerKey());
+        builder.withServerLocator(request.getUri());
     }
 
     @Override
@@ -46,12 +44,12 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
 
     @Override
     public RibbonResponse execute(RibbonRequest request, IClientConfig configOverride) throws IOException {
-        return feignLoadBalancer.execute(new RouterRibbonRequest(request), configOverride);
+        return feignLoadBalancer.execute(request, configOverride);
     }
 
     @Override
     public RequestSpecificRetryHandler getRequestSpecificRetryHandler(RibbonRequest request, IClientConfig requestConfig) {
-        return feignLoadBalancer.getRequestSpecificRetryHandler(new RouterRibbonRequest(request), requestConfig);
+        return feignLoadBalancer.getRequestSpecificRetryHandler(request, requestConfig);
     }
 
     @Override
@@ -61,12 +59,12 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
 
     @Override
     public RibbonResponse executeWithLoadBalancer(RibbonRequest request) throws ClientException {
-        return super.executeWithLoadBalancer(new RouterRibbonRequest(request));
+        return super.executeWithLoadBalancer(request);
     }
 
     @Override
     public RibbonResponse executeWithLoadBalancer(RibbonRequest request, IClientConfig requestConfig) throws ClientException {
-        return super.executeWithLoadBalancer(new RouterRibbonRequest(request), requestConfig);
+        return super.executeWithLoadBalancer(request, requestConfig);
     }
 
     @Override
@@ -134,9 +132,10 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
     /**
      * 将 {@link URI} 作为 key 的 {@link RibbonRequest}
      */
-    public static class RouterRibbonRequest extends RibbonRequest {
+    /*public static class RouterRibbonRequest extends RibbonRequest {
 
         public RouterRibbonRequest(RibbonRequest request) {
+            //低版本没有提供这两个方法
             this(request.getClient(), request.getRequest(), request.getUri());
         }
 
@@ -144,7 +143,7 @@ public class RouterFeignLoadBalancer extends FeignLoadBalancer {
             super(client, request, uri);
             setLoadBalancerKey(uri);
         }
-    }
+    }*/
 
     @SuppressWarnings("unchecked")
     public static class RouterIClientConfig extends DefaultClientConfigImpl {

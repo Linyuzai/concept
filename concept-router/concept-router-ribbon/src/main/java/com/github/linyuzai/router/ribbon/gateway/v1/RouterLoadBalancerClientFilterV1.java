@@ -31,8 +31,11 @@ public class RouterLoadBalancerClientFilterV1 implements GlobalFilter, Ordered {
     public static final int LOAD_BALANCER_CLIENT_FILTER_ORDER = 10100;
     private final LoadBalancerClient loadBalancer;
 
+    private final ApplicationContext context;
+
     public RouterLoadBalancerClientFilterV1(ApplicationContext context) {
         this.loadBalancer = context.getBean(LoadBalancerClient.class);
+        this.context = context;
     }
 
     public int getOrder() {
@@ -74,7 +77,7 @@ public class RouterLoadBalancerClientFilterV1 implements GlobalFilter, Ordered {
         URI uri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
         String serviceId = Objects.requireNonNull(uri).getHost();
         if (loadBalancer instanceof RibbonLoadBalancerClient) {
-            return ((RibbonLoadBalancerClient) loadBalancer).choose(serviceId, uri);
+            return new RouterLoadBalancerClient(context, uri).choose(serviceId);
         } else {
             return loadBalancer.choose(serviceId);
         }
