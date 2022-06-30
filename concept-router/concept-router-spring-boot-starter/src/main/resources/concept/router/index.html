@@ -80,9 +80,15 @@
 <div id="concept-router-app">
     <el-container style="height: 100vh">
         <el-header style="height: 80px">
-            <h1 style="color: #333333;margin-top: 15px;font-weight: normal;font-size:50px;font-family: Paralines-Regular"
+            <h1 style="margin-top: 15px;"
                 v-cloak>
-                CONCEPT ROUTER</h1>
+                <span style="color: #333333;font-weight: normal;font-size:50px;font-family: Paralines-Regular">
+                    CONCEPT ROUTER
+                </span>
+                <span style="color: #909399;font-weight: lighter;font-size:14px">
+                    v0.7.0
+                </span>
+            </h1>
             <a href="https://github.com/Linyuzai/concept" target="_blank" class="github-corner"
                aria-label="View source on GitHub">
                 <svg width="85" height="85" viewBox="0 0 250 250"
@@ -99,7 +105,7 @@
         <el-main style="height: 100%;padding: 15px 0">
             <el-container style="height: 100%;border-top: 1px solid #eee;">
                 <el-header style="text-align: left; font-size: 12px;padding-top: 20px;">
-                    <el-input placeholder="搜索匹配路径" v-model="routerSearch" style="width: 200px"></el-input>
+                    <el-input placeholder="搜索匹配路径" v-model="routerSearch" style="width: 300px"></el-input>
                     <el-button-group style="float: right;margin-left: 20px">
                         <el-button @click="openRouterDialog()" icon="el-icon-plus"></el-button>
                         <el-button @click="refreshRouters()" icon="el-icon-refresh"></el-button>
