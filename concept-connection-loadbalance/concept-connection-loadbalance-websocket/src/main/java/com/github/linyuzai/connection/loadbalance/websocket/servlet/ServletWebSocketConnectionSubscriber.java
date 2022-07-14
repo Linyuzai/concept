@@ -47,6 +47,7 @@ public class ServletWebSocketConnectionSubscriber extends WebSocketConnectionSub
         if (jettyPresent) {
             return new JettyWebSocketClient();
         } else if (javaxPresent) {
+            //TODO WebSocketContainer
             return new StandardWebSocketClient();
         } else {
             throw new WebSocketLoadBalanceException("No suitable client found");
