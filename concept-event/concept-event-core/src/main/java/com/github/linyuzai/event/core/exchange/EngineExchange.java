@@ -14,19 +14,19 @@ import java.util.stream.Collectors;
 @Setter
 public class EngineExchange implements EventExchange {
 
-    private Collection<String> types;
+    private Collection<String> exchanges;
 
-    public EngineExchange(String... types) {
-        this(Arrays.asList(types));
+    public EngineExchange(String... exchanges) {
+        this(Arrays.asList(exchanges));
     }
 
-    public EngineExchange(Collection<String> types) {
-        this.types = new HashSet<>(types);
+    public EngineExchange(Collection<String> exchanges) {
+        this.exchanges = new HashSet<>(exchanges);
     }
 
     @Override
     public Collection<EventPublishEngine> exchangeEngines(Collection<EventPublishEngine> engines) {
-        return engines.stream().filter(it -> types.contains(it.getName())).collect(Collectors.toList());
+        return engines.stream().filter(it -> exchanges.contains(it.getName())).collect(Collectors.toList());
     }
 
     @Override

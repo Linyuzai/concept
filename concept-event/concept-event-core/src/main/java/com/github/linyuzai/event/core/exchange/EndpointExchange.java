@@ -16,15 +16,15 @@ public class EndpointExchange implements EventExchange {
 
     private EngineExchange exchange;
 
-    private Collection<String> names;
+    private Collection<String> endpoints;
 
-    public EndpointExchange(String type, String... names) {
-        this(type, Arrays.asList(names));
+    public EndpointExchange(String exchange, String... endpoints) {
+        this(exchange, Arrays.asList(endpoints));
     }
 
-    public EndpointExchange(String type, Collection<String> names) {
-        exchange = new EngineExchange(type);
-        this.names = new HashSet<>(names);
+    public EndpointExchange(String exchange, Collection<String> endpoints) {
+        this.exchange = new EngineExchange(exchange);
+        this.endpoints = new HashSet<>(endpoints);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class EndpointExchange implements EventExchange {
     @Override
     public Collection<EventPublishEndpoint> exchangeEndpoints(Collection<EventPublishEndpoint> endpoints) {
         return endpoints.stream()
-                .filter(it -> names.contains(it.getName()))
+                .filter(it -> this.endpoints.contains(it.getName()))
                 .collect(Collectors.toList());
     }
 }
