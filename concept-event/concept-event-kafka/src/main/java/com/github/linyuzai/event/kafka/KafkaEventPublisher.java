@@ -1,21 +1,21 @@
 package com.github.linyuzai.event.kafka;
 
-import com.github.linyuzai.event.core.publisher.AbstractEventPublisher;
-import lombok.AllArgsConstructor;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import com.github.linyuzai.event.core.endpoint.EventPublishEndpoint;
+import com.github.linyuzai.event.core.publisher.EventPublisher;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
 
-@AllArgsConstructor
-public class KafkaEventPublisher extends AbstractEventPublisher {
-
-    private KafkaTemplate<Object, Object> template;
+public interface KafkaEventPublisher extends EventPublisher {
 
     @Override
-    public void publish(Object event) {
-        ProducerRecord<Object, Object> record = new ProducerRecord<>("", event);
-        ListenableFuture<SendResult<Object, Object>> send = template.send(record);
-
+    default void publish(Object event, EventPublishEndpoint endpoint) {
+        if (endpoint instanceof KafkaEventPublishEndpoint) {
+            publish(event, (KafkaEventPublishEndpoint) endpoint);
+        }
     }
+
+    default void publish(Object event, KafkaEventPublishEndpoint endpoint) {
+        publish(event, endpoint.getTemplate());
+    }
+
+    void publish(Object event, KafkaTemplate<Object, Object> template);
 }

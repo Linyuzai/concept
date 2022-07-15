@@ -1,10 +1,8 @@
 package com.github.linyuzai.event.core.publisher;
 
+import com.github.linyuzai.event.core.endpoint.EventPublishEndpoint;
+
 public interface EventPublisher {
 
-    EventPublisherGroup getGroup();
-
-    void setGroup(EventPublisherGroup group);
-
-    void publish(Object event);
+    void publish(Object event, EventPublishEndpoint endpoint);
 }
