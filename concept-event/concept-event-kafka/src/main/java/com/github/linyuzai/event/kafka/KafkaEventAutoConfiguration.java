@@ -35,10 +35,13 @@ public class KafkaEventAutoConfiguration {
                                                      KafkaEventProperties properties,
                                                      ObjectProvider<RecordMessageConverter> messageConverter,
                                                      List<KafkaEventConfigurer> configurers) {
+
         KafkaEventEngine engine = new KafkaEventEngine();
-        for (Map.Entry<String, KafkaEventProperties.KafkaProperties> entry : properties.getKafka().entrySet()) {
+
+        for (Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties> entry : properties.getKafka().entrySet()) {
+
             String key = entry.getKey();
-            KafkaEventProperties.KafkaProperties value = entry.getValue();
+            KafkaEventProperties.ExtendedKafkaProperties value = entry.getValue();
 
             ProducerFactory<Object, Object> producerFactory = createProducerFactory(value);
 
@@ -59,7 +62,8 @@ public class KafkaEventAutoConfiguration {
 
             //registerKafkaJaasLoginModuleInitializer(key, value, beanFactory);
 
-            KafkaEventEndpoint endpoint = new KafkaEventEndpoint();
+            KafkaEventEndpoint endpoint = new KafkaEventEndpoint(key);
+            endpoint.setProperties(value);
             endpoint.setProducerFactory(producerFactory);
             endpoint.setProducerListener(producerListener);
             endpoint.setTemplate(kafkaTemplate);
@@ -68,21 +72,22 @@ public class KafkaEventAutoConfiguration {
             endpoint.setListenerContainerFactory(kafkaListenerContainerFactory);
             endpoint.setAdmin(kafkaAdmin);
             endpoint.setEngine(engine);
+
             for (KafkaEventConfigurer configurer : configurers) {
                 configurer.configureEndpoint(endpoint);
             }
 
             if (endpoint.getProducerFactory() != null) {
-                beanFactory.registerSingleton(key + "ProducerFactory", endpoint.getProducerFactory());
+                beanFactory.registerSingleton(key + "KafkaProducerFactory", endpoint.getProducerFactory());
             }
             if (endpoint.getProducerListener() != null) {
-                beanFactory.registerSingleton(key + "ProducerListener", endpoint.getProducerListener());
+                beanFactory.registerSingleton(key + "KafkaProducerListener", endpoint.getProducerListener());
             }
             if (endpoint.getTemplate() != null) {
                 beanFactory.registerSingleton(key + "KafkaTemplate", endpoint.getTemplate());
             }
             if (endpoint.getConsumerFactory() != null) {
-                beanFactory.registerSingleton(key + "ConsumerFactory", endpoint.getConsumerFactory());
+                beanFactory.registerSingleton(key + "KafkaConsumerFactory", endpoint.getConsumerFactory());
             }
             if (endpoint.getTransactionManager() != null) {
                 beanFactory.registerSingleton(key + "KafkaTransactionManager", endpoint.getTransactionManager());
@@ -95,7 +100,7 @@ public class KafkaEventAutoConfiguration {
             }
 
             engine.add(endpoint);
-            beanFactory.registerSingleton(key + "KafkaEventPublishEndpoint", endpoint);
+            beanFactory.registerSingleton(key + "KafkaEventEndpoint", endpoint);
 
         }
         for (KafkaEventConfigurer configurer : configurers) {
@@ -105,7 +110,7 @@ public class KafkaEventAutoConfiguration {
     }
 
     private ProducerFactory<Object, Object> createProducerFactory(
-            KafkaEventProperties.KafkaProperties properties) {
+            KafkaEventProperties.ExtendedKafkaProperties properties) {
         DefaultKafkaProducerFactory<Object, Object> producerFactory = new DefaultKafkaProducerFactory<>(
                 properties.buildProducerProperties());
         String transactionIdPrefix = properties.getProducer().getTransactionIdPrefix();
@@ -119,7 +124,7 @@ public class KafkaEventAutoConfiguration {
         return new LoggingProducerListener<>();
     }
 
-    private KafkaTemplate<Object, Object> createKafkaTemplate(KafkaEventProperties.KafkaProperties properties,
+    private KafkaTemplate<Object, Object> createKafkaTemplate(KafkaEventProperties.ExtendedKafkaProperties properties,
                                                               ObjectProvider<RecordMessageConverter> messageConverter,
                                                               ProducerFactory<Object, Object> producerFactory,
                                                               ProducerListener<Object, Object> producerListener) {
@@ -131,19 +136,19 @@ public class KafkaEventAutoConfiguration {
     }
 
     private ConsumerFactory<Object, Object> createConsumerFactory(
-            KafkaEventProperties.KafkaProperties properties) {
+            KafkaEventProperties.ExtendedKafkaProperties properties) {
         return new DefaultKafkaConsumerFactory<>(properties.buildConsumerProperties());
     }
 
     private KafkaListenerContainerFactory<? extends MessageListenerContainer> createKafkaListenerContainerFactory(
-            KafkaEventProperties.KafkaProperties properties,
+            KafkaEventProperties.ExtendedKafkaProperties properties,
             ConsumerFactory<Object, Object> consumerFactory,
             KafkaTransactionManager<Object, Object> transactionManager) {
         ConcurrentKafkaListenerContainerFactory<Object, Object> listenerContainerFactory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         listenerContainerFactory.setConsumerFactory(consumerFactory);
         PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();
-        KafkaEventProperties.KafkaProperties.Listener listenerProperties = properties.getListener();
+        KafkaEventProperties.ExtendedKafkaProperties.Listener listenerProperties = properties.getListener();
         map.from(listenerProperties::getConcurrency).to(listenerContainerFactory::setConcurrency);
         ContainerProperties container = listenerContainerFactory.getContainerProperties();
         container.setTransactionManager(transactionManager);
@@ -164,15 +169,16 @@ public class KafkaEventAutoConfiguration {
     }
 
     private KafkaTransactionManager<Object, Object> registerKafkaTransactionManager(
-            KafkaEventProperties.KafkaProperties properties,
+            KafkaEventProperties.ExtendedKafkaProperties properties,
             ProducerFactory<Object, Object> producerFactory) {
         if (StringUtils.hasText(properties.getProducer().getTransactionIdPrefix())) {
+            //ChainedKafkaTransactionManager
             return new KafkaTransactionManager<>(producerFactory);
         }
         return null;
     }
 
-    private KafkaAdmin createKafkaAdmin(KafkaEventProperties.KafkaProperties properties) {
+    private KafkaAdmin createKafkaAdmin(KafkaEventProperties.ExtendedKafkaProperties properties) {
         KafkaAdmin admin = new KafkaAdmin(properties.buildAdminProperties());
         admin.setFatalIfBrokerNotAvailable(properties.getAdmin().isFailFast());
         return admin;
@@ -180,11 +186,11 @@ public class KafkaEventAutoConfiguration {
 
     @SneakyThrows
     private void registerKafkaJaasLoginModuleInitializer(String key,
-                                                         KafkaEventProperties.KafkaProperties properties,
+                                                         KafkaEventProperties.ExtendedKafkaProperties properties,
                                                          ConfigurableBeanFactory beanFactory) {
         if (properties.getJaas().isEnabled()) {
             KafkaJaasLoginModuleInitializer jaas = new KafkaJaasLoginModuleInitializer();
-            KafkaEventProperties.KafkaProperties.Jaas jaasProperties = properties.getJaas();
+            KafkaEventProperties.ExtendedKafkaProperties.Jaas jaasProperties = properties.getJaas();
             if (jaasProperties.getControlFlag() != null) {
                 jaas.setControlFlag(jaasProperties.getControlFlag());
             }
@@ -195,6 +201,4 @@ public class KafkaEventAutoConfiguration {
             beanFactory.registerSingleton(key + "KafkaJaasLoginModuleInitializer", jaas);
         }
     }
-
-    //ChainedKafkaTransactionManager
 }

@@ -1,5 +1,6 @@
 package com.github.linyuzai.event.core.endpoint;
 
+import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
@@ -19,6 +20,10 @@ public interface EventEndpoint {
 
     void setEngine(EventEngine publisher);
 
+    EventErrorHandler getErrorHandler();
+
+    void setErrorHandler(EventErrorHandler errorHandler);
+
     EventPublisher getPublisher();
 
     void setPublisher(EventPublisher publisher);
@@ -27,13 +32,7 @@ public interface EventEndpoint {
 
     void setSubscriber(EventSubscriber subscriber);
 
-    void publish(Object event);
+    void publish(Object event, EventContext context);
 
-    void publish(Object event, EventPublisher publisher);
-
-    void publish(Object event, EventErrorHandler errorHandler);
-
-    void publish(Object event, EventPublisher publisher, EventErrorHandler errorHandler);
-
-    void subscribe(EventSubscriber subscriber);
+    void subscribe(EventContext context);
 }

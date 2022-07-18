@@ -41,21 +41,32 @@ public class DefaultEventConcept implements EventConcept {
 
     protected void publishWithContext(Object event, EventContext context) {
         EventExchange exchange = context.get(EventExchange.class);
+        EventExchange exchangeToUse = useExchange(exchange);
+        context.put(EventExchange.class, exchangeToUse);
+        EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         EventPublisher publisher = context.get(EventPublisher.class);
-        Collection<EventEndpoint> endpoints = useExchange(exchange).exchange(this);
+        Collection<EventEndpoint> endpoints = exchangeToUse.exchange(this);
         for (EventEndpoint endpoint : endpoints) {
-            endpoint.publish(event, usePublisher(endpoint, publisher));
+            EventContext duplicate = context.duplicate();
+            duplicate.put(EventErrorHandler.class, useErrorHandler(endpoint, errorHandler));
+            duplicate.put(EventPublisher.class, usePublisher(endpoint, publisher));
+            endpoint.publish(event, duplicate);
         }
     }
 
-    public void subscribe(EventSubscriber subscriber) {
-        subscribe(exchange, subscriber);
-    }
-    
-    public void subscribe(EventExchange exchange, EventSubscriber subscriber) {
-        Collection<EventEndpoint> endpoints = useExchange(exchange).exchange(this);
+
+    protected void subscribeWithContext(EventContext context) {
+        EventExchange exchange = context.get(EventExchange.class);
+        EventExchange exchangeToUse = useExchange(exchange);
+        context.put(EventExchange.class, exchangeToUse);
+        EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
+        EventSubscriber subscriber = context.get(EventSubscriber.class);
+        Collection<EventEndpoint> endpoints = exchangeToUse.exchange(this);
         for (EventEndpoint endpoint : endpoints) {
-            endpoint.subscribe(useSubscriber(endpoint, subscriber));
+            EventContext duplicate = context.duplicate();
+            duplicate.put(EventErrorHandler.class, useErrorHandler(endpoint, errorHandler));
+            duplicate.put(EventSubscriber.class, useSubscriber(endpoint, subscriber));
+            endpoint.subscribe(duplicate);
         }
     }
 
@@ -79,6 +90,19 @@ public class DefaultEventConcept implements EventConcept {
             return this.exchange;
         }
         return EventExchange.ALL;
+    }
+
+    protected EventErrorHandler useErrorHandler(EventEndpoint endpoint, EventErrorHandler errorHandler) {
+        if (errorHandler != null) {
+            return errorHandler;
+        }
+        if (endpoint.getErrorHandler() != null) {
+            return endpoint.getErrorHandler();
+        }
+        if (endpoint.getEngine().getErrorHandler() != null) {
+            return endpoint.getEngine().getErrorHandler();
+        }
+        return this.errorHandler;
     }
 
     protected EventPublisher usePublisher(EventEndpoint endpoint, EventPublisher publisher) {
@@ -132,22 +156,28 @@ public class DefaultEventConcept implements EventConcept {
 
         @Override
         public void publish() {
-
+            publish(null);
         }
 
         public void publish(EventPublisher publisher) {
             EventContext context = contextFactory.create();
-            //TODO
+            context.put(EventExchange.class, exchange);
+            context.put(EventErrorHandler.class, errorHandler);
+            context.put(EventPublisher.class, publisher);
             publishWithContext(event, context);
         }
 
         @Override
         public void subscribe() {
-
+            subscribe(null);
         }
 
         public void subscribe(EventSubscriber subscriber) {
-            DefaultEventConcept.this.subscribe(exchange, subscriber);
+            EventContext context = contextFactory.create();
+            context.put(EventExchange.class, exchange);
+            context.put(EventErrorHandler.class, errorHandler);
+            context.put(EventSubscriber.class, subscriber);
+            subscribeWithContext(context);
         }
     }
 }

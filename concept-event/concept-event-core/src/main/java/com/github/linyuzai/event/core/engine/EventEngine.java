@@ -1,6 +1,7 @@
 package com.github.linyuzai.event.core.engine;
 
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
+import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 
@@ -12,11 +13,13 @@ public interface EventEngine {
 
     String getName();
 
-    void setName(String name);
-
     Map<Object, Object> getMetadata();
 
     void setMetadata(Map<Object, Object> metadata);
+
+    EventErrorHandler getErrorHandler();
+
+    void setErrorHandler(EventErrorHandler errorHandler);
 
     EventPublisher getPublisher();
 

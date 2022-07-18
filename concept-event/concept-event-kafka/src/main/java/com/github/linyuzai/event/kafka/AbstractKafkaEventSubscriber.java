@@ -5,15 +5,16 @@ import org.springframework.kafka.listener.AcknowledgingMessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.Acknowledgment;
 
-public abstract class DefaultKafkaEventSubscriber implements KafkaEventSubscriber {
+public abstract class AbstractKafkaEventSubscriber implements KafkaEventSubscriber {
 
     @Override
     public void subscribe(KafkaEventEndpoint endpoint) {
-        MessageListenerContainer container = endpoint.getListenerContainerFactory()
-                .createContainer("");
+        MessageListenerContainer container = createContainer(endpoint);
         container.getContainerProperties().setMessageListener(new DefaultKafkaEventMessageListener());
         container.start();
     }
+
+    public abstract MessageListenerContainer createContainer(KafkaEventEndpoint endpoint);
 
     public abstract void onEvent(Object event);
 

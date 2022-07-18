@@ -1,6 +1,7 @@
 package com.github.linyuzai.event.core.engine;
 
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
+import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 import lombok.*;
@@ -19,6 +20,8 @@ public abstract class AbstractEventEngine implements EventEngine {
     private String name;
 
     private Map<Object, Object> metadata;
+
+    private EventErrorHandler errorHandler;
 
     private EventPublisher publisher;
 
