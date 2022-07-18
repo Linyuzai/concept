@@ -1,7 +1,7 @@
 package com.github.linyuzai.event.core.exchange;
 
-import com.github.linyuzai.event.core.engine.EventPublishEngine;
-import com.github.linyuzai.event.core.endpoint.EventPublishEndpoint;
+import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,28 +14,24 @@ import java.util.stream.Collectors;
 @Setter
 public class EndpointExchange implements EventExchange {
 
-    private EngineExchange exchange;
+    private EngineExchange engine;
 
     private Collection<String> endpoints;
 
-    public EndpointExchange(String exchange, String... endpoints) {
-        this(exchange, Arrays.asList(endpoints));
+    public EndpointExchange(String engine, String... endpoints) {
+        this(engine, Arrays.asList(endpoints));
     }
 
-    public EndpointExchange(String exchange, Collection<String> endpoints) {
-        this.exchange = new EngineExchange(exchange);
+    public EndpointExchange(String engine, Collection<String> endpoints) {
+        this.engine = new EngineExchange(engine);
         this.endpoints = new HashSet<>(endpoints);
     }
 
     @Override
-    public Collection<EventPublishEngine> exchangeEngines(Collection<EventPublishEngine> engines) {
-        return exchange.exchangeEngines(engines);
-    }
-
-    @Override
-    public Collection<EventPublishEndpoint> exchangeEndpoints(Collection<EventPublishEndpoint> endpoints) {
-        return endpoints.stream()
-                .filter(it -> this.endpoints.contains(it.getName()))
+    public Collection<EventEndpoint> exchange(EventConcept concept) {
+        return engine.exchange(concept)
+                .stream()
+                .filter(it -> endpoints.contains(it.getName()))
                 .collect(Collectors.toList());
     }
 }

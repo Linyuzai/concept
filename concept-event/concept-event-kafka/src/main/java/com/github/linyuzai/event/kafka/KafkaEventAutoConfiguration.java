@@ -31,11 +31,11 @@ import java.util.Map;
 public class KafkaEventAutoConfiguration {
 
     @Bean
-    public KafkaEventPublishEngine kafkaEventPublisherGroup(ConfigurableBeanFactory beanFactory,
-                                                            KafkaEventProperties properties,
-                                                            ObjectProvider<RecordMessageConverter> messageConverter,
-                                                            List<KafkaEventConfigurer> configurers) {
-        KafkaEventPublishEngine engine = new KafkaEventPublishEngine();
+    public KafkaEventEngine kafkaEventPublisherGroup(ConfigurableBeanFactory beanFactory,
+                                                     KafkaEventProperties properties,
+                                                     ObjectProvider<RecordMessageConverter> messageConverter,
+                                                     List<KafkaEventConfigurer> configurers) {
+        KafkaEventEngine engine = new KafkaEventEngine();
         for (Map.Entry<String, KafkaEventProperties.KafkaProperties> entry : properties.getKafka().entrySet()) {
             String key = entry.getKey();
             KafkaEventProperties.KafkaProperties value = entry.getValue();
@@ -59,7 +59,7 @@ public class KafkaEventAutoConfiguration {
 
             //registerKafkaJaasLoginModuleInitializer(key, value, beanFactory);
 
-            KafkaEventPublishEndpoint endpoint = new KafkaEventPublishEndpoint();
+            KafkaEventEndpoint endpoint = new KafkaEventEndpoint();
             endpoint.setProducerFactory(producerFactory);
             endpoint.setProducerListener(producerListener);
             endpoint.setTemplate(kafkaTemplate);

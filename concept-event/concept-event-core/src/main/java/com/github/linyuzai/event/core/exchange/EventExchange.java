@@ -1,25 +1,17 @@
 package com.github.linyuzai.event.core.exchange;
 
-import com.github.linyuzai.event.core.engine.EventPublishEngine;
-import com.github.linyuzai.event.core.endpoint.EventPublishEndpoint;
+import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public interface EventExchange {
 
-    EventExchange ALL = new EventExchange() {
-        @Override
-        public Collection<EventPublishEngine> exchangeEngines(Collection<EventPublishEngine> engines) {
-            return engines;
-        }
+    EventExchange ALL = concept -> concept.getEngines()
+            .stream()
+            .flatMap(it -> it.getEndpoints().stream())
+            .collect(Collectors.toList());
 
-        @Override
-        public Collection<EventPublishEndpoint> exchangeEndpoints(Collection<EventPublishEndpoint> endpoints) {
-            return endpoints;
-        }
-    };
-
-    Collection<EventPublishEngine> exchangeEngines(Collection<EventPublishEngine> engines);
-
-    Collection<EventPublishEndpoint> exchangeEndpoints(Collection<EventPublishEndpoint> endpoints);
+    Collection<EventEndpoint> exchange(EventConcept concept);
 }

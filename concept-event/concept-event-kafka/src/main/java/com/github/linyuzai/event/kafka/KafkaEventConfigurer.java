@@ -2,7 +2,7 @@ package com.github.linyuzai.event.kafka;
 
 public interface KafkaEventConfigurer {
 
-    void configureEngine(KafkaEventPublishEngine engine);
+    void configureEngine(KafkaEventEngine engine);
 
-    void configureEndpoint(KafkaEventPublishEndpoint endpoint);
+    void configureEndpoint(KafkaEventEndpoint endpoint);
 }

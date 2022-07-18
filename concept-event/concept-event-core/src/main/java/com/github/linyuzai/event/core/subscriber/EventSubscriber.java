@@ -1,10 +1,8 @@
 package com.github.linyuzai.event.core.subscriber;
 
-import com.github.linyuzai.event.core.endpoint.EventPublishEndpoint;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 
 public interface EventSubscriber {
 
-    void subscribe(EventPublishEndpoint endpoint);
-
-    void onEvent();
+    void subscribe(EventEndpoint endpoint);
 }
