@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
+@ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
 @EnableConfigurationProperties(KafkaEventProperties.class)
 @AutoConfigureBefore(KafkaAutoConfiguration.class)
 public class KafkaEventAutoConfiguration {
