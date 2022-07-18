@@ -25,7 +25,7 @@ public class DefaultEventConcept implements EventConcept {
 
     private EventContextFactory contextFactory;
 
-    private EventExchange exchange = EventExchange.ALL;
+    private EventExchange exchange;
 
     private EventErrorHandler errorHandler;
 
@@ -132,7 +132,7 @@ public class DefaultEventConcept implements EventConcept {
     }
 
     @NoArgsConstructor
-    public class EventBuilderImpl implements EventBuilder {
+    private class EventBuilderImpl implements EventBuilder {
 
         private Object event;
 
