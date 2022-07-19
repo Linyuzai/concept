@@ -1,5 +1,7 @@
 package com.github.linyuzai.event.core.endpoint;
 
+import com.github.linyuzai.event.core.codec.EventDecoder;
+import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.exception.EventException;
@@ -25,6 +27,10 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
 
     private EventEngine engine;
 
+    private EventEncoder encoder;
+
+    private EventDecoder decoder;
+
     private EventErrorHandler errorHandler;
 
     private EventPublisher publisher;
@@ -35,14 +41,16 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
     public void publish(Object event, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
+            EventEncoder encoder = context.get(EventEncoder.class);
+            Object encodedEvent = encoder == null ? event : encoder.encode(event);
             EventPublisher publisher = context.get(EventPublisher.class);
             if (publisher == null) {
-                defaultPublish(event, context);
+                defaultPublish(encodedEvent, context);
             } else {
-                publisher.publish(event, this);
+                publisher.publish(encodedEvent, this, context);
             }
         } catch (Throwable e) {
-            errorHandler.onError(e, this);
+            errorHandler.onError(e, this, context);
         }
     }
 
@@ -58,10 +66,10 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
             if (subscriber == null) {
                 defaultSubscribe(context);
             } else {
-                subscriber.subscribe(this);
+                subscriber.subscribe(this, context);
             }
         } catch (Throwable e) {
-            errorHandler.onError(e, this);
+            errorHandler.onError(e, this, context);
         }
     }
 

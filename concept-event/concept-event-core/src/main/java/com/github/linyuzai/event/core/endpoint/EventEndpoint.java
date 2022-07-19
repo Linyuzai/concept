@@ -1,5 +1,7 @@
 package com.github.linyuzai.event.core.endpoint;
 
+import com.github.linyuzai.event.core.codec.EventDecoder;
+import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
@@ -19,6 +21,14 @@ public interface EventEndpoint {
     EventEngine getEngine();
 
     void setEngine(EventEngine publisher);
+
+    EventEncoder getEncoder();
+
+    void setEncoder(EventEncoder encoder);
+
+    EventDecoder getDecoder();
+
+    void setDecoder(EventDecoder decoder);
 
     EventErrorHandler getErrorHandler();
 

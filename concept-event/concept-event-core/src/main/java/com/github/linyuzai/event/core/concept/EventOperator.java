@@ -5,11 +5,11 @@ import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 
-public interface EventBuilder {
+public interface EventOperator {
 
-    EventBuilder exchange(EventExchange exchange);
+    EventOperator exchange(EventExchange exchange);
 
-    EventBuilder error(EventErrorHandler errorHandler);
+    EventOperator error(EventErrorHandler errorHandler);
 
     void publish();
 

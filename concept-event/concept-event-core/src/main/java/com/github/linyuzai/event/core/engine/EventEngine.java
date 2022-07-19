@@ -1,5 +1,7 @@
 package com.github.linyuzai.event.core.engine;
 
+import com.github.linyuzai.event.core.codec.EventDecoder;
+import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
@@ -16,6 +18,14 @@ public interface EventEngine {
     Map<Object, Object> getMetadata();
 
     void setMetadata(Map<Object, Object> metadata);
+
+    EventEncoder getEncoder();
+
+    void setEncoder(EventEncoder encoder);
+
+    EventDecoder getDecoder();
+
+    void setDecoder(EventDecoder decoder);
 
     EventErrorHandler getErrorHandler();
 
