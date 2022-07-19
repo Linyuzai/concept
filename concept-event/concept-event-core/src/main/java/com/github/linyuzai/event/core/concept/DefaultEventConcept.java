@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -42,6 +43,11 @@ public class DefaultEventConcept implements EventConcept {
     }
 
     @Override
+    public EventOperator event(Type type) {
+        return new EventOperatorImpl(type);
+    }
+
+    @Override
     public EventOperator event(Object event) {
         return new EventOperatorImpl(event);
     }
@@ -57,14 +63,14 @@ public class DefaultEventConcept implements EventConcept {
         }
     }
 
-    protected void subscribeWithContext(EventContext context) {
+    protected void subscribeWithContext(Type type, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
         Collection<EventEndpoint> endpoints = exchange.exchange(this);
         for (EventEndpoint endpoint : endpoints) {
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventSubscriber.class, useSubscriber(endpoint, subscriber));
-            endpoint.subscribe(prepare);
+            endpoint.subscribe(type, prepare);
         }
     }
 
@@ -179,6 +185,8 @@ public class DefaultEventConcept implements EventConcept {
 
         protected Object event;
 
+        protected Type type;
+
         protected EventExchange exchange;
 
         protected EventEncoder encoder;
@@ -187,25 +195,33 @@ public class DefaultEventConcept implements EventConcept {
 
         protected EventErrorHandler errorHandler;
 
+        protected EventOperatorImpl(Type type) {
+            this.type = type;
+        }
+
         protected EventOperatorImpl(Object event) {
             this.event = event;
         }
 
+        @Override
         public EventOperator exchange(EventExchange exchange) {
             this.exchange = exchange;
             return this;
         }
 
+        @Override
         public EventOperator encoder(EventEncoder encoder) {
             this.encoder = encoder;
             return this;
         }
 
+        @Override
         public EventOperator decoder(EventDecoder decoder) {
             this.decoder = decoder;
             return this;
         }
 
+        @Override
         public EventOperator error(EventErrorHandler errorHandler) {
             this.errorHandler = errorHandler;
             return this;
@@ -216,6 +232,7 @@ public class DefaultEventConcept implements EventConcept {
             publish(null);
         }
 
+        @Override
         public void publish(EventPublisher publisher) {
             EventContext context = buildContext();
             context.put(EventPublisher.class, publisher);
@@ -227,10 +244,11 @@ public class DefaultEventConcept implements EventConcept {
             subscribe(null);
         }
 
+        @Override
         public void subscribe(EventSubscriber subscriber) {
             EventContext context = buildContext();
             context.put(EventSubscriber.class, subscriber);
-            subscribeWithContext(context);
+            subscribeWithContext(type, context);
         }
 
         protected EventContext buildContext() {

@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 @Getter
@@ -59,21 +60,21 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
     }
 
     @Override
-    public void subscribe(EventContext context) {
+    public void subscribe(Type type, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
             EventSubscriber subscriber = context.get(EventSubscriber.class);
             if (subscriber == null) {
-                defaultSubscribe(context);
+                defaultSubscribe(type, context);
             } else {
-                subscriber.subscribe(this, context);
+                subscriber.subscribe(type, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);
         }
     }
 
-    public void defaultSubscribe(EventContext context) {
+    public void defaultSubscribe(Type type, EventContext context) {
         throw new EventException("EventSubscriber is null");
     }
 }

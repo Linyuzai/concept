@@ -6,12 +6,15 @@ import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.exchange.EventExchange;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 
 public interface EventConcept {
 
     EventOperator event();
+
+    EventOperator event(Type type);
 
     EventOperator event(Object event);
 

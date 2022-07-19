@@ -8,6 +8,7 @@ import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public interface EventEndpoint {
@@ -44,5 +45,5 @@ public interface EventEndpoint {
 
     void publish(Object event, EventContext context);
 
-    void subscribe(EventContext context);
+    void subscribe(Type type, EventContext context);
 }

@@ -15,6 +15,8 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 
+import java.lang.reflect.Type;
+
 @Getter
 @Setter
 public class KafkaEventEndpoint extends AbstractEventEndpoint {
@@ -46,7 +48,7 @@ public class KafkaEventEndpoint extends AbstractEventEndpoint {
     }
 
     @Override
-    public void defaultSubscribe(EventContext context) {
+    public void defaultSubscribe(Type type, EventContext context) {
         throw new KafkaEventException("EventSubscriber is null");
     }
 }

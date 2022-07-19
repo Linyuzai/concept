@@ -9,13 +9,15 @@ import org.springframework.kafka.listener.AcknowledgingMessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.Acknowledgment;
 
+import java.lang.reflect.Type;
+
 public abstract class AbstractKafkaEventSubscriber<T> implements KafkaEventSubscriber<T> {
 
     @Override
-    public void subscribe(KafkaEventEndpoint endpoint, EventContext context) {
+    public void subscribe(Type type, KafkaEventEndpoint endpoint, EventContext context) {
         MessageListenerContainer container = createContainer(endpoint);
         container.getContainerProperties()
-                .setMessageListener(new DefaultKafkaEventMessageListener(endpoint, context));
+                .setMessageListener(new DefaultKafkaEventMessageListener(type, endpoint, context));
         container.start();
     }
 
@@ -24,6 +26,7 @@ public abstract class AbstractKafkaEventSubscriber<T> implements KafkaEventSubsc
     @AllArgsConstructor
     public class DefaultKafkaEventMessageListener implements AcknowledgingMessageListener<Object, Object> {
 
+        private Type type;
         private KafkaEventEndpoint endpoint;
         private EventContext context;
 
@@ -34,7 +37,7 @@ public abstract class AbstractKafkaEventSubscriber<T> implements KafkaEventSubsc
             try {
                 Object value = data.value();
                 EventDecoder decoder = context.get(EventDecoder.class);
-                onEvent((T) (decoder == null ? value : decoder.decode(value)));
+                onEvent((T) (decoder == null ? value : decoder.decode(value, type)));
                 acknowledgment.acknowledge();
             } catch (Throwable e) {
                 errorHandler.onError(e, endpoint, context);
