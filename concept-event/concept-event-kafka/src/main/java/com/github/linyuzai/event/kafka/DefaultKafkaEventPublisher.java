@@ -21,7 +21,6 @@ public class DefaultKafkaEventPublisher implements KafkaEventPublisher {
             @Override
             public void onFailure(@NonNull Throwable e) {
                 errorHandler.onError(e, endpoint, context);
-                //log.error("Event publish to kafka failure", e);
             }
 
             @Override
