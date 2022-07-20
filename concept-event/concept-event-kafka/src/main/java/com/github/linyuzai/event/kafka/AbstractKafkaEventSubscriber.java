@@ -1,13 +1,8 @@
 package com.github.linyuzai.event.kafka;
 
-import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.context.EventContext;
-import com.github.linyuzai.event.core.error.EventErrorHandler;
-import lombok.AllArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.listener.AcknowledgingMessageListener;
+import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.support.Acknowledgment;
 
 import java.lang.reflect.Type;
 
@@ -15,33 +10,12 @@ public abstract class AbstractKafkaEventSubscriber<T> implements KafkaEventSubsc
 
     @Override
     public void subscribe(Type type, KafkaEventEndpoint endpoint, EventContext context) {
-        MessageListenerContainer container = createContainer(endpoint);
-        container.getContainerProperties()
-                .setMessageListener(new DefaultKafkaEventMessageListener(type, endpoint, context));
+        MessageListenerContainer container = createContainer(type, endpoint, context);
+        container.getContainerProperties().setMessageListener(createMessageListener(type, endpoint, context));
         container.start();
     }
 
-    public abstract MessageListenerContainer createContainer(KafkaEventEndpoint endpoint);
+    public abstract MessageListenerContainer createContainer(Type type, KafkaEventEndpoint endpoint, EventContext context);
 
-    @AllArgsConstructor
-    public class DefaultKafkaEventMessageListener implements AcknowledgingMessageListener<Object, Object> {
-
-        private Type type;
-        private KafkaEventEndpoint endpoint;
-        private EventContext context;
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onMessage(ConsumerRecord<Object, Object> data, Acknowledgment acknowledgment) {
-            EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
-            try {
-                Object value = data.value();
-                EventDecoder decoder = context.get(EventDecoder.class);
-                onEvent((T) (decoder == null ? value : decoder.decode(value, type)));
-                acknowledgment.acknowledge();
-            } catch (Throwable e) {
-                errorHandler.onError(e, endpoint, context);
-            }
-        }
-    }
+    public abstract MessageListener<?, ?> createMessageListener(Type type, KafkaEventEndpoint endpoint, EventContext context);
 }

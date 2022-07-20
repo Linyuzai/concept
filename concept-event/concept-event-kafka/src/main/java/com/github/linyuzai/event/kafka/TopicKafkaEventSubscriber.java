@@ -1,19 +1,24 @@
 package com.github.linyuzai.event.kafka;
 
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.event.core.context.EventContext;
 import lombok.Getter;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-@Getter
-@AllArgsConstructor
-public abstract class TopicKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
+import java.lang.reflect.Type;
 
-    private String[] topics;
+@Getter
+public abstract class TopicKafkaEventSubscriber<T> extends DefaultKafkaEventSubscriber<T> {
+
+    private final String[] topics;
+
+    public TopicKafkaEventSubscriber(String... topics) {
+        this.topics = topics;
+    }
 
     @Override
-    public MessageListenerContainer createContainer(KafkaEventEndpoint endpoint) {
+    public MessageListenerContainer createContainer(Type type, KafkaEventEndpoint endpoint, EventContext context) {
         return endpoint.getListenerContainerFactory().createContainer(topics);
     }
 
-    public abstract void onEvent(Object event);
+    public abstract void onEvent(T event);
 }

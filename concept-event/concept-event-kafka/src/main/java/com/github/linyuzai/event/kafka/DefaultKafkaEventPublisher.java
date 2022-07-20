@@ -20,13 +20,21 @@ public class DefaultKafkaEventPublisher implements KafkaEventPublisher {
 
             @Override
             public void onFailure(@NonNull Throwable e) {
-                errorHandler.onError(e, endpoint, context);
+                onPublishFailure(e, endpoint, context);
             }
 
             @Override
             public void onSuccess(SendResult<Object, Object> result) {
-
+                onPublishSuccess(result, endpoint, context);
             }
         });
+    }
+
+    public void onPublishSuccess(SendResult<Object, Object> result, KafkaEventEndpoint endpoint, EventContext context) {
+
+    }
+
+    public void onPublishFailure(Throwable e, KafkaEventEndpoint endpoint, EventContext context) {
+        errorHandler.onError(e, endpoint, context);
     }
 }

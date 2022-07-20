@@ -22,8 +22,16 @@ public class EndpointExchange implements EventExchange {
         this(engine, Arrays.asList(endpoints));
     }
 
+    public EndpointExchange(EngineExchange engine, String... endpoints) {
+        this(engine, Arrays.asList(endpoints));
+    }
+
     public EndpointExchange(String engine, Collection<String> endpoints) {
-        this.engine = new EngineExchange(engine);
+        this(new EngineExchange(engine), endpoints);
+    }
+
+    public EndpointExchange(EngineExchange engine, Collection<String> endpoints) {
+        this.engine = engine;
         this.endpoints = new HashSet<>(endpoints);
     }
 
