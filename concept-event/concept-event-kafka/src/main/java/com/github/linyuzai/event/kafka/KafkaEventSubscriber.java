@@ -16,4 +16,11 @@ public interface KafkaEventSubscriber<T> extends GenericEventSubscriber<T> {
     }
 
     void subscribe(Type type, KafkaEventEndpoint endpoint, EventContext context);
+
+    @Override
+    default void onEvent(T event, EventEndpoint endpoint, EventContext context) {
+        onEvent(event, (KafkaEventEndpoint) endpoint, context);
+    }
+
+    void onEvent(T event, KafkaEventEndpoint endpoint, EventContext context);
 }

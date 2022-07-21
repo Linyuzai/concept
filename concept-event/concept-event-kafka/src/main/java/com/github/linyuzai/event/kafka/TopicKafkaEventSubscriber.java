@@ -19,6 +19,4 @@ public abstract class TopicKafkaEventSubscriber<T> extends DefaultKafkaEventSubs
     public MessageListenerContainer createContainer(Type type, KafkaEventEndpoint endpoint, EventContext context) {
         return endpoint.getListenerContainerFactory().createContainer(topics);
     }
-
-    public abstract void onEvent(T event);
 }

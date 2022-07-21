@@ -3,11 +3,19 @@ package com.github.linyuzai.event.kafka;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.kafka.DefaultKafkaConsumerFactoryCustomizer;
+import org.springframework.boot.autoconfigure.kafka.DefaultKafkaProducerFactoryCustomizer;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -22,7 +30,10 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,17 +43,50 @@ import java.util.Map;
 @AutoConfigureBefore(KafkaAutoConfiguration.class)
 public class KafkaEventAutoConfiguration {
 
+    @Bean(name = "kafkaListenerContainerFactory")
+    public ConcurrentKafkaListenerContainerFactory<?, ?> kafkaListenerContainerFactory() {
+        return new ConcurrentKafkaListenerContainerFactory<>();
+    }
+
     @Bean
-    public KafkaEventEngine kafkaEventPublisherGroup(ConfigurableBeanFactory beanFactory,
-                                                     KafkaEventProperties properties,
-                                                     ObjectProvider<RecordMessageConverter> messageConverter,
-                                                     List<KafkaEventConfigurer> configurers) {
+    public ProducerFactory<?, ?> kafkaProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(Collections.emptyMap());
+    }
+
+    @Bean
+    public KafkaTemplate<?, ?> kafkaTemplate() {
+        return new KafkaTemplate<>(kafkaProducerFactory());
+    }
+
+    /*@Bean
+    @ConditionalOnMissingBean(ProducerListener.class)
+    public ProducerListener<Object, Object> kafkaProducerListener() {
+        return new LoggingProducerListener<>();
+    }*/
+
+    @Bean
+    public ConsumerFactory<?, ?> kafkaConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(Collections.emptyMap());
+    }
+
+
+    @Bean
+    public KafkaAdmin kafkaAdmin() {
+        return new KafkaAdmin(Collections.emptyMap());
+    }
+
+    @Bean
+    public KafkaEventEngine kafkaEventEngine(ConfigurableBeanFactory beanFactory,
+                                             KafkaEventProperties properties,
+                                             ObjectProvider<RecordMessageConverter> messageConverter,
+                                             List<KafkaEventConfigurer> configurers) {
 
         KafkaEventEngine engine = new KafkaEventEngine();
 
         for (Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties> entry : properties.getKafka().entrySet()) {
 
             String key = entry.getKey();
+
             KafkaEventProperties.ExtendedKafkaProperties value = entry.getValue();
 
             ProducerFactory<Object, Object> producerFactory = createProducerFactory(value);
@@ -100,6 +144,12 @@ public class KafkaEventAutoConfiguration {
             if (endpoint.getAdmin() != null) {
                 beanFactory.registerSingleton(key + "KafkaAdmin", endpoint.getAdmin());
             }
+
+            //registry.registerBeanDefinition();
+
+            //ApplicationContext context;
+
+            //context.getBean()
 
             engine.add(endpoint);
             beanFactory.registerSingleton(key + "KafkaEventEndpoint", endpoint);

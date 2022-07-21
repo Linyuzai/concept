@@ -33,7 +33,7 @@ public abstract class DefaultKafkaEventSubscriber<T> extends AbstractKafkaEventS
         try {
             Object value = data.value();
             EventDecoder decoder = context.get(EventDecoder.class);
-            onEvent((T) (decoder == null ? value : decoder.decode(value, type)));
+            onEvent((T) (decoder == null ? value : decoder.decode(value, type)), endpoint, context);
             if (runnable != null) {
                 runnable.run();
             }

@@ -20,6 +20,9 @@ public class JacksonEventEncoder implements EventEncoder {
     @SneakyThrows
     @Override
     public Object encode(Object event) {
+        if (event instanceof String) {
+            return event;
+        }
         return objectMapper.writeValueAsString(event);
     }
 }
