@@ -10,6 +10,7 @@ import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.error.LoggerEventErrorHandler;
 import com.github.linyuzai.event.core.exchange.EventExchange;
+import com.github.linyuzai.event.core.lifecycle.EventConceptLifecycleListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -35,21 +36,23 @@ public class EventConfiguration {
         return new LoggerEventErrorHandler(log::error);
     }
 
-    @Bean
+    @Bean(initMethod = "initialize", destroyMethod = "destroy")
     @ConditionalOnMissingBean
     public EventConcept eventConcept(EventContextFactory contextFactory,
                                      ObjectProvider<EventExchange> exchangeProvider,
                                      ObjectProvider<EventEncoder> encoderProvider,
                                      ObjectProvider<EventDecoder> decoderProvider,
                                      EventErrorHandler errorHandler,
-                                     List<EventEngine> engines) {
+                                     List<EventEngine> engines,
+                                     List<EventConceptLifecycleListener> lifecycleListeners) {
         DefaultEventConcept concept = new DefaultEventConcept();
         concept.setContextFactory(contextFactory);
         concept.setExchange(exchangeProvider.getIfUnique());
         concept.setEncoder(encoderProvider.getIfUnique());
         concept.setDecoder(decoderProvider.getIfUnique());
         concept.setErrorHandler(errorHandler);
-        concept.add(engines);
+        concept.addEngines(engines);
+        concept.addLifecycleListeners(lifecycleListeners);
         return concept;
     }
 }

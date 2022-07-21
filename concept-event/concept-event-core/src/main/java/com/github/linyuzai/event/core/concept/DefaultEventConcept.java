@@ -6,6 +6,7 @@ import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.context.EventContextFactory;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
+import com.github.linyuzai.event.core.lifecycle.EventConceptLifecycleListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.exchange.EventExchange;
@@ -18,14 +19,18 @@ import lombok.Setter;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @Setter
 public class DefaultEventConcept implements EventConcept {
 
     protected final Map<String, EventEngine> engineMap = new ConcurrentHashMap<>();
+
+    protected final List<EventConceptLifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<>();
 
     private EventContextFactory contextFactory;
 
@@ -36,6 +41,20 @@ public class DefaultEventConcept implements EventConcept {
     private EventDecoder decoder;
 
     private EventErrorHandler errorHandler;
+
+    @Override
+    public void initialize() {
+        for (EventConceptLifecycleListener lifecycleListener : lifecycleListeners) {
+            lifecycleListener.onInitialize(this);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        for (EventConceptLifecycleListener lifecycleListener : lifecycleListeners) {
+            lifecycleListener.onDestroy(this);
+        }
+    }
 
     @Override
     public EventOperator event() {
@@ -99,10 +118,27 @@ public class DefaultEventConcept implements EventConcept {
     }
 
     @Override
-    public void add(Collection<? extends EventEngine> engines) {
+    public void addEngines(Collection<? extends EventEngine> engines) {
         for (EventEngine engine : engines) {
             this.engineMap.put(engine.getName(), engine);
         }
+    }
+
+    @Override
+    public void removeEngines(Collection<String> engines) {
+        for (String engine : engines) {
+            this.engineMap.remove(engine);
+        }
+    }
+
+    @Override
+    public void addLifecycleListeners(Collection<? extends EventConceptLifecycleListener> lifecycleListeners) {
+        this.lifecycleListeners.addAll(lifecycleListeners);
+    }
+
+    @Override
+    public void removeLifecycleListeners(Collection<? extends EventConceptLifecycleListener> lifecycleListeners) {
+        this.lifecycleListeners.removeAll(lifecycleListeners);
     }
 
     protected EventExchange useExchange(EventExchange exchange) {

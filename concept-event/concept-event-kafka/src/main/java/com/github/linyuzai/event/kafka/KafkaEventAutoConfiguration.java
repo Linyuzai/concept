@@ -69,7 +69,6 @@ public class KafkaEventAutoConfiguration {
         return new DefaultKafkaConsumerFactory<>(Collections.emptyMap());
     }
 
-
     @Bean
     public KafkaAdmin kafkaAdmin() {
         return new KafkaAdmin(Collections.emptyMap());
@@ -144,12 +143,6 @@ public class KafkaEventAutoConfiguration {
             if (endpoint.getAdmin() != null) {
                 beanFactory.registerSingleton(key + "KafkaAdmin", endpoint.getAdmin());
             }
-
-            //registry.registerBeanDefinition();
-
-            //ApplicationContext context;
-
-            //context.getBean()
 
             engine.add(endpoint);
             beanFactory.registerSingleton(key + "KafkaEventEndpoint", endpoint);
