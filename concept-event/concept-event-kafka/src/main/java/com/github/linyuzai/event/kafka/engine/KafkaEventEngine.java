@@ -1,4 +1,4 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.engine;
 
 import com.github.linyuzai.event.core.engine.AbstractEventEngine;
 import lombok.Getter;

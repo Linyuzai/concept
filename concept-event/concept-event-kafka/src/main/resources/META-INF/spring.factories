@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.linyuzai.event.kafka.KafkaEventAutoConfiguration
+com.github.linyuzai.event.kafka.autoconfigure.KafkaEventAutoConfiguration

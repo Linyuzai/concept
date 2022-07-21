@@ -1,8 +1,11 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.endpoint;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.AbstractEventEndpoint;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
+import com.github.linyuzai.event.kafka.exception.KafkaEventException;
+import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
+import com.github.linyuzai.event.kafka.publisher.DefaultKafkaEventPublisher;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

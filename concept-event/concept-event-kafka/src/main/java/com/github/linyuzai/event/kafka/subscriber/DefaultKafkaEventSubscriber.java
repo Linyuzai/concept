@@ -1,8 +1,9 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.subscriber;
 
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
+import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.listener.AcknowledgingMessageListener;
 import org.springframework.kafka.listener.ContainerProperties;

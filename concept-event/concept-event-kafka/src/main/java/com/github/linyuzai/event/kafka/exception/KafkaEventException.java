@@ -1,4 +1,4 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.exception;
 
 import com.github.linyuzai.event.core.exception.EventException;
 

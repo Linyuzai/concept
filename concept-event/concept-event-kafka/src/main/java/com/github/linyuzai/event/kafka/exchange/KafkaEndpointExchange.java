@@ -1,4 +1,4 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.exchange;
 
 import com.github.linyuzai.event.core.exchange.EndpointExchange;
 

@@ -1,8 +1,9 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.subscriber;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.subscriber.GenericEventSubscriber;
+import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 
 import java.lang.reflect.Type;
 

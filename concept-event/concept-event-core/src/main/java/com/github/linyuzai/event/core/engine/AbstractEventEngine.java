@@ -35,14 +35,21 @@ public abstract class AbstractEventEngine implements EventEngine {
 
     private final Map<String, EventEndpoint> endpointMap = new ConcurrentHashMap<>();
 
+    public Collection<EventEndpoint> getEndpoints() {
+        return Collections.unmodifiableCollection(endpointMap.values());
+    }
+
     @Override
-    public void add(Collection<? extends EventEndpoint> endpoints) {
+    public void addEndpoints(Collection<? extends EventEndpoint> endpoints) {
         for (EventEndpoint endpoint : endpoints) {
             this.endpointMap.put(endpoint.getName(), endpoint);
         }
     }
 
-    public Collection<EventEndpoint> getEndpoints() {
-        return Collections.unmodifiableCollection(endpointMap.values());
+    @Override
+    public void removeEndpoints(Collection<String> endpoints) {
+        for (String endpoint : endpoints) {
+            this.endpointMap.remove(endpoint);
+        }
     }
 }

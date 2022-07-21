@@ -1,7 +1,8 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.publisher;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
+import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.lang.NonNull;

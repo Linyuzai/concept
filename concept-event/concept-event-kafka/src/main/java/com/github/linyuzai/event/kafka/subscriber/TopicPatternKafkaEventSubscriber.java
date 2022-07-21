@@ -1,6 +1,7 @@
-package com.github.linyuzai.event.kafka;
+package com.github.linyuzai.event.kafka.subscriber;
 
 import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.kafka.listener.MessageListenerContainer;
