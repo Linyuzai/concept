@@ -16,6 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -33,7 +34,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 @ConditionalOnClass(EnableKafka.class)
@@ -75,17 +76,23 @@ public class KafkaEventAutoConfiguration {
 
     @Bean
     public KafkaEventEngine kafkaEventEngine(ConfigurableBeanFactory beanFactory,
+                                             Environment environment,
                                              KafkaEventProperties properties,
                                              ObjectProvider<RecordMessageConverter> messageConverter,
                                              List<KafkaEventEngineConfigurer> engineConfigurers,
                                              List<KafkaEventEndpointConfigurer> endpointConfigurers) {
+        properties.inherit(environment);
 
         KafkaEventEngine engine = new KafkaEventEngine();
 
         properties.apply(engine);
 
-        Set<Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties>> entries =
-                properties.getEndpoints().entrySet();
+        List<Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties>> entries =
+                properties.getEndpoints()
+                        .entrySet()
+                        .stream()
+                        .filter(it -> it.getValue().isEnabled())
+                        .collect(Collectors.toList());
 
         for (Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties> entry : entries) {
 
