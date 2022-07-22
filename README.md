@@ -15,3 +15,4 @@
 - [动态加载外部 `jar` 中的 `Class`](../../wiki/Concept-Plugin)
 - [一个配置注解实现 `WebSocket` 集群方案](../../wiki/Concept-WebSocket-LoadBalance)
 - [协同开发之动态路由](../../wiki/Concept-Router)
+- [基于多个 `Kafka & Rabbitmq` 构建的事件模型](../../wiki/Concept-Event)
