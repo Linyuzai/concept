@@ -16,11 +16,15 @@ public interface EventOperator {
 
     EventOperator exchange(EventExchange exchange);
 
-    EventOperator error(EventErrorHandler errorHandler);
-
     EventOperator encoder(EventEncoder encoder);
 
     EventOperator decoder(EventDecoder decoder);
+
+    EventOperator error(EventErrorHandler errorHandler);
+
+    EventOperator context(Object key, Object value);
+
+    <K, V> EventOperator context(Map<K, V> context);
 
     void publish();
 

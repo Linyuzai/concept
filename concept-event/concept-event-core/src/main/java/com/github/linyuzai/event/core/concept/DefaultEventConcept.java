@@ -17,10 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -223,13 +220,7 @@ public class DefaultEventConcept implements EventConcept {
 
         protected Type type;
 
-        protected EventExchange exchange;
-
-        protected EventEncoder encoder;
-
-        protected EventDecoder decoder;
-
-        protected EventErrorHandler errorHandler;
+        protected Map<Object, Object> context = new LinkedHashMap<>();
 
         protected EventOperatorImpl(Type type) {
             this.type = type;
@@ -241,25 +232,37 @@ public class DefaultEventConcept implements EventConcept {
 
         @Override
         public EventOperator exchange(EventExchange exchange) {
-            this.exchange = exchange;
+            context.put(EventExchange.class, exchange);
             return this;
         }
 
         @Override
         public EventOperator encoder(EventEncoder encoder) {
-            this.encoder = encoder;
+            context.put(EventEncoder.class, encoder);
             return this;
         }
 
         @Override
         public EventOperator decoder(EventDecoder decoder) {
-            this.decoder = decoder;
+            context.put(EventDecoder.class, decoder);
             return this;
         }
 
         @Override
         public EventOperator error(EventErrorHandler errorHandler) {
-            this.errorHandler = errorHandler;
+            context.put(EventErrorHandler.class, errorHandler);
+            return this;
+        }
+
+        @Override
+        public EventOperator context(Object key, Object value) {
+            context.put(key, value);
+            return this;
+        }
+
+        @Override
+        public <K, V> EventOperator context(Map<K, V> context) {
+            this.context.putAll(context);
             return this;
         }
 
@@ -289,10 +292,7 @@ public class DefaultEventConcept implements EventConcept {
 
         protected EventContext buildContext() {
             EventContext context = contextFactory.create();
-            context.put(EventExchange.class, exchange);
-            context.put(EventEncoder.class, encoder);
-            context.put(EventDecoder.class, decoder);
-            context.put(EventErrorHandler.class, errorHandler);
+            this.context.forEach(context::put);
             return context;
         }
     }
