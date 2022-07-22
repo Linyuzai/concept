@@ -14,9 +14,9 @@ repositories {
 
 dependencies {
 
-    //compile "com.github.linyuzai:concept-router-core:${conceptRouterVersion}"
-    //compile "com.github.linyuzai:concept-router-loadbalancer:${conceptRouterVersion}"
-    //compile "com.github.linyuzai:concept-router-ribbon:${conceptRouterVersion}"
+    //compile "com.github.linyuzai:concept-event-core:${conceptEventVersion}"
+    //compile "com.github.linyuzai:concept-event-kafka:${conceptEventVersion}"
+    //compile "com.github.linyuzai:concept-event-rabbitmq:${conceptEventVersion}"
 
     compileOnly project(':concept-event:concept-event-core')
     compileOnly project(':concept-event:concept-event-kafka')
@@ -34,4 +34,4 @@ test {
     useJUnitPlatform()
 }
 
-//apply from: '../publish.gradle'
+apply from: '../publish.gradle'
