@@ -649,30 +649,30 @@ public class ConceptPluginController {
                     System.out.println(append("InstanceExtractor<Map<Object, ? extends CustomPlugin>>: ") + plugin);
                 }
             })*/
-            .addExtractor(new InstanceExtractor<CustomPlugin>() {
+            /*.addExtractor(new InstanceExtractor<CustomPlugin>() {
                 @Override
                 public void onExtract(CustomPlugin plugin) {
                     ConceptPluginController.this.plugin = plugin;
                 }
-            })
+            })*/
             /*.addExtractor(new ClassExtractor<Class<? extends CustomPlugin>>() {
 
                 @Override
                 public void onExtract(Class<? extends CustomPlugin> plugin) {
                 }
             })*/
-            //.extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
+            .extractTo(this)//自动匹配回调添加了@OnPluginExtract注解的方法参数
             .addEventListener(new PluginLoadLogger(log::info))
             .build();
 
     private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
             .locations(
                     new PluginLocation.Builder()
-                            .path("/Users/concept/plugin")
+                            .path("/Users/tanghanzheng/concept/plugin")
                             .filter(it -> it.endsWith(".jar"))
                             .build(),
                     new PluginLocation.Builder()
-                            .path("/Users/concept/plugin2")
+                            .path("/Users/tanghanzheng/concept/plugin2")
                             .filter(it -> it.endsWith(".jar"))
                             .build())
             .executor(Executors.newSingleThreadExecutor())

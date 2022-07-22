@@ -31,9 +31,13 @@ dependencies {
     //compile "com.github.linyuzai:concept-sync-waiting:1.0.0"
     implementation project(path: ':concept-sync-waiting', configuration: 'default')
 
-    //compile "com.github.linyuzai:concept-plugin-jar:1.0.0"
+    //compile "com.github.linyuzai:concept-plugin-jar:1.0.1"
     implementation project(path: ':concept-plugin:concept-plugin-core', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-jar', configuration: 'default')
+
+    implementation project(path: ':concept-event:concept-event-core', configuration: 'default')
+    implementation project(path: ':concept-event:concept-event-kafka', configuration: 'default')
+    implementation project(path: ':concept-event:concept-event-spring-boot-starter', configuration: 'default')
 
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-websocket', configuration: 'default')
@@ -56,6 +60,10 @@ dependencies {
 
     //implementation 'io.springfox:springfox-swagger2:2.9.2'
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation 'io.socket:socket.io-server:4.0.1'
 
     implementation 'org.springframework.cloud:spring-cloud-starter'
     compileOnly 'org.projectlombok:lombok'

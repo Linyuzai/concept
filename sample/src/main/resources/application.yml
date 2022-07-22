@@ -1,9 +1,12 @@
 server:
   port: 18080
-concept:
-  download:
-    logger:
-      enabled: true
+#logging:
+#  level:
+#    org : debug
+#concept:
+#  download:
+#    logger:
+#      enabled: true
 #concept:
 #  download:
 #    source:
@@ -52,3 +55,33 @@ concept:
 #        enabled: true
 #        delete: true
 #        path: /s
+#concept:
+#  plugin:
+#    jar:
+#      autoload:
+#        location: /home/concept-plugin-jar
+concept:
+  event:
+    kafka:
+      enabled: true
+      endpoints:
+        parent:
+          enabled: false
+          producer:
+            retries: 0
+            acks: 1
+          consumer:
+            enable-auto-commit: false
+            auto-offset-reset: earliest
+          template:
+            default-topic: sample
+          listener:
+            ack-mode: manual_immediate
+        local:
+          inherit: parent
+          bootstrap-servers:
+            - 192.168.30.140:9092
+        dev:
+          inherit: parent
+          bootstrap-servers:
+            - 192.168.30.140:9092
