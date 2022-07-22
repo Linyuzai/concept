@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @ConditionalOnClass(EnableKafka.class)
+@ConditionalOnProperty(name = "concept.event.kafka.enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
 @EnableConfigurationProperties(KafkaEventProperties.class)
 @AutoConfigureBefore(KafkaAutoConfiguration.class)

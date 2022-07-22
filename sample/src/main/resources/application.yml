@@ -81,7 +81,11 @@ concept:
           inherit: parent
           bootstrap-servers:
             - 192.168.30.140:9092
+          consumer:
+            group-id: sample-local
         dev:
           inherit: parent
           bootstrap-servers:
             - 192.168.30.140:9092
+          consumer:
+            group-id: sample-dev
