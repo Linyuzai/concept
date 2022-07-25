@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ import org.springframework.kafka.support.LoggingProducerListener;
 import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
@@ -114,7 +116,7 @@ public class KafkaEventAutoConfiguration {
             ConsumerFactory<Object, Object> consumerFactory = createConsumerFactory(value);
 
             KafkaTransactionManager<Object, Object> kafkaTransactionManager =
-                    registerKafkaTransactionManager(value, producerFactory);
+                    createKafkaTransactionManager(value, producerFactory);
 
             KafkaListenerContainerFactory<? extends MessageListenerContainer> kafkaListenerContainerFactory =
                     createKafkaListenerContainerFactory(value, consumerFactory, kafkaTransactionManager);
@@ -226,12 +228,15 @@ public class KafkaEventAutoConfiguration {
         map.from(listenerProperties::getMonitorInterval).as(Duration::getSeconds).as(Number::intValue)
                 .to(container::setMonitorInterval);
         map.from(listenerProperties::getLogContainerConfig).to(container::setLogContainerConfig);
-        map.from(listenerProperties::isOnlyLogRecordMetadata).to(container::setOnlyLogRecordMetadata);
+        if (ClassUtils.hasMethod(KafkaProperties.Listener.class, "isOnlyLogRecordMetadata") &&
+                ClassUtils.hasMethod(KafkaProperties.Listener.class, "setOnlyLogRecordMetadata")) {
+            map.from(listenerProperties::isOnlyLogRecordMetadata).to(container::setOnlyLogRecordMetadata);
+        }
         map.from(listenerProperties::isMissingTopicsFatal).to(container::setMissingTopicsFatal);
         return listenerContainerFactory;
     }
 
-    private KafkaTransactionManager<Object, Object> registerKafkaTransactionManager(
+    private KafkaTransactionManager<Object, Object> createKafkaTransactionManager(
             KafkaEventProperties.ExtendedKafkaProperties properties,
             ProducerFactory<Object, Object> producerFactory) {
         if (StringUtils.hasText(properties.getProducer().getTransactionIdPrefix())) {
