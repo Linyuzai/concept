@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashMap;
@@ -23,6 +24,8 @@ import java.util.Map;
 public class KafkaEventProperties implements EventOperator.PropertyConfig {
 
     private boolean enabled = true;
+
+    private InheritProperties inherit = new InheritProperties();
 
     private Map<Object, Object> metadata = new LinkedHashMap<>();
 
@@ -50,6 +53,12 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
                 properties.inherit(name, inherit, environment);
             }
         }
+    }
+
+    @Data
+    public static class InheritProperties {
+
+        private boolean enabled = true;
     }
 
     @Getter
@@ -204,12 +213,12 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
             if (child.getLogContainerConfig() == null) {
                 child.setLogContainerConfig(parent.getLogContainerConfig());
             }
-            try {
+            if (ClassUtils.hasMethod(Listener.class, "isOnlyLogRecordMetadata") &&
+                    ClassUtils.hasMethod(Listener.class, "setOnlyLogRecordMetadata")) {
                 String onlyLogRecordMetadata = environment.getProperty(prefix + ".only-log-record-metadata");
                 if (onlyLogRecordMetadata == null) {
                     child.setOnlyLogRecordMetadata(parent.isOnlyLogRecordMetadata());
                 }
-            } catch (Throwable ignore) {
             }
             String missingTopicsFatal = environment.getProperty(prefix + ".missing-topics-fatal");
             if (missingTopicsFatal == null) {
@@ -254,22 +263,18 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
             if (child.getKeyPassword() == null) {
                 child.setKeyPassword(parent.getKeyPassword());
             }
-            try {
+            if (ClassUtils.hasMethod(Ssl.class, "getKeyStoreCertificateChain") &&
+                    ClassUtils.hasMethod(Ssl.class, "setKeyStoreCertificateChain")) {
                 if (child.getKeyStoreCertificateChain() == null) {
                     child.setKeyStoreCertificateChain(parent.getKeyStoreCertificateChain());
                 }
-            } catch (Throwable ignore) {
-
             }
-
-            try {
+            if (ClassUtils.hasMethod(Ssl.class, "getKeyStoreKey") &&
+                    ClassUtils.hasMethod(Ssl.class, "setKeyStoreKey")) {
                 if (child.getKeyStoreKey() == null) {
                     child.setKeyStoreKey(parent.getKeyStoreKey());
                 }
-            } catch (Throwable ignore) {
-
             }
-
             if (child.getKeyStoreLocation() == null) {
                 child.setKeyStoreLocation(parent.getKeyStoreLocation());
             }
@@ -279,15 +284,12 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
             if (child.getKeyStoreType() == null) {
                 child.setKeyStoreType(parent.getKeyStoreType());
             }
-
-            try {
+            if (ClassUtils.hasMethod(Ssl.class, "getTrustStoreCertificates") &&
+                    ClassUtils.hasMethod(Ssl.class, "setTrustStoreCertificates")) {
                 if (child.getTrustStoreCertificates() == null) {
                     child.setTrustStoreCertificates(parent.getTrustStoreCertificates());
                 }
-            } catch (Throwable ignore) {
-
             }
-
             if (child.getTrustStoreLocation() == null) {
                 child.setTrustStoreLocation(parent.getTrustStoreLocation());
             }

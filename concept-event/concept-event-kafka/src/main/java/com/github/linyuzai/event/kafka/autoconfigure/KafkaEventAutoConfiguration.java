@@ -83,7 +83,9 @@ public class KafkaEventAutoConfiguration {
                                              ObjectProvider<RecordMessageConverter> messageConverter,
                                              List<KafkaEventEngineConfigurer> engineConfigurers,
                                              List<KafkaEventEndpointConfigurer> endpointConfigurers) {
-        properties.inherit(environment);
+        if (properties.getInherit().isEnabled()) {
+            properties.inherit(environment);
+        }
 
         KafkaEventEngine engine = new KafkaEventEngine();
 
