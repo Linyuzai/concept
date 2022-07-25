@@ -22,7 +22,7 @@ import java.util.Map;
 public abstract class AbstractEventEndpoint implements EventEndpoint {
 
     @NonNull
-    private String name;
+    private final String name;
 
     private Map<Object, Object> metadata;
 

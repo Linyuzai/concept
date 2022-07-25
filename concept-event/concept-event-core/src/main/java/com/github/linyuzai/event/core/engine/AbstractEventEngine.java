@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractEventEngine implements EventEngine {
 
     @NonNull
-    private String name;
+    private final String name;
 
     private Map<Object, Object> metadata;
 

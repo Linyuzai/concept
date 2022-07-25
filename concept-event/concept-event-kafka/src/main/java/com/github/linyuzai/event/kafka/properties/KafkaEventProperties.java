@@ -204,9 +204,16 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
             if (child.getLogContainerConfig() == null) {
                 child.setLogContainerConfig(parent.getLogContainerConfig());
             }
-            String onlyLogRecordMetadata = environment.getProperty(prefix + ".only-log-record-metadata");
-            if (onlyLogRecordMetadata == null) {
-                child.setOnlyLogRecordMetadata(parent.isOnlyLogRecordMetadata());
+            try {
+                String onlyLogRecordMetadata = environment.getProperty(prefix + ".only-log-record-metadata");
+                if (onlyLogRecordMetadata == null) {
+                    child.setOnlyLogRecordMetadata(parent.isOnlyLogRecordMetadata());
+                }
+            } catch (Throwable ignore) {
+            }
+            String missingTopicsFatal = environment.getProperty(prefix + ".missing-topics-fatal");
+            if (missingTopicsFatal == null) {
+                child.setMissingTopicsFatal(parent.isMissingTopicsFatal());
             }
         }
 
@@ -247,12 +254,22 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
             if (child.getKeyPassword() == null) {
                 child.setKeyPassword(parent.getKeyPassword());
             }
-            if (child.getKeyStoreCertificateChain() == null) {
-                child.setKeyStoreCertificateChain(parent.getKeyStoreCertificateChain());
+            try {
+                if (child.getKeyStoreCertificateChain() == null) {
+                    child.setKeyStoreCertificateChain(parent.getKeyStoreCertificateChain());
+                }
+            } catch (Throwable ignore) {
+
             }
-            if (child.getKeyStoreKey() == null) {
-                child.setKeyStoreKey(parent.getKeyStoreKey());
+
+            try {
+                if (child.getKeyStoreKey() == null) {
+                    child.setKeyStoreKey(parent.getKeyStoreKey());
+                }
+            } catch (Throwable ignore) {
+
             }
+
             if (child.getKeyStoreLocation() == null) {
                 child.setKeyStoreLocation(parent.getKeyStoreLocation());
             }
@@ -262,9 +279,15 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
             if (child.getKeyStoreType() == null) {
                 child.setKeyStoreType(parent.getKeyStoreType());
             }
-            if (child.getTrustStoreCertificates() == null) {
-                child.setTrustStoreCertificates(parent.getTrustStoreCertificates());
+
+            try {
+                if (child.getTrustStoreCertificates() == null) {
+                    child.setTrustStoreCertificates(parent.getTrustStoreCertificates());
+                }
+            } catch (Throwable ignore) {
+
             }
+
             if (child.getTrustStoreLocation() == null) {
                 child.setTrustStoreLocation(parent.getTrustStoreLocation());
             }

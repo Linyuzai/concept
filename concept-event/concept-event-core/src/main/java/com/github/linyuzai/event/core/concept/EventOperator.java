@@ -2,7 +2,6 @@ package com.github.linyuzai.event.core.concept;
 
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
-import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
