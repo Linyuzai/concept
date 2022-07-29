@@ -14,15 +14,10 @@ repositories {
 
 dependencies {
 
-    //compile "com.github.linyuzai:concept-event-core:${conceptEventVersion}"
-    //compile "com.github.linyuzai:concept-event-kafka:${conceptEventVersion}"
-    //compile "com.github.linyuzai:concept-event-rabbitmq:${conceptEventVersion}"
-
     compileOnly project(':concept-event:concept-event-core')
-    compileOnly project(':concept-event:concept-event-kafka')
-    compileOnly project(':concept-event:concept-event-rabbitmq')
 
     compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+    compileOnly "org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}"
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
