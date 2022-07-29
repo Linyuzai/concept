@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
+/**
+ * 基于 Jackson 的 json 编码器
+ */
 @Getter
 @Setter
 @AllArgsConstructor

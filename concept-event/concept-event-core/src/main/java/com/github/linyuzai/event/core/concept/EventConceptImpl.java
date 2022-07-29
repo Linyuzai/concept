@@ -20,23 +20,49 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
+/**
+ * 事件概念实现
+ */
 @Getter
 @Setter
-public class DefaultEventConcept implements EventConcept {
+public class EventConceptImpl implements EventConcept {
 
+    /**
+     * 事件引擎缓存
+     */
     protected final Map<String, EventEngine> engineMap = new ConcurrentHashMap<>();
 
+    /**
+     * 生命周期监听器缓存
+     */
     protected final List<EventConceptLifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<>();
 
+    /**
+     * 事件上下文工厂
+     */
     private EventContextFactory contextFactory;
 
+    /**
+     * 默认事件交换机
+     */
     private EventExchange exchange;
 
+    /**
+     * 默认事件编码器
+     */
     private EventEncoder encoder;
 
+    /**
+     * 默认事件解码器
+     */
     private EventDecoder decoder;
 
+    /**
+     * 默认异常处理器
+     */
     private EventErrorHandler errorHandler;
 
     @Override
@@ -68,6 +94,12 @@ public class DefaultEventConcept implements EventConcept {
         return new EventOperatorImpl(event);
     }
 
+    /**
+     * 发布事件
+     *
+     * @param event   事件
+     * @param context 事件上下文
+     */
     protected void publishWithContext(Object event, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventPublisher publisher = context.get(EventPublisher.class);
@@ -79,6 +111,12 @@ public class DefaultEventConcept implements EventConcept {
         }
     }
 
+    /**
+     * 订阅事件
+     *
+     * @param type    事件类型
+     * @param context 事件上下文
+     */
     protected void subscribeWithContext(Type type, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
@@ -90,6 +128,9 @@ public class DefaultEventConcept implements EventConcept {
         }
     }
 
+    /**
+     * 确定事件交换机
+     */
     protected EventExchange applyExchange(EventContext context) {
         EventExchange exchange = context.get(EventExchange.class);
         EventExchange exchangeToUse = useExchange(exchange);
@@ -97,6 +138,11 @@ public class DefaultEventConcept implements EventConcept {
         return exchangeToUse;
     }
 
+    /**
+     * 准备事件上下文
+     * <p>
+     * 进行复制，基于对应的端点设置事件上下文
+     */
     protected EventContext prepareContext(EventContext context, EventEndpoint endpoint) {
         EventContext duplicate = context.duplicate();
         duplicate.put(EventConcept.class, this);
@@ -107,6 +153,11 @@ public class DefaultEventConcept implements EventConcept {
         EventErrorHandler errorHandler = duplicate.get(EventErrorHandler.class);
         duplicate.put(EventErrorHandler.class, useErrorHandler(endpoint, errorHandler));
         return duplicate;
+    }
+
+    @Override
+    public EventEngine getEngine(String name) {
+        return engineMap.get(name);
     }
 
     @Override
@@ -138,6 +189,15 @@ public class DefaultEventConcept implements EventConcept {
         this.lifecycleListeners.removeAll(lifecycleListeners);
     }
 
+    /**
+     * 选择事件交换机
+     * <p>
+     * 如果指定了事件交换机则使用指定的事件交换机
+     * <p>
+     * 如果未指定则使用默认事件交换机
+     * <p>
+     * 如果默认事件交换机为 null 则发布事件到所有端点
+     */
     protected EventExchange useExchange(EventExchange exchange) {
         if (exchange != null) {
             return exchange;
@@ -148,6 +208,17 @@ public class DefaultEventConcept implements EventConcept {
         return EventExchange.ALL;
     }
 
+    /**
+     * 选择事件编码器
+     * <p>
+     * 如果指定了事件编码器则使用指定的事件编码器
+     * <p>
+     * 如果未指定事件编码器则使用事件端点的事件编码器
+     * <p>
+     * 如果事件端点的事件编码器为 null 则使用事件引擎的事件编码器
+     * <p>
+     * 如果事件引擎的事件编码器为 null 则使用默认事件编码器
+     */
     protected EventEncoder useEncoder(EventEndpoint endpoint, EventEncoder encoder) {
         if (encoder != null) {
             return encoder;
@@ -161,6 +232,17 @@ public class DefaultEventConcept implements EventConcept {
         return this.encoder;
     }
 
+    /**
+     * 选择事件解码器
+     * <p>
+     * 如果指定了事件解码器则使用指定的事件解码器
+     * <p>
+     * 如果未指定事件解码器则使用事件端点的事件解码器
+     * <p>
+     * 如果事件端点的事件解码器为 null 则使用事件引擎的事件解码器
+     * <p>
+     * 如果事件引擎的事件解码器为 null 则使用默认事件解码器
+     */
     protected EventDecoder useDecoder(EventEndpoint endpoint, EventDecoder decoder) {
         if (decoder != null) {
             return decoder;
@@ -174,6 +256,17 @@ public class DefaultEventConcept implements EventConcept {
         return this.decoder;
     }
 
+    /**
+     * 选择异常处理器
+     * <p>
+     * 如果指定了异常处理器则使用指定的异常处理器
+     * <p>
+     * 如果未指定异常处理器则使用事件端点的异常处理器
+     * <p>
+     * 如果事件端点的异常处理器为 null 则使用事件引擎的异常处理器
+     * <p>
+     * 如果事件引擎的异常处理器为 null 则使用默认异常处理器
+     */
     protected EventErrorHandler useErrorHandler(EventEndpoint endpoint, EventErrorHandler errorHandler) {
         if (errorHandler != null) {
             return errorHandler;
@@ -187,6 +280,17 @@ public class DefaultEventConcept implements EventConcept {
         return this.errorHandler;
     }
 
+    /**
+     * 选择事件发布器
+     * <p>
+     * 如果指定了事件发布器则使用指定的事件发布器
+     * <p>
+     * 如果未指定事件发布器则使用事件端点的事件发布器
+     * <p>
+     * 如果事件端点的事件发布器为 null 则使用事件引擎的事件发布器
+     * <p>
+     * 如果事件引擎的事件发布器为 null 则返回 null
+     */
     protected EventPublisher usePublisher(EventEndpoint endpoint, EventPublisher publisher) {
         if (publisher != null) {
             return publisher;
@@ -200,6 +304,17 @@ public class DefaultEventConcept implements EventConcept {
         return null;
     }
 
+    /**
+     * 选择事件订阅器
+     * <p>
+     * 如果指定了事件订阅器则使用指定的事件订阅器
+     * <p>
+     * 如果未指定事件订阅器则使用事件端点的事件订阅器
+     * <p>
+     * 如果事件端点的事件订阅器为 null 则使用事件引擎的事件订阅器
+     * <p>
+     * 如果事件引擎的事件订阅器为 null 则返回 null
+     */
     protected EventSubscriber useSubscriber(EventEndpoint endpoint, EventSubscriber subscriber) {
         if (subscriber != null) {
             return subscriber;
@@ -213,13 +328,25 @@ public class DefaultEventConcept implements EventConcept {
         return null;
     }
 
+    /**
+     * 事件操作者的实现
+     */
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     protected class EventOperatorImpl implements EventOperator {
 
+        /**
+         * 事件
+         */
         protected Object event;
 
+        /**
+         * 事件类型
+         */
         protected Type type;
 
+        /**
+         * 上下文缓存
+         */
         protected Map<Object, Object> context = new LinkedHashMap<>();
 
         protected EventOperatorImpl(Type type) {
@@ -246,6 +373,16 @@ public class DefaultEventConcept implements EventConcept {
         public EventOperator decoder(EventDecoder decoder) {
             context.put(EventDecoder.class, decoder);
             return this;
+        }
+
+        @Override
+        public EventOperator error(Consumer<Throwable> errorHandler) {
+            return error((e, endpoint, context) -> errorHandler.accept(e));
+        }
+
+        @Override
+        public EventOperator error(BiConsumer<Throwable, EventEndpoint> errorHandler) {
+            return error((e, endpoint, context) -> errorHandler.accept(e, endpoint));
         }
 
         @Override

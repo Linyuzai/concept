@@ -1,5 +1,6 @@
 package com.github.linyuzai.event.kafka.endpoint;
 
+import com.github.linyuzai.event.kafka.engine.KafkaEventEngine;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +31,9 @@ public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory 
     private final ObjectProvider<RecordMessageConverter> messageConverter;
 
     @Override
-    public KafkaEventEndpoint create(String name, KafkaEventProperties.ExtendedKafkaProperties properties) {
+    public KafkaEventEndpoint create(String name,
+                                     KafkaEventProperties.ExtendedKafkaProperties properties,
+                                     KafkaEventEngine engine) {
         ProducerFactory<Object, Object> producerFactory = createProducerFactory(properties);
 
         ProducerListener<Object, Object> producerListener = createProducerListener();
@@ -50,7 +53,7 @@ public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory 
 
         //registerKafkaJaasLoginModuleInitializer(key, value, beanFactory);
 
-        KafkaEventEndpoint endpoint = new KafkaEventEndpoint(name);
+        KafkaEventEndpoint endpoint = new KafkaEventEndpoint(name, engine);
         endpoint.setProperties(properties);
         endpoint.setProducerFactory(producerFactory);
         endpoint.setProducerListener(producerListener);

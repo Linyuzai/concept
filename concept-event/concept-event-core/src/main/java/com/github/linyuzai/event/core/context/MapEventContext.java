@@ -7,12 +7,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * 基于 Map 的事件上下文
+ */
 @Getter
 @AllArgsConstructor
 public class MapEventContext implements EventContext {
 
     private final Map<Object, Object> map;
 
+    /**
+     * 用于获得 Map 实例
+     */
     private final Supplier<Map<Object, Object>> supplier;
 
     public MapEventContext() {

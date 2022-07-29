@@ -9,10 +9,13 @@ import lombok.SneakyThrows;
 
 import java.lang.reflect.Type;
 
+/**
+ * 基于 Jackson 的 json 解码器
+ */
 @Getter
 @Setter
 @AllArgsConstructor
-public class JacksonEventDecoder implements EventDecoder {
+public class JacksonEventDecoder extends AbstractEventDecoder {
 
     private ObjectMapper objectMapper;
 
@@ -22,12 +25,18 @@ public class JacksonEventDecoder implements EventDecoder {
 
     @SneakyThrows
     @Override
-    public Object decode(Object event, Type type) {
-        return objectMapper.readValue((String) event, new TypeReference<Object>() {
-            @Override
-            public Type getType() {
-                return type;
+    public Object doDecode(Object event, Type type) {
+        if (event instanceof String) {
+            if (type == String.class) {
+                return event;
             }
-        });
+            return objectMapper.readValue((String) event, new TypeReference<Object>() {
+                @Override
+                public Type getType() {
+                    return type;
+                }
+            });
+        }
+        throw new EventDecodeException("String type required but " + event.getClass());
     }
 }

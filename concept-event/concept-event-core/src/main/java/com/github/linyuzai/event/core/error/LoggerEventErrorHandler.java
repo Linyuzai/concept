@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 
 import java.util.function.BiConsumer;
 
+/**
+ * 基于日志打印的异常处理器
+ */
 @AllArgsConstructor
 public class LoggerEventErrorHandler implements EventErrorHandler {
 

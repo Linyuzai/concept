@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties("concept.event.kafka")
-public class KafkaEventProperties implements EventOperator.PropertyConfig {
+public class KafkaEventProperties implements EventOperator.PropertiesConfig {
 
     private boolean enabled = true;
 
@@ -37,7 +37,7 @@ public class KafkaEventProperties implements EventOperator.PropertyConfig {
 
     @Getter
     @Setter
-    public static class ExtendedKafkaProperties extends KafkaProperties implements EventOperator.PropertyConfig {
+    public static class ExtendedKafkaProperties extends KafkaProperties implements EventOperator.PropertiesConfig {
 
         private boolean enabled = true;
 

@@ -282,7 +282,7 @@ public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
         }
     }
 
-    public void inheritExtended(EventOperator.PropertyConfig child, EventOperator.PropertyConfig parent) {
+    public void inheritExtended(EventOperator.PropertiesConfig child, EventOperator.PropertiesConfig parent) {
         inheritProperties(child.getMetadata(), parent.getMetadata());
         if (child.getEncoder() == null) {
             child.setEncoder(parent.getEncoder());

@@ -2,9 +2,9 @@ package com.github.linyuzai.event.autoconfigure;
 
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
-import com.github.linyuzai.event.core.concept.DefaultEventConcept;
+import com.github.linyuzai.event.core.concept.EventConceptImpl;
 import com.github.linyuzai.event.core.concept.EventConcept;
-import com.github.linyuzai.event.core.context.DefaultEventContextFactory;
+import com.github.linyuzai.event.core.context.MapEventContextFactory;
 import com.github.linyuzai.event.core.context.EventContextFactory;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
@@ -26,7 +26,7 @@ public class EventConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public EventContextFactory eventContextFactory() {
-        return new DefaultEventContextFactory();
+        return new MapEventContextFactory();
     }
 
     @Bean
@@ -45,7 +45,7 @@ public class EventConfiguration {
                                      EventErrorHandler errorHandler,
                                      List<EventEngine> engines,
                                      List<EventConceptLifecycleListener> lifecycleListeners) {
-        DefaultEventConcept concept = new DefaultEventConcept();
+        EventConceptImpl concept = new EventConceptImpl();
         concept.setContextFactory(contextFactory);
         concept.setExchange(exchangeProvider.getIfUnique());
         concept.setEncoder(encoderProvider.getIfUnique());

@@ -2,6 +2,7 @@ package com.github.linyuzai.event.kafka.endpoint;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.AbstractEventEndpoint;
+import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
@@ -40,8 +41,8 @@ public class KafkaEventEndpoint extends AbstractEventEndpoint {
 
     private KafkaAdmin admin;
 
-    public KafkaEventEndpoint(@NonNull String name) {
-        super(name);
+    public KafkaEventEndpoint(@NonNull String name, @NonNull EventEngine engine) {
+        super(name, engine);
     }
 
     @Override

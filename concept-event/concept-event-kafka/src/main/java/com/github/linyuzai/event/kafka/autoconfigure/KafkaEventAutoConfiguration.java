@@ -115,8 +115,7 @@ public class KafkaEventAutoConfiguration {
 
             KafkaEventProperties.ExtendedKafkaProperties value = entry.getValue();
 
-            KafkaEventEndpoint endpoint = endpointFactory.create(key, value);
-            endpoint.setEngine(engine);
+            KafkaEventEndpoint endpoint = endpointFactory.create(key, value, engine);
 
             for (KafkaEventEndpointConfigurer configurer : endpointConfigurers) {
                 configurer.configure(endpoint);

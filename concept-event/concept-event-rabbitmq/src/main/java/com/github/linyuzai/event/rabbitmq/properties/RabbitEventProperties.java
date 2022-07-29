@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties("concept.event.rabbitmq")
-public class RabbitEventProperties implements EventOperator.PropertyConfig {
+public class RabbitEventProperties implements EventOperator.PropertiesConfig {
 
     private boolean enabled = true;
 
@@ -37,7 +37,7 @@ public class RabbitEventProperties implements EventOperator.PropertyConfig {
 
     @Getter
     @Setter
-    public static class ExtendedRabbitProperties extends RabbitProperties implements EventOperator.PropertyConfig {
+    public static class ExtendedRabbitProperties extends RabbitProperties implements EventOperator.PropertiesConfig {
 
         private boolean enabled = true;
 

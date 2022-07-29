@@ -10,6 +10,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+/**
+ * 端点交换机
+ * <p>
+ * 指定某个事件引擎的部分端点
+ */
 @Getter
 @Setter
 public class EndpointExchange implements EventExchange {
