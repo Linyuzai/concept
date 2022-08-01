@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
-@ConditionalOnProperty(name = "concept.event.rabbitmq.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "concept.event.rabbitmq.enabled", havingValue = "true")
 @ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
 @EnableConfigurationProperties(RabbitEventProperties.class)
 @AutoConfigureBefore(RabbitAutoConfiguration.class)

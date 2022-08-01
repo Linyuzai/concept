@@ -1,15 +1,49 @@
 package com.github.linyuzai.event.core.bus;
 
-import com.github.linyuzai.event.core.concept.EventConcept;
-import com.github.linyuzai.event.core.exchange.EventExchange;
+import com.github.linyuzai.event.core.listener.EventListener;
+import com.github.linyuzai.event.core.template.EventTemplate;
+import lombok.Getter;
+import lombok.Setter;
 
-public class AbstractEventBus implements EventBus {
+import java.lang.reflect.Type;
 
-    private EventConcept concept;
+@Getter
+@Setter
+public abstract class AbstractEventBus implements EventBus {
 
-    private EventExchange exchange;
+    private EventTemplate template;
 
-    public void publish(Object event) {
-        concept.template().publish(event);
+    @Override
+    public void initialize() {
+        subscribe();
     }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void publish(Object event) {
+        template.publish(event);
+        onPublish(event);
+    }
+
+    public void subscribe() {
+        template.subscribe(new EventListener() {
+            @Override
+            public void onEvent(Object event) {
+                AbstractEventBus.this.onEvent(event);
+            }
+
+            @Override
+            public Type getType() {
+                return null;
+            }
+        });
+    }
+
+    public abstract void onPublish(Object event);
+
+    public abstract void onEvent(Object event);
 }

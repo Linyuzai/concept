@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @ConditionalOnClass(EnableKafka.class)
-@ConditionalOnProperty(name = "concept.event.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "concept.event.kafka.enabled", havingValue = "true")
 @ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
 @EnableConfigurationProperties(KafkaEventProperties.class)
 @AutoConfigureBefore(KafkaAutoConfiguration.class)
