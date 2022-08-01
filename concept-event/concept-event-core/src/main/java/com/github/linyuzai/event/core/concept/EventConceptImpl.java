@@ -7,16 +7,21 @@ import com.github.linyuzai.event.core.context.EventContextFactory;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.lifecycle.EventConceptLifecycleListener;
+import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
-import lombok.AccessLevel;
+import com.github.linyuzai.event.core.template.ContextEventTemplate;
+import com.github.linyuzai.event.core.template.EventTemplate;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.*;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -103,17 +108,17 @@ public class EventConceptImpl implements EventConcept {
     /**
      * 订阅事件
      *
-     * @param consumer 事件消费者
+     * @param listener 事件监听器
      * @param context  事件上下文
      */
-    protected void subscribeWithContext(Consumer<Object> consumer, EventContext context) {
+    protected void subscribeWithContext(EventListener listener, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
         Collection<EventEndpoint> endpoints = exchange.exchange(this);
         for (EventEndpoint endpoint : endpoints) {
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventSubscriber.class, useSubscriber(endpoint, subscriber));
-            endpoint.subscribe(consumer, prepare);
+            endpoint.subscribe(listener, prepare);
         }
     }
 
@@ -318,66 +323,15 @@ public class EventConceptImpl implements EventConcept {
     }
 
     /**
-     * 事件操作者的实现
+     * 事件模版的实现
      */
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    protected class EventTemplateImpl implements EventTemplate {
+    protected class EventTemplateImpl extends ContextEventTemplate {
 
-        /**
-         * 上下文缓存
-         */
         protected EventContext context = contextFactory.create();
 
         @Override
-        public EventTemplate exchange(EventExchange exchange) {
-            context.put(EventExchange.class, exchange);
-            return this;
-        }
-
-        @Override
-        public EventTemplate encoder(EventEncoder encoder) {
-            context.put(EventEncoder.class, encoder);
-            return this;
-        }
-
-        @Override
-        public EventTemplate decoder(EventDecoder decoder) {
-            context.put(EventDecoder.class, decoder);
-            return this;
-        }
-
-        @Override
-        public EventTemplate publisher(EventPublisher publisher) {
-            context.put(EventPublisher.class, publisher);
-            return this;
-        }
-
-        @Override
-        public EventTemplate subscriber(EventSubscriber subscriber) {
-            context.put(EventSubscriber.class, subscriber);
-            return this;
-        }
-
-        @Override
-        public EventTemplate error(Consumer<Throwable> errorHandler) {
-            return error((e, endpoint, context) -> errorHandler.accept(e));
-        }
-
-        @Override
-        public EventTemplate error(BiConsumer<Throwable, EventEndpoint> errorHandler) {
-            return error((e, endpoint, context) -> errorHandler.accept(e, endpoint));
-        }
-
-        @Override
-        public EventTemplate error(EventErrorHandler errorHandler) {
-            context.put(EventErrorHandler.class, errorHandler);
-            return this;
-        }
-
-        @Override
-        public EventTemplate context(Object key, Object value) {
-            context.put(key, value);
-            return this;
+        protected EventContext getContext() {
+            return context;
         }
 
         @Override
@@ -385,10 +339,10 @@ public class EventConceptImpl implements EventConcept {
             publishWithContext(event, context);
         }
 
-        @SuppressWarnings("unchecked")
         @Override
-        public void subscribe(Consumer<?> consumer) {
-            subscribeWithContext((Consumer<Object>) consumer, context);
+        public void subscribe(EventListener listener) {
+            context(Type.class, listener.getType());
+            subscribeWithContext(listener, context);
         }
     }
 }

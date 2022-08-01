@@ -1,10 +1,10 @@
 package com.github.linyuzai.event.core.endpoint;
 
-import com.github.linyuzai.event.core.concept.EventTemplate;
+import com.github.linyuzai.event.core.listener.EventListener;
+import com.github.linyuzai.event.core.template.EventTemplate;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.engine.EventEngine;
 
-import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
@@ -32,5 +32,5 @@ public interface EventEndpoint extends EventTemplate.InstanceConfig {
     /**
      * 订阅事件
      */
-    void subscribe(Consumer<Object> consumer, EventContext context);
+    void subscribe(EventListener listener, EventContext context);
 }

@@ -22,23 +22,44 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractEventEngine implements EventEngine {
 
     /**
-     *
+     * 引擎名称
      */
     @NonNull
     private final String name;
 
+    /**
+     * 元数据
+     */
     private Map<Object, Object> metadata;
 
+    /**
+     * 事件编码器
+     */
     private EventEncoder encoder;
 
+    /**
+     * 事件解码器
+     */
     private EventDecoder decoder;
 
+    /**
+     * 异常处理器
+     */
     private EventErrorHandler errorHandler;
 
+    /**
+     * 事件发布器
+     */
     private EventPublisher publisher;
 
+    /**
+     * 事件订阅器
+     */
     private EventSubscriber subscriber;
 
+    /**
+     * 事件端点缓存
+     */
     private final Map<String, EventEndpoint> endpointMap = new ConcurrentHashMap<>();
 
     @Override

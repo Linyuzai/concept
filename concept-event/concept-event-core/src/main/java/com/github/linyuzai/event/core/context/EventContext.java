@@ -15,6 +15,9 @@ public interface EventContext {
      */
     void put(Object key, Object value);
 
+    /**
+     * 是否包含 key
+     */
     boolean contains(Object key);
 
     /**

@@ -10,7 +10,8 @@ public interface EventDecoder {
     /**
      * 解码
      *
-     * @param event 事件
+     * @param event   事件
+     * @param context 事件上下文
      * @return 解码后的事件
      */
     Object decode(Object event, EventContext context);

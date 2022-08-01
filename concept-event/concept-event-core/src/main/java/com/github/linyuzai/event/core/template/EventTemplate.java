@@ -1,10 +1,11 @@
-package com.github.linyuzai.event.core.concept;
+package com.github.linyuzai.event.core.template;
 
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.exchange.EventExchange;
+import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 import lombok.SneakyThrows;
@@ -15,7 +16,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * 事件操作者
+ * 事件模版
  */
 public interface EventTemplate {
 
@@ -34,8 +35,14 @@ public interface EventTemplate {
      */
     EventTemplate decoder(EventDecoder decoder);
 
+    /**
+     * 指定事件发布器
+     */
     EventTemplate publisher(EventPublisher publisher);
 
+    /**
+     * 指定事件订阅者
+     */
     EventTemplate subscriber(EventSubscriber subscriber);
 
     /**
@@ -59,14 +66,14 @@ public interface EventTemplate {
     EventTemplate context(Object key, Object value);
 
     /**
-     * 发布事件，使用默认发布器
+     * 发布事件
      */
     void publish(Object event);
 
     /**
-     * 订阅事件，使用默认订阅器
+     * 订阅事件
      */
-    void subscribe(Consumer<?> consumer);
+    void subscribe(EventListener listener);
 
     /**
      * 配置文件配置

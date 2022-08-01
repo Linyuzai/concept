@@ -6,8 +6,8 @@ import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.lifecycle.EventConceptLifecycleListener;
+import com.github.linyuzai.event.core.template.EventTemplate;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 

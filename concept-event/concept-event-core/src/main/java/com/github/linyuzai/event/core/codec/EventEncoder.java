@@ -10,7 +10,8 @@ public interface EventEncoder {
     /**
      * 编码
      *
-     * @param event 事件
+     * @param event   事件
+     * @param context 事件上下文
      * @return 编码后的事件
      */
     Object encode(Object event, EventContext context);

@@ -4,6 +4,7 @@ import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.AbstractEventEndpoint;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
+import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import com.github.linyuzai.event.kafka.publisher.DefaultKafkaEventPublisher;
@@ -19,7 +20,7 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 
-import java.lang.reflect.Type;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -52,7 +53,7 @@ public class KafkaEventEndpoint extends AbstractEventEndpoint {
     }
 
     @Override
-    public void defaultSubscribe(Type type, EventContext context) {
+    public void defaultSubscribe(EventListener listener, EventContext context) {
         throw new KafkaEventException("EventSubscriber is null");
     }
 }

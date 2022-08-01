@@ -5,6 +5,7 @@ import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.exception.EventException;
+import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
@@ -13,9 +14,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * 事件端点的抽象类
@@ -88,22 +87,22 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
     }
 
     @Override
-    public void subscribe(Consumer<Object> consumer, EventContext context) {
+    public void subscribe(EventListener listener, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
             EventSubscriber subscriber = context.get(EventSubscriber.class);
             if (subscriber == null) {
                 //如果没有订阅器进行默认订阅
-                defaultSubscribe(consumer, context);
+                defaultSubscribe(listener, context);
             } else {
-                subscriber.subscribe(consumer, this, context);
+                subscriber.subscribe(listener, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);
         }
     }
 
-    public void defaultSubscribe(Consumer<?> consumer, EventContext context) {
+    public void defaultSubscribe(EventListener listener, EventContext context) {
         throw new EventException("EventSubscriber is null");
     }
 }

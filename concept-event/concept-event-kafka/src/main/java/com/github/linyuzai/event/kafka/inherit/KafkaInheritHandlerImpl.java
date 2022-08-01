@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.kafka.inherit;
 
-import com.github.linyuzai.event.core.concept.EventTemplate;
+import com.github.linyuzai.event.core.template.EventTemplate;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.core.engine;
 
-import com.github.linyuzai.event.core.concept.EventTemplate;
+import com.github.linyuzai.event.core.template.EventTemplate;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 
 import java.util.Arrays;

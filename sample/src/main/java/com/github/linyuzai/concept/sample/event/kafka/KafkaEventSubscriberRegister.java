@@ -1,6 +1,7 @@
 package com.github.linyuzai.concept.sample.event.kafka;
 
 import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.listener.GenericEventListener;
 import com.github.linyuzai.event.kafka.exchange.KafkaEngineExchange;
 import com.github.linyuzai.event.kafka.subscriber.TopicKafkaEventSubscriber;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.Acknowledgment;
-
-import java.util.function.Consumer;
 
 @Configuration
 public class KafkaEventSubscriberRegister implements ApplicationRunner {
@@ -34,6 +33,11 @@ public class KafkaEventSubscriberRegister implements ApplicationRunner {
         concept.template()
                 .exchange(new KafkaEngineExchange())
                 .subscriber(new TopicKafkaEventSubscriber("sample"))
-                .subscribe((Consumer<String>) s -> System.out.println("subscribe:" + s));
+                .subscribe(new GenericEventListener<KafkaData>() {
+                    @Override
+                    public void onGenericEvent(KafkaData event) {
+                        System.out.println(event);
+                    }
+                });
     }
 }

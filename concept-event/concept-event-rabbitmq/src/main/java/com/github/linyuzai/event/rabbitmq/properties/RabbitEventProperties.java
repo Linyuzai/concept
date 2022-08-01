@@ -2,7 +2,7 @@ package com.github.linyuzai.event.rabbitmq.properties;
 
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
-import com.github.linyuzai.event.core.concept.EventTemplate;
+import com.github.linyuzai.event.core.template.EventTemplate;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;

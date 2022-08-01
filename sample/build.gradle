@@ -37,6 +37,7 @@ dependencies {
 
     implementation project(path: ':concept-event:concept-event-core', configuration: 'default')
     implementation project(path: ':concept-event:concept-event-kafka', configuration: 'default')
+    implementation project(path: ':concept-event:concept-event-rabbitmq', configuration: 'default')
     implementation project(path: ':concept-event:concept-event-spring-boot-starter', configuration: 'default')
 
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
