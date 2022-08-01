@@ -5,10 +5,8 @@ import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import lombok.Getter;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-import java.lang.reflect.Type;
-
 @Getter
-public abstract class TopicKafkaEventSubscriber<T> extends DefaultKafkaEventSubscriber<T> {
+public class TopicKafkaEventSubscriber extends DefaultKafkaEventSubscriber {
 
     private final String[] topics;
 
@@ -17,7 +15,7 @@ public abstract class TopicKafkaEventSubscriber<T> extends DefaultKafkaEventSubs
     }
 
     @Override
-    public MessageListenerContainer createContainer(Type type, KafkaEventEndpoint endpoint, EventContext context) {
+    public MessageListenerContainer createContainer(KafkaEventEndpoint endpoint, EventContext context) {
         return endpoint.getListenerContainerFactory().createContainer(topics);
     }
 }

@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.core.engine;
 
-import com.github.linyuzai.event.core.concept.EventOperator;
+import com.github.linyuzai.event.core.concept.EventTemplate;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import java.util.Collection;
  * <p>
  * 包含多个事件端点
  */
-public interface EventEngine extends EventOperator.InstanceConfig {
+public interface EventEngine extends EventTemplate.InstanceConfig {
 
     /**
      * 获得引擎名称

@@ -2,26 +2,19 @@ package com.github.linyuzai.event.kafka.subscriber;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
-import com.github.linyuzai.event.core.subscriber.GenericEventSubscriber;
+import com.github.linyuzai.event.core.subscriber.AbstractEventSubscriber;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 
-import java.lang.reflect.Type;
+import java.util.function.Consumer;
 
-public interface KafkaEventSubscriber<T> extends GenericEventSubscriber<T> {
+public abstract class KafkaEventSubscriber extends AbstractEventSubscriber {
 
     @Override
-    default void subscribe(Type type, EventEndpoint endpoint, EventContext context) {
+    public void doSubscribe(EventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
         if (endpoint instanceof KafkaEventEndpoint) {
-            subscribe(type, (KafkaEventEndpoint) endpoint, context);
+            subscribeKafka((KafkaEventEndpoint) endpoint, context, consumer);
         }
     }
 
-    void subscribe(Type type, KafkaEventEndpoint endpoint, EventContext context);
-
-    @Override
-    default void onEvent(T event, EventEndpoint endpoint, EventContext context) {
-        onEvent(event, (KafkaEventEndpoint) endpoint, context);
-    }
-
-    void onEvent(T event, KafkaEventEndpoint endpoint, EventContext context);
+    public abstract void subscribeKafka(KafkaEventEndpoint endpoint, EventContext context, Consumer<Object> consumer);
 }

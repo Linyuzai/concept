@@ -2,6 +2,7 @@ package com.github.linyuzai.event.core.codec;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.linyuzai.event.core.context.EventContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import java.lang.reflect.Type;
 @Getter
 @Setter
 @AllArgsConstructor
-public class JacksonEventDecoder extends AbstractEventDecoder {
+public class JacksonEventDecoder implements EventDecoder {
 
     private ObjectMapper objectMapper;
 
@@ -25,9 +26,10 @@ public class JacksonEventDecoder extends AbstractEventDecoder {
 
     @SneakyThrows
     @Override
-    public Object doDecode(Object event, Type type) {
+    public Object decode(Object event, EventContext context) {
         if (event instanceof String) {
-            if (type == String.class) {
+            Type type = context.get(Type.class);
+            if (type == null || type == String.class) {
                 return event;
             }
             return objectMapper.readValue((String) event, new TypeReference<Object>() {
@@ -37,6 +39,6 @@ public class JacksonEventDecoder extends AbstractEventDecoder {
                 }
             });
         }
-        throw new EventDecodeException("String type required but " + event.getClass());
+        throw new IllegalArgumentException("String required but " + event.getClass());
     }
 }

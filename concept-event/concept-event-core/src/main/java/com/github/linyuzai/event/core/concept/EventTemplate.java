@@ -17,71 +17,56 @@ import java.util.function.Consumer;
 /**
  * 事件操作者
  */
-public interface EventOperator {
+public interface EventTemplate {
 
     /**
      * 指定事件交换机
      */
-    EventOperator exchange(EventExchange exchange);
+    EventTemplate exchange(EventExchange exchange);
 
     /**
      * 指定事件编码器
      */
-    EventOperator encoder(EventEncoder encoder);
+    EventTemplate encoder(EventEncoder encoder);
 
     /**
      * 指定事件解码器
      */
-    EventOperator decoder(EventDecoder decoder);
+    EventTemplate decoder(EventDecoder decoder);
+
+    EventTemplate publisher(EventPublisher publisher);
+
+    EventTemplate subscriber(EventSubscriber subscriber);
 
     /**
      * 异常处理
      */
-    EventOperator error(Consumer<Throwable> errorHandler);
+    EventTemplate error(Consumer<Throwable> errorHandler);
 
     /**
      * 异常处理
      */
-    EventOperator error(BiConsumer<Throwable, EventEndpoint> errorHandler);
+    EventTemplate error(BiConsumer<Throwable, EventEndpoint> errorHandler);
 
     /**
      * 指定异常处理器
      */
-    EventOperator error(EventErrorHandler errorHandler);
+    EventTemplate error(EventErrorHandler errorHandler);
 
     /**
      * 添加事件上下文
      */
-    EventOperator context(Object key, Object value);
-
-    /**
-     * 添加事件上下文
-     */
-    <K, V> EventOperator context(Map<K, V> context);
+    EventTemplate context(Object key, Object value);
 
     /**
      * 发布事件，使用默认发布器
      */
-    void publish();
-
-    /**
-     * 发布事件
-     *
-     * @param publisher 事件发布器
-     */
-    void publish(EventPublisher publisher);
+    void publish(Object event);
 
     /**
      * 订阅事件，使用默认订阅器
      */
-    void subscribe();
-
-    /**
-     * 订阅事件
-     *
-     * @param subscriber 事件订阅器
-     */
-    void subscribe(EventSubscriber subscriber);
+    void subscribe(Consumer<?> consumer);
 
     /**
      * 配置文件配置

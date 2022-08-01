@@ -15,6 +15,6 @@ public class KafkaEventController {
 
     @GetMapping("/kafka")
     public void send() {
-        concept.event("123").publish();
+        concept.template().publish("123");
     }
 }

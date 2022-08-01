@@ -2,7 +2,7 @@ package com.github.linyuzai.event.kafka.properties;
 
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
-import com.github.linyuzai.event.core.concept.EventOperator;
+import com.github.linyuzai.event.core.concept.EventTemplate;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties("concept.event.kafka")
-public class KafkaEventProperties implements EventOperator.PropertiesConfig {
+public class KafkaEventProperties implements EventTemplate.PropertiesConfig {
 
     private boolean enabled = true;
 
@@ -37,7 +37,7 @@ public class KafkaEventProperties implements EventOperator.PropertiesConfig {
 
     @Getter
     @Setter
-    public static class ExtendedKafkaProperties extends KafkaProperties implements EventOperator.PropertiesConfig {
+    public static class ExtendedKafkaProperties extends KafkaProperties implements EventTemplate.PropertiesConfig {
 
         private boolean enabled = true;
 

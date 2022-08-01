@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -80,18 +79,8 @@ public class EventConceptImpl implements EventConcept {
     }
 
     @Override
-    public EventOperator event() {
-        return new EventOperatorImpl();
-    }
-
-    @Override
-    public EventOperator event(Type type) {
-        return new EventOperatorImpl(type);
-    }
-
-    @Override
-    public EventOperator event(Object event) {
-        return new EventOperatorImpl(event);
+    public EventTemplate template() {
+        return new EventTemplateImpl();
     }
 
     /**
@@ -114,17 +103,17 @@ public class EventConceptImpl implements EventConcept {
     /**
      * 订阅事件
      *
-     * @param type    事件类型
-     * @param context 事件上下文
+     * @param consumer 事件消费者
+     * @param context  事件上下文
      */
-    protected void subscribeWithContext(Type type, EventContext context) {
+    protected void subscribeWithContext(Consumer<Object> consumer, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
         Collection<EventEndpoint> endpoints = exchange.exchange(this);
         for (EventEndpoint endpoint : endpoints) {
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventSubscriber.class, useSubscriber(endpoint, subscriber));
-            endpoint.subscribe(type, prepare);
+            endpoint.subscribe(consumer, prepare);
         }
     }
 
@@ -332,105 +321,74 @@ public class EventConceptImpl implements EventConcept {
      * 事件操作者的实现
      */
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    protected class EventOperatorImpl implements EventOperator {
-
-        /**
-         * 事件
-         */
-        protected Object event;
-
-        /**
-         * 事件类型
-         */
-        protected Type type;
+    protected class EventTemplateImpl implements EventTemplate {
 
         /**
          * 上下文缓存
          */
-        protected Map<Object, Object> context = new LinkedHashMap<>();
-
-        protected EventOperatorImpl(Type type) {
-            this.type = type;
-        }
-
-        protected EventOperatorImpl(Object event) {
-            this.event = event;
-        }
+        protected EventContext context = contextFactory.create();
 
         @Override
-        public EventOperator exchange(EventExchange exchange) {
+        public EventTemplate exchange(EventExchange exchange) {
             context.put(EventExchange.class, exchange);
             return this;
         }
 
         @Override
-        public EventOperator encoder(EventEncoder encoder) {
+        public EventTemplate encoder(EventEncoder encoder) {
             context.put(EventEncoder.class, encoder);
             return this;
         }
 
         @Override
-        public EventOperator decoder(EventDecoder decoder) {
+        public EventTemplate decoder(EventDecoder decoder) {
             context.put(EventDecoder.class, decoder);
             return this;
         }
 
         @Override
-        public EventOperator error(Consumer<Throwable> errorHandler) {
+        public EventTemplate publisher(EventPublisher publisher) {
+            context.put(EventPublisher.class, publisher);
+            return this;
+        }
+
+        @Override
+        public EventTemplate subscriber(EventSubscriber subscriber) {
+            context.put(EventSubscriber.class, subscriber);
+            return this;
+        }
+
+        @Override
+        public EventTemplate error(Consumer<Throwable> errorHandler) {
             return error((e, endpoint, context) -> errorHandler.accept(e));
         }
 
         @Override
-        public EventOperator error(BiConsumer<Throwable, EventEndpoint> errorHandler) {
+        public EventTemplate error(BiConsumer<Throwable, EventEndpoint> errorHandler) {
             return error((e, endpoint, context) -> errorHandler.accept(e, endpoint));
         }
 
         @Override
-        public EventOperator error(EventErrorHandler errorHandler) {
+        public EventTemplate error(EventErrorHandler errorHandler) {
             context.put(EventErrorHandler.class, errorHandler);
             return this;
         }
 
         @Override
-        public EventOperator context(Object key, Object value) {
+        public EventTemplate context(Object key, Object value) {
             context.put(key, value);
             return this;
         }
 
         @Override
-        public <K, V> EventOperator context(Map<K, V> context) {
-            this.context.putAll(context);
-            return this;
-        }
-
-        @Override
-        public void publish() {
-            publish(null);
-        }
-
-        @Override
-        public void publish(EventPublisher publisher) {
-            EventContext context = buildContext();
-            context.put(EventPublisher.class, publisher);
+        public void publish(Object event) {
             publishWithContext(event, context);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public void subscribe() {
-            subscribe(null);
-        }
-
-        @Override
-        public void subscribe(EventSubscriber subscriber) {
-            EventContext context = buildContext();
-            context.put(EventSubscriber.class, subscriber);
-            subscribeWithContext(type, context);
-        }
-
-        protected EventContext buildContext() {
-            EventContext context = contextFactory.create();
-            this.context.forEach(context::put);
-            return context;
+        public void subscribe(Consumer<?> consumer) {
+            subscribeWithContext((Consumer<Object>) consumer, context);
         }
     }
 }

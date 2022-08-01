@@ -42,6 +42,11 @@ public class MapEventContext implements EventContext {
     }
 
     @Override
+    public boolean contains(Object key) {
+        return map.containsKey(key);
+    }
+
+    @Override
     public void clear() {
         map.clear();
     }

@@ -31,25 +31,9 @@ public interface EventConcept {
     void destroy();
 
     /**
-     * 用于订阅事件
-     * <p>
-     * 不会进行解码处理
+     * 创建事件模版
      */
-    EventOperator event();
-
-    /**
-     * 用于订阅事件
-     *
-     * @param type 事件类型
-     */
-    EventOperator event(Type type);
-
-    /**
-     * 用于发布事件
-     *
-     * @param event 事件
-     */
-    EventOperator event(Object event);
+    EventTemplate template();
 
     /**
      * 获得默认的事件交换机

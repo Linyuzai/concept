@@ -15,6 +15,7 @@ import lombok.Setter;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 事件端点的抽象类
@@ -70,15 +71,12 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
     public void publish(Object event, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
-            EventEncoder encoder = context.get(EventEncoder.class);
-            //编码事件
-            Object encodedEvent = encoder == null ? event : encoder.encode(event);
             EventPublisher publisher = context.get(EventPublisher.class);
             if (publisher == null) {
                 //如果没有发布器进行默认发布
-                defaultPublish(encodedEvent, context);
+                defaultPublish(event, context);
             } else {
-                publisher.publish(encodedEvent, this, context);
+                publisher.publish(event, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);
@@ -90,22 +88,22 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
     }
 
     @Override
-    public void subscribe(Type type, EventContext context) {
+    public void subscribe(Consumer<Object> consumer, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
             EventSubscriber subscriber = context.get(EventSubscriber.class);
             if (subscriber == null) {
                 //如果没有订阅器进行默认订阅
-                defaultSubscribe(type, context);
+                defaultSubscribe(consumer, context);
             } else {
-                subscriber.subscribe(type, this, context);
+                subscriber.subscribe(consumer, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);
         }
     }
 
-    public void defaultSubscribe(Type type, EventContext context) {
+    public void defaultSubscribe(Consumer<?> consumer, EventContext context) {
         throw new EventException("EventSubscriber is null");
     }
 }

@@ -9,21 +9,22 @@ import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
 import java.lang.reflect.Type;
+import java.util.function.Consumer;
 
-public abstract class AbstractKafkaEventSubscriber<T> implements KafkaEventSubscriber<T> {
+public abstract class AbstractKafkaEventSubscriber extends KafkaEventSubscriber {
 
     @Override
-    public void subscribe(Type type, KafkaEventEndpoint endpoint, EventContext context) {
-        MessageListenerContainer container = createContainer(type, endpoint, context);
-        container.getContainerProperties().setMessageListener(createMessageListener(type, endpoint, context));
+    public void subscribeKafka(KafkaEventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
+        MessageListenerContainer container = createContainer(endpoint, context);
+        container.getContainerProperties().setMessageListener(createMessageListener(endpoint, context, consumer));
         container.start();
         EventConcept concept = context.get(EventConcept.class);
         concept.addLifecycleListeners(new MessageListenerContainerStopper(container));
     }
 
-    public abstract MessageListenerContainer createContainer(Type type, KafkaEventEndpoint endpoint, EventContext context);
+    public abstract MessageListenerContainer createContainer(KafkaEventEndpoint endpoint, EventContext context);
 
-    public abstract MessageListener<?, ?> createMessageListener(Type type, KafkaEventEndpoint endpoint, EventContext context);
+    public abstract MessageListener<?, ?> createMessageListener(KafkaEventEndpoint endpoint, EventContext context, Consumer<Object> consumer);
 
     @AllArgsConstructor
     public static class MessageListenerContainerStopper implements EventConceptLifecycleListener {
