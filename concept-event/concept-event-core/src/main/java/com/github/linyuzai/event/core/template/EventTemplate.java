@@ -8,6 +8,7 @@ import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
+import com.github.linyuzai.event.core.subscriber.Subscription;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
@@ -73,83 +74,6 @@ public interface EventTemplate {
     /**
      * 订阅事件
      */
-    void subscribe(EventListener listener);
+    Subscription subscribe(EventListener listener);
 
-    /**
-     * 配置文件配置
-     */
-    interface PropertiesConfig {
-
-        Map<Object, Object> getMetadata();
-
-        void setMetadata(Map<Object, Object> metadata);
-
-        Class<? extends EventEncoder> getEncoder();
-
-        void setEncoder(Class<? extends EventEncoder> encoder);
-
-        Class<? extends EventDecoder> getDecoder();
-
-        void setDecoder(Class<? extends EventDecoder> decoder);
-
-        Class<? extends EventErrorHandler> getErrorHandler();
-
-        void setErrorHandler(Class<? extends EventErrorHandler> errorHandler);
-
-        Class<? extends EventPublisher> getPublisher();
-
-        void setPublisher(Class<? extends EventPublisher> publisher);
-
-        Class<? extends EventSubscriber> getSubscriber();
-
-        void setSubscriber(Class<? extends EventSubscriber> subscriber);
-
-        default void apply(InstanceConfig config) {
-            config.setMetadata(getMetadata());
-            config.setEncoder(newInstance(getEncoder()));
-            config.setDecoder(newInstance(getDecoder()));
-            config.setErrorHandler(newInstance(getErrorHandler()));
-            config.setPublisher(newInstance(getPublisher()));
-            config.setSubscriber(newInstance(getSubscriber()));
-        }
-
-        @SneakyThrows
-        default <T> T newInstance(Class<T> clazz) {
-            if (clazz == null) {
-                return null;
-            }
-            Constructor<T> constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        }
-    }
-
-    /**
-     * 实例配置
-     */
-    interface InstanceConfig {
-        Map<Object, Object> getMetadata();
-
-        void setMetadata(Map<Object, Object> metadata);
-
-        EventEncoder getEncoder();
-
-        void setEncoder(EventEncoder encoder);
-
-        EventDecoder getDecoder();
-
-        void setDecoder(EventDecoder decoder);
-
-        EventErrorHandler getErrorHandler();
-
-        void setErrorHandler(EventErrorHandler errorHandler);
-
-        EventPublisher getPublisher();
-
-        void setPublisher(EventPublisher publisher);
-
-        EventSubscriber getSubscriber();
-
-        void setSubscriber(EventSubscriber subscriber);
-    }
 }

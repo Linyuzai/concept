@@ -1,13 +1,18 @@
 package com.github.linyuzai.event.autoconfigure.bus;
 
-import lombok.Data;
+import com.github.linyuzai.event.core.config.AbstractPropertiesConfig;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Data
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "concept.event.bus")
-public class EventBusProperties {
+public class EventBusProperties extends AbstractPropertiesConfig {
 
     private boolean enabled;
 
+    private String engine;
 
+    private String endpoint;
 }

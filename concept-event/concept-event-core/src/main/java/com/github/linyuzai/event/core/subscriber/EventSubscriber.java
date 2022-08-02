@@ -17,5 +17,5 @@ public interface EventSubscriber {
      * @param endpoint 事件端点
      * @param context  事件上下文
      */
-    void subscribe(EventListener listener, EventEndpoint endpoint, EventContext context);
+    Subscription subscribe(EventListener listener, EventEndpoint endpoint, EventContext context);
 }

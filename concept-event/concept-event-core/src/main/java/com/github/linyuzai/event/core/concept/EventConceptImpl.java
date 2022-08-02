@@ -11,17 +11,16 @@ import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.exchange.EventExchange;
+import com.github.linyuzai.event.core.subscriber.ComposeSubscription;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
+import com.github.linyuzai.event.core.subscriber.Subscription;
 import com.github.linyuzai.event.core.template.ContextEventTemplate;
 import com.github.linyuzai.event.core.template.EventTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -71,15 +70,17 @@ public class EventConceptImpl implements EventConcept {
 
     @Override
     public void initialize() {
-        for (EventConceptLifecycleListener lifecycleListener : lifecycleListeners) {
-            lifecycleListener.onInitialize(this);
+        List<EventConceptLifecycleListener> listeners = new ArrayList<>(lifecycleListeners);
+        for (EventConceptLifecycleListener listener : listeners) {
+            listener.onInitialize(this);
         }
     }
 
     @Override
     public void destroy() {
-        for (EventConceptLifecycleListener lifecycleListener : lifecycleListeners) {
-            lifecycleListener.onDestroy(this);
+        List<EventConceptLifecycleListener> listeners = new ArrayList<>(lifecycleListeners);
+        for (EventConceptLifecycleListener listener : listeners) {
+            listener.onDestroy(this);
         }
     }
 
@@ -111,15 +112,18 @@ public class EventConceptImpl implements EventConcept {
      * @param listener 事件监听器
      * @param context  事件上下文
      */
-    protected void subscribeWithContext(EventListener listener, EventContext context) {
+    protected Subscription subscribeWithContext(EventListener listener, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
         Collection<EventEndpoint> endpoints = exchange.exchange(this);
+        List<Subscription> subscriptions = new ArrayList<>();
         for (EventEndpoint endpoint : endpoints) {
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventSubscriber.class, useSubscriber(endpoint, subscriber));
-            endpoint.subscribe(listener, prepare);
+            Subscription subscription = endpoint.subscribe(listener, prepare);
+            subscriptions.add(subscription);
         }
+        return new ComposeSubscription(subscriptions);
     }
 
     /**
@@ -340,9 +344,9 @@ public class EventConceptImpl implements EventConcept {
         }
 
         @Override
-        public void subscribe(EventListener listener) {
+        public Subscription subscribe(EventListener listener) {
             context(Type.class, listener.getType());
-            subscribeWithContext(listener, context);
+            return subscribeWithContext(listener, context);
         }
     }
 }

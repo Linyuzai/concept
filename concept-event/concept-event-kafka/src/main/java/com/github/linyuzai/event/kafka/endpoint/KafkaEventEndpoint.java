@@ -5,6 +5,7 @@ import com.github.linyuzai.event.core.endpoint.AbstractEventEndpoint;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.listener.EventListener;
+import com.github.linyuzai.event.core.subscriber.Subscription;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import com.github.linyuzai.event.kafka.publisher.DefaultKafkaEventPublisher;
@@ -53,7 +54,7 @@ public class KafkaEventEndpoint extends AbstractEventEndpoint {
     }
 
     @Override
-    public void defaultSubscribe(EventListener listener, EventContext context) {
+    public Subscription defaultSubscribe(EventListener listener, EventContext context) {
         throw new KafkaEventException("EventSubscriber is null");
     }
 }

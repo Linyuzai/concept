@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.kafka.inherit;
 
-import com.github.linyuzai.event.core.template.EventTemplate;
+import com.github.linyuzai.event.core.config.PropertiesConfig;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;
@@ -282,7 +282,7 @@ public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
         }
     }
 
-    public void inheritExtended(EventTemplate.PropertiesConfig child, EventTemplate.PropertiesConfig parent) {
+    public void inheritExtended(PropertiesConfig child, PropertiesConfig parent) {
         inheritProperties(child.getMetadata(), parent.getMetadata());
         if (child.getEncoder() == null) {
             child.setEncoder(parent.getEncoder());

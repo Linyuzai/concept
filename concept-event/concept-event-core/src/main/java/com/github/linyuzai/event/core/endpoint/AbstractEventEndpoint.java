@@ -1,7 +1,6 @@
 package com.github.linyuzai.event.core.endpoint;
 
-import com.github.linyuzai.event.core.codec.EventDecoder;
-import com.github.linyuzai.event.core.codec.EventEncoder;
+import com.github.linyuzai.event.core.config.AbstractInstanceConfig;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.exception.EventException;
@@ -9,6 +8,7 @@ import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.engine.EventEngine;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
+import com.github.linyuzai.event.core.subscriber.Subscription;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.Map;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public abstract class AbstractEventEndpoint implements EventEndpoint {
+public abstract class AbstractEventEndpoint extends AbstractInstanceConfig implements EventEndpoint {
 
     /**
      * 端点名称
@@ -35,36 +35,6 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
      */
     @NonNull
     private final EventEngine engine;
-
-    /**
-     * 元数据
-     */
-    private Map<Object, Object> metadata;
-
-    /**
-     * 事件编码器
-     */
-    private EventEncoder encoder;
-
-    /**
-     * 事件解码器
-     */
-    private EventDecoder decoder;
-
-    /**
-     * 异常处理器
-     */
-    private EventErrorHandler errorHandler;
-
-    /**
-     * 事件发布器
-     */
-    private EventPublisher publisher;
-
-    /**
-     * 事件订阅器
-     */
-    private EventSubscriber subscriber;
 
     @Override
     public void publish(Object event, EventContext context) {
@@ -87,22 +57,23 @@ public abstract class AbstractEventEndpoint implements EventEndpoint {
     }
 
     @Override
-    public void subscribe(EventListener listener, EventContext context) {
+    public Subscription subscribe(EventListener listener, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
             EventSubscriber subscriber = context.get(EventSubscriber.class);
             if (subscriber == null) {
                 //如果没有订阅器进行默认订阅
-                defaultSubscribe(listener, context);
+                return defaultSubscribe(listener, context);
             } else {
-                subscriber.subscribe(listener, this, context);
+                return subscriber.subscribe(listener, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);
+            return Subscription.EMPTY;
         }
     }
 
-    public void defaultSubscribe(EventListener listener, EventContext context) {
+    public Subscription defaultSubscribe(EventListener listener, EventContext context) {
         throw new EventException("EventSubscriber is null");
     }
 }
