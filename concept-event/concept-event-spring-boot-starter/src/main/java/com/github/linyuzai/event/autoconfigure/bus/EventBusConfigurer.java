@@ -1,8 +1,8 @@
 package com.github.linyuzai.event.autoconfigure.bus;
 
-import com.github.linyuzai.event.core.template.EventTemplate;
+import com.github.linyuzai.event.core.bus.EventBus;
 
 public interface EventBusConfigurer {
 
-    void configure(EventTemplate template);
+    void configure(EventBus bus);
 }

@@ -1,6 +1,8 @@
 package com.github.linyuzai.event.core.bus;
 
-public interface EventBus {
+import com.github.linyuzai.event.core.config.InstanceConfig;
+
+public interface EventBus extends InstanceConfig {
 
     void initialize();
 

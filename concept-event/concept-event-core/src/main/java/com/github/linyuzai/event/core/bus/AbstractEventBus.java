@@ -1,16 +1,25 @@
 package com.github.linyuzai.event.core.bus;
 
+import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.config.AbstractInstanceConfig;
+import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.subscriber.Subscription;
 import com.github.linyuzai.event.core.template.EventTemplate;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.lang.reflect.Type;
 
 @Getter
 @Setter
-public abstract class AbstractEventBus implements EventBus {
+@RequiredArgsConstructor
+public abstract class AbstractEventBus extends AbstractInstanceConfig implements EventBus {
+
+    private final EventConcept concept;
+
+    private final EventExchange exchange;
 
     private EventTemplate template;
 
@@ -18,6 +27,16 @@ public abstract class AbstractEventBus implements EventBus {
 
     @Override
     public void initialize() {
+        if (subscription != null && subscription.subscribed()) {
+            return;
+        }
+        template = concept.template()
+                .exchange(exchange)
+                .encoder(getEncoder())
+                .decoder(getDecoder())
+                .publisher(getPublisher())
+                .subscriber(getSubscriber())
+                .error(getErrorHandler());
         subscription = subscribe();
     }
 
