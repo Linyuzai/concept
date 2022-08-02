@@ -88,4 +88,5 @@ concept:
     rabbitmq:
       endpoints:
         parent:
+          enabled: false
           addresses: 1
