@@ -1,12 +1,13 @@
 server:
   port: 18080
+#spring:
+#  mvc:
+#    pathmatch:
+#      matching-strategy: path_pattern_parser
 #logging:
 #  level:
 #    org : debug
-#concept:
-#  download:
-#    logger:
-#      enabled: true
+#debug: true
 #concept:
 #  download:
 #    source:
@@ -34,11 +35,6 @@ server:
 #        percentage: true #进度计算日志是否使用百分比输出
 #      time-spent:
 #        enabled: true #时间计算日志是否启用
-#spring:
-#  mvc:
-#    pathmatch:
-#      matching-strategy: path_pattern_parser
-#debug: true
 #concept:
 #  download:
 #    compress:
@@ -89,3 +85,7 @@ concept:
             - 192.168.30.140:9092
           consumer:
             group-id: sample-dev
+    rabbitmq:
+      endpoints:
+        parent:
+          addresses: 1
