@@ -9,20 +9,20 @@ import org.springframework.context.ApplicationEventPublisher;
 @Getter
 public class ApplicationEventBus extends AbstractEventBus {
 
-    private final ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public ApplicationEventBus(EventConcept concept, EventExchange exchange, ApplicationEventPublisher publisher) {
+    public ApplicationEventBus(EventConcept concept, EventExchange exchange, ApplicationEventPublisher eventPublisher) {
         super(concept, exchange);
-        this.publisher = publisher;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public void onPublish(Object event) {
-        publisher.publishEvent(event);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
     public void onEvent(Object event) {
-        publisher.publishEvent(event);
+        eventPublisher.publishEvent(event);
     }
 }

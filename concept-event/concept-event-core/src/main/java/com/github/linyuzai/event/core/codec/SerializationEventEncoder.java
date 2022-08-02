@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
  * 基于序列化的事件编码器
  */
 public class SerializationEventEncoder implements EventEncoder {
+
     @SneakyThrows
     @Override
     public Object encode(Object event, EventContext context) {

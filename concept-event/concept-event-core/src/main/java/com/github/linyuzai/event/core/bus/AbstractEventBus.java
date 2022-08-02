@@ -1,5 +1,7 @@
 package com.github.linyuzai.event.core.bus;
 
+import com.github.linyuzai.event.core.codec.SerializationEventDecoder;
+import com.github.linyuzai.event.core.codec.SerializationEventEncoder;
 import com.github.linyuzai.event.core.concept.EventConcept;
 import com.github.linyuzai.event.core.config.AbstractInstanceConfig;
 import com.github.linyuzai.event.core.exchange.EventExchange;
@@ -32,8 +34,8 @@ public abstract class AbstractEventBus extends AbstractInstanceConfig implements
         }
         template = concept.template()
                 .exchange(exchange)
-                .encoder(getEncoder())
-                .decoder(getDecoder())
+                .encoder(getEncoder() == null ? new SerializationEventEncoder() : getEncoder())
+                .decoder(getDecoder() == null ? new SerializationEventDecoder() : getDecoder())
                 .publisher(getPublisher())
                 .subscriber(getSubscriber())
                 .error(getErrorHandler());
