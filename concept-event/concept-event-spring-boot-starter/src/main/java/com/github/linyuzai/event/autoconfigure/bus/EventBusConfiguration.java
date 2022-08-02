@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(EventBusProperties.class)
 public class EventBusConfiguration {
 
-    @Bean
+    @Bean(initMethod = "initialize", destroyMethod = "destroy")
     @ConditionalOnProperty(name = "concept.event.bus.enabled", havingValue = "true")
     @ConditionalOnMissingBean
     public EventBus eventBus(ApplicationEventPublisher publisher,

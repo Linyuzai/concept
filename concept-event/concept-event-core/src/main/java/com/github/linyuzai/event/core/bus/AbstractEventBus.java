@@ -23,7 +23,9 @@ public abstract class AbstractEventBus implements EventBus {
 
     @Override
     public void destroy() {
-        subscription.unsubscribe();
+        if (subscription != null && subscription.subscribed()) {
+            subscription.unsubscribe();
+        }
     }
 
     @Override
