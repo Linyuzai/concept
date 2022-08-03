@@ -123,7 +123,7 @@ public class EventConceptImpl implements EventConcept {
             Subscription subscription = endpoint.subscribe(listener, prepare);
             subscriptions.add(subscription);
         }
-        return new ComposeSubscription(subscriptions);
+        return new ComposeSubscription(subscriptions).simplify();
     }
 
     /**

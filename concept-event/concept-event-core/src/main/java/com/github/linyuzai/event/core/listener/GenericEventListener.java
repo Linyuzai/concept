@@ -1,5 +1,8 @@
 package com.github.linyuzai.event.core.listener;
 
+import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -12,8 +15,8 @@ public abstract class GenericEventListener<T> implements EventListener {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onEvent(Object event) {
-        onGenericEvent((T) event);
+    public void onEvent(Object event, EventEndpoint endpoint, EventContext context) {
+        onGenericEvent((T) event, endpoint, context);
     }
 
     /**
@@ -34,5 +37,5 @@ public abstract class GenericEventListener<T> implements EventListener {
     /**
      * 监听处理泛型后的事件
      */
-    public abstract void onGenericEvent(T event);
+    public abstract void onGenericEvent(T event, EventEndpoint endpoint, EventContext context);
 }

@@ -1,6 +1,8 @@
 package com.github.linyuzai.concept.sample.event.kafka;
 
 import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.listener.GenericEventListener;
 import com.github.linyuzai.event.kafka.exchange.KafkaEngineExchange;
 import com.github.linyuzai.event.kafka.subscriber.TopicKafkaEventSubscriber;
@@ -35,7 +37,7 @@ public class KafkaEventSubscriberRegister implements ApplicationRunner {
                 .subscriber(new TopicKafkaEventSubscriber("sample"))
                 .subscribe(new GenericEventListener<KafkaData>() {
                     @Override
-                    public void onGenericEvent(KafkaData event) {
+                    public void onGenericEvent(KafkaData event, EventEndpoint endpoint, EventContext context) {
                         System.out.println(event);
                     }
                 });

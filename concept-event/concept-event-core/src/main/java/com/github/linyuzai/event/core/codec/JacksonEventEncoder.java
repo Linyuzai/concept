@@ -2,6 +2,7 @@ package com.github.linyuzai.event.core.codec;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +24,7 @@ public class JacksonEventEncoder implements EventEncoder {
 
     @SneakyThrows
     @Override
-    public Object encode(Object event, EventContext context) {
+    public Object encode(Object event, EventEndpoint endpoint, EventContext context) {
         if (event instanceof String) {
             return event;
         }

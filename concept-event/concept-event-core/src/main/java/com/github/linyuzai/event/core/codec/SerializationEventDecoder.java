@@ -1,6 +1,7 @@
 package com.github.linyuzai.event.core.codec;
 
 import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayInputStream;
@@ -13,7 +14,7 @@ public class SerializationEventDecoder implements EventDecoder {
 
     @SneakyThrows
     @Override
-    public Object decode(Object event, EventContext context) {
+    public Object decode(Object event, EventEndpoint endpoint, EventContext context) {
         if (event instanceof byte[]) {
             try (ByteArrayInputStream is = new ByteArrayInputStream((byte[]) event);
                  ObjectInputStream ois = new ObjectInputStream(is)) {

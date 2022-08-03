@@ -3,6 +3,7 @@ package com.github.linyuzai.event.core.codec;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +27,7 @@ public class JacksonEventDecoder implements EventDecoder {
 
     @SneakyThrows
     @Override
-    public Object decode(Object event, EventContext context) {
+    public Object decode(Object event, EventEndpoint endpoint, EventContext context) {
         if (event instanceof String) {
             Type type = context.get(Type.class);
             if (type == null || type == String.class) {
