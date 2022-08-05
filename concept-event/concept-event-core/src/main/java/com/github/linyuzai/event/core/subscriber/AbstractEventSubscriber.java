@@ -57,9 +57,7 @@ public abstract class AbstractEventSubscriber implements EventSubscriber {
 
         @Override
         public void onDestroy(EventConcept concept) {
-            if (subscription.subscribed()) {
-                subscription.unsubscribe();
-            }
+            subscription.unsubscribe();
         }
     }
 }

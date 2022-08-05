@@ -15,22 +15,8 @@ public class ComposeSubscription implements Subscription {
     private Collection<Subscription> subscriptions;
 
     @Override
-    public boolean subscribed() {
-        for (Subscription subscription : subscriptions) {
-            if (subscription.subscribed()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public void unsubscribe() {
-        for (Subscription subscription : subscriptions) {
-            if (subscription.subscribed()) {
-                subscription.unsubscribe();
-            }
-        }
+        subscriptions.forEach(Subscription::unsubscribe);
     }
 
     public Subscription simplify() {

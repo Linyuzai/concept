@@ -12,11 +12,6 @@ public class PostSubscription implements Subscription {
     private Runnable runnable;
 
     @Override
-    public boolean subscribed() {
-        return subscription.subscribed();
-    }
-
-    @Override
     public void unsubscribe() {
         subscription.unsubscribe();
         if (runnable != null) {

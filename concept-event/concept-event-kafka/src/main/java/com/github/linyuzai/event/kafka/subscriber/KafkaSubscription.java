@@ -12,12 +12,9 @@ public class KafkaSubscription implements Subscription {
     private MessageListenerContainer container;
 
     @Override
-    public boolean subscribed() {
-        return container.isRunning();
-    }
-
-    @Override
     public void unsubscribe() {
-        container.stop();
+        if (container.isRunning()) {
+            container.stop();
+        }
     }
 }

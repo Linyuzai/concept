@@ -4,6 +4,8 @@ import com.github.linyuzai.event.core.codec.SerializationEventDecoder;
 import com.github.linyuzai.event.core.codec.SerializationEventEncoder;
 import com.github.linyuzai.event.core.concept.EventConcept;
 import com.github.linyuzai.event.core.config.AbstractInstanceConfig;
+import com.github.linyuzai.event.core.context.EventContext;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.exchange.EventExchange;
 import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.subscriber.Subscription;
@@ -29,7 +31,7 @@ public abstract class AbstractEventBus extends AbstractInstanceConfig implements
 
     @Override
     public void initialize() {
-        if (subscription != null && subscription.subscribed()) {
+        if (subscription != null) {
             return;
         }
         template = concept.template()
@@ -44,7 +46,7 @@ public abstract class AbstractEventBus extends AbstractInstanceConfig implements
 
     @Override
     public void destroy() {
-        if (subscription != null && subscription.subscribed()) {
+        if (subscription != null) {
             subscription.unsubscribe();
         }
     }
@@ -57,8 +59,9 @@ public abstract class AbstractEventBus extends AbstractInstanceConfig implements
 
     public Subscription subscribe() {
         return template.subscribe(new EventListener() {
+
             @Override
-            public void onEvent(Object event) {
+            public void onEvent(Object event, EventEndpoint endpoint, EventContext context) {
                 AbstractEventBus.this.onEvent(event);
             }
 
