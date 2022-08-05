@@ -44,8 +44,6 @@ public class ComposeSubscription implements Subscription {
             return Subscription.EMPTY;
         } else if (size == 1) {
             return list.get(0);
-        } else if (size == subscriptions.size()) {
-            return this;
         } else {
             return new ComposeSubscription(list);
         }
