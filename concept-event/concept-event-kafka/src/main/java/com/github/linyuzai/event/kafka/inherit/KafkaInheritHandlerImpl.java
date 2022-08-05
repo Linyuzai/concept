@@ -1,6 +1,7 @@
 package com.github.linyuzai.event.kafka.inherit;
 
 import com.github.linyuzai.event.core.config.PropertiesConfig;
+import com.github.linyuzai.event.core.utils.InheritUtils;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;
@@ -52,13 +53,7 @@ public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
     }
 
     public <K, V> void inheritProperties(Map<K, V> child, Map<K, V> parent) {
-        for (Map.Entry<K, V> entry : parent.entrySet()) {
-            K key = entry.getKey();
-            if (child.containsKey(key)) {
-                continue;
-            }
-            child.put(key, entry.getValue());
-        }
+        InheritUtils.inherit(child, parent);
     }
 
     public void inheritConsumer(KafkaProperties.Consumer child, KafkaProperties.Consumer parent, String prefix) {
@@ -283,21 +278,6 @@ public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
     }
 
     public void inheritExtended(PropertiesConfig child, PropertiesConfig parent) {
-        inheritProperties(child.getMetadata(), parent.getMetadata());
-        if (child.getEncoder() == null) {
-            child.setEncoder(parent.getEncoder());
-        }
-        if (child.getDecoder() == null) {
-            child.setDecoder(parent.getDecoder());
-        }
-        if (child.getErrorHandler() == null) {
-            child.setErrorHandler(parent.getErrorHandler());
-        }
-        if (child.getPublisher() == null) {
-            child.setPublisher(parent.getPublisher());
-        }
-        if (child.getSubscriber() == null) {
-            child.setSubscriber(parent.getSubscriber());
-        }
+        InheritUtils.inherit(child, parent);
     }
 }

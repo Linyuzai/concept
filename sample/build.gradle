@@ -63,6 +63,7 @@ dependencies {
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
     implementation 'io.socket:socket.io-server:4.0.1'
 

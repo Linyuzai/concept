@@ -2,10 +2,7 @@ package com.github.linyuzai.event.kafka.endpoint;
 
 import com.github.linyuzai.event.kafka.engine.KafkaEventEngine;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
@@ -17,18 +14,13 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.security.jaas.KafkaJaasLoginModuleInitializer;
 import org.springframework.kafka.support.LoggingProducerListener;
 import org.springframework.kafka.support.ProducerListener;
-import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 
-@Getter
-@AllArgsConstructor
 public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory {
-
-    private final ObjectProvider<RecordMessageConverter> messageConverter;
 
     @Override
     public KafkaEventEndpoint create(String name,
@@ -68,45 +60,42 @@ public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory 
         return endpoint;
     }
 
-    private ProducerFactory<Object, Object> createProducerFactory(
-            KafkaEventProperties.ExtendedKafkaProperties properties) {
-        DefaultKafkaProducerFactory<Object, Object> producerFactory = new DefaultKafkaProducerFactory<>(
+    protected ProducerFactory<Object, Object> createProducerFactory(KafkaProperties properties) {
+        DefaultKafkaProducerFactory<Object, Object> factory = new DefaultKafkaProducerFactory<>(
                 properties.buildProducerProperties());
         String transactionIdPrefix = properties.getProducer().getTransactionIdPrefix();
         if (transactionIdPrefix != null) {
-            producerFactory.setTransactionIdPrefix(transactionIdPrefix);
+            factory.setTransactionIdPrefix(transactionIdPrefix);
         }
-        return producerFactory;
+        return factory;
     }
 
-    private ProducerListener<Object, Object> createProducerListener() {
+    protected ProducerListener<Object, Object> createProducerListener() {
         return new LoggingProducerListener<>();
     }
 
-    private KafkaTemplate<Object, Object> createKafkaTemplate(KafkaEventProperties.ExtendedKafkaProperties properties,
-                                                              ProducerFactory<Object, Object> producerFactory,
-                                                              ProducerListener<Object, Object> producerListener) {
+    protected KafkaTemplate<Object, Object> createKafkaTemplate(KafkaProperties properties,
+                                                                ProducerFactory<Object, Object> producerFactory,
+                                                                ProducerListener<Object, Object> producerListener) {
         KafkaTemplate<Object, Object> template = new KafkaTemplate<>(producerFactory);
-        messageConverter.ifUnique(template::setMessageConverter);
         template.setProducerListener(producerListener);
         template.setDefaultTopic(properties.getTemplate().getDefaultTopic());
         return template;
     }
 
-    private ConsumerFactory<Object, Object> createConsumerFactory(
-            KafkaEventProperties.ExtendedKafkaProperties properties) {
+    protected ConsumerFactory<Object, Object> createConsumerFactory(KafkaProperties properties) {
         return new DefaultKafkaConsumerFactory<>(properties.buildConsumerProperties());
     }
 
-    private KafkaListenerContainerFactory<? extends MessageListenerContainer> createKafkaListenerContainerFactory(
-            KafkaEventProperties.ExtendedKafkaProperties properties,
+    protected KafkaListenerContainerFactory<? extends MessageListenerContainer> createKafkaListenerContainerFactory(
+            KafkaProperties properties,
             ConsumerFactory<Object, Object> consumerFactory,
             KafkaTransactionManager<Object, Object> transactionManager) {
         ConcurrentKafkaListenerContainerFactory<Object, Object> listenerContainerFactory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         listenerContainerFactory.setConsumerFactory(consumerFactory);
         PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();
-        KafkaEventProperties.ExtendedKafkaProperties.Listener listenerProperties = properties.getListener();
+        KafkaProperties.Listener listenerProperties = properties.getListener();
         map.from(listenerProperties::getConcurrency).to(listenerContainerFactory::setConcurrency);
         ContainerProperties container = listenerContainerFactory.getContainerProperties();
         container.setTransactionManager(transactionManager);
@@ -129,8 +118,8 @@ public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory 
         return listenerContainerFactory;
     }
 
-    private KafkaTransactionManager<Object, Object> createKafkaTransactionManager(
-            KafkaEventProperties.ExtendedKafkaProperties properties,
+    protected KafkaTransactionManager<Object, Object> createKafkaTransactionManager(
+            KafkaProperties properties,
             ProducerFactory<Object, Object> producerFactory) {
         if (StringUtils.hasText(properties.getProducer().getTransactionIdPrefix())) {
             //ChainedKafkaTransactionManager
@@ -139,7 +128,7 @@ public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory 
         return null;
     }
 
-    private KafkaAdmin createKafkaAdmin(KafkaEventProperties.ExtendedKafkaProperties properties) {
+    protected KafkaAdmin createKafkaAdmin(KafkaProperties properties) {
         KafkaAdmin admin = new KafkaAdmin(properties.buildAdminProperties());
         admin.setFatalIfBrokerNotAvailable(properties.getAdmin().isFailFast());
         return admin;
@@ -147,12 +136,12 @@ public class KafkaEventEndpointFactoryImpl implements KafkaEventEndpointFactory 
 
     @Deprecated
     @SneakyThrows
-    private void registerKafkaJaasLoginModuleInitializer(String key,
-                                                         KafkaEventProperties.ExtendedKafkaProperties properties,
-                                                         ConfigurableBeanFactory beanFactory) {
+    protected void registerKafkaJaasLoginModuleInitializer(String key,
+                                                           KafkaProperties properties,
+                                                           ConfigurableBeanFactory beanFactory) {
         if (properties.getJaas().isEnabled()) {
             KafkaJaasLoginModuleInitializer jaas = new KafkaJaasLoginModuleInitializer();
-            KafkaEventProperties.ExtendedKafkaProperties.Jaas jaasProperties = properties.getJaas();
+            KafkaProperties.Jaas jaasProperties = properties.getJaas();
             if (jaasProperties.getControlFlag() != null) {
                 jaas.setControlFlag(jaasProperties.getControlFlag());
             }

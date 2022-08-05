@@ -11,7 +11,6 @@ import com.github.linyuzai.event.kafka.engine.KafkaEventEngineFactoryImpl;
 import com.github.linyuzai.event.kafka.inherit.KafkaInheritHandler;
 import com.github.linyuzai.event.kafka.inherit.KafkaInheritHandlerImpl;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -26,7 +25,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.support.converter.RecordMessageConverter;
 
 import java.util.Collections;
 import java.util.List;
@@ -86,8 +84,8 @@ public class KafkaEventAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public KafkaEventEndpointFactory kafkaEventEndpointFactory(ObjectProvider<RecordMessageConverter> messageConverter) {
-        return new KafkaEventEndpointFactoryImpl(messageConverter);
+    public KafkaEventEndpointFactory kafkaEventEndpointFactory() {
+        return new KafkaEventEndpointFactoryImpl();
     }
 
     @Bean

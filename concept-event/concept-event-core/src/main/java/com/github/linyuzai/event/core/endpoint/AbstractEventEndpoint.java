@@ -14,7 +14,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * 事件端点的抽象类
@@ -75,5 +75,17 @@ public abstract class AbstractEventEndpoint extends AbstractInstanceConfig imple
 
     public Subscription defaultSubscribe(EventListener listener, EventContext context) {
         throw new EventException("EventSubscriber is null");
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(engine, name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof EventEndpoint &&
+                engine.equals(((EventEndpoint) obj).getEngine()) &&
+                name.equals(((EventEndpoint) obj).getName());
     }
 }

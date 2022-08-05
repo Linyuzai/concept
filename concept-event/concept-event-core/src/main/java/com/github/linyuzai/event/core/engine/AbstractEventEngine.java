@@ -50,4 +50,15 @@ public abstract class AbstractEventEngine extends AbstractInstanceConfig impleme
             this.endpointMap.remove(endpoint);
         }
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof EventEngine &&
+                name.equals(((EventEngine) obj).getName());
+    }
 }

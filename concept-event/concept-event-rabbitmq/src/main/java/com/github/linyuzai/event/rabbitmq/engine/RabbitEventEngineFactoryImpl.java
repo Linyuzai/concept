@@ -6,6 +6,8 @@ public class RabbitEventEngineFactoryImpl implements RabbitEventEngineFactory {
 
     @Override
     public RabbitEventEngine create(RabbitEventProperties properties) {
-        return null;
+        RabbitEventEngine engine = new RabbitEventEngine();
+        properties.apply(engine);
+        return engine;
     }
 }

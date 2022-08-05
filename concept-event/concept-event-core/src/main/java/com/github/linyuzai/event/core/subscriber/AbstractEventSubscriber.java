@@ -22,8 +22,8 @@ public abstract class AbstractEventSubscriber implements EventSubscriber {
             Subscription subscription = doSubscribe(endpoint, context, o -> {
                 EventDecoder decoder = context.get(EventDecoder.class);
                 //解码事件
-                Object decoded = decoder == null ? o : decoder.decode(o, context);
-                listener.onEvent(decoded);
+                Object decoded = decoder == null ? o : decoder.decode(o, endpoint, context);
+                listener.onEvent(decoded, endpoint, context);
             });
             addLifecycleListener(context, subscription);
             return subscription;
