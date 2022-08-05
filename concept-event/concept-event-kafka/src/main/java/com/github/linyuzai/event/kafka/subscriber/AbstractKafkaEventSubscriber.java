@@ -12,13 +12,13 @@ public abstract class AbstractKafkaEventSubscriber extends KafkaEventSubscriber 
 
     @Override
     public Subscription subscribeKafka(KafkaEventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
-        MessageListenerContainer container = createContainer(endpoint, context);
+        MessageListenerContainer container = createMessageListenerContainer(endpoint, context);
         container.getContainerProperties().setMessageListener(createMessageListener(endpoint, context, consumer));
         container.start();
         return new KafkaSubscription(container);
     }
 
-    public abstract MessageListenerContainer createContainer(KafkaEventEndpoint endpoint, EventContext context);
+    public abstract MessageListenerContainer createMessageListenerContainer(KafkaEventEndpoint endpoint, EventContext context);
 
     public abstract MessageListener<?, ?> createMessageListener(KafkaEventEndpoint endpoint, EventContext context, Consumer<Object> consumer);
 }

@@ -33,13 +33,24 @@ public class JacksonEventDecoder implements EventDecoder {
             if (type == null || type == String.class) {
                 return event;
             }
-            return objectMapper.readValue((String) event, new TypeReference<Object>() {
-                @Override
-                public Type getType() {
-                    return type;
-                }
-            });
+            return objectMapper.readValue((String) event, newTypeReference(type));
+        }
+        if (event instanceof byte[]) {
+            Type type = context.get(Type.class);
+            if (type == null || type == byte[].class) {
+                return event;
+            }
+            return objectMapper.readValue((byte[]) event, newTypeReference(type));
         }
         throw new IllegalArgumentException("String required but " + event.getClass());
+    }
+
+    protected TypeReference<?> newTypeReference(Type type) {
+        return new TypeReference<Object>() {
+            @Override
+            public Type getType() {
+                return type;
+            }
+        };
     }
 }

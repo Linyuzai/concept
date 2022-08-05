@@ -47,7 +47,7 @@ public class RabbitEventEndpointFactoryImpl implements RabbitEventEndpointFactor
         RabbitAdmin rabbitAdmin = createRabbitAdmin(connectionFactory);
 
         RabbitEventEndpoint endpoint = new RabbitEventEndpoint(name, engine);
-
+        endpoint.setProperties(properties);
         endpoint.setConnectionFactory(connectionFactory);
         endpoint.setListenerContainerFactory(listenerContainerFactory);
         endpoint.setTemplate(rabbitTemplate);

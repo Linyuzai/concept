@@ -16,7 +16,7 @@ public class TopicPartitionOffsetKafkaEventSubscriber extends DefaultKafkaEventS
     }
 
     @Override
-    public MessageListenerContainer createContainer(KafkaEventEndpoint endpoint, EventContext context) {
+    public MessageListenerContainer createMessageListenerContainer(KafkaEventEndpoint endpoint, EventContext context) {
         return endpoint.getListenerContainerFactory().createContainer(topicPartitions);
     }
 }

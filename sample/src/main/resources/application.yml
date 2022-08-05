@@ -90,3 +90,5 @@ concept:
         parent:
           enabled: false
           addresses: 1
+          template:
+            exchange: "1"

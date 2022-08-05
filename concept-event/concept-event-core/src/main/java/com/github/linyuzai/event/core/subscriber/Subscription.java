@@ -18,9 +18,4 @@ public interface Subscription {
     boolean subscribed();
 
     void unsubscribe();
-
-    default void unsubscribe(Runnable runnable) {
-        unsubscribe();
-        runnable.run();
-    }
 }

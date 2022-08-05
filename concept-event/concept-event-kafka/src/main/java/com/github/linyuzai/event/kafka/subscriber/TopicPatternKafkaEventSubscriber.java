@@ -15,7 +15,7 @@ public class TopicPatternKafkaEventSubscriber extends DefaultKafkaEventSubscribe
     private final Pattern topicPattern;
 
     @Override
-    public MessageListenerContainer createContainer(KafkaEventEndpoint endpoint, EventContext context) {
+    public MessageListenerContainer createMessageListenerContainer(KafkaEventEndpoint endpoint, EventContext context) {
         return endpoint.getListenerContainerFactory().createContainer(topicPattern);
     }
 }
