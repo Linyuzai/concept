@@ -1,7 +1,8 @@
 package com.github.linyuzai.event.core.exchange;
 
-import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
+import com.github.linyuzai.event.core.engine.EventEngine;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -16,10 +17,10 @@ public interface EventExchange {
     /**
      * 所有端点
      */
-    EventExchange ALL = concept -> concept.getEngines()
+    EventExchange ALL = (engines, context) -> engines
             .stream()
             .flatMap(it -> it.getEndpoints().stream())
             .collect(Collectors.toList());
 
-    Collection<EventEndpoint> exchange(EventConcept concept);
+    Collection<EventEndpoint> exchange(Collection<EventEngine> engines, EventContext context);
 }

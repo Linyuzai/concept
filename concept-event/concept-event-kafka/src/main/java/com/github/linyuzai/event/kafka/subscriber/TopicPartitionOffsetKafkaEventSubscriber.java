@@ -7,7 +7,7 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.TopicPartitionOffset;
 
 @Getter
-public class TopicPartitionOffsetKafkaEventSubscriber extends DefaultKafkaEventSubscriber {
+public class TopicPartitionOffsetKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
 
     private final TopicPartitionOffset[] topicPartitions;
 

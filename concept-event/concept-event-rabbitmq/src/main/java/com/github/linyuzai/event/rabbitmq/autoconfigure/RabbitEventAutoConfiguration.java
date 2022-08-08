@@ -67,8 +67,7 @@ public class RabbitEventAutoConfiguration {
 
     @Bean
     public ConnectionFactory rabbitConnectionFactory() {
-        com.rabbitmq.client.ConnectionFactory connectionFactory = new com.rabbitmq.client.ConnectionFactory();
-        return new CachingConnectionFactory(connectionFactory);
+        return new CachingConnectionFactory(new com.rabbitmq.client.ConnectionFactory());
     }
 
     @Bean

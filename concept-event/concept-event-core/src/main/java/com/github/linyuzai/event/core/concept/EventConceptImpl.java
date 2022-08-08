@@ -98,7 +98,7 @@ public class EventConceptImpl implements EventConcept {
     protected void publishWithContext(Object event, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventPublisher publisher = context.get(EventPublisher.class);
-        Collection<EventEndpoint> endpoints = exchange.exchange(this);
+        Collection<EventEndpoint> endpoints = exchange.exchange(getEngines(), context);
         for (EventEndpoint endpoint : endpoints) {
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventPublisher.class, usePublisher(endpoint, publisher));
@@ -115,7 +115,7 @@ public class EventConceptImpl implements EventConcept {
     protected Subscription subscribeWithContext(EventListener listener, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
-        Collection<EventEndpoint> endpoints = exchange.exchange(this);
+        Collection<EventEndpoint> endpoints = exchange.exchange(getEngines(), context);
         List<Subscription> subscriptions = new ArrayList<>();
         for (EventEndpoint endpoint : endpoints) {
             EventContext prepare = prepareContext(context, endpoint);

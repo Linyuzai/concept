@@ -1,7 +1,8 @@
 package com.github.linyuzai.event.core.exchange;
 
-import com.github.linyuzai.event.core.concept.EventConcept;
+import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
+import com.github.linyuzai.event.core.engine.EventEngine;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,8 +42,8 @@ public class EndpointExchange implements EventExchange {
     }
 
     @Override
-    public Collection<EventEndpoint> exchange(EventConcept concept) {
-        return engine.exchange(concept)
+    public Collection<EventEndpoint> exchange(Collection<EventEngine> engines, EventContext context) {
+        return engine.exchange(engines, context)
                 .stream()
                 .filter(it -> endpoints.contains(it.getName()))
                 .collect(Collectors.toList());

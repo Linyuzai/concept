@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 @Getter
 @AllArgsConstructor
-public class TopicPatternKafkaEventSubscriber extends DefaultKafkaEventSubscriber {
+public class TopicPatternKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
 
     private final Pattern topicPattern;
 

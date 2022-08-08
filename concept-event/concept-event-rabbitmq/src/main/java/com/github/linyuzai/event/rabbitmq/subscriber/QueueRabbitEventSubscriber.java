@@ -2,19 +2,24 @@ package com.github.linyuzai.event.rabbitmq.subscriber;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.rabbitmq.endpoint.RabbitEventEndpoint;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint;
 
 @Getter
-@AllArgsConstructor
-public class DefaultRabbitEventSubscriber extends AbstractRabbitEventSubscriber {
+public class QueueRabbitEventSubscriber extends AbstractRabbitEventSubscriber {
 
-    private final RabbitListenerEndpoint listenerEndpoint;
+    private final String[] queues;
+
+    public QueueRabbitEventSubscriber(String... queues) {
+        this.queues = queues;
+    }
 
     @Override
     public MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint, EventContext context) {
+        SimpleRabbitListenerEndpoint listenerEndpoint = new SimpleRabbitListenerEndpoint();
+        listenerEndpoint.setQueueNames(queues);
+        listenerEndpoint.setAdmin(endpoint.getAdmin());
         return endpoint.getListenerContainerFactory().createListenerContainer(listenerEndpoint);
     }
 }

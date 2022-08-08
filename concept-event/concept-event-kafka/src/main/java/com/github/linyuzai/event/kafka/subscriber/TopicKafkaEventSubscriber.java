@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
 @Getter
-public class TopicKafkaEventSubscriber extends DefaultKafkaEventSubscriber {
+public class TopicKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
 
     private final String[] topics;
 
