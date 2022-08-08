@@ -3,12 +3,14 @@ package com.github.linyuzai.event.rabbitmq.subscriber;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.subscriber.Subscription;
+import com.github.linyuzai.event.rabbitmq.binding.RabbitBinding;
 import com.github.linyuzai.event.rabbitmq.endpoint.RabbitEventEndpoint;
 import com.github.linyuzai.event.rabbitmq.exception.RabbitEventException;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.BatchMessageListener;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
@@ -22,9 +24,17 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
     @Override
     public Subscription subscribeRabbit(RabbitEventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
         MessageListenerContainer container = createMessageListenerContainer(endpoint, context);
+        binding(new RabbitBinding(endpoint.getAdmin()));
+        if (container instanceof AbstractMessageListenerContainer) {
+            ((AbstractMessageListenerContainer) container).setAmqpAdmin(endpoint.getAdmin());
+        }
         container.setupMessageListener(createMessageListener(endpoint, context, consumer));
         container.start();
         return new RabbitSubscription(container);
+    }
+
+    public void binding(RabbitBinding binding) {
+
     }
 
     public abstract MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint, EventContext context);

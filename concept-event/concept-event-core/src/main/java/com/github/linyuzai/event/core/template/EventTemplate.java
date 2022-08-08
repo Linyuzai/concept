@@ -75,5 +75,4 @@ public interface EventTemplate {
      * 订阅事件
      */
     Subscription subscribe(EventListener listener);
-
 }

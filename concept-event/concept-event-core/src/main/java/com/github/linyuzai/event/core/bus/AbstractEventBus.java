@@ -12,12 +12,10 @@ import com.github.linyuzai.event.core.subscriber.Subscription;
 import com.github.linyuzai.event.core.template.EventTemplate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.lang.reflect.Type;
 
 @Getter
-@Setter
 @RequiredArgsConstructor
 public abstract class AbstractEventBus extends AbstractInstanceConfig implements EventBus {
 
@@ -30,7 +28,7 @@ public abstract class AbstractEventBus extends AbstractInstanceConfig implements
     private Subscription subscription;
 
     @Override
-    public void initialize() {
+    public synchronized void initialize() {
         if (subscription != null) {
             return;
         }
@@ -45,7 +43,7 @@ public abstract class AbstractEventBus extends AbstractInstanceConfig implements
     }
 
     @Override
-    public void destroy() {
+    public synchronized void destroy() {
         if (subscription != null) {
             subscription.unsubscribe();
         }

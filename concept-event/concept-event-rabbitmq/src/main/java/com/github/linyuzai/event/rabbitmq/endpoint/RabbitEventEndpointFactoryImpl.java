@@ -40,7 +40,8 @@ public class RabbitEventEndpointFactoryImpl implements RabbitEventEndpointFactor
 
         ConnectionFactory connectionFactory = createConnectionFactory(properties);
 
-        RabbitListenerContainerFactory<? extends MessageListenerContainer> listenerContainerFactory = createRabbitListenerContainerFactory(properties, connectionFactory);
+        RabbitListenerContainerFactory<? extends MessageListenerContainer> listenerContainerFactory =
+                createRabbitListenerContainerFactory(properties, connectionFactory);
 
         RabbitTemplate rabbitTemplate = createRabbitTemplate(properties, connectionFactory);
 

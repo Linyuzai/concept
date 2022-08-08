@@ -73,12 +73,6 @@ concept:
             default-topic: sample
           listener:
             ack-mode: manual_immediate
-#        local:
-#          inherit: parent
-#          bootstrap-servers:
-#            - 192.168.30.140:9092
-#          consumer:
-#            group-id: sample-local
         dev:
           inherit: parent
           bootstrap-servers:
@@ -89,6 +83,10 @@ concept:
       endpoints:
         parent:
           enabled: false
-          addresses: 1
+        dev:
+          inherit: parent
+          enabled: true
+          host: 192.168.30.140
           template:
-            exchange: "1"
+            routing-key: concept-event.dev
+            exchange: concept-event

@@ -49,8 +49,7 @@ public class KafkaEventEndpoint extends AbstractEventEndpoint {
 
     @Override
     public void defaultPublish(Object event, EventContext context) {
-        EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
-        new DefaultKafkaEventPublisher(errorHandler).publish(event, this, context);
+        new DefaultKafkaEventPublisher().publish(event, this, context);
     }
 
     @Override

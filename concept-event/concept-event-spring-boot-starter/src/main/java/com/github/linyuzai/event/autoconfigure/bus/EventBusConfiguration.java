@@ -25,7 +25,8 @@ public class EventBusConfiguration {
     @Bean(initMethod = "initialize", destroyMethod = "destroy")
     @ConditionalOnProperty(name = "concept.event.bus.enabled", havingValue = "true")
     @ConditionalOnMissingBean
-    public EventBus eventBus(EventBusProperties properties, EventConcept concept, ApplicationEventPublisher publisher, List<EventBusConfigurer> configurers) {
+    public EventBus eventBus(EventBusProperties properties, EventConcept concept,
+                             ApplicationEventPublisher publisher, List<EventBusConfigurer> configurers) {
         EventExchange exchange = getEventExchange(concept, properties);
         ApplicationEventBus bus = new ApplicationEventBus(concept, exchange, publisher);
         configurers.forEach(it -> it.configure(bus));
