@@ -80,12 +80,15 @@ concept:
           consumer:
             group-id: sample-dev
     rabbitmq:
+      enabled: true
       endpoints:
         parent:
           enabled: false
+          username: landsky
+          password: landsky
+          port: 11831
         dev:
           inherit: parent
-          enabled: true
           host: 192.168.30.140
           template:
             routing-key: concept-event.dev

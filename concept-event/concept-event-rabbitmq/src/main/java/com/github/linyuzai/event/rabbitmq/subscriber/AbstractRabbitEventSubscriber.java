@@ -10,7 +10,6 @@ import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.BatchMessageListener;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
@@ -23,12 +22,12 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
 
     @Override
     public Subscription subscribeRabbit(RabbitEventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
-        MessageListenerContainer container = createMessageListenerContainer(endpoint, context);
-        binding(new RabbitBinding(endpoint.getAdmin()));
-        if (container instanceof AbstractMessageListenerContainer) {
-            ((AbstractMessageListenerContainer) container).setAmqpAdmin(endpoint.getAdmin());
+        MessageListener messageListener = createMessageListener(endpoint, context, consumer);
+        MessageListenerContainer container = createMessageListenerContainer(endpoint, context, messageListener);
+        if (container.getMessageListener() == null) {
+            container.setupMessageListener(messageListener);
         }
-        container.setupMessageListener(createMessageListener(endpoint, context, consumer));
+        binding(new RabbitBinding(endpoint.getAdmin()));
         container.start();
         return new RabbitSubscription(container);
     }
@@ -37,7 +36,9 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
 
     }
 
-    public abstract MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint, EventContext context);
+    public abstract MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint,
+                                                                            EventContext context,
+                                                                            MessageListener messageListener);
 
     public MessageListener createMessageListener(RabbitEventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
         RabbitProperties.Listener listener = endpoint.getProperties().getListener();

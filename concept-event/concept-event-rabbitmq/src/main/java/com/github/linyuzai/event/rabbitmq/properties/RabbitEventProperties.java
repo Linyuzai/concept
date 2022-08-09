@@ -20,7 +20,7 @@ import java.util.Map;
 @ConfigurationProperties("concept.event.rabbitmq")
 public class RabbitEventProperties extends AbstractPropertiesConfig implements PropertiesConfig {
 
-    private boolean enabled = true;
+    private boolean enabled;
 
     private Map<String, ExtendedRabbitProperties> endpoints = new LinkedHashMap<>();
 

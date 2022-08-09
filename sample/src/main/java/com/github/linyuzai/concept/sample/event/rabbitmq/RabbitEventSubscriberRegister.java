@@ -1,6 +1,5 @@
 package com.github.linyuzai.concept.sample.event.rabbitmq;
 
-import com.github.linyuzai.concept.sample.event.kafka.KafkaData;
 import com.github.linyuzai.event.core.concept.EventConcept;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
@@ -24,7 +23,6 @@ public class RabbitEventSubscriberRegister implements ApplicationRunner {
     @Autowired
     public EventConcept concept;
 
-    //@KafkaListener(topics = "sample", containerFactory = "devKafkaListenerContainerFactory")
     @SneakyThrows
     public void receiveDev(Message message, Channel channel) {
         System.out.println("dev-" + new String(message.getBody()));
@@ -35,7 +33,7 @@ public class RabbitEventSubscriberRegister implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         concept.template()
                 .exchange(new RabbitEngineExchange())
-                .subscriber(new QueueRabbitEventSubscriber("sample") {
+                .subscriber(new QueueRabbitEventSubscriber("concept-event") {
 
                     @Override
                     public void binding(RabbitBinding binding) {
@@ -44,9 +42,9 @@ public class RabbitEventSubscriberRegister implements ApplicationRunner {
                                 .with("concept-event.#");
                     }
                 })
-                .subscribe(new GenericEventListener<KafkaData>() {
+                .subscribe(new GenericEventListener<RabbitData>() {
                     @Override
-                    public void onGenericEvent(KafkaData event, EventEndpoint endpoint, EventContext context) {
+                    public void onGenericEvent(RabbitData event, EventEndpoint endpoint, EventContext context) {
                         System.out.println(event);
                     }
                 });

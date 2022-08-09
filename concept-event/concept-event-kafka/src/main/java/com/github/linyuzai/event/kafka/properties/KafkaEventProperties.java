@@ -20,7 +20,7 @@ import java.util.Map;
 @ConfigurationProperties("concept.event.kafka")
 public class KafkaEventProperties extends AbstractPropertiesConfig implements PropertiesConfig {
 
-    private boolean enabled = true;
+    private boolean enabled;
 
     private Map<String, ExtendedKafkaProperties> endpoints = new LinkedHashMap<>();
 

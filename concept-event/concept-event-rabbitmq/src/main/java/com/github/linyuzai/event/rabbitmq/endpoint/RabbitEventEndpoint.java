@@ -37,7 +37,7 @@ public class RabbitEventEndpoint extends AbstractEventEndpoint {
 
     @Override
     public void defaultPublish(Object event, EventContext context) {
-        new DefaultRabbitEventPublisher().publishRabbit(event, this, context);
+        new DefaultRabbitEventPublisher().publish(event, this, context);
     }
 
     @Override

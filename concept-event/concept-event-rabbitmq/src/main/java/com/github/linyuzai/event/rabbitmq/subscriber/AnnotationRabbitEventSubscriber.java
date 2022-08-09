@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.MethodRabbitListenerEndpoint;
@@ -22,7 +23,9 @@ public class AnnotationRabbitEventSubscriber extends AbstractRabbitEventSubscrib
     private Object target;
 
     @Override
-    public MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint, EventContext context) {
+    public MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint,
+                                                                   EventContext context,
+                                                                   MessageListener messageListener) {
         return endpoint.getListenerContainerFactory().createListenerContainer(generateRabbitListenerEndpoint());
     }
 

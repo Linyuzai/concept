@@ -27,6 +27,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 
 import java.util.List;
@@ -77,18 +78,18 @@ public class RabbitEventAutoConfiguration {
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
-        return new RabbitTemplate();
+        return new RabbitTemplate(rabbitConnectionFactory());
     }
 
     @Bean
-    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        return new RabbitAdmin(connectionFactory);
+    public RabbitAdmin rabbitAdmin() {
+        return new RabbitAdmin(rabbitConnectionFactory());
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public RabbitInheritHandler rabbitInheritHandler() {
-        return new RabbitInheritHandlerImpl();
+    public RabbitInheritHandler rabbitInheritHandler(Environment environment) {
+        return new RabbitInheritHandlerImpl(environment);
     }
 
     @Bean
