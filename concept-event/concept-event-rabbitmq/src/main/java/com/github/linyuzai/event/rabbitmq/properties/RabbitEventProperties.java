@@ -4,6 +4,7 @@ import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.config.AbstractPropertiesConfig;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
+import com.github.linyuzai.event.core.inherit.Inheritable;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 import com.github.linyuzai.event.core.config.PropertiesConfig;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ConfigurationProperties("concept.event.rabbitmq")
-public class RabbitEventProperties extends AbstractPropertiesConfig implements PropertiesConfig {
+public class RabbitEventProperties extends AbstractPropertiesConfig implements PropertiesConfig, Inheritable {
 
     private boolean enabled;
 
@@ -26,7 +27,8 @@ public class RabbitEventProperties extends AbstractPropertiesConfig implements P
 
     @Getter
     @Setter
-    public static class ExtendedRabbitProperties extends RabbitProperties implements PropertiesConfig {
+    public static class ExtendedRabbitProperties extends RabbitProperties
+            implements PropertiesConfig, Inheritable.Endpoint {
 
         private boolean enabled = true;
 

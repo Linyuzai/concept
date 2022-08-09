@@ -9,7 +9,7 @@ import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngineConfigurer;
 import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngineFactory;
 import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngineFactoryImpl;
 import com.github.linyuzai.event.rabbitmq.inherit.RabbitInheritHandler;
-import com.github.linyuzai.event.rabbitmq.inherit.RabbitInheritHandlerImpl;
+import com.github.linyuzai.event.rabbitmq.inherit.ReflectionRabbitInheritHandler;
 import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -68,7 +68,9 @@ public class RabbitEventAutoConfiguration {
 
     @Bean
     public ConnectionFactory rabbitConnectionFactory() {
-        return new CachingConnectionFactory(new com.rabbitmq.client.ConnectionFactory());
+        com.rabbitmq.client.ConnectionFactory factory = new com.rabbitmq.client.ConnectionFactory();
+        factory.setAutomaticRecoveryEnabled(false);
+        return new CachingConnectionFactory(factory);
     }
 
     @Bean
@@ -89,7 +91,7 @@ public class RabbitEventAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RabbitInheritHandler rabbitInheritHandler(Environment environment) {
-        return new RabbitInheritHandlerImpl(environment);
+        return new ReflectionRabbitInheritHandler(environment);
     }
 
     @Bean

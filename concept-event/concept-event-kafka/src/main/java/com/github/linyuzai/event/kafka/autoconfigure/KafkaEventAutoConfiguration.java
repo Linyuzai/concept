@@ -9,7 +9,7 @@ import com.github.linyuzai.event.kafka.engine.KafkaEventEngineConfigurer;
 import com.github.linyuzai.event.kafka.engine.KafkaEventEngineFactory;
 import com.github.linyuzai.event.kafka.engine.KafkaEventEngineFactoryImpl;
 import com.github.linyuzai.event.kafka.inherit.KafkaInheritHandler;
-import com.github.linyuzai.event.kafka.inherit.KafkaInheritHandlerImpl;
+import com.github.linyuzai.event.kafka.inherit.ReflectionKafkaInheritHandler;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -73,7 +73,7 @@ public class KafkaEventAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public KafkaInheritHandler kafkaInheritHandler(Environment environment) {
-        return new KafkaInheritHandlerImpl(environment);
+        return new ReflectionKafkaInheritHandler(environment);
     }
 
     @Bean

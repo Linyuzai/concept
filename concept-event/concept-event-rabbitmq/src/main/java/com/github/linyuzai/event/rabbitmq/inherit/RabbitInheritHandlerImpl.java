@@ -1,7 +1,7 @@
 package com.github.linyuzai.event.rabbitmq.inherit;
 
 import com.github.linyuzai.event.core.config.PropertiesConfig;
-import com.github.linyuzai.event.core.utils.InheritUtils;
+import com.github.linyuzai.event.core.inherit.InheritHelper;
 import com.github.linyuzai.event.rabbitmq.exception.RabbitEventException;
 import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
+@Deprecated
 @Getter
 @AllArgsConstructor
 public class RabbitInheritHandlerImpl implements RabbitInheritHandler {
@@ -373,6 +374,6 @@ public class RabbitInheritHandlerImpl implements RabbitInheritHandler {
     }
 
     public void inheritExtended(PropertiesConfig child, PropertiesConfig parent) {
-        InheritUtils.inherit(child, parent);
+        InheritHelper.inherit(child, parent);
     }
 }
