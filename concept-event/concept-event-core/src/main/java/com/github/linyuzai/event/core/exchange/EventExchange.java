@@ -22,5 +22,5 @@ public interface EventExchange {
             .flatMap(it -> it.getEndpoints().stream())
             .collect(Collectors.toList());
 
-    Collection<EventEndpoint> exchange(Collection<EventEngine> engines, EventContext context);
+    Collection<? extends EventEndpoint> exchange(Collection<? extends EventEngine> engines, EventContext context);
 }

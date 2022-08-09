@@ -42,7 +42,7 @@ public class EndpointExchange implements EventExchange {
     }
 
     @Override
-    public Collection<EventEndpoint> exchange(Collection<EventEngine> engines, EventContext context) {
+    public Collection<? extends EventEndpoint> exchange(Collection<? extends EventEngine> engines, EventContext context) {
         return engine.exchange(engines, context)
                 .stream()
                 .filter(it -> endpoints.contains(it.getName()))

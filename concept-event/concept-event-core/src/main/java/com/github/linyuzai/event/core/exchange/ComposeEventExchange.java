@@ -21,7 +21,7 @@ public class ComposeEventExchange implements EventExchange {
     }
 
     @Override
-    public Collection<EventEndpoint> exchange(Collection<EventEngine> engines, EventContext context) {
+    public Collection<? extends EventEndpoint> exchange(Collection<? extends EventEngine> engines, EventContext context) {
         return exchanges.stream()
                 .flatMap(it -> it.exchange(engines, context).stream())
                 .collect(Collectors.toSet());

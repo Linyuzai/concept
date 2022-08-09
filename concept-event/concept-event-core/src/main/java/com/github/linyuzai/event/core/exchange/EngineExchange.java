@@ -31,7 +31,7 @@ public class EngineExchange implements EventExchange {
     }
 
     @Override
-    public Collection<EventEndpoint> exchange(Collection<EventEngine> engines, EventContext context) {
+    public Collection<? extends EventEndpoint> exchange(Collection<? extends EventEngine> engines, EventContext context) {
         return engines.stream()
                 .filter(it -> this.engines.contains(it.getName()))
                 .flatMap(it -> it.getEndpoints().stream())

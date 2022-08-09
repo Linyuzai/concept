@@ -38,7 +38,7 @@ public class EventBusConfiguration {
         if (StringUtils.hasText(properties.getEngine())) {
             engine = properties.getEngine();
         } else {
-            Collection<EventEngine> engines = concept.getEngines();
+            Collection<? extends EventEngine> engines = concept.getEngines();
             int size = engines.size();
             if (size == 0) {
                 throw new EventException("No engine found");
@@ -53,7 +53,7 @@ public class EventBusConfiguration {
         if (StringUtils.hasText(properties.getEndpoint())) {
             endpoint = properties.getEndpoint();
         } else {
-            Collection<EventEndpoint> endpoints = concept.getEngine(engine).getEndpoints();
+            Collection<? extends EventEndpoint> endpoints = concept.getEngine(engine).getEndpoints();
             int size = endpoints.size();
             if (size == 0) {
                 throw new EventException("No endpoint found");

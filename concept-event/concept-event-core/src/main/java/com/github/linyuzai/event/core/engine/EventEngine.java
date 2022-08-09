@@ -26,7 +26,7 @@ public interface EventEngine extends InstanceConfig {
     /**
      * 获得所有的事件端点
      */
-    Collection<EventEndpoint> getEndpoints();
+    Collection<? extends EventEndpoint> getEndpoints();
 
     /**
      * 添加事件端点

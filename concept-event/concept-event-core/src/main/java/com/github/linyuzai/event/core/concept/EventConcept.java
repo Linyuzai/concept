@@ -86,7 +86,7 @@ public interface EventConcept {
     /**
      * 获得所有的事件引擎
      */
-    Collection<EventEngine> getEngines();
+    Collection<? extends EventEngine> getEngines();
 
     /**
      * 添加事件引擎
@@ -115,7 +115,7 @@ public interface EventConcept {
     /**
      * 获得所有的生命周期监听器
      */
-    Collection<EventConceptLifecycleListener> getLifecycleListeners();
+    Collection<? extends EventConceptLifecycleListener> getLifecycleListeners();
 
     /**
      * 添加生命周期监听器

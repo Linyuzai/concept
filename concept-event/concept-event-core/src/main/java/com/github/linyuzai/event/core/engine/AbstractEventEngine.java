@@ -33,7 +33,7 @@ public abstract class AbstractEventEngine extends AbstractInstanceConfig impleme
         return endpointMap.get(name);
     }
 
-    public Collection<EventEndpoint> getEndpoints() {
+    public Collection<? extends EventEndpoint> getEndpoints() {
         return Collections.unmodifiableCollection(endpointMap.values());
     }
 
