@@ -14,6 +14,7 @@ import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -80,7 +82,15 @@ public class RabbitEventAutoConfiguration {
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
-        return new RabbitTemplate(rabbitConnectionFactory());
+        return new RabbitTemplate(rabbitConnectionFactory()) {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public <T> T execute(@NonNull ChannelCallback<T> action) {
+                //RabbitHealthIndicator报错问题
+                return (T) "";
+            }
+        };
     }
 
     @Bean
