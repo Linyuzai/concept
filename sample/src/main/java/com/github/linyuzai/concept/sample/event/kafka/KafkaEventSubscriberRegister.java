@@ -36,6 +36,7 @@ public class KafkaEventSubscriberRegister implements ApplicationRunner {
                 .exchange(new KafkaEngineExchange())
                 .subscriber(new TopicKafkaEventSubscriber("sample"))
                 .subscribe(new GenericEventListener<KafkaData>() {
+
                     @Override
                     public void onGenericEvent(KafkaData event, EventEndpoint endpoint, EventContext context) {
                         System.out.println(event);
