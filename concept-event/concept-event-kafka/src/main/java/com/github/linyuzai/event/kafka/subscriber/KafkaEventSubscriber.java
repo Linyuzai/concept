@@ -2,17 +2,16 @@ package com.github.linyuzai.event.kafka.subscriber;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
+import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.subscriber.AbstractEventSubscriber;
 import com.github.linyuzai.event.core.subscriber.Subscription;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 
-import java.util.function.Consumer;
-
 public abstract class KafkaEventSubscriber extends AbstractEventSubscriber {
 
     @Override
-    public Subscription doSubscribe(EventEndpoint endpoint, EventContext context, Consumer<Object> consumer) {
-        return subscribeKafka((KafkaEventEndpoint) endpoint, context, consumer);
+    public Subscription doSubscribe(EventListener listener, EventEndpoint endpoint, EventContext context) {
+        return subscribeKafka(listener, (KafkaEventEndpoint) endpoint, context);
     }
 
     @Override
@@ -20,5 +19,7 @@ public abstract class KafkaEventSubscriber extends AbstractEventSubscriber {
         return endpoint instanceof KafkaEventEndpoint;
     }
 
-    public abstract Subscription subscribeKafka(KafkaEventEndpoint endpoint, EventContext context, Consumer<Object> consumer);
+    public abstract Subscription subscribeKafka(EventListener listener,
+                                                KafkaEventEndpoint endpoint,
+                                                EventContext context);
 }

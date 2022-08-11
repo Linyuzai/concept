@@ -1,5 +1,7 @@
 package com.github.linyuzai.event.core.endpoint;
 
+import com.github.linyuzai.event.core.codec.EventDecoder;
+import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.config.AbstractInstanceConfig;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
@@ -14,7 +16,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.lang.reflect.Type;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 事件端点的抽象类
@@ -40,12 +44,18 @@ public abstract class AbstractEventEndpoint extends AbstractInstanceConfig imple
     public void publish(Object event, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
+            EventEncoder encoder = context.get(EventEncoder.class);
+            //编码事件
+            //Object encoded = encoder == null ? event : encoder.encode(event, this, context);
+            Object encoded = Optional.ofNullable(encoder)
+                    .map(it -> it.encode(event, this, context))
+                    .orElse(event);
             EventPublisher publisher = context.get(EventPublisher.class);
             if (publisher == null) {
                 //如果没有发布器进行默认发布
-                defaultPublish(event, context);
+                defaultPublish(encoded, context);
             } else {
-                publisher.publish(event, this, context);
+                publisher.publish(encoded, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);
@@ -60,12 +70,31 @@ public abstract class AbstractEventEndpoint extends AbstractInstanceConfig imple
     public Subscription subscribe(EventListener listener, EventContext context) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
+            context.put(Type.class, listener.getType());
+            EventListener decodeListener = new EventListener() {
+
+                @Override
+                public void onEvent(Object event, EventEndpoint endpoint, EventContext context) {
+                    EventDecoder decoder = context.get(EventDecoder.class);
+                    //解码事件
+                    //Object decoded = decoder == null ? event : decoder.decode(event, endpoint, context);
+                    Object decoded = Optional.ofNullable(decoder)
+                            .map(it -> it.decode(event, endpoint, context))
+                            .orElse(event);
+                    listener.onEvent(decoded, endpoint, context);
+                }
+
+                @Override
+                public Type getType() {
+                    return listener.getType();
+                }
+            };
             EventSubscriber subscriber = context.get(EventSubscriber.class);
             if (subscriber == null) {
                 //如果没有订阅器进行默认订阅
-                return defaultSubscribe(listener, context);
+                return defaultSubscribe(decodeListener, context);
             } else {
-                return subscriber.subscribe(listener, this, context);
+                return subscriber.subscribe(decodeListener, this, context);
             }
         } catch (Throwable e) {
             errorHandler.onError(e, this, context);

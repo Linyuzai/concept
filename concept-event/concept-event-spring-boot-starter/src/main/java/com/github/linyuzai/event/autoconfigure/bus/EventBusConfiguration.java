@@ -18,10 +18,18 @@ import org.springframework.util.StringUtils;
 import java.util.Collection;
 import java.util.List;
 
-@Configuration
+/**
+ * 事件总线配置类
+ */
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(EventBusProperties.class)
 public class EventBusConfiguration {
 
+    /**
+     * 'concept.event.bus.enabled=true' 时注入事件总线
+     * <p>
+     * 基于 {@link ApplicationEventPublisher} 的事件发布和监听
+     */
     @Bean(initMethod = "initialize", destroyMethod = "destroy")
     @ConditionalOnProperty(name = "concept.event.bus.enabled", havingValue = "true")
     @ConditionalOnMissingBean
@@ -33,6 +41,13 @@ public class EventBusConfiguration {
         return bus;
     }
 
+    /**
+     * 获得事件总线的事件交换机
+     * <p>
+     * 通过 'concept.event.bus.engine' 和 'concept.event.bus.endpoint'
+     * <p>
+     * 来指定一个端点作为事件总线的中间件
+     */
     private EventExchange getEventExchange(EventConcept concept, EventBusProperties properties) {
         String engine;
         if (StringUtils.hasText(properties.getEngine())) {

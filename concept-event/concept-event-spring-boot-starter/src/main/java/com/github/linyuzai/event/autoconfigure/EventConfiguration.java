@@ -20,6 +20,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * 事件配置类
+ */
 @Configuration(proxyBeanMethods = false)
 public class EventConfiguration {
 

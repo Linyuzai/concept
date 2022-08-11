@@ -13,10 +13,7 @@ public abstract class AbstractEventPublisher implements EventPublisher {
 
     @Override
     public void publish(Object event, EventEndpoint endpoint, EventContext context) {
-        EventEncoder encoder = context.get(EventEncoder.class);
-        //编码事件
-        Object encoded = encoder == null ? event : encoder.encode(event, endpoint, context);
-        doPublish(encoded, endpoint, context);
+        doPublish(event, endpoint, context);
     }
 
     public abstract void doPublish(Object event, EventEndpoint endpoint, EventContext context);

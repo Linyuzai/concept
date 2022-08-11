@@ -1,13 +1,10 @@
 package com.github.linyuzai.event.core.subscriber;
 
-import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.concept.EventConcept;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.lifecycle.EventConceptLifecycleListener;
 import com.github.linyuzai.event.core.listener.EventListener;
-
-import java.util.function.Consumer;
 
 /**
  * 事件订阅器的抽象类
@@ -19,12 +16,7 @@ public abstract class AbstractEventSubscriber implements EventSubscriber {
     @Override
     public Subscription subscribe(EventListener listener, EventEndpoint endpoint, EventContext context) {
         if (support(endpoint, context)) {
-            Subscription subscription = doSubscribe(endpoint, context, o -> {
-                EventDecoder decoder = context.get(EventDecoder.class);
-                //解码事件
-                Object decoded = decoder == null ? o : decoder.decode(o, endpoint, context);
-                listener.onEvent(decoded, endpoint, context);
-            });
+            Subscription subscription = doSubscribe(listener, endpoint, context);
             addLifecycleListener(context, subscription);
             return subscription;
         } else {
@@ -39,7 +31,7 @@ public abstract class AbstractEventSubscriber implements EventSubscriber {
 
     public abstract boolean support(EventEndpoint endpoint, EventContext context);
 
-    public abstract Subscription doSubscribe(EventEndpoint endpoint, EventContext context, Consumer<Object> consumer);
+    public abstract Subscription doSubscribe(EventListener listener, EventEndpoint endpoint, EventContext context);
 
     public static class UnSubscriber implements EventConceptLifecycleListener {
 

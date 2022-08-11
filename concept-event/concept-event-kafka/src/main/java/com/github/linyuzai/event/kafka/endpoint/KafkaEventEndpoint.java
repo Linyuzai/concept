@@ -3,7 +3,6 @@ package com.github.linyuzai.event.kafka.endpoint;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.AbstractEventEndpoint;
 import com.github.linyuzai.event.core.engine.EventEngine;
-import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.subscriber.Subscription;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
@@ -20,8 +19,6 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
-
-import java.util.function.Consumer;
 
 @Getter
 @Setter

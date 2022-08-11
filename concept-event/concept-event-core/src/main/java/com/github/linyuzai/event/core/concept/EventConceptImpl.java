@@ -19,7 +19,6 @@ import com.github.linyuzai.event.core.template.EventTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -343,7 +342,6 @@ public class EventConceptImpl implements EventConcept {
 
         @Override
         public Subscription subscribe(EventListener listener) {
-            context(Type.class, listener.getType());
             return subscribeWithContext(listener, context);
         }
     }
