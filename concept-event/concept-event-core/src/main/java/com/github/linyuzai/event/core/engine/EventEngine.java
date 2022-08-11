@@ -1,7 +1,7 @@
 package com.github.linyuzai.event.core.engine;
 
-import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.config.InstanceConfig;
+import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 
 import java.util.Arrays;
 import java.util.Collection;

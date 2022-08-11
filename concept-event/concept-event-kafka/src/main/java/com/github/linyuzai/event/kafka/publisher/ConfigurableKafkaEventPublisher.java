@@ -2,11 +2,9 @@ package com.github.linyuzai.event.kafka.publisher;
 
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.lang.Nullable;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.function.Supplier;

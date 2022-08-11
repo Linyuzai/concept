@@ -1,9 +1,9 @@
 package com.github.linyuzai.event.core.endpoint;
 
-import com.github.linyuzai.event.core.listener.EventListener;
+import com.github.linyuzai.event.core.config.InstanceConfig;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.engine.EventEngine;
-import com.github.linyuzai.event.core.config.InstanceConfig;
+import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.subscriber.Subscription;
 
 /**

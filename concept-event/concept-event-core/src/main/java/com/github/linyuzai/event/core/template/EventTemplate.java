@@ -9,10 +9,7 @@ import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 import com.github.linyuzai.event.core.subscriber.Subscription;
-import lombok.SneakyThrows;
 
-import java.lang.reflect.Constructor;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 

@@ -2,7 +2,10 @@ package com.github.linyuzai.event.core.engine;
 
 import com.github.linyuzai.event.core.config.AbstractInstanceConfig;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.Collection;
 import java.util.Collections;

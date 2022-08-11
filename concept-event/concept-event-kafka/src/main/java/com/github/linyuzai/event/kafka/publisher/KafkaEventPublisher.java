@@ -3,7 +3,6 @@ package com.github.linyuzai.event.kafka.publisher;
 import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.publisher.AbstractEventPublisher;
-import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 
 public abstract class KafkaEventPublisher extends AbstractEventPublisher {
