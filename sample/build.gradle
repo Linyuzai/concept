@@ -46,6 +46,8 @@ dependencies {
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-websocket-loadbalance-spring-boot-starter', configuration: 'default')
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     //compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     /*implementation("org.springframework.boot:spring-boot-starter-web") {
@@ -69,6 +71,7 @@ dependencies {
     implementation 'io.socket:socket.io-server:4.0.1'
 
     implementation 'org.springframework.cloud:spring-cloud-starter'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
