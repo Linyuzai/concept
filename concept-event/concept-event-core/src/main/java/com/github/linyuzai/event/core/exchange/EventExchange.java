@@ -22,5 +22,8 @@ public interface EventExchange {
             .flatMap(it -> it.getEndpoints().stream())
             .collect(Collectors.toList());
 
+    /**
+     * 提供发布或订阅操作所对应的事件端点
+     */
     Collection<? extends EventEndpoint> exchange(Collection<? extends EventEngine> engines, EventContext context);
 }

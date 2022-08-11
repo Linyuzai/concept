@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.rabbitmq.inherit;
 
-import com.github.linyuzai.event.core.inherit.InheritHelper;
+import com.github.linyuzai.event.core.inherit.AbstractInheritHandler;
 import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,13 +12,19 @@ import java.time.Duration;
 
 @Getter
 @AllArgsConstructor
-public class ReflectionRabbitInheritHandler extends InheritHelper implements RabbitInheritHandler {
+public class ReflectionRabbitInheritHandler extends AbstractInheritHandler<RabbitEventProperties>
+        implements RabbitInheritHandler {
 
     private final Environment environment;
 
     @Override
-    public void inherit(RabbitEventProperties properties) {
-        inherit(properties, RabbitProperties.class, "concept.event.rabbitmq.endpoints");
+    public Class<?> getRootClass() {
+        return RabbitProperties.class;
+    }
+
+    @Override
+    public String getRootPrefix() {
+        return "concept.event.rabbitmq.endpoints";
     }
 
     @Override
@@ -34,6 +40,6 @@ public class ReflectionRabbitInheritHandler extends InheritHelper implements Rab
 
     @Override
     public boolean isValueType(Class<?> clazz) {
-        return clazz == Duration.class;
+        return super.isValueType(clazz) && clazz == Duration.class;
     }
 }

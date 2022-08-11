@@ -10,10 +10,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+/**
+ * 组合事件交换机
+ * <p>
+ * 可以组合多个事件交换机
+ * <p>
+ * 已对端点去重
+ */
 @Getter
 @AllArgsConstructor
 public class ComposeEventExchange implements EventExchange {
 
+    /**
+     * 多个事件交换机
+     */
     private Collection<EventExchange> exchanges;
 
     public ComposeEventExchange(EventExchange... exchanges) {

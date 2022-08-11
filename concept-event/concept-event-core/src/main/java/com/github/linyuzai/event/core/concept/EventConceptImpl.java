@@ -65,6 +65,9 @@ public class EventConceptImpl implements EventConcept {
      */
     private EventErrorHandler errorHandler;
 
+    /**
+     * 调用生命周期的初始化方法
+     */
     @Override
     public void initialize() {
         List<EventConceptLifecycleListener> listeners = new ArrayList<>(lifecycleListeners);
@@ -73,14 +76,22 @@ public class EventConceptImpl implements EventConcept {
         }
     }
 
+    /**
+     * 调用生命周期的销毁接口
+     */
     @Override
     public void destroy() {
+        //UnSubscriber会在销毁时移除生命周期监听
+        //所以这里不使用原始的列表
         List<EventConceptLifecycleListener> listeners = new ArrayList<>(lifecycleListeners);
         for (EventConceptLifecycleListener listener : listeners) {
             listener.onDestroy(this);
         }
     }
 
+    /**
+     * 新建一个事件模版
+     */
     @Override
     public EventTemplate template() {
         return new EventTemplateImpl();
@@ -95,8 +106,10 @@ public class EventConceptImpl implements EventConcept {
     protected void publishWithContext(Object event, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventPublisher publisher = context.get(EventPublisher.class);
+        //确定需要发布事件的端点
         Collection<? extends EventEndpoint> endpoints = exchange.exchange(getEngines(), context);
         for (EventEndpoint endpoint : endpoints) {
+            //准备上下文为每个事件端点生成一个上下文副本
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventPublisher.class, usePublisher(endpoint, publisher));
             endpoint.publish(event, prepare);
@@ -112,9 +125,11 @@ public class EventConceptImpl implements EventConcept {
     protected Subscription subscribeWithContext(EventListener listener, EventContext context) {
         EventExchange exchange = applyExchange(context);
         EventSubscriber subscriber = context.get(EventSubscriber.class);
+        //确定需要订阅事件的端点
         Collection<? extends EventEndpoint> endpoints = exchange.exchange(getEngines(), context);
         List<Subscription> subscriptions = new ArrayList<>();
         for (EventEndpoint endpoint : endpoints) {
+            //准备上下文为每个事件端点生成一个上下文副本
             EventContext prepare = prepareContext(context, endpoint);
             prepare.put(EventSubscriber.class, useSubscriber(endpoint, subscriber));
             Subscription subscription = endpoint.subscribe(listener, prepare);
@@ -125,6 +140,8 @@ public class EventConceptImpl implements EventConcept {
 
     /**
      * 确定事件交换机
+     * <p>
+     * 同时设置到上下文中
      */
     protected EventExchange applyExchange(EventContext context) {
         EventExchange exchange = context.get(EventExchange.class);
@@ -328,6 +345,9 @@ public class EventConceptImpl implements EventConcept {
      */
     protected class EventTemplateImpl extends ContextEventTemplate {
 
+        /**
+         * 通过事件上下文工厂生成一个事件上下文
+         */
         protected EventContext context = contextFactory.create();
 
         @Override

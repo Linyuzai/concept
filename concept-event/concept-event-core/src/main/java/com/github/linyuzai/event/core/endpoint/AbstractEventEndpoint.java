@@ -106,11 +106,17 @@ public abstract class AbstractEventEndpoint extends AbstractInstanceConfig imple
         throw new EventException("EventSubscriber is null");
     }
 
+    /**
+     * 引擎（名称）和名称组合计算
+     */
     @Override
     public int hashCode() {
         return Objects.hash(engine, name);
     }
 
+    /**
+     * 引擎（名称）相同并且名称相同
+     */
     @Override
     public boolean equals(Object obj) {
         return obj instanceof EventEndpoint &&

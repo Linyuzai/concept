@@ -6,7 +6,7 @@ import com.github.linyuzai.event.core.listener.EventListener;
 
 
 /**
- * 事件订阅者
+ * 事件订阅器
  */
 public interface EventSubscriber {
 

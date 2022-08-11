@@ -25,19 +25,28 @@ public class JacksonEventDecoder implements EventDecoder {
         this(new ObjectMapper());
     }
 
+    /**
+     * 如果未指定类型则直接返回
+     * <p>
+     * 如果是字符串或字节数组并且指定了对应的类型则直接返回
+     * <p>
+     * 否则尝试解析 json 为指定类型的对象
+     */
     @SneakyThrows
     @Override
     public Object decode(Object event, EventEndpoint endpoint, EventContext context) {
+        Type type = context.get(Type.class);
+        if (type == null) {
+            return event;
+        }
         if (event instanceof String) {
-            Type type = context.get(Type.class);
-            if (type == null || type == String.class) {
+            if (type == String.class) {
                 return event;
             }
             return objectMapper.readValue((String) event, newTypeReference(type));
         }
         if (event instanceof byte[]) {
-            Type type = context.get(Type.class);
-            if (type == null || type == byte[].class) {
+            if (type == byte[].class) {
                 return event;
             }
             return objectMapper.readValue((byte[]) event, newTypeReference(type));

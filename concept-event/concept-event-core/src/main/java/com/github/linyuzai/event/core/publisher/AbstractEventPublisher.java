@@ -13,6 +13,7 @@ public abstract class AbstractEventPublisher implements EventPublisher {
 
     @Override
     public void publish(Object event, EventEndpoint endpoint, EventContext context) {
+        //预留扩展
         doPublish(event, endpoint, context);
     }
 

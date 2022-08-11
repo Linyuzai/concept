@@ -5,6 +5,8 @@ import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 
 /**
  * 事件编码器
+ *
+ * 在执行事件监听器 {@link com.github.linyuzai.event.core.listener.EventListener} 之前生效
  */
 public interface EventEncoder {
 

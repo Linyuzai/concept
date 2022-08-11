@@ -12,6 +12,10 @@ import java.util.Map;
 
 /**
  * 配置文件配置
+ * <p>
+ * 事件引擎和事件端点都有很多相同的配置
+ * <p>
+ * 所以提取出来统一处理
  */
 public interface PropertiesConfig {
 
@@ -39,6 +43,9 @@ public interface PropertiesConfig {
 
     void setSubscriber(Class<? extends EventSubscriber> subscriber);
 
+    /**
+     * 这里统一为事件引擎或事件端点按照该配置文件对应的属性进行配置
+     */
     default void apply(InstanceConfig config) {
         config.setMetadata(getMetadata());
         config.setEncoder(newInstance(getEncoder()));

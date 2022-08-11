@@ -14,6 +14,8 @@ import java.util.function.Consumer;
 
 /**
  * 基于上下文的事件模版
+ * <p>
+ * 所有的配置都设置到上下文中
  */
 public abstract class ContextEventTemplate implements EventTemplate {
 

@@ -10,6 +10,10 @@ import java.util.Map;
 
 /**
  * 实例配置
+ * <p>
+ * 事件引擎和事件端点都有很多相同的配置
+ * <p>
+ * 所以提取出来统一处理
  */
 public interface InstanceConfig {
 

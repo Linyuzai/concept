@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.kafka.inherit;
 
-import com.github.linyuzai.event.core.inherit.InheritHelper;
+import com.github.linyuzai.event.core.inherit.AbstractInheritHandler;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,13 +14,19 @@ import java.time.Duration;
 
 @Getter
 @AllArgsConstructor
-public class ReflectionKafkaInheritHandler extends InheritHelper implements KafkaInheritHandler {
+public class ReflectionKafkaInheritHandler extends AbstractInheritHandler<KafkaEventProperties>
+        implements KafkaInheritHandler {
 
     private final Environment environment;
 
     @Override
-    public void inherit(KafkaEventProperties properties) {
-        inherit(properties, KafkaProperties.class, "concept.event.kafka.endpoints");
+    public Class<?> getRootClass() {
+        return KafkaProperties.class;
+    }
+
+    @Override
+    public String getRootPrefix() {
+        return "concept.event.kafka.endpoints";
     }
 
     @Override
@@ -31,7 +37,8 @@ public class ReflectionKafkaInheritHandler extends InheritHelper implements Kafk
 
     @Override
     public boolean isValueType(Class<?> clazz) {
-        return clazz == Duration.class || clazz == DataSize.class || clazz == Resource.class;
+        return super.isValueType(clazz) &&
+                (clazz == Duration.class || clazz == DataSize.class || clazz == Resource.class);
     }
 
     @Override

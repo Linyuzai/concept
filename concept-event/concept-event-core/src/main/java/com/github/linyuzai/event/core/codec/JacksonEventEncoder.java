@@ -22,9 +22,19 @@ public class JacksonEventEncoder implements EventEncoder {
         this(new ObjectMapper());
     }
 
+    /**
+     * 如果是 null 则直接返回 null
+     * <p>
+     * 如果是字符串则直接返回
+     * <p>
+     * 否则尝试转换为 json 字符串
+     */
     @SneakyThrows
     @Override
     public Object encode(Object event, EventEndpoint endpoint, EventContext context) {
+        if (event == null) {
+            return null;
+        }
         if (event instanceof String) {
             return event;
         }

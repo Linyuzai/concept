@@ -32,6 +32,10 @@ public interface EventConcept {
 
     /**
      * 创建事件模版
+     * <p>
+     * 事件模版可以进行配置
+     * <p>
+     * 持有事件模版进行发布订阅可以复用配置
      */
     EventTemplate template();
 

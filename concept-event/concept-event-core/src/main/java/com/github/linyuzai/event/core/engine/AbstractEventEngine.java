@@ -33,6 +33,7 @@ public abstract class AbstractEventEngine extends AbstractInstanceConfig impleme
         return endpointMap.get(name);
     }
 
+    @Override
     public Collection<? extends EventEndpoint> getEndpoints() {
         return Collections.unmodifiableCollection(endpointMap.values());
     }
@@ -51,11 +52,17 @@ public abstract class AbstractEventEngine extends AbstractInstanceConfig impleme
         }
     }
 
+    /**
+     * 名称的哈希值
+     */
     @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+    /**
+     * 名称相同
+     */
     @Override
     public boolean equals(Object obj) {
         return obj instanceof EventEngine &&

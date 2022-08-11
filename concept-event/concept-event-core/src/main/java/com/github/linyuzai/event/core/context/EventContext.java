@@ -2,6 +2,12 @@ package com.github.linyuzai.event.core.context;
 
 /**
  * 事件上下文
+ * <p>
+ * 用于在发布和订阅的过程中传递一些属性
+ * <p>
+ * 包括事件交换机，事件编码器，事件解码器，事件发布器，事件订阅器等等内部组件
+ * <p>
+ * 也可以传入一些自定属性进行扩展
  */
 public interface EventContext {
 
