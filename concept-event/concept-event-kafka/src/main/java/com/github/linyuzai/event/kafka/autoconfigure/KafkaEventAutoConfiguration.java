@@ -1,5 +1,6 @@
 package com.github.linyuzai.event.kafka.autoconfigure;
 
+import com.github.linyuzai.event.core.config.EngineEndpointConfiguration;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpointConfigurer;
 import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpointFactory;
@@ -28,27 +29,42 @@ import org.springframework.kafka.core.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * 需要集成 kafka 模块并启用 @EnableEventConcept
+ * <p>
+ * 替换 {@link KafkaAutoConfiguration} 中配置的 Bean
+ * <p>
+ * 这些替换的 Bean 无法使用仅仅用于不让默认的配置生效
+ */
 @Configuration
 @ConditionalOnClass(EnableKafka.class)
 @ConditionalOnProperty(name = "concept.event.kafka.enabled", havingValue = "true")
 @ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
 @EnableConfigurationProperties(KafkaEventProperties.class)
 @AutoConfigureBefore(KafkaAutoConfiguration.class)
-public class KafkaEventAutoConfiguration {
+public class KafkaEventAutoConfiguration extends EngineEndpointConfiguration<KafkaEventProperties,
+        KafkaEventProperties.ExtendedKafkaProperties, KafkaEventEngine, KafkaEventEndpoint> {
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean(name = "kafkaListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<?, ?> kafkaListenerContainerFactory() {
         return new ConcurrentKafkaListenerContainerFactory<>();
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public ProducerFactory<?, ?> kafkaProducerFactory() {
         return new DefaultKafkaProducerFactory<>(Collections.emptyMap());
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public KafkaTemplate<?, ?> kafkaTemplate() {
         return new KafkaTemplate<>(kafkaProducerFactory());
@@ -60,34 +76,52 @@ public class KafkaEventAutoConfiguration {
         return new LoggingProducerListener<>();
     }*/
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public ConsumerFactory<?, ?> kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(Collections.emptyMap());
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public KafkaAdmin kafkaAdmin() {
         return new KafkaAdmin(Collections.emptyMap());
     }
 
+    /**
+     * Kafka 配置继承处理器
+     */
     @Bean
     @ConditionalOnMissingBean
     public KafkaInheritHandler kafkaInheritHandler(Environment environment) {
         return new ReflectionKafkaInheritHandler(environment);
     }
 
+    /**
+     * Kafka 事件引擎工厂
+     */
     @Bean
     @ConditionalOnMissingBean
     public KafkaEventEngineFactory kafkaEventEngineFactory() {
         return new KafkaEventEngineFactoryImpl();
     }
 
+    /**
+     * Kafka 事件端点工厂
+     */
     @Bean
     @ConditionalOnMissingBean
     public KafkaEventEndpointFactory kafkaEventEndpointFactory() {
         return new KafkaEventEndpointFactoryImpl();
     }
 
+    /**
+     * 创建事件引擎和事件端点
+     */
     @Bean
     public KafkaEventEngine kafkaEventEngine(ConfigurableBeanFactory beanFactory,
                                              KafkaEventProperties properties,
@@ -96,37 +130,9 @@ public class KafkaEventAutoConfiguration {
                                              KafkaEventEndpointFactory endpointFactory,
                                              List<KafkaEventEngineConfigurer> engineConfigurers,
                                              List<KafkaEventEndpointConfigurer> endpointConfigurers) {
-        inheritHandler.inherit(properties);
-
-        KafkaEventEngine engine = engineFactory.create(properties);
-
-        List<Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties>> entries =
-                properties.getEndpoints()
-                        .entrySet()
-                        .stream()
-                        .filter(it -> it.getValue().isEnabled())
-                        .collect(Collectors.toList());
-
-        for (Map.Entry<String, KafkaEventProperties.ExtendedKafkaProperties> entry : entries) {
-
-            String key = entry.getKey();
-
-            KafkaEventProperties.ExtendedKafkaProperties value = entry.getValue();
-
-            KafkaEventEndpoint endpoint = endpointFactory.create(key, value, engine);
-
-            for (KafkaEventEndpointConfigurer configurer : endpointConfigurers) {
-                configurer.configure(endpoint);
-            }
-
-            engine.addEndpoints(endpoint);
-
-            registerEndpoint(key, endpoint, beanFactory);
-        }
-        for (KafkaEventEngineConfigurer configurer : engineConfigurers) {
-            configurer.configure(engine);
-        }
-        return engine;
+        return configure(properties, inheritHandler, engineFactory, endpointFactory,
+                engineConfigurers, endpointConfigurers, (name, endpoint) ->
+                        registerEndpoint(name, endpoint, beanFactory));
     }
 
     private void registerEndpoint(String name, KafkaEventEndpoint endpoint, ConfigurableBeanFactory beanFactory) {

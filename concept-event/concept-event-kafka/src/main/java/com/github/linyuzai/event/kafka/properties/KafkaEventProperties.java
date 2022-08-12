@@ -3,9 +3,9 @@ package com.github.linyuzai.event.kafka.properties;
 import com.github.linyuzai.event.core.codec.EventDecoder;
 import com.github.linyuzai.event.core.codec.EventEncoder;
 import com.github.linyuzai.event.core.config.AbstractPropertiesConfig;
-import com.github.linyuzai.event.core.config.PropertiesConfig;
+import com.github.linyuzai.event.core.config.EndpointConfig;
+import com.github.linyuzai.event.core.config.EngineConfig;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
-import com.github.linyuzai.event.core.inherit.Inheritable;
 import com.github.linyuzai.event.core.publisher.EventPublisher;
 import com.github.linyuzai.event.core.subscriber.EventSubscriber;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ConfigurationProperties("concept.event.kafka")
-public class KafkaEventProperties extends AbstractPropertiesConfig implements PropertiesConfig, Inheritable {
+public class KafkaEventProperties extends AbstractPropertiesConfig implements EngineConfig {
 
     private boolean enabled;
 
@@ -27,8 +27,7 @@ public class KafkaEventProperties extends AbstractPropertiesConfig implements Pr
 
     @Getter
     @Setter
-    public static class ExtendedKafkaProperties extends KafkaProperties
-            implements PropertiesConfig, Inheritable.Endpoint {
+    public static class ExtendedKafkaProperties extends KafkaProperties implements EndpointConfig {
 
         private boolean enabled = true;
 

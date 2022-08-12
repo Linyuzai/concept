@@ -1,6 +1,7 @@
 package com.github.linyuzai.event.kafka.engine;
 
-public interface KafkaEventEngineConfigurer {
+import com.github.linyuzai.event.core.engine.EventEngineConfigurer;
 
-    void configure(KafkaEventEngine engine);
+public interface KafkaEventEngineConfigurer extends EventEngineConfigurer<KafkaEventEngine> {
+
 }

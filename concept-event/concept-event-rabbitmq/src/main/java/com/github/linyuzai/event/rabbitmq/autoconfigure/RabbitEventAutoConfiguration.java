@@ -1,5 +1,6 @@
 package com.github.linyuzai.event.rabbitmq.autoconfigure;
 
+import com.github.linyuzai.event.core.config.EngineEndpointConfiguration;
 import com.github.linyuzai.event.rabbitmq.endpoint.RabbitEventEndpoint;
 import com.github.linyuzai.event.rabbitmq.endpoint.RabbitEventEndpointConfigurer;
 import com.github.linyuzai.event.rabbitmq.endpoint.RabbitEventEndpointFactory;
@@ -33,15 +34,14 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Configuration
 @ConditionalOnProperty(name = "concept.event.rabbitmq.enabled", havingValue = "true")
 @ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
 @EnableConfigurationProperties(RabbitEventProperties.class)
 @AutoConfigureBefore(RabbitAutoConfiguration.class)
-public class RabbitEventAutoConfiguration {
+public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<RabbitEventProperties,
+        RabbitEventProperties.ExtendedRabbitProperties, RabbitEventEngine, RabbitEventEndpoint> {
 
     @Bean
     public SimpleRabbitListenerContainerFactoryConfigurer simpleRabbitListenerContainerFactoryConfigurer() {
@@ -124,37 +124,9 @@ public class RabbitEventAutoConfiguration {
                                                RabbitEventEndpointFactory endpointFactory,
                                                List<RabbitEventEngineConfigurer> engineConfigurers,
                                                List<RabbitEventEndpointConfigurer> endpointConfigurers) {
-        inheritHandler.inherit(properties);
-
-        RabbitEventEngine engine = engineFactory.create(properties);
-
-        List<Map.Entry<String, RabbitEventProperties.ExtendedRabbitProperties>> entries =
-                properties.getEndpoints()
-                        .entrySet()
-                        .stream()
-                        .filter(it -> it.getValue().isEnabled())
-                        .collect(Collectors.toList());
-
-        for (Map.Entry<String, RabbitEventProperties.ExtendedRabbitProperties> entry : entries) {
-
-            String key = entry.getKey();
-
-            RabbitEventProperties.ExtendedRabbitProperties value = entry.getValue();
-
-            RabbitEventEndpoint endpoint = endpointFactory.create(key, value, engine);
-
-            for (RabbitEventEndpointConfigurer configurer : endpointConfigurers) {
-                configurer.configure(endpoint);
-            }
-
-            engine.addEndpoints(endpoint);
-
-            registerEndpoint(key, endpoint, beanFactory);
-        }
-        for (RabbitEventEngineConfigurer configurer : engineConfigurers) {
-            configurer.configure(engine);
-        }
-        return engine;
+        return configure(properties, inheritHandler, engineFactory, endpointFactory,
+                engineConfigurers, endpointConfigurers, (name, endpoint) ->
+                        registerEndpoint(name, endpoint, beanFactory));
     }
 
     private void registerEndpoint(String name, RabbitEventEndpoint endpoint, ConfigurableBeanFactory beanFactory) {

@@ -1,6 +1,5 @@
-package com.github.linyuzai.event.core.inherit;
+package com.github.linyuzai.event.core.config;
 
-import com.github.linyuzai.event.core.config.PropertiesConfig;
 import com.github.linyuzai.event.core.exception.EventException;
 import lombok.SneakyThrows;
 
@@ -24,7 +23,7 @@ import java.util.regex.Pattern;
  *
  * @param <T> 继承类型
  */
-public abstract class AbstractInheritHandler<T extends Inheritable> implements InheritHandler<T> {
+public abstract class AbstractInheritHandler<T extends EngineConfig> implements InheritHandler<T> {
 
     /**
      * 用于将驼峰转为中划线
@@ -37,18 +36,18 @@ public abstract class AbstractInheritHandler<T extends Inheritable> implements I
      * 则进行配置继承
      */
     @Override
-    public void inherit(T inheritable) {
-        Map<String, ? extends Inheritable.Endpoint> endpoints = inheritable.getEndpoints();
-        for (Map.Entry<String, ? extends Inheritable.Endpoint> entry : endpoints.entrySet()) {
+    public void inherit(T engine) {
+        Map<String, ? extends EndpointConfig> endpoints = engine.getEndpoints();
+        for (Map.Entry<String, ? extends EndpointConfig> entry : endpoints.entrySet()) {
             String name = entry.getKey();
-            Inheritable.Endpoint ie = entry.getValue();
-            String parent = ie.getInherit();
+            EndpointConfig endpoint = entry.getValue();
+            String parent = endpoint.getInherit();
             if (parent != null && !parent.isEmpty()) {
-                Inheritable.Endpoint inherit = endpoints.get(parent);
+                EndpointConfig inherit = endpoints.get(parent);
                 if (inherit == null) {
                     throw new EventException("Inherit endpoint not found: " + parent);
                 }
-                inherit(ie, inherit, getRootClass(), getRootPrefix() + "." + formatKey(name));
+                inherit(endpoint, inherit, getRootClass(), getRootPrefix() + "." + formatKey(name));
             }
         }
     }

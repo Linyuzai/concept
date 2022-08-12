@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.rabbitmq.endpoint;
 
-public interface RabbitEventEndpointConfigurer {
+import com.github.linyuzai.event.core.endpoint.EventEndpointConfigurer;
 
-    void configure(RabbitEventEndpoint endpoint);
+public interface RabbitEventEndpointConfigurer extends EventEndpointConfigurer<RabbitEventEndpoint> {
 }

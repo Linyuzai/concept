@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.rabbitmq.inherit;
 
-import com.github.linyuzai.event.core.inherit.AbstractInheritHandler;
+import com.github.linyuzai.event.core.config.AbstractInheritHandler;
 import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

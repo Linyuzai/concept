@@ -1,6 +1,7 @@
 package com.github.linyuzai.event.kafka.endpoint;
 
-public interface KafkaEventEndpointConfigurer {
+import com.github.linyuzai.event.core.endpoint.EventEndpointConfigurer;
 
-    void configure(KafkaEventEndpoint endpoint);
+public interface KafkaEventEndpointConfigurer extends EventEndpointConfigurer<KafkaEventEndpoint> {
+
 }

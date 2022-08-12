@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.rabbitmq.engine;
 
-public interface RabbitEventEngineConfigurer {
+import com.github.linyuzai.event.core.engine.EventEngineConfigurer;
 
-    void configure(RabbitEventEngine engine);
+public interface RabbitEventEngineConfigurer extends EventEngineConfigurer<RabbitEventEngine> {
 }
