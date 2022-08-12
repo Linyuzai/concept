@@ -1,7 +1,7 @@
 package com.github.linyuzai.event.kafka.inherit;
 
-import com.github.linyuzai.event.core.config.PropertiesConfig;
 import com.github.linyuzai.event.core.config.AbstractInheritHandler;
+import com.github.linyuzai.event.core.config.PropertiesConfig;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;
