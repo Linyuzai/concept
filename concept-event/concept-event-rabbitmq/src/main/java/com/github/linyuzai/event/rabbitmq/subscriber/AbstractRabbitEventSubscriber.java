@@ -18,13 +18,21 @@ import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 
 import java.util.Objects;
 
+/**
+ * RabbitMQ 事件订阅器抽象类
+ */
 public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscriber {
 
+    /**
+     * 在订阅之前先进行绑定
+     */
     @Override
     public Subscription doSubscribe(EventListener listener, RabbitEventEndpoint endpoint, EventContext context) {
         binding(new RabbitBinding(endpoint.getAdmin()));
         MessageListener messageListener = createMessageListener(listener, endpoint, context);
+        //使用SimpleRabbitListenerEndpoint需要设置监听器，否则会报错
         MessageListenerContainer container = createMessageListenerContainer(endpoint, context, messageListener);
+        //如果没有设置监听器则设置生成的监听器
         if (container.getMessageListener() == null) {
             container.setupMessageListener(messageListener);
         }
@@ -32,14 +40,23 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
         return new RabbitSubscription(container);
     }
 
+    /**
+     * 用于创建 交换机/队列/绑定关系
+     */
     public void binding(RabbitBinding binding) {
 
     }
 
+    /**
+     * 创建消息监听器容器
+     */
     public abstract MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint,
                                                                             EventContext context,
                                                                             MessageListener messageListener);
 
+    /**
+     * 创建消息监听器
+     */
     public MessageListener createMessageListener(EventListener listener, RabbitEventEndpoint endpoint, EventContext context) {
         RabbitProperties.Listener listenerProperties = endpoint.getProperties().getListener();
         if (listenerProperties.getType() == RabbitProperties.ContainerType.SIMPLE) {
@@ -56,6 +73,9 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
         throw new RabbitEventException("Unsupported listener type: " + listener.getType());
     }
 
+    /**
+     * 根据 acknowledgeMode 和 batchEnabled 创建消息监听器
+     */
     protected MessageListener createMessageListener(AcknowledgeMode acknowledgeMode,
                                                     boolean batchEnabled,
                                                     EventListener listener,
@@ -64,6 +84,7 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         if (acknowledgeMode == AcknowledgeMode.MANUAL) {
             if (batchEnabled) {
+                //手动&批量
                 return (ChannelAwareBatchMessageListener) (messages, channel) -> {
                     for (Message message : messages) {
                         handleMessage(message, listener, endpoint, context, () -> {
@@ -76,6 +97,7 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
                     }
                 };
             } else {
+                //手动&单条
                 return (ChannelAwareMessageListener) (message, channel) ->
                         handleMessage(message, listener, endpoint, context, () -> {
                             try {
@@ -89,17 +111,22 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
             }
         } else {
             if (batchEnabled) {
+                //自动&批量
                 return (BatchMessageListener) messages -> {
                     for (Message message : messages) {
                         handleMessage(message, listener, endpoint, context, null);
                     }
                 };
             } else {
+                //自动&单条
                 return message -> handleMessage(message, listener, endpoint, context, null);
             }
         }
     }
 
+    /**
+     * 处理消息
+     */
     public void handleMessage(Message message,
                               EventListener listener,
                               RabbitEventEndpoint endpoint,
@@ -107,7 +134,9 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
                               Runnable runnable) {
         EventErrorHandler errorHandler = context.get(EventErrorHandler.class);
         try {
+            //回调
             listener.onEvent(getPayload(message, endpoint, context), endpoint, context);
+            //后置执行，用于手动ack
             if (runnable != null) {
                 runnable.run();
             }
@@ -116,6 +145,9 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
         }
     }
 
+    /**
+     * 获得数据内容
+     */
     public Object getPayload(Message message, RabbitEventEndpoint endpoint, EventContext context) {
         return message.getBody();
     }

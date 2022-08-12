@@ -8,6 +8,9 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 
 import java.util.function.Supplier;
 
+/**
+ * 可配置的 RabbitMQ 事件发布器
+ */
 @Setter
 @Getter
 public class ConfigurableRabbitEventPublisher extends AbstractRabbitEventPublisher {

@@ -26,6 +26,15 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * RabbitMQ 事件端点工厂实现
+ * <p>
+ * 都是复制过来的配置
+ * <p>
+ * 只复制了属性配置
+ * <p>
+ * 其他的 Bean 配置可以用 {@link RabbitEventEndpointConfigurer} 扩展
+ */
 @Getter
 @Setter
 @AllArgsConstructor

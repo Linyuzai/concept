@@ -120,7 +120,7 @@ public class KafkaEventAutoConfiguration extends EngineEndpointConfiguration<Kaf
     }
 
     /**
-     * 创建事件引擎和事件端点
+     * 创建 Kafka 事件引擎和 Kafka 事件端点
      */
     @Bean
     public KafkaEventEngine kafkaEventEngine(ConfigurableBeanFactory beanFactory,
@@ -136,7 +136,7 @@ public class KafkaEventAutoConfiguration extends EngineEndpointConfiguration<Kaf
     }
 
     /**
-     * 注册事件端点
+     * 注册 Kafka 事件端点
      */
     private void registerEndpoint(String name, KafkaEventEndpoint endpoint, ConfigurableBeanFactory beanFactory) {
         register(name + "KafkaProducerFactory", endpoint.getProducerFactory(), beanFactory);

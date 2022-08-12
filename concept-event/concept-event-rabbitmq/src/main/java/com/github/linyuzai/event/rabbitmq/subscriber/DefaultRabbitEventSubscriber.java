@@ -8,6 +8,9 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint;
 
+/**
+ * 基于 {@link RabbitListenerEndpoint} 创建消息监听器容器的 RabbitMQ 事件订阅器
+ */
 @Getter
 @AllArgsConstructor
 public class DefaultRabbitEventSubscriber extends AbstractRabbitEventSubscriber {

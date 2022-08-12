@@ -7,9 +7,15 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 
+/**
+ * 基于指定队列的 RabbitMQ 事件订阅器
+ */
 @Getter
 public class QueueRabbitEventSubscriber extends AbstractRabbitEventSubscriber {
 
+    /**
+     * 指定队列
+     */
     private final String[] queues;
 
     public QueueRabbitEventSubscriber(String... queues) {

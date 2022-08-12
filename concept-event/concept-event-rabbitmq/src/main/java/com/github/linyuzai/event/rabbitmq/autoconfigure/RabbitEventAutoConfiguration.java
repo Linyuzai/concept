@@ -35,6 +35,13 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 
+/**
+ * 需要集成 amqp 模块并启用 @EnableEventConcept
+ * <p>
+ * 替换 {@link RabbitAutoConfiguration} 中配置的 Bean
+ * <p>
+ * 这些替换的 Bean 无法使用仅仅用于不让默认的配置生效
+ */
 @Configuration
 @ConditionalOnProperty(name = "concept.event.rabbitmq.enabled", havingValue = "true")
 @ConditionalOnBean(name = "com.github.linyuzai.event.autoconfigure.EventEnabled")
@@ -43,31 +50,49 @@ import java.util.List;
 public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<RabbitEventProperties,
         RabbitEventProperties.ExtendedRabbitProperties, RabbitEventEngine, RabbitEventEndpoint> {
 
-    @Bean
-    public SimpleRabbitListenerContainerFactoryConfigurer simpleRabbitListenerContainerFactoryConfigurer() {
-        return new SimpleRabbitListenerContainerFactoryConfigurer(new RabbitProperties());
-    }
-
+    /**
+     * 覆盖默认配置
+     */
     @Bean(name = "rabbitListenerContainerFactory")
     public RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory() {
         return new SimpleRabbitListenerContainerFactory();
     }
 
+    /**
+     * 覆盖默认配置
+     */
+    @Bean
+    public SimpleRabbitListenerContainerFactoryConfigurer simpleRabbitListenerContainerFactoryConfigurer() {
+        return new SimpleRabbitListenerContainerFactoryConfigurer(new RabbitProperties());
+    }
+
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public DirectRabbitListenerContainerFactoryConfigurer directRabbitListenerContainerFactoryConfigurer() {
         return new DirectRabbitListenerContainerFactoryConfigurer(new RabbitProperties());
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public RabbitConnectionFactoryBeanConfigurer rabbitConnectionFactoryBeanConfigurer() {
         return new RabbitConnectionFactoryBeanConfigurer(null, null);
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public CachingConnectionFactoryConfigurer rabbitConnectionFactoryConfigurer() {
         return new CachingConnectionFactoryConfigurer(new RabbitProperties());
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public ConnectionFactory rabbitConnectionFactory() {
         com.rabbitmq.client.ConnectionFactory factory = new com.rabbitmq.client.ConnectionFactory();
@@ -75,11 +100,17 @@ public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<Ra
         return new CachingConnectionFactory(factory);
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public RabbitTemplateConfigurer rabbitTemplateConfigurer() {
         return new RabbitTemplateConfigurer(new RabbitProperties());
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public RabbitTemplate rabbitTemplate() {
         return new RabbitTemplate(rabbitConnectionFactory()) {
@@ -93,29 +124,44 @@ public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<Ra
         };
     }
 
+    /**
+     * 覆盖默认配置
+     */
     @Bean
     public RabbitAdmin rabbitAdmin() {
         return new RabbitAdmin(rabbitConnectionFactory());
     }
 
+    /**
+     * RabbitMQ 配置继承处理器
+     */
     @Bean
     @ConditionalOnMissingBean
     public RabbitInheritHandler rabbitInheritHandler(Environment environment) {
         return new ReflectionRabbitInheritHandler(environment);
     }
 
+    /**
+     * RabbitMQ 事件引擎工厂
+     */
     @Bean
     @ConditionalOnMissingBean
     public RabbitEventEngineFactory rabbitEventEngineFactory() {
         return new RabbitEventEngineFactoryImpl();
     }
 
+    /**
+     * RabbitMQ 事件端点工厂
+     */
     @Bean
     @ConditionalOnMissingBean
     public RabbitEventEndpointFactory rabbitEventEndpointFactory(ResourceLoader resourceLoader) {
         return new RabbitEventEndpointFactoryImpl(resourceLoader);
     }
 
+    /**
+     * 创建 RabbitMQ 事件引擎和 RabbitMQ 事件端点
+     */
     @Bean
     public RabbitEventEngine rabbitEventEngine(ConfigurableBeanFactory beanFactory,
                                                RabbitEventProperties properties,
@@ -129,6 +175,9 @@ public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<Ra
                         registerEndpoint(name, endpoint, beanFactory));
     }
 
+    /**
+     * 注册 RabbitMQ 事件端点
+     */
     private void registerEndpoint(String name, RabbitEventEndpoint endpoint, ConfigurableBeanFactory beanFactory) {
         register(name + "RabbitConnectionFactory", endpoint.getConnectionFactory(), beanFactory);
         register(name + "RabbitListenerContainerFactory", endpoint.getListenerContainerFactory(), beanFactory);

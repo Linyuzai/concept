@@ -11,6 +11,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 用于创建 交换机/队列/绑定关系
+ * <p>
+ * 复制 {@link BindingBuilder} 的代码
+ * <p>
+ * 用法一样，直接创建
+ */
 @Getter
 @AllArgsConstructor
 public class RabbitBinding {

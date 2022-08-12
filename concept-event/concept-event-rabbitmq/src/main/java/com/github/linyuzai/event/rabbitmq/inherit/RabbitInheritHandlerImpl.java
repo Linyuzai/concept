@@ -12,6 +12,11 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
+/**
+ * 手动罗列所有的配置项
+ * <p>
+ * 不同版本会存在配置不存在的异常问题
+ */
 @Deprecated
 @Getter
 @AllArgsConstructor

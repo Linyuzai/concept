@@ -21,7 +21,7 @@ import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 
 /**
- * 基于 Kafka 的事件端点
+ * Kafka 事件端点
  */
 @Getter
 @Setter

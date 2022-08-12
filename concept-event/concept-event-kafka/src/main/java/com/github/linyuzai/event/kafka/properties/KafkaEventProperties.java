@@ -25,7 +25,7 @@ import java.util.Map;
 public class KafkaEventProperties extends AbstractPropertiesConfig implements EngineConfig {
 
     /**
-     * 是否启用
+     * 是否启用引擎
      */
     private boolean enabled;
 
@@ -42,7 +42,7 @@ public class KafkaEventProperties extends AbstractPropertiesConfig implements En
     public static class ExtendedKafkaProperties extends KafkaProperties implements EndpointConfig {
 
         /**
-         * 是否启用
+         * 是否启用端点
          */
         private boolean enabled = true;
 

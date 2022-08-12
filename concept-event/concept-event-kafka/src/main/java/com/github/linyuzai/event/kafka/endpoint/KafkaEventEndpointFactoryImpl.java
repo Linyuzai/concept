@@ -27,7 +27,7 @@ import java.time.Duration;
  * <p>
  * 只复制了属性配置
  * <p>
- * 其他的 Bean 配置可以用 {@link KafkaEventEndpointConfigurer}
+ * 其他的 Bean 配置可以用 {@link KafkaEventEndpointConfigurer} 扩展
  * <p>
  * Jaas 应该是全部配置，所以可以直接使用 spring.kafka 进行配置
  */

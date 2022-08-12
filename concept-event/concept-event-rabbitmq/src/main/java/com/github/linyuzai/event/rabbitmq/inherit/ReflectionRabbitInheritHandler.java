@@ -10,6 +10,9 @@ import org.springframework.core.env.Environment;
 import java.lang.reflect.Field;
 import java.time.Duration;
 
+/**
+ * 基于反射的 RabbitMQ 配置继承处理器
+ */
 @Getter
 @AllArgsConstructor
 public class ReflectionRabbitInheritHandler extends AbstractInheritHandler<RabbitEventProperties>
