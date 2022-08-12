@@ -12,9 +12,20 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+/**
+ * 事件引擎和事件端点配置流程
+ *
+ * @param <EngineC>   事件引擎配置类型
+ * @param <EndpointC> 事件端点配置类型
+ * @param <Engine>    事件引擎类型
+ * @param <Endpoint>  事件端点类型
+ */
 public class EngineEndpointConfiguration<EngineC extends EngineConfig, EndpointC extends EndpointConfig,
         Engine extends EventEngine, Endpoint extends EventEndpoint> {
 
+    /**
+     * 实例化并配置事件引擎和事件端点
+     */
     public Engine configure(EngineC engineConfig,
                             InheritHandler<EngineC> inheritHandler,
                             EventEngineFactory<EngineC, Engine> engineFactory,
@@ -33,24 +44,23 @@ public class EngineEndpointConfiguration<EngineC extends EngineConfig, EndpointC
                         .stream()
                         .filter(it -> it.getValue().isEnabled())
                         .collect(Collectors.toList());
-
         for (Map.Entry<String, ? extends EndpointConfig> entry : entries) {
             //事件端点名称
             String name = entry.getKey();
-
             @SuppressWarnings("unchecked")
             EndpointC endpointConfig = (EndpointC) entry.getValue();
-
+            //创建事件端点
             Endpoint endpoint = endpointFactory.create(name, endpointConfig, engine);
-
+            //事件端点扩展配置
             for (EventEndpointConfigurer<Endpoint> configurer : endpointConfigurers) {
                 configurer.configure(endpoint);
             }
-
+            //事件引擎添加事件端点
             engine.addEndpoints(endpoint);
-
+            //事件端点后置处理
             consumer.accept(name, endpoint);
         }
+        //事件引擎扩展配置
         for (EventEngineConfigurer<Engine> configurer : engineConfigurers) {
             configurer.configure(engine);
         }

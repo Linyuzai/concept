@@ -135,6 +135,9 @@ public class KafkaEventAutoConfiguration extends EngineEndpointConfiguration<Kaf
                         registerEndpoint(name, endpoint, beanFactory));
     }
 
+    /**
+     * 注册事件端点
+     */
     private void registerEndpoint(String name, KafkaEventEndpoint endpoint, ConfigurableBeanFactory beanFactory) {
         register(name + "KafkaProducerFactory", endpoint.getProducerFactory(), beanFactory);
         register(name + "KafkaProducerListener", endpoint.getProducerListener(), beanFactory);

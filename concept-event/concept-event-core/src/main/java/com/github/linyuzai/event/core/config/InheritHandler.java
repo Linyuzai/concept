@@ -7,5 +7,8 @@ package com.github.linyuzai.event.core.config;
  */
 public interface InheritHandler<C extends EngineConfig> {
 
-    void inherit(C engine);
+    /**
+     * 继承
+     */
+    void inherit(C config);
 }
