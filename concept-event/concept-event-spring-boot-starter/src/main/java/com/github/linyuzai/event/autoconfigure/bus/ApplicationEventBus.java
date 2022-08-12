@@ -19,12 +19,13 @@ public class ApplicationEventBus extends AbstractEventBus {
         this.eventPublisher = eventPublisher;
     }
 
-    /**
-     * 在发布事件时通过 {@link ApplicationEventPublisher} 发布本地事件
-     */
     @Override
     public void onPublish(Object event) {
-        eventPublisher.publishEvent(event);
+        //通过监听的事件也会进行本地事件发布
+        //这里如果直接发布本地事件可能会导致重复发布
+        //如果要解决重复就必须额外添加标识
+        //所以不如不发布本地等监听到事件统一发布
+        //eventPublisher.publishEvent(event);
     }
 
     /**

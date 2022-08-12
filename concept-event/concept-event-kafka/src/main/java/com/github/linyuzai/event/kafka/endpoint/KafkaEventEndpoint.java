@@ -20,10 +20,16 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 
+/**
+ * 基于 Kafka 的事件端点
+ */
 @Getter
 @Setter
 public class KafkaEventEndpoint extends AbstractEventEndpoint {
 
+    /**
+     * Kafka 扩展配置
+     */
     private KafkaEventProperties.ExtendedKafkaProperties properties;
 
     private ProducerFactory<Object, Object> producerFactory;
@@ -44,11 +50,17 @@ public class KafkaEventEndpoint extends AbstractEventEndpoint {
         super(name, engine);
     }
 
+    /**
+     * 默认发布
+     */
     @Override
     public void defaultPublish(Object event, EventContext context) {
         new DefaultKafkaEventPublisher().publish(event, this, context);
     }
 
+    /**
+     * 默认订阅
+     */
     @Override
     public Subscription defaultSubscribe(EventListener listener, EventContext context) {
         throw new KafkaEventException("EventSubscriber is null");

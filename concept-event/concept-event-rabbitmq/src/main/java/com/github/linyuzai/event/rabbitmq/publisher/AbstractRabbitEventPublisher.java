@@ -12,7 +12,7 @@ public abstract class AbstractRabbitEventPublisher extends RabbitEventPublisher 
     private final Map<String, RabbitBinding> bindings = new ConcurrentHashMap<>();
 
     @Override
-    public void publishRabbit(Object event, RabbitEventEndpoint endpoint, EventContext context) {
+    public void doPublish(Object event, RabbitEventEndpoint endpoint, EventContext context) {
         if (!bindings.containsKey(endpoint.getName())) {
             RabbitBinding binding = new RabbitBinding(endpoint.getAdmin());
             binding(binding);

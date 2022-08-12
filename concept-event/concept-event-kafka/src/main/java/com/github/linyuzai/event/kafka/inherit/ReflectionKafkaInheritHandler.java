@@ -12,6 +12,9 @@ import org.springframework.util.unit.DataSize;
 import java.lang.reflect.Field;
 import java.time.Duration;
 
+/**
+ * 基于反射的 Kafka 配置继承处理器
+ */
 @Getter
 @AllArgsConstructor
 public class ReflectionKafkaInheritHandler extends AbstractInheritHandler<KafkaEventProperties>
@@ -37,8 +40,10 @@ public class ReflectionKafkaInheritHandler extends AbstractInheritHandler<KafkaE
 
     @Override
     public boolean isValueType(Class<?> clazz) {
-        return super.isValueType(clazz) &&
-                (clazz == Duration.class || clazz == DataSize.class || clazz == Resource.class);
+        return super.isValueType(clazz) ||
+                clazz == Duration.class ||
+                clazz == DataSize.class ||
+                clazz == Resource.class;
     }
 
     @Override

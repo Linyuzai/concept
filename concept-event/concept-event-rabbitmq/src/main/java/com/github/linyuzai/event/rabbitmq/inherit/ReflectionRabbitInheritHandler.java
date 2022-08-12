@@ -40,6 +40,6 @@ public class ReflectionRabbitInheritHandler extends AbstractInheritHandler<Rabbi
 
     @Override
     public boolean isValueType(Class<?> clazz) {
-        return super.isValueType(clazz) && clazz == Duration.class;
+        return super.isValueType(clazz) || clazz == Duration.class;
     }
 }

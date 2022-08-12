@@ -5,6 +5,11 @@ import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 
+/**
+ * 默认的 Kafka 事件发布器
+ * <p>
+ * 调用 {@link org.springframework.kafka.core.KafkaTemplate#sendDefault(Object)} 发送消息
+ */
 public class DefaultKafkaEventPublisher extends AbstractKafkaEventPublisher {
 
     @Override

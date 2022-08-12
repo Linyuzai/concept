@@ -5,16 +5,18 @@ import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 import com.github.linyuzai.event.core.lifecycle.EventConceptLifecycleListener;
 import com.github.linyuzai.event.core.listener.EventListener;
+import com.github.linyuzai.event.core.utils.GenericProvider;
 
 /**
  * 事件订阅器的抽象类
  * <p>
  * 处理事件解码
  */
-public abstract class AbstractEventSubscriber implements EventSubscriber {
+public abstract class AbstractEventSubscriber<E extends EventEndpoint>
+        implements EventSubscriber, GenericProvider<E> {
 
     /**
-     * 当支持订阅对应的事件端点时进行订阅
+     * 当适配事件端点时进行订阅
      * <p>
      * 并添加生命周期监听器
      * <p>
@@ -26,17 +28,17 @@ public abstract class AbstractEventSubscriber implements EventSubscriber {
      */
     @Override
     public Subscription subscribe(EventListener listener, EventEndpoint endpoint, EventContext context) {
-        if (support(endpoint, context)) {
-            Subscription subscription = doSubscribe(listener, endpoint, context);
-            addLifecycleListener(context, subscription);
-            return subscription;
-        } else {
+        E adapt = adapt(endpoint, context);
+        if (adapt == null) {
             return Subscription.EMPTY;
         }
+        Subscription subscription = doSubscribe(listener, adapt, context);
+        addLifecycleListener(context, subscription);
+        return subscription;
     }
 
     /**
-     * 添加生命周期监听器¬
+     * 添加生命周期监听器
      */
     public void addLifecycleListener(EventContext context, Subscription subscription) {
         EventConcept concept = context.get(EventConcept.class);
@@ -44,20 +46,33 @@ public abstract class AbstractEventSubscriber implements EventSubscriber {
     }
 
     /**
-     * 是否支持订阅该节点
+     * 端点适配
      */
-    public abstract boolean support(EventEndpoint endpoint, EventContext context);
+    public E adapt(EventEndpoint endpoint, EventContext context) {
+        return adaptGeneric(endpoint);
+    }
+
+    /**
+     * 指定 {@link AbstractEventSubscriber} 上的泛型
+     */
+    @Override
+    public Class<?> getTarget() {
+        return AbstractEventSubscriber.class;
+    }
 
     /**
      * 执行订阅
      */
-    public abstract Subscription doSubscribe(EventListener listener, EventEndpoint endpoint, EventContext context);
+    public abstract Subscription doSubscribe(EventListener listener, E endpoint, EventContext context);
 
     /**
      * 用于在监听到销毁时取消订阅
      */
     public static class UnSubscriber implements EventConceptLifecycleListener {
 
+        /**
+         * 订阅句柄
+         */
         private final Subscription subscription;
 
         public UnSubscriber(EventConcept concept, Subscription subscription) {

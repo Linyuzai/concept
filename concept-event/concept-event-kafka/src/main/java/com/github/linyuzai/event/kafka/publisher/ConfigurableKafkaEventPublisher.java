@@ -9,6 +9,9 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.function.Supplier;
 
+/**
+ * 可配置的 Kafka 事件发布器
+ */
 @Setter
 @Getter
 public class ConfigurableKafkaEventPublisher extends AbstractKafkaEventPublisher {

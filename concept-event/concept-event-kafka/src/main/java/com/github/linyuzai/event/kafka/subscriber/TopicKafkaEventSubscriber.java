@@ -5,9 +5,15 @@ import com.github.linyuzai.event.kafka.endpoint.KafkaEventEndpoint;
 import lombok.Getter;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
+/**
+ * 指定 Topic 的 Kafka 事件订阅器
+ */
 @Getter
 public class TopicKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
 
+    /**
+     * 指定的 Topic
+     */
     private final String[] topics;
 
     public TopicKafkaEventSubscriber(String... topics) {

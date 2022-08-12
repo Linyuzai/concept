@@ -6,6 +6,9 @@ import lombok.Getter;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.TopicPartitionOffset;
 
+/**
+ * 基于 {@link TopicPartitionOffset} 的 Kafka 事件订阅器
+ */
 @Getter
 public class TopicPartitionOffsetKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
 

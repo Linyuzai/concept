@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * <p>
  * 一个一个适配所有版本的工作量太大
  * <p>
- * 所以通过反射来处理
+ * 所以通过反射方便统一处理
  *
  * @param <T> 继承类型
  */
@@ -139,8 +139,9 @@ public abstract class AbstractInheritHandler<T extends EngineConfig> implements 
         return clazz == String.class ||
                 clazz == Class.class ||
                 clazz.isPrimitive() ||
-                isWrapClass(clazz) ||
-                clazz.isEnum();
+                clazz.isEnum() ||
+                clazz.isInterface() ||
+                isWrapClass(clazz);
     }
 
     /**

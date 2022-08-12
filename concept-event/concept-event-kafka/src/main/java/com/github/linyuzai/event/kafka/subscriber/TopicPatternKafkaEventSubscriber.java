@@ -8,10 +8,16 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 
 import java.util.regex.Pattern;
 
+/**
+ * 基于 {@link Pattern} 的 Kafka Topic 事件订阅器
+ */
 @Getter
 @AllArgsConstructor
 public class TopicPatternKafkaEventSubscriber extends AbstractKafkaEventSubscriber {
 
+    /**
+     * Topic Pattern
+     */
     private final Pattern topicPattern;
 
     @Override

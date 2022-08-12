@@ -4,6 +4,7 @@ import com.github.linyuzai.event.core.context.EventContext;
 import com.github.linyuzai.event.core.error.EventErrorHandler;
 import com.github.linyuzai.event.core.listener.EventListener;
 import com.github.linyuzai.event.core.subscriber.Subscription;
+import com.github.linyuzai.event.rabbitmq.binding.RabbitBinding;
 import com.github.linyuzai.event.rabbitmq.endpoint.RabbitEventEndpoint;
 import com.github.linyuzai.event.rabbitmq.exception.RabbitEventException;
 import org.springframework.amqp.core.AcknowledgeMode;
@@ -20,7 +21,8 @@ import java.util.Objects;
 public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscriber {
 
     @Override
-    public Subscription subscribeRabbit(EventListener listener, RabbitEventEndpoint endpoint, EventContext context) {
+    public Subscription doSubscribe(EventListener listener, RabbitEventEndpoint endpoint, EventContext context) {
+        binding(new RabbitBinding(endpoint.getAdmin()));
         MessageListener messageListener = createMessageListener(listener, endpoint, context);
         MessageListenerContainer container = createMessageListenerContainer(endpoint, context, messageListener);
         if (container.getMessageListener() == null) {
@@ -28,6 +30,10 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
         }
         container.start();
         return new RabbitSubscription(container);
+    }
+
+    public void binding(RabbitBinding binding) {
+
     }
 
     public abstract MessageListenerContainer createMessageListenerContainer(RabbitEventEndpoint endpoint,

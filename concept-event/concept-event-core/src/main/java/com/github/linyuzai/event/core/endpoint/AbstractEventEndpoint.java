@@ -62,6 +62,9 @@ public abstract class AbstractEventEndpoint extends AbstractInstanceConfig imple
         }
     }
 
+    /**
+     * 默认发布
+     */
     public void defaultPublish(Object event, EventContext context) {
         throw new EventException("EventPublisher is null");
     }
@@ -102,6 +105,9 @@ public abstract class AbstractEventEndpoint extends AbstractInstanceConfig imple
         }
     }
 
+    /**
+     * 默认订阅
+     */
     public Subscription defaultSubscribe(EventListener listener, EventContext context) {
         throw new EventException("EventSubscriber is null");
     }
