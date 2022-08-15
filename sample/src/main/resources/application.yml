@@ -68,7 +68,6 @@ concept:
             acks: 1
           consumer:
             enable-auto-commit: false
-            auto-offset-reset: earliest
           template:
             default-topic: sample
           listener:
