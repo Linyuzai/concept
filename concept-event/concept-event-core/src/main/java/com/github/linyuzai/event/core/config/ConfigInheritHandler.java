@@ -5,7 +5,7 @@ package com.github.linyuzai.event.core.config;
  *
  * @param <C> 配置类型
  */
-public interface InheritHandler<C extends EngineConfig> {
+public interface ConfigInheritHandler<C extends EngineConfig> {
 
     /**
      * 继承

@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  *
  * @param <T> 继承类型
  */
-public abstract class AbstractInheritHandler<T extends EngineConfig> implements InheritHandler<T> {
+public abstract class AbstractConfigInheritHandler<T extends EngineConfig> implements ConfigInheritHandler<T> {
 
     /**
      * 用于将驼峰转为中划线

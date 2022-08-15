@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.kafka.inherit;
 
-import com.github.linyuzai.event.core.config.AbstractInheritHandler;
+import com.github.linyuzai.event.core.config.AbstractConfigInheritHandler;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,8 +17,8 @@ import java.time.Duration;
  */
 @Getter
 @AllArgsConstructor
-public class ReflectionKafkaInheritHandler extends AbstractInheritHandler<KafkaEventProperties>
-        implements KafkaInheritHandler {
+public class ReflectionKafkaConfigInheritHandler extends AbstractConfigInheritHandler<KafkaEventProperties>
+        implements KafkaConfigInheritHandler {
 
     private final Environment environment;
 

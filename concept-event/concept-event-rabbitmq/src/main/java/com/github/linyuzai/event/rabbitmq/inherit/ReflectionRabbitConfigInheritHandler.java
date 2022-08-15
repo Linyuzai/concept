@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.rabbitmq.inherit;
 
-import com.github.linyuzai.event.core.config.AbstractInheritHandler;
+import com.github.linyuzai.event.core.config.AbstractConfigInheritHandler;
 import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +15,8 @@ import java.time.Duration;
  */
 @Getter
 @AllArgsConstructor
-public class ReflectionRabbitInheritHandler extends AbstractInheritHandler<RabbitEventProperties>
-        implements RabbitInheritHandler {
+public class ReflectionRabbitConfigInheritHandler extends AbstractConfigInheritHandler<RabbitEventProperties>
+        implements RabbitConfigInheritHandler {
 
     private final Environment environment;
 

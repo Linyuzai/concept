@@ -9,8 +9,8 @@ import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngine;
 import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngineConfigurer;
 import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngineFactory;
 import com.github.linyuzai.event.rabbitmq.engine.RabbitEventEngineFactoryImpl;
-import com.github.linyuzai.event.rabbitmq.inherit.RabbitInheritHandler;
-import com.github.linyuzai.event.rabbitmq.inherit.ReflectionRabbitInheritHandler;
+import com.github.linyuzai.event.rabbitmq.inherit.RabbitConfigInheritHandler;
+import com.github.linyuzai.event.rabbitmq.inherit.ReflectionRabbitConfigInheritHandler;
 import com.github.linyuzai.event.rabbitmq.properties.RabbitEventProperties;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -137,8 +137,8 @@ public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<Ra
      */
     @Bean
     @ConditionalOnMissingBean
-    public RabbitInheritHandler rabbitInheritHandler(Environment environment) {
-        return new ReflectionRabbitInheritHandler(environment);
+    public RabbitConfigInheritHandler rabbitInheritHandler(Environment environment) {
+        return new ReflectionRabbitConfigInheritHandler(environment);
     }
 
     /**
@@ -165,7 +165,7 @@ public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<Ra
     @Bean
     public RabbitEventEngine rabbitEventEngine(ConfigurableBeanFactory beanFactory,
                                                RabbitEventProperties properties,
-                                               RabbitInheritHandler inheritHandler,
+                                               RabbitConfigInheritHandler inheritHandler,
                                                RabbitEventEngineFactory engineFactory,
                                                RabbitEventEndpointFactory endpointFactory,
                                                List<RabbitEventEngineConfigurer> engineConfigurers,

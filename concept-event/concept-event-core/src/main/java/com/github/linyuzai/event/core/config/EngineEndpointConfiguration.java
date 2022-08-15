@@ -27,14 +27,14 @@ public class EngineEndpointConfiguration<EngineC extends EngineConfig, EndpointC
      * 实例化并配置事件引擎和事件端点
      */
     public Engine configure(EngineC engineConfig,
-                            InheritHandler<EngineC> inheritHandler,
+                            ConfigInheritHandler<EngineC> configInheritHandler,
                             EventEngineFactory<EngineC, Engine> engineFactory,
                             EventEndpointFactory<EndpointC, Engine, Endpoint> endpointFactory,
                             List<? extends EventEngineConfigurer<Engine>> engineConfigurers,
                             List<? extends EventEndpointConfigurer<Endpoint>> endpointConfigurers,
                             BiConsumer<String, Endpoint> consumer) {
         //处理配置继承
-        inheritHandler.inherit(engineConfig);
+        configInheritHandler.inherit(engineConfig);
         //创建事件引擎
         Engine engine = engineFactory.create(engineConfig);
         //过滤未启用的事件端点

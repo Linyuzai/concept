@@ -9,8 +9,8 @@ import com.github.linyuzai.event.kafka.engine.KafkaEventEngine;
 import com.github.linyuzai.event.kafka.engine.KafkaEventEngineConfigurer;
 import com.github.linyuzai.event.kafka.engine.KafkaEventEngineFactory;
 import com.github.linyuzai.event.kafka.engine.KafkaEventEngineFactoryImpl;
-import com.github.linyuzai.event.kafka.inherit.KafkaInheritHandler;
-import com.github.linyuzai.event.kafka.inherit.ReflectionKafkaInheritHandler;
+import com.github.linyuzai.event.kafka.inherit.KafkaConfigInheritHandler;
+import com.github.linyuzai.event.kafka.inherit.ReflectionKafkaConfigInheritHandler;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -97,8 +97,8 @@ public class KafkaEventAutoConfiguration extends EngineEndpointConfiguration<Kaf
      */
     @Bean
     @ConditionalOnMissingBean
-    public KafkaInheritHandler kafkaInheritHandler(Environment environment) {
-        return new ReflectionKafkaInheritHandler(environment);
+    public KafkaConfigInheritHandler kafkaInheritHandler(Environment environment) {
+        return new ReflectionKafkaConfigInheritHandler(environment);
     }
 
     /**
@@ -125,7 +125,7 @@ public class KafkaEventAutoConfiguration extends EngineEndpointConfiguration<Kaf
     @Bean
     public KafkaEventEngine kafkaEventEngine(ConfigurableBeanFactory beanFactory,
                                              KafkaEventProperties properties,
-                                             KafkaInheritHandler inheritHandler,
+                                             KafkaConfigInheritHandler inheritHandler,
                                              KafkaEventEngineFactory engineFactory,
                                              KafkaEventEndpointFactory endpointFactory,
                                              List<KafkaEventEngineConfigurer> engineConfigurers,

@@ -1,6 +1,6 @@
 package com.github.linyuzai.event.kafka.inherit;
 
-import com.github.linyuzai.event.core.config.AbstractInheritHandler;
+import com.github.linyuzai.event.core.config.AbstractConfigInheritHandler;
 import com.github.linyuzai.event.core.config.PropertiesConfig;
 import com.github.linyuzai.event.kafka.exception.KafkaEventException;
 import com.github.linyuzai.event.kafka.properties.KafkaEventProperties;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Deprecated
 @Getter
 @AllArgsConstructor
-public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
+public class KafkaConfigInheritHandlerImpl implements KafkaConfigInheritHandler {
 
     private final Environment environment;
 
@@ -59,7 +59,7 @@ public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
     }
 
     public <K, V> void inheritProperties(Map<K, V> child, Map<K, V> parent) {
-        AbstractInheritHandler.inheritMap(child, parent);
+        AbstractConfigInheritHandler.inheritMap(child, parent);
     }
 
     public void inheritConsumer(KafkaProperties.Consumer child, KafkaProperties.Consumer parent, String prefix) {
@@ -284,6 +284,6 @@ public class KafkaInheritHandlerImpl implements KafkaInheritHandler {
     }
 
     public void inheritExtended(PropertiesConfig child, PropertiesConfig parent) {
-        AbstractInheritHandler.inherit(child, parent);
+        AbstractConfigInheritHandler.inherit(child, parent);
     }
 }
