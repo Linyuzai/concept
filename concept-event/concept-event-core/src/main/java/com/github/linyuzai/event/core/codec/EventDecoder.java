@@ -6,7 +6,7 @@ import com.github.linyuzai.event.core.endpoint.EventEndpoint;
 /**
  * 事件解码器
  * <p>
- * 在执行事件发布器 {@link com.github.linyuzai.event.core.publisher.EventPublisher} 之前生效
+ * 在执行事件监听器 {@link com.github.linyuzai.event.core.listener.EventListener} 之前生效
  */
 public interface EventDecoder {
 
