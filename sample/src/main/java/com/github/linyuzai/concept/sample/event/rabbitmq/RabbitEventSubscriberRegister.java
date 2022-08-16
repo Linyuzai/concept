@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -24,6 +25,7 @@ public class RabbitEventSubscriberRegister implements ApplicationRunner {
     public EventConcept concept;
 
     @SneakyThrows
+    //@RabbitListener(queues = "queue", containerFactory = "devRabbitListenerContainerFactory")
     public void receiveDev(Message message, Channel channel) {
         System.out.println("dev-" + new String(message.getBody()));
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);

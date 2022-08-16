@@ -183,6 +183,7 @@ public class RabbitEventAutoConfiguration extends EngineEndpointConfiguration<Ra
         register(name + "RabbitListenerContainerFactory", endpoint.getListenerContainerFactory(), beanFactory);
         register(name + "RabbitTemplate", endpoint.getTemplate(), beanFactory);
         register(name + "RabbitAdmin", endpoint.getAdmin(), beanFactory);
+        register(name + "RabbitEventEndpoint", endpoint, beanFactory);
     }
 
     private void register(String name, Object bean, ConfigurableBeanFactory beanFactory) {
