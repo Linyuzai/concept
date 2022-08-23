@@ -28,12 +28,15 @@ public class BuilderRefPsiAugmentProvider extends PsiAugmentProvider {
 
     @SuppressWarnings("unchecked")
     private <Psi extends PsiElement> List<Psi> getPsis(PsiElement element, @NotNull Class<Psi> type) {
+        //处理 Class
         if (!(element instanceof PsiClass)) {
             return null;
         }
         PsiClass psiClass = (PsiClass) element;
+        //获得 Class 上的 @BuilderRef 注解
         PsiAnnotation annotation = psiClass.getAnnotation("com.github.linyuzai.builder.core.BuilderRef");
         if (annotation == null) {
+            //注解不存在就清理缓存
             cache.getOrDefault(element, Collections.emptyMap()).remove(type);
             return null;
         }
@@ -41,18 +44,21 @@ public class BuilderRefPsiAugmentProvider extends PsiAugmentProvider {
         return (List<Psi>) cache.computeIfAbsent(element, e -> new ConcurrentHashMap<>())
                 .computeIfAbsent(type, t -> {
 
+                    //获得注解上的参数值
                     PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
 
                     if (value == null) {
                         return null;
                     }
 
+                    //获得注解上指定的 Class
                     PsiElement child = value.getFirstChild();
 
                     if (!(child instanceof PsiTypeElement)) {
                         return null;
                     }
 
+                    // Type && Class
                     PsiType psiType = ((PsiTypeElement) child).getType();
                     PsiClass refClass = PsiUtil.resolveClassInType(psiType);
 
@@ -62,36 +68,55 @@ public class BuilderRefPsiAugmentProvider extends PsiAugmentProvider {
 
                     PsiManager manager = psiClass.getManager();
                     List<PsiElement> list = new ArrayList<>();
+
+                    //如果需要方法
                     if (type.isAssignableFrom(PsiMethod.class)) {
+                        //遍历属性
                         for (PsiField field : refClass.getAllFields()) {
                             LightMethodBuilder method =
                                     new LightMethodBuilder(manager,
                                             JavaLanguage.INSTANCE,
                                             field.getName());
+                            //Public
                             method.addModifier(PsiModifier.PUBLIC);
+                            //Class
                             method.setContainingClass(psiClass);
+                            //导航
                             method.setNavigationElement(annotation);
+                            //入参是字段名称和字段类型
                             method.addParameter(field.getName(), field.getType());
+                            //返回值类型是 Builder
                             method.setMethodReturnType(PsiTypesUtil.getClassType(psiClass));
                             list.add(method);
                         }
+                        //额外添加 build 方法
                         LightMethodBuilder build =
                                 new LightMethodBuilder(manager,
                                         JavaLanguage.INSTANCE,
                                         "build");
+                        //Public
                         build.addModifier(PsiModifier.PUBLIC);
+                        //Class
                         build.setContainingClass(psiClass);
+                        //导航
                         build.setNavigationElement(annotation);
+                        //返回值是 @BuilderRef 指定的 Class
                         build.setMethodReturnType(psiType);
                         list.add(build);
-                    } else if (type.isAssignableFrom(PsiField.class)) {
+                    }
+
+                    //如果需要属性
+                    if (type.isAssignableFrom(PsiField.class)) {
                         for (PsiField field : refClass.getAllFields()) {
                             LightFieldBuilder lfb =
                                     new LightFieldBuilder(manager,
                                             field.getName(),
                                             field.getType());
+                            //Protected 用于继承
                             lfb.setModifiers(PsiModifier.PROTECTED);
+                            //Class
                             lfb.setContainingClass(psiClass);
+                            //导航
                             lfb.setNavigationElement(annotation);
                             list.add(lfb);
                         }

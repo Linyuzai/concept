@@ -45,49 +45,70 @@ public class BuilderRefProcessor extends AbstractProcessor {
                 Type builderType = ((Symbol.ClassSymbol) element).type;
                 //获得 Builder 的语法树
                 JCTree.JCClassDecl tree = (JCTree.JCClassDecl) elementUtils.getTree(element);
-
+                //遍历 Builder 上的注解
                 for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+                    //忽略 @BuilderRef
                     if (!isSupportAnnotation(mirror)) {
                         continue;
                     }
+                    //读取 @BuilderRef 的参数
                     for (AnnotationValue value : mirror.getElementValues().values()) {
+                        //获得指定的 Class
                         TypeMirror clazz = (TypeMirror) value.getValue();
                         if (!isClass(clazz)) {
                             continue;
                         }
+
                         Type.ClassType classType = (Type.ClassType) clazz;
+                        //获得指定 Class 的语法树
                         JCTree.JCClassDecl refClass = (JCTree.JCClassDecl) elementUtils
                                 .getTree(classType.asElement());
+                        //遍历所有的属性，接口等
                         for (JCTree def : refClass.defs) {
+                            //忽略非字段类型的定义
                             if (!isVariable(def)) {
                                 continue;
                             }
+                            //把字段添加到 Builder 类上
                             tree.defs = tree.defs.append(def);
+
                             JCTree.JCVariableDecl refVariable = (JCTree.JCVariableDecl) def;
+
+                            //用属性名称作为方法名称
                             Name name = refVariable.name;
+                            //Public
                             JCTree.JCModifiers modifiers = treeMaker.Modifiers(Flags.PUBLIC);
+                            //返回值类型为 Builder 类型
                             JCTree.JCExpression returnType = treeMaker.Type(builderType);
-                            //变量
+                            //入参用属性名称和属性类型
                             JCTree.JCVariableDecl variableDecl = treeMaker.VarDef(
                                     treeMaker.Modifiers(Flags.PARAMETER),
                                     name, refVariable.vartype, null);
                             List<JCTree.JCVariableDecl> variableDecls = List.of(variableDecl);
+                            //方法表达式
                             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+                            //this.xxx = xxx;
                             JCTree.JCExpressionStatement assign = treeMaker.Exec(
                                     treeMaker.Assign(treeMaker.Select(
                                                     treeMaker.Ident(names.fromString("this")), name),
                                             treeMaker.Ident(name)));
                             statements.add(assign);
+                            //return this;
                             JCTree.JCStatement ret = treeMaker.Return(
                                     treeMaker.Ident(names.fromString("this")));
                             statements.add(ret);
+                            //方法代码块
                             JCTree.JCBlock block = treeMaker.Block(0, statements.toList());
+                            //泛型字段
                             List<JCTree.JCTypeParameter> typeParameters = List.nil();
+                            //异常
                             List<JCTree.JCExpression> throwsClauses = List.nil();
+                            //生成方法
                             JCTree.JCMethodDecl methodDecl = treeMaker
                                     .MethodDef(modifiers, name, returnType,
                                             typeParameters, variableDecls, throwsClauses,
                                             block, null);
+                            //添加方法
                             tree.defs = tree.defs.append(methodDecl);
                         }
                     }
