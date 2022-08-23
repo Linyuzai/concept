@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>com.github.linyuzai.builder.plugin.intellij</id>
+    <name>Concept Builder</name>
+    <vendor url="https://github.com/mplushnikov/lombok-intellij-plugin">
+        Linyuzai
+    </vendor>
+
+    <version>1.0.0</version>
+
+    <idea-version since-build="203"/>
+
+    <description>
+        Concept Builder Plugin
+        Use @BuilderRef(Class) to generate fields and methods
+    </description>
+    <category>Tools Integration</category>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <lang.psiAugmentProvider
+                implementation="com.github.linyuzai.builder.plugin.intellij.BuilderRefPsiAugmentProvider"/>
+
+    </extensions>
+
+    <change-notes>
+        1.0.0
+    </change-notes>
+</idea-plugin>

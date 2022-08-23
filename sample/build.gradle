@@ -20,6 +20,9 @@ repositories {
 }
 
 dependencies {
+    implementation project(path: ':concept-builder:concept-builder-core', configuration: 'default')
+    annotationProcessor project(path: ':concept-builder:concept-builder-core', configuration: 'default')
+
     /*compile "com.github.linyuzai:concept-download-spring-boot-starter:1.2.0"
     compile "com.github.linyuzai:concept-download-source-okhttp:1.2.0"
     compile "com.github.linyuzai:concept-download-load-coroutines:1.2.0"*/
