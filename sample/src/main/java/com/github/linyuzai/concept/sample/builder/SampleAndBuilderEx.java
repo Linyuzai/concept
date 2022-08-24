@@ -4,14 +4,17 @@ import com.github.linyuzai.builder.core.BuilderRef;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class Sample {
+public class SampleAndBuilderEx {
 
     private String a;
 
     private String b;
 
-    @BuilderRef(Sample.class)
-    public static class Builder {
+    private String ex;
+
+    //@BuilderRef(SampleAndBuilderEx.class)
+    public static class BuilderEx extends Sample.Builder {
+
 
     }
 }

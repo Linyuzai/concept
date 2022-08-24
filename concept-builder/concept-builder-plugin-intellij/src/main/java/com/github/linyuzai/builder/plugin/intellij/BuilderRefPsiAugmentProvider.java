@@ -1,7 +1,6 @@
 package com.github.linyuzai.builder.plugin.intellij;
 
 import com.intellij.lang.java.JavaLanguage;
-import com.intellij.lang.jvm.JvmMethod;
 import com.intellij.psi.*;
 import com.intellij.psi.augment.PsiAugmentProvider;
 import com.intellij.psi.impl.light.LightFieldBuilder;
@@ -28,6 +27,9 @@ public class BuilderRefPsiAugmentProvider extends PsiAugmentProvider {
 
     @SuppressWarnings("unchecked")
     private <Psi extends PsiElement> List<Psi> getPsis(PsiElement element, @NotNull Class<Psi> type) {
+        if (!ConceptBuilderLibraryUtils.hasConceptBuilderLibrary(element.getProject())) {
+            return null;
+        }
         //处理 Class
         if (!(element instanceof PsiClass)) {
             return null;

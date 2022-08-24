@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+apply from: 'version.gradle'
+
+group 'com.github.linyuzai'
+version "${conceptInheritVersion}"
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}

@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.linyuzai.builder.plugin.intellij</id>
     <name>Concept Builder</name>
-    <vendor url="https://github.com/mplushnikov/lombok-intellij-plugin">
+    <vendor url="https://github.com/Linyuzai/concept/wiki/Concept-Builder">
         Linyuzai
     </vendor>
 

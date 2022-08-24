@@ -1,4 +1,4 @@
-package com.github.linyuzai.builder.core;
+package com.github.linyuzai.inherit.core;
 
 import com.google.auto.service.AutoService;
 import com.sun.tools.javac.code.Flags;
@@ -8,22 +8,23 @@ import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
-import com.sun.tools.javac.util.*;
 import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.util.*;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.lang.model.type.*;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import java.util.HashSet;
 import java.util.Set;
 
 @AutoService(Processor.class)
-//@SupportedSourceVersion(SourceVersion.RELEASE_8)
-//@SupportedAnnotationTypes(BuilderProcessor.ANNOTATION_NAME)
-public class BuilderRefProcessor extends AbstractProcessor {
+public class InheritFieldsProcessor extends AbstractProcessor {
 
-    private static final String ANNOTATION_NAME = "com.github.linyuzai.builder.core.BuilderRef";
+    private static final String ANNOTATION_NAME = "com.github.linyuzai.inherit.core.InheritFields";
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
