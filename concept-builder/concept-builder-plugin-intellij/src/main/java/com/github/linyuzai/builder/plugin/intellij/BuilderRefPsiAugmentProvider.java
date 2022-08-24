@@ -1,24 +1,24 @@
 package com.github.linyuzai.builder.plugin.intellij;
 
 import com.intellij.lang.java.JavaLanguage;
+import com.intellij.lang.jvm.JvmMethod;
 import com.intellij.psi.*;
 import com.intellij.psi.augment.PsiAugmentProvider;
 import com.intellij.psi.impl.light.LightFieldBuilder;
 import com.intellij.psi.impl.light.LightMethodBuilder;
+import com.intellij.psi.impl.source.PsiExtensibleClass;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class BuilderRefPsiAugmentProvider extends PsiAugmentProvider {
-
-    private static final Map<PsiElement, Map<Class<?>, List<PsiElement>>> cache = new ConcurrentHashMap<>();
 
     @Override
     protected @NotNull <Psi extends PsiElement> List<Psi> getAugments(@NotNull PsiElement element, @NotNull Class<Psi> type, @Nullable String nameHint) {
@@ -32,96 +32,132 @@ public class BuilderRefPsiAugmentProvider extends PsiAugmentProvider {
         if (!(element instanceof PsiClass)) {
             return null;
         }
-        PsiClass psiClass = (PsiClass) element;
+        PsiClass builderClass = (PsiClass) element;
         //获得 Class 上的 @BuilderRef 注解
-        PsiAnnotation annotation = psiClass.getAnnotation("com.github.linyuzai.builder.core.BuilderRef");
+        PsiAnnotation annotation = builderClass.getAnnotation("com.github.linyuzai.builder.core.BuilderRef");
         if (annotation == null) {
-            //注解不存在就清理缓存
-            cache.getOrDefault(element, Collections.emptyMap()).remove(type);
             return null;
         }
 
-        return (List<Psi>) cache.computeIfAbsent(element, e -> new ConcurrentHashMap<>())
-                .computeIfAbsent(type, t -> {
+        //获得注解上的参数值
+        PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
 
-                    //获得注解上的参数值
-                    PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
+        if (value == null) {
+            return null;
+        }
 
-                    if (value == null) {
-                        return null;
-                    }
+        //获得注解上指定的 Class
+        PsiElement refElement = value.getFirstChild();
 
-                    //获得注解上指定的 Class
-                    PsiElement child = value.getFirstChild();
+        if (!(refElement instanceof PsiTypeElement)) {
+            return null;
+        }
 
-                    if (!(child instanceof PsiTypeElement)) {
-                        return null;
-                    }
+        // Type && Class
+        PsiType refType = ((PsiTypeElement) refElement).getType();
+        PsiClass refClass = PsiUtil.resolveClassInType(refType);
 
-                    // Type && Class
-                    PsiType psiType = ((PsiTypeElement) child).getType();
-                    PsiClass refClass = PsiUtil.resolveClassInType(psiType);
+        if (refClass == null) {
+            return null;
+        }
 
-                    if (refClass == null) {
-                        return null;
-                    }
+        PsiManager manager = builderClass.getManager();
+        List<PsiElement> list = new ArrayList<>();
 
-                    PsiManager manager = psiClass.getManager();
-                    List<PsiElement> list = new ArrayList<>();
+        //如果需要方法
+        if (type.isAssignableFrom(PsiMethod.class)) {
+            //遍历属性
+            for (PsiField field : refClass.getAllFields()) {
+                if (field.hasModifierProperty(PsiModifier.STATIC)) {
+                    continue;
+                }
+                LightMethodBuilder method =
+                        new LightMethodBuilder(manager,
+                                JavaLanguage.INSTANCE,
+                                field.getName());
+                //Public
+                method.addModifier(PsiModifier.PUBLIC);
+                //Class
+                method.setContainingClass(builderClass);
+                //导航
+                method.setNavigationElement(annotation);
+                //入参是字段名称和字段类型
+                method.addParameter(field.getName(), field.getType());
+                //返回值类型是 Builder
+                method.setMethodReturnType(PsiTypesUtil.getClassType(builderClass));
+                list.add(method);
+            }
 
-                    //如果需要方法
-                    if (type.isAssignableFrom(PsiMethod.class)) {
-                        //遍历属性
-                        for (PsiField field : refClass.getAllFields()) {
-                            LightMethodBuilder method =
-                                    new LightMethodBuilder(manager,
-                                            JavaLanguage.INSTANCE,
-                                            field.getName());
-                            //Public
-                            method.addModifier(PsiModifier.PUBLIC);
-                            //Class
-                            method.setContainingClass(psiClass);
-                            //导航
-                            method.setNavigationElement(annotation);
-                            //入参是字段名称和字段类型
-                            method.addParameter(field.getName(), field.getType());
-                            //返回值类型是 Builder
-                            method.setMethodReturnType(PsiTypesUtil.getClassType(psiClass));
-                            list.add(method);
-                        }
-                        //额外添加 build 方法
-                        LightMethodBuilder build =
-                                new LightMethodBuilder(manager,
-                                        JavaLanguage.INSTANCE,
-                                        "build");
-                        //Public
-                        build.addModifier(PsiModifier.PUBLIC);
-                        //Class
-                        build.setContainingClass(psiClass);
-                        //导航
-                        build.setNavigationElement(annotation);
-                        //返回值是 @BuilderRef 指定的 Class
-                        build.setMethodReturnType(psiType);
-                        list.add(build);
-                    }
+            if (!hasBuildMethod(builderClass)) {
+                //额外添加 build 方法
+                LightMethodBuilder build =
+                        new LightMethodBuilder(manager,
+                                JavaLanguage.INSTANCE,
+                                "build");
+                //Public
+                build.addModifier(PsiModifier.PUBLIC);
+                //Class
+                build.setContainingClass(builderClass);
+                //导航
+                build.setNavigationElement(annotation);
+                //返回值是 @BuilderRef 指定的 Class
+                build.setMethodReturnType(refType);
+                list.add(build);
+            }
+        }
 
-                    //如果需要属性
-                    if (type.isAssignableFrom(PsiField.class)) {
-                        for (PsiField field : refClass.getAllFields()) {
-                            LightFieldBuilder lfb =
-                                    new LightFieldBuilder(manager,
-                                            field.getName(),
-                                            field.getType());
-                            //Protected 用于继承
-                            lfb.setModifiers(PsiModifier.PROTECTED);
-                            //Class
-                            lfb.setContainingClass(psiClass);
-                            //导航
-                            lfb.setNavigationElement(annotation);
-                            list.add(lfb);
-                        }
-                    }
-                    return list;
-                });
+        //如果需要属性
+        if (type.isAssignableFrom(PsiField.class)) {
+            for (PsiField field : refClass.getAllFields()) {
+                if (field.hasModifierProperty(PsiModifier.STATIC)) {
+                    continue;
+                }
+                LightFieldBuilder lfb =
+                        new LightFieldBuilder(manager,
+                                field.getName(),
+                                field.getType());
+                //Protected 用于继承
+                lfb.setModifiers(PsiModifier.PROTECTED);
+                //Class
+                lfb.setContainingClass(builderClass);
+                //导航
+                lfb.setNavigationElement(annotation);
+                list.add(lfb);
+            }
+        }
+
+        return (List<Psi>) list;
+    }
+
+    private boolean hasBuildMethod(PsiClass builderClass) {
+        Collection<PsiMethod> methods = collectClassMethodsIntern(builderClass);
+        for (PsiMethod method : methods) {
+            if ("build".equals(method.getName()) && method.getParameterList().isEmpty()) {
+                return true;
+            }
+        }
+        PsiClass superClass = builderClass.getSuperClass();
+        if (superClass == null) {
+            return false;
+        }
+        PsiMethod[] builds = superClass.findMethodsByName("build", true);
+        for (PsiMethod build : builds) {
+            if (build.getParameterList().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Collection<PsiMethod> collectClassMethodsIntern(@NotNull PsiClass psiClass) {
+        if (psiClass instanceof PsiExtensibleClass) {
+            return new ArrayList<>(((PsiExtensibleClass) psiClass).getOwnMethods());
+        } else {
+            return filterPsiElements(psiClass, PsiMethod.class);
+        }
+    }
+
+    private static <T extends PsiElement> Collection<T> filterPsiElements(@NotNull PsiClass psiClass, @NotNull Class<T> desiredClass) {
+        return Arrays.stream(psiClass.getChildren()).filter(desiredClass::isInstance).map(desiredClass::cast).collect(Collectors.toList());
     }
 }

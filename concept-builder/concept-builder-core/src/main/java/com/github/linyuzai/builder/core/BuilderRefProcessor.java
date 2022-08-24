@@ -63,35 +63,54 @@ public class BuilderRefProcessor extends AbstractProcessor {
                         //获得指定 Class 的语法树
                         JCTree.JCClassDecl refClass = (JCTree.JCClassDecl) elementUtils
                                 .getTree(classType.asElement());
+
+                        List<JCTree.JCExpression> typeargs = List.nil();
+                        List<JCTree.JCExpression> args = List.nil();
+
                         //遍历所有的属性，接口等
                         for (JCTree def : refClass.defs) {
                             //忽略非字段类型的定义
                             if (!isVariable(def)) {
                                 continue;
                             }
-                            //把字段添加到 Builder 类上
-                            tree.defs = tree.defs.append(def);
 
                             JCTree.JCVariableDecl refVariable = (JCTree.JCVariableDecl) def;
 
+                            //静态字段忽略
+                            if (refVariable.mods.getFlags().contains(Modifier.STATIC)) {
+                                continue;
+                            }
+
                             //用属性名称作为方法名称
                             Name name = refVariable.name;
-                            //Public
-                            JCTree.JCModifiers modifiers = treeMaker.Modifiers(Flags.PUBLIC);
+                            args = args.append(treeMaker.Ident(name));
+
+                            //字段类型
+                            JCTree.JCExpression vartype = refVariable.vartype;
+                            typeargs = typeargs.append(vartype);
+
+                            //把字段添加到 Builder 类上
+                            JCTree.JCVariableDecl varDef = treeMaker.VarDef(treeMaker.Modifiers(Flags.PROTECTED),
+                                    name, vartype, null);
+                            tree.defs = tree.defs.append(varDef);
+
                             //返回值类型为 Builder 类型
                             JCTree.JCExpression returnType = treeMaker.Type(builderType);
                             //入参用属性名称和属性类型
                             JCTree.JCVariableDecl variableDecl = treeMaker.VarDef(
                                     treeMaker.Modifiers(Flags.PARAMETER),
-                                    name, refVariable.vartype, null);
+                                    name, vartype, null);
                             List<JCTree.JCVariableDecl> variableDecls = List.of(variableDecl);
                             //方法表达式
                             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
                             //this.xxx = xxx;
                             JCTree.JCExpressionStatement assign = treeMaker.Exec(
-                                    treeMaker.Assign(treeMaker.Select(
+                                    treeMaker.Assign(
+                                            treeMaker.Select(
                                                     treeMaker.Ident(names.fromString("this")), name),
-                                            treeMaker.Ident(name)));
+                                            treeMaker.Ident(name)
+                                    )
+                            );
                             statements.add(assign);
                             //return this;
                             JCTree.JCStatement ret = treeMaker.Return(
@@ -105,12 +124,41 @@ public class BuilderRefProcessor extends AbstractProcessor {
                             List<JCTree.JCExpression> throwsClauses = List.nil();
                             //生成方法
                             JCTree.JCMethodDecl methodDecl = treeMaker
-                                    .MethodDef(modifiers, name, returnType,
+                                    .MethodDef(treeMaker.Modifiers(Flags.PUBLIC), name, returnType,
                                             typeParameters, variableDecls, throwsClauses,
                                             block, null);
                             //添加方法
                             tree.defs = tree.defs.append(methodDecl);
                         }
+
+                        //build 方法
+                        //X $$ = new X();
+                        JCTree.JCNewClass newClass = treeMaker.NewClass(
+                                null,
+                                typeargs,
+                                treeMaker.Type(classType),
+                                args,
+                                null
+                        );
+                        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+                        JCTree.JCVariableDecl build = treeMaker.VarDef(treeMaker.Modifiers(Flags.PARAMETER),
+                                names.fromString("_$build"), treeMaker.Type(classType),
+                                newClass);
+                        statements.add(build);
+                        //return $$;
+                        JCTree.JCStatement ret = treeMaker.Return(
+                                treeMaker.Ident(names.fromString("_$build")));
+                        statements.add(ret);
+                        //方法代码块
+                        JCTree.JCBlock block = treeMaker.Block(0, statements.toList());
+                        JCTree.JCMethodDecl methodDecl = treeMaker
+                                .MethodDef(treeMaker.Modifiers(Flags.PUBLIC),
+                                        names.fromString("build"),
+                                        treeMaker.Type(classType.asElement().type),
+                                        List.nil(), List.nil(), List.nil(),
+                                        block, null);
+                        //添加 build 方法
+                        tree.defs = tree.defs.append(methodDecl);
                     }
                 }
             }
