@@ -1,7 +1,8 @@
-package com.github.linyuzai.inherit.core.handler;
+package com.github.linyuzai.inherit.processor.handler;
 
 import com.github.linyuzai.inherit.core.flag.InheritFlags;
-import com.github.linyuzai.inherit.core.utils.InheritUtils;
+import com.github.linyuzai.inherit.core.handler.InheritHandler;
+import com.github.linyuzai.inherit.processor.utils.InheritUtils;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.TypeTag;

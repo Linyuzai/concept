@@ -1,4 +1,4 @@
-package com.github.linyuzai.inherit.core.processor;
+package com.github.linyuzai.inherit.processor;
 
 import com.github.linyuzai.inherit.core.annotation.InheritField;
 import com.github.linyuzai.inherit.core.annotation.InheritFields;

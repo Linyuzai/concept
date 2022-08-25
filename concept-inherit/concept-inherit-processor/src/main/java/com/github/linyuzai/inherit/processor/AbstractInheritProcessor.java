@@ -1,7 +1,7 @@
-package com.github.linyuzai.inherit.core.processor;
+package com.github.linyuzai.inherit.processor;
 
 import com.github.linyuzai.inherit.core.handler.InheritHandler;
-import com.github.linyuzai.inherit.core.utils.InheritUtils;
+import com.github.linyuzai.inherit.processor.utils.InheritUtils;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
@@ -9,8 +9,9 @@ import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
-import com.sun.tools.javac.util.*;
+import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.Names;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -55,7 +56,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     Collection<String> flags = convertString((Collection<Attribute.Constant>) attributes
                             .getOrDefault("flags", Collections.emptyList()));
 
-                    Collection<InheritHandler> handlers = InheritHandler.from(flags);
+                    Collection<InheritHandler> handlers = InheritUtils.getInheritHandlers(flags);
 
                     for (Type.ClassType sourceClass : sources) {
                         //获得指定 Class 的语法树

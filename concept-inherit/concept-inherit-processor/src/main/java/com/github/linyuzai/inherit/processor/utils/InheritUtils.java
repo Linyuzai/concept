@@ -1,5 +1,8 @@
-package com.github.linyuzai.inherit.core.utils;
+package com.github.linyuzai.inherit.processor.utils;
 
+import com.github.linyuzai.inherit.core.flag.InheritFlags;
+import com.github.linyuzai.inherit.processor.handler.GenerateMethodsWithFieldsHandler;
+import com.github.linyuzai.inherit.core.handler.InheritHandler;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
@@ -10,8 +13,19 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class InheritUtils {
+
+    public static Collection<InheritHandler> getInheritHandlers(Collection<String> flags) {
+        Collection<String> of = InheritFlags.of(flags);
+        Collection<InheritHandler> handlers = new ArrayList<>();
+        if (of.contains(InheritFlags.GENERATE_METHODS_WITH_FIELDS)) {
+            handlers.add(new GenerateMethodsWithFieldsHandler(of));
+        }
+        return handlers;
+    }
 
     public static boolean isAnnotation(AnnotationMirror annotation, String className) {
         DeclaredType declaredType = annotation.getAnnotationType();
