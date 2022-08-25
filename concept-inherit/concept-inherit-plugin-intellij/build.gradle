@@ -15,7 +15,7 @@ targetCompatibility = "11"
 apply from: '../version.gradle'
 
 group 'com.github.linyuzai'
-version "${conceptBuilderVersion}"
+version "${conceptInheritVersion}"
 //sourceCompatibility = '11'
 
 repositories {

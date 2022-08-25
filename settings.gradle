@@ -35,4 +35,6 @@ include 'concept-router:concept-router-ribbon'
 include 'concept-router:concept-router-spring-boot-starter'
 include 'concept-sync-waiting'
 include 'sample'
+include 'concept-inherit:concept-inherit-plugin-intellij'
+findProject(':concept-inherit:concept-inherit-plugin-intellij')?.name = 'concept-inherit-plugin-intellij'
 

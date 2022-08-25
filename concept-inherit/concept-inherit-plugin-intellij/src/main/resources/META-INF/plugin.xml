@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>com.github.linyuzai.inherit.plugin.intellij</id>
+    <name>Concept Builder</name>
+    <vendor url="https://github.com/Linyuzai/concept/wiki/Concept-Inherit">
+        Linyuzai
+    </vendor>
+
+    <version>1.0.0</version>
+
+    <idea-version since-build="203"/>
+
+    <description>
+        Concept Inherit Plugin
+        Use @InheritClass/@InheritField/@InheritMethod to generate fields and methods
+    </description>
+    <category>Tools Integration</category>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <lang.psiAugmentProvider
+                implementation="com.github.linyuzai.inherit.plugin.intellij.ConceptInheritPsiAugmentProvider"/>
+
+    </extensions>
+
+    <change-notes>
+        1.0.0
+    </change-notes>
+</idea-plugin>
