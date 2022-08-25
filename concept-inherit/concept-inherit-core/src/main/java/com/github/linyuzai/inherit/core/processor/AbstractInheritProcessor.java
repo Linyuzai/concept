@@ -47,7 +47,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     Collection<Type.ClassType> sources = convertClass((Collection<Attribute.Class>) attributes
                             .get("sources"));
                     Boolean inheritSuper = (Boolean) attributes
-                            .getOrDefault("inheritSuper", true);
+                            .getOrDefault("inheritSuper", false);
                     Collection<String> excludeFields = convertString((Collection<Attribute.Constant>) attributes
                             .getOrDefault("excludeFields", Collections.emptyList()));
                     Collection<String> excludeMethods = convertString((Collection<Attribute.Constant>) attributes

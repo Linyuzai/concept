@@ -5,10 +5,7 @@ import com.github.linyuzai.inherit.core.flag.InheritFlags;
 
 public class Inherit2 extends Inherit1 {
 
-    @InheritClass(sources = Inherit2.class, flags = {
-            InheritFlags.BUILDER,
-            InheritFlags.GETTER,
-            InheritFlags.SETTER})
+    @InheritClass(sources = Inherit2.class, flags = InheritFlags.BUILDER)
     public static class Builder extends Inherit1.Builder {
 
     }

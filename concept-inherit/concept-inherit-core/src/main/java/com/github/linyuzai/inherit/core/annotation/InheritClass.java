@@ -15,7 +15,7 @@ public @interface InheritClass {
     /**
      * 是否继承父类属性
      */
-    boolean inheritSuper() default true;
+    boolean inheritSuper() default false;
 
     /**
      * 排除哪几个名称的属性
