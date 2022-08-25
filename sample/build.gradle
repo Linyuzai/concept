@@ -20,6 +20,10 @@ repositories {
 }
 
 dependencies {
+
+    implementation project(path: ':concept-inherit:concept-inherit-core', configuration: 'default')
+    annotationProcessor project(path: ':concept-inherit:concept-inherit-core', configuration: 'default')
+
     implementation project(path: ':concept-builder:concept-builder-core', configuration: 'default')
     annotationProcessor project(path: ':concept-builder:concept-builder-core', configuration: 'default')
 
