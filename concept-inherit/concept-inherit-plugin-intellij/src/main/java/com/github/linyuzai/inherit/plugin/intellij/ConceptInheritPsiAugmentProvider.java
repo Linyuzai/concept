@@ -1,6 +1,7 @@
 package com.github.linyuzai.inherit.plugin.intellij;
 
 import com.intellij.lang.java.JavaLanguage;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.*;
 import com.intellij.psi.augment.PsiAugmentProvider;
 import com.intellij.psi.impl.light.LightFieldBuilder;
@@ -8,35 +9,42 @@ import com.intellij.psi.impl.light.LightMethodBuilder;
 import com.intellij.psi.impl.light.LightModifierList;
 import com.intellij.psi.impl.source.PsiExtensibleClass;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
-import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
-    private final Set<String> ANNOTATION_NAMES = new HashSet<>(Arrays.asList(
+    private final Set<String> FIELD_ANNOTATION_NAMES = new HashSet<>(Arrays.asList(
             "com.github.linyuzai.inherit.core.annotation.InheritClass",
-            "com.github.linyuzai.inherit.core.annotation.InheritField",
+            "com.github.linyuzai.inherit.core.annotation.InheritField"));
+
+    private final Set<String> FIELD_REPEATABLE_ANNOTATION_NAMES = new HashSet<>(Arrays.asList(
+            "com.github.linyuzai.inherit.core.annotation.InheritClasses",
+            "com.github.linyuzai.inherit.core.annotation.InheritFields"));
+
+    private final Set<String> METHOD_ANNOTATION_NAMES = new HashSet<>(Arrays.asList(
+            "com.github.linyuzai.inherit.core.annotation.InheritClass",
             "com.github.linyuzai.inherit.core.annotation.InheritMethod"));
 
-    private final Set<String> REPEATABLE_ANNOTATION_NAMES = new HashSet<>(Arrays.asList(
+    private final Set<String> METHOD_REPEATABLE_ANNOTATION_NAMES = new HashSet<>(Arrays.asList(
             "com.github.linyuzai.inherit.core.annotation.InheritClasses",
-            "com.github.linyuzai.inherit.core.annotation.InheritFields",
             "com.github.linyuzai.inherit.core.annotation.InheritMethods"));
 
     @Override
     protected @NotNull <Psi extends PsiElement> List<Psi> getAugments(@NotNull PsiElement element, @NotNull Class<Psi> type, @Nullable String nameHint) {
-        List<Psi> psis = getPsis(element, type);
+        List<Psi> psis = getPsis(element, type, new HashSet<>(), new HashSet<>());
         return psis == null ? super.getAugments(element, type, nameHint) : psis;
     }
 
     @SuppressWarnings("unchecked")
-    private <Psi extends PsiElement> List<Psi> getPsis(PsiElement element, @NotNull Class<Psi> type) {
+    private <Psi extends PsiElement> List<Psi> getPsis(PsiElement element, @NotNull Class<Psi> type,
+                                                       Collection<String> hasHandleFieldClasses,
+                                                       Collection<String> hasHandleMethodClasses) {
+        System.out.println(ApplicationManager.getApplication().isUnitTestMode());
         if (!ConceptInheritLibraryUtils.hasConceptInheritLibrary(element.getProject())) {
             return null;
         }
@@ -44,42 +52,76 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
         if (!(element instanceof PsiClass)) {
             return null;
         }
-        PsiClass targetClass = (PsiClass) element;
-        PsiManager manager = targetClass.getManager();
-
-        Collection<PsiAnnotation> annotations = findAnnotations(targetClass);
 
         List<PsiElement> list = new ArrayList<>();
 
-        for (PsiAnnotation annotation : annotations) {
-            Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
-            Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
-            Collection<String> excludeFields = findStrings(annotation.findAttributeValue("excludeFields"));
-            Collection<String> excludeMethods = findStrings(annotation.findAttributeValue("excludeMethods"));
-            Collection<String> flags = findStrings(annotation.findAttributeValue("flags"));
+        PsiClass targetClass = (PsiClass) element;
+        if (type.isAssignableFrom(PsiField.class)) {
+            if (hasHandleFieldClasses.contains(targetClass.getQualifiedName())) {
+                return Collections.emptyList();
+            }
+            hasHandleFieldClasses.add(targetClass.getQualifiedName());
 
-            for (PsiType sourceType : sources) {
-                PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);
-                if (sourceClass == null) {
-                    continue;
-                }
+            Collection<PsiAnnotation> annotations = findFieldAnnotations(targetClass);
 
-                //如果需要属性
-                if (type.isAssignableFrom(PsiField.class)) {
-                    for (PsiField field : getFields(sourceClass, targetClass, inheritSuper)) {
+            for (PsiAnnotation annotation : annotations) {
+                Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
+                Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
+                Collection<String> excludeFields = findStrings(annotation.findAttributeValue("excludeFields"));
+                Collection<String> flags = findStrings(annotation.findAttributeValue("flags"));
+
+                for (PsiType sourceType : sources) {
+                    PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);
+                    if (sourceClass == null) {
+                        continue;
+                    }
+
+                    Collection<PsiField> fields =
+                            getFields(sourceClass, inheritSuper, hasHandleFieldClasses, hasHandleMethodClasses);
+
+                    Collection<PsiField> hasFields = collectClassFieldsIntern(targetClass);
+
+                    for (PsiField field : fields) {
                         if (field.hasModifierProperty(PsiModifier.STATIC) ||
-                                excludeFields.contains(field.getName())) {
+                                excludeFields.contains(field.getName()) ||
+                                hasFieldDefined(field, hasFields)) {
                             continue;
                         }
                         list.add(field);
                     }
                 }
+            }
+        }
 
-                //如果需要方法
-                if (type.isAssignableFrom(PsiMethod.class)) {
-                    for (PsiMethod method : getMethods(sourceClass, targetClass, inheritSuper)) {
+        if (type.isAssignableFrom(PsiMethod.class)) {
+            if (hasHandleMethodClasses.contains(targetClass.getQualifiedName())) {
+                return Collections.emptyList();
+            }
+            hasHandleMethodClasses.add(targetClass.getQualifiedName());
+
+            Collection<PsiAnnotation> annotations = findMethodAnnotations(targetClass);
+
+            for (PsiAnnotation annotation : annotations) {
+                Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
+                Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
+                Collection<String> excludeMethods = findStrings(annotation.findAttributeValue("excludeMethods"));
+                Collection<String> flags = findStrings(annotation.findAttributeValue("flags"));
+
+                for (PsiType sourceType : sources) {
+                    PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);
+                    if (sourceClass == null) {
+                        continue;
+                    }
+
+                    Collection<PsiMethod> methods =
+                            getMethods(sourceClass, inheritSuper, hasHandleFieldClasses, hasHandleMethodClasses);
+
+                    Collection<PsiMethod> hasMethods = collectClassMethodsIntern(targetClass);
+
+                    for (PsiMethod method : methods) {
                         if (method.hasModifierProperty(PsiModifier.STATIC) ||
-                                excludeMethods.contains(method.getName())) {
+                                excludeMethods.contains(method.getName()) ||
+                                hasMethodDefined(method, hasMethods)) {
                             continue;
                         }
                         list.add(method);
@@ -88,101 +130,32 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
             }
         }
 
-        /*//获得注解上指定的 Class
-        PsiElement refElement = value.getFirstChild();
-
-        if (!(refElement instanceof PsiTypeElement)) {
-
-            return null;
-        }
-
-        // Type && Class
-        PsiType refType = ((PsiTypeElement) refElement).getType();
-        PsiClass refClass = PsiUtil.resolveClassInType(refType);
-
-        if (refClass == null) {
-            return null;
-        }
-
-        PsiManager manager = targetClass.getManager();
-
-
-        //如果需要方法
-        if (type.isAssignableFrom(PsiMethod.class)) {
-            //遍历属性
-            for (PsiField field : refClass.getAllFields()) {
-                if (field.hasModifierProperty(PsiModifier.STATIC)) {
-                    continue;
-                }
-                LightMethodBuilder method =
-                        new LightMethodBuilder(manager,
-                                JavaLanguage.INSTANCE,
-                                field.getName());
-                //Public
-                method.addModifier(PsiModifier.PUBLIC);
-                //Class
-                method.setContainingClass(targetClass);
-                //导航
-                method.setNavigationElement(annotation);
-                //入参是字段名称和字段类型
-                method.addParameter(field.getName(), field.getType());
-                //返回值类型是 Builder
-                method.setMethodReturnType(PsiTypesUtil.getClassType(targetClass));
-                list.add(method);
-            }
-
-            if (!hasBuildMethod(targetClass)) {
-                //额外添加 build 方法
-                LightMethodBuilder build =
-                        new LightMethodBuilder(manager,
-                                JavaLanguage.INSTANCE,
-                                "build");
-                //Public
-                build.addModifier(PsiModifier.PUBLIC);
-                //Class
-                build.setContainingClass(targetClass);
-                //导航
-                build.setNavigationElement(annotation);
-                //返回值是 @BuilderRef 指定的 Class
-                build.setMethodReturnType(refType);
-                list.add(build);
-            }
-        }
-
-        //如果需要属性
-        if (type.isAssignableFrom(PsiField.class)) {
-            for (PsiField field : refClass.getAllFields()) {
-                if (field.hasModifierProperty(PsiModifier.STATIC)) {
-                    continue;
-                }
-                LightFieldBuilder lfb =
-                        new LightFieldBuilder(manager,
-                                field.getName(),
-                                field.getType());
-                //Protected 用于继承
-                lfb.setModifiers(PsiModifier.PROTECTED);
-                //Class
-                lfb.setContainingClass(targetClass);
-                //导航
-                lfb.setNavigationElement(annotation);
-                list.add(lfb);
-            }
-        }
-*/
         return (List<Psi>) list;
     }
 
-    private Collection<PsiAnnotation> findAnnotations(PsiClass targetClass) {
+    private Collection<PsiAnnotation> findFieldAnnotations(PsiClass targetClass) {
         Collection<PsiAnnotation> annotations = new ArrayList<>();
         for (PsiAnnotation annotation : targetClass.getAnnotations()) {
-            if (ANNOTATION_NAMES.contains(annotation.getQualifiedName())) {
+            if (FIELD_ANNOTATION_NAMES.contains(annotation.getQualifiedName())) {
                 annotations.add(annotation);
             }
-            if (REPEATABLE_ANNOTATION_NAMES.contains(annotation.getQualifiedName())) {
+            if (FIELD_REPEATABLE_ANNOTATION_NAMES.contains(annotation.getQualifiedName())) {
                 handleRepeatableAnnotation(annotation, annotations);
             }
         }
+        return annotations;
+    }
 
+    private Collection<PsiAnnotation> findMethodAnnotations(PsiClass targetClass) {
+        Collection<PsiAnnotation> annotations = new ArrayList<>();
+        for (PsiAnnotation annotation : targetClass.getAnnotations()) {
+            if (METHOD_ANNOTATION_NAMES.contains(annotation.getQualifiedName())) {
+                annotations.add(annotation);
+            }
+            if (METHOD_REPEATABLE_ANNOTATION_NAMES.contains(annotation.getQualifiedName())) {
+                handleRepeatableAnnotation(annotation, annotations);
+            }
+        }
         return annotations;
     }
 
@@ -251,66 +224,95 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
         }
     }
 
-    private boolean hasBuildMethod(PsiClass builderClass) {
-        Collection<PsiMethod> methods = collectClassMethodsIntern(builderClass);
-        for (PsiMethod method : methods) {
-            if ("build".equals(method.getName()) && method.getParameterList().isEmpty()) {
-                return true;
-            }
-        }
-        PsiClass superClass = builderClass.getSuperClass();
-        if (superClass == null) {
-            return false;
-        }
-        PsiMethod[] builds = superClass.findMethodsByName("build", true);
-        for (PsiMethod build : builds) {
-            if (build.getParameterList().isEmpty()) {
+    private boolean hasFieldDefined(PsiField field, Collection<PsiField> fields) {
+        for (PsiField psiField : fields) {
+            if (psiField.getName().equals(field.getName())) {
                 return true;
             }
         }
         return false;
     }
 
-    public Collection<PsiField> getFields(PsiClass psiClass, PsiClass targetClass, boolean getSuper) {
-        Collection<PsiField> fields = new HashSet<>(collectClassFieldsIntern(psiClass));
-        if (psiClass != targetClass) {
-            List<PsiField> psis = getPsis(psiClass, PsiField.class);
-            if (psis != null) {
-                fields.addAll(psis);
+    private boolean hasMethodDefined(PsiMethod method, Collection<PsiMethod> methods) {
+        for (PsiMethod psiMethod : methods) {
+            if (psiMethod.getName().equals(method.getName()) &&
+                    isParameterListEqual(psiMethod.getParameterList(), method.getParameterList())) {
+                return true;
             }
         }
+        return false;
+    }
+
+    private boolean isParameterListEqual(PsiParameterList list1, PsiParameterList list2) {
+        PsiParameter[] parameters1 = list1.getParameters();
+        PsiParameter[] parameters2 = list2.getParameters();
+        if (parameters1.length != parameters2.length) {
+            return false;
+        }
+        for (int i = 0; i < parameters1.length; i++) {
+            PsiParameter parameter1 = parameters1[i];
+            PsiParameter parameter2 = parameters2[i];
+            PsiClass psiClass1 = PsiUtil.resolveClassInType(parameter1.getType());
+            PsiClass psiClass2 = PsiUtil.resolveClassInType(parameter2.getType());
+            if (psiClass1 != null && psiClass2 != null) {
+                String qualifiedName1 = psiClass1.getQualifiedName();
+                String qualifiedName2 = psiClass2.getQualifiedName();
+                if (qualifiedName1 != null && qualifiedName2 != null) {
+                    if (!qualifiedName1.equals(qualifiedName2)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public Collection<PsiField> getFields(PsiClass psiClass, boolean getSuper,
+                                          Collection<String> hasHandleFieldClasses,
+                                          Collection<String> hasHandleMethodClasses) {
+        Collection<PsiField> fields = findFields(psiClass, hasHandleFieldClasses, hasHandleMethodClasses);
         if (getSuper) {
             PsiClass superClass = psiClass.getSuperClass();
             while (superClass != null) {
-                fields.addAll(collectClassFieldsIntern(superClass));
-                List<PsiField> psis = getPsis(superClass, PsiField.class);
-                if (psis != null) {
-                    fields.addAll(psis);
-                }
+                fields.addAll(findFields(superClass, hasHandleFieldClasses, hasHandleMethodClasses));
                 superClass = superClass.getSuperClass();
             }
         }
         return fields;
     }
 
-    public Collection<PsiMethod> getMethods(PsiClass psiClass, PsiClass targetClass, boolean getSuper) {
-        Collection<PsiMethod> methods = new HashSet<>(collectClassMethodsIntern(psiClass));
-        if (psiClass != targetClass) {
-            List<PsiMethod> psis = getPsis(psiClass, PsiMethod.class);
-            if (psis != null) {
-                methods.addAll(psis);
-            }
-        }
+    public Collection<PsiMethod> getMethods(PsiClass psiClass, boolean getSuper,
+                                            Collection<String> hasHandleFieldClasses,
+                                            Collection<String> hasHandleMethodClasses) {
+        Collection<PsiMethod> methods = findMethods(psiClass, hasHandleFieldClasses, hasHandleMethodClasses);
         if (getSuper) {
             PsiClass superClass = psiClass.getSuperClass();
             while (superClass != null) {
-                methods.addAll(collectClassMethodsIntern(superClass));
-                List<PsiMethod> psis = getPsis(superClass, PsiMethod.class);
-                if (psis != null) {
-                    methods.addAll(psis);
-                }
+                methods.addAll(findMethods(superClass, hasHandleFieldClasses, hasHandleMethodClasses));
                 superClass = superClass.getSuperClass();
             }
+        }
+        return methods;
+    }
+
+    private Collection<PsiField> findFields(PsiClass psiClass,
+                                            Collection<String> hasHandleFieldClasses,
+                                            Collection<String> hasHandleMethodClasses) {
+        Collection<PsiField> fields = collectClassFieldsIntern(psiClass);
+        List<PsiField> psis = getPsis(psiClass, PsiField.class, hasHandleFieldClasses, hasHandleMethodClasses);
+        if (psis != null) {
+            fields.addAll(psis);
+        }
+        return fields;
+    }
+
+    private Collection<PsiMethod> findMethods(PsiClass psiClass,
+                                              Collection<String> hasHandleFieldClasses,
+                                              Collection<String> hasHandleMethodClasses) {
+        Collection<PsiMethod> methods = collectClassMethodsIntern(psiClass);
+        List<PsiMethod> psis = getPsis(psiClass, PsiMethod.class, hasHandleFieldClasses, hasHandleMethodClasses);
+        if (psis != null) {
+            methods.addAll(psis);
         }
         return methods;
     }
