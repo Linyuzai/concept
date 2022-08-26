@@ -8,11 +8,11 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 
-public class ConceptInheritLibraryUtils {
+public class LibraryUtils {
 
     private static final String CONCEPT_INHERIT_PACKAGE = "com.github.linyuzai.inherit.core";
 
-    public static boolean hasConceptInheritLibrary(Project project) {
+    public static boolean hasLibrary(Project project) {
         ApplicationManager.getApplication().assertReadAccessAllowed();
         return CachedValuesManager.getManager(project).getCachedValue(project, () -> {
             PsiPackage aPackage = JavaPsiFacade.getInstance(project).findPackage(CONCEPT_INHERIT_PACKAGE);

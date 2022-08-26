@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly project(':concept-inherit:concept-inherit-core')
+    //compileOnly project(':concept-inherit:concept-inherit-core')
 }
 
 intellij.version = "2021.3"

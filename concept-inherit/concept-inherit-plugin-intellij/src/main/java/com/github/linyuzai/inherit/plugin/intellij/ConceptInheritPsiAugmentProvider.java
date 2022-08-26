@@ -1,7 +1,6 @@
 package com.github.linyuzai.inherit.plugin.intellij;
 
 import com.intellij.lang.java.JavaLanguage;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.*;
 import com.intellij.psi.augment.PsiAugmentProvider;
 import com.intellij.psi.impl.light.LightFieldBuilder;
@@ -44,8 +43,7 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
     private <Psi extends PsiElement> List<Psi> getPsis(PsiElement element, @NotNull Class<Psi> type,
                                                        Collection<String> hasHandleFieldClasses,
                                                        Collection<String> hasHandleMethodClasses) {
-        System.out.println(ApplicationManager.getApplication().isUnitTestMode());
-        if (!ConceptInheritLibraryUtils.hasConceptInheritLibrary(element.getProject())) {
+        if (!LibraryUtils.hasLibrary(element.getProject())) {
             return null;
         }
         //处理 Class
@@ -56,6 +54,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
         List<PsiElement> list = new ArrayList<>();
 
         PsiClass targetClass = (PsiClass) element;
+
+        PsiManager manager = targetClass.getManager();
+
         if (type.isAssignableFrom(PsiField.class)) {
             if (hasHandleFieldClasses.contains(targetClass.getQualifiedName())) {
                 return Collections.emptyList();
@@ -87,7 +88,24 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                                 hasFieldDefined(field, hasFields)) {
                             continue;
                         }
-                        list.add(field);
+
+                        LightFieldBuilder fieldBuilder =
+                                new LightFieldBuilder(manager,
+                                        field.getName(),
+                                        field.getType());
+                        //访问限定
+                        fieldBuilder.setModifierList(new LightModifierList(field));
+                        //初始化
+                        fieldBuilder.setInitializer(field.getInitializer());
+                        //所属的Class
+                        fieldBuilder.setContainingClass(targetClass);
+                        //是否 Deprecated
+                        fieldBuilder.setIsDeprecated(field.isDeprecated());
+                        //注释
+                        fieldBuilder.setDocComment(field.getDocComment());
+                        //导航
+                        fieldBuilder.setNavigationElement(field);
+                        list.add(fieldBuilder);
                     }
                 }
             }
@@ -124,7 +142,22 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                                 hasMethodDefined(method, hasMethods)) {
                             continue;
                         }
-                        list.add(method);
+
+                        LightMethodBuilder methodBuilder =
+                                new LightMethodBuilder(manager,
+                                        JavaLanguage.INSTANCE,
+                                        method.getName(),
+                                        method.getParameterList(),
+                                        method.getModifierList(),
+                                        method.getThrowsList(),
+                                        method.getTypeParameterList());
+                        //返回值
+                        methodBuilder.setMethodReturnType(method.getReturnType());
+                        //所属的 Class
+                        methodBuilder.setContainingClass(targetClass);
+                        //导航
+                        methodBuilder.setNavigationElement(method);
+                        list.add(methodBuilder);
                     }
                 }
             }
