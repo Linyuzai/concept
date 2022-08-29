@@ -71,7 +71,7 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                 Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
                 Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
                 Collection<String> excludeFields = findStrings(annotation.findAttributeValue("excludeFields"));
-                Collection<String> flags = InheritFlag.of(findStrings(annotation.findAttributeValue("flags")));
+                //Collection<String> flags = InheritFlag.of(findStrings(annotation.findAttributeValue("flags")));
 
                 for (PsiType sourceType : sources) {
                     PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);

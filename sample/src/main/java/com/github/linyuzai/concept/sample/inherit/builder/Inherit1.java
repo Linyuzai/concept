@@ -11,7 +11,7 @@ public class Inherit1 {
 
     private boolean c;
 
-    @InheritField(sources = {Inherit1.class, Builder.class}, flags = InheritFlag.BUILDER)
+    //@InheritField(sources = {Inherit1.class, Builder.class}, flags = InheritFlag.BUILDER)
     public static class Builder {
 
         private String d;
