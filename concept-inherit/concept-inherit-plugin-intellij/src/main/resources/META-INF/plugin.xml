@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <idea-plugin>
     <id>com.github.linyuzai.inherit.plugin.intellij</id>
-    <name>Concept Builder</name>
+    <name>Concept Inherit</name>
     <vendor url="https://github.com/Linyuzai/concept/wiki/Concept-Inherit">
         Linyuzai
     </vendor>
 
     <version>1.0.0</version>
 
-    <idea-version since-build="203"/>
+    <idea-version since-build="193"/>
 
-    <description>
-        Concept Inherit Plugin
-        Use @InheritClass/@InheritField/@InheritMethod to generate fields and methods
-    </description>
+    <description><![CDATA[
+      Concept Inherit Plugin.<br>
+      Use @InheritField to extends fields.<br>
+      Use @InheritMethod to extends methods.<br>
+      Use @InheritClass to extends fields and methods.<br>
+      Just copy fields and methods to the target class, not the real inherit.
+    ]]></description>
+
     <category>Tools Integration</category>
 
     <depends>com.intellij.modules.lang</depends>

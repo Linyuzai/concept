@@ -30,7 +30,7 @@ public class GenerateMethodsWithFieldsHandler implements InheritHandler {
     }
 
     @Override
-    public void handle(JCTree tree, JCTree.JCClassDecl targetClass, TreeMaker treeMaker, Names names) {
+    public void handle(JCTree tree, JCTree.JCClassDecl targetClass, TreeMaker treeMaker, Names names, int level) {
         if (tree instanceof JCTree.JCVariableDecl) {
             JCTree.JCVariableDecl refVariable = (JCTree.JCVariableDecl) tree;
 

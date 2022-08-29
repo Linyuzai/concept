@@ -81,8 +81,19 @@ public class InheritUtils {
     public static boolean isMethodEqual(JCTree.JCMethodDecl methodDef1, JCTree.JCMethodDecl methodDef2) {
         return methodDef1.name.contentEquals(methodDef2.name) &&
                 methodDef1.mods.getFlags().equals(methodDef2.mods.getFlags()) &&
-                methodDef1.restype.type.equals(methodDef2.restype.type) &&
+                isRestypeEqual(methodDef1.restype, methodDef2.restype) &&
                 isVariablesEqual(methodDef1.params, methodDef2.params);
+    }
+
+    public static boolean isRestypeEqual(JCTree.JCExpression restype1, JCTree.JCExpression restype2) {
+        if (restype1 instanceof JCTree.JCPrimitiveTypeTree &&
+                restype2 instanceof JCTree.JCPrimitiveTypeTree) {
+            return ((JCTree.JCPrimitiveTypeTree) restype1).typetag.equals(((JCTree.JCPrimitiveTypeTree) restype2).typetag);
+        }
+        if (restype1.type == null || restype2.type == null) {
+            return false;
+        }
+        return restype1.type.equals(restype2.type);
     }
 
     public static boolean isVariablesEqual(List<JCTree.JCVariableDecl> varDef1s, List<JCTree.JCVariableDecl> varDef2s) {

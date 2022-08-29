@@ -1,5 +1,6 @@
 package com.github.linyuzai.inherit.processor;
 
+import com.github.linyuzai.inherit.core.flag.InheritFlag;
 import com.github.linyuzai.inherit.core.handler.InheritHandler;
 import com.github.linyuzai.inherit.processor.utils.InheritUtils;
 import com.sun.tools.javac.code.Attribute;
@@ -18,6 +19,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractInheritProcessor extends AbstractProcessor {
@@ -54,8 +56,10 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     Collection<InheritHandler> handlers = InheritUtils.getInheritHandlers(flags);
 
                     for (Type.ClassType sourceClass : sources) {
-                        //获得指定 Class 的语法树
-                        inheritClass(sourceClass, targetClassDef, inheritSuper, excludeFields, excludeMethods, handlers, treeMaker, names, elementUtils);
+
+                        inheritClass(sourceClass, targetClassDef, inheritSuper,
+                                excludeFields, excludeMethods, flags, handlers,
+                                treeMaker, names, elementUtils, 0);
                     }
                 }
             }
@@ -123,7 +127,17 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
         return set;
     }
 
-    private void inheritClass(Type.ClassType sourceClass, JCTree.JCClassDecl targetClassDef, Boolean inheritSuper, Collection<String> excludeFields, Collection<String> excludeMethods, Collection<InheritHandler> handlers, TreeMaker treeMaker, Names names, JavacElements elementUtils) {
+    private void inheritClass(Type.ClassType sourceClass,
+                              JCTree.JCClassDecl targetClassDef,
+                              Boolean inheritSuper,
+                              Collection<String> excludeFields,
+                              Collection<String> excludeMethods,
+                              Collection<String> flags,
+                              Collection<InheritHandler> handlers,
+                              TreeMaker treeMaker,
+                              Names names,
+                              JavacElements elementUtils,
+                              int level) {
         JCTree.JCClassDecl sourceClassDef = (JCTree.JCClassDecl) elementUtils.getTree(sourceClass.asElement());
         if (inheritSuper) {
             Symbol.TypeSymbol symbol = sourceClass.supertype_field.tsym;
@@ -132,29 +146,52 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
             }
             Type type = symbol.asType();
             if (type instanceof Type.ClassType) {
-                inheritClass((Type.ClassType) type, targetClassDef, true, excludeFields, excludeMethods, handlers, treeMaker, names, elementUtils);
+                inheritClass((Type.ClassType) type, targetClassDef, true,
+                        excludeFields, excludeMethods, flags, handlers,
+                        treeMaker, names, elementUtils, level + 1);
             }
         }
-        for (JCTree sourceDef : sourceClassDef.defs) {
-            if (inheritFields() && InheritUtils.isNonStaticVariable(sourceDef)) {
-                JCTree.JCVariableDecl sourceVarDef = (JCTree.JCVariableDecl) sourceDef;
-                if (!excludeFields.contains(sourceVarDef.name.toString())) {
-                    if (!InheritUtils.isFieldDefined(targetClassDef, sourceVarDef)) {
-                        targetClassDef.defs = targetClassDef.defs.append(sourceVarDef);
-                    }
-                    for (InheritHandler handler : handlers) {
-                        handler.handle(sourceDef, targetClassDef, treeMaker, names);
+
+        if (inheritFields()) {
+
+            if (level == 0) {
+                for (JCTree def : targetClassDef.defs) {
+                    if (InheritUtils.isNonStaticVariable(def)) {
+                        JCTree.JCVariableDecl varDef = (JCTree.JCVariableDecl) def;
+                        for (InheritHandler handler : handlers) {
+                            handler.handle(varDef, targetClassDef, treeMaker, names, level);
+                        }
                     }
                 }
             }
-            if (inheritMethods() && InheritUtils.isNonStaticMethod(sourceDef)) {
-                JCTree.JCMethodDecl sourceMethodDef = (JCTree.JCMethodDecl) sourceDef;
-                if (!excludeMethods.contains(sourceMethodDef.name.toString())) {
-                    if (!InheritUtils.isMethodDefined(targetClassDef, sourceMethodDef)) {
-                        targetClassDef.defs = targetClassDef.defs.append(sourceMethodDef);
+
+            for (JCTree sourceDef : sourceClassDef.defs) {
+                if (InheritUtils.isNonStaticVariable(sourceDef)) {
+                    JCTree.JCVariableDecl sourceVarDef = (JCTree.JCVariableDecl) sourceDef;
+                    if (!excludeFields.contains(sourceVarDef.name.toString())) {
+                        if (!InheritUtils.isFieldDefined(targetClassDef, sourceVarDef)) {
+                            targetClassDef.defs = targetClassDef.defs.append(sourceVarDef);
+                        }
+                        for (InheritHandler handler : handlers) {
+                            handler.handle(sourceDef, targetClassDef, treeMaker, names, level);
+                        }
                     }
-                    for (InheritHandler handler : handlers) {
-                        handler.handle(sourceDef, targetClassDef, treeMaker, names);
+                }
+            }
+        }
+
+        if (inheritMethods()) {
+
+            for (JCTree sourceDef : sourceClassDef.defs) {
+                if (InheritUtils.isNonStaticMethod(sourceDef)) {
+                    JCTree.JCMethodDecl sourceMethodDef = (JCTree.JCMethodDecl) sourceDef;
+                    if (!excludeMethods.contains(sourceMethodDef.name.toString())) {
+                        if (!InheritUtils.isMethodDefined(targetClassDef, sourceMethodDef)) {
+                            targetClassDef.defs = targetClassDef.defs.append(sourceMethodDef);
+                        }
+                        for (InheritHandler handler : handlers) {
+                            handler.handle(sourceDef, targetClassDef, treeMaker, names, level);
+                        }
                     }
                 }
             }

@@ -6,5 +6,5 @@ public enum InheritFlag {
 
     GETTER,
 
-    SETTER;
+    SETTER
 }

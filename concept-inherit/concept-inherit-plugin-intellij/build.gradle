@@ -26,7 +26,7 @@ dependencies {
     //compileOnly project(':concept-inherit:concept-inherit-core')
 }
 
-intellij.version = "2021.3"
+intellij.version = "2019.3"
 intellij.type = "IC"
 intellij.plugins = ["java"]
 
@@ -39,7 +39,7 @@ intellij.plugins = ["java"]
 tasks {
 
     patchPluginXml {
-        sinceBuild.set("203")
+        sinceBuild.set("193")
         //untilBuild.set("223.*")
         untilBuild.set("")
     }

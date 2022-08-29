@@ -6,5 +6,5 @@ import com.sun.tools.javac.util.Names;
 
 public interface InheritHandler {
 
-    void handle(JCTree tree, JCTree.JCClassDecl targetClass, TreeMaker treeMaker, Names names);
+    void handle(JCTree tree, JCTree.JCClassDecl targetClass, TreeMaker treeMaker, Names names, int level);
 }

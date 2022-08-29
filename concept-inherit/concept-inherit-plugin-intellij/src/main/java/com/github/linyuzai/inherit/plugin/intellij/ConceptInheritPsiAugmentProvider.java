@@ -10,7 +10,6 @@ import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,13 +33,13 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
             "com.github.linyuzai.inherit.core.annotation.InheritMethods"));
 
     @Override
-    protected @NotNull <Psi extends PsiElement> List<Psi> getAugments(@NotNull PsiElement element, @NotNull Class<Psi> type, @Nullable String nameHint) {
+    protected @NotNull <Psi extends PsiElement> List<Psi> getAugments(@NotNull PsiElement element, @NotNull Class<Psi> type) {
         List<Psi> psis = getPsis(element, type, new HashSet<>(), new HashSet<>());
-        return psis == null ? super.getAugments(element, type, nameHint) : psis;
+        return psis == null ? super.getAugments(element, type) : psis;
     }
 
     @SuppressWarnings("unchecked")
-    private <Psi extends PsiElement> List<Psi> getPsis(PsiElement element, @NotNull Class<Psi> type,
+    private <Psi extends PsiElement> List<Psi> getPsis(@NotNull PsiElement element, @NotNull Class<Psi> type,
                                                        Collection<String> hasHandleFieldClasses,
                                                        Collection<String> hasHandleMethodClasses) {
         if (!LibraryUtils.hasLibrary(element.getProject())) {
@@ -83,15 +82,17 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                             getFields(sourceClass, inheritSuper, hasHandleFieldClasses, hasHandleMethodClasses);
 
                     for (PsiField field : fields) {
-                        if (field.hasModifierProperty(PsiModifier.STATIC) ||
-                                excludeFields.contains(field.getName()) ||
+                        String fieldName = field.getName();
+                        if (fieldName == null ||
+                                field.hasModifierProperty(PsiModifier.STATIC) ||
+                                excludeFields.contains(fieldName) ||
                                 hasFieldDefined(field, hasFields)) {
                             continue;
                         }
 
                         LightFieldBuilder fieldBuilder =
                                 new LightFieldBuilder(manager,
-                                        field.getName(),
+                                        fieldName,
                                         field.getType());
                         //访问限定
                         fieldBuilder.setModifierList(new LightModifierList(field));
@@ -162,7 +163,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                 }
 
                 if (InheritFlag.hasFlag(flags)) {
-                    Collection<PsiField> fields = getInternFieldsWithSuper(targetClass);
+
+                    Collection<PsiField> fields = collectClassFieldsIntern(targetClass);
+
                     List<PsiField> ex = getPsis(targetClass, PsiField.class, new HashSet<>(), new HashSet<>());
                     if (ex != null) {
                         fields.addAll(ex);
@@ -170,12 +173,16 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
                     if (flags.contains(InheritFlag.BUILDER.name())) {
                         for (PsiField field : fields) {
+                            String fieldName = field.getName();
+                            if (fieldName == null) {
+                                continue;
+                            }
                             LightMethodBuilder methodBuilder =
                                     new LightMethodBuilder(manager,
                                             JavaLanguage.INSTANCE,
                                             field.getName());
                             methodBuilder.setModifiers(PsiModifier.PUBLIC);
-                            methodBuilder.addParameter(field.getName(), field.getType());
+                            methodBuilder.addParameter(fieldName, field.getType());
                             //返回值
                             methodBuilder.setMethodReturnType(PsiTypesUtil.getClassType(targetClass));
                             //所属的 Class
@@ -190,6 +197,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                     if (flags.contains(InheritFlag.GETTER.name())) {
                         for (PsiField field : fields) {
                             String fieldName = field.getName();
+                            if (fieldName == null) {
+                                continue;
+                            }
                             String prefix;
                             if (field.getType().equals(PsiType.BOOLEAN)) {
                                 prefix = "is";
@@ -217,6 +227,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                     if (flags.contains(InheritFlag.SETTER.name())) {
                         for (PsiField field : fields) {
                             String fieldName = field.getName();
+                            if (fieldName == null) {
+                                continue;
+                            }
                             String methodName = "set" + fieldName.substring(0, 1).toUpperCase() +
                                     fieldName.substring(1);
                             LightMethodBuilder methodBuilder =
@@ -454,6 +467,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
     }
 
     public static Collection<PsiField> getInternFieldsWithSuper(PsiClass psiClass) {
+        if (psiClass == null) {
+            return new ArrayList<>();
+        }
         Collection<PsiField> fields = collectClassFieldsIntern(psiClass);
         PsiClass superClass = psiClass.getSuperClass();
         while (superClass != null) {
@@ -464,6 +480,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
     }
 
     public static Collection<PsiMethod> getInternMethodsWithSuper(PsiClass psiClass) {
+        if (psiClass == null) {
+            return new ArrayList<>();
+        }
         Collection<PsiMethod> methods = collectClassMethodsIntern(psiClass);
         PsiClass superClass = psiClass.getSuperClass();
         while (superClass != null) {
