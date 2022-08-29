@@ -3,11 +3,11 @@ package com.github.linyuzai.inherit.plugin.intellij;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.psi.*;
 import com.intellij.psi.augment.PsiAugmentProvider;
-import com.intellij.psi.impl.light.LightFieldBuilder;
-import com.intellij.psi.impl.light.LightMethodBuilder;
-import com.intellij.psi.impl.light.LightModifierList;
+import com.intellij.psi.impl.light.*;
 import com.intellij.psi.impl.source.PsiExtensibleClass;
+import com.intellij.psi.impl.source.tree.java.PsiIdentifierImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
+import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,11 +65,13 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
             Collection<PsiAnnotation> annotations = findFieldAnnotations(targetClass);
 
+            Collection<PsiField> hasFields = getInternFieldsWithSuper(targetClass);
+
             for (PsiAnnotation annotation : annotations) {
                 Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
                 Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
                 Collection<String> excludeFields = findStrings(annotation.findAttributeValue("excludeFields"));
-                Collection<String> flags = InheritFlags.of(findStrings(annotation.findAttributeValue("flags")));
+                Collection<String> flags = InheritFlag.of(findStrings(annotation.findAttributeValue("flags")));
 
                 for (PsiType sourceType : sources) {
                     PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);
@@ -79,8 +81,6 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
                     Collection<PsiField> fields =
                             getFields(sourceClass, inheritSuper, hasHandleFieldClasses, hasHandleMethodClasses);
-
-                    Collection<PsiField> hasFields = collectClassFieldsIntern(targetClass);
 
                     for (PsiField field : fields) {
                         if (field.hasModifierProperty(PsiModifier.STATIC) ||
@@ -119,11 +119,13 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
             Collection<PsiAnnotation> annotations = findMethodAnnotations(targetClass);
 
+            Collection<PsiMethod> hasMethods = getInternMethodsWithSuper(targetClass);
+
             for (PsiAnnotation annotation : annotations) {
                 Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
                 Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
                 Collection<String> excludeMethods = findStrings(annotation.findAttributeValue("excludeMethods"));
-                Collection<String> flags = InheritFlags.of(findStrings(annotation.findAttributeValue("flags")));
+                Collection<String> flags = InheritFlag.of(findEnums(annotation.findAttributeValue("flags")));
 
                 for (PsiType sourceType : sources) {
                     PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);
@@ -133,8 +135,6 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
                     Collection<PsiMethod> methods =
                             getMethods(sourceClass, inheritSuper, hasHandleFieldClasses, hasHandleMethodClasses);
-
-                    Collection<PsiMethod> hasMethods = collectClassMethodsIntern(targetClass);
 
                     for (PsiMethod method : methods) {
                         if (method.hasModifierProperty(PsiModifier.STATIC) ||
@@ -158,6 +158,83 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                         //导航
                         methodBuilder.setNavigationElement(method);
                         list.add(methodBuilder);
+                    }
+                }
+
+                if (InheritFlag.hasFlag(flags)) {
+                    Collection<PsiField> fields = getInternFieldsWithSuper(targetClass);
+                    List<PsiField> ex = getPsis(targetClass, PsiField.class, new HashSet<>(), new HashSet<>());
+                    if (ex != null) {
+                        fields.addAll(ex);
+                    }
+
+                    if (flags.contains(InheritFlag.BUILDER.name())) {
+                        for (PsiField field : fields) {
+                            LightMethodBuilder methodBuilder =
+                                    new LightMethodBuilder(manager,
+                                            JavaLanguage.INSTANCE,
+                                            field.getName());
+                            methodBuilder.setModifiers(PsiModifier.PUBLIC);
+                            methodBuilder.addParameter(field.getName(), field.getType());
+                            //返回值
+                            methodBuilder.setMethodReturnType(PsiTypesUtil.getClassType(targetClass));
+                            //所属的 Class
+                            methodBuilder.setContainingClass(targetClass);
+                            //导航
+                            methodBuilder.setNavigationElement(field.getNavigationElement());
+                            if (!hasMethodDefined(methodBuilder, hasMethods)) {
+                                list.add(methodBuilder);
+                            }
+                        }
+                    }
+                    if (flags.contains(InheritFlag.GETTER.name())) {
+                        for (PsiField field : fields) {
+                            String fieldName = field.getName();
+                            String prefix;
+                            if (field.getType().equals(PsiType.BOOLEAN)) {
+                                prefix = "is";
+                            } else {
+                                prefix = "get";
+                            }
+                            String methodName = prefix + fieldName.substring(0, 1).toUpperCase() +
+                                    fieldName.substring(1);
+                            LightMethodBuilder methodBuilder =
+                                    new LightMethodBuilder(manager,
+                                            JavaLanguage.INSTANCE,
+                                            methodName);
+                            methodBuilder.setModifiers(PsiModifier.PUBLIC);
+                            //返回值
+                            methodBuilder.setMethodReturnType(field.getType());
+                            //所属的 Class
+                            methodBuilder.setContainingClass(targetClass);
+                            //导航
+                            methodBuilder.setNavigationElement(field.getNavigationElement());
+                            if (!hasMethodDefined(methodBuilder, hasMethods)) {
+                                list.add(methodBuilder);
+                            }
+                        }
+                    }
+                    if (flags.contains(InheritFlag.SETTER.name())) {
+                        for (PsiField field : fields) {
+                            String fieldName = field.getName();
+                            String methodName = "set" + fieldName.substring(0, 1).toUpperCase() +
+                                    fieldName.substring(1);
+                            LightMethodBuilder methodBuilder =
+                                    new LightMethodBuilder(manager,
+                                            JavaLanguage.INSTANCE,
+                                            methodName);
+                            methodBuilder.setModifiers(PsiModifier.PUBLIC);
+                            methodBuilder.addParameter(field.getName(), field.getType());
+                            //返回值
+                            methodBuilder.setMethodReturnType(PsiType.VOID);
+                            //所属的 Class
+                            methodBuilder.setContainingClass(targetClass);
+                            //导航
+                            methodBuilder.setNavigationElement(field.getNavigationElement());
+                            if (!hasMethodDefined(methodBuilder, hasMethods)) {
+                                list.add(methodBuilder);
+                            }
+                        }
                     }
                 }
             }
@@ -234,6 +311,32 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
     private String getString(PsiElement element) {
         if (element instanceof PsiLiteralExpressionImpl) {
             return String.valueOf(((PsiLiteralExpressionImpl) element).getValue());
+        }
+        return null;
+    }
+
+    private Collection<String> findEnums(PsiElement element) {
+        Collection<String> enums = new HashSet<>();
+        findEnums0(element, enums);
+        return enums;
+    }
+
+    private void findEnums0(PsiElement element, Collection<String> enums) {
+        if (element == null) {
+            return;
+        }
+        String anEnum = getEnum(element);
+        if (anEnum != null) {
+            enums.add(anEnum);
+        }
+        for (PsiElement child : element.getChildren()) {
+            findEnums0(child, enums);
+        }
+    }
+
+    private String getEnum(PsiElement element) {
+        if (element instanceof PsiIdentifierImpl) {
+            return ((PsiIdentifierImpl) element).getText();
         }
         return null;
     }
@@ -346,6 +449,26 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
         List<PsiMethod> psis = getPsis(psiClass, PsiMethod.class, hasHandleFieldClasses, hasHandleMethodClasses);
         if (psis != null) {
             methods.addAll(psis);
+        }
+        return methods;
+    }
+
+    public static Collection<PsiField> getInternFieldsWithSuper(PsiClass psiClass) {
+        Collection<PsiField> fields = collectClassFieldsIntern(psiClass);
+        PsiClass superClass = psiClass.getSuperClass();
+        while (superClass != null) {
+            fields.addAll(collectClassFieldsIntern(superClass));
+            superClass = superClass.getSuperClass();
+        }
+        return fields;
+    }
+
+    public static Collection<PsiMethod> getInternMethodsWithSuper(PsiClass psiClass) {
+        Collection<PsiMethod> methods = collectClassMethodsIntern(psiClass);
+        PsiClass superClass = psiClass.getSuperClass();
+        while (superClass != null) {
+            methods.addAll(collectClassMethodsIntern(superClass));
+            superClass = superClass.getSuperClass();
         }
         return methods;
     }

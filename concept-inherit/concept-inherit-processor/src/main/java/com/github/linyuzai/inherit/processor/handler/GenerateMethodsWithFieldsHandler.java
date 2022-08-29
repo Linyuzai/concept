@@ -1,6 +1,6 @@
 package com.github.linyuzai.inherit.processor.handler;
 
-import com.github.linyuzai.inherit.core.flag.InheritFlags;
+import com.github.linyuzai.inherit.core.flag.InheritFlag;
 import com.github.linyuzai.inherit.core.handler.InheritHandler;
 import com.github.linyuzai.inherit.processor.utils.InheritUtils;
 import com.sun.tools.javac.code.Flags;
@@ -24,9 +24,9 @@ public class GenerateMethodsWithFieldsHandler implements InheritHandler {
     private final boolean setter;
 
     public GenerateMethodsWithFieldsHandler(Collection<String> flags) {
-        builder = flags.contains(InheritFlags.BUILDER_TEMPLATE);
-        getter = flags.contains(InheritFlags.GETTER_TEMPLATE);
-        setter = flags.contains(InheritFlags.SETTER_TEMPLATE);
+        builder = flags.contains(InheritFlag.BUILDER.name());
+        getter = flags.contains(InheritFlag.GETTER.name());
+        setter = flags.contains(InheritFlag.SETTER.name());
     }
 
     @Override

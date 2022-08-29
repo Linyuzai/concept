@@ -1,5 +1,7 @@
 package com.github.linyuzai.inherit.core.annotation;
 
+import com.github.linyuzai.inherit.core.flag.InheritFlag;
+
 import java.lang.annotation.*;
 
 @Repeatable(InheritClasses.class)
@@ -28,5 +30,5 @@ public @interface InheritClass {
     String[] excludeMethods() default {};
 
 
-    String[] flags() default {};
+    InheritFlag[] flags() default {};
 }

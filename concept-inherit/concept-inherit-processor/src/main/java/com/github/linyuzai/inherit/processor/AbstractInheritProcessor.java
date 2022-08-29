@@ -45,23 +45,17 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                 //遍历 @Inherit 注解
                 for (AnnotationMirror inheritAnnotation : annotationsWithRepeat) {
                     Map<String, Object> attributes = getAttributes(inheritAnnotation);
-                    Collection<Type.ClassType> sources = convertClass((Collection<Attribute.Class>) attributes
-                            .get("sources"));
-                    Boolean inheritSuper = (Boolean) attributes
-                            .getOrDefault("inheritSuper", false);
-                    Collection<String> excludeFields = convertString((Collection<Attribute.Constant>) attributes
-                            .getOrDefault("excludeFields", Collections.emptyList()));
-                    Collection<String> excludeMethods = convertString((Collection<Attribute.Constant>) attributes
-                            .getOrDefault("excludeMethods", Collections.emptyList()));
-                    Collection<String> flags = convertString((Collection<Attribute.Constant>) attributes
-                            .getOrDefault("flags", Collections.emptyList()));
+                    Collection<Type.ClassType> sources = convertClass((Collection<Attribute.Class>) attributes.get("sources"));
+                    Boolean inheritSuper = (Boolean) attributes.getOrDefault("inheritSuper", false);
+                    Collection<String> excludeFields = convertString((Collection<Attribute.Constant>) attributes.getOrDefault("excludeFields", Collections.emptyList()));
+                    Collection<String> excludeMethods = convertString((Collection<Attribute.Constant>) attributes.getOrDefault("excludeMethods", Collections.emptyList()));
+                    Collection<String> flags = convertEnum((Collection<Attribute.Enum>) attributes.getOrDefault("flags", Collections.emptyList()));
 
                     Collection<InheritHandler> handlers = InheritUtils.getInheritHandlers(flags);
 
                     for (Type.ClassType sourceClass : sources) {
                         //获得指定 Class 的语法树
-                        inheritClass(sourceClass, targetClassDef, inheritSuper,
-                                excludeFields, excludeMethods, handlers, treeMaker, names, elementUtils);
+                        inheritClass(sourceClass, targetClassDef, inheritSuper, excludeFields, excludeMethods, handlers, treeMaker, names, elementUtils);
                     }
                 }
             }
@@ -98,8 +92,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
 
     private Map<String, Object> getAttributes(AnnotationMirror annotation) {
         Map<String, Object> attributes = new LinkedHashMap<>();
-        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
-                annotation.getElementValues().entrySet()) {
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotation.getElementValues().entrySet()) {
             Symbol.MethodSymbol key = (Symbol.MethodSymbol) entry.getKey();
             attributes.put(key.getQualifiedName().toString(), entry.getValue().getValue());
         }
@@ -122,17 +115,16 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
         return set;
     }
 
-    private void inheritClass(Type.ClassType sourceClass,
-                              JCTree.JCClassDecl targetClassDef,
-                              Boolean inheritSuper,
-                              Collection<String> excludeFields,
-                              Collection<String> excludeMethods,
-                              Collection<InheritHandler> handlers,
-                              TreeMaker treeMaker,
-                              Names names,
-                              JavacElements elementUtils) {
-        JCTree.JCClassDecl sourceClassDef = (JCTree.JCClassDecl) elementUtils
-                .getTree(sourceClass.asElement());
+    private Collection<String> convertEnum(Collection<Attribute.Enum> enums) {
+        Collection<String> set = new HashSet<>();
+        for (Attribute.Enum attribute : enums) {
+            set.add(attribute.value.toString());
+        }
+        return set;
+    }
+
+    private void inheritClass(Type.ClassType sourceClass, JCTree.JCClassDecl targetClassDef, Boolean inheritSuper, Collection<String> excludeFields, Collection<String> excludeMethods, Collection<InheritHandler> handlers, TreeMaker treeMaker, Names names, JavacElements elementUtils) {
+        JCTree.JCClassDecl sourceClassDef = (JCTree.JCClassDecl) elementUtils.getTree(sourceClass.asElement());
         if (inheritSuper) {
             Symbol.TypeSymbol symbol = sourceClass.supertype_field.tsym;
             if (symbol == null) {
@@ -140,8 +132,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
             }
             Type type = symbol.asType();
             if (type instanceof Type.ClassType) {
-                inheritClass((Type.ClassType) type, targetClassDef, true,
-                        excludeFields, excludeMethods, handlers, treeMaker, names, elementUtils);
+                inheritClass((Type.ClassType) type, targetClassDef, true, excludeFields, excludeMethods, handlers, treeMaker, names, elementUtils);
             }
         }
         for (JCTree sourceDef : sourceClassDef.defs) {

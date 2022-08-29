@@ -1,6 +1,5 @@
 package com.github.linyuzai.inherit.processor.utils;
 
-import com.github.linyuzai.inherit.core.flag.InheritFlags;
 import com.github.linyuzai.inherit.processor.handler.GenerateMethodsWithFieldsHandler;
 import com.github.linyuzai.inherit.core.handler.InheritHandler;
 import com.sun.tools.javac.code.Symbol;
@@ -19,11 +18,8 @@ import java.util.Collection;
 public class InheritUtils {
 
     public static Collection<InheritHandler> getInheritHandlers(Collection<String> flags) {
-        Collection<String> of = InheritFlags.of(flags);
         Collection<InheritHandler> handlers = new ArrayList<>();
-        if (of.contains(InheritFlags.GENERATE_METHODS_WITH_FIELDS)) {
-            handlers.add(new GenerateMethodsWithFieldsHandler(of));
-        }
+        handlers.add(new GenerateMethodsWithFieldsHandler(flags));
         return handlers;
     }
 
