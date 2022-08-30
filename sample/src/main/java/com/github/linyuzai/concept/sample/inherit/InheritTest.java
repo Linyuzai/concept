@@ -1,5 +1,6 @@
 package com.github.linyuzai.concept.sample.inherit;
 
+import com.github.linyuzai.concept.sample.inherit.builder.BuilderTest2;
 import com.github.linyuzai.inherit.core.annotation.InheritClass;
 import com.github.linyuzai.inherit.core.flag.InheritFlag;
 
@@ -24,7 +25,7 @@ public class InheritTest {
     }
 
     @InheritClass(sources = {InheritA.class, InheritB.class},
-            flags = {InheritFlag.BUILDER, InheritFlag.GETTER, InheritFlag.SETTER})
+            flags = {InheritFlag.BUILDER})
     public static class InheritC {
 
         private String c;
@@ -32,5 +33,10 @@ public class InheritTest {
         private void mc() {
 
         }
+    }
+
+    public static void main(String[] args) {
+        BuilderTest2 build = new BuilderTest2.Builder()
+                .build();
     }
 }

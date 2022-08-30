@@ -9,7 +9,9 @@ public enum InheritFlag {
 
     GETTER,
 
-    SETTER;
+    SETTER,
+
+    OWN;
 
     public static Collection<String> of(Collection<String> flags) {
         return flags.stream()

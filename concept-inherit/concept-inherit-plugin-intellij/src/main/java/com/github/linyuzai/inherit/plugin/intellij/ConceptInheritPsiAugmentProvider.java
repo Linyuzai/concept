@@ -12,6 +12,7 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
@@ -34,14 +35,16 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
     @Override
     protected @NotNull <Psi extends PsiElement> List<Psi> getAugments(@NotNull PsiElement element, @NotNull Class<Psi> type) {
-        List<Psi> psis = getPsis(element, type, new HashSet<>(), new HashSet<>());
+        List<Psi> psis = getPsis(element, type, new HashSet<>(), new HashSet<>(), null, null);
         return psis == null ? super.getAugments(element, type) : psis;
     }
 
     @SuppressWarnings("unchecked")
     private <Psi extends PsiElement> List<Psi> getPsis(@NotNull PsiElement element, @NotNull Class<Psi> type,
                                                        Collection<String> hasHandleFieldClasses,
-                                                       Collection<String> hasHandleMethodClasses) {
+                                                       Collection<String> hasHandleMethodClasses,
+                                                       BiConsumer<PsiField, Collection<String>> fieldFlagsConsumer,
+                                                       BiConsumer<PsiMethod, Collection<String>> methodFlagsConsumer) {
         if (!LibraryUtils.hasLibrary(element.getProject())) {
             return null;
         }
@@ -70,7 +73,7 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                 Collection<PsiType> sources = findTypes(annotation.findAttributeValue("sources"));
                 Boolean inheritSuper = getBoolean(annotation.findAttributeValue("inheritSuper"));
                 Collection<String> excludeFields = findStrings(annotation.findAttributeValue("excludeFields"));
-                //Collection<String> flags = InheritFlag.of(findStrings(annotation.findAttributeValue("flags")));
+                Collection<String> flags = InheritFlag.of(findEnums(annotation.findAttributeValue("flags")));
 
                 for (PsiType sourceType : sources) {
                     PsiClass sourceClass = PsiUtil.resolveClassInType(sourceType);
@@ -107,6 +110,10 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                         //导航
                         fieldBuilder.setNavigationElement(field);
                         list.add(fieldBuilder);
+
+                        if (fieldFlagsConsumer != null) {
+                            fieldFlagsConsumer.accept(field, flags);
+                        }
                     }
                 }
             }
@@ -159,97 +166,100 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                         //导航
                         methodBuilder.setNavigationElement(method);
                         list.add(methodBuilder);
+
+                        if (methodFlagsConsumer != null) {
+                            methodFlagsConsumer.accept(method, flags);
+                        }
                     }
                 }
+            }
 
+            Set<String> ownFlags = new HashSet<>();
+
+            BiConsumer<PsiField, Collection<String>> fieldConsumer = (field, flags) -> {
                 if (InheritFlag.hasFlag(flags)) {
-
-                    Collection<PsiField> fields = collectClassFieldsIntern(targetClass);
-
-                    List<PsiField> ex = getPsis(targetClass, PsiField.class, new HashSet<>(), new HashSet<>());
-                    if (ex != null) {
-                        fields.addAll(ex);
+                    String fieldName = field.getName();
+                    if (fieldName == null) {
+                        return;
                     }
-
                     if (flags.contains(InheritFlag.BUILDER.name())) {
-                        for (PsiField field : fields) {
-                            String fieldName = field.getName();
-                            if (fieldName == null) {
-                                continue;
-                            }
-                            LightMethodBuilder methodBuilder =
-                                    new LightMethodBuilder(manager,
-                                            JavaLanguage.INSTANCE,
-                                            field.getName());
-                            methodBuilder.setModifiers(PsiModifier.PUBLIC);
-                            methodBuilder.addParameter(fieldName, field.getType());
-                            //返回值
-                            methodBuilder.setMethodReturnType(PsiTypesUtil.getClassType(targetClass));
-                            //所属的 Class
-                            methodBuilder.setContainingClass(targetClass);
-                            //导航
-                            methodBuilder.setNavigationElement(field.getNavigationElement());
-                            if (!hasMethodDefined(methodBuilder, hasMethods)) {
-                                list.add(methodBuilder);
-                            }
+                        if (flags.contains(InheritFlag.OWN.name())) {
+                            ownFlags.add(InheritFlag.BUILDER.name());
+                        }
+                        LightMethodBuilder methodBuilder =
+                                new LightMethodBuilder(manager,
+                                        JavaLanguage.INSTANCE,
+                                        field.getName());
+                        methodBuilder.setModifiers(PsiModifier.PUBLIC);
+                        methodBuilder.addParameter(fieldName, field.getType());
+                        //返回值
+                        methodBuilder.setMethodReturnType(PsiTypesUtil.getClassType(targetClass));
+                        //所属的 Class
+                        methodBuilder.setContainingClass(targetClass);
+                        //导航
+                        methodBuilder.setNavigationElement(field.getNavigationElement());
+                        if (!hasMethodDefined(methodBuilder, hasMethods)) {
+                            list.add(methodBuilder);
                         }
                     }
                     if (flags.contains(InheritFlag.GETTER.name())) {
-                        for (PsiField field : fields) {
-                            String fieldName = field.getName();
-                            if (fieldName == null) {
-                                continue;
-                            }
-                            String prefix;
-                            if (field.getType().equals(PsiType.BOOLEAN)) {
-                                prefix = "is";
-                            } else {
-                                prefix = "get";
-                            }
-                            String methodName = prefix + fieldName.substring(0, 1).toUpperCase() +
-                                    fieldName.substring(1);
-                            LightMethodBuilder methodBuilder =
-                                    new LightMethodBuilder(manager,
-                                            JavaLanguage.INSTANCE,
-                                            methodName);
-                            methodBuilder.setModifiers(PsiModifier.PUBLIC);
-                            //返回值
-                            methodBuilder.setMethodReturnType(field.getType());
-                            //所属的 Class
-                            methodBuilder.setContainingClass(targetClass);
-                            //导航
-                            methodBuilder.setNavigationElement(field.getNavigationElement());
-                            if (!hasMethodDefined(methodBuilder, hasMethods)) {
-                                list.add(methodBuilder);
-                            }
+                        if (flags.contains(InheritFlag.OWN.name())) {
+                            ownFlags.add(InheritFlag.GETTER.name());
+                        }
+                        String prefix;
+                        if (field.getType().equals(PsiType.BOOLEAN)) {
+                            prefix = "is";
+                        } else {
+                            prefix = "get";
+                        }
+                        String methodName = prefix + fieldName.substring(0, 1).toUpperCase() +
+                                fieldName.substring(1);
+                        LightMethodBuilder methodBuilder =
+                                new LightMethodBuilder(manager,
+                                        JavaLanguage.INSTANCE,
+                                        methodName);
+                        methodBuilder.setModifiers(PsiModifier.PUBLIC);
+                        //返回值
+                        methodBuilder.setMethodReturnType(field.getType());
+                        //所属的 Class
+                        methodBuilder.setContainingClass(targetClass);
+                        //导航
+                        methodBuilder.setNavigationElement(field.getNavigationElement());
+                        if (!hasMethodDefined(methodBuilder, hasMethods)) {
+                            list.add(methodBuilder);
                         }
                     }
                     if (flags.contains(InheritFlag.SETTER.name())) {
-                        for (PsiField field : fields) {
-                            String fieldName = field.getName();
-                            if (fieldName == null) {
-                                continue;
-                            }
-                            String methodName = "set" + fieldName.substring(0, 1).toUpperCase() +
-                                    fieldName.substring(1);
-                            LightMethodBuilder methodBuilder =
-                                    new LightMethodBuilder(manager,
-                                            JavaLanguage.INSTANCE,
-                                            methodName);
-                            methodBuilder.setModifiers(PsiModifier.PUBLIC);
-                            methodBuilder.addParameter(field.getName(), field.getType());
-                            //返回值
-                            methodBuilder.setMethodReturnType(PsiType.VOID);
-                            //所属的 Class
-                            methodBuilder.setContainingClass(targetClass);
-                            //导航
-                            methodBuilder.setNavigationElement(field.getNavigationElement());
-                            if (!hasMethodDefined(methodBuilder, hasMethods)) {
-                                list.add(methodBuilder);
-                            }
+                        if (flags.contains(InheritFlag.OWN.name())) {
+                            ownFlags.add(InheritFlag.SETTER.name());
+                        }
+                        String methodName = "set" + fieldName.substring(0, 1).toUpperCase() +
+                                fieldName.substring(1);
+                        LightMethodBuilder methodBuilder =
+                                new LightMethodBuilder(manager,
+                                        JavaLanguage.INSTANCE,
+                                        methodName);
+                        methodBuilder.setModifiers(PsiModifier.PUBLIC);
+                        methodBuilder.addParameter(field.getName(), field.getType());
+                        //返回值
+                        methodBuilder.setMethodReturnType(PsiType.VOID);
+                        //所属的 Class
+                        methodBuilder.setContainingClass(targetClass);
+                        //导航
+                        methodBuilder.setNavigationElement(field.getNavigationElement());
+                        if (!hasMethodDefined(methodBuilder, hasMethods)) {
+                            list.add(methodBuilder);
                         }
                     }
                 }
+            };
+
+            getPsis(targetClass, PsiField.class, new HashSet<>(), new HashSet<>(),
+                    fieldConsumer, null);
+
+            Collection<PsiField> ownFields = collectClassFieldsIntern(targetClass);
+            for (PsiField ownField : ownFields) {
+                fieldConsumer.accept(ownField, ownFlags);
             }
         }
 
@@ -448,7 +458,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                                             Collection<String> hasHandleFieldClasses,
                                             Collection<String> hasHandleMethodClasses) {
         Collection<PsiField> fields = collectClassFieldsIntern(psiClass);
-        List<PsiField> psis = getPsis(psiClass, PsiField.class, hasHandleFieldClasses, hasHandleMethodClasses);
+        List<PsiField> psis = getPsis(psiClass, PsiField.class,
+                hasHandleFieldClasses, hasHandleMethodClasses,
+                null, null);
         if (psis != null) {
             fields.addAll(psis);
         }
@@ -459,7 +471,9 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
                                               Collection<String> hasHandleFieldClasses,
                                               Collection<String> hasHandleMethodClasses) {
         Collection<PsiMethod> methods = collectClassMethodsIntern(psiClass);
-        List<PsiMethod> psis = getPsis(psiClass, PsiMethod.class, hasHandleFieldClasses, hasHandleMethodClasses);
+        List<PsiMethod> psis = getPsis(psiClass, PsiMethod.class,
+                hasHandleFieldClasses, hasHandleMethodClasses,
+                null, null);
         if (psis != null) {
             methods.addAll(psis);
         }

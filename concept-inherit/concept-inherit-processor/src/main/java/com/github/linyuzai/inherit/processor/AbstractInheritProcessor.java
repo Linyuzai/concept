@@ -154,7 +154,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
 
         if (inheritFields()) {
 
-            if (level == 0) {
+            if (level == 0 && flags.contains(InheritFlag.OWN.name())) {
                 for (JCTree def : targetClassDef.defs) {
                     if (InheritUtils.isNonStaticVariable(def)) {
                         JCTree.JCVariableDecl varDef = (JCTree.JCVariableDecl) def;
