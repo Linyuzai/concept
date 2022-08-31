@@ -16,4 +16,4 @@
 - [一个配置注解实现 WebSocket 集群方案](../../wiki/Concept-WebSocket-LoadBalance)
 - [协同开发之动态路由](../../wiki/Concept-Router)
 - [基于多个 Kafka & Rabbitmq 构建的事件模型](../../wiki/Concept-Event)
-- [@BuilderRef 代码生成器（测试中）](../../wiki/Concept-Builder)
+- [属性继承（伪 Java 多继承）（测试中）](../../wiki/Concept-Inherit)
