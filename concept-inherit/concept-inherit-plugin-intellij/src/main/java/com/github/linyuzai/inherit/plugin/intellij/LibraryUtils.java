@@ -12,6 +12,9 @@ public class LibraryUtils {
 
     private static final String CONCEPT_INHERIT_PACKAGE = "com.github.linyuzai.inherit.core";
 
+    /**
+     * 是否存在对应的依赖
+     */
     public static boolean hasLibrary(Project project) {
         ApplicationManager.getApplication().assertReadAccessAllowed();
         return CachedValuesManager.getManager(project).getCachedValue(project, () -> {

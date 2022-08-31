@@ -1,45 +1,37 @@
 package com.github.linyuzai.concept.sample.inherit;
 
-import com.github.linyuzai.concept.sample.inherit.builder.BuilderTest2;
 import com.github.linyuzai.inherit.core.annotation.InheritClass;
+import com.github.linyuzai.inherit.core.annotation.InheritField;
 import com.github.linyuzai.inherit.core.flag.InheritFlag;
 
 public class InheritTest {
-
     public static class InheritA {
-
         private String a;
-
-        private void ma() {
-
-        }
     }
-
     public static class InheritB {
-
         private String b;
-
-        private void mb() {
-
-        }
     }
-
-    @InheritClass(sources = {InheritA.class, InheritB.class},
-            flags = {InheritFlag.BUILDER})
+    @InheritClass(sources = {InheritA.class, InheritB.class})
     public static class InheritC {
-
         private String c;
 
-        private void mc() {
+        @InheritField(sources = InheritC.class, flags = InheritFlag.BUILDER)
+        public static class Builder {
 
+            public InheritC build() {
+                if (a == null) {
+                    a = "a";
+                }
+                return null;
+            }
         }
     }
 
     public static void main(String[] args) {
-        BuilderTest2 build = (BuilderTest2) new BuilderTest2.Builder()
-                .b2("")
-                .b1("")
-                .string("")
+        new InheritC.Builder()
+                .a("a")
+                .b("b")
+                .c("c")
                 .build();
     }
 }

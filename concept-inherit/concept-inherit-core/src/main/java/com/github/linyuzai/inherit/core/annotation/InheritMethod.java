@@ -4,6 +4,9 @@ import com.github.linyuzai.inherit.core.flag.InheritFlag;
 
 import java.lang.annotation.*;
 
+/**
+ * 通过该注解来继承指定类的方法
+ */
 @Repeatable(InheritMethods.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -15,14 +18,17 @@ public @interface InheritMethod {
     Class<?>[] sources();
 
     /**
-     * 是否继承父类属性
+     * 是否继承父类方法
      */
     boolean inheritSuper() default false;
 
     /**
-     * 排除哪几个名称的方法
+     * 排除指定名称的方法
      */
     String[] excludeMethods() default {};
 
+    /**
+     * 继承标识
+     */
     InheritFlag[] flags() default {};
 }

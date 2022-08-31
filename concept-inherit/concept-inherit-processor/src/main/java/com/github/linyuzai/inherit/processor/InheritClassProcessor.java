@@ -6,6 +6,9 @@ import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.Processor;
 
+/**
+ * {@link InheritClass} 处理器
+ */
 @AutoService(Processor.class)
 public class InheritClassProcessor extends AbstractInheritProcessor {
 
