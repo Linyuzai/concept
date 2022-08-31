@@ -86,8 +86,7 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
 
                     for (PsiField field : fields) {
                         String fieldName = field.getName();
-                        if (fieldName == null ||
-                                field.hasModifierProperty(PsiModifier.STATIC) ||
+                        if (field.hasModifierProperty(PsiModifier.STATIC) ||
                                 excludeFields.contains(fieldName) ||
                                 hasFieldDefined(field, hasFields)) {
                             continue;
@@ -179,9 +178,6 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
             BiConsumer<PsiField, Collection<String>> fieldConsumer = (field, flags) -> {
                 if (InheritFlag.hasFlag(flags)) {
                     String fieldName = field.getName();
-                    if (fieldName == null) {
-                        return;
-                    }
                     if (flags.contains(InheritFlag.BUILDER.name())) {
                         if (flags.contains(InheritFlag.OWN.name())) {
                             ownFlags.add(InheritFlag.BUILDER.name());

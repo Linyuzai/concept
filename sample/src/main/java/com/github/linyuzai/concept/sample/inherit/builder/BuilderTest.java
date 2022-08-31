@@ -1,6 +1,7 @@
 package com.github.linyuzai.concept.sample.inherit.builder;
 
 import com.github.linyuzai.inherit.core.annotation.InheritField;
+import com.github.linyuzai.inherit.core.flag.InheritFlag;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
@@ -11,14 +12,16 @@ import java.util.List;
 @AllArgsConstructor
 public class BuilderTest {
 
-    private String string;
+    protected String string;
 
-    private int i;
+    protected int i;
 
-    private List<?> list;
+    protected List<?> list;
 
-    @InheritField(sources = BuilderTest.class)
+    @InheritField(sources = BuilderTest.class, flags = {InheritFlag.BUILDER, InheritFlag.OWN})
     public static class Builder {
+
+        private String b1;
 
         protected void valid() {
             if (string == null) {

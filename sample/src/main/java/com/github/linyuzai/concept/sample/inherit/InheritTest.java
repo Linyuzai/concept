@@ -36,7 +36,10 @@ public class InheritTest {
     }
 
     public static void main(String[] args) {
-        BuilderTest2 build = new BuilderTest2.Builder()
+        BuilderTest2 build = (BuilderTest2) new BuilderTest2.Builder()
+                .b2("")
+                .b1("")
+                .string("")
                 .build();
     }
 }

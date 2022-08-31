@@ -19,8 +19,10 @@ public class BuilderTest2 extends BuilderTest {
         this.map = map;
     }
 
-    @InheritClass(sources = BuilderTest2.class, inheritSuper = true, flags = InheritFlag.BUILDER)
+    @InheritField(sources = BuilderTest2.class, flags = {InheritFlag.BUILDER, InheritFlag.OWN})
     public static class Builder extends BuilderTest.Builder {
+
+        private String b2;
 
         @Override
         public BuilderTest2 build() {
