@@ -1,6 +1,10 @@
 ### Example user template template
 ### Example user template
 
+sonatype.gradle
+intellij.gradle
+github.gradle
+
 HELP.md
 .gradle
 build/
