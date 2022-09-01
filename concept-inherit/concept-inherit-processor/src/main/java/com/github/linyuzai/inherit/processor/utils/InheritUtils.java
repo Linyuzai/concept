@@ -2,7 +2,7 @@ package com.github.linyuzai.inherit.processor.utils;
 
 import com.github.linyuzai.inherit.core.flag.InheritFlag;
 import com.github.linyuzai.inherit.processor.handler.GenerateMethodsWithFieldsHandler;
-import com.github.linyuzai.inherit.core.handler.InheritHandler;
+import com.github.linyuzai.inherit.processor.handler.InheritHandler;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;

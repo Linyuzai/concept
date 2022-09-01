@@ -1,4 +1,4 @@
-package com.github.linyuzai.inherit.core.handler;
+package com.github.linyuzai.inherit.processor.handler;
 
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
