@@ -13,7 +13,8 @@ repositories {
 }
 
 dependencies {
-    implementation project(':concept-inherit:concept-inherit-core')
+    //compile "com.github.linyuzai:concept-inherit-core:${conceptInheritVersion}"
+    compileOnly project(':concept-inherit:concept-inherit-core')
     compileOnly 'com.google.auto.service:auto-service:1.0.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.0.1'
 }
@@ -26,6 +27,10 @@ compileJava {
     options.compilerArgs << '-XDignore.symbol.file'
     options.fork = true // may not needed on 1.8
     options.forkOptions.executable = 'javac' // may not needed on 1.8
+}
+
+javadoc {
+    exclude("*")
 }
 
 apply from: '../publish.gradle'
