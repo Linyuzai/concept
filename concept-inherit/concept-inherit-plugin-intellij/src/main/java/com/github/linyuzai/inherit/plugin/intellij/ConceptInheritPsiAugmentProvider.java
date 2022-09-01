@@ -79,8 +79,8 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
             hasHandleFieldClasses.add(targetClass.getQualifiedName());
             //获得所有继承字段的注解
             Collection<PsiAnnotation> annotations = findFieldAnnotations(targetClass);
-            //目标类及其父类已经定义的字段，不包括本功能生成的字段
-            Collection<PsiField> hasFields = getInternFieldsWithSuper(targetClass);
+            //目标类已经定义的字段，不包括本功能生成的字段
+            Collection<PsiField> hasFields = collectClassFieldsIntern(targetClass);
             //遍历注解
             for (PsiAnnotation annotation : annotations) {
                 //需要继承的 Class
@@ -148,8 +148,8 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
             hasHandleMethodClasses.add(targetClass.getQualifiedName());
             //获得所有继承方法的注解
             Collection<PsiAnnotation> annotations = findMethodAnnotations(targetClass);
-            //目标类及其父类已经定义的方法，不包括本功能生成的方法
-            Collection<PsiMethod> hasMethods = getInternMethodsWithSuper(targetClass);
+            //目标类已经定义的方法，不包括本功能生成的方法
+            Collection<PsiMethod> hasMethods = collectClassMethodsIntern(targetClass);
             //遍历需要继承的 Class
             for (PsiAnnotation annotation : annotations) {
                 //需要继承的 Class
@@ -558,6 +558,7 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
     /**
      * 获得包含父类的所有字段，不包含本功能生成的字段
      */
+    @Deprecated
     public static Collection<PsiField> getInternFieldsWithSuper(PsiClass psiClass) {
         if (psiClass == null) {
             return new ArrayList<>();
@@ -574,6 +575,7 @@ public class ConceptInheritPsiAugmentProvider extends PsiAugmentProvider {
     /**
      * 获得包含父类的所有方法，不包含本功能生成的方法
      */
+    @Deprecated
     public static Collection<PsiMethod> getInternMethodsWithSuper(PsiClass psiClass) {
         if (psiClass == null) {
             return new ArrayList<>();
