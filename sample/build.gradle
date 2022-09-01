@@ -21,12 +21,12 @@ repositories {
 
 dependencies {
 
+    //compile "com.github.linyuzai:concept-inherit-processor:1.0.0"
+    //annotationProcessor "com.github.linyuzai:concept-inherit-processor:1.0.0"
+
     implementation project(path: ':concept-inherit:concept-inherit-core', configuration: 'default')
     implementation project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
     annotationProcessor project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
-
-    implementation project(path: ':concept-builder:concept-builder-core', configuration: 'default')
-    annotationProcessor project(path: ':concept-builder:concept-builder-core', configuration: 'default')
 
     /*compile "com.github.linyuzai:concept-download-spring-boot-starter:1.2.0"
     compile "com.github.linyuzai:concept-download-source-okhttp:1.2.0"

@@ -9,22 +9,22 @@ public class InheritTest {
         protected String p;
     }
 
-    public static class InheritA<A> {
+    public static class InheritA {
         private String a;
     }
 
-    public static class InheritB<B> {
-        private B b;
+    public static class InheritB {
+        private String b;
     }
 
     @InheritClass(sources = {InheritA.class, InheritB.class})
-    public static class InheritC<C> {
+    public static class InheritC {
         private String c;
 
         private String p;
 
         @InheritField(sources = InheritC.class, flags = InheritFlag.BUILDER)
-        public static class Builder<D> extends Parent {
+        public static class Builder extends Parent {
 
             public InheritC build() {
                 if (a == null) {
@@ -34,7 +34,7 @@ public class InheritTest {
                 inheritC.a = a;
                 inheritC.b = b;
                 inheritC.c = c;
-                inheritC.p = "p";
+                inheritC.p = p;
                 return inheritC;
             }
         }
@@ -42,7 +42,6 @@ public class InheritTest {
 
     public static void main(String[] args) {
         InheritC build = new InheritC.Builder()
-                .a("a")
                 .b("b")
                 .c("c")
                 .p("p")
