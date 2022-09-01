@@ -71,7 +71,11 @@ public class InheritUtils {
         for (JCTree def : classDef.defs) {
             if (isNonStaticVariable(def)) {
                 JCTree.JCVariableDecl has = (JCTree.JCVariableDecl) def;
-                if (isVariableEqual(has, varDef)) {
+                /*if (isVariableEqual(has, varDef)) {
+                    return true;
+                }*/
+                if (has.name.contentEquals(varDef.name)) {
+                    //名称相同就算一样
                     return true;
                 }
             }
@@ -116,8 +120,8 @@ public class InheritUtils {
      */
     public static boolean isMethodEqual(JCTree.JCMethodDecl methodDef1, JCTree.JCMethodDecl methodDef2) {
         return methodDef1.name.contentEquals(methodDef2.name) && //名称
-                methodDef1.mods.getFlags().equals(methodDef2.mods.getFlags()) && //访问限制
-                isRestypeEqual(methodDef1.restype, methodDef2.restype) && //返回值
+                //methodDef1.mods.getFlags().equals(methodDef2.mods.getFlags()) && //访问限制
+                //isRestypeEqual(methodDef1.restype, methodDef2.restype) && //返回值
                 isVariablesEqual(methodDef1.params, methodDef2.params); //入参
     }
 
@@ -159,7 +163,7 @@ public class InheritUtils {
      */
     public static boolean isVariableEqual(JCTree.JCVariableDecl varDef1, JCTree.JCVariableDecl varDef2) {
         return varDef1.name.contentEquals(varDef2.name) && //名称
-                varDef1.mods.getFlags().equals(varDef2.mods.getFlags()) && //访问限制
+                //varDef1.mods.getFlags().equals(varDef2.mods.getFlags()) && //访问限制
                 varDef1.vartype.type.equals(varDef2.vartype.type); //类型
     }
 }

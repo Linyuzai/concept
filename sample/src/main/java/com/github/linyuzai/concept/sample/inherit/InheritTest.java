@@ -45,6 +45,7 @@ public class InheritTest {
                 .a("a")
                 .b("b")
                 .c("c")
+                .p("p")
                 .build();
         System.out.println(build.a);
         System.out.println(build.b);
