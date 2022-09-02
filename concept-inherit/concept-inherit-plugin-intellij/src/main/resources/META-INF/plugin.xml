@@ -6,7 +6,7 @@
         Linyuzai
     </vendor>
 
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <idea-version since-build="193"/>
 
@@ -34,6 +34,6 @@
     </extensions>
 
     <change-notes><![CDATA[
-      1.0.0
+      1.0.1
     ]]></change-notes>
 </idea-plugin>
