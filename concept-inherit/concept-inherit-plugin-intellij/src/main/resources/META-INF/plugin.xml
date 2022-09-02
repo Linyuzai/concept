@@ -11,11 +11,13 @@
     <idea-version since-build="193"/>
 
     <description><![CDATA[
-      Concept Inherit Plugin.<br>
+      Inherit fields and methods of multiple classes by annotations.<br>
       Use @InheritField to extends fields.<br>
       Use @InheritMethod to extends methods.<br>
       Use @InheritClass to extends fields and methods.<br>
-      Just copy fields and methods to the target class, not the real inherit.
+      Just copy fields and methods to the target class, not the real inherit.<br>
+      <a href="https://github.com/Linyuzai/concept/wiki/Concept-Inherit">Wiki</a>
+      <img src="https://user-images.githubusercontent.com/18523183/187874252-dfb853f5-9b5e-47df-9a40-412ece369675.gif">
     ]]></description>
 
     <category>Tools Integration</category>
