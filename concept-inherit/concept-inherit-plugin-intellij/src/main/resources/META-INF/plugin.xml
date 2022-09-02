@@ -16,7 +16,7 @@
       Use @InheritMethod to extends methods.<br>
       Use @InheritClass to extends fields and methods.<br>
       Just copy fields and methods to the target class, not the real inherit.<br>
-      <a href="https://github.com/Linyuzai/concept/wiki/Concept-Inherit">Wiki</a>
+      <a href="https://github.com/Linyuzai/concept/wiki/Concept-Inherit"><b>Wiki</b></a><br>
       <img src="https://user-images.githubusercontent.com/18523183/187874252-dfb853f5-9b5e-47df-9a40-412ece369675.gif">
     ]]></description>
 
