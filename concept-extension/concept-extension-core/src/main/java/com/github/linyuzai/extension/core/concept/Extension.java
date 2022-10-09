@@ -1,6 +1,5 @@
 package com.github.linyuzai.extension.core.concept;
 
-import com.github.linyuzai.extension.core.dependence.DependenceProvider;
 import com.github.linyuzai.extension.core.lifecycle.Lifecycle;
 
 import java.util.Map;
@@ -14,10 +13,6 @@ public interface Extension extends Lifecycle {
     String getType();
 
     Map<Object, Object> getMetadata();
-
-    DependenceProvider getDependenceProvider();
-
-    void setDependenceProvider(DependenceProvider resolver);
 
     ExtensionConcept getConcept();
 
@@ -33,9 +28,7 @@ public interface Extension extends Lifecycle {
 
         Object getValue();
 
-        <T> T getConfig(Object o);
-
-        <T> T getConfig(Object o, T defaultValue);
+        Map<Object, Object> getConfigs();
     }
 
     interface Result {

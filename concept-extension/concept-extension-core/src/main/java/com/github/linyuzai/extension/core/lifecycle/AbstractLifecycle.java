@@ -9,6 +9,7 @@ public abstract class AbstractLifecycle implements Lifecycle {
         if (!initialized) {
             onInitialize();
             initialized = true;
+            onInitialized();
         }
     }
 
@@ -22,12 +23,25 @@ public abstract class AbstractLifecycle implements Lifecycle {
         if (initialized) {
             onDestroy();
             initialized = false;
+            onDestroyed();
         }
     }
 
-    public abstract void onInitialize();
+    public void onInitialize() {
 
-    public abstract void onDestroy();
+    }
+
+    public void onInitialized() {
+
+    }
+
+    public void onDestroy() {
+
+    }
+
+    public void onDestroyed() {
+
+    }
 
     /*private enum Initialization {
         UNINITIALIZED, INITIALIZING, INITIALIZED

@@ -10,7 +10,7 @@ public interface ExtensionRepository {
 
     Extension remove(String extensionId);
 
-    boolean exist(String extensionId);
+    boolean exist(Extension extension);
 
     Extension get(String extensionId);
 

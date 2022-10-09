@@ -23,8 +23,8 @@ public class MapExtensionRepository implements ExtensionRepository {
     }
 
     @Override
-    public boolean exist(String extensionId) {
-        return extensionMap.containsKey(extensionId);
+    public boolean exist(Extension extension) {
+        return extensionMap.containsKey(extension.getId());
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.github.linyuzai.extension.core.concept;
 
 import com.github.linyuzai.extension.core.adapter.ExtensionAdapter;
-import com.github.linyuzai.extension.core.dependence.DependenceProvider;
 import com.github.linyuzai.extension.core.exception.ExtensionException;
 import com.github.linyuzai.extension.core.factory.ExtensionFactory;
 import com.github.linyuzai.extension.core.invoker.ExtensionInvoker;
@@ -13,17 +12,14 @@ import com.github.linyuzai.extension.core.strategy.ExtensionStrategy;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 @Getter
 @RequiredArgsConstructor
-public abstract class AbstractExtensionConcept extends AbstractLifecycle
-        implements ExtensionConcept, DependenceProvider {
+public abstract class AbstractExtensionConcept extends AbstractLifecycle implements ExtensionConcept {
 
     private final ExtensionRepository extensionRepository;
 
@@ -33,46 +29,113 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle
 
     private final ExtensionStrategy extensionStrategy;
 
-    private final Collection<ExtensionFactory> extensionFactories = new CopyOnWriteArrayList<>();
+    private final List<Extension> extensions =
+            Collections.synchronizedList(new LinkedList<>());
+
+    private final List<ExtensionFactory> extensionFactories =
+            Collections.synchronizedList(new LinkedList<>());
 
     @Override
     public void register(Extension extension) {
-        extension.setConcept(this);
-        extension.setDependenceProvider(this);
-        initializeExtensionIfConceptInitialized(extension);
-        extensionRepository.add(extension);
-    }
-
-    @Override
-    public void register(ExtensionFactory factory) {
-        extensionFactories.add(factory);
-    }
-
-    private void initializeExtensionIfConceptInitialized(Extension extension) {
-        if (initialized() && !extension.initialized()) {
-            extension.initialize();
+        if (extension == null) {
+            throw new NullPointerException("Extension is null");
+        }
+        if (initialized()) {
+            if (!extension.initialized()) {
+                extension.setConcept(this);
+                extension.initialize();
+            }
+            if (!extensionRepository.exist(extension)) {
+                extensionRepository.add(extension);
+            }
+        } else {
+            extensions.add(extension);
         }
     }
 
     @Override
-    public Extension getExtension(String extensionId) {
-        return extensionRepository.get(extensionId);
+    public void register(ExtensionFactory factory) {
+        if (factory == null) {
+            throw new NullPointerException("ExtensionFactory is null");
+        }
+        if (initialized()) {
+            register(factory.create());
+        } else {
+            extensionFactories.add(factory);
+        }
+    }
+
+    @Override
+    public <T extends Extension> T getExtension(Predicate<Extension> predicate) {
+        List<Extension> extensions = lookupInRepository(predicate);
+        if (extensions.isEmpty()) {
+            return null;
+        } else if (extensions.size() == 1) {
+            return (T) extensions.get(0);
+        } else {
+            throw new ExtensionException(extensions.size() + " extensions found");
+        }
+    }
+
+    @Override
+    public <T extends Extension> T getExtension(String extensionId) {
+        return getExtension(it -> it.getId().equals(extensionId));
+    }
+
+    @Override
+    public <T extends Extension> T getExtension(Class<T> extensionClass) {
+        return getExtension(it -> extensionClass.isAssignableFrom(it.getClass()));
+    }
+
+    protected List<Extension> lookupInRepository(Predicate<Extension> predicate) {
+        List<Extension> found = extensionRepository.stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
+        if (found.isEmpty()) {
+            return lookupFromExtensions(predicate);
+        } else {
+            return found;
+        }
+    }
+
+    protected List<Extension> lookupFromExtensions(Predicate<Extension> predicate) {
+        List<Extension> found = extensions.stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
+        if (found.isEmpty()) {
+            return lookupWithFactories(predicate);
+        } else {
+            extensions.removeAll(found);
+            found.forEach(this::register);
+            return found;
+        }
+    }
+
+    protected List<Extension> lookupWithFactories(Predicate<Extension> predicate) {
+        if (extensionFactories.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Extension> creates = extensionFactories.stream()
+                .map(ExtensionFactory::create)
+                .collect(Collectors.toList());
+        extensionFactories.clear();
+        extensions.addAll(creates);
+        return lookupFromExtensions(predicate);
     }
 
     @Override
     public Collection<Extension.ArgumentAndResult> extend(Collection<? extends Extension.Argument> arguments) {
         List<ExtensionInvoker> invokers = new ArrayList<>();
         for (Extension.Argument argument : arguments) {
-            ExtensionAdapter adapter = argument.getConfig(ExtensionAdapter.class,
-                    extensionAdapter);
+            Map<Object, Object> configs = argument.getConfigs();
+            ExtensionAdapter adapter = (ExtensionAdapter) configs
+                    .getOrDefault(ExtensionAdapter.class, extensionAdapter);
             Collection<Extension> extensions = adapter.adapt(argument, extensionRepository);
             if (extensions == null) {
                 continue;
             }
-
-            ExtensionInvokerFactory invokerFactory =
-                    argument.getConfig(ExtensionInvokerFactory.class,
-                            extensionInvokerFactory);
+            ExtensionInvokerFactory invokerFactory = (ExtensionInvokerFactory) configs
+                    .getOrDefault(ExtensionInvokerFactory.class, extensionInvokerFactory);
             for (Extension extension : extensions) {
                 ExtensionInvoker invoker = invokerFactory.create(extension, argument);
                 invokers.add(invoker);
@@ -87,34 +150,21 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle
     }
 
     @Override
-    public Extension getDependenceExtension(String extensionId) {
-        Extension extension = extensionRepository.get(extensionId);
-        initializeExtensionIfConceptInitialized(extension);
-        return extension;
-    }
-
-    @Override
-    public Extension getDependenceExtension(Class<? extends Extension> clazz) {
-        Collection<Extension> extensions = extensionRepository.stream()
-                .filter(it -> clazz.isAssignableFrom(it.getClass()))
-                .collect(Collectors.toList());
-        if (extensions.isEmpty()) {
-            return null;
-        } else if (extensions.size() == 1) {
-            return extensions.iterator().next();
-        } else {
-            throw new ExtensionException(extensions.size() + " extensions found");
+    public void onInitialized() {
+        while (!extensions.isEmpty()) {
+            Extension extension = extensions.get(0);
+            register(extension);
+        }
+        while (!extensionFactories.isEmpty()) {
+            ExtensionFactory factory = extensionFactories.get(0);
+            register(factory);
         }
     }
 
     @Override
-    public void onInitialize() {
-        extensionRepository.stream().sorted().forEach(this::initializeExtensionIfConceptInitialized);
-        extensionFactories.stream().map(ExtensionFactory::create).forEach(this::register);
-    }
-
-    @Override
-    public void onDestroy() {
-        extensionRepository.stream().filter(Lifecycle::initialized).forEach(Lifecycle::destroy);
+    public void onDestroyed() {
+        extensionRepository.stream()
+                .filter(Lifecycle::initialized)
+                .forEach(Lifecycle::destroy);
     }
 }
