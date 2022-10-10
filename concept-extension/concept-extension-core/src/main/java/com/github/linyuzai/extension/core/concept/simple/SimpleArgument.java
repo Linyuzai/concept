@@ -21,16 +21,6 @@ public class SimpleArgument implements Extension.Argument {
 
     private final Map<Object, Object> configs;
 
-    @Override
-    public <T> T getConfig(Object o) {
-        return (T) configs.get(o);
-    }
-
-    @Override
-    public <T> T getConfig(Object o, T defaultValue) {
-        return (T) configs.getOrDefault(o, defaultValue);
-    }
-
     public static class Builder {
 
         private Object target;
