@@ -20,7 +20,9 @@ public interface Lifecycle {
     void destroy();
 
     default void refresh() {
-        destroy();
+        if (initialized()) {
+            destroy();
+        }
         initialize();
     }
 }

@@ -12,7 +12,11 @@ public interface Extension extends Lifecycle {
 
     String getType();
 
-    Map<Object, Object> getMetadata();
+    Map<String, String> getMetadata();
+
+    boolean isAutoInitialize();
+
+    void setAutoInitialize(boolean autoInitialize);
 
     ExtensionConcept getConcept();
 

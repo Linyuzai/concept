@@ -11,6 +11,20 @@ public interface ExtensionConcept {
 
     void register(ExtensionFactory factory);
 
+    Extension unregister(String extensionId);
+
+    /**
+     * 初始化
+     */
+    Extension initialize(String extensionId);
+
+    /**
+     * 销毁
+     */
+    Extension destroy(String extensionId);
+
+    Extension refresh(String extensionId);
+
     <T extends Extension> T getExtension(Predicate<Extension> predicate);
 
     <T extends Extension> T getExtension(String extensionId);

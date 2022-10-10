@@ -41,11 +41,11 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle impleme
             throw new NullPointerException("Extension is null");
         }
         if (initialized()) {
-            if (!extension.initialized()) {
-                extension.setConcept(this);
+            extension.setConcept(this);
+            if (extension.isAutoInitialize() && !extension.initialized()) {
                 extension.initialize();
             }
-            if (!extensionRepository.exist(extension)) {
+            if (!extensionRepository.exist(extension.getId())) {
                 extensionRepository.add(extension);
             }
         } else {
@@ -63,6 +63,42 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle impleme
         } else {
             extensionFactories.add(factory);
         }
+    }
+
+    @Override
+    public Extension unregister(String extensionId) {
+        Extension extension = extensionRepository.remove(extensionId);
+        if (extension != null && extension.initialized()) {
+            extension.destroy();
+        }
+        return extension;
+    }
+
+    @Override
+    public Extension initialize(String extensionId) {
+        Extension extension = extensionRepository.get(extensionId);
+        if (extension != null && !extension.initialized()) {
+            extension.initialize();
+        }
+        return extension;
+    }
+
+    @Override
+    public Extension destroy(String extensionId) {
+        Extension extension = extensionRepository.get(extensionId);
+        if (extension != null && extension.initialized()) {
+            extension.destroy();
+        }
+        return extension;
+    }
+
+    @Override
+    public Extension refresh(String extensionId) {
+        Extension extension = extensionRepository.get(extensionId);
+        if (extension != null) {
+            extension.refresh();
+        }
+        return extension;
     }
 
     @Override
@@ -137,8 +173,10 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle impleme
             ExtensionInvokerFactory invokerFactory = (ExtensionInvokerFactory) configs
                     .getOrDefault(ExtensionInvokerFactory.class, extensionInvokerFactory);
             for (Extension extension : extensions) {
-                ExtensionInvoker invoker = invokerFactory.create(extension, argument);
-                invokers.add(invoker);
+                if (extension.initialized()) {
+                    ExtensionInvoker invoker = invokerFactory.create(extension, argument);
+                    invokers.add(invoker);
+                }
             }
         }
 

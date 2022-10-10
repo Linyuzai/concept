@@ -1,6 +1,5 @@
 package com.github.linyuzai.extension.core.concept;
 
-import com.github.linyuzai.extension.core.dependence.DependenceProvider;
 import com.github.linyuzai.extension.core.lifecycle.AbstractLifecycle;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +16,9 @@ public abstract class AbstractExtension extends AbstractLifecycle implements Ext
 
     private String type;
 
-    private Map<Object, Object> metadata;
+    private Map<String, String> metadata;
 
-    private DependenceProvider dependenceProvider;
+    private boolean autoInitialize = true;
 
     private ExtensionConcept concept;
 }
