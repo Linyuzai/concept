@@ -8,6 +8,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SimpleArgumentAndResult implements Extension.ArgumentAndResult {
 
+    private final Extension extension;
+
     private final Extension.Argument argument;
 
     private final Extension.Result result;

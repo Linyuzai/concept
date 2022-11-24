@@ -51,13 +51,13 @@ public abstract class ConcurrentExtensionStrategy extends SequentialExtensionStr
                 sequentialInvokers.add(invoker);
             }
         }
-        //并发分发
-        if (!concurrentInvokers.isEmpty()) {
-            results.addAll(dispatchConcurrently(concurrentInvokers));
-        }
         //顺序分发
         if (!sequentialInvokers.isEmpty()) {
             results.addAll(dispatchSequential(sequentialInvokers));
+        }
+        //并发分发
+        if (!concurrentInvokers.isEmpty()) {
+            results.addAll(dispatchConcurrently(concurrentInvokers));
         }
         return results;
     }

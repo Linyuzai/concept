@@ -2,6 +2,7 @@ package com.github.linyuzai.extension.core.concept;
 
 import com.github.linyuzai.extension.core.adapter.ExtensionAdapter;
 import com.github.linyuzai.extension.core.exception.ExtensionException;
+import com.github.linyuzai.extension.core.factory.ExceptionResultFactory;
 import com.github.linyuzai.extension.core.factory.ExtensionFactory;
 import com.github.linyuzai.extension.core.invoker.ExtensionInvoker;
 import com.github.linyuzai.extension.core.invoker.ExtensionInvokerFactory;
@@ -26,6 +27,8 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle impleme
     private final ExtensionAdapter extensionAdapter;
 
     private final ExtensionInvokerFactory extensionInvokerFactory;
+
+    private final ExceptionResultFactory exceptionResultFactory;
 
     private final ExtensionStrategy extensionStrategy;
 
@@ -172,9 +175,11 @@ public abstract class AbstractExtensionConcept extends AbstractLifecycle impleme
             }
             ExtensionInvokerFactory invokerFactory = (ExtensionInvokerFactory) configs
                     .getOrDefault(ExtensionInvokerFactory.class, extensionInvokerFactory);
+            ExceptionResultFactory resultFactory = (ExceptionResultFactory) configs
+                    .getOrDefault(ExceptionResultFactory.class, exceptionResultFactory);
             for (Extension extension : extensions) {
                 if (extension.initialized()) {
-                    ExtensionInvoker invoker = invokerFactory.create(extension, argument);
+                    ExtensionInvoker invoker = invokerFactory.create(extension, argument, resultFactory);
                     invokers.add(invoker);
                 }
             }

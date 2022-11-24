@@ -9,6 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SimpleResult implements Extension.Result {
 
+    private final boolean success;
+
     private final String code;
 
     private final String message;
@@ -17,11 +19,18 @@ public class SimpleResult implements Extension.Result {
 
     public static class Builder {
 
+        private boolean success;
+
         private String code;
 
         private String message;
 
         private Object object;
+
+        public Builder success(boolean success) {
+            this.success = success;
+            return this;
+        }
 
         public Builder code(String code) {
             this.code = code;
@@ -39,7 +48,7 @@ public class SimpleResult implements Extension.Result {
         }
 
         public SimpleResult build() {
-            return new SimpleResult(code, message, object);
+            return new SimpleResult(success, code, message, object);
         }
     }
 }

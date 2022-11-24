@@ -8,7 +8,6 @@ import lombok.Getter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SimpleArgument implements Extension.Argument {

@@ -1,6 +1,7 @@
 package com.github.linyuzai.extension.core.invoker;
 
 import com.github.linyuzai.extension.core.concept.Extension;
+import com.github.linyuzai.extension.core.factory.ExceptionResultFactory;
 import com.github.linyuzai.extension.core.handler.ExtensionHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class HandlerChainExtensionInvokerFactory implements ExtensionInvokerFact
     private final List<ExtensionHandler> handlers;
 
     @Override
-    public ExtensionInvoker create(Extension extension, Extension.Argument argument) {
-        return new HandlerChainExtensionInvoker(extension, argument, handlers);
+    public ExtensionInvoker create(Extension extension, Extension.Argument argument, ExceptionResultFactory resultFactory) {
+        return new HandlerChainExtensionInvoker(extension, argument, resultFactory, handlers);
     }
 }

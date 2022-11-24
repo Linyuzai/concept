@@ -37,6 +37,8 @@ public interface Extension extends Lifecycle {
 
     interface Result {
 
+        boolean isSuccess();
+
         String getCode();
 
         String getMessage();
@@ -45,6 +47,8 @@ public interface Extension extends Lifecycle {
     }
 
     interface ArgumentAndResult {
+
+        Extension getExtension();
 
         Argument getArgument();
 

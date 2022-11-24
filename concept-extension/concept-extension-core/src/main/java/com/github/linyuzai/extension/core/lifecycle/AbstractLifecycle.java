@@ -2,28 +2,38 @@ package com.github.linyuzai.extension.core.lifecycle;
 
 public abstract class AbstractLifecycle implements Lifecycle {
 
+    private final Object lock = new Object();
+
     private volatile boolean initialized = false;
 
     @Override
-    public synchronized void initialize() {
+    public void initialize() {
         if (!initialized) {
-            onInitialize();
-            initialized = true;
-            onInitialized();
+            synchronized (lock) {
+                if (!initialized) {
+                    onInitialize();
+                    initialized = true;
+                    onInitialized();
+                }
+            }
         }
     }
 
     @Override
-    public synchronized boolean initialized() {
+    public boolean initialized() {
         return initialized;
     }
 
     @Override
     public synchronized void destroy() {
         if (initialized) {
-            onDestroy();
-            initialized = false;
-            onDestroyed();
+            synchronized (lock) {
+                if (initialized) {
+                    onDestroy();
+                    initialized = false;
+                    onDestroyed();
+                }
+            }
         }
     }
 

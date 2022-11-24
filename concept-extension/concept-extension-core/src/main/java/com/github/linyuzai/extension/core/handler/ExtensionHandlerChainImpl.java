@@ -22,7 +22,7 @@ public class ExtensionHandlerChainImpl implements ExtensionHandlerChain {
             return handler.onExtend(extension, argument, this);
         } else {
             Extension.Result result = extension.extend(argument);
-            return Collections.singletonList(new SimpleArgumentAndResult(argument, result));
+            return Collections.singletonList(new SimpleArgumentAndResult(extension, argument, result));
         }
     }
 }
