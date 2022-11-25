@@ -35,5 +35,7 @@ include 'concept-router:concept-router-ribbon'
 include 'concept-router:concept-router-spring-boot-starter'
 include 'concept-sync-waiting'
 include 'concept-sync-waiting:concept-sync-waiting-core'
+include 'concept-thing'
+include 'concept-thing:concept-thing-core'
 include 'sample'
 
