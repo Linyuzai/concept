@@ -1,28 +1,13 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptPluginVersion
 
-group 'com.github.linyuzai'
-version "${conceptPluginVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Plugin Jar')
+    set('publishDescription', 'Dynamic loading class with external jar simply and gracefully')
 }
 
 dependencies {
-    //compile "com.github.linyuzai:concept-plugin-core:${conceptPluginVersion}"
     compileOnly project(':concept-plugin:concept-plugin-core')
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

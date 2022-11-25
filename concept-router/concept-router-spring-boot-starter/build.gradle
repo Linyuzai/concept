@@ -1,45 +1,19 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptRouterVersion
 
-group 'com.github.linyuzai'
-version "${conceptRouterVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Router Spring Boot Starter')
+    set('publishDescription', 'Router 4 Debug')
 }
 
 dependencies {
-
-    //compile "com.github.linyuzai:concept-router-core:${conceptRouterVersion}"
-    //compile "com.github.linyuzai:concept-router-loadbalancer:${conceptRouterVersion}"
-    //compile "com.github.linyuzai:concept-router-ribbon:${conceptRouterVersion}"
+    //compile "com.github.linyuzai:concept-router-core:${ConceptRouterVersion}"
+    //compile "com.github.linyuzai:concept-router-loadbalancer:${ConceptRouterVersion}"
+    //compile "com.github.linyuzai:concept-router-ribbon:${ConceptRouterVersion}"
 
     compileOnly project(':concept-router:concept-router-core')
     compileOnly project(':concept-router:concept-router-loadbalancer')
     compileOnly project(':concept-router:concept-router-ribbon')
-
-    compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
-    compileOnly "org.springframework.cloud:spring-cloud-loadbalancer:${springCloudVersion}"
-    //compileOnly 'org.springframework.cloud:spring-cloud-starter-gateway:2.2.5.RELEASE'
-    //compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.5.RELEASE'
-    compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
-    //compileOnly "org.springframework:spring-web:${springWebVersion}"
-    compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
-    compileOnly "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

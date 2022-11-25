@@ -1,26 +1,12 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptExtensionVersion
 
-group 'com.github.linyuzai'
-version "${conceptExtensionVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Extension Core')
+    set('publishDescription', 'Extension any thing')
 }
 
 dependencies {
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

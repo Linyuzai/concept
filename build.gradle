@@ -1,24 +1,80 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'org.jetbrains.dokka' version '1.6.0'
 }
 
-group 'com.github.linyuzai'
-version '1.0.0'
-sourceCompatibility = '1.8'
+allprojects {
 
-repositories {
-    mavenCentral()
+    if (project.name.contains('intellij')) {
+        return
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'org.jetbrains.dokka'
+
+    group = 'com.github.linyuzai'
+    sourceCompatibility = '1.8'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+        compileOnly 'org.springframework.cloud:spring-cloud-starter'
+        compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'
+
+        compileOnly 'org.springframework.boot:spring-boot-starter'
+        compileOnly 'org.springframework.boot:spring-boot-starter-aop'
+        compileOnly 'org.springframework.boot:spring-boot-starter-web'
+        compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+        compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
+        compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
+
+        compileOnly 'org.springframework.kafka:spring-kafka'
+
+        compileOnly 'org.jboss.xnio:xnio-api:3.8.6.Final'
+        compileOnly 'io.netty:netty-all:4.1.85.Final'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+        testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    }
+
+    //依赖管理
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'
+            mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.dokkaJavadoc.configure {
+        outputDirectory.set(javadoc.destinationDir)
+    }
+
+    if (project.name != 'sample') {
+        bootJar.enabled = false
+        jar.enabled = true
+        jar.archiveClassifier.set('')
+    }
 }
-
-dependencies {
-
-}
-
-test {
-    useJUnitPlatform()
-}
-
-apply from: 'allprojects.gradle'
 
 /*apply from: 'github.gradle'
 

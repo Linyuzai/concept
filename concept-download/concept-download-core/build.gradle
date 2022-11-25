@@ -1,33 +1,14 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
-
-group 'com.github.linyuzai'
-version "${conceptDownloadVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+version ConceptDownloadVersion
+ext {
+    set('publishName', 'Download Core')
+    set('publishDescription', 'Build Download in a simple way')
 }
 
 dependencies {
-    compile "javax.activation:activation:1.1.1"
-    compile "io.projectreactor:reactor-core:${reactorVersion}"
-    compileOnly "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
-    compileOnly "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
-    compileOnly "org.springframework.boot:spring-boot-starter-aop:${springBootVersion}"
-    //compile "cglib:cglib:${cglibVersion}"
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    compile 'javax.activation:activation:1.1.1'
+    compile 'io.projectreactor:reactor-core:3.4.22'
 }
 
-test {
-    useJUnitPlatform()
-}
+apply from: '../../publish.gradle'
 
-apply from: '../publish.gradle'

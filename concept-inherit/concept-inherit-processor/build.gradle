@@ -1,26 +1,15 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptInheritVersion
 
-group 'com.github.linyuzai'
-version "${conceptInheritVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Inherit Processor')
+    set('publishDescription', 'Inherit fields and methods')
 }
 
 dependencies {
-    //compile "com.github.linyuzai:concept-inherit-core:${conceptInheritVersion}"
     compileOnly project(':concept-inherit:concept-inherit-core')
     compileOnly 'com.google.auto.service:auto-service:1.0.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.0.1'
-}
-
-test {
-    useJUnitPlatform()
 }
 
 compileJava {
@@ -33,4 +22,4 @@ javadoc {
     exclude("*")
 }
 
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

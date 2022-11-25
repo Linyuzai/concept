@@ -1,31 +1,12 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptRouterVersion
 
-group 'com.github.linyuzai'
-version "${conceptRouterVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Router Core')
+    set('publishDescription', 'Router 4 Debug')
 }
 
 dependencies {
-
-    compileOnly "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
-    compileOnly "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

@@ -2,7 +2,7 @@
 //如果想要本地编译
 //可以在最外层目录添加sonatype.gradle文件
 //并定义sonatypeUsername和sonatypePassword
-apply from: '../sonatype.gradle'
+apply from: '../../sonatype.gradle'
 
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
@@ -32,9 +32,9 @@ publishing {
             pom {
                 // 构件名称
                 // 区别于artifactId，可以理解为artifactName
-                name = 'Concept Sync Waiting'
+                name = publishName
                 // 构件描述
-                description = 'Transfer callback async to sync waiting'
+                description = publishDescription
                 // 构件主页
                 url = 'https://github.com/Linyuzai/concept'
                 // 许可证名称和地址

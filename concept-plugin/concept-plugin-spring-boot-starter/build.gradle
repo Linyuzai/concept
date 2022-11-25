@@ -1,19 +1,14 @@
-plugins {
-    id 'java'
-}
+apply from: '../version.gradle'
+version ConceptPluginVersion
 
-group 'com.github.linyuzai'
-version '1.0.0'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Plugin Spring Boot Starter')
+    set('publishDescription', 'Dynamic loading class with external jar simply and gracefully')
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    compileOnly project(':concept-plugin:concept-plugin-core')
+    compileOnly project(':concept-plugin:concept-plugin-jar')
 }
 
-test {
-    useJUnitPlatform()
-}
+apply from: '../../publish.gradle'

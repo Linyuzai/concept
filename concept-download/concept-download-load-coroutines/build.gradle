@@ -1,40 +1,17 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version "${kotlinVersion}"
-    id 'java'
-    id 'org.jetbrains.dokka' version "${dokkaVersion}"
-}
-
 apply from: '../version.gradle'
+version ConceptDownloadVersion
 
-group 'com.github.linyuzai'
-version "${conceptDownloadVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Download Load Coroutines')
+    set('publishDescription', 'Build Download in a simple way')
 }
 
 dependencies {
     compileOnly project(':concept-download:concept-download-core')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}"
-    //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${coroutinesVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
 }
 
-test {
-    useJUnitPlatform()
-}
-
-/*sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
-}*/
-
-tasks.dokkaJavadoc.configure {
-    outputDirectory.set(javadoc.destinationDir)
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'
 
 publish.dependsOn dokkaJavadoc

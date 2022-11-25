@@ -1,0 +1,12 @@
+apply from: '../version.gradle'
+version ConceptSyncWaitingVersion
+
+ext {
+    set('publishName', 'Sync Waiting Core')
+    set('publishDescription', 'Transfer callback async to sync waiting')
+}
+
+dependencies {
+}
+
+apply from: '../../publish.gradle'

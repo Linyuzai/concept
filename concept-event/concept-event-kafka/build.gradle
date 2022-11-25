@@ -1,33 +1,13 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptEventVersion
 
-group 'com.github.linyuzai'
-version "${conceptEventVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Event Kafka')
+    set('publishDescription', 'Event 4 MQ')
 }
 
 dependencies {
-
     compileOnly project(':concept-event:concept-event-core')
-
-    compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
-    compileOnly "org.springframework.kafka:spring-kafka:${springBootVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

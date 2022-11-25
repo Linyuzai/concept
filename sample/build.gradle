@@ -1,12 +1,4 @@
-plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-    id 'java'
-}
-
-group = 'com.github.linyuzai'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
 
 configurations {
     compileOnly {
@@ -56,46 +48,17 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    //compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     /*implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }*/
     //implementation 'org.springframework.boot:spring-boot-starter-undertow'
     //implementation 'org.springframework.boot:spring-boot-starter-jetty'
 
-    //implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     implementation 'org.apache.httpcomponents:httpclient:4.5.2'
 
     //implementation 'io.springfox:springfox-swagger2:2.9.2'
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 
-    implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
-
     implementation 'io.socket:socket.io-server:4.0.1'
 
-    implementation 'org.springframework.cloud:spring-cloud-starter'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudDependencyManagementVersion}"
-    }
-}
-
-test {
-    useJUnitPlatform()
-}
-
-//bootJar.enabled = false
-//jar.enabled = true

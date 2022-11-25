@@ -1,39 +1,21 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptEventVersion
 
-group 'com.github.linyuzai'
-version "${conceptEventVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Event Spring Boot Starter')
+    set('publishDescription', 'Event 4 MQ')
 }
 
 dependencies {
 
-    //compile "com.github.linyuzai:concept-event-core:${conceptEventVersion}"
-    //compile "com.github.linyuzai:concept-event-kafka:${conceptEventVersion}"
-    //compile "com.github.linyuzai:concept-event-rabbitmq:${conceptEventVersion}"
+    //compile "com.github.linyuzai:concept-event-core:${ConceptEventVersion}"
+    //compile "com.github.linyuzai:concept-event-kafka:${ConceptEventVersion}"
+    //compile "com.github.linyuzai:concept-event-rabbitmq:${ConceptEventVersion}"
 
     compileOnly project(':concept-event:concept-event-core')
     compileOnly project(':concept-event:concept-event-local')
     compileOnly project(':concept-event:concept-event-kafka')
     compileOnly project(':concept-event:concept-event-rabbitmq')
-
-    compileOnly "org.springframework.boot:spring-boot-starter:${springBootVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

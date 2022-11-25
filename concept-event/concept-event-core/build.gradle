@@ -1,29 +1,12 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptEventVersion
 
-group 'com.github.linyuzai'
-version "${conceptEventVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Event Core')
+    set('publishDescription', 'Event 4 MQ')
 }
 
 dependencies {
-
-    compileOnly "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

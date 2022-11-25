@@ -1,23 +1,12 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptInheritVersion
 
-group 'com.github.linyuzai'
-version "${conceptInheritVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Inherit Core')
+    set('publishDescription', 'Inherit fields and methods')
 }
 
 dependencies {
-
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

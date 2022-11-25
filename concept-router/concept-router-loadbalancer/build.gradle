@@ -1,33 +1,13 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
+version ConceptRouterVersion
 
-group 'com.github.linyuzai'
-version "${conceptRouterVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Router Load Balancer')
+    set('publishDescription', 'Router 4 Debug')
 }
 
 dependencies {
-
     compileOnly project(':concept-router:concept-router-core')
-
-    compileOnly "org.springframework.cloud:spring-cloud-loadbalancer:${springCloudVersion}"
-
-    compileOnly "org.springframework.cloud:spring-cloud-starter:${springCloudVersion}"
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    //annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }
 
-test {
-    useJUnitPlatform()
-}
-
-apply from: '../publish.gradle'
+apply from: '../../publish.gradle'

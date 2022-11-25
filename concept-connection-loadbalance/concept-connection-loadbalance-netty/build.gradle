@@ -1,28 +1,12 @@
-plugins {
-    id 'java'
-}
-
 apply from: '../version.gradle'
-
-group 'com.github.linyuzai'
-version "${conceptConnectionLoadbalanceVersion}"
-sourceCompatibility = '1.8'
-
-repositories {
-    mavenCentral()
+version ConceptConnectionLoadbalanceVersion
+ext {
+    set('publishName', 'Connection Load Balance Netty')
+    set('publishDescription', 'Load Balance 4 Connection')
 }
 
 dependencies {
-    compileOnly project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
-
-    compileOnly "io.netty:netty-all:${nettyVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
 }
 
-test {
-    useJUnitPlatform()
-}
+apply from: '../../publish.gradle'
