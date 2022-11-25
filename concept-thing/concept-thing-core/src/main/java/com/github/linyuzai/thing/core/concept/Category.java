@@ -1,14 +1,18 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Category {
+import com.github.linyuzai.thing.core.common.Containable;
 
-    String getId();
+public interface Category extends Containable {
 
-    String getName();
+    String name();
 
-    Category getCategory();
+    Category parent();
 
-    Categories getCategories();
+    Category category(String id);
 
-    Labels getLabels();
+    Label label(String id);
+
+    Categories categories();
+
+    Labels labels();
 }

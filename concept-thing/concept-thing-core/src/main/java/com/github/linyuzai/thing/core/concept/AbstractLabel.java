@@ -1,15 +1,25 @@
 package com.github.linyuzai.thing.core.concept;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class AbstractLabel implements Label {
 
-    private String id;
+    protected String id;
 
-    private String name;
+    protected String name;
 
-    private Category category;
+    protected Category category;
+
+    @Override
+    public String id() {
+        return id;
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public Category category() {
+        return category;
+    }
 }

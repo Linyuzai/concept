@@ -1,10 +1,10 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Label {
+import com.github.linyuzai.thing.core.common.Containable;
 
-    String getId();
+public interface Label extends Containable {
 
-    String getName();
+    String name();
 
-    Category getCategory();
+    Category category();
 }

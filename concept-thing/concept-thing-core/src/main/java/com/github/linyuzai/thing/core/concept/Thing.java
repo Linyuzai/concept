@@ -1,14 +1,24 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Thing {
+import com.github.linyuzai.thing.core.common.Containable;
 
-    String getId();
+public interface Thing extends Containable {
 
-    String getName();
+    String name();
 
-    Categories getCategories();
+    Category category(String id);
 
-    Attributes getAttributes();
+    Attribute attribute(String id);
 
-    States getStates();
+    State state(String id);
+
+    Categories categories();
+
+    Attributes attributes();
+
+    States states();
+
+    Relationships relationships();
+
+    <T> T create(Class<T> target);
 }

@@ -1,12 +1,15 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface State {
+import com.github.linyuzai.thing.core.common.Containable;
+import com.github.linyuzai.thing.core.operation.Operation;
 
-    String getId();
+public interface State extends Containable {
 
-    Label getLabel();
+    Label label();
 
-    Thing getThing();
+    Thing thing();
 
-    <T> T getValue();
+    <T> T value();
+
+    Operation update(Object value);
 }
