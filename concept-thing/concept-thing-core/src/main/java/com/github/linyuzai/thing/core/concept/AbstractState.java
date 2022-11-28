@@ -1,43 +1,25 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.operation.Operation;
-import com.github.linyuzai.thing.core.operation.StateUpdateOperation;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class AbstractState implements State {
+@Getter
+@Setter
+public abstract class AbstractState implements State,State.Modifiable {
 
-    protected String id;
+    private String id;
 
-    protected Label label;
+    private String key;
 
-    protected Thing thing;
+    private Label label;
 
-    protected Object value;
+    private Thing thing;
 
-    @Override
-    public String id() {
-        return id;
-    }
-
-    @Override
-    public Label label() {
-        return label;
-    }
+    private Object value;
 
     @Override
-    public Thing thing() {
-        return thing;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T value() {
-        return (T) value;
-    }
-
-    @Override
-    public Operation update(Object value) {
-        Operation operation = new StateUpdateOperation(this, this.value, value);
-        this.value = value;
-        return operation;
+    public void update(Object value) {
+        //TODO valid
+        setValue(value);
     }
 }

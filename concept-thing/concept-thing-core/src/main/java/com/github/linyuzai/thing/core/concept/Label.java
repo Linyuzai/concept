@@ -1,10 +1,15 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.common.Containable;
+public interface Label extends IdAndKey {
 
-public interface Label extends Containable {
+    String getName();
 
-    String name();
+    Category getCategory();
 
-    Category category();
+    interface Modifiable extends IdAndKey.Modifiable {
+
+        void setName(String name);
+
+        void setCategory(Category category);
+    }
 }

@@ -1,49 +1,23 @@
 package com.github.linyuzai.thing.core.concept;
 
-public abstract class AbstractCategory implements Category {
+import com.github.linyuzai.thing.core.container.Categories;
+import com.github.linyuzai.thing.core.container.Labels;
+import lombok.Getter;
+import lombok.Setter;
 
-    protected String id;
+@Getter
+@Setter
+public abstract class AbstractCategory implements Category, Category.Modifiable {
 
-    protected String name;
+    private String id;
 
-    protected Category category;
+    private String key;
 
-    protected Categories categories;
+    private String name;
 
-    protected Labels labels;
+    private Category category;
 
-    @Override
-    public String id() {
-        return id;
-    }
+    private Categories categories;
 
-    @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
-    public Category parent() {
-        return category;
-    }
-
-    @Override
-    public Category category(String id) {
-        return categories.find(id);
-    }
-
-    @Override
-    public Label label(String id) {
-        return labels.find(id);
-    }
-
-    @Override
-    public Categories categories() {
-        return categories;
-    }
-
-    @Override
-    public Labels labels() {
-        return labels;
-    }
+    private Labels labels;
 }

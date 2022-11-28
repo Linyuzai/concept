@@ -1,24 +1,40 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.common.Containable;
+import com.github.linyuzai.thing.core.action.ThingAction;
+import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.container.*;
+import com.github.linyuzai.thing.core.context.ThingContext;
 
-public interface Thing extends Containable {
+public interface Thing extends IdAndKey {
 
-    String name();
+    String getName();
 
-    Category category(String id);
+    Categories getCategories();
 
-    Attribute attribute(String id);
+    Attributes getAttributes();
 
-    State state(String id);
+    States getStates();
 
-    Categories categories();
+    Relationships getRelationships();
 
-    Attributes attributes();
+    ThingContext getContext();
 
-    States states();
-
-    Relationships relationships();
+    ThingActionChain action(ThingAction action);
 
     <T> T create(Class<T> target);
+
+    interface Modifiable extends IdAndKey.Modifiable {
+
+        void setName(String name);
+
+        void setCategories(Categories categories);
+
+        void setAttributes(Attributes attributes);
+
+        void setStates(States states);
+
+        void setRelationships(Relationships relationships);
+
+        void setContext(ThingContext context);
+    }
 }

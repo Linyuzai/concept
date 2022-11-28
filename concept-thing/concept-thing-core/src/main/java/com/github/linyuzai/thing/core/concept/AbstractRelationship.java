@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AbstractLabel implements Label, Label.Modifiable {
+public abstract class AbstractRelationship implements Relationship, Relationship.Modifiable {
 
     private String id;
 
@@ -13,5 +13,9 @@ public class AbstractLabel implements Label, Label.Modifiable {
 
     private String name;
 
-    private Category category;
+    private Thing major;
+
+    private Thing minor;
+
+    private Relationship opposite;
 }

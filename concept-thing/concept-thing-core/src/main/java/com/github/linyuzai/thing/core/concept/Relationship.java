@@ -1,12 +1,23 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.common.Containable;
+public interface Relationship extends IdAndKey {
 
-public interface Relationship extends Containable {
+    String getName();
 
-    Thing major();
+    Thing getMajor();
 
-    Thing minor();
+    Thing getMinor();
 
-    Relationship opposite();
+    Relationship getOpposite();
+
+    interface Modifiable extends IdAndKey.Modifiable {
+
+        void setName(String name);
+
+        void setMajor(Thing major);
+
+        void setMinor(Thing minor);
+
+        void setOpposite(Relationship opposite);
+    }
 }

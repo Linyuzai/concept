@@ -1,15 +1,21 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.common.Containable;
-import com.github.linyuzai.thing.core.operation.Operation;
+public interface State extends IdAndKey {
 
-public interface State extends Containable {
+    Label getLabel();
 
-    Label label();
+    Thing getThing();
 
-    Thing thing();
+    <T> T getValue();
 
-    <T> T value();
+    void update(Object value);
 
-    Operation update(Object value);
+    interface Modifiable extends IdAndKey.Modifiable {
+
+        void setLabel(Label label);
+
+        void setThing(Thing thing);
+
+        void setValue(Object value);
+    }
 }

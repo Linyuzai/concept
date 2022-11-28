@@ -1,62 +1,41 @@
 package com.github.linyuzai.thing.core.concept;
 
-public abstract class AbstractThing implements Thing {
+import com.github.linyuzai.thing.core.action.ThingAction;
+import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.action.ThingActionChainFactory;
+import com.github.linyuzai.thing.core.container.Attributes;
+import com.github.linyuzai.thing.core.container.Categories;
+import com.github.linyuzai.thing.core.container.Relationships;
+import com.github.linyuzai.thing.core.container.States;
+import com.github.linyuzai.thing.core.context.ThingContext;
+import lombok.Getter;
+import lombok.Setter;
 
-    protected String id;
+@Getter
+@Setter
+public abstract class AbstractThing implements Thing, Thing.Modifiable {
 
-    protected String name;
+    private String id;
 
-    protected Categories categories;
+    private String key;
 
-    protected Attributes attributes;
+    private String name;
 
-    protected States states;
+    private Categories categories;
 
-    protected Relationships relationships;
+    private Attributes attributes;
 
-    @Override
-    public String id() {
-        return id;
-    }
+    private States states;
 
-    @Override
-    public String name() {
-        return name;
-    }
+    private Relationships relationships;
 
-    @Override
-    public Category category(String id) {
-        return categories.find(id);
-    }
-
-    @Override
-    public Attribute attribute(String id) {
-        return attributes.find(id);
-    }
+    private ThingContext context;
 
     @Override
-    public State state(String id) {
-        return states.find(id);
-    }
-
-    @Override
-    public Categories categories() {
-        return categories;
-    }
-
-    @Override
-    public Attributes attributes() {
-        return attributes;
-    }
-
-    @Override
-    public States states() {
-        return states;
-    }
-
-    @Override
-    public Relationships relationships() {
-        return relationships;
+    public ThingActionChain action(ThingAction action) {
+        ThingActionChainFactory factory = context.get(ThingActionChainFactory.class);
+        ThingActionChain chain = factory.create(this);
+        return chain.action(action);
     }
 
     @Override
