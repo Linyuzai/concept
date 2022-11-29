@@ -1,7 +1,7 @@
 package com.github.linyuzai.thing.core.container;
 
+import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.concept.IdAndKey;
-import com.github.linyuzai.thing.core.operation.Operation;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +19,34 @@ public interface Container<T extends IdAndKey> {
 
     interface Modifiable<T extends IdAndKey> {
 
-        Operation add(T one);
+        ThingActionChain add(T one);
 
-        Operation remove(String id);
+        ThingActionChain add(T one, AddInterceptor<T> interceptor);
+
+        ThingActionChain remove(String id);
+
+        ThingActionChain remove(String id, RemoveInterceptor<T> interceptor);
+    }
+
+    interface AddInterceptor<T extends IdAndKey> {
+
+        default boolean beforeAdd(T add) {
+            return true;
+        }
+
+        default void afterAdd(T add) {
+
+        }
+    }
+
+    interface RemoveInterceptor<T extends IdAndKey> {
+
+        default boolean beforeRemove(String id) {
+            return true;
+        }
+
+        default void afterRemove(T remove) {
+
+        }
     }
 }

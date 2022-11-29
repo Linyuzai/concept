@@ -1,6 +1,5 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.container.*;
 import com.github.linyuzai.thing.core.context.ThingContext;
@@ -13,13 +12,13 @@ public interface Thing extends IdAndKey {
 
     Attributes getAttributes();
 
-    States getStates();
-
     Relationships getRelationships();
 
     ThingContext getContext();
 
-    ThingActionChain action(ThingAction action);
+    ThingActionChain actions();
+
+    void publish(Object event);
 
     <T> T create(Class<T> target);
 
@@ -30,8 +29,6 @@ public interface Thing extends IdAndKey {
         void setCategories(Categories categories);
 
         void setAttributes(Attributes attributes);
-
-        void setStates(States states);
 
         void setRelationships(Relationships relationships);
 

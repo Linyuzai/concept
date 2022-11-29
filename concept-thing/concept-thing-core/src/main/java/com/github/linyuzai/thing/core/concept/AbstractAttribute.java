@@ -1,5 +1,8 @@
 package com.github.linyuzai.thing.core.concept;
 
+import com.github.linyuzai.thing.core.action.InnerThingAction;
+import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.action.ThingActionInvocation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +21,16 @@ public abstract class AbstractAttribute implements Attribute, Attribute.Modifiab
     private Object value;
 
     @Override
-    public void update(Object value) {
+    public ThingActionChain update(Object value) {
+        return thing.actions().next(new InnerThingAction(() -> {
+            Object oldValue = getValue();
+            doUpdate(value);
+            return new UpdateInvocation(this, oldValue, value);
+        }));
+    }
+
+    protected void doUpdate(Object value) {
         //TODO valid
-        setValue(value);
+        this.value = value;
     }
 }
