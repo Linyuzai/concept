@@ -1,8 +1,14 @@
 package com.github.linyuzai.thing.core.container;
 
 import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.action.ThingActionInvocation;
 import com.github.linyuzai.thing.core.concept.Attribute;
 import com.github.linyuzai.thing.core.concept.Thing;
+import com.github.linyuzai.thing.core.event.AttributeAddedEvent;
+import com.github.linyuzai.thing.core.event.AttributeRemovedEvent;
+import com.github.linyuzai.thing.core.event.ThingEvent;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
@@ -12,23 +18,39 @@ public interface Attributes extends Container<Attribute>, Container.Modifiable<A
 
     ThingActionChain update(Map<String, Object> values);
 
-    ThingActionChain update(Map<String, Object> values, UpdateInterceptor interceptor);
+    @Getter
+    @RequiredArgsConstructor
+    class AddInvocation implements ThingActionInvocation, AttributeAddedEvent {
 
-    interface UpdateInterceptor {
+        private final Attribute attribute;
 
-        UpdateInterceptor DEFAULT = new UpdateInterceptor() {
-        };
-
-        default boolean beforeUpdate(Attribute attribute, Object value) {
-            return true;
+        @Override
+        public ThingEvent toEvent() {
+            return this;
         }
 
-        default void afterUpdate(Attribute attribute) {
+        @Override
+        public Thing getThing() {
+            return attribute.getThing();
+        }
+    }
 
+    @Getter
+    @RequiredArgsConstructor
+    class RemoveInvocation implements ThingActionInvocation, AttributeRemovedEvent {
+
+        private final String attributeId;
+
+        private final Attribute attribute;
+
+        @Override
+        public ThingEvent toEvent() {
+            return this;
         }
 
-        default void onAttributeNotFound(Attributes attributes, String id, Object value) {
-
+        @Override
+        public Thing getThing() {
+            return attribute.getThing();
         }
     }
 }

@@ -13,9 +13,4 @@ public class ThingEvents implements ThingEvent {
     private final Thing thing;
 
     private final List<ThingEvent> events;
-
-    @Override
-    public void publish() {
-        thing.publish(this);
-    }
 }

@@ -42,8 +42,8 @@ public interface Attribute extends IdAndKey {
         }
 
         @Override
-        public void publish() {
-            attribute.getThing().publish(this);
+        public Thing getThing() {
+            return attribute.getThing();
         }
     }
 }

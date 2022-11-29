@@ -16,24 +16,23 @@ public abstract class AbstractAttributes implements Attributes {
 
     @Override
     public ThingActionChain update(Map<String, Object> values) {
-        return update(values, UpdateInterceptor.DEFAULT);
-    }
-
-    @Override
-    public ThingActionChain update(Map<String, Object> values, UpdateInterceptor interceptor) {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            Attribute attribute = get(key);
-            if (attribute == null) {
-                interceptor.onAttributeNotFound(this, key, value);
-            } else {
-                if (interceptor.beforeUpdate(attribute, value)) {
-                    attribute.update(value);
-                    interceptor.afterUpdate(attribute);
-                }
-            }
+            update(key, value);
         }
         return thing.actions();
+    }
+
+    protected void update(String id, Object value) {
+        Attribute attribute = getAttribute(id);
+        if (attribute == null) {
+            return;
+        }
+        attribute.update(value);
+    }
+
+    protected Attribute getAttribute(String id) {
+        return get(id);
     }
 }

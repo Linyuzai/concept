@@ -21,32 +21,6 @@ public interface Container<T extends IdAndKey> {
 
         ThingActionChain add(T one);
 
-        ThingActionChain add(T one, AddInterceptor<T> interceptor);
-
         ThingActionChain remove(String id);
-
-        ThingActionChain remove(String id, RemoveInterceptor<T> interceptor);
-    }
-
-    interface AddInterceptor<T extends IdAndKey> {
-
-        default boolean beforeAdd(T add) {
-            return true;
-        }
-
-        default void afterAdd(T add) {
-
-        }
-    }
-
-    interface RemoveInterceptor<T extends IdAndKey> {
-
-        default boolean beforeRemove(String id) {
-            return true;
-        }
-
-        default void afterRemove(T remove) {
-
-        }
     }
 }
