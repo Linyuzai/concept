@@ -1,15 +1,17 @@
 package com.github.linyuzai.thing.core.action;
 
-import com.github.linyuzai.thing.core.concept.Thing;
+import com.github.linyuzai.thing.core.context.ThingContext;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @RequiredArgsConstructor
 public class ThingActionChainImpl implements ThingActionChain {
 
-    private final Thing thing;
+    private final ThingContext context;
 
     private final List<ThingActionInvoker> invokers;
 
@@ -28,11 +30,11 @@ public class ThingActionChainImpl implements ThingActionChain {
         for (ThingAction action : actionList) {
             List<ThingActionInvoker> supportInvokers = getSupportInvokers(action);
             for (ThingActionInvoker invoker : supportInvokers) {
-                ThingActionInvocation invocation = invoker.invoke(action, thing);
+                ThingActionInvocation invocation = invoker.invoke(action, context);
                 invocations.add(invocation);
             }
         }
-        return new ThingActionInvocations(thing, invocations);
+        return new ThingActionInvocations(context, invocations);
     }
 
     protected List<ThingAction> confirmActionsAndInvalid() {
@@ -44,7 +46,7 @@ public class ThingActionChainImpl implements ThingActionChain {
     protected List<ThingActionInvoker> getSupportInvokers(ThingAction action) {
         List<ThingActionInvoker> supportInvokers = new ArrayList<>();
         for (ThingActionInvoker invoker : invokers) {
-            if (invoker.support(action, thing)) {
+            if (invoker.support(action, context)) {
                 supportInvokers.add(invoker);
             }
         }

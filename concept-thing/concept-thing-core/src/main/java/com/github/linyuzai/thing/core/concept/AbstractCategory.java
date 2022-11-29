@@ -2,6 +2,7 @@ package com.github.linyuzai.thing.core.concept;
 
 import com.github.linyuzai.thing.core.container.Categories;
 import com.github.linyuzai.thing.core.container.Labels;
+import com.github.linyuzai.thing.core.context.ThingContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,4 +21,6 @@ public abstract class AbstractCategory implements Category, Category.Modifiable 
     private Categories categories;
 
     private Labels labels;
+
+    private ThingContext context;
 }

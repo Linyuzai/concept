@@ -1,8 +1,12 @@
 package com.github.linyuzai.thing.core.event;
 
 import com.github.linyuzai.thing.core.concept.Attribute;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public interface AttributeAddedEvent extends ThingEvent {
+@Getter
+@RequiredArgsConstructor
+public class AttributeAddedEvent extends AttributeEvent {
 
-    Attribute getAttribute();
+    private final Attribute attribute;
 }

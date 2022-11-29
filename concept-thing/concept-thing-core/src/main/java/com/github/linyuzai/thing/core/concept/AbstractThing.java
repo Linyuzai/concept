@@ -1,12 +1,10 @@
 package com.github.linyuzai.thing.core.concept;
 
 import com.github.linyuzai.thing.core.action.ThingActionChain;
-import com.github.linyuzai.thing.core.action.ThingActionChainFactory;
 import com.github.linyuzai.thing.core.container.Attributes;
 import com.github.linyuzai.thing.core.container.Categories;
 import com.github.linyuzai.thing.core.container.Relationships;
 import com.github.linyuzai.thing.core.context.ThingContext;
-import com.github.linyuzai.thing.core.event.ThingEventPublisher;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,21 +28,12 @@ public abstract class AbstractThing implements Thing, Thing.Modifiable {
 
     @Override
     public ThingActionChain actions() {
-        ThingActionChain chain = context.get(ThingActionChain.class);
-        if (chain == null) {
-            ThingActionChainFactory factory = context.get(ThingActionChainFactory.class);
-            ThingActionChain create = factory.create(this);
-            context.put(ThingActionChain.class, create);
-            return create;
-        } else {
-            return chain;
-        }
+        return context.actions();
     }
 
     @Override
     public void publish(Object event) {
-        ThingEventPublisher publisher = context.get(ThingEventPublisher.class);
-        publisher.publish(event);
+        context.publish(event);
     }
 
     @Override

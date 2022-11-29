@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractCategories implements Categories, Categories.Modifiable {
+public abstract class AbstractLabels implements Labels, Labels.Modifiable {
 
     private ThingContext context;
 }

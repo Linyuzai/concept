@@ -1,14 +1,16 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.action.InnerThingAction;
-import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.action.inner.InnerThingAction;
+import com.github.linyuzai.thing.core.action.inner.InnerThingActionInvocation;
+import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.concept.Attribute;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.thing.core.event.AttributeAddedEvent;
+import com.github.linyuzai.thing.core.event.AttributeRemovedEvent;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
-import java.util.stream.Stream;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AttributesImpl extends AbstractAttributes {
 
     private final Map<String, Attribute> attributes;
@@ -19,33 +21,23 @@ public class AttributesImpl extends AbstractAttributes {
     }
 
     @Override
-    public Optional<Attribute> optional(String id) {
-        return Optional.ofNullable(get(id));
-    }
-
-    @Override
     public List<Attribute> list() {
         return Collections.unmodifiableList(new ArrayList<>(attributes.values()));
     }
 
     @Override
-    public Stream<Attribute> stream() {
-        return list().stream();
-    }
-
-    @Override
-    public ThingActionChain add(Attribute one) {
-        return getThing().actions().next(new InnerThingAction(() -> {
+    public ThingAction add(Attribute one) {
+        return new InnerThingAction(getThing().getContext(), () -> {
             attributes.put(one.getId(), one);
-            return new AddInvocation(one);
-        }));
+            return new InnerThingActionInvocation(() -> new AttributeAddedEvent(one));
+        });
     }
 
     @Override
-    public ThingActionChain remove(String id) {
-        return getThing().actions().next(new InnerThingAction(() -> {
+    public ThingAction remove(String id) {
+        return new InnerThingAction(getThing().getContext(), () -> {
             Attribute remove = attributes.remove(id);
-            return null;
-        }));
+            return new InnerThingActionInvocation(() -> new AttributeRemovedEvent(id, remove));
+        });
     }
 }

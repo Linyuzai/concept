@@ -1,4 +1,4 @@
-package com.github.linyuzai.thing.core.event;
+package com.github.linyuzai.thing.core.action;
 
 import com.github.linyuzai.thing.core.context.ThingContext;
 import lombok.Getter;
@@ -8,14 +8,9 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class ThingEvents implements ThingEvent {
+public class ThingActions implements ThingAction {
 
     private final ThingContext context;
 
-    private final List<ThingEvent> events;
-
-    @Override
-    public void publish() {
-        context.publish(this);
-    }
+    private final List<ThingAction> actions;
 }

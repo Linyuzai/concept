@@ -1,6 +1,7 @@
 package com.github.linyuzai.thing.core.action;
 
 import com.github.linyuzai.thing.core.concept.Thing;
+import com.github.linyuzai.thing.core.context.ThingContext;
 import com.github.linyuzai.thing.core.event.ThingEvent;
 import com.github.linyuzai.thing.core.event.ThingEvents;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ThingActionInvocations implements ThingActionInvocation {
 
-    private final Thing thing;
+    private final ThingContext context;
 
     private final List<ThingActionInvocation> invocations;
 
@@ -22,6 +23,6 @@ public class ThingActionInvocations implements ThingActionInvocation {
         List<ThingEvent> events = invocations.stream()
                 .map(ThingActionInvocation::toEvent)
                 .collect(Collectors.toList());
-        return new ThingEvents(thing, events);
+        return new ThingEvents(context, events);
     }
 }

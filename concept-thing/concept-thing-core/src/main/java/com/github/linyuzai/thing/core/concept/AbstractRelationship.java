@@ -13,9 +13,9 @@ public abstract class AbstractRelationship implements Relationship, Relationship
 
     private String name;
 
-    private Thing major;
+    private Thing thing;
 
-    private Thing minor;
+    private Thing relation;
 
     private Relationship opposite;
 }

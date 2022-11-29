@@ -1,56 +1,35 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.action.ThingActionChain;
-import com.github.linyuzai.thing.core.action.ThingActionInvocation;
+import com.github.linyuzai.thing.core.action.ThingAction;
+import com.github.linyuzai.thing.core.action.ThingActions;
 import com.github.linyuzai.thing.core.concept.Attribute;
 import com.github.linyuzai.thing.core.concept.Thing;
-import com.github.linyuzai.thing.core.event.AttributeAddedEvent;
-import com.github.linyuzai.thing.core.event.AttributeRemovedEvent;
-import com.github.linyuzai.thing.core.event.ThingEvent;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public interface Attributes extends Container<Attribute>, Container.Modifiable<Attribute> {
+public interface Attributes extends Container<Attribute> {
 
     Thing getThing();
 
-    ThingActionChain update(Map<String, Object> values);
-
-    @Getter
-    @RequiredArgsConstructor
-    class AddInvocation implements ThingActionInvocation, AttributeAddedEvent {
-
-        private final Attribute attribute;
-
-        @Override
-        public ThingEvent toEvent() {
-            return this;
+    default ThingAction update(Map<String, Object> values) {
+        List<ThingAction> actions = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            Attribute attribute = get(key);
+            if (attribute == null) {
+                continue;
+            }
+            ThingAction update = attribute.update(value);
+            actions.add(update);
         }
-
-        @Override
-        public Thing getThing() {
-            return attribute.getThing();
-        }
+        return new ThingActions(getThing().getContext(), actions);
     }
 
-    @Getter
-    @RequiredArgsConstructor
-    class RemoveInvocation implements ThingActionInvocation, AttributeRemovedEvent {
+    interface Modifiable {
 
-        private final String attributeId;
-
-        private final Attribute attribute;
-
-        @Override
-        public ThingEvent toEvent() {
-            return this;
-        }
-
-        @Override
-        public Thing getThing() {
-            return attribute.getThing();
-        }
+        void setThing(Thing thing);
     }
 }

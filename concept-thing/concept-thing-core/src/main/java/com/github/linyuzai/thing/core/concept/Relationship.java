@@ -4,9 +4,9 @@ public interface Relationship extends IdAndKey {
 
     String getName();
 
-    Thing getMajor();
+    Thing getThing();
 
-    Thing getMinor();
+    Thing getRelation();
 
     Relationship getOpposite();
 
@@ -14,9 +14,9 @@ public interface Relationship extends IdAndKey {
 
         void setName(String name);
 
-        void setMajor(Thing major);
+        void setThing(Thing major);
 
-        void setMinor(Thing minor);
+        void setRelation(Thing minor);
 
         void setOpposite(Relationship opposite);
     }

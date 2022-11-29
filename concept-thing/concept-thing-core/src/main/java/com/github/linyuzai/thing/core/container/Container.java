@@ -1,6 +1,6 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.concept.IdAndKey;
 
 import java.util.List;
@@ -11,16 +11,17 @@ public interface Container<T extends IdAndKey> {
 
     T get(String id);
 
-    Optional<T> optional(String id);
+    default Optional<T> optional(String id) {
+        return Optional.ofNullable(get(id));
+    }
 
     List<T> list();
 
-    Stream<T> stream();
-
-    interface Modifiable<T extends IdAndKey> {
-
-        ThingActionChain add(T one);
-
-        ThingActionChain remove(String id);
+    default Stream<T> stream() {
+        return list().stream();
     }
+
+    ThingAction add(T one);
+
+    ThingAction remove(String id);
 }

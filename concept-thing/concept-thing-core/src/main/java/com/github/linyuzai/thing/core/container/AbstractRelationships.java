@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractAttributes implements Attributes, Attributes.Modifiable {
+public abstract class AbstractRelationships implements Relationships, Relationships.Modifiable {
 
     private Thing thing;
 }

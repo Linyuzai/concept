@@ -1,10 +1,14 @@
 package com.github.linyuzai.thing.core.event;
 
 import com.github.linyuzai.thing.core.concept.Attribute;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public interface AttributeRemovedEvent extends ThingEvent {
+@Getter
+@RequiredArgsConstructor
+public class AttributeRemovedEvent extends AttributeEvent {
 
-    String getAttributeId();
+    private final String attributeId;
 
-    Attribute getAttribute();
+    private final Attribute attribute;
 }

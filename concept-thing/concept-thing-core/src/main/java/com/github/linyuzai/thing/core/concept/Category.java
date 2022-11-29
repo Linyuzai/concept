@@ -2,6 +2,7 @@ package com.github.linyuzai.thing.core.concept;
 
 import com.github.linyuzai.thing.core.container.Categories;
 import com.github.linyuzai.thing.core.container.Labels;
+import com.github.linyuzai.thing.core.context.ThingContext;
 
 public interface Category extends IdAndKey {
 
@@ -13,6 +14,8 @@ public interface Category extends IdAndKey {
 
     Labels getLabels();
 
+    ThingContext getContext();
+
     interface Modifiable extends IdAndKey.Modifiable {
 
         void setName(String name);
@@ -22,5 +25,7 @@ public interface Category extends IdAndKey {
         void setCategories(Categories categories);
 
         void setLabels(Labels labels);
+
+        void setContext(ThingContext context);
     }
 }
