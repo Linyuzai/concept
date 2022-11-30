@@ -1,17 +1,13 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.action.ThingAction;
-import com.github.linyuzai.thing.core.action.ThingActionInvocation;
-import com.github.linyuzai.thing.core.action.inner.InnerThingAction;
-import com.github.linyuzai.thing.core.action.inner.InnerThingActionInvocation;
 import com.github.linyuzai.thing.core.concept.Label;
+import com.github.linyuzai.thing.core.event.ThingEvent;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class LabelsImpl extends AbstractLabels {
@@ -29,15 +25,22 @@ public class LabelsImpl extends AbstractLabels {
     }
 
     @Override
-    public ThingAction add(Label one) {
-        return new InnerThingAction(getContext(), () -> {
-            labels.put(one.getId(), one);
-            return new InnerThingActionInvocation(() -> null);
-        });
+    protected void onAdd(Label add) {
+        labels.put(add.getId(), add);
     }
 
     @Override
-    public ThingAction remove(String id) {
+    protected ThingEvent createAddedEvent(Label add) {
+        return null;
+    }
+
+    @Override
+    protected Label onRemove(String id) {
+        return labels.remove(id);
+    }
+
+    @Override
+    protected ThingEvent createRemovedEvent(String id, Label removed) {
         return null;
     }
 }

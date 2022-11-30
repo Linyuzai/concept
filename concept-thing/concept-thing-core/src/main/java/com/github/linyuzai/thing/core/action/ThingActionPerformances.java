@@ -1,6 +1,5 @@
 package com.github.linyuzai.thing.core.action;
 
-import com.github.linyuzai.thing.core.concept.Thing;
 import com.github.linyuzai.thing.core.context.ThingContext;
 import com.github.linyuzai.thing.core.event.ThingEvent;
 import com.github.linyuzai.thing.core.event.ThingEvents;
@@ -12,16 +11,16 @@ import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
-public class ThingActionInvocations implements ThingActionInvocation {
+public class ThingActionPerformances implements ThingActionPerformance {
 
     private final ThingContext context;
 
-    private final List<ThingActionInvocation> invocations;
+    private final List<ThingActionPerformance> performances;
 
     @Override
     public ThingEvent toEvent() {
-        List<ThingEvent> events = invocations.stream()
-                .map(ThingActionInvocation::toEvent)
+        List<ThingEvent> events = performances.stream()
+                .map(ThingActionPerformance::toEvent)
                 .collect(Collectors.toList());
         return new ThingEvents(context, events);
     }

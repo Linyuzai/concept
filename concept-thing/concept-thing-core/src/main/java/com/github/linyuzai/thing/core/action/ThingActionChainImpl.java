@@ -13,8 +13,6 @@ public class ThingActionChainImpl implements ThingActionChain {
 
     private final ThingContext context;
 
-    private final List<ThingActionInvoker> invokers;
-
     private final List<ThingAction> actions = new ArrayList<>();
 
     @Override
@@ -24,32 +22,12 @@ public class ThingActionChainImpl implements ThingActionChain {
     }
 
     @Override
-    public ThingActionInvocation invoke() {
-        List<ThingAction> actionList = confirmActionsAndInvalid();
-        List<ThingActionInvocation> invocations = new ArrayList<>();
-        for (ThingAction action : actionList) {
-            List<ThingActionInvoker> supportInvokers = getSupportInvokers(action);
-            for (ThingActionInvoker invoker : supportInvokers) {
-                ThingActionInvocation invocation = invoker.invoke(action, context);
-                invocations.add(invocation);
-            }
+    public ThingActionPerformance perform() {
+        List<ThingActionPerformance> performances = new ArrayList<>();
+        for (ThingAction action : actions) {
+            ThingActionPerformance performance = action.perform();
+            performances.add(performance);
         }
-        return new ThingActionInvocations(context, invocations);
-    }
-
-    protected List<ThingAction> confirmActionsAndInvalid() {
-        List<ThingAction> actionsToInvoke = new ArrayList<>(actions);
-        actions.clear();
-        return actionsToInvoke;
-    }
-
-    protected List<ThingActionInvoker> getSupportInvokers(ThingAction action) {
-        List<ThingActionInvoker> supportInvokers = new ArrayList<>();
-        for (ThingActionInvoker invoker : invokers) {
-            if (invoker.support(action, context)) {
-                supportInvokers.add(invoker);
-            }
-        }
-        return supportInvokers;
+        return new ThingActionPerformances(context, performances);
     }
 }

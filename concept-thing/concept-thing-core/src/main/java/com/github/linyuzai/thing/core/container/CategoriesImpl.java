@@ -1,8 +1,7 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.action.inner.InnerThingAction;
-import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.concept.Category;
+import com.github.linyuzai.thing.core.event.ThingEvent;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -26,18 +25,22 @@ public class CategoriesImpl extends AbstractCategories {
     }
 
     @Override
-    public ThingAction add(Category one) {
-        return new InnerThingAction(getContext(), () -> {
-            categories.put(one.getId(), one);
-            return null;
-        });
+    protected void onAdd(Category add) {
+        categories.put(add.getId(), add);
     }
 
     @Override
-    public ThingAction remove(String id) {
-        return new InnerThingAction(getContext(), () -> {
-            Category remove = categories.remove(id);
-            return null;
-        });
+    protected ThingEvent createAddedEvent(Category add) {
+        return null;
+    }
+
+    @Override
+    protected Category onRemove(String id) {
+        return categories.remove(id);
+    }
+
+    @Override
+    protected ThingEvent createRemovedEvent(String id, Category removed) {
+        return null;
     }
 }

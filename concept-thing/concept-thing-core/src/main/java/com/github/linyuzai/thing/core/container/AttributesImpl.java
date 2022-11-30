@@ -1,11 +1,9 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.action.inner.InnerThingAction;
-import com.github.linyuzai.thing.core.action.inner.InnerThingActionInvocation;
-import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.concept.Attribute;
 import com.github.linyuzai.thing.core.event.AttributeAddedEvent;
 import com.github.linyuzai.thing.core.event.AttributeRemovedEvent;
+import com.github.linyuzai.thing.core.event.ThingEvent;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
@@ -26,18 +24,22 @@ public class AttributesImpl extends AbstractAttributes {
     }
 
     @Override
-    public ThingAction add(Attribute one) {
-        return new InnerThingAction(getThing().getContext(), () -> {
-            attributes.put(one.getId(), one);
-            return new InnerThingActionInvocation(() -> new AttributeAddedEvent(one));
-        });
+    protected void onAdd(Attribute add) {
+        attributes.put(add.getId(), add);
     }
 
     @Override
-    public ThingAction remove(String id) {
-        return new InnerThingAction(getThing().getContext(), () -> {
-            Attribute remove = attributes.remove(id);
-            return new InnerThingActionInvocation(() -> new AttributeRemovedEvent(id, remove));
-        });
+    protected ThingEvent createAddedEvent(Attribute add) {
+        return new AttributeAddedEvent(add);
+    }
+
+    @Override
+    protected Attribute onRemove(String id) {
+        return attributes.remove(id);
+    }
+
+    @Override
+    protected ThingEvent createRemovedEvent(String id, Attribute removed) {
+        return new AttributeRemovedEvent(id, removed);
     }
 }

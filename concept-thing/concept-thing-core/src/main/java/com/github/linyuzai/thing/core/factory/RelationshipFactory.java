@@ -6,7 +6,7 @@ import com.github.linyuzai.thing.core.container.Relationships;
 
 public interface RelationshipFactory {
 
-    Relationship create(String name, Thing thing);
+    Relationship create(String name, Thing relation);
 
     Relationships createContainer();
 }

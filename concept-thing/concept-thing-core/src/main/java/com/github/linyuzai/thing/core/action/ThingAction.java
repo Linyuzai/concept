@@ -1,15 +1,13 @@
 package com.github.linyuzai.thing.core.action;
 
 import com.github.linyuzai.thing.core.context.ThingContext;
+import com.github.linyuzai.thing.core.event.ThingEvent;
+
+import java.util.function.Supplier;
 
 public interface ThingAction {
 
-    ThingContext getContext();
+    ThingActionPerformance perform();
 
-    default ThingActionChain chain() {
-        if (this instanceof ThingActionChain) {
-            return (ThingActionChain) this;
-        }
-        return getContext().actions().next(this);
-    }
+    ThingActionChain chain();
 }

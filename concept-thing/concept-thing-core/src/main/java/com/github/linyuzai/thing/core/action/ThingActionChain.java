@@ -4,5 +4,8 @@ public interface ThingActionChain extends ThingAction {
 
     ThingActionChain next(ThingAction action);
 
-    ThingActionInvocation invoke();
+    @Override
+    default ThingActionChain chain() {
+        return this;
+    }
 }

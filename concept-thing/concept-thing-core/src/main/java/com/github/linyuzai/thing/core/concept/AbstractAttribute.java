@@ -1,7 +1,6 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.action.inner.InnerThingAction;
-import com.github.linyuzai.thing.core.action.inner.InnerThingActionInvocation;
+import com.github.linyuzai.thing.core.action.ContextThingAction;
 import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.event.AttributeUpdatedEvent;
 import lombok.Getter;
@@ -23,10 +22,10 @@ public abstract class AbstractAttribute implements Attribute, Attribute.Modifiab
 
     @Override
     public ThingAction update(Object value) {
-        return new InnerThingAction(thing.getContext(), () -> {
+        return ContextThingAction.of(thing.getContext(), () -> {
             Object oldValue = getValue();
             doUpdate(value);
-            return new InnerThingActionInvocation(() -> new AttributeUpdatedEvent(this, oldValue, value));
+            return () -> new AttributeUpdatedEvent(this, oldValue, value);
         });
     }
 

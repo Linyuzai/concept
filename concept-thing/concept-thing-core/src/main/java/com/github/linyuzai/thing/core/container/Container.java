@@ -21,7 +21,7 @@ public interface Container<T extends IdAndKey> {
         return list().stream();
     }
 
-    ThingAction add(T one);
+    ThingAction add(T add);
 
     ThingAction remove(String id);
 }

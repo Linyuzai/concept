@@ -1,12 +1,10 @@
 package com.github.linyuzai.thing.core.container;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
-import com.github.linyuzai.thing.core.action.ThingActions;
+import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.concept.Attribute;
 import com.github.linyuzai.thing.core.concept.Thing;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public interface Attributes extends Container<Attribute> {
@@ -14,7 +12,7 @@ public interface Attributes extends Container<Attribute> {
     Thing getThing();
 
     default ThingAction update(Map<String, Object> values) {
-        List<ThingAction> actions = new ArrayList<>();
+        ThingActionChain chain = getThing().actions();
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -23,9 +21,9 @@ public interface Attributes extends Container<Attribute> {
                 continue;
             }
             ThingAction update = attribute.update(value);
-            actions.add(update);
+            chain.next(update);
         }
-        return new ThingActions(getThing().getContext(), actions);
+        return chain;
     }
 
     interface Modifiable {
