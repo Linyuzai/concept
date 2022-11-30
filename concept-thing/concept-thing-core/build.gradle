@@ -1,19 +1,14 @@
-plugins {
-    id 'java'
-}
+apply from: '../../allprojects.gradle'
 
-group 'com.github.linyuzai'
-version 'unspecified'
+apply from: '../version.gradle'
+version ConceptThingVersion
 
-repositories {
-    mavenCentral()
+ext {
+    set('publishName', 'Thing Core')
+    set('publishDescription', 'Dynamic Configure Things')
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
-test {
-    useJUnitPlatform()
-}
+apply from: '../../publish.gradle'

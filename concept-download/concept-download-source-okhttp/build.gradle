@@ -1,3 +1,5 @@
+apply from: '../../allprojects.gradle'
+
 apply from: '../version.gradle'
 version ConceptDownloadVersion
 ext {
@@ -7,7 +9,7 @@ ext {
 
 dependencies {
     compileOnly project(':concept-download:concept-download-core')
-    compile 'com.squareup.okhttp3:okhttp:4.9.3'
+    api 'com.squareup.okhttp3:okhttp:4.9.3'
 }
 
 apply from: '../../publish.gradle'

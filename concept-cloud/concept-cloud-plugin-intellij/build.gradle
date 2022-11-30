@@ -15,7 +15,7 @@ targetCompatibility = "11"
 apply from: '../version.gradle'
 
 group 'com.github.linyuzai'
-version ConceptInheritVersion
+version ConceptCloudVersion
 //sourceCompatibility = '11'
 
 repositories {
@@ -28,7 +28,7 @@ dependencies {
 
 intellij.version = "2021.3"
 intellij.type = "IC"
-intellij.plugins = ["java"]
+intellij.plugins = ["java", "gradle"]
 
 /*intellij {
     version "2021.3"

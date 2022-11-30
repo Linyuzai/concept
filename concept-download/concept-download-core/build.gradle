@@ -1,3 +1,5 @@
+apply from: '../../allprojects.gradle'
+
 apply from: '../version.gradle'
 version ConceptDownloadVersion
 ext {
@@ -6,8 +8,8 @@ ext {
 }
 
 dependencies {
-    compile 'javax.activation:activation:1.1.1'
-    compile 'io.projectreactor:reactor-core:3.4.22'
+    api 'javax.activation:activation:1.1.1'
+    api 'io.projectreactor:reactor-core:3.4.22'
 }
 
 apply from: '../../publish.gradle'

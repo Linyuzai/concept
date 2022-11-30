@@ -1,3 +1,5 @@
+apply from: '../../allprojects.gradle'
+
 apply from: '../version.gradle'
 version ConceptRouterVersion
 
