@@ -6,6 +6,8 @@ public interface IdAndKey {
 
     String getKey();
 
+    //void attach();
+
     interface Modifiable {
 
         void setId(String id);

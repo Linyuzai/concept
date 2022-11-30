@@ -4,25 +4,27 @@ import com.github.linyuzai.thing.core.concept.*;
 import com.github.linyuzai.thing.core.container.Attributes;
 import com.github.linyuzai.thing.core.container.AttributesImpl;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
 public class AttributeFactoryImpl implements AttributeFactory {
 
     @Override
-    public Attribute create(Label label, Thing thing, Object value) {
+    public Attribute create(Label label, Object value, Collection<Consumer<Thing>> consumers) {
         AttributeImpl attribute = new AttributeImpl();
         attribute.setId(label.getId());
         attribute.setKey(label.getKey());
         attribute.setLabel(label);
-        attribute.setThing(thing);
         attribute.setValue(value);
+        consumers.add(attribute::setThing);
         return attribute;
     }
 
     @Override
-    public Attributes createContainer(Thing thing) {
+    public Attributes createContainer(Collection<Consumer<Thing>> consumers) {
         AttributesImpl attributes = new AttributesImpl(new LinkedHashMap<>());
-        attributes.setThing(thing);
+        consumers.add(attributes::setThing);
         return attributes;
     }
 }

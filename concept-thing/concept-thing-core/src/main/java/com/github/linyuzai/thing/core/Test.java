@@ -8,11 +8,11 @@ import java.util.Map;
 public class Test {
 
     public void test0(Thing thing) {
-        thing.getAttributes().get("color").update("RED").chain().invoke().toEvent().publish();
+        thing.getAttributes().get("color").update("RED").perform().toEvent().publish();
     }
 
     public void test1(Thing thing, Map<String, Object> attributes) {
-        thing.getAttributes().update(attributes).chain().invoke().toEvent().publish();
+        thing.getAttributes().update(attributes).perform().toEvent().publish();
     }
 
     public void test2(Thing device) {

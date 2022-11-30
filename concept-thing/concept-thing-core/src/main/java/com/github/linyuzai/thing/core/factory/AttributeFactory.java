@@ -5,10 +5,13 @@ import com.github.linyuzai.thing.core.concept.Label;
 import com.github.linyuzai.thing.core.concept.Thing;
 import com.github.linyuzai.thing.core.container.Attributes;
 
+import java.util.Collection;
+import java.util.function.Consumer;
+
 public interface AttributeFactory {
 
-    Attribute create(Label label, Thing thing, Object value);
+    Attribute create(Label label, Object value, Collection<Consumer<Thing>> consumers);
 
-    Attributes createContainer(Thing thing);
+    Attributes createContainer(Collection<Consumer<Thing>> consumers);
 
 }
