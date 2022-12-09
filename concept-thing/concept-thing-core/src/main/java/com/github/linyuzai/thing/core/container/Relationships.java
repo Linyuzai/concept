@@ -7,8 +7,5 @@ public interface Relationships extends Container<Relationship> {
 
     Thing getThing();
 
-    interface Modifiable {
-
-        void setThing(Thing thing);
-    }
+    void setThing(Thing thing);
 }

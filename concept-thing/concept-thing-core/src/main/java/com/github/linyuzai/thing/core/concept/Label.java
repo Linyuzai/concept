@@ -1,15 +1,12 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Label extends IdAndKey {
+public interface Label extends Identify {
 
     String getName();
 
+    void setName(String name);
+
     Category getCategory();
 
-    interface Modifiable extends IdAndKey.Modifiable {
-
-        void setName(String name);
-
-        void setCategory(Category category);
-    }
+    void setCategory(Category category);
 }

@@ -5,15 +5,17 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AttributeImpl extends AbstractAttribute {
+public class RelationshipImpl extends AbstractRelationship {
 
     private String id;
 
     private String key;
 
-    private Label label;
+    private String name;
 
     private Thing thing;
 
-    private Object value;
+    private Thing relation;
+
+    private Relationship opposite;
 }

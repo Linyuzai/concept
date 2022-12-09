@@ -1,13 +1,13 @@
 package com.github.linyuzai.thing.core.container;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
-import com.github.linyuzai.thing.core.concept.IdAndKey;
+import com.github.linyuzai.thing.core.concept.Identify;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface Container<T extends IdAndKey> {
+public interface Container<T extends Identify> {
 
     T get(String id);
 

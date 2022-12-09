@@ -1,4 +1,6 @@
 package com.github.linyuzai.thing.core.container;
 
-public abstract class AbstractThings implements Things {
+import com.github.linyuzai.thing.core.concept.Thing;
+
+public abstract class AbstractThings extends AbstractContainer<Thing> implements Things {
 }

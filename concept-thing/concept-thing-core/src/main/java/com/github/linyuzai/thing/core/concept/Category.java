@@ -4,28 +4,25 @@ import com.github.linyuzai.thing.core.container.Categories;
 import com.github.linyuzai.thing.core.container.Labels;
 import com.github.linyuzai.thing.core.context.ThingContext;
 
-public interface Category extends IdAndKey {
+public interface Category extends Identify {
 
     String getName();
 
+    void setName(String name);
+
     Category getParent();
+
+    void setParent(Category parent);
 
     Categories getCategories();
 
+    void setCategories(Categories categories);
+
     Labels getLabels();
+
+    void setLabels(Labels labels);
 
     ThingContext getContext();
 
-    interface Modifiable extends IdAndKey.Modifiable {
-
-        void setName(String name);
-
-        void setParent(Category parent);
-
-        void setCategories(Categories categories);
-
-        void setLabels(Labels labels);
-
-        void setContext(ThingContext context);
-    }
+    void setContext(ThingContext context);
 }

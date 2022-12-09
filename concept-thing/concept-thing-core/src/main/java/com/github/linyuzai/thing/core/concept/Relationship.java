@@ -1,23 +1,20 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Relationship extends IdAndKey {
+public interface Relationship extends Identify {
 
     String getName();
 
+    void setName(String name);
+
     Thing getThing();
+
+    void setThing(Thing major);
 
     Thing getRelation();
 
+    void setRelation(Thing minor);
+
     Relationship getOpposite();
 
-    interface Modifiable extends IdAndKey.Modifiable {
-
-        void setName(String name);
-
-        void setThing(Thing major);
-
-        void setRelation(Thing minor);
-
-        void setOpposite(Relationship opposite);
-    }
+    void setOpposite(Relationship opposite);
 }

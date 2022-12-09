@@ -5,7 +5,7 @@ import com.github.linyuzai.thing.core.container.Labels;
 
 public interface LabelFactory {
 
-    Label create(String name);
+    Label create();
 
     Labels createContainer();
 }

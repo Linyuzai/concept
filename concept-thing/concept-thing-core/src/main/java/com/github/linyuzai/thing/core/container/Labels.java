@@ -7,8 +7,5 @@ public interface Labels extends Container<Label> {
 
     Category getCategory();
 
-    interface Modifiable {
-
-        void setCategory(Category category);
-    }
+    void setCategory(Category category);
 }

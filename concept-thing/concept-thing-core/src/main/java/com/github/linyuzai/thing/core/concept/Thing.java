@@ -4,34 +4,31 @@ import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.container.*;
 import com.github.linyuzai.thing.core.context.ThingContext;
 
-public interface Thing extends IdAndKey {
+public interface Thing extends Identify {
 
     String getName();
 
+    void setName(String name);
+
     Categories getCategories();
+
+    void setCategories(Categories categories);
 
     Attributes getAttributes();
 
+    void setAttributes(Attributes attributes);
+
     Relationships getRelationships();
 
+    void setRelationships(Relationships relationships);
+
     ThingContext getContext();
+
+    void setContext(ThingContext context);
 
     ThingActionChain actions();
 
     void publish(Object event);
 
     <T> T create(Class<T> target);
-
-    interface Modifiable extends IdAndKey.Modifiable {
-
-        void setName(String name);
-
-        void setCategories(Categories categories);
-
-        void setAttributes(Attributes attributes);
-
-        void setRelationships(Relationships relationships);
-
-        void setContext(ThingContext context);
-    }
 }

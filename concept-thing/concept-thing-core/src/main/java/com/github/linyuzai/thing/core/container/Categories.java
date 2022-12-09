@@ -6,8 +6,5 @@ public interface Categories extends Container<Category> {
 
     Category getCategory();
 
-    interface Modifiable {
-
-        void setCategory(Category category);
-    }
+    void setCategory(Category category);
 }

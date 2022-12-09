@@ -5,7 +5,7 @@ import com.github.linyuzai.thing.core.container.Categories;
 
 public interface CategoryFactory {
 
-    Category create(String name);
+    Category create();
 
     Categories createContainer();
 }

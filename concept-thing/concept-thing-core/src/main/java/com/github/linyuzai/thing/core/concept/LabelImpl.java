@@ -5,15 +5,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AttributeImpl extends AbstractAttribute {
+public class LabelImpl extends AbstractLabel {
 
     private String id;
 
     private String key;
 
-    private Label label;
+    private String name;
 
-    private Thing thing;
-
-    private Object value;
+    private Category category;
 }

@@ -2,22 +2,19 @@ package com.github.linyuzai.thing.core.concept;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
 
-public interface Attribute extends IdAndKey {
+public interface Attribute extends Identify {
 
     Label getLabel();
 
+    void setLabel(Label label);
+
     Thing getThing();
+
+    void setThing(Thing thing);
 
     <T> T getValue();
 
+    void setValue(Object value);
+
     ThingAction update(Object value);
-
-    interface Modifiable extends IdAndKey.Modifiable {
-
-        void setLabel(Label label);
-
-        void setThing(Thing thing);
-
-        void setValue(Object value);
-    }
 }

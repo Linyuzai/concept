@@ -1,42 +1,24 @@
 package com.github.linyuzai.thing.core.container;
 
+import com.github.linyuzai.thing.core.concept.Category;
 import com.github.linyuzai.thing.core.concept.Label;
 import com.github.linyuzai.thing.core.event.ThingEvent;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
+@Getter
+@Setter
 public class LabelsImpl extends AbstractLabels {
 
-    private final Map<String, Label> labels;
+    private Category category;
 
-    @Override
-    public Label get(String id) {
-        return labels.get(id);
-    }
-
-    @Override
-    public List<Label> list() {
-        return Collections.unmodifiableList(new ArrayList<>(labels.values()));
-    }
-
-    @Override
-    protected void onAdd(Label add) {
-        labels.put(add.getId(), add);
-    }
+    private Map<String, Label> map;
 
     @Override
     protected ThingEvent createAddedEvent(Label add) {
         return null;
-    }
-
-    @Override
-    protected Label onRemove(String id) {
-        return labels.remove(id);
     }
 
     @Override

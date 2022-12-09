@@ -11,6 +11,8 @@ public interface Attributes extends Container<Attribute> {
 
     Thing getThing();
 
+    void setThing(Thing thing);
+
     default ThingAction update(Map<String, Object> values) {
         ThingActionChain chain = getThing().actions();
         for (Map.Entry<String, Object> entry : values.entrySet()) {
@@ -24,10 +26,5 @@ public interface Attributes extends Container<Attribute> {
             chain.next(update);
         }
         return chain;
-    }
-
-    interface Modifiable {
-
-        void setThing(Thing thing);
     }
 }

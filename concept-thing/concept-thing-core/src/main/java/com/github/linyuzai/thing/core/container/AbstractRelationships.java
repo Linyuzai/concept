@@ -1,12 +1,12 @@
 package com.github.linyuzai.thing.core.container;
 
-import com.github.linyuzai.thing.core.concept.Thing;
-import lombok.Getter;
-import lombok.Setter;
+import com.github.linyuzai.thing.core.concept.Relationship;
+import com.github.linyuzai.thing.core.context.ThingContext;
 
-@Getter
-@Setter
-public abstract class AbstractRelationships implements Relationships, Relationships.Modifiable {
+public abstract class AbstractRelationships extends AbstractContainer<Relationship> implements Relationships {
 
-    private Thing thing;
+    @Override
+    protected ThingContext getContext() {
+        return getThing().getContext();
+    }
 }
