@@ -12,10 +12,6 @@ public interface Category extends Identify<Category> {
 
     void setName(String name);
 
-    Category getParent();
-
-    void setParent(Category parent);
-
     Categories getCategories();
 
     void setCategories(Categories categories);

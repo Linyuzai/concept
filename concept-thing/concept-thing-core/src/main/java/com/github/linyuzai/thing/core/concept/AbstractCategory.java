@@ -13,8 +13,6 @@ public abstract class AbstractCategory extends AbstractIdentify<Category> implem
 
     private String name;
 
-    private Category parent;
-
     private Categories categories;
 
     private Labels labels;
