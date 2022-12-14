@@ -1,6 +1,6 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Label extends Identify {
+public interface Label extends Identify<Label> {
 
     String getName();
 

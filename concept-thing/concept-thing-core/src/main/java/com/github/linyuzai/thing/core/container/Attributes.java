@@ -14,7 +14,7 @@ public interface Attributes extends Container<Attribute> {
     void setThing(Thing thing);
 
     default ThingAction update(Map<String, Object> values) {
-        ThingActionChain chain = getThing().actions();
+        ThingActionChain chain = getContext().actions();
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();

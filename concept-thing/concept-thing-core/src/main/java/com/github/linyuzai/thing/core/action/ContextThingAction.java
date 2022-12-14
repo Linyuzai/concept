@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Supplier;
 
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public abstract class ContextThingAction implements ThingAction {
@@ -21,7 +22,7 @@ public abstract class ContextThingAction implements ThingAction {
         return new ContextThingAction(context) {
 
             @Override
-            public ThingActionPerformance perform() {
+            public ThingActionExecution execute() {
                 Supplier<ThingEvent> event = supplier.get();
                 return event::get;
             }

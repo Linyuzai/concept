@@ -2,12 +2,17 @@ package com.github.linyuzai.thing.core.container;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.concept.Identify;
+import com.github.linyuzai.thing.core.context.ThingContext;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface Container<T extends Identify> {
+public interface Container<T extends Identify<T>> {
+
+    ThingContext getContext();
+
+    void setContext(ThingContext context);
 
     T get(String id);
 

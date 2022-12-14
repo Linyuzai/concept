@@ -4,7 +4,7 @@ import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.container.*;
 import com.github.linyuzai.thing.core.context.ThingContext;
 
-public interface Thing extends Identify {
+public interface Thing extends Identify<Thing> {
 
     String getName();
 

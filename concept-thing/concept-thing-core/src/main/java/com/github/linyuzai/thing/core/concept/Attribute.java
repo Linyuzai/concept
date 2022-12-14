@@ -2,7 +2,7 @@ package com.github.linyuzai.thing.core.concept;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
 
-public interface Attribute extends Identify {
+public interface Attribute extends Identify<Attribute> {
 
     Label getLabel();
 

@@ -4,7 +4,9 @@ import com.github.linyuzai.thing.core.container.Categories;
 import com.github.linyuzai.thing.core.container.Labels;
 import com.github.linyuzai.thing.core.context.ThingContext;
 
-public interface Category extends Identify {
+import java.util.function.Function;
+
+public interface Category extends Identify<Category> {
 
     String getName();
 
@@ -21,8 +23,4 @@ public interface Category extends Identify {
     Labels getLabels();
 
     void setLabels(Labels labels);
-
-    ThingContext getContext();
-
-    void setContext(ThingContext context);
 }

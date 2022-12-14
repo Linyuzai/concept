@@ -9,7 +9,7 @@ import com.github.linyuzai.thing.core.container.RelationshipsImpl;
 public class RelationshipFactoryImpl implements RelationshipFactory {
 
     @Override
-    public Relationship create(String name, Thing relation) {
+    public Relationship create() {
         return new RelationshipImpl();
     }
 

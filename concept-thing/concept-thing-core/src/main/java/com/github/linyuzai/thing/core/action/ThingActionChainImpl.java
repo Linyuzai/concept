@@ -22,12 +22,12 @@ public class ThingActionChainImpl implements ThingActionChain {
     }
 
     @Override
-    public ThingActionPerformance perform() {
-        List<ThingActionPerformance> performances = new ArrayList<>();
+    public ThingActionExecution execute() {
+        List<ThingActionExecution> executions = new ArrayList<>();
         for (ThingAction action : actions) {
-            ThingActionPerformance performance = action.perform();
-            performances.add(performance);
+            ThingActionExecution execution = action.execute();
+            executions.add(execution);
         }
-        return new ThingActionPerformances(context, performances);
+        return new ThingActionExecutions(context, executions);
     }
 }

@@ -1,17 +1,26 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.action.ContextThingAction;
 import com.github.linyuzai.thing.core.action.ThingAction;
-import com.github.linyuzai.thing.core.event.AttributeUpdatedEvent;
+import com.github.linyuzai.thing.core.event.ThingUpdatedEvent;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class AbstractAttribute implements Attribute {
+@Getter
+@Setter
+public abstract class AbstractAttribute extends AbstractIdentify<Attribute> implements Attribute {
+
+    private Label label;
+
+    private Thing thing;
+
+    private Object value;
 
     @Override
     public ThingAction update(Object value) {
-        return ContextThingAction.of(getThing().getContext(), () -> {
+        return ThingAction.create(() -> {
             Object oldValue = getValue();
             doUpdate(value);
-            return () -> new AttributeUpdatedEvent(this, oldValue, value);
+            return () -> new ThingUpdatedEvent(getContext(), ThingAction.VALUE_UPDATE, this, this, oldValue, value);
         });
     }
 
