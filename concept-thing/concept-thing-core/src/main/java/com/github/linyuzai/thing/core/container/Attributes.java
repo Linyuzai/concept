@@ -3,9 +3,13 @@ package com.github.linyuzai.thing.core.container;
 import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.concept.Attribute;
+import com.github.linyuzai.thing.core.concept.Category;
+import com.github.linyuzai.thing.core.concept.Label;
 import com.github.linyuzai.thing.core.concept.Thing;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public interface Attributes extends Container<Attribute> {
 
@@ -13,18 +17,13 @@ public interface Attributes extends Container<Attribute> {
 
     void setThing(Thing thing);
 
-    default ThingAction update(Map<String, Object> values) {
-        ThingActionChain chain = getContext().actions();
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            Attribute attribute = get(key);
-            if (attribute == null) {
-                continue;
-            }
-            ThingAction update = attribute.update(value);
-            chain.next(update);
-        }
-        return chain;
-    }
+    ThingAction add(Label label);
+
+    ThingAction add(Label label, Function<Attribute, ThingAction> next);
+
+    ThingAction add(String label);
+
+    ThingAction add(String label, Function<Attribute, ThingAction> next);
+
+    ThingAction update(Map<String, Object> values);
 }

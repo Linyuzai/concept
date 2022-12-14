@@ -17,8 +17,8 @@ public class Test {
         thing.getAttributes().update(attributes).execute().toEvent().publish();
     }
 
-    public void test2(Thing thing) {
-        thing.getCategories().add("A", new Function<Category, ThingAction>() {
+    public void test2(Category root) {
+        root.getCategories().add("A", new Function<Category, ThingAction>() {
             @Override
             public ThingAction apply(Category category) {
                 return category.getCategories().add("B");

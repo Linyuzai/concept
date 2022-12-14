@@ -18,44 +18,43 @@ public abstract class AbstractRelationships extends AbstractContainer<Relationsh
 
     @Override
     public ThingAction add(Thing relation, String name) {
-        return add(create(relation, name));
+        return add(relation, name, null, null);
     }
 
     @Override
     public ThingAction add(Thing relation, String name, Function<Relationship, ThingAction> next) {
-        Relationship relationship = create(relation, name);
-        ThingAction action = add(relationship);
-        ThingAction apply = next.apply(relationship);
-        ThingActionChain chain = getContext().actions();
-        return chain.next(action).next(apply);
+        return add(relation, name, null, next);
     }
 
     @Override
     public ThingAction add(Thing relation, String name, String opposite) {
-        Relationship relationship = create(relation, name);
-        relationship.getOpposite().setName(opposite);
-        return add(relationship);
+        return add(relation, name, opposite, null);
     }
 
     @Override
     public ThingAction add(Thing relation, String name, String opposite, Function<Relationship, ThingAction> next) {
-        Relationship relationship = create(relation, name);
-        relationship.getOpposite().setName(opposite);
+        Relationship relationship = create(relation, name, opposite);
         ThingAction action = add(relationship);
-        ThingAction apply = next.apply(relationship);
-        ThingActionChain chain = getContext().actions();
-        return chain.next(action).next(apply);
+        if (next == null) {
+            return action;
+        } else {
+            ThingAction apply = next.apply(relationship);
+            ThingActionChain chain = getContext().actions();
+            return chain.next(action).next(apply);
+        }
     }
 
-    protected Relationship create(Thing relation, String name) {
+    protected Relationship create(Thing relation, String name, String opposite) {
         RelationshipFactory factory = getContext().get(RelationshipFactory.class);
         Relationship relationship = factory.create();
         relationship.setName(name);
         relationship.setThing(thing);
         relationship.setRelation(relation);
-        Relationship opposite = relationship.getOpposite();
-        relationship.setOpposite(opposite);
+        relationship.setOpposite(relationship.getOpposite());
         relationship.setContext(getContext());
+        if (opposite != null) {
+            relationship.getOpposite().setName(opposite);
+        }
         return relationship;
     }
 }

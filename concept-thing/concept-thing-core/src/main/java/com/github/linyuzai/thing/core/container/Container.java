@@ -14,6 +14,8 @@ public interface Container<T extends Identify<T>> {
 
     void setContext(ThingContext context);
 
+    //List<T> key(String key);
+
     T get(String id);
 
     default Optional<T> optional(String id) {

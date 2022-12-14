@@ -17,16 +17,20 @@ public abstract class AbstractCategories extends AbstractContainer<Category> imp
 
     @Override
     public ThingAction add(String name) {
-        return add(create(name));
+        return add(name, null);
     }
 
     @Override
     public ThingAction add(String name, Function<Category, ThingAction> next) {
         Category category = create(name);
         ThingAction action = add(category);
-        ThingAction apply = next.apply(category);
-        ThingActionChain chain = getContext().actions();
-        return chain.next(action).next(apply);
+        if (next == null) {
+            return action;
+        } else {
+            ThingAction apply = next.apply(category);
+            ThingActionChain chain = getContext().actions();
+            return chain.next(action).next(apply);
+        }
     }
 
     protected Category create(String name) {
