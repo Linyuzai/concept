@@ -37,7 +37,6 @@ public abstract class AbstractCategories extends AbstractContainer<Category> imp
         CategoryFactory factory = getContext().get(CategoryFactory.class);
         Category category = factory.create();
         category.setName(name);
-        category.setParent(getCategory());
         category.setContext(getContext());
         return category;
     }
