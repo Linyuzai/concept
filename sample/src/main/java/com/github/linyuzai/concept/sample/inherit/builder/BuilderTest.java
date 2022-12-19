@@ -18,23 +18,23 @@ public class BuilderTest {
 
     protected List<?> list;
 
-    @InheritField(sources = BuilderTest.class, flags = {InheritFlag.BUILDER, InheritFlag.OWN})
+    //@InheritField(sources = BuilderTest.class, flags = {InheritFlag.BUILDER, InheritFlag.OWN})
     public static class Builder {
 
         private String b1;
 
         protected void valid() {
-            if (string == null) {
+            /*if (string == null) {
                 string = "BuilderTest";
             }
             if (list == null) {
                 list = new ArrayList<>();
-            }
+            }*/
         }
 
-        public BuilderTest build() {
+        /*public BuilderTest build() {
             valid();
             return new BuilderTest(string, i, list);
-        }
+        }*/
     }
 }

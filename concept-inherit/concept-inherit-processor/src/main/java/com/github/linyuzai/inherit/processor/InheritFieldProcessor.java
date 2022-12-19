@@ -1,25 +1,23 @@
 package com.github.linyuzai.inherit.processor;
 
-import com.github.linyuzai.inherit.core.annotation.InheritField;
-import com.github.linyuzai.inherit.core.annotation.InheritFields;
 import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.Processor;
 
 /**
- * {@link InheritField} 处理器
+ * com.github.linyuzai.inherit.core.annotation.InheritField 处理器
  */
 @AutoService(Processor.class)
 public class InheritFieldProcessor extends AbstractInheritProcessor {
 
     @Override
     protected String getAnnotationName() {
-        return InheritField.class.getName();
+        return "com.github.linyuzai.inherit.core.annotation.InheritField";
     }
 
     @Override
     protected String getRepeatableAnnotationName() {
-        return InheritFields.class.getName();
+        return "com.github.linyuzai.inherit.core.annotation.InheritFields";
     }
 
     @Override

@@ -1,25 +1,23 @@
 package com.github.linyuzai.inherit.processor;
 
-import com.github.linyuzai.inherit.core.annotation.InheritClass;
-import com.github.linyuzai.inherit.core.annotation.InheritClasses;
 import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.Processor;
 
 /**
- * {@link InheritClass} 处理器
+ * com.github.linyuzai.inherit.core.annotation.InheritClass 处理器
  */
 @AutoService(Processor.class)
 public class InheritClassProcessor extends AbstractInheritProcessor {
 
     @Override
     protected String getAnnotationName() {
-        return InheritClass.class.getName();
+        return "com.github.linyuzai.inherit.core.annotation.InheritClass";
     }
 
     @Override
     protected String getRepeatableAnnotationName() {
-        return InheritClasses.class.getName();
+        return "com.github.linyuzai.inherit.core.annotation.InheritClasses";
     }
 
     @Override

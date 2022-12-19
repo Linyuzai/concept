@@ -17,31 +17,31 @@ public class InheritTest {
         private String b;
     }
 
-    @InheritClass(sources = {InheritA.class, InheritB.class})
+    //@InheritClass(sources = {InheritA.class, InheritB.class})
     public static class InheritC {
         private String c;
 
         private String p;
 
-        @InheritField(sources = InheritC.class, flags = InheritFlag.BUILDER)
+        //@InheritField(sources = InheritC.class, flags = InheritFlag.BUILDER)
         public static class Builder extends Parent {
 
             public InheritC build() {
-                if (a == null) {
+                /*if (a == null) {
                     a = "a";
-                }
+                }*/
                 InheritC inheritC = new InheritC();
-                inheritC.a = a;
+                /*inheritC.a = a;
                 inheritC.b = b;
                 inheritC.c = c;
-                inheritC.p = p;
+                inheritC.p = p;*/
                 return inheritC;
             }
         }
     }
 
     public static void main(String[] args) {
-        InheritC build = new InheritC.Builder()
+        /*InheritC build = new InheritC.Builder()
                 .b("b")
                 .c("c")
                 .p("p")
@@ -49,6 +49,6 @@ public class InheritTest {
         System.out.println(build.a);
         System.out.println(build.b);
         System.out.println(build.c);
-        System.out.println(build.p);
+        System.out.println(build.p);*/
     }
 }

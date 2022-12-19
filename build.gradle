@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    //id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.springframework.boot' version '2.7.6'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.6.10'
@@ -12,14 +13,23 @@ allprojects {
         return
     }
 
-    apply plugin: 'java'
+    apply plugin: 'java-library'
+    //apply plugin: "org.javamodularity.moduleplugin"
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'org.jetbrains.kotlin.jvm'
-    apply plugin: 'org.jetbrains.dokka'
+
+    if (project.name == 'concept-download-load-coroutines') {
+        apply plugin: 'org.jetbrains.kotlin.jvm'
+        apply plugin: 'org.jetbrains.dokka'
+
+        tasks.dokkaJavadoc.configure {
+            outputDirectory.set(javadoc.destinationDir)
+        }
+    }
 
     group = 'com.github.linyuzai'
-    sourceCompatibility = '1.8'
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
 
     repositories {
         mavenCentral()
@@ -49,7 +59,6 @@ allprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     }
 
-//依赖管理
     dependencyManagement {
         imports {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'
@@ -63,10 +72,6 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-    }
-
-    tasks.dokkaJavadoc.configure {
-        outputDirectory.set(javadoc.destinationDir)
     }
 
     if (project.name != 'sample') {

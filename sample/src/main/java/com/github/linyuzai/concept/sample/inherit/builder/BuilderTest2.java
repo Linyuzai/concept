@@ -19,18 +19,18 @@ public class BuilderTest2 extends BuilderTest {
         this.map = map;
     }
 
-    @InheritField(sources = BuilderTest2.class, flags = {InheritFlag.BUILDER, InheritFlag.OWN})
+    //@InheritField(sources = BuilderTest2.class, flags = {InheritFlag.BUILDER, InheritFlag.OWN})
     public static class Builder extends BuilderTest.Builder {
 
         private String b2;
 
-        @Override
+        /*@Override
         public BuilderTest2 build() {
             valid();
             if (map == null) {
                 map = new HashMap<>();
             }
             return new BuilderTest2(string, i, list, map);
-        }
+        }*/
     }
 }

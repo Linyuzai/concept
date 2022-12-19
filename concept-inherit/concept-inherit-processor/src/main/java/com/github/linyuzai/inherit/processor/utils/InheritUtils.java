@@ -1,6 +1,5 @@
 package com.github.linyuzai.inherit.processor.utils;
 
-import com.github.linyuzai.inherit.core.flag.InheritFlag;
 import com.github.linyuzai.inherit.processor.handler.GenerateMethodsWithFieldsHandler;
 import com.github.linyuzai.inherit.processor.handler.InheritHandler;
 import com.sun.tools.javac.code.Symbol;

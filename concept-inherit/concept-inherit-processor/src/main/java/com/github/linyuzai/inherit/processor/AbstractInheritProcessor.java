@@ -1,7 +1,7 @@
 package com.github.linyuzai.inherit.processor;
 
-import com.github.linyuzai.inherit.core.flag.InheritFlag;
 import com.github.linyuzai.inherit.processor.handler.InheritHandler;
+import com.github.linyuzai.inherit.processor.utils.InheritFlag;
 import com.github.linyuzai.inherit.processor.utils.InheritUtils;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;

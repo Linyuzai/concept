@@ -15,8 +15,8 @@ repositories {
 
 dependencies {
 
-    //compile "com.github.linyuzai:concept-inherit-processor:1.0.0"
-    //annotationProcessor "com.github.linyuzai:concept-inherit-processor:1.0.0"
+    /*implementation "com.github.linyuzai:concept-inherit-processor:1.0.0"
+    annotationProcessor "com.github.linyuzai:concept-inherit-processor:1.0.0"*/
 
     implementation project(path: ':concept-inherit:concept-inherit-core', configuration: 'default')
     implementation project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
@@ -31,7 +31,7 @@ dependencies {
     implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
 
     //compile "com.github.linyuzai:concept-sync-waiting:1.0.0"
-    implementation project(path: ':concept-sync-waiting', configuration: 'default')
+    implementation project(path: ':concept-sync-waiting:concept-sync-waiting-core', configuration: 'default')
 
     //compile "com.github.linyuzai:concept-plugin-jar:1.0.1"
     implementation project(path: ':concept-plugin:concept-plugin-core', configuration: 'default')

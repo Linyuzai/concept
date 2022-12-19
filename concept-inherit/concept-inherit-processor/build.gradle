@@ -9,15 +9,21 @@ ext {
 }
 
 dependencies {
-    compileOnly project(':concept-inherit:concept-inherit-core')
+    //api project(':concept-inherit:concept-inherit-core')
     compileOnly 'com.google.auto.service:auto-service:1.0.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.0.1'
 }
 
-compileJava {
-    options.compilerArgs << '-XDignore.symbol.file'
+tasks.withType(JavaCompile) {
+    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED'])
+    //options.compilerArgs << '--add-exports=java.compiler/com.sun.tools.javac.tree=ALL-UNNAMED'
+    /*options.compilerArgs << '-XDignore.symbol.file'
     options.fork = true // may not needed on 1.8
-    options.forkOptions.executable = 'javac' // may not needed on 1.8
+    options.forkOptions.executable = 'javac' // may not needed on 1.8*/
 }
 
 javadoc {
