@@ -3,9 +3,6 @@ plugins {
     id 'org.jetbrains.intellij' version "1.10.0"
 }
 
-sourceCompatibility = "11"
-targetCompatibility = "11"
-
 /*tasks.withType(JavaCompile) {
     // Set the JVM compatibility versions
     sourceCompatibility = "11"
@@ -14,13 +11,8 @@ targetCompatibility = "11"
 
 apply from: '../version.gradle'
 
-group 'com.github.linyuzai'
 version ConceptCloudVersion
 //sourceCompatibility = '11'
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     //compileOnly project(':concept-inherit:concept-inherit-core')

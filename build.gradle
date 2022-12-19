@@ -9,7 +9,15 @@ plugins {
 
 allprojects {
 
-    if (project.name.contains('intellij')) {
+    group = 'com.github.linyuzai'
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+
+    repositories {
+        mavenCentral()
+    }
+
+    if (project.name.contains('intellij') || project.name == 'sample') {
         return
     }
 
@@ -25,14 +33,6 @@ allprojects {
         tasks.dokkaJavadoc.configure {
             outputDirectory.set(javadoc.destinationDir)
         }
-    }
-
-    group = 'com.github.linyuzai'
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
-
-    repositories {
-        mavenCentral()
     }
 
     dependencies {
@@ -74,11 +74,9 @@ allprojects {
         options.encoding = "UTF-8"
     }
 
-    if (project.name != 'sample') {
-        bootJar.enabled = false
-        jar.enabled = true
-        jar.archiveClassifier.set('')
-    }
+    bootJar.enabled = false
+    jar.enabled = true
+    jar.archiveClassifier.set('')
 }
 /*apply from: 'github.gradle'
 
