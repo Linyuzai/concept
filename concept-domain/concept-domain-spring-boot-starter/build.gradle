@@ -4,7 +4,7 @@ apply from: '../version.gradle'
 version ConceptDomainVersion
 
 ext {
-    set('publishName', 'Domain Core')
+    set('publishName', 'Domain Spring Boot Starter')
     set('publishDescription', 'Domain Spring Boot Starter')
 }
 

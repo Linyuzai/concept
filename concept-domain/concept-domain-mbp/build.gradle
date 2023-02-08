@@ -4,7 +4,7 @@ apply from: '../version.gradle'
 version ConceptDomainVersion
 
 ext {
-    set('publishName', 'Domain Core')
+    set('publishName', 'Domain Mybatis Plus')
     set('publishDescription', 'Domain Mybatis Plus')
 }
 

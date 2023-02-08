@@ -5,7 +5,7 @@ version ConceptDomainVersion
 
 ext {
     set('publishName', 'Domain Core')
-    set('publishDescription', 'Domain Impl Base')
+    set('publishDescription', 'Domain Core 4 DDD')
 }
 
 dependencies {
