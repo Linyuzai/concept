@@ -10,16 +10,19 @@ plugins {
 allprojects {
 
     group = 'com.github.linyuzai'
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
 
     repositories {
         mavenCentral()
     }
 
     if (project.name.contains('intellij') || project.name == 'sample') {
+        sourceCompatibility = '11'
+        targetCompatibility = '11'
         return
     }
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
     apply plugin: 'java-library'
     //apply plugin: "org.javamodularity.moduleplugin"
