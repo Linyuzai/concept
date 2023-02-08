@@ -1,0 +1,14 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptDomainVersion
+
+ext {
+    set('publishName', 'Domain Core')
+    set('publishDescription', 'Domain Impl Base')
+}
+
+dependencies {
+}
+
+apply from: '../../publish.gradle'
