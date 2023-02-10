@@ -11,6 +11,7 @@ ext {
 dependencies {
     //api "com.github.linyuzai:concept-domain-core:${ConceptDomainVersion}"
     compileOnly project(':concept-domain:concept-domain-core')
+    compileOnly project(':concept-domain:concept-domain-generator')
 }
 
 apply from: '../../publish.gradle'

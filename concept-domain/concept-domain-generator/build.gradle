@@ -1,0 +1,16 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptDomainVersion
+
+ext {
+    set('publishName', 'Domain Generator')
+    set('publishDescription', 'Domain Generator')
+}
+
+dependencies {
+    compileOnly project(':concept-domain:concept-domain-core')
+    compileOnly project(':concept-domain:concept-domain-mbp')
+}
+
+apply from: '../../publish.gradle'

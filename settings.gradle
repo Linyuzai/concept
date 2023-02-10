@@ -9,6 +9,7 @@ include 'concept-connection-loadbalance:concept-connection-loadbalance-autoconfi
 include 'concept-connection-loadbalance:concept-websocket-loadbalance-spring-boot-starter'
 include 'concept-domain'
 include 'concept-domain:concept-domain-core'
+include 'concept-domain:concept-domain-generator'
 include 'concept-domain:concept-domain-mbp'
 include 'concept-domain:concept-domain-spring-boot-starter'
 include 'concept-download'
