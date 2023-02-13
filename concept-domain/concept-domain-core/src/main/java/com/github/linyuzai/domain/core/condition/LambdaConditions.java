@@ -2,6 +2,10 @@ package com.github.linyuzai.domain.core.condition;
 
 
 import com.github.linyuzai.domain.core.lambda.LambdaFunction;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.lang.invoke.SerializedLambda;
 import java.util.Collection;
@@ -9,7 +13,13 @@ import java.util.Collection;
 /**
  * 支持 lambda 的查询条件
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LambdaConditions extends Conditions {
+
+    private boolean defaultPrependClass;
 
     @Override
     public LambdaConditions lambda() {
@@ -17,7 +27,7 @@ public class LambdaConditions extends Conditions {
     }
 
     public <T, R> LambdaConditions equal(LambdaFunction<T, R> cf, Object value) {
-        return equal(cf, value, true);
+        return equal(cf, value, defaultPrependClass);
     }
 
     public <T, R> LambdaConditions equal(LambdaFunction<T, R> cf, Object value, boolean prependClass) {
@@ -27,7 +37,7 @@ public class LambdaConditions extends Conditions {
     }
 
     public <T, R> LambdaConditions isNull(LambdaFunction<T, R> cf) {
-        return isNull(cf, true);
+        return isNull(cf, defaultPrependClass);
     }
 
     public <T, R> LambdaConditions isNull(LambdaFunction<T, R> cf, boolean prependClass) {
@@ -37,7 +47,7 @@ public class LambdaConditions extends Conditions {
     }
 
     public <T, R> LambdaConditions in(LambdaFunction<T, R> cf, Collection<?> values) {
-        return in(cf, values, true);
+        return in(cf, values, defaultPrependClass);
     }
 
     public <T, R> LambdaConditions in(LambdaFunction<T, R> cf, Collection<?> values, boolean prependClass) {
@@ -47,7 +57,7 @@ public class LambdaConditions extends Conditions {
     }
 
     public <T, R> LambdaConditions like(LambdaFunction<T, R> cf, String value) {
-        return like(cf, value, true);
+        return like(cf, value, defaultPrependClass);
     }
 
     public <T, R> LambdaConditions like(LambdaFunction<T, R> cf, String value, boolean prependClass) {
@@ -57,7 +67,7 @@ public class LambdaConditions extends Conditions {
     }
 
     public <T, R> LambdaConditions orderBy(LambdaFunction<T, R> cf, boolean desc) {
-        return orderBy(cf, desc, true);
+        return orderBy(cf, desc, defaultPrependClass);
     }
 
     public <T, R> LambdaConditions orderBy(LambdaFunction<T, R> cf, boolean desc, boolean prependClass) {
