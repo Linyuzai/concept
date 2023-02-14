@@ -35,7 +35,7 @@ public interface Cache<T> {
         return (Cache<T>) DISABLED;
     }
 
-    Cache<?> DISABLED = new Cache<>() {
+    Cache<?> DISABLED = new Cache<Object>() {
 
         @Override
         public void set(String id, Object cache) {
