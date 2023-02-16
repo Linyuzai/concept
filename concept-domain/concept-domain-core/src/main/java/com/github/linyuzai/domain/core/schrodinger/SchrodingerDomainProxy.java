@@ -2,6 +2,7 @@ package com.github.linyuzai.domain.core.schrodinger;
 
 import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
+import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -60,7 +61,9 @@ public abstract class SchrodingerDomainProxy<T extends DomainObject> extends Abs
     /**
      * 被代理的领域模型的存储
      */
-    protected abstract Class<? extends DomainRepository<? extends T>> getDomainRepositoryType();
+    protected Class<? extends DomainRepository<? extends T>> getDomainRepositoryType() {
+        return DomainLink.repository(getDomainType());
+    }
 
     /**
      * 薛定谔模型代理 Builder

@@ -7,6 +7,7 @@ import com.github.linyuzai.domain.core.DomainRepository;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.exception.DomainIdRequiredException;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
+import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
 
 import java.util.stream.Stream;
@@ -120,15 +121,21 @@ public abstract class SchrodingerDomainCollection<T extends DomainObject> extend
     /**
      * 领域模型存储
      */
-    protected abstract Class<? extends DomainRepository<? extends T>> getDomainRepositoryType();
+    protected Class<? extends DomainRepository<? extends T>> getDomainRepositoryType() {
+        return DomainLink.repository(getDomainType());
+    }
 
     /**
      * 所属者类
      */
-    protected abstract Class<?> getOwnerType();
+    protected Class<? extends DomainObject> getOwnerType() {
+        return DomainLink.owner(getClass());
+    }
 
     /**
      * 所属者模型存储
      */
-    protected abstract Class<? extends DomainRepository<?>> getOwnerRepositoryType();
+    protected Class<? extends DomainRepository<?>> getOwnerRepositoryType() {
+        return DomainLink.repository(getOwnerType());
+    }
 }
