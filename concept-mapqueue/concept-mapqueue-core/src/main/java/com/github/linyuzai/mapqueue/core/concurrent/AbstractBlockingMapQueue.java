@@ -91,6 +91,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         last = last.next = node;
     }*/
 
+    @Deprecated
     private static class Enqueued<V> {
 
         boolean increased;
@@ -110,6 +111,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
      * @param v value
      * @return 数量是否增加
      */
+    @Deprecated
     private Enqueued<V> enqueue(K k, V v) {
         if (map.containsKey(k)) {
             //+0
@@ -324,14 +326,14 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             while (count.get() == capacity) {
                 notFull.await();
             }
-            Enqueued<V> enqueued = enqueue(k, v);
-            x = enqueued.value;
-            if (enqueued.increased) {
-                //新增数量加1
-                c = count.getAndIncrement();
-            } else {
-                //覆盖数量不加
+            if (map.containsKey(k)) {
+                //+0
+                x = map.put(k, v);
                 c = count.get();
+            } else {
+                //+1
+                x = map.put(k, v);
+                c = count.getAndIncrement();
             }
             if (c + 1 < capacity) notFull.signal();
         } finally {
@@ -570,10 +572,14 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
                 if (nanos <= 0) return false;
                 nanos = notFull.awaitNanos(nanos);
             }
-            if (enqueue(k, v).increased) {
-                c = count.getAndIncrement();
-            } else {
+            if (map.containsKey(k)) {
+                //+0
+                map.put(k, v);
                 c = count.get();
+            } else {
+                //+1
+                map.put(k, v);
+                c = count.getAndIncrement();
             }
             if (c + 1 < capacity) notFull.signal();
         } finally {
@@ -625,10 +631,14 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         putLock.lock();
         try {
             if (count.get() < capacity) {
-                if (enqueue(k, v).increased) {
-                    c = count.getAndIncrement();
-                } else {
+                if (map.containsKey(k)) {
+                    //+0
+                    map.put(k, v);
                     c = count.get();
+                } else {
+                    //+1
+                    map.put(k, v);
+                    c = count.getAndIncrement();
                 }
                 if (c + 1 < capacity) notFull.signal();
             }
@@ -1513,7 +1523,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }
 
-    /**
+    /*/**
      * A customized variant of Spliterators.IteratorSpliterator
      */
     /*static final class LBQSpliterator<E> implements Spliterator<E> {
