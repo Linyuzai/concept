@@ -1,0 +1,14 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptMapqueueVersion
+
+ext {
+    set('publishName', 'Map Queue Core')
+    set('publishDescription', 'Map Queue Core')
+}
+
+dependencies {
+}
+
+apply from: '../../publish.gradle'
