@@ -12,12 +12,13 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.*;
 
-public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
+public abstract class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
 
     /**
      * The capacity bound, or Integer.MAX_VALUE if none
@@ -32,21 +33,25 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
     /**
      * Lock
      */
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock;
 
     /**
      * Wait queue for waiting takes
      */
-    private final Condition notEmpty = lock.newCondition();
+    private final Condition notEmpty;
 
     /**
      * Wait queue for waiting puts
      */
-    private final Condition notFull = lock.newCondition();
+    private final Condition notFull;
 
     private final Map<K, V> map;
 
-    /**
+    private final Map<K, V> readOnly;
+
+    private final List<Synchronizer<K, V>> synchronizers = new CopyOnWriteArrayList<>();
+
+    /*/**
      * Signals a waiting take. Called only from put/offer (which do not
      * otherwise ordinarily lock takeLock.)
      */
@@ -60,7 +65,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }*/
 
-    /**
+    /*/**
      * Signals a waiting put. Called only from take/poll.
      */
     /*private void signalNotFull() {
@@ -73,6 +78,22 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }*/
 
+    private void invokeSynchronizersBeforeEnqueue(K key, V value) {
+        synchronizers.forEach(it -> it.beforeEnqueue(key, value, readOnly));
+    }
+
+    private void invokeSynchronizersAfterEnqueue(K key, V value) {
+        synchronizers.forEach(it -> it.afterEnqueue(key, value, readOnly));
+    }
+
+    private void invokeSynchronizersBeforeDequeue(K key, V value) {
+        synchronizers.forEach(it -> it.beforeDequeue(key, value, readOnly));
+    }
+
+    private void invokeSynchronizersAfterDequeue(K key, V value) {
+        synchronizers.forEach(it -> it.afterDequeue(key, value, readOnly));
+    }
+
     /*
     /**
      * Links node at end of queue.
@@ -84,19 +105,24 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         // assert last.next == null;
         last = last.next = node;
     }*/
-
     private boolean nonBlockingEnqueue(K k, V v) {
         boolean x;
         if (map.containsKey(k)) {
+            invokeSynchronizersBeforeEnqueue(k, v);
             map.put(k, v);
             x = true;
         } else {
             if (count < capacity) {
+                invokeSynchronizersBeforeEnqueue(k, v);
                 map.put(k, v);
+                count++;
                 x = true;
             } else {
                 x = false;
             }
+        }
+        if (x) {
+            invokeSynchronizersAfterEnqueue(k, v);
         }
         //发送未空信号
         notEmpty.signal();
@@ -109,6 +135,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             //已经存在
             //更新节点
             //count不变
+            invokeSynchronizersBeforeEnqueue(k, v);
             x = map.put(k, v);
         } else {
             //不存在
@@ -118,9 +145,11 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             }
             //添加节点
             //count+1
+            invokeSynchronizersBeforeEnqueue(k, v);
             x = map.put(k, v);
             count++;
         }
+        invokeSynchronizersAfterEnqueue(k, v);
         //发送未空信号
         notEmpty.signal();
         return x;
@@ -131,6 +160,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             //已经存在
             //更新节点
             //count不变
+            invokeSynchronizersBeforeEnqueue(k, v);
             map.put(k, v);
         } else {
             //不存在
@@ -144,21 +174,25 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             }
             //添加节点
             //count+1
+            invokeSynchronizersBeforeEnqueue(k, v);
             map.put(k, v);
             count++;
         }
+        invokeSynchronizersAfterEnqueue(k, v);
         //发送未空信号
         notEmpty.signal();
         return true;
     }
 
-    private V nonBlockingDequeue(Object k) {
+    private V nonBlockingDequeue(K k) {
         if (map.containsKey(k)) {
             //已经存在
             //移除节点
             //count-1
+            invokeSynchronizersBeforeDequeue(k, map.get(k));
             V v = map.remove(k);
             count--;
+            invokeSynchronizersAfterDequeue(k, v);
             //发送未满信号
             notFull.signal();
             return v;
@@ -216,20 +250,24 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
     private Map.Entry<K, V> dequeue0() {
         Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
         Map.Entry<K, V> entry = iterator.next();
+        K k = entry.getKey();
+        V v = entry.getValue();
+        invokeSynchronizersBeforeDequeue(k, v);
         iterator.remove();
         count--;
+        invokeSynchronizersAfterDequeue(k, v);
         notFull.signal();
         return entry;
     }
 
-    /**
+    /*/**
      * Locks to prevent both puts and takes.
      */
     /*void fullyLock() {
         lock.lock();
     }*/
 
-    /**
+    /*/**
      * Unlocks to allow both puts and takes.
      */
     /*void fullyUnlock() {
@@ -240,6 +278,8 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         lock.lockInterruptibly();
     }*/
 
+    protected abstract Map<K, V> createMap();
+
     /*/**
      * Creates a {@code v} with a capacity of
      * {@link Integer#MAX_VALUE}.
@@ -248,8 +288,28 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         this(Integer.MAX_VALUE);
     }*/
 
+    public AbstractBlockingMapQueue() {
+        this(Integer.MAX_VALUE, false);
+    }
+
+    public AbstractBlockingMapQueue(int capacity) {
+        this(capacity, false);
+    }
+
+    public AbstractBlockingMapQueue(boolean fair) {
+        this(Integer.MAX_VALUE, fair);
+    }
+
     public AbstractBlockingMapQueue(Map<K, V> map) {
-        this(map, Integer.MAX_VALUE);
+        this(Integer.MAX_VALUE, false, map);
+    }
+
+    public AbstractBlockingMapQueue(int capacity, Map<K, V> map) {
+        this(capacity, false, map);
+    }
+
+    public AbstractBlockingMapQueue(boolean fair, Map<K, V> map) {
+        this(Integer.MAX_VALUE, fair, map);
     }
 
     /*/**
@@ -295,13 +355,23 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }*/
 
-    public AbstractBlockingMapQueue(Map<K, V> map, int capacity) {
-        if (capacity <= 0) throw new IllegalArgumentException();
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-        this.map = map;
+    public AbstractBlockingMapQueue(int capacity, boolean fair) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException();
+        }
         this.capacity = capacity;
+        this.map = createMap();
+        this.readOnly = Collections.unmodifiableMap(this.map);
+        this.lock = new ReentrantLock(fair);
+        this.notEmpty = lock.newCondition();
+        this.notFull = lock.newCondition();
+    }
+
+    public AbstractBlockingMapQueue(int capacity, boolean fair, Map<? extends K, ? extends V> map) {
+        this(capacity, fair);
+        this.lock.lock();
         try {
+            this.map.putAll(map);
             int size = map.size();
             if (size >= capacity) {
                 throw new IllegalStateException("Queue full");
@@ -310,6 +380,16 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public void addSynchronizer(Synchronizer<K, V> synchronizer) {
+        synchronizers.add(synchronizer);
+    }
+
+    @Override
+    public void removeSynchronizer(Synchronizer<K, V> synchronizer) {
+        synchronizers.remove(synchronizer);
     }
 
     // this doc comment is overridden to remove the reference to collections
@@ -384,11 +464,10 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         if (c == 0)
             signalNotEmpty();
     }*/
-    public V put(K k, V v) throws InterruptedException {
-        final ReentrantLock lock = this.lock;
+    public V put(K key, V value) throws InterruptedException {
         lock.lockInterruptibly();
         try {
-            return blockingEnqueue(k, v);
+            return blockingEnqueue(key, value);
         } finally {
             lock.unlock();
         }
@@ -400,14 +479,13 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }
 
-    public V putIfAbsent(K k, V v) throws InterruptedException {
-        final ReentrantLock lock = this.lock;
+    public V putIfAbsent(K key, V value) throws InterruptedException {
         lock.lockInterruptibly();
         try {
-            V oldValue = map.get(k);
+            V oldValue = map.get(key);
             //如果不存在或值为null则需要添加
             if (oldValue == null) {
-                return blockingEnqueue(k, v);
+                return blockingEnqueue(key, value);
             } else {
                 return oldValue;
             }
@@ -418,7 +496,6 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
 
     public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) throws InterruptedException {
         Objects.requireNonNull(mappingFunction);
-        final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         try {
             V oldValue = map.get(key);
@@ -540,13 +617,12 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             signalNotEmpty();
         return true;
     }*/
-    public boolean offer(K k, V v, long timeout, TimeUnit unit) throws InterruptedException {
-        final ReentrantLock putLock = this.lock;
-        putLock.lockInterruptibly();
+    public boolean offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException {
+        lock.lockInterruptibly();
         try {
-            return blockingEnqueue(k, v, timeout, unit);
+            return blockingEnqueue(key, value, timeout, unit);
         } finally {
-            putLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -584,14 +660,12 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             signalNotEmpty();
         return c >= 0;
     }*/
-    public boolean offer(K k, V v) {
-        int c;
-        final ReentrantLock putLock = this.lock;
-        putLock.lock();
+    public boolean offer(K key, V value) {
+        lock.lock();
         try {
-            return nonBlockingEnqueue(k, v);
+            return nonBlockingEnqueue(key, value);
         } finally {
-            putLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -618,12 +692,11 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
     }*/
 
     public Map.Entry<K, V> take() throws InterruptedException {
-        final ReentrantLock takeLock = this.lock;
-        takeLock.lockInterruptibly();
+        lock.lockInterruptibly();
         try {
             return blockingDequeue();
         } finally {
-            takeLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -657,7 +730,6 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
     }*/
 
     public Map.Entry<K, V> poll(long timeout, TimeUnit unit) throws InterruptedException {
-        final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         try {
             return blockingDequeue(timeout, unit);
@@ -694,7 +766,6 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
     }*/
 
     public Map.Entry<K, V> poll() {
-        final ReentrantLock lock = this.lock;
         lock.lock();
         try {
             return nonBlockingDequeue();
@@ -724,7 +795,6 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
     }*/
 
     public Map.Entry<K, V> peek() {
-        final ReentrantLock lock = this.lock;
         lock.lock();
         try {
             if (count == 0) {
@@ -745,8 +815,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         return peek().getValue();
     }
 
-    public V get(Object key) {
-        final ReentrantLock lock = this.lock;
+    public V get(K key) {
         lock.lock();
         try {
             return map.get(key);
@@ -755,8 +824,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }
 
-    public V getOrDefault(Object key, V defaultValue) {
-        final ReentrantLock lock = this.lock;
+    public V getOrDefault(K key, V defaultValue) {
         lock.lock();
         try {
             return map.getOrDefault(key, defaultValue);
@@ -808,21 +876,25 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             fullyUnlock();
         }
     }*/
-    public V remove(Object k) {
+    public V remove(K key) {
         lock.lock();
         try {
-            return nonBlockingDequeue(k);
+            return nonBlockingDequeue(key);
         } finally {
             lock.unlock();
         }
     }
 
-    public boolean remove(Object key, Object value) {
+    public boolean remove(K key, V value) {
         lock.lock();
         try {
+            if (Objects.equals(map.get(key), value)) {
+                invokeSynchronizersBeforeDequeue(key, value);
+            }
             boolean remove = map.remove(key, value);
             if (remove) {
                 count--;
+                invokeSynchronizersAfterDequeue(key, value);
                 //发送未满信号
                 notFull.signal();
             }
@@ -832,17 +904,21 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         }
     }
 
-    public boolean removeValue(Object v) {
+    public boolean removeValue(V value) {
         lock.lock();
         try {
             boolean removed = false;
-            Iterator<V> iterator = map.values().iterator();
+            Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
             while (iterator.hasNext()) {
-                V e = iterator.next();
-                if (Objects.equals(v, e)) {
+                Map.Entry<K, V> entry = iterator.next();
+                K k = entry.getKey();
+                V v = entry.getValue();
+                if (Objects.equals(value, v)) {
+                    invokeSynchronizersBeforeDequeue(k, v);
                     iterator.remove();
                     count--;
                     removed = true;
+                    invokeSynchronizersAfterDequeue(k, v);
                 }
             }
             if (removed) {
@@ -901,16 +977,16 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
             fullyUnlock();
         }
     }*/
-    public boolean containsKey(Object k) {
+    public boolean containsKey(K key) {
         lock.lock();
         try {
-            return map.containsKey(k);
+            return map.containsKey(key);
         } finally {
             lock.unlock();
         }
     }
 
-    public boolean containsValue(Object v) {
+    public boolean containsValue(V v) {
         lock.lock();
         try {
             return map.containsValue(v);
@@ -1062,7 +1138,9 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         lock.lock();
         try {
             int size = count;
-            if (a.length < size) a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+            if (a.length < size) {
+                a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+            }
             int k = 0;
             for (V value : map.values()) {
                 a[k++] = (T) value;
@@ -1220,7 +1298,6 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         if (maxElements <= 0) {
             return 0;
         }
-        final ReentrantLock lock = this.lock;
         lock.lock();
         try {
             int n = Math.min(maxElements, count);
@@ -1751,6 +1828,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
         return new QueueImpl();
     }
 
+    @SuppressWarnings("unchecked")
     private class MapImpl implements ConcurrentMap<K, V> {
 
         @Override
@@ -1765,22 +1843,22 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
 
         @Override
         public V get(Object key) {
-            return AbstractBlockingMapQueue.this.get(key);
+            return AbstractBlockingMapQueue.this.get((K) key);
         }
 
         @Override
         public V getOrDefault(Object key, V defaultValue) {
-            return AbstractBlockingMapQueue.this.getOrDefault(key, defaultValue);
+            return AbstractBlockingMapQueue.this.getOrDefault((K) key, defaultValue);
         }
 
         @Override
         public boolean containsKey(Object key) {
-            return AbstractBlockingMapQueue.this.containsKey(key);
+            return AbstractBlockingMapQueue.this.containsKey((K) key);
         }
 
         @Override
         public boolean containsValue(Object value) {
-            return AbstractBlockingMapQueue.this.containsValue(value);
+            return AbstractBlockingMapQueue.this.containsValue((V) value);
         }
 
         @SneakyThrows
@@ -1803,7 +1881,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
 
         @Override
         public V remove(Object key) {
-            return AbstractBlockingMapQueue.this.remove(key);
+            return AbstractBlockingMapQueue.this.remove((K) key);
         }
 
         @Override
@@ -1841,7 +1919,7 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
 
         @Override
         public boolean remove(@NonNull Object key, Object value) {
-            return AbstractBlockingMapQueue.this.remove(key, value);
+            return AbstractBlockingMapQueue.this.remove((K) key, (V) value);
         }
 
         @Override
@@ -1958,12 +2036,12 @@ public class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue<K, V> {
 
         @Override
         public boolean remove(Object o) {
-            return AbstractBlockingMapQueue.this.removeValue(o);
+            return AbstractBlockingMapQueue.this.removeValue((V) o);
         }
 
         @Override
         public boolean contains(Object o) {
-            return AbstractBlockingMapQueue.this.containsValue(o);
+            return AbstractBlockingMapQueue.this.containsValue((V) o);
         }
 
         @NonNull

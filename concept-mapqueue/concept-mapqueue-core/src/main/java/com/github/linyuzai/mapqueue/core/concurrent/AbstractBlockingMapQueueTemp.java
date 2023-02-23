@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Deprecated
-public class AbstractBlockingMapQueueTemp<K, V> implements BlockingMapQueue<K, V> {
+public abstract class AbstractBlockingMapQueueTemp<K, V> implements BlockingMapQueue<K, V> {
 
     /**
      * The capacity bound, or Integer.MAX_VALUE if none
