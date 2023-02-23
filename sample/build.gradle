@@ -15,6 +15,7 @@ dependencies {
     implementation project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
     annotationProcessor project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
 
+    //implementation 'com.github.linyuzai:concept-mapqueue-core:1.1.0'
     implementation project(path: ':concept-mapqueue:concept-mapqueue-core', configuration: 'default')
 
     /*compile "com.github.linyuzai:concept-download-spring-boot-starter:1.2.0"
