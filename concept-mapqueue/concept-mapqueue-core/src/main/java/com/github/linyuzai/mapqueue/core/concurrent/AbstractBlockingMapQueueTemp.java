@@ -327,14 +327,14 @@ public abstract class AbstractBlockingMapQueueTemp<K, V> implements BlockingMapQ
         final AtomicInteger count = this.count;
         putLock.lockInterruptibly();
         try {
-            while (count.get() == capacity) {
-                notFull.await();
-            }
             if (map.containsKey(k)) {
                 //+0
                 x = map.put(k, v);
                 c = count.get();
             } else {
+                while (count.get() == capacity) {
+                    notFull.await();
+                }
                 //+1
                 x = map.put(k, v);
                 c = count.getAndIncrement();
