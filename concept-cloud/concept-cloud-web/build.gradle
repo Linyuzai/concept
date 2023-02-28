@@ -1,0 +1,15 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptCloudVersion
+
+ext {
+    set('publishName', 'Cloud Web')
+    set('publishDescription', 'Cloud Web')
+}
+
+dependencies {
+    //compileOnly project(':concept-chain:concept-chain-core')
+}
+
+apply from: '../../publish.gradle'

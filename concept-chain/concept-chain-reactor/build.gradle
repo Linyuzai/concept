@@ -1,0 +1,15 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptChainVersion
+
+ext {
+    set('publishName', 'Chain Reactor')
+    set('publishDescription', 'Chain Reactor')
+}
+
+dependencies {
+    compileOnly project(':concept-chain:concept-chain-core')
+}
+
+apply from: '../../publish.gradle'

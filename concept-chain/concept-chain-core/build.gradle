@@ -1,0 +1,14 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptChainVersion
+
+ext {
+    set('publishName', 'Chain Core')
+    set('publishDescription', 'Chain Core')
+}
+
+dependencies {
+}
+
+apply from: '../../publish.gradle'
