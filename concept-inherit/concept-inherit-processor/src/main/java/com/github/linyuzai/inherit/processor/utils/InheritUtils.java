@@ -63,6 +63,16 @@ public class InheritUtils {
         return mirror instanceof Type.ClassType;
     }
 
+    public static boolean isImportDefined(JCTree.JCCompilationUnit compilationUnit, JCTree.JCImport jcImport) {
+        for (JCTree.JCImport anImport : compilationUnit.getImports()) {
+            String string = anImport.qualid.toString();
+            if (string.equals(jcImport.qualid.toString()) || string.startsWith("java.lang")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 字段是否在类中定义
      */

@@ -15,7 +15,7 @@ allprojects {
         mavenCentral()
     }
 
-    if (project.name.contains('intellij') || project.name == 'sample') {
+    if (project.name.contains('intellij')) {
         sourceCompatibility = '11'
         targetCompatibility = '11'
         return

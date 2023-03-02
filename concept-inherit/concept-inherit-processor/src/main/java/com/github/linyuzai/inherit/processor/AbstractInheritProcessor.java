@@ -3,6 +3,7 @@ package com.github.linyuzai.inherit.processor;
 import com.github.linyuzai.inherit.processor.handler.InheritHandler;
 import com.github.linyuzai.inherit.processor.utils.InheritFlag;
 import com.github.linyuzai.inherit.processor.utils.InheritUtils;
+import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
@@ -12,6 +13,7 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -29,9 +31,10 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
+        JavacElements elementUtils = (JavacElements) processingEnv.getElementUtils();
+        Trees trees = Trees.instance(processingEnv);
         TreeMaker treeMaker = TreeMaker.instance(context);
         Names names = Names.instance(context);
-        JavacElements elementUtils = (JavacElements) processingEnv.getElementUtils();
         //扫描到的 @InheritXXX
         for (TypeElement annotation : annotations) {
             //获得标注了 @InheritXXX 的类
@@ -67,7 +70,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                         //继承 Class
                         inheritClass(sourceClass, targetClassDef, inheritSuper,
                                 excludeFields, excludeMethods, flags, handlers,
-                                treeMaker, names, elementUtils, 0);
+                                treeMaker, names, trees, elementUtils, 0);
                     }
                 }
             }
@@ -162,6 +165,7 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                               Collection<InheritHandler> handlers,
                               TreeMaker treeMaker,
                               Names names,
+                              Trees trees,
                               JavacElements elementUtils,
                               int level) {
         //获得要继承的 Class 的语法树
@@ -178,10 +182,13 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                 //处理父类
                 inheritClass((Type.ClassType) type, targetClassDef, true,
                         excludeFields, excludeMethods, flags, handlers,
-                        treeMaker, names, elementUtils, level + 1);
+                        treeMaker, names, trees, elementUtils, level + 1);
             }
         }
 
+        //JCTree.JCCompilationUnit compilationUnit = treeMaker.toplevel;
+        JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees
+                .getPath(targetClassDef.sym).getCompilationUnit();
         //继承字段
         if (inheritFields()) {
             //如果要处理自身的字段或方法
@@ -208,6 +215,14 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                         //Class 中未定义
                         if (!InheritUtils.isFieldDefined(targetClassDef, sourceVarDef)) {
                             //添加字段
+                            Symbol.ClassSymbol sym = (Symbol.ClassSymbol) ((JCTree.JCIdent) sourceVarDef.vartype).sym;
+                            Name name = sym.name;
+                            Symbol.PackageSymbol owner = (Symbol.PackageSymbol) sym.owner;
+                            JCTree.JCFieldAccess select = treeMaker.Select(treeMaker.Ident(owner.fullname), name);
+                            JCTree.JCImport jcImport = treeMaker.Import(select, false);
+                            if (!InheritUtils.isImportDefined(compilationUnit, jcImport)) {
+                                compilationUnit.defs = compilationUnit.defs.append(jcImport);
+                            }
                             targetClassDef.defs = targetClassDef.defs.append(sourceVarDef);
                         }
                         //处理字段的 flag
