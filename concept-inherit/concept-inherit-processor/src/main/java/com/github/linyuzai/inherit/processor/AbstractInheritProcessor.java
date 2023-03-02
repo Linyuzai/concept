@@ -174,19 +174,18 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
         if (inheritSuper) {
             //获得父类信息
             Symbol.TypeSymbol symbol = sourceClass.supertype_field.tsym;
-            if (symbol == null) {
-                return;
-            }
-            Type type = symbol.asType();
-            if (type instanceof Type.ClassType) {
-                //处理父类
-                inheritClass((Type.ClassType) type, targetClassDef, true,
-                        excludeFields, excludeMethods, flags, handlers,
-                        treeMaker, names, trees, elementUtils, level + 1);
+            if (symbol != null) {
+                Type type = symbol.asType();
+                if (type instanceof Type.ClassType) {
+                    //处理父类
+                    inheritClass((Type.ClassType) type, targetClassDef, true,
+                            excludeFields, excludeMethods, flags, handlers,
+                            treeMaker, names, trees, elementUtils, level + 1);
+                }
             }
         }
 
-        //JCTree.JCCompilationUnit compilationUnit = treeMaker.toplevel;
+        //JCTree.JCCompilationUnit compilationUnit = treeMaker.toplevel; 拿不到
         JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees
                 .getPath(targetClassDef.sym).getCompilationUnit();
         //继承字段
