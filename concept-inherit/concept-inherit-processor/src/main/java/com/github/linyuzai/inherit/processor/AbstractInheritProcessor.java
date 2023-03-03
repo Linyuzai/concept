@@ -213,15 +213,9 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     if (!excludeFields.contains(sourceVarDef.name.toString())) {
                         //Class 中未定义
                         if (!InheritUtils.isFieldDefined(targetClassDef, sourceVarDef)) {
+                            //import 字段类型
+                            addImport(compilationUnit, sourceVarDef.vartype, treeMaker);
                             //添加字段
-                            Symbol.ClassSymbol sym = (Symbol.ClassSymbol) ((JCTree.JCIdent) sourceVarDef.vartype).sym;
-                            Name name = sym.name;
-                            Symbol.PackageSymbol owner = (Symbol.PackageSymbol) sym.owner;
-                            JCTree.JCFieldAccess select = treeMaker.Select(treeMaker.Ident(owner.fullname), name);
-                            JCTree.JCImport jcImport = treeMaker.Import(select, false);
-                            if (!InheritUtils.isImportDefined(compilationUnit, jcImport)) {
-                                compilationUnit.defs = compilationUnit.defs.append(jcImport);
-                            }
                             targetClassDef.defs = targetClassDef.defs.append(sourceVarDef);
                         }
                         //处理字段的 flag
@@ -242,6 +236,13 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     if (!excludeMethods.contains(sourceMethodDef.name.toString())) {
                         //Class 中未定义
                         if (!InheritUtils.isMethodDefined(targetClassDef, sourceMethodDef)) {
+                            //遍历方法参数
+                            for (JCTree.JCVariableDecl param : sourceMethodDef.params) {
+                                //import 方法参数类型
+                                addImport(compilationUnit, param.vartype, treeMaker);
+                            }
+                            //import 返回值的类型
+                            addImport(compilationUnit, sourceMethodDef.restype, treeMaker);
                             //添加方法
                             targetClassDef.defs = targetClassDef.defs.append(sourceMethodDef);
                         }
@@ -253,6 +254,34 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                 }
             }
         }
+    }
+
+    private void addImport(JCTree.JCCompilationUnit compilationUnit, JCTree.JCExpression expression, TreeMaker treeMaker) {
+        if (expression instanceof JCTree.JCIdent) {
+            JCTree.JCIdent ident = (JCTree.JCIdent) expression;
+            Symbol symbol = ident.sym;
+            if (symbol instanceof Symbol.ClassSymbol) {
+                //得到 Class 信息
+                Symbol.ClassSymbol classSymbol = (Symbol.ClassSymbol) symbol;
+                JCTree.JCImport jcImport = toImport(treeMaker, classSymbol);
+                //如果没有 import 则添加
+                if (!InheritUtils.isImportDefined(compilationUnit, jcImport)) {
+                    compilationUnit.defs = compilationUnit.defs.append(jcImport);
+                }
+            }
+        }
+    }
+
+    private JCTree.JCImport toImport(TreeMaker treeMaker, Symbol.ClassSymbol sym) {
+        //类名称
+        Name name = sym.name;
+        //包名
+        Symbol.PackageSymbol owner = (Symbol.PackageSymbol) sym.owner;
+        //组合包名和类名
+        //必须是JCFieldAccess，只有Select会返回JCFieldAccess
+        JCTree.JCFieldAccess select = treeMaker.Select(treeMaker.Ident(owner.fullname), name);
+        //生成 import 树
+        return treeMaker.Import(select, false);
     }
 
     @Override
