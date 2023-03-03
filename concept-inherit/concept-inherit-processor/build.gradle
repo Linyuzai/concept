@@ -9,6 +9,7 @@ ext {
 }
 
 dependencies {
+    //api "com.github.linyuzai:concept-inherit-core:${ConceptInheritVersion}"
     //api project(':concept-inherit:concept-inherit-core')
     compileOnly 'com.google.auto.service:auto-service:1.0.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.0.1'
