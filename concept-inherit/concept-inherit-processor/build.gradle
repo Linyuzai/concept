@@ -21,8 +21,10 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED'])
     options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'])
     options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED'])
-    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED'])*/
-    //options.compilerArgs << '--add-exports=java.compiler/com.sun.tools.javac.tree=ALL-UNNAMED'
+    options.compilerArgs.addAll(['--add-exports', 'jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'java.compiler/javax.annotation.processing=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'java.compiler/javax.lang.model=ALL-UNNAMED'])
+    options.compilerArgs.addAll(['--add-exports', 'java.compiler/javax.lang.model.element=ALL-UNNAMED'])*/
 
     //JDK8
     options.compilerArgs << '-XDignore.symbol.file'

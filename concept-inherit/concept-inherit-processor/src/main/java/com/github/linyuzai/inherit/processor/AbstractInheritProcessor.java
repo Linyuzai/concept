@@ -10,6 +10,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.TreeCopier;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
@@ -186,8 +187,39 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
         }
 
         //JCTree.JCCompilationUnit compilationUnit = treeMaker.toplevel; 拿不到
-        JCTree.JCCompilationUnit compilationUnit = (JCTree.JCCompilationUnit) trees
+        JCTree.JCCompilationUnit targetCompilationUnit = (JCTree.JCCompilationUnit) trees
                 .getPath(targetClassDef.sym).getCompilationUnit();
+
+        JCTree.JCCompilationUnit sourceCompilationUnit = (JCTree.JCCompilationUnit) trees
+                .getPath(sourceClassDef.sym).getCompilationUnit();
+
+        for (JCTree.JCImport anImport : sourceCompilationUnit.getImports()) {
+            if (!InheritUtils.isImportDefined(targetCompilationUnit, anImport)) {
+                targetCompilationUnit.defs = targetCompilationUnit.defs.append(anImport);
+            }
+        }
+
+        if (!targetClassDef.sym.packge().fullname.toString()
+                .equals(sourceClassDef.sym.packge().fullname.toString())) {
+            JCTree.JCFieldAccess select = treeMaker.
+                    Select(treeMaker.Ident(sourceClassDef.sym.packge().fullname),
+                            names.fromString("*"));
+            //生成 import 树
+            JCTree.JCImport jcImport = treeMaker.Import(select, false);
+            targetCompilationUnit.defs = targetCompilationUnit.defs.append(jcImport);
+        }
+
+        /*TreeScanner importAdder = new TreeScanner() {
+
+            @Override
+            public void visitIdent(JCTree.JCIdent that) {
+                System.out.println(that);
+                addImport(targetCompilationUnit, that, treeMaker);
+            }
+        };*/
+
+        TreeCopier<Object> copier = new TreeCopier<>(treeMaker);
+
         //继承字段
         if (inheritFields()) {
             //如果要处理自身的字段或方法
@@ -213,10 +245,12 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     if (!excludeFields.contains(sourceVarDef.name.toString())) {
                         //Class 中未定义
                         if (!InheritUtils.isFieldDefined(targetClassDef, sourceVarDef)) {
+                            JCTree.JCVariableDecl copy = copier.copy(sourceVarDef);
                             //import 字段类型
-                            addImport(compilationUnit, sourceVarDef.vartype, treeMaker);
+                            //统一复制
+                            //copy.accept(importAdder);
                             //添加字段
-                            targetClassDef.defs = targetClassDef.defs.append(sourceVarDef);
+                            targetClassDef.defs = targetClassDef.defs.append(copy);
                         }
                         //处理字段的 flag
                         for (InheritHandler handler : handlers) {
@@ -236,15 +270,30 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
                     if (!excludeMethods.contains(sourceMethodDef.name.toString())) {
                         //Class 中未定义
                         if (!InheritUtils.isMethodDefined(targetClassDef, sourceMethodDef)) {
-                            //遍历方法参数
-                            for (JCTree.JCVariableDecl param : sourceMethodDef.params) {
-                                //import 方法参数类型
-                                addImport(compilationUnit, param.vartype, treeMaker);
+                            JCTree.JCMethodDecl copy = copier.copy(sourceMethodDef);
+                            List<JCTree.JCAnnotation> annotations = List.nil();
+                            for (JCTree.JCAnnotation annotation : copy.mods.annotations) {
+                                if (!((Symbol.ClassSymbol) copy.mods.annotations.get(0).attribute.type.tsym).fullname.toString()
+                                        .equals("java.lang.Override")) {
+                                    annotations = annotations.append(annotation);
+                                }
                             }
+                            copy.mods.annotations = annotations;
+                            //遍历方法参数
+                            /*for (JCTree.JCVariableDecl param : sourceMethodDef.params) {
+                                //import 方法参数类型
+                                param.vartype.accept(importAdder);
+                            }*/
                             //import 返回值的类型
-                            addImport(compilationUnit, sourceMethodDef.restype, treeMaker);
+                            //sourceMethodDef.restype.accept(importAdder);
+                            //import 方法体中的类型
+                            //sourceMethodDef.body.accept(importAdder);
+
+                            //import 方法涉及的类型
+                            //统一复制
+                            //copy.accept(importAdder);
                             //添加方法
-                            targetClassDef.defs = targetClassDef.defs.append(sourceMethodDef);
+                            targetClassDef.defs = targetClassDef.defs.append(copy);
                         }
                         //处理方法的 flag
                         for (InheritHandler handler : handlers) {
@@ -256,18 +305,31 @@ public abstract class AbstractInheritProcessor extends AbstractProcessor {
         }
     }
 
-    private void addImport(JCTree.JCCompilationUnit compilationUnit, JCTree.JCExpression expression, TreeMaker treeMaker) {
+    /*private void addImport1(JCTree.JCCompilationUnit compilationUnit, JCTree.JCExpression expression, TreeMaker treeMaker) {
         if (expression instanceof JCTree.JCIdent) {
-            JCTree.JCIdent ident = (JCTree.JCIdent) expression;
-            Symbol symbol = ident.sym;
-            if (symbol instanceof Symbol.ClassSymbol) {
-                //得到 Class 信息
-                Symbol.ClassSymbol classSymbol = (Symbol.ClassSymbol) symbol;
-                JCTree.JCImport jcImport = toImport(treeMaker, classSymbol);
-                //如果没有 import 则添加
-                if (!InheritUtils.isImportDefined(compilationUnit, jcImport)) {
-                    compilationUnit.defs = compilationUnit.defs.append(jcImport);
-                }
+            addImport0(compilationUnit, (JCTree.JCIdent) expression, treeMaker);
+        } else if (expression instanceof JCTree.JCTypeApply) {
+            //泛型处理
+            JCTree.JCTypeApply apply = (JCTree.JCTypeApply) expression;
+            addImport(compilationUnit, apply.clazz, treeMaker);
+            for (JCTree.JCExpression argument : apply.arguments) {
+                addImport(compilationUnit, argument, treeMaker);
+            }
+        } else if (expression instanceof JCTree.JCArrayTypeTree) {
+            addImport(compilationUnit, ((JCTree.JCArrayTypeTree) expression).elemtype, treeMaker);
+        }
+    }*/
+
+    @Deprecated
+    private void addImport(JCTree.JCCompilationUnit compilationUnit, JCTree.JCIdent ident, TreeMaker treeMaker) {
+        Symbol symbol = ident.sym;
+        if (symbol instanceof Symbol.ClassSymbol) {
+            //得到 Class 信息
+            Symbol.ClassSymbol classSymbol = (Symbol.ClassSymbol) symbol;
+            JCTree.JCImport jcImport = toImport(treeMaker, classSymbol);
+            //如果没有 import 则添加
+            if (!InheritUtils.isImportDefined(compilationUnit, jcImport)) {
+                compilationUnit.defs = compilationUnit.defs.append(jcImport);
             }
         }
     }
