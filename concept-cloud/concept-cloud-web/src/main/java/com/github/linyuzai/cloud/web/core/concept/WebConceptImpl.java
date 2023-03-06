@@ -57,7 +57,7 @@ public class WebConceptImpl implements WebConcept {
         if (scopes.contains(WebInterceptor.Scope.RESPONSE)) {
             responseInterceptors.add(interceptor);
         }
-        if (scopes.contains(WebInterceptor.Scope.EXCEPTION)) {
+        if (scopes.contains(WebInterceptor.Scope.ERROR)) {
             errorInterceptors.add(interceptor);
         }
     }
