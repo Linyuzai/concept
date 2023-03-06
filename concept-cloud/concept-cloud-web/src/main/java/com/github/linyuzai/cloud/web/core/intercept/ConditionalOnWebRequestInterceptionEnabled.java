@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ConditionalOnWebInterceptionEnabled
-@ConditionalOnProperty(name = "concept.cloud.web.intercept.response.enabled", havingValue = "true", matchIfMissing = true)
-public @interface ConditionalOnResponseInterceptionEnabled {
+@ConditionalOnProperty(name = "concept.cloud.web.intercept.request.enabled", havingValue = "true", matchIfMissing = true)
+public @interface ConditionalOnWebRequestInterceptionEnabled {
 
 }

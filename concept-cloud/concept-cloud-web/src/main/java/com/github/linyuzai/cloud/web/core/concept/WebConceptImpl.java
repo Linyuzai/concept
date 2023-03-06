@@ -2,15 +2,15 @@ package com.github.linyuzai.cloud.web.core.concept;
 
 import com.github.linyuzai.cloud.web.core.CloudWebProperties;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptorChainFactory;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Getter
 public class WebConceptImpl implements WebConcept {
@@ -19,26 +19,18 @@ public class WebConceptImpl implements WebConcept {
 
     private final WebInterceptorChainFactory chainFactory;
 
-    private final List<WebInterceptor> requestInterceptors;
+    private final List<WebInterceptor> requestInterceptors = new CopyOnWriteArrayList<>();
 
-    private final List<WebInterceptor> responseInterceptors;
+    private final List<WebInterceptor> responseInterceptors = new CopyOnWriteArrayList<>();
 
-    private final List<WebInterceptor> errorInterceptors;
+    private final List<WebInterceptor> errorInterceptors = new CopyOnWriteArrayList<>();
 
     public WebConceptImpl(CloudWebProperties properties,
                           WebInterceptorChainFactory chainFactory,
                           List<WebInterceptor> interceptors) {
         this.properties = properties;
         this.chainFactory = chainFactory;
-        this.requestInterceptors = interceptors.stream()
-                .filter(it -> it.getScopes().contains(WebInterceptor.Scope.REQUEST))
-                .collect(Collectors.toList());
-        this.responseInterceptors = interceptors.stream()
-                .filter(it -> it.getScopes().contains(WebInterceptor.Scope.RESPONSE))
-                .collect(Collectors.toList());
-        this.errorInterceptors = interceptors.stream()
-                .filter(it -> it.getScopes().contains(WebInterceptor.Scope.ERROR))
-                .collect(Collectors.toList());
+        interceptors.forEach(this::addInterceptor);
     }
 
     @Override
@@ -54,6 +46,20 @@ public class WebConceptImpl implements WebConcept {
     @Override
     public boolean isErrorInterceptionEnabled() {
         return properties.getIntercept().getError().isEnabled();
+    }
+
+    @Override
+    public void addInterceptor(WebInterceptor interceptor) {
+        Set<WebInterceptor.Scope> scopes = interceptor.getScopes();
+        if (scopes.contains(WebInterceptor.Scope.REQUEST)) {
+            requestInterceptors.add(interceptor);
+        }
+        if (scopes.contains(WebInterceptor.Scope.RESPONSE)) {
+            responseInterceptors.add(interceptor);
+        }
+        if (scopes.contains(WebInterceptor.Scope.EXCEPTION)) {
+            errorInterceptors.add(interceptor);
+        }
     }
 
     @Override

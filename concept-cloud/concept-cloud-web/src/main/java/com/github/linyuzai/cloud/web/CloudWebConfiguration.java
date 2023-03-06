@@ -41,13 +41,13 @@ public class CloudWebConfiguration {
     public static class InterceptConfiguration {
 
         @Configuration
-        @ConditionalOnRequestInterceptionEnabled
+        @ConditionalOnWebRequestInterceptionEnabled
         public static class RequestConfiguration {
 
         }
 
         @Configuration
-        @ConditionalOnResponseInterceptionEnabled
+        @ConditionalOnWebResponseInterceptionEnabled
         public static class ResponseConfiguration {
 
             @Bean
@@ -64,13 +64,13 @@ public class CloudWebConfiguration {
 
             @Bean
             @ConditionalOnMissingBean
-            public StringTypeResponseInterceptor stringTypeResponseInterceptor() {
-                return new StringTypeResponseInterceptor();
+            public ParseStringTypeResponseInterceptor parseStringTypeResponseInterceptor() {
+                return new ParseStringTypeResponseInterceptor();
             }
         }
 
         @Configuration
-        @ConditionalOnErrorInterceptionEnabled
+        @ConditionalOnWebErrorInterceptionEnabled
         public static class ErrorConfiguration {
 
             @Bean

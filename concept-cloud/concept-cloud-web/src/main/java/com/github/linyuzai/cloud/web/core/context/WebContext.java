@@ -16,11 +16,11 @@ public interface WebContext {
 
     void reset();
 
-    enum Request {
-        PATH
+    interface Request {
+        String PATH = "_request@path";
     }
 
-    enum Response {
-        BODY
+    interface Response {
+        String BODY = "_response@body";
     }
 }

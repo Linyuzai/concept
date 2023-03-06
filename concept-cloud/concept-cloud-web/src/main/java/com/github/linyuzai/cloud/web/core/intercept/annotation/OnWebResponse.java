@@ -5,6 +5,7 @@ import java.lang.annotation.*;
 @Inherited
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OnRequest {
+public @interface OnWebResponse {
 
+    Class<?> value() default void.class;
 }

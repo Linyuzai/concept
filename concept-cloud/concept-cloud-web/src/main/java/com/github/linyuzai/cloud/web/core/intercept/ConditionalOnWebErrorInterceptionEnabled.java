@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ConditionalOnWebInterceptionEnabled
 @ConditionalOnProperty(name = "concept.cloud.web.intercept.error.enabled", havingValue = "true", matchIfMissing = true)
-public @interface ConditionalOnErrorInterceptionEnabled {
+public @interface ConditionalOnWebErrorInterceptionEnabled {
 
 }

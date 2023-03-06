@@ -1,13 +1,13 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnError;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 
 @CommonsLog
 @RequiredArgsConstructor
-@OnError
+@OnWebError
 public class LoggerErrorInterceptor implements WebInterceptor {
 
     @Override
