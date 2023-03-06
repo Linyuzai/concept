@@ -1,14 +1,25 @@
 package com.github.linyuzai.cloud.web;
 
-import com.github.linyuzai.cloud.web.context.WebContextFactory;
-import com.github.linyuzai.cloud.web.context.WebContextFactoryImpl;
+import com.github.linyuzai.cloud.web.core.CloudWebProperties;
+import com.github.linyuzai.cloud.web.core.concept.WebConcept;
+import com.github.linyuzai.cloud.web.core.concept.WebConceptImpl;
+import com.github.linyuzai.cloud.web.core.intercept.*;
+import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
+import com.github.linyuzai.cloud.web.core.context.WebContextFactoryImpl;
+import com.github.linyuzai.cloud.web.core.result.BooleanWebResultFactory;
+import com.github.linyuzai.cloud.web.core.result.WebResultFactory;
+import com.github.linyuzai.cloud.web.servlet.RestControllerAndResponseBodyAdvice;
+import com.github.linyuzai.cloud.web.servlet.ServletWebInterceptorChainFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
-@EnableConfigurationProperties(CloudWebConfiguration.class)
+@EnableConfigurationProperties(CloudWebProperties.class)
 public class CloudWebConfiguration {
 
     @Bean
@@ -17,120 +28,74 @@ public class CloudWebConfiguration {
         return new WebContextFactoryImpl();
     }
 
-    /*@Configuration
-    @ConditionalOnWebInterceptEnabled
+    @Bean
+    @ConditionalOnMissingBean
+    public WebConcept webConcept(CloudWebProperties properties,
+                                 WebInterceptorChainFactory factory,
+                                 List<WebInterceptor> interceptors) {
+        return new WebConceptImpl(properties, factory, interceptors);
+    }
+
+    @Configuration
+    @ConditionalOnWebInterceptionEnabled
     public static class InterceptConfiguration {
 
-        @Bean
-        @ConditionalOnMissingBean
-        public WebInterceptorChainFactory webInterceptorChainFactory() {
-            return new WebInterceptorChainFactoryImpl();
-        }
-
         @Configuration
-        @ConditionalOnRequestInterceptEnabled
+        @ConditionalOnRequestInterceptionEnabled
         public static class RequestConfiguration {
 
-            @Bean
-            @ConditionalOnProperty(name = "concept.cloud.web.intercept.request.skip.urls")
-            public UriSkipRequestInterceptor uriSkipRequestInterceptor(WebConceptProperties properties) {
-                return new UriSkipRequestInterceptor(properties.getIntercept().getRequest().getSkip().getUrls());
-            }
         }
 
         @Configuration
-        @ConditionalOnResponseInterceptEnabled
+        @ConditionalOnResponseInterceptionEnabled
         public static class ResponseConfiguration {
 
             @Bean
-            @ConditionalOnProperty(name = "concept.cloud.web.intercept.response.skip.urls")
-            public UriSkipResponseInterceptor uriSkipResponseInterceptor(WebConceptProperties properties) {
-                return new UriSkipResponseInterceptor(properties.getIntercept().getResponse().getSkip().getUrls());
-            }
-
-            @Bean
-            public ResultMessageResponseInterceptor resultMessageResponseInterceptor() {
-                return new ResultMessageResponseInterceptor();
-            }
-
-            @Bean
-            public ResponseWebResultFactory responseWebResultFactory() {
-                return new ResponseWebResultFactory();
+            @ConditionalOnMissingBean
+            public WebResultFactory webResultFactory() {
+                return new BooleanWebResultFactory();
             }
 
             @Bean
             @ConditionalOnMissingBean
-            public WebResultFactoryAdapter webResultFactoryAdapter(List<WebResultFactory> webResultFactories) {
-                return new WebResultFactoryAdapterImpl(webResultFactories);
+            public CreateWebResultResponseInterceptor createWebResultResponseInterceptor(WebResultFactory webResultFactory) {
+                return new CreateWebResultResponseInterceptor(webResultFactory);
             }
 
-            /**
-             * 加载响应WrapResult拦截器
-             *
             @Bean
-            public WrapResultResponseInterceptor wrapResultResponseInterceptor(WebResultFactoryAdapter webResultFactoryAdapter) {
-                return new WrapResultResponseInterceptor(webResultFactoryAdapter);
-            }
-
-            /**
-             * 加载响应String拦截器
-             *
-            @Bean
+            @ConditionalOnMissingBean
             public StringTypeResponseInterceptor stringTypeResponseInterceptor() {
                 return new StringTypeResponseInterceptor();
             }
         }
 
         @Configuration
-        @ConditionalOnErrorInterceptEnabled
+        @ConditionalOnErrorInterceptionEnabled
         public static class ErrorConfiguration {
 
             @Bean
+            @ConditionalOnMissingBean
             public LoggerErrorInterceptor loggerErrorInterceptor() {
                 return new LoggerErrorInterceptor();
             }
-
-            @Bean
-            public ExceptionResultErrorInterceptor exceptionResultErrorInterceptor() {
-                return new ExceptionResultErrorInterceptor();
-            }
-        }
-
-        @Bean
-        public RestControllerAndResponseBodyAdvice restControllerAndResponseBodyAdvice(WebConceptProperties properties,
-                                                                                       WebContextFactory contextFactory,
-                                                                                       WebInterceptorChainFactory chainFactory,
-                                                                                       List<WebInterceptor> interceptors) {
-            return new RestControllerAndResponseBodyAdvice(properties, contextFactory, chainFactory, interceptors);
         }
 
         @Configuration
-        public static class SwaggerConfiguration {
+        @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+        public static class ServletConfiguration {
 
-            @Configuration
-            public static class SpringFoxConfiguration {
-
+            @Bean
+            @ConditionalOnMissingBean
+            public WebInterceptorChainFactory webInterceptorChainFactory() {
+                return new ServletWebInterceptorChainFactory();
             }
 
-            @Configuration
-            @ConditionalOnClass(name = "org.springdoc.core.OpenAPIService")
-            @ConditionalOnProperty(name = "springdoc.api-docs.enabled", matchIfMissing = true)
-            public static class SpringDocConfiguration {
-
-                @Bean
-                @ConditionalOnRequestInterceptEnabled
-                @ConditionalOnProperty(name = "concept.cloud.web.intercept.request.skip.swagger", havingValue = "true", matchIfMissing = true)
-                public UriSkipRequestInterceptor swaggerSkipRequestInterceptor() {
-                    return new UriSkipRequestInterceptor(SWAGGER_SPRING_DOC_PATTERN);
-                }
-
-                @Bean
-                @ConditionalOnResponseInterceptEnabled
-                @ConditionalOnProperty(name = "concept.cloud.web.intercept.response.skip.swagger", havingValue = "true", matchIfMissing = true)
-                public UriSkipResponseInterceptor swaggerSkipResponseInterceptor() {
-                    return new UriSkipResponseInterceptor(SWAGGER_SPRING_DOC_PATTERN);
-                }
+            @Bean
+            @ConditionalOnMissingBean
+            public RestControllerAndResponseBodyAdvice restControllerAndResponseBodyAdvice(WebContextFactory factory,
+                                                                                           WebConcept concept) {
+                return new RestControllerAndResponseBodyAdvice(factory, concept);
             }
         }
-    }*/
+    }
 }
