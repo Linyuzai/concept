@@ -5,6 +5,7 @@ import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebRequest;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
+import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -77,11 +78,19 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
             if (metadata.type == Predicate.class) {
                 //断言拦截器
                 if (method.getReturnType() == boolean.class || method.getReturnType() == Boolean.class) {
-                    PredicateWebInterceptor interceptor =
+                    WebInterceptor interceptor =
                             new AnnotationPredicateWebInterceptor(metadata.scope, method, bean);
                     concept.addInterceptor(interceptor);
                 } else {
                     throw new CloudWebException("Return type must be boolean");
+                }
+            } else if (metadata.type == WebResult.class) {
+                if (WebResult.class.isAssignableFrom(method.getReturnType())) {
+                    WebInterceptor interceptor =
+                            new AnnotationRewriteWebResultWebInterceptor(metadata.scope, method, bean);
+                    concept.addInterceptor(interceptor);
+                } else {
+                    throw new CloudWebException("Return type must be WebResult");
                 }
             } else {
                 WebInterceptor interceptor = new AnnotationWebInterceptor(metadata.scope, method, bean);

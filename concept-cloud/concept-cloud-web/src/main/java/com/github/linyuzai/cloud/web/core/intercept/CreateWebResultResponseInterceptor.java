@@ -21,10 +21,7 @@ public class CreateWebResultResponseInterceptor implements WebInterceptor {
 
     @Override
     public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
-        Object result = context.get(WebResult.class);
-        if (result instanceof WebResult) {
-            //do nothing
-        } else {
+        if (!context.containsKey(WebResult.class)) {
             Object body = context.get(WebContext.Response.BODY);
             if (body instanceof WebResult) {
                 context.put(WebResult.class, body);

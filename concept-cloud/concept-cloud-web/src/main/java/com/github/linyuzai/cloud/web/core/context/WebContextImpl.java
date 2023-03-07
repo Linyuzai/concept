@@ -10,6 +10,11 @@ public class WebContextImpl implements WebContext {
     private final Map<Object, Object> context = new LinkedHashMap<>();
 
     @Override
+    public boolean containsKey(Object key) {
+        return context.containsKey(key);
+    }
+
+    @Override
     public void put(Object key, Object value) {
         context.put(key, value);
     }

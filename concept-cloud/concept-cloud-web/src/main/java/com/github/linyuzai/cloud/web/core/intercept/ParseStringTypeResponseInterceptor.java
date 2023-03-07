@@ -5,6 +5,7 @@ import com.github.linyuzai.cloud.web.core.CloudWebException;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
+import com.sun.org.apache.xpath.internal.operations.String;
 import lombok.*;
 import org.springframework.core.MethodParameter;
 
@@ -29,13 +30,17 @@ public class ParseStringTypeResponseInterceptor implements WebInterceptor {
     @Override
     public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
         MethodParameter parameter = context.get(MethodParameter.class);
-        Method method = parameter.getMethod();
-        if (method != null && method.getReturnType() == String.class) {
-            WebResult<?> webResult = context.get(WebResult.class);
-            if (webResult == null) {
-                throw new CloudWebException("WebResult not found");
+        if (parameter != null) {
+            Method method = parameter.getMethod();
+            if (method != null && method.getReturnType() == String.class) {
+                WebResult<?> webResult = context.get(WebResult.class);
+                if (webResult == null) {
+                    throw new CloudWebException("WebResult not found");
+                }
+                if (!(webResult instanceof String)) {
+                    context.put(WebResult.class, objectMapper.writeValueAsString(webResult));
+                }
             }
-            context.put(WebResult.class, objectMapper.writeValueAsString(webResult));
         }
         return chain.next(context, returner);
     }

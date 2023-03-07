@@ -4,6 +4,8 @@ import java.util.Map;
 
 public interface WebContext {
 
+    boolean containsKey(Object key);
+
     void put(Object key, Object value);
 
     <V> V get(Object key);
