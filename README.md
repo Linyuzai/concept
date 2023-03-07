@@ -18,3 +18,5 @@
 - [基于多个 Kafka & Rabbitmq 构建的事件模型](../../wiki/Concept-Event)
 - [属性继承插件（伪 Java 多继承）](../../wiki/Concept-Inherit)
 - [MapQueue：支持元素更新的 Queue](../../wiki/Concept-MapQueue)
+- Spring Cloud & Spring Boot 基建
+  - RestControllerAdvice & ResponseBodyAdvice & ExceptionHandler
