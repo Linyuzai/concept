@@ -42,6 +42,6 @@ public class ParseStringTypeResponseInterceptor implements WebInterceptor {
 
     @Override
     public int getOrder() {
-        return Order.STRING_TYPE;
+        return Orders.STRING_TYPE;
     }
 }

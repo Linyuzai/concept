@@ -32,6 +32,6 @@ public class PredicateWebInterceptor implements WebInterceptor {
 
     @Override
     public int getOrder() {
-        return Order.PREDICATE;
+        return Orders.PREDICATE;
     }
 }

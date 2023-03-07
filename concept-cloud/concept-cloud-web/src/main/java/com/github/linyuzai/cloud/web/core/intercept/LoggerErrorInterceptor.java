@@ -23,6 +23,6 @@ public class LoggerErrorInterceptor implements WebInterceptor {
 
     @Override
     public int getOrder() {
-        return Order.LOGGER_ERROR;
+        return Orders.LOGGER_ERROR;
     }
 }

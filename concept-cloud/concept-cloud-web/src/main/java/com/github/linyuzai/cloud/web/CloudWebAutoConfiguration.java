@@ -7,6 +7,10 @@ import com.github.linyuzai.cloud.web.core.concept.WebConceptImpl;
 import com.github.linyuzai.cloud.web.core.intercept.*;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactoryImpl;
+import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebErrorInterceptionEnabled;
+import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebInterceptionEnabled;
+import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebRequestInterceptionEnabled;
+import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebResponseInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.result.BooleanWebResultFactory;
 import com.github.linyuzai.cloud.web.core.result.WebResultFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -40,6 +44,12 @@ public class CloudWebAutoConfiguration {
     @Configuration
     @ConditionalOnWebInterceptionEnabled
     public static class InterceptConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        PropertiesInterceptorConfigurer propertiesInterceptorConfigurer(CloudWebProperties properties) {
+            return new PropertiesInterceptorConfigurer(properties);
+        }
 
         @Bean
         @ConditionalOnMissingBean

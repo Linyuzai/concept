@@ -1,10 +1,12 @@
 package com.github.linyuzai.concept.sample.cloud.web;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
+import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebRequest;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 
@@ -33,5 +35,14 @@ public class Intercepts {
     @OnWebError
     public void onHttp(HandlerMethod method) {
         System.out.println(method.getMethod().getName());
+    }
+
+    @Order(WebInterceptor.Orders.PREDICATE + 100)
+    @OnWebRequest
+    public void checkToken(HttpServletRequest request) {
+        String token = request.getHeader("Token");
+        if (token == null) {
+            throw new RuntimeException("Token not found");
+        }
     }
 }

@@ -56,39 +56,56 @@ server:
 #    jar:
 #      autoload:
 #        location: /home/concept-plugin-jar
+#concept:
+#  event:
+#    kafka:
+#      enabled: false
+#      endpoints:
+#        parent:
+#          enabled: false
+#          producer:
+#            retries: 0
+#            acks: 1
+#          consumer:
+#            enable-auto-commit: false
+#          template:
+#            default-topic: sample
+#          listener:
+#            ack-mode: manual_immediate
+#        dev:
+#          inherit: parent
+#          bootstrap-servers:
+#            - 192.168.30.140:9092
+#          consumer:
+#            group-id: sample-dev
+#    rabbitmq:
+#      enabled: false
+#      endpoints:
+#        parent:
+#          enabled: false
+#          username: landsky
+#          password: landsky
+#          port: 11831
+#        dev:
+#          inherit: parent
+#          host: 192.168.30.140
+#          template:
+#            routing-key: concept-event.dev
+#            exchange: concept-event
 concept:
-  event:
-    kafka:
-      enabled: true
-      endpoints:
-        parent:
-          enabled: false
-          producer:
-            retries: 0
-            acks: 1
-          consumer:
-            enable-auto-commit: false
-          template:
-            default-topic: sample
-          listener:
-            ack-mode: manual_immediate
-        dev:
-          inherit: parent
-          bootstrap-servers:
-            - 192.168.30.140:9092
-          consumer:
-            group-id: sample-dev
-    rabbitmq:
-      enabled: true
-      endpoints:
-        parent:
-          enabled: false
-          username: landsky
-          password: landsky
-          port: 11831
-        dev:
-          inherit: parent
-          host: 192.168.30.140
-          template:
-            routing-key: concept-event.dev
-            exchange: concept-event
+  cloud:
+    web:
+      intercept:
+        request:
+          predicate:
+            request-path:
+              - patterns:
+                  - /login
+                negate: true
+                order: 0
+        predicate:
+          request-path:
+            - patterns:
+                - /**/api-docs/**
+              negate: true
+              order: 0

@@ -2,9 +2,9 @@ package com.github.linyuzai.cloud.web.core;
 
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -24,14 +24,14 @@ public class CloudWebProperties {
 
         private ErrorProperties error = new ErrorProperties();
 
-        private List<PredicateProperties> predicates;
+        private PredicateProperties predicate = new PredicateProperties();
 
         @Data
         public static class RequestProperties {
 
             private boolean enabled = true;
 
-            private List<ScopePredicateProperties> predicates;
+            private PredicateProperties predicate = new PredicateProperties();
         }
 
         @Data
@@ -39,7 +39,7 @@ public class CloudWebProperties {
 
             private boolean enabled = true;
 
-            private List<ScopePredicateProperties> predicates;
+            private PredicateProperties predicate = new PredicateProperties();
         }
 
         @Data
@@ -47,24 +47,23 @@ public class CloudWebProperties {
 
             private boolean enabled = true;
 
-            private List<ScopePredicateProperties> predicates;
+            private PredicateProperties predicate = new PredicateProperties();
         }
 
         @Data
-        public static class ScopePredicateProperties {
+        public static class PredicateProperties {
 
-            private List<String> pathPatterns;
+            private List<RequestPathProperties> requestPath = Collections.emptyList();
+        }
+
+        @Data
+        public static class RequestPathProperties {
+
+            private List<String> patterns;
 
             private boolean negate = false;
 
-            private int order = WebInterceptor.Order.PREDICATE;
-        }
-
-        @Data
-        @EqualsAndHashCode(callSuper = true)
-        public static class PredicateProperties extends ScopePredicateProperties {
-
-            private List<WebInterceptor.Scope> scopes;
+            private int order = WebInterceptor.Orders.PREDICATE;
         }
     }
 }

@@ -5,6 +5,7 @@ import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebRequest;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,8 +33,7 @@ public interface WebInterceptor extends Ordered {
 
     @Override
     default int getOrder() {
-        org.springframework.core.annotation.Order annotation =
-                getClass().getAnnotation(org.springframework.core.annotation.Order.class);
+        Order annotation = getClass().getAnnotation(Order.class);
         if (annotation != null) {
             return annotation.value();
         }
@@ -45,15 +45,15 @@ public interface WebInterceptor extends Ordered {
         REQUEST, RESPONSE, ERROR
     }
 
-    class Order {
+    class Orders {
 
-        public static final int PREDICATE = Ordered.HIGHEST_PRECEDENCE + 100;
+        public static final int PREDICATE = 100;
 
         //Response
         public static final int WEB_RESULT = 1000;
-        public static final int STRING_TYPE = 2000;
+        public static final int STRING_TYPE = 1100;
 
         //Error
-        public static final int LOGGER_ERROR = Ordered.HIGHEST_PRECEDENCE + 1000;
+        public static final int LOGGER_ERROR = 100;
     }
 }

@@ -1,4 +1,4 @@
-package com.github.linyuzai.cloud.web.core.intercept;
+package com.github.linyuzai.cloud.web.core.intercept.condition;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ConditionalOnWebInterceptionEnabled
-@ConditionalOnProperty(name = "concept.cloud.web.intercept.response.enabled", havingValue = "true", matchIfMissing = true)
-public @interface ConditionalOnWebResponseInterceptionEnabled {
+@ConditionalOnProperty(name = "concept.cloud.web.intercept.error.enabled", havingValue = "true", matchIfMissing = true)
+public @interface ConditionalOnWebErrorInterceptionEnabled {
 
 }

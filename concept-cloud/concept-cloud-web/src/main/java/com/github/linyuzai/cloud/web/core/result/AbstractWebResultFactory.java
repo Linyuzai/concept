@@ -24,7 +24,11 @@ public abstract class AbstractWebResultFactory implements WebResultFactory {
     }
 
     protected String getFailureMessage(Throwable e, WebContext context) {
-        return e.getMessage();
+        Throwable cause = e;
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return cause.getMessage();
     }
 
     protected abstract WebResult<?> createSuccessWebResult(String message, Object body, WebContext context);

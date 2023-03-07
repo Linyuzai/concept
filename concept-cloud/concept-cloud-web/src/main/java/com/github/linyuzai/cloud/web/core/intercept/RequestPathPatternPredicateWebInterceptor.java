@@ -8,7 +8,7 @@ import org.springframework.util.AntPathMatcher;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class PathPatternPredicateWebInterceptor extends PredicateWebInterceptor {
+public class RequestPathPatternPredicateWebInterceptor extends PredicateWebInterceptor {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
@@ -16,17 +16,17 @@ public class PathPatternPredicateWebInterceptor extends PredicateWebInterceptor 
     @Setter
     private Collection<String> patterns;
 
-    public PathPatternPredicateWebInterceptor(String... paths) {
+    public RequestPathPatternPredicateWebInterceptor(String... paths) {
         this(Arrays.asList(paths));
     }
 
-    public PathPatternPredicateWebInterceptor(Collection<String> paths) {
+    public RequestPathPatternPredicateWebInterceptor(Collection<String> paths) {
         setPatterns(paths);
         setPredicate(this::match);
     }
 
     @Override
-    public PathPatternPredicateWebInterceptor negate() {
+    public RequestPathPatternPredicateWebInterceptor negate() {
         super.negate();
         return this;
     }

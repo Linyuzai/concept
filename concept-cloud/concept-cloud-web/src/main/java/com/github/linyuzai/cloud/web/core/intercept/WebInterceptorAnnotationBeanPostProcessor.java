@@ -2,12 +2,10 @@ package com.github.linyuzai.cloud.web.core.intercept;
 
 import com.github.linyuzai.cloud.web.core.CloudWebException;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
-import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebRequest;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
@@ -16,12 +14,10 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.MethodIntrospector;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -82,13 +78,13 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
                 //断言拦截器
                 if (method.getReturnType() == boolean.class || method.getReturnType() == Boolean.class) {
                     PredicateWebInterceptor interceptor =
-                            new AnnotationPredicateWebInterceptor(metadata, method, bean);
+                            new AnnotationPredicateWebInterceptor(metadata.scope, method, bean);
                     concept.addInterceptor(interceptor);
                 } else {
                     throw new CloudWebException("Return type must be boolean");
                 }
             } else {
-                WebInterceptor interceptor = new AnnotationWebInterceptor(metadata, method, bean);
+                WebInterceptor interceptor = new AnnotationWebInterceptor(metadata.scope, method, bean);
                 concept.addInterceptor(interceptor);
             }
         }
@@ -104,29 +100,6 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
         this.concept = applicationContext.getBean(WebConcept.class);
     }
 
-    private static Object[] getArgs(Method method, WebContext context) {
-        Parameter[] parameters = method.getParameters();
-        Object[] args = new Object[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            Class<?> type = parameters[i].getType();
-            if (type == WebContext.class) {
-                args[i] = context;
-            } else {
-                args[i] = context.get(type);
-            }
-        }
-        return args;
-    }
-
-    private static int getMethodOrder(Method method, int defaultOrder) {
-        org.springframework.core.annotation.Order annotation =
-                method.getAnnotation(org.springframework.core.annotation.Order.class);
-        if (annotation != null) {
-            return annotation.value();
-        }
-        return defaultOrder;
-    }
-
     @RequiredArgsConstructor
     private static class InterceptMetadata {
 
@@ -135,69 +108,4 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
         final Class<?> type;
     }
 
-    @RequiredArgsConstructor
-    private static class AnnotationPredicate implements Predicate<WebContext> {
-
-        private final Method method;
-
-        private final Object bean;
-
-        @SneakyThrows
-        @Override
-        public boolean test(WebContext context) {
-            Object[] args = getArgs(method, context);
-            return (boolean) method.invoke(bean, args);
-        }
-    }
-
-    private static class AnnotationPredicateWebInterceptor extends PredicateWebInterceptor {
-
-        private final InterceptMetadata metadata;
-
-        private final Method method;
-
-        public AnnotationPredicateWebInterceptor(InterceptMetadata metadata, Method method, Object bean) {
-            this.metadata = metadata;
-            this.method = method;
-            setPredicate(new AnnotationPredicate(method, bean));
-        }
-
-        @Override
-        public Set<Scope> getScopes() {
-            return Collections.singleton(metadata.scope);
-        }
-
-        @Override
-        public int getOrder() {
-            return getMethodOrder(method, Order.PREDICATE);
-        }
-    }
-
-    @RequiredArgsConstructor
-    private static class AnnotationWebInterceptor implements WebInterceptor {
-
-        private final InterceptMetadata metadata;
-
-        private final Method method;
-
-        private final Object bean;
-
-        @SneakyThrows
-        @Override
-        public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
-            Object[] args = getArgs(method, context);
-            method.invoke(bean, args);
-            return chain.next(context, returner);
-        }
-
-        @Override
-        public Set<Scope> getScopes() {
-            return Collections.singleton(metadata.scope);
-        }
-
-        @Override
-        public int getOrder() {
-            return getMethodOrder(method, Ordered.LOWEST_PRECEDENCE);
-        }
-    }
 }

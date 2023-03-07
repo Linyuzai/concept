@@ -38,6 +38,6 @@ public class CreateWebResultResponseInterceptor implements WebInterceptor {
 
     @Override
     public int getOrder() {
-        return Order.WEB_RESULT;
+        return Orders.WEB_RESULT;
     }
 }

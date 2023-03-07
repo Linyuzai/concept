@@ -1,13 +1,13 @@
 package com.github.linyuzai.concept.sample.cloud.web;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.result.AbstractWebResultFactory;
+import com.github.linyuzai.cloud.web.core.result.AnnotationWebResultFactory;
 import com.github.linyuzai.cloud.web.core.result.LongWebResult;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomWebResultFactory extends AbstractWebResultFactory {
+public class CustomWebResultFactory extends AnnotationWebResultFactory {
 
     @Override
     protected WebResult<?> createSuccessWebResult(String message, Object body, WebContext context) {
