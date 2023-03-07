@@ -10,6 +10,6 @@ public class ServletWebInterceptorChainFactory implements WebInterceptorChainFac
 
     @Override
     public WebInterceptorChain create(List<WebInterceptor> interceptors) {
-        return new ServletWebInterceptorChain(0, interceptors);
+        return new ServletWebInterceptorChain(interceptors);
     }
 }

@@ -8,6 +8,8 @@ version = '0.0.1-SNAPSHOT'
 
 dependencies {
 
+    implementation project(path: ':concept-cloud:concept-cloud-web', configuration: 'default')
+
     /*implementation "com.github.linyuzai:concept-inherit-processor:1.0.0"
     annotationProcessor "com.github.linyuzai:concept-inherit-processor:1.0.0"*/
 

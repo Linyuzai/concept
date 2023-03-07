@@ -7,6 +7,7 @@ import com.github.linyuzai.cloud.web.core.intercept.WebInterceptorChainFactory;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.Getter;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -53,13 +54,23 @@ public class WebConceptImpl implements WebConcept {
         Set<WebInterceptor.Scope> scopes = interceptor.getScopes();
         if (scopes.contains(WebInterceptor.Scope.REQUEST)) {
             requestInterceptors.add(interceptor);
+            requestInterceptors.sort(Comparator.comparingInt(WebInterceptor::getOrder));
         }
         if (scopes.contains(WebInterceptor.Scope.RESPONSE)) {
             responseInterceptors.add(interceptor);
+            responseInterceptors.sort(Comparator.comparingInt(WebInterceptor::getOrder));
         }
         if (scopes.contains(WebInterceptor.Scope.ERROR)) {
             errorInterceptors.add(interceptor);
+            errorInterceptors.sort(Comparator.comparingInt(WebInterceptor::getOrder));
         }
+    }
+
+    @Override
+    public void removeInterceptor(WebInterceptor interceptor) {
+        requestInterceptors.remove(interceptor);
+        responseInterceptors.remove(interceptor);
+        errorInterceptors.remove(interceptor);
     }
 
     @Override

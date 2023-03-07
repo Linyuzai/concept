@@ -16,6 +16,8 @@ public interface WebConcept {
 
     void addInterceptor(WebInterceptor interceptor);
 
+    void removeInterceptor(WebInterceptor interceptor);
+
     Object interceptRequest(Supplier<WebContext> supplier, Object defaultValue);
 
     Object interceptResponse(Supplier<WebContext> supplier, Object defaultValue);

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 拦截请求的接口，该接口继承Ordered接口，提供拦截顺序
+ * 拦截请求的接口，该接口继承 {@link Ordered} 接口，提供拦截顺序
  */
 public interface WebInterceptor extends Ordered {
 
@@ -32,6 +32,11 @@ public interface WebInterceptor extends Ordered {
 
     @Override
     default int getOrder() {
+        org.springframework.core.annotation.Order annotation =
+                getClass().getAnnotation(org.springframework.core.annotation.Order.class);
+        if (annotation != null) {
+            return annotation.value();
+        }
         return Ordered.LOWEST_PRECEDENCE;
     }
 
