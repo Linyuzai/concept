@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.github.linyuzai.cloud.web.CloudWebAutoConfiguration,\
-com.github.linyuzai.cloud.web.servlet.CloudWebServletAutoConfiguration
+com.github.linyuzai.cloud.web.servlet.ServletCloudWebAutoConfiguration,\
+com.github.linyuzai.cloud.web.reactive.ReactiveCloudWebAutoConfiguration

@@ -1,9 +1,9 @@
 package com.github.linyuzai.cloud.web.core.concept;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
+import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 public interface WebConcept {
@@ -18,9 +18,9 @@ public interface WebConcept {
 
     void removeInterceptor(WebInterceptor interceptor);
 
-    Object interceptRequest(Supplier<WebContext> supplier, Object defaultValue);
+    Object interceptRequest(WebContext context, ValueReturner returner, Object defaultValue);
 
-    Object interceptResponse(Supplier<WebContext> supplier, Object defaultValue);
+    Object interceptResponse(WebContext context, ValueReturner returner, Object defaultValue);
 
-    Object interceptError(Supplier<WebContext> supplier, Object defaultValue);
+    Object interceptError(WebContext context, ValueReturner returner, Object defaultValue);
 }

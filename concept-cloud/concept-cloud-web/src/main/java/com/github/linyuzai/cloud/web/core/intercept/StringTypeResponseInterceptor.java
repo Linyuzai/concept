@@ -5,7 +5,6 @@ import com.github.linyuzai.cloud.web.core.CloudWebException;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
-import com.sun.org.apache.xpath.internal.operations.String;
 import lombok.*;
 import org.springframework.core.MethodParameter;
 
@@ -18,11 +17,11 @@ import java.lang.reflect.Method;
 @Getter
 @RequiredArgsConstructor
 @OnWebResponse
-public class ParseStringTypeResponseInterceptor implements WebInterceptor {
+public class StringTypeResponseInterceptor implements WebInterceptor {
 
     private final ObjectMapper objectMapper;
 
-    public ParseStringTypeResponseInterceptor() {
+    public StringTypeResponseInterceptor() {
         this(new ObjectMapper());
     }
 
@@ -33,7 +32,7 @@ public class ParseStringTypeResponseInterceptor implements WebInterceptor {
         if (parameter != null) {
             Method method = parameter.getMethod();
             if (method != null && method.getReturnType() == String.class) {
-                WebResult<?> webResult = context.get(WebResult.class);
+                Object webResult = context.get(WebResult.class);
                 if (webResult == null) {
                     throw new CloudWebException("WebResult not found");
                 }

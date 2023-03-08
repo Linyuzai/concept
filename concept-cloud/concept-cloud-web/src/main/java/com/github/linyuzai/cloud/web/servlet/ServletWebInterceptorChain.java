@@ -4,14 +4,17 @@ import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptorChain;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+@Getter
+@AllArgsConstructor
 public class ServletWebInterceptorChain implements WebInterceptorChain {
 
-    private int index = 0;
+    private int index;
 
     private final List<WebInterceptor> interceptors;
 

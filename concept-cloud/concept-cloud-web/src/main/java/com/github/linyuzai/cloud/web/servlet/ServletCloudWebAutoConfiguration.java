@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class CloudWebServletAutoConfiguration {
+public class ServletCloudWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -20,8 +20,8 @@ public class CloudWebServletAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RestControllerAndResponseBodyAdvice restControllerAndResponseBodyAdvice(WebContextFactory factory,
-                                                                                   WebConcept concept) {
-        return new RestControllerAndResponseBodyAdvice(factory, concept);
+    public ServletCloudWebAdvice servletCloudWebAdvice(WebContextFactory factory,
+                                                       WebConcept concept) {
+        return new ServletCloudWebAdvice(factory, concept);
     }
 }

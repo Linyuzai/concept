@@ -75,14 +75,14 @@ public class CloudWebAutoConfiguration {
 
             @Bean
             @ConditionalOnMissingBean
-            public CreateWebResultResponseInterceptor createWebResultResponseInterceptor(WebResultFactory webResultFactory) {
-                return new CreateWebResultResponseInterceptor(webResultFactory);
+            public WebResultResponseInterceptor webResultResponseInterceptor(WebResultFactory webResultFactory) {
+                return new WebResultResponseInterceptor(webResultFactory);
             }
 
             @Bean
             @ConditionalOnMissingBean
-            public ParseStringTypeResponseInterceptor parseStringTypeResponseInterceptor() {
-                return new ParseStringTypeResponseInterceptor();
+            public StringTypeResponseInterceptor stringTypeResponseInterceptor() {
+                return new StringTypeResponseInterceptor();
             }
         }
 

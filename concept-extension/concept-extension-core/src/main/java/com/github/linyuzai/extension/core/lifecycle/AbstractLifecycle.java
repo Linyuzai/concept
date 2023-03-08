@@ -25,7 +25,7 @@ public abstract class AbstractLifecycle implements Lifecycle {
     }
 
     @Override
-    public synchronized void destroy() {
+    public void destroy() {
         if (initialized) {
             synchronized (lock) {
                 if (initialized) {

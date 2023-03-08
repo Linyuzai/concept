@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface WebInterceptorChainFactory {
 
-    WebInterceptorChain create(List<WebInterceptor> interceptors);
+    WebInterceptorChain create(int index, List<WebInterceptor> interceptors);
 }

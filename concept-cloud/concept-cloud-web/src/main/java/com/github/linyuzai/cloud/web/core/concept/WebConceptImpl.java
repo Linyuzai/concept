@@ -2,9 +2,9 @@ package com.github.linyuzai.cloud.web.core.concept;
 
 import com.github.linyuzai.cloud.web.core.CloudWebProperties;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
+import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptorChainFactory;
-import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.Getter;
 
 import java.util.Comparator;
@@ -74,28 +74,25 @@ public class WebConceptImpl implements WebConcept {
     }
 
     @Override
-    public Object interceptRequest(Supplier<WebContext> supplier, Object disableValue) {
+    public Object interceptRequest(WebContext context, ValueReturner returner, Object disableValue) {
         if (isRequestInterceptionEnabled()) {
-            WebContext context = supplier.get();
-            return chainFactory.create(requestInterceptors).next(context, ctx -> null);
+            return chainFactory.create(0, requestInterceptors).next(context, returner);
         }
         return disableValue;
     }
 
     @Override
-    public Object interceptResponse(Supplier<WebContext> supplier, Object disableValue) {
+    public Object interceptResponse(WebContext context, ValueReturner returner, Object disableValue) {
         if (isResponseInterceptionEnabled()) {
-            WebContext context = supplier.get();
-            return chainFactory.create(responseInterceptors).next(context, ctx -> ctx.get(WebResult.class));
+            return chainFactory.create(0, responseInterceptors).next(context, returner);
         }
         return disableValue;
     }
 
     @Override
-    public Object interceptError(Supplier<WebContext> supplier, Object disableValue) {
+    public Object interceptError(WebContext context, ValueReturner returner, Object disableValue) {
         if (isErrorInterceptionEnabled()) {
-            WebContext context = supplier.get();
-            return chainFactory.create(errorInterceptors).next(context, ctx -> ctx.get(Throwable.class));
+            return chainFactory.create(0, errorInterceptors).next(context, returner);
         }
         return disableValue;
     }

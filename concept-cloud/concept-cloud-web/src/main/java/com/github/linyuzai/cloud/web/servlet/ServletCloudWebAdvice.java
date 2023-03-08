@@ -3,6 +3,7 @@ package com.github.linyuzai.cloud.web.servlet;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
+import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -27,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 @Getter
 @RequiredArgsConstructor
 @RestControllerAdvice
-public class RestControllerAndResponseBodyAdvice implements ResponseBodyAdvice<Object>, WebMvcConfigurer {
+public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvcConfigurer {
 
     private final WebContextFactory contextFactory;
 
@@ -40,21 +41,17 @@ public class RestControllerAndResponseBodyAdvice implements ResponseBodyAdvice<O
 
     @ModelAttribute
     public void onRequest(HttpServletRequest request) {
-        webConcept.interceptRequest(() -> {
-            WebContext context = getOrCreateContext();
-            context.put(HttpServletRequest.class, request);
-            context.put(WebContext.Request.PATH, request.getRequestURI());
-            return context;
-        }, null);
+        WebContext context = getOrCreateContext();
+        context.put(HttpServletRequest.class, request);
+        context.put(WebContext.Request.PATH, request.getRequestURI());
+        webConcept.interceptRequest(context, ctx -> null, null);
     }
 
     @ExceptionHandler({Throwable.class})
     public Object onError(Throwable e) {
-        return webConcept.interceptError(() -> {
-            WebContext context = getOrCreateContext();
-            context.put(Throwable.class, e);
-            return context;
-        }, e);
+        WebContext context = getOrCreateContext();
+        context.put(Throwable.class, e);
+        return webConcept.interceptError(context, ctx -> ctx.get(Throwable.class), e);
     }
 
     @Override
@@ -70,16 +67,14 @@ public class RestControllerAndResponseBodyAdvice implements ResponseBodyAdvice<O
                                   @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   @NonNull ServerHttpRequest request,
                                   @NonNull ServerHttpResponse response) {
-        Object result = webConcept.interceptResponse(() -> {
-            WebContext context = getOrCreateContext();
-            context.put(ServerHttpRequest.class, request);
-            context.put(ServerHttpResponse.class, response);
-            context.put(MethodParameter.class, returnType);
-            context.put(MediaType.class, selectedContentType);
-            context.put(HttpMessageConverter.class, selectedConverterType);
-            context.put(WebContext.Response.BODY, body);
-            return context;
-        }, body);
+        WebContext context = getOrCreateContext();
+        context.put(ServerHttpRequest.class, request);
+        context.put(ServerHttpResponse.class, response);
+        context.put(MethodParameter.class, returnType);
+        context.put(MediaType.class, selectedContentType);
+        context.put(HttpMessageConverter.class, selectedConverterType);
+        context.put(WebContext.Response.BODY, body);
+        Object result = webConcept.interceptResponse(context, ctx -> ctx.get(WebResult.class), body);
         invalidContext();
         /*RequestMappingHandlerMapping mapping;
         mapping.getHandler(request)*/

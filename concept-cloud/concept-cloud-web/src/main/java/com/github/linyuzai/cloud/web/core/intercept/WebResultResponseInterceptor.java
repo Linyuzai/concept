@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @OnWebResponse
-public class CreateWebResultResponseInterceptor implements WebInterceptor {
+public class WebResultResponseInterceptor implements WebInterceptor {
 
     private final WebResultFactory webResultFactory;
 
