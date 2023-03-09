@@ -1,5 +1,9 @@
 server:
   port: 18080
+management:
+  health:
+    rabbit:
+      enabled: false
 #spring:
 #  mvc:
 #    pathmatch:
