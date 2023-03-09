@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
-import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
@@ -25,9 +24,9 @@ public class ReactiveCloudWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ReactiveCloudWebFilter reactiveCloudWebFilter(@Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping,
+    public ReactiveCloudWebFilter reactiveCloudWebFilter(//@Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping,
                                                          WebContextFactory factory) {
-        return new ReactiveCloudWebFilter(handlerMapping, factory);
+        return new ReactiveCloudWebFilter(factory);
     }
 
     @Bean

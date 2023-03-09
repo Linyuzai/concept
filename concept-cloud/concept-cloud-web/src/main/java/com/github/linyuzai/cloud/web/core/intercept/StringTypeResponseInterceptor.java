@@ -29,13 +29,10 @@ public class StringTypeResponseInterceptor implements WebInterceptor {
     @Override
     public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
         MethodParameter parameter = context.get(MethodParameter.class);
-        if (parameter != null) {
-            Method method = parameter.getMethod();
-            if (method != null && method.getReturnType() == String.class) {
-                Object webResult = context.get(WebResult.class);
-                if (webResult != null && !(webResult instanceof String)) {
-                    context.put(WebResult.class, objectMapper.writeValueAsString(webResult));
-                }
+        if (parameter != null && parameter.getParameterType() == String.class) {
+            Object webResult = context.get(WebResult.class);
+            if (webResult != null && !(webResult instanceof String)) {
+                context.put(WebResult.class, objectMapper.writeValueAsString(webResult));
             }
         }
         return chain.next(context, returner);

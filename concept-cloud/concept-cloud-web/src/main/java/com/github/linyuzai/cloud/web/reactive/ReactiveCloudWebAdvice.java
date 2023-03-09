@@ -2,6 +2,7 @@ package com.github.linyuzai.cloud.web.reactive;
 
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
+import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.Getter;
 import org.reactivestreams.Publisher;
@@ -12,6 +13,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
@@ -48,9 +51,13 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
     }
 
     @ModelAttribute
-    public Mono<Void> onRequest() {
-        return getOrCreateContext().flatMap(it ->
-                (Mono<Void>) webConcept.interceptRequest(it, ctx -> Mono.empty(), Mono.empty()));
+    public Mono<Void> onRequest(ServerWebExchange exchange) {
+        return getOrCreateContext().doOnNext(context -> {
+            setHandlerMethod(context, exchange);
+            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
+        }).flatMap(it -> {
+            return (Mono<Void>) webConcept.interceptRequest(it, ctx -> Mono.empty(), Mono.empty());
+        });
     }
 
     @ExceptionHandler({Throwable.class})
@@ -79,6 +86,8 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
                 });
             }
         }).doOnNext(context -> {
+            setHandlerMethod(context, exchange);
+            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
             context.put(HandlerResult.class, result);
             context.put(MethodParameter.class, result.getReturnTypeSource());
             //context.put(ServerWebExchange.class, exchange);
@@ -103,6 +112,12 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
             return Mono.deferContextual(contextView -> Mono.just(contextView.get(WebContext.class)));
         } else {
             return Mono.subscriberContext().map(ctx -> ctx.get(WebContext.class));
+        }
+    }
+
+    protected void setHandlerMethod(WebContext context, ServerWebExchange exchange) {
+        if (context.get(HandlerMethod.class) == null) {
+            context.put(HandlerMethod.class, exchange.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE));
         }
     }
 
