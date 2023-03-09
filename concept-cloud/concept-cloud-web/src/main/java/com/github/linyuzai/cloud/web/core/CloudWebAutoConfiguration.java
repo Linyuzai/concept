@@ -1,4 +1,4 @@
-package com.github.linyuzai.cloud.web;
+package com.github.linyuzai.cloud.web.core;
 
 import com.github.linyuzai.cloud.web.core.CloudWebProperties;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
@@ -7,7 +7,6 @@ import com.github.linyuzai.cloud.web.core.concept.WebConceptImpl;
 import com.github.linyuzai.cloud.web.core.intercept.*;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactoryImpl;
-import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebErrorInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebRequestInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebResponseInterceptionEnabled;
