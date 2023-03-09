@@ -22,8 +22,6 @@ public class CloudWebProperties {
 
         private ResponseProperties response = new ResponseProperties();
 
-        private ErrorProperties error = new ErrorProperties();
-
         private PredicateProperties predicate = new PredicateProperties();
 
         @Data
@@ -36,14 +34,6 @@ public class CloudWebProperties {
 
         @Data
         public static class ResponseProperties {
-
-            private boolean enabled = true;
-
-            private PredicateProperties predicate = new PredicateProperties();
-        }
-
-        @Data
-        public static class ErrorProperties {
 
             private boolean enabled = true;
 

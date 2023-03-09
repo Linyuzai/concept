@@ -2,9 +2,8 @@ package com.github.linyuzai.cloud.web.core.intercept;
 
 import com.github.linyuzai.cloud.web.core.CloudWebException;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebRequest;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopInfrastructureBean;
@@ -40,21 +39,17 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
             return bean;
         }
         if (AnnotationUtils.isCandidateClass(targetClass,
-                Arrays.asList(OnWebRequest.class, OnWebResponse.class, OnWebError.class))) {
+                Arrays.asList(OnRequest.class, OnResponse.class))) {
             Map<Method, List<InterceptMetadata>> annotatedMethods = MethodIntrospector.selectMethods(targetClass,
                     (MethodIntrospector.MetadataLookup<List<InterceptMetadata>>) method -> {
                         List<InterceptMetadata> list = new ArrayList<>();
-                        OnWebRequest onWebRequest = method.getAnnotation(OnWebRequest.class);
-                        if (onWebRequest != null) {
-                            list.add(new InterceptMetadata(WebInterceptor.Scope.REQUEST, onWebRequest.value()));
+                        OnRequest onRequest = method.getAnnotation(OnRequest.class);
+                        if (onRequest != null) {
+                            list.add(new InterceptMetadata(WebInterceptor.Scope.REQUEST, onRequest.value()));
                         }
-                        OnWebResponse onWebResponse = method.getAnnotation(OnWebResponse.class);
-                        if (onWebResponse != null) {
-                            list.add(new InterceptMetadata(WebInterceptor.Scope.RESPONSE, onWebResponse.value()));
-                        }
-                        OnWebError onWebError = method.getAnnotation(OnWebError.class);
-                        if (onWebError != null) {
-                            list.add(new InterceptMetadata(WebInterceptor.Scope.ERROR, onWebError.value()));
+                        OnResponse onResponse = method.getAnnotation(OnResponse.class);
+                        if (onResponse != null) {
+                            list.add(new InterceptMetadata(WebInterceptor.Scope.RESPONSE, onResponse.value()));
                         }
                         return list;
                     });

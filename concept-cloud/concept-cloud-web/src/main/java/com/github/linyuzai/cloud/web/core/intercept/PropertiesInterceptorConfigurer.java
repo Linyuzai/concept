@@ -18,8 +18,7 @@ public class PropertiesInterceptorConfigurer implements WebConceptConfigurer {
     public void configure(WebConcept concept) {
         Set<WebInterceptor.Scope> scopes = new HashSet<>(Arrays.asList(
                 WebInterceptor.Scope.REQUEST,
-                WebInterceptor.Scope.RESPONSE,
-                WebInterceptor.Scope.ERROR));
+                WebInterceptor.Scope.RESPONSE));
         addInterceptors(properties.getIntercept().getPredicate(), scopes, concept);
 
         Set<WebInterceptor.Scope> requestScopes = Collections.singleton(WebInterceptor.Scope.REQUEST);
@@ -27,9 +26,6 @@ public class PropertiesInterceptorConfigurer implements WebConceptConfigurer {
 
         Set<WebInterceptor.Scope> responseScopes = Collections.singleton(WebInterceptor.Scope.RESPONSE);
         addInterceptors(properties.getIntercept().getResponse().getPredicate(), responseScopes, concept);
-
-        Set<WebInterceptor.Scope> errorScopes = Collections.singleton(WebInterceptor.Scope.ERROR);
-        addInterceptors(properties.getIntercept().getError().getPredicate(), errorScopes, concept);
     }
 
     private void addInterceptors(CloudWebProperties.InterceptProperties.PredicateProperties predicate,

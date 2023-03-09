@@ -48,10 +48,9 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
     }
 
     @ExceptionHandler({Throwable.class})
-    public Object onError(Throwable e) {
+    public void onError(Throwable e) {
         WebContext context = getOrCreateContext();
         context.put(Throwable.class, e);
-        return webConcept.interceptError(context, ctx -> ctx.get(Throwable.class), e);
     }
 
     @Override
@@ -76,8 +75,6 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         context.put(WebContext.Response.BODY, body);
         Object result = webConcept.interceptResponse(context, ctx -> ctx.get(WebResult.class), body);
         invalidContext();
-        /*RequestMappingHandlerMapping mapping;
-        mapping.getHandler(request)*/
         return result;
     }
 
@@ -107,10 +104,9 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         public boolean preHandle(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull Object handler) throws Exception {
-            if (handler instanceof HandlerMethod && (
-                    webConcept.isRequestInterceptionEnabled() ||
-                            webConcept.isResponseInterceptionEnabled() ||
-                            webConcept.isErrorInterceptionEnabled())) {
+            if (handler instanceof HandlerMethod &&
+                    (webConcept.isRequestInterceptionEnabled() ||
+                            webConcept.isResponseInterceptionEnabled())) {
                 getOrCreateContext().put(HandlerMethod.class, handler);
             }
             return true;

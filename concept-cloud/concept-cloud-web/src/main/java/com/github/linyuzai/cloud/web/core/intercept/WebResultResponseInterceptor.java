@@ -1,7 +1,7 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import com.github.linyuzai.cloud.web.core.result.WebResultFactory;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-@OnWebResponse
+@OnResponse
 public class WebResultResponseInterceptor implements WebInterceptor {
 
     private final WebResultFactory webResultFactory;

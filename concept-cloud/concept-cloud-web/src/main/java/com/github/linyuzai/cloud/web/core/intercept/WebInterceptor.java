@@ -1,9 +1,8 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebRequest;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
@@ -19,14 +18,11 @@ public interface WebInterceptor extends Ordered {
 
     default Set<Scope> getScopes() {
         Set<Scope> scopes = new HashSet<>();
-        if (getClass().isAnnotationPresent(OnWebRequest.class)) {
+        if (getClass().isAnnotationPresent(OnRequest.class)) {
             scopes.add(Scope.REQUEST);
         }
-        if (getClass().isAnnotationPresent(OnWebResponse.class)) {
+        if (getClass().isAnnotationPresent(OnResponse.class)) {
             scopes.add(Scope.RESPONSE);
-        }
-        if (getClass().isAnnotationPresent(OnWebError.class)) {
-            scopes.add(Scope.ERROR);
         }
         return scopes;
     }
@@ -42,7 +38,7 @@ public interface WebInterceptor extends Ordered {
 
     enum Scope {
 
-        REQUEST, RESPONSE, ERROR
+        REQUEST, RESPONSE
     }
 
     class Orders {
@@ -50,10 +46,8 @@ public interface WebInterceptor extends Ordered {
         public static final int PREDICATE = 100;
 
         //Response
+        public static final int LOGGER_ERROR = 200;
         public static final int WEB_RESULT = 1000;
         public static final int STRING_TYPE = 1100;
-
-        //Error
-        public static final int LOGGER_ERROR = 100;
     }
 }

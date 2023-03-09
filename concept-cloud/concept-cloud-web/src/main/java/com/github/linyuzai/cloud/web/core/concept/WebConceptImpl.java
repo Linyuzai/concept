@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Supplier;
 
 @Getter
 public class WebConceptImpl implements WebConcept {
@@ -23,8 +22,6 @@ public class WebConceptImpl implements WebConcept {
     private final List<WebInterceptor> requestInterceptors = new CopyOnWriteArrayList<>();
 
     private final List<WebInterceptor> responseInterceptors = new CopyOnWriteArrayList<>();
-
-    private final List<WebInterceptor> errorInterceptors = new CopyOnWriteArrayList<>();
 
     public WebConceptImpl(CloudWebProperties properties,
                           WebInterceptorChainFactory chainFactory,
@@ -45,11 +42,6 @@ public class WebConceptImpl implements WebConcept {
     }
 
     @Override
-    public boolean isErrorInterceptionEnabled() {
-        return properties.getIntercept().getError().isEnabled();
-    }
-
-    @Override
     public void addInterceptor(WebInterceptor interceptor) {
         Set<WebInterceptor.Scope> scopes = interceptor.getScopes();
         if (scopes.contains(WebInterceptor.Scope.REQUEST)) {
@@ -60,17 +52,12 @@ public class WebConceptImpl implements WebConcept {
             responseInterceptors.add(interceptor);
             responseInterceptors.sort(Comparator.comparingInt(WebInterceptor::getOrder));
         }
-        if (scopes.contains(WebInterceptor.Scope.ERROR)) {
-            errorInterceptors.add(interceptor);
-            errorInterceptors.sort(Comparator.comparingInt(WebInterceptor::getOrder));
-        }
     }
 
     @Override
     public void removeInterceptor(WebInterceptor interceptor) {
         requestInterceptors.remove(interceptor);
         responseInterceptors.remove(interceptor);
-        errorInterceptors.remove(interceptor);
     }
 
     @Override
@@ -85,14 +72,6 @@ public class WebConceptImpl implements WebConcept {
     public Object interceptResponse(WebContext context, ValueReturner returner, Object disableValue) {
         if (isResponseInterceptionEnabled()) {
             return chainFactory.create(0, responseInterceptors).next(context, returner);
-        }
-        return disableValue;
-    }
-
-    @Override
-    public Object interceptError(WebContext context, ValueReturner returner, Object disableValue) {
-        if (isErrorInterceptionEnabled()) {
-            return chainFactory.create(0, errorInterceptors).next(context, returner);
         }
         return disableValue;
     }

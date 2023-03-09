@@ -1,19 +1,21 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebError;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 
 @CommonsLog
 @RequiredArgsConstructor
-@OnWebError
-public class LoggerErrorInterceptor implements WebInterceptor {
+@OnResponse
+public class LoggerErrorResponseInterceptor implements WebInterceptor {
 
     @Override
     public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
         Throwable e = context.get(Throwable.class);
-        log.error(getMessage(context), e);
+        if (e != null) {
+            log.error(getMessage(context), e);
+        }
         return chain.next(context, returner);
     }
 

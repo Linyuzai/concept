@@ -7,15 +7,11 @@ public abstract class AbstractWebResultFactory implements WebResultFactory {
     @Override
     public WebResult<?> create(WebContext context) {
         Throwable e = context.get(Throwable.class);
-        Object body = context.get(WebContext.Response.BODY);
-        if (e != null) {
-            return createFailureWebResult(getFailureMessage(e, context), e, context);
+        if (e == null) {
+            Object body = context.get(WebContext.Response.BODY);
+            return createSuccessWebResult(getSuccessMessage(context), body, context);
         } else {
-            if (body instanceof Throwable) {
-                return createFailureWebResult(getFailureMessage((Throwable) body, context), (Throwable) body, context);
-            } else {
-                return createSuccessWebResult(getSuccessMessage(context), body, context);
-            }
+            return createFailureWebResult(getFailureMessage(e, context), e, context);
         }
     }
 

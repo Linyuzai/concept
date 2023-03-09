@@ -3,7 +3,7 @@ package com.github.linyuzai.cloud.web.core.intercept;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.linyuzai.cloud.web.core.CloudWebException;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.OnWebResponse;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.*;
 import org.springframework.core.MethodParameter;
@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  */
 @Getter
 @RequiredArgsConstructor
-@OnWebResponse
+@OnResponse
 public class StringTypeResponseInterceptor implements WebInterceptor {
 
     private final ObjectMapper objectMapper;
@@ -33,10 +33,7 @@ public class StringTypeResponseInterceptor implements WebInterceptor {
             Method method = parameter.getMethod();
             if (method != null && method.getReturnType() == String.class) {
                 Object webResult = context.get(WebResult.class);
-                if (webResult == null) {
-                    throw new CloudWebException("WebResult not found");
-                }
-                if (!(webResult instanceof String)) {
+                if (webResult != null && !(webResult instanceof String)) {
                     context.put(WebResult.class, objectMapper.writeValueAsString(webResult));
                 }
             }

@@ -75,6 +75,12 @@ public class CloudWebAutoConfiguration {
 
             @Bean
             @ConditionalOnMissingBean
+            public LoggerErrorResponseInterceptor loggerErrorResponseInterceptor() {
+                return new LoggerErrorResponseInterceptor();
+            }
+
+            @Bean
+            @ConditionalOnMissingBean
             public WebResultResponseInterceptor webResultResponseInterceptor(WebResultFactory webResultFactory) {
                 return new WebResultResponseInterceptor(webResultFactory);
             }
@@ -83,17 +89,6 @@ public class CloudWebAutoConfiguration {
             @ConditionalOnMissingBean
             public StringTypeResponseInterceptor stringTypeResponseInterceptor() {
                 return new StringTypeResponseInterceptor();
-            }
-        }
-
-        @Configuration
-        @ConditionalOnWebErrorInterceptionEnabled
-        public static class ErrorConfiguration {
-
-            @Bean
-            @ConditionalOnMissingBean
-            public LoggerErrorInterceptor loggerErrorInterceptor() {
-                return new LoggerErrorInterceptor();
             }
         }
     }
