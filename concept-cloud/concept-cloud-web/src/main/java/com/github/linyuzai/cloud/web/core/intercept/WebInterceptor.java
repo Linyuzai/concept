@@ -47,7 +47,7 @@ public interface WebInterceptor extends Ordered {
 
         //Response
         public static final int LOGGER_ERROR = 200;
-        public static final int WEB_RESULT = 1000;
-        public static final int STRING_TYPE = 1100;
+        public static final int WEB_RESULT = 300;
+        public static final int STRING_TYPE = 400;
     }
 }

@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Getter
-class AnnotationPredicateWebInterceptor extends PredicateWebInterceptor implements MethodInvocationWebInterceptor {
+public class AnnotationPredicateWebInterceptor extends PredicateWebInterceptor implements MethodInvocationWebInterceptor {
 
     private final Scope scope;
 

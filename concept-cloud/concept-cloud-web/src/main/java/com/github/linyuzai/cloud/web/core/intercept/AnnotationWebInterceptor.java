@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
-class AnnotationWebInterceptor implements MethodInvocationWebInterceptor {
+public class AnnotationWebInterceptor implements MethodInvocationWebInterceptor {
 
     private final Scope scope;
 
