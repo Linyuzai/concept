@@ -19,4 +19,4 @@
 - [属性继承插件（伪 Java 多继承）](../../wiki/Concept-Inherit)
 - [MapQueue：支持元素更新的 Queue](../../wiki/Concept-MapQueue)
 - Spring Cloud & Spring Boot 基建
-  - RestControllerAdvice & ResponseBodyAdvice & ExceptionHandler
+  - [全局请求响应拦截](../../wiki/Concept-Cloud-Web)
