@@ -21,9 +21,9 @@ public class ReactiveWebInterceptorChain implements WebInterceptorChain {
 
     private final WebInterceptorChainFactory chainFactory;
 
-    @SuppressWarnings("all")
     @Override
     public Object next(WebContext context, ValueReturner returner) {
+        //noinspection ReactiveStreamsUnusedPublisher
         return Mono.defer(() -> {
             if (this.index < interceptors.size()) {
                 WebInterceptor interceptor = interceptors.get(this.index);

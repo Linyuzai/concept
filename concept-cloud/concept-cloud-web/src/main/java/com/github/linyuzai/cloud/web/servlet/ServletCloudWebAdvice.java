@@ -3,8 +3,9 @@ package com.github.linyuzai.cloud.web.servlet;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
+import com.github.linyuzai.cloud.web.core.intercept.EmptyValueReturner;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
-import com.github.linyuzai.cloud.web.core.result.WebResult;
+import com.github.linyuzai.cloud.web.core.intercept.WebResultValueReturner;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -43,19 +44,21 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
 
     @ModelAttribute
     public void onRequest(HttpServletRequest request) {
-        WebContext context = getOrCreateContext();
-        WebInterceptor.Scope scope = context.get(WebInterceptor.Scope.class);
-        if (scope == WebInterceptor.Scope.REQUEST) {
-            //Async call: Mono
-            return;
+        if (webConcept.isRequestInterceptionEnabled()) {
+            WebContext context = getOrCreateContext();
+            WebInterceptor.Scope scope = context.get(WebInterceptor.Scope.class);
+            if (scope == WebInterceptor.Scope.REQUEST) {
+                //Async call: Mono
+                return;
+            }
+            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
+            context.put(HttpServletRequest.class, request);
+            if (!context.containsKey(HandlerMethod.class)) {
+                context.put(HandlerMethod.class, request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE));
+            }
+            context.put(WebContext.Request.PATH, request.getRequestURI());
+            webConcept.interceptRequest(context, EmptyValueReturner.INSTANCE);
         }
-        context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
-        context.put(HttpServletRequest.class, request);
-        if (!context.containsKey(HandlerMethod.class)) {
-            context.put(HandlerMethod.class, request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE));
-        }
-        context.put(WebContext.Request.PATH, request.getRequestURI());
-        webConcept.interceptRequest(context, ctx -> null, null);
     }
 
     @ExceptionHandler({Throwable.class})
@@ -77,20 +80,20 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
                                   @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   @NonNull ServerHttpRequest request,
                                   @NonNull ServerHttpResponse response) {
-        WebContext context = getOrCreateContext();
-        /*WebInterceptor.Scope scope = context.get(WebInterceptor.Scope.class);
-        if (scope == WebInterceptor.Scope.RESPONSE) {
-            //Async call: Mono
-            return null;
-        }*/
-        context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
-        context.put(ServerHttpRequest.class, request);
-        context.put(ServerHttpResponse.class, response);
-        context.put(MethodParameter.class, returnType);
-        context.put(MediaType.class, selectedContentType);
-        context.put(HttpMessageConverter.class, selectedConverterType);
-        context.put(WebContext.Response.BODY, body);
-        Object result = webConcept.interceptResponse(context, ctx -> ctx.get(WebResult.class), body);
+        Object result;
+        if (webConcept.isResponseInterceptionEnabled()) {
+            WebContext context = getOrCreateContext();
+            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
+            context.put(ServerHttpRequest.class, request);
+            context.put(ServerHttpResponse.class, response);
+            context.put(MethodParameter.class, returnType);
+            context.put(MediaType.class, selectedContentType);
+            context.put(HttpMessageConverter.class, selectedConverterType);
+            context.put(WebContext.Response.BODY, body);
+            result = webConcept.interceptResponse(context, WebResultValueReturner.INSTANCE);
+        } else {
+            result = body;
+        }
         invalidContext();
         return result;
     }
@@ -121,10 +124,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         public boolean preHandle(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull Object handler) throws Exception {
-            //全局设置，如果请求拦截不启用则需要在响应拦截中添加，不如在这里添加
-            if (handler instanceof HandlerMethod &&
-                    (webConcept.isRequestInterceptionEnabled() ||
-                            webConcept.isResponseInterceptionEnabled())) {
+            if (handler instanceof HandlerMethod) {
                 getOrCreateContext().put(HandlerMethod.class, handler);
             }
             return true;

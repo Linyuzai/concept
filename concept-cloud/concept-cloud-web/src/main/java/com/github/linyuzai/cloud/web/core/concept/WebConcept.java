@@ -14,7 +14,7 @@ public interface WebConcept {
 
     void removeInterceptor(WebInterceptor interceptor);
 
-    Object interceptRequest(WebContext context, ValueReturner returner, Object defaultValue);
+    Object interceptRequest(WebContext context, ValueReturner returner);
 
-    Object interceptResponse(WebContext context, ValueReturner returner, Object defaultValue);
+    Object interceptResponse(WebContext context, ValueReturner returner);
 }

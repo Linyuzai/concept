@@ -3,7 +3,6 @@ package com.github.linyuzai.cloud.web.reactive;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
-import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.Getter;
 import org.reactivestreams.Publisher;
 import org.springframework.core.MethodParameter;
@@ -52,12 +51,16 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
 
     @ModelAttribute
     public Mono<Void> onRequest(ServerWebExchange exchange) {
-        return getOrCreateContext().doOnNext(context -> {
-            setHandlerMethod(context, exchange);
-            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
-        }).flatMap(it -> {
-            return (Mono<Void>) webConcept.interceptRequest(it, ctx -> Mono.empty(), Mono.empty());
-        });
+        if (webConcept.isRequestInterceptionEnabled()) {
+            return getOrCreateContext().doOnNext(context -> {
+                setHandlerMethod(context, exchange);
+                context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
+            }).flatMap(it -> {
+                return (Mono<Void>) webConcept.interceptRequest(it, ReactiveEmptyValueReturner.INSTANCE);
+            });
+        } else {
+            return Mono.empty();
+        }
     }
 
     @ExceptionHandler({Throwable.class})
@@ -70,41 +73,37 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
     @NonNull
     @Override
     public Mono<Void> handleResult(@NonNull ServerWebExchange exchange, @NonNull HandlerResult result) {
-        Object returnValue = result.getReturnValue();
-        Mono<Object> mono;
-        if (returnValue instanceof Publisher) {
-            mono = Mono.from((Publisher<?>) returnValue);
-        } else {
-            mono = Mono.justOrEmpty(returnValue);
-        }
-        return mono.switchIfEmpty(getOrCreateContext()).flatMap(valueOrContext -> {
-            if (valueOrContext instanceof WebContext) {
-                return Mono.just((WebContext) valueOrContext);
+        if (webConcept.isResponseInterceptionEnabled()) {
+            Object returnValue = result.getReturnValue();
+            Mono<Object> mono;
+            if (returnValue instanceof Publisher) {
+                mono = Mono.from((Publisher<?>) returnValue);
             } else {
-                return getOrCreateContext().doOnNext(context -> {
-                    context.put(WebContext.Response.BODY, valueOrContext);
-                });
+                mono = Mono.justOrEmpty(returnValue);
             }
-        }).doOnNext(context -> {
-            setHandlerMethod(context, exchange);
-            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
-            context.put(HandlerResult.class, result);
-            context.put(MethodParameter.class, result.getReturnTypeSource());
-            //context.put(ServerWebExchange.class, exchange);
-        }).flatMap(context -> {
-            return (Mono<?>) webConcept.interceptResponse(context,
-                    ctx -> Mono.justOrEmpty((Object) ctx.get(WebResult.class)),
-                    Mono.justOrEmpty((Object) context.get(WebContext.Response.BODY)));
-        }).flatMap(webResult -> {
-            MethodParameter parameter =
-                    new WebResultMethodParameter(result.getReturnTypeSource(), webResult);
-            return writeBody(webResult, parameter, exchange);
-        }).doAfterTerminate(new Runnable() {
-            @Override
-            public void run() {
-                //invalidContext();
-            }
-        });
+            return mono.switchIfEmpty(getOrCreateContext()).flatMap(valueOrContext -> {
+                if (valueOrContext instanceof WebContext) {
+                    return Mono.just((WebContext) valueOrContext);
+                } else {
+                    return getOrCreateContext().doOnNext(context -> {
+                        context.put(WebContext.Response.BODY, valueOrContext);
+                    });
+                }
+            }).doOnNext(context -> {
+                setHandlerMethod(context, exchange);
+                context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
+                context.put(HandlerResult.class, result);
+                context.put(MethodParameter.class, result.getReturnTypeSource());
+                //context.put(ServerWebExchange.class, exchange);
+            }).flatMap(context -> {
+                return (Mono<?>) webConcept.interceptResponse(context, ReactiveWebResultValueReturner.INSTANCE);
+            }).flatMap(webResult -> {
+                MethodParameter parameter = new WebResultMethodParameter(result.getReturnTypeSource(), webResult);
+                return writeBody(webResult, parameter, exchange);
+            });
+        } else {
+            return super.handleResult(exchange, result);
+        }
     }
 
     protected Mono<WebContext> getOrCreateContext() {

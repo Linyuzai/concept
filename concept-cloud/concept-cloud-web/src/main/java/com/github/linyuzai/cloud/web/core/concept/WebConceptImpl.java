@@ -61,18 +61,16 @@ public class WebConceptImpl implements WebConcept {
     }
 
     @Override
-    public Object interceptRequest(WebContext context, ValueReturner returner, Object disableValue) {
-        if (isRequestInterceptionEnabled()) {
-            return chainFactory.create(0, requestInterceptors).next(context, returner);
-        }
-        return disableValue;
+    public Object interceptRequest(WebContext context, ValueReturner returner) {
+        return intercept(context, returner, requestInterceptors);
     }
 
     @Override
-    public Object interceptResponse(WebContext context, ValueReturner returner, Object disableValue) {
-        if (isResponseInterceptionEnabled()) {
-            return chainFactory.create(0, responseInterceptors).next(context, returner);
-        }
-        return disableValue;
+    public Object interceptResponse(WebContext context, ValueReturner returner) {
+        return intercept(context, returner, responseInterceptors);
+    }
+
+    protected Object intercept(WebContext context, ValueReturner returner, List<WebInterceptor> interceptors) {
+        return chainFactory.create(0, interceptors).next(context, returner);
     }
 }
