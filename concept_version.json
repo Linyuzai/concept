@@ -1,0 +1,10 @@
+{
+  "cloud": {
+    "version": "1.0.0"
+  },
+  "dependency": {
+    "Concept": [
+      "Concept Cloud Web"
+    ]
+  }
+}
