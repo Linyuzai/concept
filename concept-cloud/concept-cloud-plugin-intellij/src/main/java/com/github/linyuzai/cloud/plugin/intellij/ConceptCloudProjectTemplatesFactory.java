@@ -7,10 +7,10 @@ import com.intellij.platform.ProjectTemplatesFactory;
 import com.intellij.platform.templates.BuilderBasedTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.gradle.service.project.wizard.InternalGradleModuleBuilder;
 
 import javax.swing.*;
 
+@Deprecated
 public class ConceptCloudProjectTemplatesFactory extends ProjectTemplatesFactory {
 
     @NotNull
@@ -22,7 +22,8 @@ public class ConceptCloudProjectTemplatesFactory extends ProjectTemplatesFactory
     @NotNull
     @Override
     public ProjectTemplate[] createTemplates(@Nullable String group, @NotNull WizardContext context) {
-        return new ProjectTemplate[]{new BuilderBasedTemplate(new ConceptCloudModuleBuilder())};
+        return new ProjectTemplate[]{};
+        //return new ProjectTemplate[]{new BuilderBasedTemplate(new ConceptCloudModuleBuilder())};
         //return new ProjectTemplate[]{new BuilderBasedTemplate(new InternalGradleModuleBuilder())};
     }
 

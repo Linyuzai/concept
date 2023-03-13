@@ -1,0 +1,19 @@
+{
+  "cloud": [
+    {
+      "version": "1.0.0"
+    }
+  ],
+  "dependency": {
+    "Concept": [
+      "Concept Cloud Web",
+      "Concept WebSocket LoadBalance",
+      "Concept Download",
+      "Concept Event",
+      "Concept MapQueue",
+      "Concept Plugin",
+      "Concept Router",
+      "Concept Sync Waiting"
+    ]
+  }
+}
