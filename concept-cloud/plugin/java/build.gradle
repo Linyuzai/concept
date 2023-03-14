@@ -1,0 +1,119 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+allprojects {
+
+    group = '$GROUP$'
+
+    repositories {
+        mavenCentral()
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    var excludeBasic = ['$ARTIFACT$-basic', '$ARTIFACT$-gateway']
+    var excludeWeb = ['$ARTIFACT$-gateway']
+    var excludeDB = ['$ARTIFACT$-gateway']
+
+    dependencies {
+        if (!excludeBasic.contains(project.name)) {
+            implementation project(':$ARTIFACT$-basic')
+        }
+        if (!excludeWeb.contains(project.name)) {
+            implementation 'org.springframework.boot:spring-boot-starter-web'
+        }
+        if (!excludeDB.contains(project.name)) {
+            //implementation 'mysql:mysql-connector-java'
+            //implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
+        }
+
+        implementation 'org.springframework.cloud:spring-cloud-starter'
+        implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+        implementation 'org.springframework.cloud:spring-cloud-loadbalancer'
+        //implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+        //implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
+        //implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
+
+        implementation 'org.springframework.boot:spring-boot-starter'
+
+        implementation 'org.springdoc:springdoc-openapi-ui:1.6.13'
+
+        //compileOnly 'org.projectlombok:lombok'
+        //annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'
+            //mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+    }
+
+    //application 启动模块 用 bootJar 打包，其他模块用 jar 打包
+    if (!project.name.contains("application")) {
+        bootJar.enabled = false
+        jar.enabled = true
+        jar.archiveClassifier.set('')
+    }
+
+    processResources {
+        //资源文件处理之前生成路由文件
+        doFirst {
+            Set<String> mSet = new HashSet<>()
+            //遍历所有的依赖
+            project.configurations.forEach(configuration -> {
+                configuration.allDependencies.forEach(dependency -> {
+                    //如果是我们项目中的业务模块则添加该模块名称
+                    if (dependency.group == '$GROUP$') {
+                        mSet.add(dependency.name)
+                    }
+                })
+            })
+            //移除，基础模块不需要路由
+            mSet.remove('$ARTIFACT$-basic')
+            //如果包含了业务模块
+            if (!mSet.isEmpty()) {
+                //获得资源目录
+                File resourcesDir = new File(project.projectDir, '/src/main/resources')
+                //创建路由文件
+                File file = new File(resourcesDir, 'router.properties')
+                if (!file.exists()) {
+                    file.createNewFile()
+                }
+                //将模块信息写入文件
+                Properties properties = new Properties()
+                properties.setProperty("routers", String.join(',', mSet))
+                OutputStream os = new FileOutputStream(file)
+                properties.store(os, "Routers generated file")
+                os.close()
+            }
+        }
+    }
+
+    clean {
+        doLast {
+            //删除路由文件
+            File resourcesDir = new File(project.projectDir, '/src/main/resources')
+            File file = new File(resourcesDir, 'router.properties')
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+    }
+}

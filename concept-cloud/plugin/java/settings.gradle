@@ -1,0 +1,4 @@
+rootProject.name = '$ARTIFACT$'
+include '$ARTIFACT$-basic'
+include '$ARTIFACT$-gateway'
+

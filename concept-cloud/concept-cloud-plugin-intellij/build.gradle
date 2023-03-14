@@ -20,7 +20,11 @@ dependencies {
 
 intellij.version = "2022.1"
 intellij.type = "IC"
-intellij.plugins = ["java", "gradle", "org.jetbrains.plugins.gradle"]
+//intellij.type = "IU"
+intellij.plugins = ["java", "gradle"]
+//intellij.plugins = ["java", "gradle", "com.intellij.quarkus"]
+//intellij.plugins = ["java", "gradle", "com.intellij.spring.boot.initializr"]
+//intellij.plugins = ["java", "gradle", "org.jetbrains.plugins.gradle"]
 
 /*intellij {
     version "2021.3"

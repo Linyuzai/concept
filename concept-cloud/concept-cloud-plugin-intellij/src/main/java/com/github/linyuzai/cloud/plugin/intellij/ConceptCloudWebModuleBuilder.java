@@ -47,13 +47,14 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
     @NotNull
     @Override
     public String getDefaultServerUrl() {
-        return "https://cdn.jsdelivr.net/gh/Linyuzai/concept/concept-cloud/plugin";
+        return "https://raw.githubusercontent.com/Linyuzai/concept/master/concept-cloud/plugin";
+        //return "https://cdn.jsdelivr.net/gh/Linyuzai/concept/concept-cloud/plugin";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Generate a project or module to support Spring Cloud and Spring Boot both simultaneous with Gradle";
+        return "Generate a project based on Gradle that supports both Spring Cloud and Spring Boot";
     }
 
     @NotNull
