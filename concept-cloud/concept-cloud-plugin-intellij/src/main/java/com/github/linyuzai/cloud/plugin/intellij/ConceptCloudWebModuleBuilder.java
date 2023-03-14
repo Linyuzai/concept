@@ -9,7 +9,6 @@ import com.intellij.ide.starters.shared.*;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Url;
 import com.intellij.util.Urls;
 import org.jetbrains.annotations.NotNull;
@@ -50,62 +49,59 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 if (entry.isDirectory()) {
-                    String dirName = transform(entry.getName());
-                    String s = dirName.replaceAll("\\.", "/");
-                    createDir(s, parent);
+                    String dirName = transform(entry.getName(), true);
+                    createDir(dirName, parent);
                 } else {
                     files.add(entry);
                 }
             }
             for (ZipEntry file : files) {
-                String fileName = transform(file.getName());
+                String fileName = transform(file.getName(), false);
                 File create = createFile(fileName, parent);
-                if ("concept.gradle".equals(create.getName())) {
-                    Map<String, Map<String, Set<String>>> value = getStarterContext().getUserData(CONECPT_DEPENDENCY_KEY);
-                    if (value != null) {
-                        WebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
-                        if (frameworkVersion != null) {
-                            String frameworkVersionId = frameworkVersion.getId();
-                            Map<String, Set<String>> map = value.get(frameworkVersionId);
-                            if (map != null) {
-                                Set<WebStarterDependency> dependencies = getStarterContext().getDependencies();
-                                StringBuilder builder = new StringBuilder();
-                                builder.append("dependencies {\n");
-                                for (WebStarterDependency dependency : dependencies) {
-                                    Set<String> set = map.get(dependency.getId());
-                                    if (set != null) {
-                                        for (String s : set) {
-                                            builder.append("\t").append(s).append("\n");
-                                        }
-                                    }
-                                }
-                                builder.append("}");
-                            }
-                        }
-                    }
-                } else {
+                if (needHandleAfterSpecialCheck(create)) {
                     try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
                         String collect = br.lines().collect(Collectors.joining("\n"));
-                        FileUtil.writeToFile(create, transform(collect));
+                        FileUtil.writeToFile(create, transform(collect, false));
                     }
                 }
             }
         } catch (Throwable e) {
             Messages.showErrorDialog("Unzip error: " + e.getMessage(), getPresentableName());
         }
-        /*try (ZipInputStream zis = new ZipInputStream(new FileInputStream(download), StandardCharsets.UTF_8)) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                if (entry.isDirectory()) {
+        //ZipUtil.extract();
+    }
 
-                } else {
-
+    private boolean needHandleAfterSpecialCheck(File file) throws IOException {
+        if (!"concept.gradle".equals(file.getName())) {
+            return true;
+        }
+        Map<String, Map<String, Set<String>>> value = getStarterContext().getUserData(CONECPT_DEPENDENCY_KEY);
+        if (value == null) {
+            return false;
+        }
+        WebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
+        if (frameworkVersion == null) {
+            return false;
+        }
+        String frameworkVersionId = frameworkVersion.getId();
+        Map<String, Set<String>> map = value.get(frameworkVersionId);
+        if (map == null) {
+            return false;
+        }
+        Set<WebStarterDependency> dependencies = getStarterContext().getDependencies();
+        StringBuilder builder = new StringBuilder();
+        builder.append("dependencies {\n");
+        for (WebStarterDependency dependency : dependencies) {
+            Set<String> set = map.get(dependency.getId());
+            if (set != null) {
+                for (String s : set) {
+                    builder.append("\t").append(s).append("\n");
                 }
             }
-        } catch (Throwable e) {
-
-        }*/
-        //ZipUtil.extract();
+        }
+        builder.append("}");
+        FileUtil.writeToFile(file, builder.toString());
+        return false;
     }
 
     private void createDir(String name, File parent) {
@@ -117,25 +113,33 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
 
     private File createFile(String name, File parent) throws IOException {
         File file = new File(parent, name);
-        File parentFile = file.getParentFile();
+        File parentFile = new File(transform(file.getParent(), true));
         if (!parentFile.exists()) {
             parentFile.mkdirs();
         }
-        if (!file.exists()) {
-            file.createNewFile();
+        File create = new File(parentFile, file.getName());
+        if (!create.exists()) {
+            create.createNewFile();
         }
-        return file;
+        return create;
     }
 
-    private String transform(String content) {
+    private String transform(String content, boolean replaceDot) {
         String group = getStarterContext().getGroup();
         String artifact = getStarterContext().getArtifact();
+        String version = getStarterContext().getVersion();
         String pkg = group.toLowerCase() + "." + artifact.toLowerCase();
         String cls = artifact.substring(0, 1).toUpperCase() + artifact.substring(1);
-        return content.replaceAll("\\$GROUP\\$", group)
+        String replaced = content.replaceAll("\\$GROUP\\$", group)
                 .replaceAll("\\$ARTIFACT\\$", artifact)
+                .replaceAll("\\$VERSION\\$", version)
                 .replaceAll("\\$PACKAGE\\$", pkg)
                 .replaceAll("\\$CLASS\\$", cls);
+        if (replaceDot) {
+            return replaced.replaceAll("\\.", "/");
+        } else {
+            return replaced;
+        }
     }
 
     @NotNull
@@ -179,6 +183,12 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
     @Override
     protected List<StarterProjectType> getProjectTypes() {
         return Collections.singletonList(StarterSettings.getGRADLE_PROJECT());
+    }
+
+    @NotNull
+    @Override
+    protected List<String> getFilePathsToOpen() {
+        return Collections.singletonList("README.md");
     }
 
     @NotNull

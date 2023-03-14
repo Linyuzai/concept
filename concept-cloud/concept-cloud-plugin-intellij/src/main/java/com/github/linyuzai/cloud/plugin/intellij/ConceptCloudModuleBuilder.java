@@ -55,6 +55,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 //JavaFxModuleBuilder
+@Deprecated
 public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
 
     @NotNull
