@@ -5,37 +5,110 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.starters.remote.*;
-import com.intellij.ide.starters.shared.CustomizedMessages;
 import com.intellij.ide.starters.shared.StarterLanguage;
 import com.intellij.ide.starters.shared.StarterProjectType;
 import com.intellij.ide.starters.shared.StarterSettings;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.Url;
 import com.intellij.util.Urls;
-import com.intellij.util.io.HttpRequests;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+@SuppressWarnings("all")
 public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
 
     @NotNull
     @Override
     protected Url composeGeneratorUrl(@NotNull String s, @NotNull WebStarterContext webStarterContext) {
-        return Urls.newUrl("https", "", "cdn.jsdelivr.net/gh/Linyuzai/concept/concept_version.properties");
+        String url;
+        String path = s.replace("https://", "").replace("http://", "");
+        if (path.endsWith("/")) {
+            url = path + "java.zip";
+        } else {
+            url = path + "/java.zip";
+        }
+        return Urls.newUrl("https", "", url);
     }
 
     @Override
-    protected void extractGeneratorResult(@NotNull File file, @NotNull File file1) {
+    protected void extractGeneratorResult(@NotNull File download, @NotNull File parent) {
+        //Decompressor.Zip
+        try (ZipFile zf = new ZipFile(download)) {
+            Enumeration<? extends ZipEntry> entries = zf.entries();
+            List<ZipEntry> files = new ArrayList<>();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.isDirectory()) {
+                    String dirName = transform(entry.getName());
+                    String s = dirName.replaceAll("\\.", "/");
+                    createDir(s, parent);
+                } else {
+                    files.add(entry);
+                }
+            }
+            for (ZipEntry file : files) {
+                String fileName = transform(file.getName());
+                File create = createFile(fileName, parent);
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
+                    String collect = br.lines().collect(Collectors.joining("\n"));
+                    FileUtil.writeToFile(create, transform(collect));
+                }
+            }
+        } catch (Throwable e) {
+            Messages.showErrorDialog("Unzip error: " + e.getMessage(), getPresentableName());
+        }
+        /*try (ZipInputStream zis = new ZipInputStream(new FileInputStream(download), StandardCharsets.UTF_8)) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (entry.isDirectory()) {
 
-        System.out.println("extractGeneratorResult");
+                } else {
+
+                }
+            }
+        } catch (Throwable e) {
+
+        }*/
+        //ZipUtil.extract();
+    }
+
+    private void createDir(String name, File parent) {
+        File file = new File(parent, name);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+    }
+
+    private File createFile(String name, File parent) throws IOException {
+        File file = new File(parent, name);
+        File parentFile = file.getParentFile();
+        if (!parentFile.exists()) {
+            parentFile.mkdirs();
+        }
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        return file;
+    }
+
+    private String transform(String content) {
+        String group = getStarterContext().getGroup();
+        String artifact = getStarterContext().getArtifact();
+        String pkg = group.toLowerCase() + "." + artifact.toLowerCase();
+        String cls = artifact.substring(0, 1).toUpperCase() + artifact.substring(1);
+        return content.replaceAll("\\$GROUP\\$", group)
+                .replaceAll("\\$ARTIFACT\\$", artifact)
+                .replaceAll("\\$PACKAGE\\$", pkg)
+                .replaceAll("\\$CLASS\\$", cls);
     }
 
     @NotNull
