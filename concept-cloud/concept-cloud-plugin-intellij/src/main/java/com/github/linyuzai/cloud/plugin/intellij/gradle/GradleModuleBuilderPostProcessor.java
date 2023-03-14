@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.cloud.plugin.intellij.gradle;
 
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
@@ -8,13 +9,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.plugins.gradle.service.project.open.GradleProjectImportUtil;
 
+@Deprecated
 public class GradleModuleBuilderPostProcessor {
 
     public boolean postProcess(Module module) {
         // TODO: Find a way to use GradleModuleBuilder instead of GradleProjectImportBuilder when adding a child module to the parent
         Project project = module.getProject();
         //org.jetbrains.plugins.gradle.service.project.wizard.AbstractGradleModuleBuilder;
-        /*VirtualFile gradleFile = findFileUnderRootInModule(module, "build.gradle");
+        */
+/*VirtualFile gradleFile = findFileUnderRootInModule(module, "build.gradle");
         if (gradleFile == null) { // not a gradle project
             return true;
         } else {
@@ -32,7 +35,9 @@ public class GradleModuleBuilderPostProcessor {
                 importBuilder.commit(project, null, null);
                 return false;
             }
-        }*/
+        }*//*
+
         return false;
     }
 }
+*/
