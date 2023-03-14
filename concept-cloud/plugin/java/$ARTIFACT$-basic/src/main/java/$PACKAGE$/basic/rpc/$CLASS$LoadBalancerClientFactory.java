@@ -1,4 +1,4 @@
-package $PACKAGE.basic.rpc;
+package $PACKAGE$.basic.rpc;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -9,13 +9,20 @@ import org.springframework.context.event.EventListener;
 
 import java.util.*;
 
+/**
+ * 该类重写负载均衡的路由规则
+ * <p>
+ * 用于 Feign 这类 RPC 组件的服务路由
+ * <p>
+ * https://juejin.cn/post/7202807471882731580
+ */
 public class $CLASS$LoadBalancerClientFactory extends LoadBalancerClientFactory {
 
     private final DiscoveryClient discoveryClient;
 
     private volatile Map<String, String> routerMap = Collections.emptyMap();
 
-    public RouterLoadBalancerClientFactory(LoadBalancerClientsProperties properties, DiscoveryClient discoveryClient) {
+    public $CLASS$LoadBalancerClientFactory(LoadBalancerClientsProperties properties, DiscoveryClient discoveryClient) {
         super(properties);
         this.discoveryClient = discoveryClient;
     }

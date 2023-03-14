@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 微服务需要而单体应用不需要注入的组件，目前不需要
+ * 这里添加微服务需要而单体应用不需要注入的组件
  */
 @Configuration
 public class $CLASS$CloudConfiguration {
