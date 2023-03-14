@@ -50,6 +50,11 @@ allprojects {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 
+    //Concept 相关依赖在这里引入
+    if (project.depth == 1) {
+        apply from: '../concept.gradle'
+    }
+
     dependencyManagement {
         imports {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'

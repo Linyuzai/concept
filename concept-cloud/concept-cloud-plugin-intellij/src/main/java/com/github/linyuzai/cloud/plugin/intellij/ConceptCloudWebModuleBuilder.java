@@ -7,7 +7,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.starters.remote.*;
 import com.intellij.ide.starters.shared.*;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Url;
 import com.intellij.util.Urls;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +25,8 @@ import java.util.zip.ZipFile;
 
 @SuppressWarnings("all")
 public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
+
+    private final Key<Map<String, Map<String, Set<String>>>> CONECPT_DEPENDENCY_KEY = new Key<>("CONECPT_DEPENDENCY_KEY");
 
     @NotNull
     @Override
@@ -56,9 +60,34 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
             for (ZipEntry file : files) {
                 String fileName = transform(file.getName());
                 File create = createFile(fileName, parent);
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
-                    String collect = br.lines().collect(Collectors.joining("\n"));
-                    FileUtil.writeToFile(create, transform(collect));
+                if ("concept.gradle".equals(create.getName())) {
+                    Map<String, Map<String, Set<String>>> value = getStarterContext().getUserData(CONECPT_DEPENDENCY_KEY);
+                    if (value != null) {
+                        WebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
+                        if (frameworkVersion != null) {
+                            String frameworkVersionId = frameworkVersion.getId();
+                            Map<String, Set<String>> map = value.get(frameworkVersionId);
+                            if (map != null) {
+                                Set<WebStarterDependency> dependencies = getStarterContext().getDependencies();
+                                StringBuilder builder = new StringBuilder();
+                                builder.append("dependencies {\n");
+                                for (WebStarterDependency dependency : dependencies) {
+                                    Set<String> set = map.get(dependency.getId());
+                                    if (set != null) {
+                                        for (String s : set) {
+                                            builder.append("\t").append(s).append("\n");
+                                        }
+                                    }
+                                }
+                                builder.append("}");
+                            }
+                        }
+                    }
+                } else {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
+                        String collect = br.lines().collect(Collectors.joining("\n"));
+                        FileUtil.writeToFile(create, transform(collect));
+                    }
                 }
             }
         } catch (Throwable e) {
@@ -164,14 +193,27 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
         JsonObject json = loadJsonData(url, null).getAsJsonObject();
         List<WebStarterFrameworkVersion> frameworkVersions = new ArrayList<>();
         JsonArray frameworkVersionArray = json.get("frameworkVersions").getAsJsonArray();
+        Map<String, Map<String, Set<String>>> value = new LinkedHashMap<>();
         for (JsonElement frameworkVersionElement : frameworkVersionArray) {
             JsonObject frameworkVersionObject = frameworkVersionElement.getAsJsonObject();
-            //getStarterContext().putUserData();
             String id = frameworkVersionObject.get("id").getAsString();
             String title = frameworkVersionObject.get("title").getAsString();
             boolean isDefault = frameworkVersionObject.get("default").getAsBoolean();
             frameworkVersions.add(new WebStarterFrameworkVersion(id, title, isDefault));
+
+            Map<String, Set<String>> map = new LinkedHashMap<>();
+            JsonObject dependencies = frameworkVersionObject.get("dependencies").getAsJsonObject();
+            for (Map.Entry<String, JsonElement> entry : dependencies.entrySet()) {
+                JsonArray array = entry.getValue().getAsJsonArray();
+                Set<String> set = new LinkedHashSet<>();
+                for (JsonElement element : array) {
+                    set.add(element.getAsString());
+                }
+                map.put(entry.getKey(), set);
+            }
+            value.put(id, map);
         }
+        getStarterContext().putUserData(CONECPT_DEPENDENCY_KEY, value);
         List<WebStarterDependencyCategory> dependencyCategories = new ArrayList<>();
         JsonArray dependencyCategoryArray = json.get("dependencyCategories").getAsJsonArray();
         for (JsonElement dependencyCategoryElement : dependencyCategoryArray) {

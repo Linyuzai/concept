@@ -1,0 +1,4 @@
+dependencies {
+    implementation 'com.github.linyuzai:concept-domain-spring-boot-starter:1.1.0'
+    implementation 'com.github.linyuzai:concept-domain-mbp:1.1.0'
+}
