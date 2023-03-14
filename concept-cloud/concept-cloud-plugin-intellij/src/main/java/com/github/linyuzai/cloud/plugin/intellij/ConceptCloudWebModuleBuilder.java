@@ -5,9 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.starters.remote.*;
-import com.intellij.ide.starters.shared.StarterLanguage;
-import com.intellij.ide.starters.shared.StarterProjectType;
-import com.intellij.ide.starters.shared.StarterSettings;
+import com.intellij.ide.starters.shared.*;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.Url;
@@ -163,25 +161,43 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
         } else {
             url = s + "/starter.json";
         }
-        JsonElement json = loadJsonData(url, null);
-        JsonObject object = json.getAsJsonObject();
+        JsonObject json = loadJsonData(url, null).getAsJsonObject();
         List<WebStarterFrameworkVersion> frameworkVersions = new ArrayList<>();
-        JsonArray cloudArray = object.get("cloud").getAsJsonArray();
-        for (JsonElement e : cloudArray) {
-            JsonObject cloudObject = e.getAsJsonObject();
-            String cloudVersion = cloudObject.get("version").getAsString();
-            frameworkVersions.add(new WebStarterFrameworkVersion(cloudVersion, "Concept Cloud v" + cloudVersion, false));
+        JsonArray frameworkVersionArray = json.get("frameworkVersions").getAsJsonArray();
+        for (JsonElement frameworkVersionElement : frameworkVersionArray) {
+            JsonObject frameworkVersionObject = frameworkVersionElement.getAsJsonObject();
+            //getStarterContext().putUserData();
+            String id = frameworkVersionObject.get("id").getAsString();
+            String title = frameworkVersionObject.get("title").getAsString();
+            boolean isDefault = frameworkVersionObject.get("default").getAsBoolean();
+            frameworkVersions.add(new WebStarterFrameworkVersion(id, title, isDefault));
         }
         List<WebStarterDependencyCategory> dependencyCategories = new ArrayList<>();
-        JsonObject dependencyObject = object.get("dependency").getAsJsonObject();
-        for (Map.Entry<String, JsonElement> entry : dependencyObject.entrySet()) {
-            JsonArray dependencyArray = entry.getValue().getAsJsonArray();
+        JsonArray dependencyCategoryArray = json.get("dependencyCategories").getAsJsonArray();
+        for (JsonElement dependencyCategoryElement : dependencyCategoryArray) {
+            JsonObject dependencyCategoryObject = dependencyCategoryElement.getAsJsonObject();
+            String categoryTitle = dependencyCategoryObject.get("title").getAsString();
+            JsonArray dependencyArray = dependencyCategoryObject.get("dependencies").getAsJsonArray();
             List<WebStarterDependency> dependencies = new ArrayList<>();
-            for (JsonElement dependency : dependencyArray) {
-                String string = dependency.getAsString();
-                dependencies.add(new WebStarterDependency(string, string, null, Collections.emptyList(), false, false));
+            for (JsonElement dependencyElement : dependencyArray) {
+                JsonObject dependencyObject = dependencyElement.getAsJsonObject();
+                String id = dependencyObject.get("id").getAsString();
+                String dependencyTitle = dependencyObject.get("title").getAsString();
+                String description = dependencyObject.get("description").getAsString();
+                JsonArray linkArray = dependencyObject.get("links").getAsJsonArray();
+                List<LibraryLink> links = new ArrayList<>();
+                for (JsonElement linkElement : linkArray) {
+                    JsonObject linkObject = linkElement.getAsJsonObject();
+                    String type = linkObject.get("type").getAsString();
+                    String linkUrl = linkObject.get("url").getAsString();
+                    String linkTitle = linkObject.get("title").getAsString();
+                    links.add(new LibraryLink(LibraryLinkType.valueOf(type), linkUrl, linkTitle));
+                }
+                boolean isDefault = dependencyObject.get("default").getAsBoolean();
+                boolean isRequired = dependencyObject.get("required").getAsBoolean();
+                dependencies.add(new WebStarterDependency(id, dependencyTitle, description, links, isDefault, isRequired));
             }
-            dependencyCategories.add(new WebStarterDependencyCategory(entry.getKey(), dependencies));
+            dependencyCategories.add(new WebStarterDependencyCategory(categoryTitle, dependencies));
         }
         return new WebStarterServerOptions(frameworkVersions, dependencyCategories);
     }

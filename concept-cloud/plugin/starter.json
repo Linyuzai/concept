@@ -1,19 +1,88 @@
 {
-  "cloud": [
+  "frameworkVersions": [
     {
-      "version": "1.0.0"
+      "id": "0",
+      "title": "Concept Cloud v1.0.0",
+      "default": false,
+      "versions": {
+      }
     }
   ],
-  "dependency": {
-    "Concept": [
-      "Concept Cloud Web",
-      "Concept WebSocket LoadBalance",
-      "Concept Download",
-      "Concept Event",
-      "Concept MapQueue",
-      "Concept Plugin",
-      "Concept Router",
-      "Concept Sync Waiting"
-    ]
-  }
+  "dependencyCategories": [
+    {
+      "title": "Concept",
+      "dependencies": [
+        {
+          "id": "cloud-web",
+          "title": "Concept Cloud Web",
+          "description": "提供注解 @OnRequest 和 @OnResponse 简化请求响应拦截",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Cloud-Web",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-websocket-loadbalance",
+          "title": "Concept WebSocket LoadBalance",
+          "description": "多实例场景下的 WebSocket 应用",
+          "links": [],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-download",
+          "title": "Concept Download",
+          "description": "支持使用 @Download 注解简化下载功能",
+          "links": [],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-event",
+          "title": "Concept Event",
+          "description": "抽象事件概念，支持本地/RabbitMQ/Kafka",
+          "links": [],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-mapqueue",
+          "title": "Concept MapQueue",
+          "description": "能够更新元素的阻塞队列",
+          "links": [],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-plugin",
+          "title": "Concept Plugin",
+          "description": "提供外部加载 jar 中 Class 的功能",
+          "links": [],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-router",
+          "title": "Concept Router",
+          "description": "提供在开发环境下网关或 RPC 调用的路由指定功能",
+          "links": [],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "cloud-sync-waiting",
+          "title": "Concept Sync Waiting",
+          "description": "将对外异步请求转为同步的方式获得返回值",
+          "links": [],
+          "default": false,
+          "required": false
+        }
+      ]
+    }
+  ]
 }
