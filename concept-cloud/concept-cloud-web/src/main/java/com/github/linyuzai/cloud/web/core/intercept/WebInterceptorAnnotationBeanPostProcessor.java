@@ -13,7 +13,7 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.Lifecycle;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProcessor,
-        ApplicationContextAware, SmartInitializingSingleton, Lifecycle {
+        ApplicationContextAware, SmartInitializingSingleton, SmartLifecycle {
 
     private ApplicationContext applicationContext;
 
@@ -112,6 +112,11 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
     public void start() {
         WebConcept webConcept = applicationContext.getBean(WebConcept.class);
         webInterceptors.forEach(webConcept::addInterceptor);
+    }
+
+    @Override
+    public int getPhase() {
+        return 0;
     }
 
     @Override
