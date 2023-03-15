@@ -45,25 +45,25 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
     @ModelAttribute
     public void onRequest(HttpServletRequest request) {
         if (webConcept.isRequestInterceptionEnabled()) {
-            WebContext context = getOrCreateContext();
+            WebContext context = getContext();
             WebInterceptor.Scope scope = context.get(WebInterceptor.Scope.class);
             if (scope == WebInterceptor.Scope.REQUEST) {
                 //Async call: Mono
                 return;
             }
             context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
-            context.put(HttpServletRequest.class, request);
+            //context.put(HttpServletRequest.class, request);
+            //context.put(WebContext.Request.PATH, request.getRequestURI());
             if (!context.containsKey(HandlerMethod.class)) {
                 context.put(HandlerMethod.class, request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE));
             }
-            context.put(WebContext.Request.PATH, request.getRequestURI());
             webConcept.interceptRequest(context, EmptyValueReturner.INSTANCE);
         }
     }
 
     @ExceptionHandler({Throwable.class})
     public void onError(Throwable e) {
-        WebContext context = getOrCreateContext();
+        WebContext context = getContext();
         context.put(Throwable.class, e);
     }
 
@@ -82,7 +82,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
                                   @NonNull ServerHttpResponse response) {
         Object result;
         if (webConcept.isResponseInterceptionEnabled()) {
-            WebContext context = getOrCreateContext();
+            WebContext context = getContext();
             context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
             context.put(ServerHttpRequest.class, request);
             context.put(ServerHttpResponse.class, response);
@@ -98,15 +98,12 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         return result;
     }
 
-    protected WebContext getOrCreateContext() {
-        WebContext context = WebContextManager.get();
-        if (context == null) {
-            WebContext create = contextFactory.create();
-            WebContextManager.set(create);
-            return create;
-        } else {
-            return context;
-        }
+    protected WebContext getContext() {
+        return WebContextManager.get();
+    }
+
+    protected void validContext(WebContext context) {
+        WebContextManager.set(context);
     }
 
     protected void invalidContext() {
@@ -124,9 +121,12 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         public boolean preHandle(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull Object handler) throws Exception {
-            if (handler instanceof HandlerMethod) {
-                getOrCreateContext().put(HandlerMethod.class, handler);
-            }
+            WebContext context = contextFactory.create();
+            context.put(HttpServletRequest.class, request);
+            context.put(HttpServletResponse.class, response);
+            context.put(HandlerMethod.class, handler);
+            context.put(WebContext.Request.PATH, request.getRequestURI());
+            validContext(context);
             return true;
         }
     }

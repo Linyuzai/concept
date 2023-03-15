@@ -52,7 +52,7 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
     @ModelAttribute
     public Mono<Void> onRequest(ServerWebExchange exchange) {
         if (webConcept.isRequestInterceptionEnabled()) {
-            return getOrCreateContext().doOnNext(context -> {
+            return getContext().doOnNext(context -> {
                 setHandlerMethod(context, exchange);
                 context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
             }).flatMap(it -> {
@@ -65,7 +65,7 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
 
     @ExceptionHandler({Throwable.class})
     public Mono<Void> onError(Throwable e) {
-        return getOrCreateContext().doOnNext(context -> {
+        return getContext().doOnNext(context -> {
             context.put(Throwable.class, e);
         }).then();
     }
@@ -81,11 +81,11 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
             } else {
                 mono = Mono.justOrEmpty(returnValue);
             }
-            return mono.switchIfEmpty(getOrCreateContext()).flatMap(valueOrContext -> {
+            return mono.switchIfEmpty(getContext()).flatMap(valueOrContext -> {
                 if (valueOrContext instanceof WebContext) {
                     return Mono.just((WebContext) valueOrContext);
                 } else {
-                    return getOrCreateContext().doOnNext(context -> {
+                    return getContext().doOnNext(context -> {
                         context.put(WebContext.Response.BODY, valueOrContext);
                     });
                 }
@@ -106,7 +106,7 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
         }
     }
 
-    protected Mono<WebContext> getOrCreateContext() {
+    protected Mono<WebContext> getContext() {
         if (hasMethod) {
             return Mono.deferContextual(contextView -> Mono.just(contextView.get(WebContext.class)));
         } else {
