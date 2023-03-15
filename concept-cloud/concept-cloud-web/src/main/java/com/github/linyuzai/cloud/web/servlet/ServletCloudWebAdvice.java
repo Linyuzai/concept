@@ -125,6 +125,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
             context.put(HttpServletRequest.class, request);
             context.put(HttpServletResponse.class, response);
             context.put(HandlerMethod.class, handler);
+            context.put(WebContext.Request.METHOD, request.getMethod());
             context.put(WebContext.Request.PATH, request.getRequestURI());
             validContext(context);
             return true;

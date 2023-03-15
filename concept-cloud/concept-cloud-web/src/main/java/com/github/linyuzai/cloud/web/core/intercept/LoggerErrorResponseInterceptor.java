@@ -20,7 +20,7 @@ public class LoggerErrorResponseInterceptor implements WebInterceptor {
     }
 
     protected String getMessage(WebContext context) {
-        return context.get(WebContext.Request.PATH);
+        return context.get(WebContext.Request.METHOD) + " " + context.get(WebContext.Request.PATH);
     }
 
     @Override

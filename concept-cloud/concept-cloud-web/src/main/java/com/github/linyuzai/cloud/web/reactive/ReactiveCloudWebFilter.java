@@ -28,6 +28,7 @@ public class ReactiveCloudWebFilter implements WebFilter {
         context.put(ServerWebExchange.class, exchange);
         context.put(ServerHttpRequest.class, exchange.getRequest());
         context.put(ServerHttpResponse.class, exchange.getResponse());
+        context.put(WebContext.Request.METHOD, exchange.getRequest().getMethodValue());
         context.put(WebContext.Request.PATH, exchange.getRequest().getPath().value());
         return chain.filter(exchange).contextWrite(ctx -> ctx.put(WebContext.class, context));
         /*return handlerMapping.getHandler(exchange)

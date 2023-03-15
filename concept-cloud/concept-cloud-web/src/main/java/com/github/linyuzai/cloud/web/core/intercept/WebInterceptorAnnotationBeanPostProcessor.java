@@ -13,6 +13,7 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.Lifecycle;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
@@ -22,9 +23,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware, SmartInitializingSingleton {
+public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProcessor,
+        ApplicationContextAware, SmartInitializingSingleton, Lifecycle {
 
-    private WebConcept concept;
+    private ApplicationContext applicationContext;
+
+    private final List<WebInterceptor> webInterceptors = Collections.synchronizedList(new ArrayList<>());
 
     private final Set<Class<?>> nonAnnotatedClasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -75,7 +79,7 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
                 if (method.getReturnType() == boolean.class || method.getReturnType() == Boolean.class) {
                     WebInterceptor interceptor =
                             new AnnotationPredicateWebInterceptor(metadata.scope, method, bean);
-                    concept.addInterceptor(interceptor);
+                    webInterceptors.add(interceptor);
                 } else {
                     throw new CloudWebException("Return type must be boolean");
                 }
@@ -83,13 +87,13 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
                 if (WebResult.class.isAssignableFrom(method.getReturnType())) {
                     WebInterceptor interceptor =
                             new AnnotationRewriteWebResultWebInterceptor(metadata.scope, method, bean);
-                    concept.addInterceptor(interceptor);
+                    webInterceptors.add(interceptor);
                 } else {
                     throw new CloudWebException("Return type must be WebResult");
                 }
             } else {
                 WebInterceptor interceptor = new AnnotationWebInterceptor(metadata.scope, method, bean);
-                concept.addInterceptor(interceptor);
+                webInterceptors.add(interceptor);
             }
         }
     }
@@ -101,7 +105,23 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
-        this.concept = applicationContext.getBean(WebConcept.class);
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void start() {
+        WebConcept webConcept = applicationContext.getBean(WebConcept.class);
+        webInterceptors.forEach(webConcept::addInterceptor);
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public boolean isRunning() {
+        return false;
     }
 
     @RequiredArgsConstructor

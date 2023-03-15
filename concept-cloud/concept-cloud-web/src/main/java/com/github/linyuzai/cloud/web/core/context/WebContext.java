@@ -19,6 +19,9 @@ public interface WebContext {
     void reset();
 
     interface Request {
+
+        String METHOD = "_request@method";
+
         String PATH = "_request@path";
     }
 
