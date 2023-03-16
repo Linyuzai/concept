@@ -34,7 +34,7 @@ public class PredicateWebInterceptor implements WebInterceptor {
     }
 
     protected void onPredicate(boolean test, WebContext context) {
-        if (useResponseBodyAsWebResult) {
+        if (useResponseBodyAsWebResult && context.get(Scope.class) == Scope.RESPONSE) {
             if (!test) {
                 context.put(WebResult.class, context.get(WebContext.Response.BODY));
             }

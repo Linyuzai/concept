@@ -10,7 +10,6 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
@@ -21,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProcessor,
-        ApplicationContextAware, SmartInitializingSingleton, SmartLifecycle {
+        ApplicationContextAware, SmartInitializingSingleton {
 
     private ApplicationContext applicationContext;
 
@@ -90,11 +89,6 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
         this.applicationContext = applicationContext;
     }
 
-    @Override
-    public void start() {
-
-    }
-
     private MethodWebInterceptorFactory adaptFactory(InterceptMetadata metadata,
                                                      List<MethodWebInterceptorFactory> factories) {
         for (MethodWebInterceptorFactory factory : factories) {
@@ -103,21 +97,6 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
             }
         }
         return null;
-    }
-
-    @Override
-    public int getPhase() {
-        return 0;
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public boolean isRunning() {
-        return false;
     }
 
     @RequiredArgsConstructor
