@@ -7,5 +7,4 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OnRequest {
 
-    Class<?> value() default void.class;
 }

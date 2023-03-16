@@ -1,12 +1,14 @@
 package com.github.linyuzai.cloud.web.core;
 
-import com.github.linyuzai.cloud.web.core.CloudWebProperties;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.concept.WebConceptConfigurer;
 import com.github.linyuzai.cloud.web.core.concept.WebConceptImpl;
 import com.github.linyuzai.cloud.web.core.intercept.*;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactoryImpl;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakInterceptMethodWebInterceptorFactory;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.SampleMethodWebInterceptorFactory;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.WebInterceptorAnnotationBeanPostProcessor;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebRequestInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebResponseInterceptionEnabled;
@@ -46,8 +48,20 @@ public class CloudWebAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        PropertiesInterceptorConfigurer propertiesInterceptorConfigurer(CloudWebProperties properties) {
+        public PropertiesInterceptorConfigurer propertiesInterceptorConfigurer(CloudWebProperties properties) {
             return new PropertiesInterceptorConfigurer(properties);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public SampleMethodWebInterceptorFactory sampleMethodWebInterceptorFactory() {
+            return new SampleMethodWebInterceptorFactory();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public BreakInterceptMethodWebInterceptorFactory breakInterceptMethodWebInterceptorFactory() {
+            return new BreakInterceptMethodWebInterceptorFactory();
         }
 
         @Bean

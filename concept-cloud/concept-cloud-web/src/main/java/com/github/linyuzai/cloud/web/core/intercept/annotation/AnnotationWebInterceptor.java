@@ -1,6 +1,9 @@
-package com.github.linyuzai.cloud.web.core.intercept;
+package com.github.linyuzai.cloud.web.core.intercept.annotation;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
+import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
+import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
+import com.github.linyuzai.cloud.web.core.intercept.WebInterceptorChain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -12,13 +15,13 @@ import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
-public class AnnotationWebInterceptor implements MethodInvocationWebInterceptor {
-
-    private final Scope scope;
+public class AnnotationWebInterceptor implements WebInterceptor, MethodInvocationSupport {
 
     private final Method method;
 
     private final Object bean;
+
+    private final Set<Scope> scopes;
 
     @SneakyThrows
     @Override
@@ -30,7 +33,7 @@ public class AnnotationWebInterceptor implements MethodInvocationWebInterceptor 
 
     @Override
     public Set<Scope> getScopes() {
-        return Collections.singleton(scope);
+        return scopes;
     }
 
     @Override

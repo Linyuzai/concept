@@ -2,6 +2,7 @@ package com.github.linyuzai.concept.sample.cloud.web;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakIntercept;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
@@ -9,6 +10,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.method.HandlerMethod;
+
+import javax.servlet.http.HttpServletRequest;
 
 //import javax.servlet.http.HttpServletRequest;
 
@@ -28,6 +31,12 @@ public class Intercepts {
             return false;
         }
         return true;
+    }
+
+    @BreakIntercept
+    @OnResponse
+    public boolean nonWrap(HttpServletRequest request) {
+        return request.getRequestURI().equals("/cloud-web/test-map");
     }
 
     @OnRequest

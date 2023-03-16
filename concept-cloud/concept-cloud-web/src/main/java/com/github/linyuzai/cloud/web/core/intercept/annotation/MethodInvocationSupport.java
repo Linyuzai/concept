@@ -1,4 +1,4 @@
-package com.github.linyuzai.cloud.web.core.intercept;
+package com.github.linyuzai.cloud.web.core.intercept.annotation;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import org.springframework.core.annotation.Order;
@@ -6,7 +6,7 @@ import org.springframework.core.annotation.Order;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public interface MethodInvocationWebInterceptor extends WebInterceptor {
+public interface MethodInvocationSupport {
 
     Method getMethod();
 

@@ -39,6 +39,7 @@ public class PropertiesInterceptorConfigurer implements WebConceptConfigurer {
             Set<WebInterceptor.Scope> scopes) {
         return new PropertiesRequestPathPatternPredicateWebInterceptor(
                 properties.getPatterns(),
+                properties.isUseResponseBodyAsWebResult(),
                 scopes,
                 properties.isNegate(),
                 properties.getOrder());
@@ -47,25 +48,20 @@ public class PropertiesInterceptorConfigurer implements WebConceptConfigurer {
     private static class PropertiesRequestPathPatternPredicateWebInterceptor
             extends RequestPathPatternPredicateWebInterceptor {
 
-        private final Set<Scope> scopes;
-
         private final int order;
 
         public PropertiesRequestPathPatternPredicateWebInterceptor(Collection<String> paths,
+                                                                   boolean useResponseBodyAsWebResult,
                                                                    Set<Scope> scopes,
                                                                    boolean negate,
                                                                    int order) {
             super(paths);
-            this.scopes = scopes;
+            setUseResponseBodyAsWebResult(useResponseBodyAsWebResult);
+            setScopes(scopes);
             this.order = order;
             if (negate) {
                 negate();
             }
-        }
-
-        @Override
-        public Set<Scope> getScopes() {
-            return scopes;
         }
 
         @Override

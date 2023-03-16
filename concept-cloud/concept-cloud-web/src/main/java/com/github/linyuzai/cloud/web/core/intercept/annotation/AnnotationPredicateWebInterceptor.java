@@ -1,31 +1,25 @@
-package com.github.linyuzai.cloud.web.core.intercept;
+package com.github.linyuzai.cloud.web.core.intercept.annotation;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
+import com.github.linyuzai.cloud.web.core.intercept.PredicateWebInterceptor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.Predicate;
 
 @Getter
-public class AnnotationPredicateWebInterceptor extends PredicateWebInterceptor implements MethodInvocationWebInterceptor {
-
-    private final Scope scope;
+public class AnnotationPredicateWebInterceptor extends PredicateWebInterceptor implements MethodInvocationSupport {
 
     private final Method method;
 
-    public AnnotationPredicateWebInterceptor(Scope scope, Method method, Object bean) {
-        this.scope = scope;
+    public AnnotationPredicateWebInterceptor(Method method, Object bean, Set<Scope> scopes, boolean useResponseBodyAsWebResult) {
         this.method = method;
+        setScopes(scopes);
+        setUseResponseBodyAsWebResult(useResponseBodyAsWebResult);
         setPredicate(new AnnotationPredicate(method, bean));
-    }
-
-    @Override
-    public Set<Scope> getScopes() {
-        return Collections.singleton(scope);
     }
 
     @Override

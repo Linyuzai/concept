@@ -2,9 +2,9 @@ package com.github.linyuzai.cloud.web.core.intercept.annotation;
 
 import java.lang.annotation.*;
 
-@Inherited
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OnResponse {
+public @interface BreakIntercept {
 
+    boolean useResponseBodyAsWebResult() default true;
 }

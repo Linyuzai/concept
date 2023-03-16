@@ -51,6 +51,8 @@ public class CloudWebProperties {
 
             private List<String> patterns;
 
+            private boolean useResponseBodyAsWebResult = true;
+
             private boolean negate = false;
 
             private int order = WebInterceptor.Orders.PREDICATE;
