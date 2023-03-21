@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 扫描标注了 {@link OnRequest,OnResponse} 的方法生成对应的拦截器并添加
+ * 扫描标注了 {@link OnRequest}，{@link OnResponse} 的方法生成对应的拦截器并添加
  */
 public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProcessor,
         ApplicationContextAware, SmartInitializingSingleton {

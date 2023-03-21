@@ -27,7 +27,7 @@ public interface WebInterceptor extends Ordered {
     /**
      * 获得拦截作用域
      * <p>
-     * 默认通过拦截器上是否标记 {@link OnRequest,OnResponse} 来指定拦截作用域
+     * 默认通过拦截器上是否标记 {@link OnRequest}，{@link OnResponse} 来指定拦截作用域
      *
      * @return 拦截作用域
      */
