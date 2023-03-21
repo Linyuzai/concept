@@ -104,7 +104,7 @@ public abstract class AbstractAttributes extends AbstractContainer<Attribute> im
                     keyLabelsCache.computeIfAbsent(label.getKey(), f -> new ArrayList<>()).add(label);
                 }
             }
-            collectLabels(category.getCategories(), keys);
+            collectLabels(category.getParents(), keys);
         }
     }
 }

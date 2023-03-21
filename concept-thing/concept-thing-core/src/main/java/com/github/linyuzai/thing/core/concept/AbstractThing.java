@@ -41,6 +41,7 @@ public abstract class AbstractThing extends AbstractIdentify<Thing> implements T
             AttributeFactory factory = context.get(AttributeFactory.class);
             attributes = factory.createContainer();
             attributes.setThing(this);
+            attributes.setContext(context);
         }
         return attributes;
     }

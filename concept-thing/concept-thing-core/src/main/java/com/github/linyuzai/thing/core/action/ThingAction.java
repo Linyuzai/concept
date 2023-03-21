@@ -21,6 +21,18 @@ public interface ThingAction {
             Supplier<ThingEvent> event = supplier.get();
             return event::get;
         };
+        /*return new ThingAction() {
+            @Override
+            public ThingActionExecution execute() {
+                Supplier<ThingEvent> event = supplier.get();
+                return new ThingActionExecution() {
+                    @Override
+                    public ThingEvent toEvent() {
+                        return event.get();
+                    }
+                };
+            }
+        };*/
     }
 
 
