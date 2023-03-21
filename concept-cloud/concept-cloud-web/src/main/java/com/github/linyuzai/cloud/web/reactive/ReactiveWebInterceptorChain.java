@@ -11,6 +11,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+/**
+ * webflux 拦截链实现
+ */
 @Getter
 @RequiredArgsConstructor
 public class ReactiveWebInterceptorChain implements WebInterceptorChain {

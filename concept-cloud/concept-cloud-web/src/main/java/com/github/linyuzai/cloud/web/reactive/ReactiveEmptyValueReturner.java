@@ -4,6 +4,9 @@ import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
 import reactor.core.publisher.Mono;
 
+/**
+ * webflux 返回 {@link Mono#empty()}
+ */
 public class ReactiveEmptyValueReturner implements ValueReturner {
 
     public static final ReactiveEmptyValueReturner INSTANCE = new ReactiveEmptyValueReturner();

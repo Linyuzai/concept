@@ -2,6 +2,9 @@ package com.github.linyuzai.cloud.web.servlet;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 
+/**
+ * 基于 {@link ThreadLocal} 的上下文管理类
+ */
 public class WebContextManager {
 
     //TODO Use InheritableThreadLocal or TransmittableThreadLocal if necessity

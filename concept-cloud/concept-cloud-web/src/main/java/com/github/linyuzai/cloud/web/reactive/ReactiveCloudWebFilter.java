@@ -12,7 +12,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 /**
- * 用于设置当前的请求和响应。
+ * 用于设置上下文
  */
 @RequiredArgsConstructor
 public class ReactiveCloudWebFilter implements WebFilter {

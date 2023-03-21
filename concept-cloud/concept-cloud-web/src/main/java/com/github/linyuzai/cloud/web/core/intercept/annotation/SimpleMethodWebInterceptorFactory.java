@@ -5,6 +5,11 @@ import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+/**
+ * 简单的方法拦截器工厂
+ * <p>
+ * 支持所有方法
+ */
 public class SimpleMethodWebInterceptorFactory implements MethodWebInterceptorFactory {
 
     @Override

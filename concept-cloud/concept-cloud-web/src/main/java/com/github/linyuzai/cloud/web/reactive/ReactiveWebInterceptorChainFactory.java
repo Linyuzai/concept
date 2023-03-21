@@ -7,6 +7,9 @@ import com.github.linyuzai.cloud.web.servlet.ServletWebInterceptorChain;
 
 import java.util.List;
 
+/**
+ * webflux 拦截链工厂实现
+ */
 public class ReactiveWebInterceptorChainFactory implements WebInterceptorChainFactory {
 
     @Override

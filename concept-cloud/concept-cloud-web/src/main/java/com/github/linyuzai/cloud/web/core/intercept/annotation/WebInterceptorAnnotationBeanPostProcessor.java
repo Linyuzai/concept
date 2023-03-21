@@ -19,11 +19,17 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * 扫描标注了 {@link OnRequest,OnResponse} 的方法生成对应的拦截器并添加
+ */
 public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProcessor,
         ApplicationContextAware, SmartInitializingSingleton {
 
     private ApplicationContext applicationContext;
 
+    /**
+     * 方法拦截器信息
+     */
     private final List<InterceptMetadata> interceptMetadataList = Collections.synchronizedList(new ArrayList<>());
 
     private final Set<Class<?>> nonAnnotatedClasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -69,14 +75,17 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
     public void afterSingletonsInstantiated() {
         this.nonAnnotatedClasses.clear();
         WebConcept webConcept = applicationContext.getBean(WebConcept.class);
+        //获得所有方法拦截器工厂
         List<MethodWebInterceptorFactory> factories =
                 applicationContext.getBeansOfType(MethodWebInterceptorFactory.class)
                         .values().stream()
                         .sorted(Comparator.comparingInt(MethodWebInterceptorFactory::getOrder))
                         .collect(Collectors.toList());
         for (InterceptMetadata metadata : interceptMetadataList) {
+            //匹配工厂
             MethodWebInterceptorFactory factory = adaptFactory(metadata, factories);
             if (factory != null) {
+                //创建拦截器并添加
                 WebInterceptor interceptor = factory.create(metadata.scopes, metadata.method, metadata.bean);
                 webConcept.addInterceptor(interceptor);
             }
@@ -99,13 +108,25 @@ public class WebInterceptorAnnotationBeanPostProcessor implements BeanPostProces
         return null;
     }
 
+    /**
+     * 方法拦截器信息
+     */
     @RequiredArgsConstructor
     private static class InterceptMetadata {
 
+        /**
+         * 方法
+         */
         final Method method;
 
+        /**
+         * 实例
+         */
         final Object bean;
 
+        /**
+         * 作用域
+         */
         final Set<WebInterceptor.Scope> scopes;
     }
 

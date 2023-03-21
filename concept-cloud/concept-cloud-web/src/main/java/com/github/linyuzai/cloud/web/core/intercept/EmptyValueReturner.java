@@ -3,7 +3,7 @@ package com.github.linyuzai.cloud.web.core.intercept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 
 /**
- * 非 reactive 场景返回 null
+ * webmvc 返回 null
  */
 public class EmptyValueReturner implements ValueReturner {
 

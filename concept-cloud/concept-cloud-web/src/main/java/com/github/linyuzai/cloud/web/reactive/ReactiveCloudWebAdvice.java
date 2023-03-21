@@ -24,6 +24,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * webflux 切面
+ */
 @SuppressWarnings("all")
 @Getter
 @RestControllerAdvice
@@ -102,7 +105,14 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
                 return writeBody(webResult, parameter, exchange);
             });
         } else {
-            return super.handleResult(exchange, result);
+            return getContext().flatMap(it -> {
+                Throwable e = it.get(Throwable.class);
+                if (e == null) {
+                    return super.handleResult(exchange, result);
+                } else {
+                    return Mono.error(e);
+                }
+            });
         }
     }
 
@@ -120,6 +130,9 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
         }
     }
 
+    /**
+     * 返回值类型需要变成我们的 WebResult 对应的类型
+     */
     public static class WebResultMethodParameter extends MethodParameter {
 
         private final Class<?> type;

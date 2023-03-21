@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+/**
+ * webmvc 链接链实现
+ */
 @Getter
 @AllArgsConstructor
 public class ServletWebInterceptorChain implements WebInterceptorChain {

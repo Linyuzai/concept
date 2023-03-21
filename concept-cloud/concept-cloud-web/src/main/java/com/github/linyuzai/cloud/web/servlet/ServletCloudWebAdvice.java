@@ -28,6 +28,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * webmvc 切面
+ */
 @Getter
 @RequiredArgsConstructor
 @RestControllerAdvice
@@ -39,7 +42,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
 
     //@InitBinder
     public void initBinder(WebDataBinder binder) {
-
+        //用到的不多
     }
 
     @ModelAttribute
@@ -51,16 +54,21 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
                 //Async call: Mono
                 return;
             }
+            //设置当前作用域
             context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.REQUEST);
             //context.put(HttpServletRequest.class, request);
             //context.put(WebContext.Request.PATH, request.getRequestURI());
             if (!context.containsKey(HandlerMethod.class)) {
                 context.put(HandlerMethod.class, request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE));
             }
+            //拦截请求，忽略返回值
             webConcept.interceptRequest(context, EmptyValueReturner.INSTANCE);
         }
     }
 
+    /**
+     * 如果发生异常则在上下文中添加异常
+     */
     @ExceptionHandler({Throwable.class})
     public void onError(Throwable e) {
         WebContext context = getContext();
@@ -70,7 +78,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
     @Override
     public boolean supports(@NonNull MethodParameter returnType,
                             @NonNull Class<? extends HttpMessageConverter<?>> converterType) {
-        return true;
+        return webConcept.isResponseInterceptionEnabled();
     }
 
     @Override
@@ -80,20 +88,15 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
                                   @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   @NonNull ServerHttpRequest request,
                                   @NonNull ServerHttpResponse response) {
-        Object result;
-        if (webConcept.isResponseInterceptionEnabled()) {
-            WebContext context = getContext();
-            context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
-            context.put(ServerHttpRequest.class, request);
-            context.put(ServerHttpResponse.class, response);
-            context.put(MethodParameter.class, returnType);
-            context.put(MediaType.class, selectedContentType);
-            context.put(HttpMessageConverter.class, selectedConverterType);
-            context.put(WebContext.Response.BODY, body);
-            result = webConcept.interceptResponse(context, WebResultValueReturner.INSTANCE);
-        } else {
-            result = body;
-        }
+        WebContext context = getContext();
+        context.put(WebInterceptor.Scope.class, WebInterceptor.Scope.RESPONSE);
+        context.put(ServerHttpRequest.class, request);
+        context.put(ServerHttpResponse.class, response);
+        context.put(MethodParameter.class, returnType);
+        context.put(MediaType.class, selectedContentType);
+        context.put(HttpMessageConverter.class, selectedConverterType);
+        context.put(WebContext.Response.BODY, body);
+        Object result = webConcept.interceptResponse(context, WebResultValueReturner.INSTANCE);
         invalidContext();
         return result;
     }

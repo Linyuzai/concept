@@ -6,6 +6,9 @@ import com.github.linyuzai.cloud.web.core.intercept.WebInterceptorChainFactory;
 
 import java.util.List;
 
+/**
+ * webmvc 拦截链工厂
+ */
 public class ServletWebInterceptorChainFactory implements WebInterceptorChainFactory {
 
     @Override
