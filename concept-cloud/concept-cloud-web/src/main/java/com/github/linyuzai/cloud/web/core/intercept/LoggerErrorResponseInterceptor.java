@@ -5,6 +5,9 @@ import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 
+/**
+ * 异常打印拦截器
+ */
 @CommonsLog
 @RequiredArgsConstructor
 @OnResponse
@@ -19,6 +22,9 @@ public class LoggerErrorResponseInterceptor implements WebInterceptor {
         return chain.next(context, returner);
     }
 
+    /**
+     * 请求的方法 + 路径
+     */
     protected String getMessage(WebContext context) {
         return context.get(WebContext.Request.METHOD) + " " + context.get(WebContext.Request.PATH);
     }

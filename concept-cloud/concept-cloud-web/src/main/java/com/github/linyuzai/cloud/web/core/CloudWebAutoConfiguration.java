@@ -7,7 +7,7 @@ import com.github.linyuzai.cloud.web.core.intercept.*;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactoryImpl;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakInterceptMethodWebInterceptorFactory;
-import com.github.linyuzai.cloud.web.core.intercept.annotation.SampleMethodWebInterceptorFactory;
+import com.github.linyuzai.cloud.web.core.intercept.annotation.SimpleMethodWebInterceptorFactory;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.WebInterceptorAnnotationBeanPostProcessor;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebInterceptionEnabled;
 import com.github.linyuzai.cloud.web.core.intercept.condition.ConditionalOnWebRequestInterceptionEnabled;
@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * 核心配置
+ */
 @Configuration
 @EnableConfigurationProperties(CloudWebProperties.class)
 public class CloudWebAutoConfiguration {
@@ -54,8 +57,8 @@ public class CloudWebAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public SampleMethodWebInterceptorFactory sampleMethodWebInterceptorFactory() {
-            return new SampleMethodWebInterceptorFactory();
+        public SimpleMethodWebInterceptorFactory simpleMethodWebInterceptorFactory() {
+            return new SimpleMethodWebInterceptorFactory();
         }
 
         @Bean

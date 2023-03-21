@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 基于 {@link LinkedHashMap} 的上下文实现
+ */
 @SuppressWarnings("unchecked")
 public class WebContextImpl implements WebContext {
 

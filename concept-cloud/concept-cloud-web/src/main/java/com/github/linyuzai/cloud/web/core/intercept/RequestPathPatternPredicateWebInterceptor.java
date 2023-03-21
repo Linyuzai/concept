@@ -8,6 +8,9 @@ import org.springframework.util.AntPathMatcher;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * 匹配请求路径的断言拦截器
+ */
 public class RequestPathPatternPredicateWebInterceptor extends PredicateWebInterceptor {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
@@ -31,6 +34,12 @@ public class RequestPathPatternPredicateWebInterceptor extends PredicateWebInter
         return this;
     }
 
+    /**
+     * 是否匹配路径
+     *
+     * @param context 上下文
+     * @return true 匹配，false 不匹配
+     */
     protected boolean match(WebContext context) {
         String path = context.get(WebContext.Request.PATH);
         for (String pattern : patterns) {

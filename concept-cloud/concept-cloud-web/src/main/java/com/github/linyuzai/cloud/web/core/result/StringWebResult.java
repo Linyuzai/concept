@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用于返回值的包装，提供额外的数据信息
+ * result 为 {@link String} 的结果包装类
  */
 @Data
 @NoArgsConstructor

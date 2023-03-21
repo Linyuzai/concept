@@ -3,7 +3,7 @@ package com.github.linyuzai.cloud.web.core.result;
 import lombok.*;
 
 /**
- * 用于返回值的包装，提供额外的数据信息
+ * result 为 {@link Boolean} 的结果包装类
  */
 @Data
 @NoArgsConstructor

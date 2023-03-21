@@ -8,12 +8,18 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 
+/**
+ * 基于配置文件添加拦截器的配置器
+ */
 @Getter
 @RequiredArgsConstructor
 public class PropertiesInterceptorConfigurer implements WebConceptConfigurer {
 
     private final CloudWebProperties properties;
 
+    /**
+     * 生成配置文件中的断言配置对应的拦截器并添加
+     */
     @Override
     public void configure(WebConcept concept) {
         Set<WebInterceptor.Scope> scopes = new HashSet<>(Arrays.asList(

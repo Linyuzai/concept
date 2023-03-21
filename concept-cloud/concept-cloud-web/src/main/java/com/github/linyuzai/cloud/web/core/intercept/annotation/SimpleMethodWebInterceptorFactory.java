@@ -5,7 +5,7 @@ import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-public class SampleMethodWebInterceptorFactory implements MethodWebInterceptorFactory {
+public class SimpleMethodWebInterceptorFactory implements MethodWebInterceptorFactory {
 
     @Override
     public boolean support(Set<WebInterceptor.Scope> scopes, Method method, Object bean) {
