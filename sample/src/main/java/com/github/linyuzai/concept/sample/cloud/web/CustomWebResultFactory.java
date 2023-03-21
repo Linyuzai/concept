@@ -1,7 +1,7 @@
 package com.github.linyuzai.concept.sample.cloud.web;
 
 import com.github.linyuzai.cloud.web.core.context.WebContext;
-import com.github.linyuzai.cloud.web.core.result.AnnotationWebResultFactory;
+import com.github.linyuzai.cloud.web.core.result.annotation.AnnotationWebResultFactory;
 import com.github.linyuzai.cloud.web.core.result.LongWebResult;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import org.springframework.stereotype.Component;
