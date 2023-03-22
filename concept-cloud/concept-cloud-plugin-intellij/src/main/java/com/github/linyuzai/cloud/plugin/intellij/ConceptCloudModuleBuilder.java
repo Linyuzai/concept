@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.intellij.icons.AllIcons;
@@ -114,10 +115,12 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
     @NotNull
     @Override
     protected StarterPack getStarterPack() {
-        /*return new StarterPack("concept-cloud", Collections.singletonList(
+        */
+/*return new StarterPack("concept-cloud", Collections.singletonList(
                 new Starter("concept-cloud", "Concept Cloud",
                         getDependencyConfig("/starters/javafx.pom"),
-                        Collections.emptyList())));*/
+                        Collections.emptyList())));*//*
+
         return new StarterPack("concept-cloud", Collections.emptyList());
     }
 
@@ -146,13 +149,15 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
     @Nullable
     @Override
     protected CustomizedMessages getCustomizedMessages() {
-        /*CustomizedMessages messages = new CustomizedMessages();
+        */
+/*CustomizedMessages messages = new CustomizedMessages();
         messages.setProjectTypeLabel("ProjectTypeLabel");
         messages.setServerUrlDialogTitle("ServerUrlDialogTitle");
         messages.setDependenciesLabel("DependenciesLabel");
         messages.setSelectedDependenciesLabel("SelectedDependenciesLabel");
         messages.setNoDependenciesSelectedLabel("NoDependenciesSelectedLabel");
-        messages.setFrameworkVersionLabel("FrameworkVersionLabel");*/
+        messages.setFrameworkVersionLabel("FrameworkVersionLabel");*//*
+
         return super.getCustomizedMessages();
     }
 
@@ -171,10 +176,12 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
         assets.add(new GeneratorTemplateFile("build.gradle", build));
         assets.add(new GeneratorTemplateFile("settings.gradle", settings));
 
-        /*assets.add(new GeneratorTemplateFile("build.gradle", ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_BUILD_GRADLE)));
+        */
+/*assets.add(new GeneratorTemplateFile("build.gradle", ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_BUILD_GRADLE)));
         assets.add(new GeneratorTemplateFile("settings.gradle", ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_SETTINGS_GRADLE)));
         assets.add(new GeneratorTemplateFile(standardAssetsProvider.getGradleWrapperPropertiesLocation(),
-                ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_GRADLEW_PROPERTIES)));*/
+                ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_GRADLEW_PROPERTIES)));*//*
+
         //assets.addAll(standardAssetsProvider.getGradlewAssets());
         //assets.addAll(standardAssetsProvider.getGradleIgnoreAssets());
 
@@ -182,7 +189,8 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
         String samplesLanguage = getStarterContext().getLanguage().getId();
         String samplesExt = getSamplesExt(getStarterContext().getLanguage());
 
-        /*assets.add(new GeneratorTemplateFile("src/main/java/module-info.java",
+        */
+/*assets.add(new GeneratorTemplateFile("src/main/java/module-info.java",
                 ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_MODULE_INFO_JAVA)))
 
         assets.add(new GeneratorTemplateFile("src/main/${samplesLanguage}/${packagePath}/HelloApplication.${samplesExt}",
@@ -190,15 +198,18 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
         assets.add(new GeneratorTemplateFile("src/main/${samplesLanguage}/${packagePath}/HelloController.${samplesExt}",
                 ftManager.getJ2eeTemplate("javafx-HelloController-${samplesLanguage}.${samplesExt}")));
         assets.add(new GeneratorTemplateFile("src/main/resources/${packagePath}/hello-view.fxml",
-                ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_HELLO_VIEW_FXML)));*/
+                ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_HELLO_VIEW_FXML)));*//*
+
 
         return assets;
     }
 
-    /*@Override
+    */
+/*@Override
     protected void setupModule(@NotNull Module module) throws ConfigurationException {
         super.setupModule(module);
-    }*/
+    }*//*
+
 
     @Override
     public void setupRootModel(@NotNull ModifiableRootModel modifiableRootModel) {
@@ -236,3 +247,4 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
         //return request.saveToFile(tempFile, indicator);
     }
 }
+*/

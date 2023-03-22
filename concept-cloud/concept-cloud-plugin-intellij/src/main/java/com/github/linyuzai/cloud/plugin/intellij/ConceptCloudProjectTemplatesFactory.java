@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.intellij.icons.AllIcons;
@@ -32,3 +33,4 @@ public class ConceptCloudProjectTemplatesFactory extends ProjectTemplatesFactory
         return AllIcons.Nodes.Module;
     }
 }
+*/

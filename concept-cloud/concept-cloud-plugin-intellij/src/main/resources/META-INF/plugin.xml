@@ -8,7 +8,7 @@
 
     <version>1.0.0</version>
 
-    <idea-version since-build="212"/>
+    <idea-version since-build="212" until-build="222.*"/>
 
     <description><![CDATA[
         Generate a multiple modules project based on Gradle that supports both Spring Cloud and Spring Boot.<br>
