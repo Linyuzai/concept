@@ -151,8 +151,8 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
     @NotNull
     @Override
     public String getDefaultServerUrl() {
-        return "https://raw.githubusercontent.com/Linyuzai/concept/master/concept-cloud/plugin";
-        //return "https://cdn.jsdelivr.net/gh/Linyuzai/concept/concept-cloud/plugin";
+        //return "https://raw.githubusercontent.com/Linyuzai/concept/master/concept-cloud/plugin";
+        return "https://cdn.jsdelivr.net/gh/Linyuzai/concept/concept-cloud/plugin";
     }
 
     @NotNull

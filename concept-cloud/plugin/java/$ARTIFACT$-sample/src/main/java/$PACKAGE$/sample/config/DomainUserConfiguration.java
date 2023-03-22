@@ -14,6 +14,8 @@ public class DomainUserConfiguration {
 
     /**
      * 远程用户存储
+     * <p>
+     * 注意方法名和 user 模块不能重复
      */
     @Bean
     @ConditionalOnMissingBean

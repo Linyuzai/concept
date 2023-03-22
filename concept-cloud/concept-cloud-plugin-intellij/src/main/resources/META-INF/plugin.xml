@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.linyuzai.cloud.plugin.intellij</id>
     <name>Concept Cloud</name>
-    <vendor url="https://github.com/Linyuzai/concept/wiki/Concept-Cloud">
+    <vendor url="https://github.com/Linyuzai/concept/wiki/Concept-Cloud-Plugin-Intellij">
         Linyuzai
     </vendor>
 
@@ -11,7 +11,7 @@
     <idea-version since-build="213"/>
 
     <description><![CDATA[
-      Generate a project or module to support Spring Cloud and Spring Boot both
+        Generate a multiple modules project based on Gradle that supports both Spring Cloud and Spring Boot
     ]]></description>
 
     <category>Framework</category>
@@ -23,13 +23,13 @@
     <!--<depends>org.jetbrains.plugins.gradle</depends>-->
 
     <extensions defaultExtensionNs="com.intellij">
-<!--
-        <newProjectWizard.java.buildSystem implementation="org.jetbrains.plugins.gradle.service.project.wizard.GradleJavaNewProjectWizard"/>
--->
+        <!--
+                <newProjectWizard.java.buildSystem implementation="org.jetbrains.plugins.gradle.service.project.wizard.GradleJavaNewProjectWizard"/>
+        -->
 
         <!--<projectTemplatesFactory
                 implementation="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudProjectTemplatesFactory"/>-->
-<!--        <moduleType implementationClass="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudModuleType"/>-->
+        <!--        <moduleType implementationClass="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudModuleType"/>-->
         <moduleBuilder builderClass="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudWebModuleBuilder"/>
     </extensions>
 

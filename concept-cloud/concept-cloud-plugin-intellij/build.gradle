@@ -9,9 +9,12 @@ plugins {
     targetCompatibility = "11"
 }*/
 
-apply from: '../version.gradle'
+//apply from: '../version.gradle'
 
-version ConceptCloudVersion
+//version ConceptCloudVersion
+
+version '1.0.0'
+
 //sourceCompatibility = '11'
 
 dependencies {
@@ -21,7 +24,7 @@ dependencies {
 intellij.version = "2022.1"
 intellij.type = "IC"
 //intellij.type = "IU"
-intellij.plugins = ["java"]
+intellij.plugins = ["java", "gradle"]
 //intellij.plugins = ["java", "gradle", "com.intellij.quarkus"]
 //intellij.plugins = ["java", "gradle", "com.intellij.spring.boot.initializr"]
 //intellij.plugins = ["java", "gradle", "org.jetbrains.plugins.gradle"]

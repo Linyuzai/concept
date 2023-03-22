@@ -1,7 +1,7 @@
 package $PACKAGE$.sample.domain.user;
 
-import com.example.demo12.basic.rpc.api.user.UserApi;
-import com.example.demo12.basic.rpc.api.user.UserRO;
+import $PACKAGE$.basic.rpc.api.user.UserApi;
+import $PACKAGE$.basic.rpc.api.user.UserRO;
 
 /**
  * 在 sample 模块中定义 user 模型
