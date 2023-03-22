@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: $ARTIFACT$-application-boot
+# 在配置中禁用注册中心和配置中心（如引入依赖必须使用 bootstrap.yml）
+# 或是通过 build.gradle 控制注册中心和配置中心的依赖引用（可以使用 application.yml）

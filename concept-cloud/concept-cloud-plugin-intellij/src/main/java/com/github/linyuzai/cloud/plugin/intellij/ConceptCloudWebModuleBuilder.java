@@ -188,7 +188,7 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
     @NotNull
     @Override
     protected List<String> getFilePathsToOpen() {
-        return Collections.singletonList("README.md");
+        return Collections.singletonList("HELP.md");
     }
 
     @NotNull

@@ -1,0 +1,5 @@
+dependencies {
+    //在这里添加需要的模块
+    //implementation project(':$ARTIFACT$-sample')
+    //implementation project(':$ARTIFACT$-user')
+}

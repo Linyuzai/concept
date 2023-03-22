@@ -35,7 +35,7 @@ allprojects {
         implementation 'org.springframework.cloud:spring-cloud-starter'
         implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
         implementation 'org.springframework.cloud:spring-cloud-loadbalancer'
-        //implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+        implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
         //implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
         //implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'

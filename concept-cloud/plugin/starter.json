@@ -5,6 +5,9 @@
       "title": "Concept Cloud v1.0.0",
       "default": false,
       "dependencies": {
+        "cloud-web": [
+          "implementation 'com.github.linyuzai:concept-cloud-web:1.3.0'"
+        ],
         "websocket-loadbalance": [
           "implementation 'com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:1.0.4'",
           "implementation 'org.springframework.boot:spring-boot-starter-websocket'"
