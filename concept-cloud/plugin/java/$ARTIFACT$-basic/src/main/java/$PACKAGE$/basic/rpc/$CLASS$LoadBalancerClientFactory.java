@@ -13,8 +13,6 @@ import java.util.*;
  * 该类重写负载均衡的路由规则
  * <p>
  * 用于 Feign 这类 RPC 组件的服务路由
- * <p>
- * https://juejin.cn/post/7202807471882731580
  */
 public class $CLASS$LoadBalancerClientFactory extends LoadBalancerClientFactory {
 

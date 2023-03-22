@@ -1,4 +1,9 @@
 rootProject.name = '$ARTIFACT$'
 include '$ARTIFACT$-basic'
 include '$ARTIFACT$-gateway'
+include '$ARTIFACT$-sample'
+include '$ARTIFACT$-user'
+
+include '$ARTIFACT$-application-boot'
+include '$ARTIFACT$-application-cloud'
 
