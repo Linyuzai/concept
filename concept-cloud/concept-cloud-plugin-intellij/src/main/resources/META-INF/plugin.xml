@@ -11,13 +11,13 @@
     <idea-version since-build="212"/>
 
     <description><![CDATA[
-        Generate a multiple modules project based on Gradle that supports both Spring Cloud and Spring Boot.
-        If u have 3 modules: A, B, C
-        1. A(as a service) + B(as a service) + C(as a service) = Microservices
-        2. AB(compose as a service) + C(as a service) = Microservices
-        3. AC(compose as a service) + B(as a service) = Microservices
-        4. BC(compose as a service) + A(as a service) = Microservices
-        5. ABC(compose as a service) = Single service
+        Generate a multiple modules project based on Gradle that supports both Spring Cloud and Spring Boot.<br>
+        If u have 3 modules: A, B, C<br>
+        1. A(as a service) + B(as a service) + C(as a service) = Microservices<br>
+        2. AB(compose as a service) + C(as a service) = Microservices<br>
+        3. AC(compose as a service) + B(as a service) = Microservices<br>
+        4. BC(compose as a service) + A(as a service) = Microservices<br>
+        5. ABC(compose as a service) = Single service<br>
         <a href="https://github.com/Linyuzai/concept/wiki/Concept-Cloud-Plugin-Intellij"><b>Wiki</b></a><br>
     ]]></description>
 
