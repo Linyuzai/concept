@@ -161,7 +161,7 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
     protected List<GeneratorAsset> getAssets(@NotNull Starter starter) {
         boolean project = getStarterContext().isCreatingNewProject();
         FileTemplateManager ftManager = FileTemplateManager.getInstance(ProjectManager.getInstance().getDefaultProject());
-        StandardAssetsProvider standardAssetsProvider = new StandardAssetsProvider();
+        //StandardAssetsProvider standardAssetsProvider = new StandardAssetsProvider();
         final FileTemplate build = new CustomFileTemplate("build", "gradle");
         build.setText("");
         final FileTemplate settings = new CustomFileTemplate("settings", "gradle");
@@ -175,8 +175,8 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
         assets.add(new GeneratorTemplateFile("settings.gradle", ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_SETTINGS_GRADLE)));
         assets.add(new GeneratorTemplateFile(standardAssetsProvider.getGradleWrapperPropertiesLocation(),
                 ftManager.getJ2eeTemplate(JavaFxModuleTemplateGroup.JAVAFX_GRADLEW_PROPERTIES)));*/
-        assets.addAll(standardAssetsProvider.getGradlewAssets());
-        assets.addAll(standardAssetsProvider.getGradleIgnoreAssets());
+        //assets.addAll(standardAssetsProvider.getGradlewAssets());
+        //assets.addAll(standardAssetsProvider.getGradleIgnoreAssets());
 
         String packagePath = getPackagePath(getStarterContext().getGroup(), getStarterContext().getArtifact());
         String samplesLanguage = getStarterContext().getLanguage().getId();
@@ -195,10 +195,10 @@ public class ConceptCloudModuleBuilder extends StarterModuleBuilder {
         return assets;
     }
 
-    @Override
+    /*@Override
     protected void setupModule(@NotNull Module module) throws ConfigurationException {
         super.setupModule(module);
-    }
+    }*/
 
     @Override
     public void setupRootModel(@NotNull ModifiableRootModel modifiableRootModel) {

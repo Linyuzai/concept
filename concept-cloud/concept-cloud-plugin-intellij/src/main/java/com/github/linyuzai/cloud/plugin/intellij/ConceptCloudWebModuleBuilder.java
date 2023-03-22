@@ -31,13 +31,14 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
     @Override
     protected Url composeGeneratorUrl(@NotNull String s, @NotNull WebStarterContext webStarterContext) {
         String url;
-        String path = s.replace("https://", "").replace("http://", "");
-        if (path.endsWith("/")) {
-            url = path + "java.zip";
+        //String path = s.replace("https://", "").replace("http://", "");
+        if (s.endsWith("/")) {
+            url = s + "java.zip";
         } else {
-            url = path + "/java.zip";
+            url = s + "/java.zip";
         }
-        return Urls.newUrl("https", "", url);
+        return Urls.newUnparsable(url);
+        //return Urls.newUrl("https", "", url);
     }
 
     @Override

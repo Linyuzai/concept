@@ -21,7 +21,7 @@ dependencies {
     //compileOnly project(':concept-inherit:concept-inherit-core')
 }
 
-intellij.version = "2022.1"
+intellij.version = "2021.2"
 intellij.type = "IC"
 //intellij.type = "IU"
 intellij.plugins = ["java", "gradle"]
@@ -40,7 +40,7 @@ apply from: '../../intellij.gradle'
 tasks {
 
     patchPluginXml {
-        sinceBuild.set("213")
+        sinceBuild.set("212")
         //untilBuild.set("223.*")
         untilBuild.set("")
     }
