@@ -163,8 +163,8 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
         String group = getStarterContext().getGroup();
         String artifact = getStarterContext().getArtifact();
         String version = getStarterContext().getVersion();
-        String pkg = group.toLowerCase() + "." + artifact.toLowerCase();
-        String cls = artifact.substring(0, 1).toUpperCase() + artifact.substring(1);
+        String cls = handleClass(artifact);
+        String pkg = group.toLowerCase() + "." + cls.toLowerCase();
         String replaced = content.replaceAll("\\$GROUP\\$", group)
                 .replaceAll("\\$ARTIFACT\\$", artifact)
                 .replaceAll("\\$VERSION\\$", version)
@@ -175,6 +175,22 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
         } else {
             return replaced;
         }
+    }
+
+    private String handleClass(String s) {
+        return Arrays.stream(Arrays.stream(s.split("-"))
+                        .map(this::upperFirst)
+                        .collect(Collectors.joining())
+                        .split("_"))
+                .map(this::upperFirst)
+                .collect(Collectors.joining());
+    }
+
+    private String upperFirst(String s) {
+        if (s == null || s.isEmpty()) {
+            return "";
+        }
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
     private SpringVersion getSpringVersion() {
