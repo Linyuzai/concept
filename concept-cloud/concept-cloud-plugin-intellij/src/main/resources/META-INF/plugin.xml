@@ -6,18 +6,22 @@
         Linyuzai
     </vendor>
 
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <idea-version since-build="212" until-build="222.*"/>
 
     <description><![CDATA[
         Generate a multiple modules project based on Gradle that supports both Spring Cloud and Spring Boot.<br>
+        <br>
+        Usage: File -> New -> Project -> Concept Cloud<br>
+        <br>
         If u have 3 modules: A, B, C<br>
         1. A(as a service) + B(as a service) + C(as a service) = Microservices<br>
         2. AB(compose as a service) + C(as a service) = Microservices<br>
         3. AC(compose as a service) + B(as a service) = Microservices<br>
         4. BC(compose as a service) + A(as a service) = Microservices<br>
         5. ABC(compose as a service) = Single service<br>
+        <br>
         <a href="https://github.com/Linyuzai/concept/wiki/Concept-Cloud-Plugin-Intellij"><b>Wiki</b></a><br>
     ]]></description>
 
@@ -42,6 +46,6 @@
     </extensions>
 
     <change-notes><![CDATA[
-      1.0.0
+      1.1.0 add spring versions to starter_v2.json
     ]]></change-notes>
 </idea-plugin>
