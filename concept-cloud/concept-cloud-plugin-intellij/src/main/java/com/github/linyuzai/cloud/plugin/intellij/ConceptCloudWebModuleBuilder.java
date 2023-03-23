@@ -25,17 +25,24 @@ import java.util.zip.ZipFile;
 @SuppressWarnings("all")
 public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
 
-    private final Key<Map<String, Map<String, Set<String>>>> CONECPT_DEPENDENCY_KEY = new Key<>("CONECPT_DEPENDENCY_KEY");
+    private final Key<Map<String, FrameworkVersionEx>> CONCEPT_CLOUD_FVE_KEY = new Key<>("CONCEPT_CLOUD_FVE_KEY");
 
     @NotNull
     @Override
     protected Url composeGeneratorUrl(@NotNull String s, @NotNull WebStarterContext webStarterContext) {
+        String version;
+        WebStarterFrameworkVersion frameworkVersion = webStarterContext.getFrameworkVersion();
+        if (frameworkVersion == null) {
+            version = "";
+        } else {
+            version = "_" + frameworkVersion.getId();
+        }
         String url;
         //String path = s.replace("https://", "").replace("http://", "");
         if (s.endsWith("/")) {
-            url = s + "java.zip";
+            url = s + "java" + version + ".zip";
         } else {
-            url = s + "/java.zip";
+            url = s + "/java" + version + ".zip";
         }
         return Urls.newUnparsable(url);
         //return Urls.newUrl("https", "", url);
@@ -59,11 +66,19 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
             for (ZipEntry file : files) {
                 String fileName = transform(file.getName(), false);
                 File create = createFile(fileName, parent);
-                if (needHandleAfterSpecialCheck(create)) {
-                    try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
-                        String collect = br.lines().collect(Collectors.joining("\n"));
-                        FileUtil.writeToFile(create, transform(collect, false));
+                if ("concept.gradle".equals(file.getName())) {
+                    handleConceptGradle(create);
+                }
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
+                    String collect = br.lines().collect(Collectors.joining("\n"));
+                    String transform = transform(collect, false);
+                    String content;
+                    if ("build.gradle".equals(file.getName())) {
+                        content = handleSpringVersion(transform);
+                    } else {
+                        content = transform;
                     }
+                    FileUtil.writeToFile(create, content);
                 }
             }
         } catch (Throwable e) {
@@ -72,37 +87,56 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
         //ZipUtil.extract();
     }
 
-    private boolean needHandleAfterSpecialCheck(File file) throws IOException {
-        if (!"concept.gradle".equals(file.getName())) {
-            return true;
-        }
-        Map<String, Map<String, Set<String>>> value = getStarterContext().getUserData(CONECPT_DEPENDENCY_KEY);
-        if (value == null) {
-            return false;
-        }
-        WebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
-        if (frameworkVersion == null) {
-            return false;
-        }
-        String frameworkVersionId = frameworkVersion.getId();
-        Map<String, Set<String>> map = value.get(frameworkVersionId);
-        if (map == null) {
-            return false;
+    private void handleConceptGradle(File file) throws IOException {
+        FrameworkVersionEx frameworkVersionEx = getFrameworkVersionEx();
+        if (frameworkVersionEx == null) {
+            return;
         }
         Set<WebStarterDependency> dependencies = getStarterContext().getDependencies();
         StringBuilder builder = new StringBuilder();
         builder.append("dependencies {\n");
         for (WebStarterDependency dependency : dependencies) {
-            Set<String> set = map.get(dependency.getId());
-            if (set != null) {
-                for (String s : set) {
+            Collection<String> collection = frameworkVersionEx.getConceptDependency(dependency.getId());
+            if (collection != null) {
+                for (String s : collection) {
                     builder.append("\t").append(s).append("\n");
                 }
             }
         }
         builder.append("}");
         FileUtil.writeToFile(file, builder.toString());
-        return false;
+    }
+
+    private String handleSpringVersion(String content) {
+        String springBoot;
+        String springDependencyManagement;
+        String springCloudDependencyManagement;
+        SpringVersion springVersion = getSpringVersion();
+        if (springVersion == null) {
+            springBoot = "2.7.6";
+            springDependencyManagement = "1.1.0";
+            springCloudDependencyManagement = "2021.0.4";
+        } else {
+            springBoot = springVersion.springBoot;
+            springDependencyManagement = springVersion.springDependencyManagement;
+            springCloudDependencyManagement = springVersion.springCloudDependencyManagement;
+        }
+        return content.replaceAll("\\$V_SPRING_BOOT\\$", springBoot)
+                .replaceAll("\\$V_SPRING_DM\\$", springDependencyManagement)
+                .replaceAll("\\$V_SPRING_CLOUD_DM\\$", springCloudDependencyManagement);
+    }
+
+    private FrameworkVersionEx getFrameworkVersionEx() {
+        Map<String, FrameworkVersionEx> data = getStarterContext().getUserData(CONCEPT_CLOUD_FVE_KEY);
+        if (data == null) {
+            return null;
+        }
+        WebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
+        if (frameworkVersion == null) {
+            return null;
+        }
+        String frameworkVersionId = frameworkVersion.getId();
+        return data.get(frameworkVersionId);
     }
 
     private void createDir(String name, File parent) {
@@ -141,6 +175,14 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
         } else {
             return replaced;
         }
+    }
+
+    private SpringVersion getSpringVersion() {
+        FrameworkVersionEx frameworkVersionEx = getFrameworkVersionEx();
+        if (frameworkVersionEx == null) {
+            return null;
+        }
+        return frameworkVersionEx.springVersion;
     }
 
     @NotNull
@@ -197,20 +239,29 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
     protected WebStarterServerOptions loadServerOptions(@NotNull String s) {
         String url;
         if (s.endsWith("/")) {
-            url = s + "starter.json";
+            url = s + "starter_v2.json";
         } else {
-            url = s + "/starter.json";
+            url = s + "/starter_v2.json";
         }
         JsonObject json = loadJsonData(url, null).getAsJsonObject();
         List<WebStarterFrameworkVersion> frameworkVersions = new ArrayList<>();
         JsonArray frameworkVersionArray = json.get("frameworkVersions").getAsJsonArray();
-        Map<String, Map<String, Set<String>>> value = new LinkedHashMap<>();
+        Map<String, FrameworkVersionEx> value = new LinkedHashMap<>();
         for (JsonElement frameworkVersionElement : frameworkVersionArray) {
+            FrameworkVersionEx frameworkVersionEx = new FrameworkVersionEx();
             JsonObject frameworkVersionObject = frameworkVersionElement.getAsJsonObject();
             String id = frameworkVersionObject.get("id").getAsString();
             String title = frameworkVersionObject.get("title").getAsString();
             boolean isDefault = frameworkVersionObject.get("default").getAsBoolean();
             frameworkVersions.add(new WebStarterFrameworkVersion(id, title, isDefault));
+
+            if (frameworkVersionObject.has("springVersions")) {
+                JsonObject springVersionsObject = frameworkVersionObject.get("springVersions").getAsJsonObject();
+                String springBoot = springVersionsObject.get("springBoot").getAsString();
+                String springDependencyManagement = springVersionsObject.get("springDependencyManagement").getAsString();
+                String springCloudDependencyManagement = springVersionsObject.get("springCloudDependencyManagement").getAsString();
+                frameworkVersionEx.setSpringVersion(springBoot, springDependencyManagement, springCloudDependencyManagement);
+            }
 
             Map<String, Set<String>> map = new LinkedHashMap<>();
             JsonObject dependencies = frameworkVersionObject.get("dependencies").getAsJsonObject();
@@ -221,10 +272,11 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
                     set.add(element.getAsString());
                 }
                 map.put(entry.getKey(), set);
+                frameworkVersionEx.addConceptDependency(id, set);
             }
-            value.put(id, map);
+            value.put(id, frameworkVersionEx);
         }
-        getStarterContext().putUserData(CONECPT_DEPENDENCY_KEY, value);
+        getStarterContext().putUserData(CONCEPT_CLOUD_FVE_KEY, value);
         List<WebStarterDependencyCategory> dependencyCategories = new ArrayList<>();
         JsonArray dependencyCategoryArray = json.get("dependencyCategories").getAsJsonArray();
         for (JsonElement dependencyCategoryElement : dependencyCategoryArray) {
@@ -253,5 +305,41 @@ public class ConceptCloudWebModuleBuilder extends WebStarterModuleBuilder {
             dependencyCategories.add(new WebStarterDependencyCategory(categoryTitle, dependencies));
         }
         return new WebStarterServerOptions(frameworkVersions, dependencyCategories);
+    }
+
+    public static class FrameworkVersionEx {
+
+        SpringVersion springVersion = new SpringVersion();
+
+        ConceptDependency conceptDependency = new ConceptDependency();
+
+        void setSpringVersion(String springBoot, String springDependencyManagement, String springCloudDependencyManagement) {
+            springVersion.springBoot = springBoot;
+            springVersion.springDependencyManagement = springDependencyManagement;
+            springVersion.springCloudDependencyManagement = springCloudDependencyManagement;
+        }
+
+        void addConceptDependency(String id, Collection<String> dependencies) {
+            conceptDependency.mapping.put(id, dependencies);
+        }
+
+        Collection<String> getConceptDependency(String id) {
+            return conceptDependency.mapping.get(id);
+        }
+    }
+
+    public static class SpringVersion {
+
+        String springBoot;
+
+        String springDependencyManagement;
+
+        String springCloudDependencyManagement;
+
+    }
+
+    public static class ConceptDependency {
+
+        Map<String, Collection<String>> mapping = new LinkedHashMap<>();
     }
 }

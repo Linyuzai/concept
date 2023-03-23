@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.6'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '$V_SPRING_BOOT$'
+    id 'io.spring.dependency-management' version '$V_SPRING_DM$'
 }
 
 allprojects {
@@ -57,7 +57,7 @@ allprojects {
 
     dependencyManagement {
         imports {
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:$V_SPRING_CLOUD_DM$'
             //mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
         }
     }
@@ -74,7 +74,7 @@ allprojects {
     if (!project.name.contains("application")) {
         bootJar.enabled = false
         jar.enabled = true
-        jar.archiveClassifier.set('')
+        //jar.archiveClassifier.set('')
     }
 
     processResources {
