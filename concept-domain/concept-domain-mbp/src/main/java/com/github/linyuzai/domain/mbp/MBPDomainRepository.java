@@ -12,6 +12,7 @@ import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.Identifiable;
 import com.github.linyuzai.domain.core.condition.Conditions;
+import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.page.Pages;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -196,7 +197,9 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
     /**
      * 字段匹配类
      */
-    public abstract Class<P> getFetchClass();
+    public Class<P> getFetchClass() {
+        return DomainLink.generic(getClass(), 0);
+    }
 
     /**
      * 获得 Mapper

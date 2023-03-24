@@ -10,9 +10,26 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public class DomainLink {
+
+    private static Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder = new Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>>() {
+        @Override
+        public Class<? extends DomainRepository<?, ?>> apply(Class<? extends DomainObject> domainClass) {
+            String repository = domainClass.getName() + "Repository";
+            try {
+                return (Class<? extends DomainRepository<?, ?>>) Class.forName(repository);
+            } catch (ClassNotFoundException ignore) {
+                return null;
+            }
+        }
+    };
+
+    public static void setRepositoryFinder(Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder) {
+        DomainLink.repositoryFinder = repositoryFinder;
+    }
 
     private static final Map<Object, Map<Object, Object>> CACHE = new ConcurrentHashMap<>();
 
@@ -48,15 +65,21 @@ public class DomainLink {
                 });
     }
 
-    public static <R extends DomainRepository<?, ?>> Class<R> repository(Class<?> domainClass) {
+    public static <R extends DomainRepository<?, ?>> Class<R> repository(Class<? extends DomainObject> domainClass) {
         return (Class<R>) CACHE
                 .computeIfAbsent(DomainRepositoryLink.class, type -> new ConcurrentHashMap<>())
                 .computeIfAbsent(domainClass, key -> {
                     DomainRepositoryLink annotation = domainClass.getAnnotation(DomainRepositoryLink.class);
                     if (annotation == null) {
-                        throw new DomainRequiredException("@DomainRepositoryLink");
+                        Class<? extends DomainRepository<?, ?>> repository = repositoryFinder.apply(domainClass);
+                        if (repository == null) {
+                            throw new DomainRequiredException("@DomainRepositoryLink");
+                        } else {
+                            return repository;
+                        }
+                    } else {
+                        return annotation.value();
                     }
-                    return annotation.value();
                 });
     }
 }
