@@ -3,8 +3,8 @@ package com.github.linyuzai.domain.core.page;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class Pages<T> {
 
     @Schema(description = "分页视图")
-    private List<T> records = Collections.emptyList();
+    private Collection<T> records = Collections.emptyList();
 
     @Schema(description = "总数")
     private long total = 0;
@@ -39,6 +39,16 @@ public class Pages<T> {
         p.setRecords(this.records.stream()
                 .map(function)
                 .collect(Collectors.toList()));
+        return p;
+    }
+
+    public <R> Pages<R> mapAll(Function<Collection<T>, Collection<R>> function) {
+        Pages<R> p = new Pages<>();
+        p.setTotal(this.total);
+        p.setSize(this.size);
+        p.setCurrent(this.current);
+        p.setPages(this.pages);
+        p.setRecords(function.apply(this.records));
         return p;
     }
 

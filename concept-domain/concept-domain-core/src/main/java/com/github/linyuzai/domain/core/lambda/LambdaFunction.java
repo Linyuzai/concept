@@ -17,12 +17,12 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface LambdaFunction<T, R> extends Serializable {
 
-    Map<Class<?>, SerializedLambda> cache = new ConcurrentHashMap<>();
+    Map<Class<?>, SerializedLambda> CACHE = new ConcurrentHashMap<>();
 
     R get(T t);
 
     default SerializedLambda getSerializedLambda() {
-        return cache.computeIfAbsent(this.getClass(), new MappingFunction(this));
+        return CACHE.computeIfAbsent(this.getClass(), new MappingFunction(this));
     }
 
     static Name getClassName(SerializedLambda sl) {

@@ -1,5 +1,6 @@
 package com.github.linyuzai.concept.sample;
 
+import com.github.linyuzai.concept.sample.domain.DomainTest;
 import com.github.linyuzai.concept.sample.inherit.bug6.Bug6Sample;
 import com.github.linyuzai.concept.sample.mapqueue.MapQueueBugSample;
 import com.github.linyuzai.concept.sample.mapqueue.MapQueueSample;
@@ -24,5 +25,6 @@ public class ConceptSampleApplication {
         //new ThrowsDemo().demo4throws();
         //new Bug6Sample().bug(null);
         //new MapQueueBugSample().start();
+        //new DomainTest().test();
     }
 }

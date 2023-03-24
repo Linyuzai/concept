@@ -8,17 +8,16 @@ import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.linyuzai.domain.core.AbstractDomainRepository;
+import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.Identifiable;
 import com.github.linyuzai.domain.core.condition.Conditions;
-import com.github.linyuzai.domain.core.exception.DomainMultipleRecordsException;
 import com.github.linyuzai.domain.core.page.Pages;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * 基于 MyBatis-Plus 的通用存储
@@ -26,7 +25,8 @@ import java.util.stream.Stream;
  * @param <T> 领域模型
  * @param <P> 数据模型
  */
-public abstract class MBPDomainRepository<T extends DomainObject, P extends Identifiable> extends AbstractDomainRepository<T, P> {
+public abstract class MBPDomainRepository<T extends DomainObject, C extends DomainCollection<T>, P extends Identifiable>
+        extends AbstractDomainRepository<T, C, P> {
 
     /**
      * 插入一条数据
@@ -38,8 +38,8 @@ public abstract class MBPDomainRepository<T extends DomainObject, P extends Iden
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public void create(Collection<? extends T> objects) {
-        super.create(objects);
+    public void create(C collection) {
+        super.create(collection);
     }
 
     /**
@@ -60,8 +60,8 @@ public abstract class MBPDomainRepository<T extends DomainObject, P extends Iden
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public void update(Collection<? extends T> objects) {
-        super.update(objects);
+    public void update(C collection) {
+        super.update(collection);
     }
 
     /**
@@ -77,23 +77,12 @@ public abstract class MBPDomainRepository<T extends DomainObject, P extends Iden
      */
     @Override
     protected void doDelete(P po) {
-        doDelete(po.getId());
+        getBaseMapper().deleteById(po.getId());
     }
 
-    /**
-     * 删除一条数据
-     */
     @Override
-    protected void doDelete(String id) {
-        getBaseMapper().deleteById(id);
-    }
-
-    /**
-     * 删除多条数据
-     */
-    @Override
-    protected void doDelete(Collection<String> ids) {
-        getBaseMapper().deleteBatchIds(ids);
+    protected void doDelete(Collection<? extends P> pos) {
+        getBaseMapper().deleteBatchIds(pos.stream().map(Identifiable::getId).collect(Collectors.toSet()));
     }
 
     /**
@@ -130,16 +119,13 @@ public abstract class MBPDomainRepository<T extends DomainObject, P extends Iden
      * 根据条件查询一条数据
      */
     @Override
-    protected P doQuery(Conditions conditions) {
-        List<P> list = doList(conditions);
-        int size = list.size();
-        if (size == 0) {
-            return null;
-        } else if (size == 1) {
-            return list.get(0);
-        } else {
-            throw new DomainMultipleRecordsException(size);
-        }
+    protected P doGet(Conditions conditions) {
+        return getBaseMapper().selectOne(getWrapper(conditions));
+    }
+
+    @Override
+    protected Collection<P> doSelect(Conditions conditions) {
+        return getBaseMapper().selectList(getWrapper(conditions));
     }
 
     /**
@@ -151,28 +137,12 @@ public abstract class MBPDomainRepository<T extends DomainObject, P extends Iden
     }
 
     /**
-     * 根据条件获得列表数据
-     */
-    @Override
-    protected List<P> doList(Conditions conditions) {
-        return getBaseMapper().selectList(getWrapper(conditions));
-    }
-
-    /**
      * 根据条件获得分页数据
      */
     @Override
     protected Pages<P> doPage(Conditions conditions, Pages.Args page) {
         IPage<P> p = new Page<>(page.getCurrent(), page.getSize());
         return toPages(getBaseMapper().selectPage(p, getWrapper(conditions)));
-    }
-
-    /**
-     * 获得数据流
-     */
-    @Override
-    protected Stream<P> doStream(Conditions conditions) {
-        return doList(conditions).stream();
     }
 
     /**

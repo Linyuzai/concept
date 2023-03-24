@@ -1,95 +1,65 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
-import com.github.linyuzai.domain.core.AbstractDomainCollection;
-import com.github.linyuzai.domain.core.DomainContext;
-import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.DomainRepository;
+import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.exception.DomainIdRequiredException;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
+import com.github.linyuzai.domain.core.proxy.DomainCollectionProxy;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
  * 薛定谔的集合模型
- *
- * @param <T>
  */
 @Getter
-public abstract class SchrodingerDomainCollection<T extends DomainObject> extends AbstractDomainCollection<T> {
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class SchrodingerDomainCollection implements DomainCollection<DomainObject>, DomainCollectionProxy {
 
-    /**
-     * 所属 id
-     */
-    protected String ownerId;
-
+    protected final Class<? extends DomainCollection<?>> collectionType;
     /**
      * 领域上下文
      */
-    protected DomainContext context;
+    @NonNull
+    protected final DomainContext context;
 
-    /**
-     * 获得所属者
-     */
-    @Override
-    public Object getOwner() {
-        if (owner == null) {
-            this.owner = doGetOwner();
-        }
-        return owner;
-    }
-
-    /**
-     * 获得所属者
-     */
-    protected Object doGetOwner() {
-        DomainRepository<?> repository = context.get(getOwnerRepositoryType());
-        Object owner = repository.get(ownerId);
-        if (owner == null) {
-            throw new DomainNotFoundException(getOwnerType(), ownerId);
-        }
-        return owner;
-    }
+    protected Conditions conditions = Conditions.EMPTY;
 
     /**
      * 根据 id 获得领域模型
      */
     @Override
-    public T get(String id) {
-        T exist = objects.get(id);
-        if (exist == null) {
-            T get = doGet(id);
-            if (get != null) {
-                objects.put(get.getId(), get);
-            }
-        }
-        return exist;
-    }
-
-    /**
-     * 根据 id 获得领域模型
-     */
-    protected T doGet(String id) {
+    public DomainObject get(String id) {
         if (id == null) {
             throw new DomainIdRequiredException(getDomainType());
         }
-        DomainRepository<? extends T> repository = context.get(getDomainRepositoryType());
-        T domain = repository.get(id);
+        DomainRepository<?, ?> repository = context.get(getDomainRepositoryType());
+        DomainObject domain = repository.get(id);
         if (domain == null) {
             throw new DomainNotFoundException(getDomainType(), id);
         }
         return domain;
     }
 
+    @Override
+    public List<DomainObject> list() {
+        DomainRepository<DomainObject, ?> repository = context.get(getDomainRepositoryType());
+        return repository.select(getConditions()).list();
+    }
+
     /**
      * 流式数据查询
      */
     @Override
-    public Stream<? extends T> stream() {
-        DomainRepository<? extends T> repository = context.get(getDomainRepositoryType());
-        return repository.stream(obtainConditions());
+    public Stream<DomainObject> stream() {
+        DomainRepository<DomainObject, ?> repository = context.get(getDomainRepositoryType());
+        return repository.select(getConditions()).stream();
     }
 
     /**
@@ -97,45 +67,26 @@ public abstract class SchrodingerDomainCollection<T extends DomainObject> extend
      */
     @Override
     public Long count() {
-        DomainRepository<? extends T> repository = context.get(getDomainRepositoryType());
-        return repository.count(obtainConditions());
+        DomainRepository<DomainObject, ?> repository = context.get(getDomainRepositoryType());
+        return repository.count(getConditions());
     }
-
-    /**
-     * 生成条件
-     */
-    protected Conditions obtainConditions() {
-        return onConditionsObtain(new Conditions(), ownerId);
-    }
-
-    /**
-     * 条件生成回调
-     */
-    protected abstract Conditions onConditionsObtain(Conditions conditions, String id);
 
     /**
      * 领域模型类
      */
-    protected abstract Class<? extends T> getDomainType();
+    protected Class<? extends DomainObject> getDomainType() {
+        return DomainLink.collection(collectionType);
+    }
 
     /**
      * 领域模型存储
      */
-    protected Class<? extends DomainRepository<? extends T>> getDomainRepositoryType() {
+    protected Class<? extends DomainRepository<DomainObject, ?>> getDomainRepositoryType() {
         return DomainLink.repository(getDomainType());
     }
 
-    /**
-     * 所属者类
-     */
-    protected Class<? extends DomainObject> getOwnerType() {
-        return DomainLink.owner(getClass());
-    }
-
-    /**
-     * 所属者模型存储
-     */
-    protected Class<? extends DomainRepository<?>> getOwnerRepositoryType() {
-        return DomainLink.repository(getOwnerType());
+    @Override
+    public Object getInvokeCollection() {
+        return this;
     }
 }

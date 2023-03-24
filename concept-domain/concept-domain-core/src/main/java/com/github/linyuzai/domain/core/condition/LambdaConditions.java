@@ -1,6 +1,5 @@
 package com.github.linyuzai.domain.core.condition;
 
-
 import com.github.linyuzai.domain.core.lambda.LambdaFunction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

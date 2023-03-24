@@ -4,10 +4,8 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.page.Pages;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
 
-public abstract class QueryDomainRepository<T extends DomainObject, P extends Identifiable> extends AbstractDomainRepository<T, P> {
+public abstract class QueryDomainRepository<T extends DomainObject, C extends DomainCollection<T>, P extends Identifiable> extends AbstractDomainRepository<T, C, P> {
 
     @Override
     public P do2po(T object) {
@@ -40,17 +38,7 @@ public abstract class QueryDomainRepository<T extends DomainObject, P extends Id
     }
 
     @Override
-    protected void doDelete(String id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected void doDelete(Collection<String> ids) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected Collection<P> doSelect(Collection<String> ids) {
+    protected void doDelete(Collection<? extends P> pos) {
         throw new UnsupportedOperationException();
     }
 
@@ -60,27 +48,12 @@ public abstract class QueryDomainRepository<T extends DomainObject, P extends Id
     }
 
     @Override
-    protected P doQuery(Conditions conditions) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     protected Long doCount(Conditions conditions) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected List<P> doList(Conditions conditions) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     protected Pages<P> doPage(Conditions conditions, Pages.Args page) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected Stream<P> doStream(Conditions conditions) {
         throw new UnsupportedOperationException();
     }
 }

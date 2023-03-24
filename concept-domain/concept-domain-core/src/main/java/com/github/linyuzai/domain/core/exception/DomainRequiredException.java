@@ -1,6 +1,5 @@
 package com.github.linyuzai.domain.core.exception;
 
-
 import com.github.linyuzai.domain.core.lambda.LambdaFunction;
 
 public class DomainRequiredException extends DomainException {

@@ -4,13 +4,12 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.page.Pages;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
  * 领域存储
  */
-public interface DomainRepository<T extends DomainObject> {
+public interface DomainRepository<T extends DomainObject, C extends DomainCollection<T>> {
 
     /**
      * 单个新增
@@ -20,7 +19,7 @@ public interface DomainRepository<T extends DomainObject> {
     /**
      * 多个新增
      */
-    void create(Collection<? extends T> objects);
+    void create(C collection);
 
     /**
      * 单个更新
@@ -30,7 +29,7 @@ public interface DomainRepository<T extends DomainObject> {
     /**
      * 多个更新
      */
-    void update(Collection<? extends T> objects);
+    void update(C collection);
 
     /**
      * 单个删除
@@ -38,14 +37,9 @@ public interface DomainRepository<T extends DomainObject> {
     void delete(T object);
 
     /**
-     * 根据 id 单个删除
-     */
-    void delete(String id);
-
-    /**
      * 多个删除
      */
-    void delete(Collection<String> ids);
+    void delete(C collection);
 
     /**
      * 单个 id 查询
@@ -55,7 +49,7 @@ public interface DomainRepository<T extends DomainObject> {
     /**
      * 多个 id 查询
      */
-    Collection<T> select(Collection<String> ids);
+    C select(Collection<String> ids);
 
     /**
      * 条件删除
@@ -65,7 +59,12 @@ public interface DomainRepository<T extends DomainObject> {
     /**
      * 单个条件查询
      */
-    T query(Conditions conditions);
+    T get(Conditions conditions);
+
+    /**
+     * 列表条件查询
+     */
+    C select(Conditions conditions);
 
     /**
      * 数量条件查询
@@ -73,17 +72,7 @@ public interface DomainRepository<T extends DomainObject> {
     Long count(Conditions conditions);
 
     /**
-     * 列表条件查询
-     */
-    List<T> list(Conditions conditions);
-
-    /**
      * 分页条件查询
      */
     Pages<T> page(Conditions conditions, Pages.Args page);
-
-    /**
-     * 流式读取
-     */
-    Stream<T> stream(Conditions conditions);
 }

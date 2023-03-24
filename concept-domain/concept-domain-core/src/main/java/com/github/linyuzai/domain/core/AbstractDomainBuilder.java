@@ -1,5 +1,7 @@
 package com.github.linyuzai.domain.core;
 
+import com.github.linyuzai.domain.core.exception.DomainException;
+
 import java.util.Objects;
 
 /**
@@ -31,7 +33,10 @@ public abstract class AbstractDomainBuilder<T extends DomainObject, B> implement
      * 校验
      */
     protected void validate() {
-        Objects.requireNonNull(validator).validate(this);
+        if (validator == null) {
+            throw new DomainException("DomainValidator is null");
+        }
+        validator.validate(this);
     }
 
     /**

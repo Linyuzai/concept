@@ -15,6 +15,8 @@ import java.util.Map;
 @Getter
 public class Conditions {
 
+    public static final Conditions EMPTY = new Conditions();
+
     /**
      * 如果是 null 则不拼接
      */
