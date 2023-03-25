@@ -73,7 +73,7 @@ public class DomainLink {
                     if (annotation == null) {
                         Class<? extends DomainRepository<?, ?>> repository = repositoryFinder.apply(domainClass);
                         if (repository == null) {
-                            throw new DomainRequiredException("@DomainRepositoryLink");
+                            throw new DomainRequiredException("Add @DomainRepositoryLink on " + domainClass + " or custom DomainLink.setRepositoryFinder");
                         } else {
                             return repository;
                         }
