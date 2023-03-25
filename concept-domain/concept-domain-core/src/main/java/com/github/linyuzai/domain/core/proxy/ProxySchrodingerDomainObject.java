@@ -12,11 +12,11 @@ import java.lang.reflect.Method;
  * 薛定谔模型代理
  */
 @Getter
-public class ProxyDomainObject extends SchrodingerDomainObject<DomainObject> implements DomainObject, DomainProxy {
+public class ProxySchrodingerDomainObject extends SchrodingerDomainObject<DomainObject> implements DomainObject, DomainProxy {
 
     protected final Class<? extends DomainObject> type;
 
-    public ProxyDomainObject(Class<? extends DomainObject> type, @NonNull String id, @NonNull DomainContext context) {
+    public ProxySchrodingerDomainObject(Class<? extends DomainObject> type, @NonNull String id, @NonNull DomainContext context) {
         super(id, context);
         this.type = type;
     }

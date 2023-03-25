@@ -53,8 +53,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
         }
         T exist = targetMap.get(id);
         if (exist == null) {
-            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-            T domain = repository.get(id);
+            T domain = doGet(id);
             if (domain == null) {
                 throw new DomainNotFoundException(getDomainType(), id);
             }
@@ -68,17 +67,27 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
         }
     }
 
+    protected T doGet(String id) {
+        DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+        return repository.get(id);
+    }
+
     @Override
     public List<T> list() {
         if (targetList == null) {
-            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-            targetList = repository.select(getConditions()).list();
+
+            targetList = doList();
 
             updateTargetMap();
 
             updateTargetCount();
         }
         return targetList;
+    }
+
+    protected List<T> doList() {
+        DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+        return repository.select(getConditions()).list();
     }
 
     /**
@@ -88,14 +97,17 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     public Stream<T> stream() {
         if (targetList == null) {
             List<T> list = new ArrayList<>();
-            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-            return repository.select(getConditions())
-                    .stream()
+            return doStream()
                     .peek(list::add)
                     .onClose(() -> updateTargetList(list));
         } else {
             return targetList.stream();
         }
+    }
+
+    protected Stream<T> doStream() {
+        DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+        return repository.select(getConditions()).stream();
     }
 
     /**
@@ -133,6 +145,14 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
 
     protected void updateTargetCount() {
         targetCount = Integer.valueOf(targetList.size()).longValue();
+    }
+
+    @Override
+    public void refresh(boolean force) {
+        if (force) {
+            targetList = null;
+        }
+        list();
     }
 
     /**

@@ -15,17 +15,17 @@ import java.lang.reflect.Method;
  * 薛定谔的集合模型
  */
 @Getter
-public class ProxyDomainCollection<T extends DomainObject> extends SchrodingerDomainCollection<T>
+public class ProxySchrodingerDomainCollection<T extends DomainObject> extends SchrodingerDomainCollection<T>
         implements DomainCollection<T>, DomainProxy {
 
     protected final Class<? extends DomainCollection<?>> type;
 
-    public ProxyDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainContext context) {
+    public ProxySchrodingerDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainContext context) {
         super(context);
         this.type = type;
     }
 
-    public ProxyDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainContext context, Conditions conditions) {
+    public ProxySchrodingerDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainContext context, Conditions conditions) {
         super(context, conditions);
         this.type = type;
     }
