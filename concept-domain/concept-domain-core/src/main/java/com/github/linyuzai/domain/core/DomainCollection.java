@@ -1,10 +1,5 @@
 package com.github.linyuzai.domain.core;
 
-import com.github.linyuzai.domain.core.condition.Conditions;
-import com.github.linyuzai.domain.core.schrodinger.SchrodingerDomainCollection;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -39,16 +34,4 @@ public interface DomainCollection<T extends DomainObject> extends DomainObject {
      * 数量
      */
     Long count();
-
-    static <C extends DomainCollection<?>> C wrap(Class<C> cls, Collection<? extends DomainObject> collection) {
-        return new ListableDomainCollection<>(new ArrayList<>(collection)).create(cls);
-    }
-
-    static <C extends DomainCollection<?>> C schrodinger(Class<C> cls, DomainContext context) {
-        return new SchrodingerDomainCollection(cls, context).create(cls);
-    }
-
-    static <C extends DomainCollection<?>> C schrodinger(Class<C> cls, DomainContext context, Conditions conditions) {
-        return new SchrodingerDomainCollection(cls, context, conditions).create(cls);
-    }
 }

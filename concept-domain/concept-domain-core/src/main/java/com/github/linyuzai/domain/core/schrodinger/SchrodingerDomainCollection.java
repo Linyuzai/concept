@@ -5,24 +5,22 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.exception.DomainIdRequiredException;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
-import com.github.linyuzai.domain.core.proxy.DomainCollectionProxy;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * 薛定谔的集合模型
  */
 @Getter
-@AllArgsConstructor
 @RequiredArgsConstructor
-public class SchrodingerDomainCollection implements DomainCollection<DomainObject>, DomainCollectionProxy {
+public class SchrodingerDomainCollection<T extends DomainObject> implements DomainCollection<T> {
 
-    protected final Class<? extends DomainCollection<?>> collectionType;
     /**
      * 领域上下文
      */
@@ -31,62 +29,123 @@ public class SchrodingerDomainCollection implements DomainCollection<DomainObjec
 
     protected Conditions conditions = Conditions.EMPTY;
 
+    protected Map<String, T> targetMap;
+
+    protected List<T> targetList;
+
+    protected Long targetCount;
+
+    public SchrodingerDomainCollection(@NonNull DomainContext context, Conditions conditions) {
+        this.context = context;
+        this.conditions = conditions;
+    }
+
     /**
      * 根据 id 获得领域模型
      */
     @Override
-    public DomainObject get(String id) {
+    public T get(String id) {
         if (id == null) {
             throw new DomainIdRequiredException(getDomainType());
         }
-        DomainRepository<?, ?> repository = context.get(getDomainRepositoryType());
-        DomainObject domain = repository.get(id);
-        if (domain == null) {
-            throw new DomainNotFoundException(getDomainType(), id);
+        if (targetMap == null) {
+            targetMap = new HashMap<>();
         }
-        return domain;
+        T exist = targetMap.get(id);
+        if (exist == null) {
+            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+            T domain = repository.get(id);
+            if (domain == null) {
+                throw new DomainNotFoundException(getDomainType(), id);
+            }
+            targetMap.put(id, domain);
+
+            updateTargetList(id);
+
+            return domain;
+        } else {
+            return exist;
+        }
     }
 
     @Override
-    public List<DomainObject> list() {
-        DomainRepository<DomainObject, ?> repository = context.get(getDomainRepositoryType());
-        return repository.select(getConditions()).list();
+    public List<T> list() {
+        if (targetList == null) {
+            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+            targetList = repository.select(getConditions()).list();
+
+            updateTargetMap();
+
+            updateTargetCount();
+        }
+        return targetList;
     }
 
     /**
      * 流式数据查询
      */
     @Override
-    public Stream<DomainObject> stream() {
-        DomainRepository<DomainObject, ?> repository = context.get(getDomainRepositoryType());
-        return repository.select(getConditions()).stream();
+    public Stream<T> stream() {
+        if (targetList == null) {
+            List<T> list = new ArrayList<>();
+            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+            return repository.select(getConditions())
+                    .stream()
+                    .peek(list::add)
+                    .onClose(() -> updateTargetList(list));
+        } else {
+            return targetList.stream();
+        }
     }
 
     /**
-     * 获得沸点的评论数
+     * 获得数量
      */
     @Override
     public Long count() {
-        DomainRepository<DomainObject, ?> repository = context.get(getDomainRepositoryType());
-        return repository.count(getConditions());
+        if (targetCount == null) {
+            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
+            targetCount = repository.count(getConditions());
+        }
+        return targetCount;
+    }
+
+    protected void updateTargetList(String id) {
+        if (targetList == null) {
+            return;
+        }
+        Set<String> ids = targetList.stream()
+                .map(Identifiable::getId)
+                .collect(Collectors.toSet());
+        if (!ids.contains(id)) {
+            targetList = null;
+        }
+    }
+
+    protected void updateTargetList(List<T> list) {
+        targetList = list;
+    }
+
+    protected void updateTargetMap() {
+        targetMap = targetList.stream()
+                .collect(Collectors.toMap(Identifiable::getId, Function.identity()));
+    }
+
+    protected void updateTargetCount() {
+        targetCount = Integer.valueOf(targetList.size()).longValue();
     }
 
     /**
      * 领域模型类
      */
     protected Class<? extends DomainObject> getDomainType() {
-        return DomainLink.collection(collectionType);
+        return DomainLink.generic(getClass(), 0);
     }
 
     /**
      * 领域模型存储
      */
-    protected Class<? extends DomainRepository<DomainObject, ?>> getDomainRepositoryType() {
+    protected Class<? extends DomainRepository<T, ?>> getDomainRepositoryType() {
         return DomainLink.repository(getDomainType());
-    }
-
-    @Override
-    public Object getInvokeCollection() {
-        return this;
     }
 }

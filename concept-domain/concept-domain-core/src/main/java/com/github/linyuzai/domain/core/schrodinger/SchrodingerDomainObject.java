@@ -3,19 +3,14 @@ package com.github.linyuzai.domain.core.schrodinger;
 import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
-import com.github.linyuzai.domain.core.proxy.AbstractDomainObjectProxy;
 import lombok.*;
-
-import java.lang.reflect.Method;
 
 /**
  * 薛定谔模型代理
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerDomainObject extends AbstractDomainObjectProxy {
-
-    protected final Class<? extends DomainObject> domainType;
+public class SchrodingerDomainObject<T extends DomainObject> implements DomainObject {
 
     /**
      * 领域模型 id
@@ -29,32 +24,38 @@ public class SchrodingerDomainObject extends AbstractDomainObjectProxy {
     @NonNull
     protected final DomainContext context;
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        //如果是 getId 则直接返回
-        if ("getId".equals(method.getName())) {
-            return id;
+    /**
+     * 被代理的领域模型
+     */
+    protected T target;
+
+    public T getTarget() {
+        if (this.target == null) {
+            this.target = doGetTarget();
         }
-        return super.invoke(proxy, method, args);
+        return this.target;
     }
 
     /**
      * 获得被代理的对象
      */
-    @Override
-    public Object doGetTarget() {
-        DomainRepository<?, ?> repository = context.get(getDomainRepositoryType());
-        Object domain = repository.get(id);
+    public T doGetTarget() {
+        DomainRepository<? extends T, ?> repository = context.get(getDomainRepositoryType());
+        T domain = repository.get(id);
         if (domain == null) {
-            throw new DomainNotFoundException(getDomainType(), id);
+            throw new DomainNotFoundException(getDomainObjectType(), id);
         }
         return domain;
+    }
+
+    protected Class<? extends T> getDomainObjectType() {
+        return DomainLink.generic(getClass(), 0);
     }
 
     /**
      * 被代理的领域模型的存储
      */
-    protected Class<? extends DomainRepository<?, ?>> getDomainRepositoryType() {
-        return DomainLink.repository(getDomainType());
+    protected Class<? extends DomainRepository<? extends T, ?>> getDomainRepositoryType() {
+        return DomainLink.repository(getDomainObjectType());
     }
 }

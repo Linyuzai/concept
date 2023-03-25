@@ -17,6 +17,7 @@ import com.github.linyuzai.domain.core.page.Pages;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -83,6 +84,9 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
 
     @Override
     protected void doDelete(Collection<? extends P> pos) {
+        if (pos.isEmpty()) {
+            return;
+        }
         getBaseMapper().deleteBatchIds(pos.stream().map(Identifiable::getId).collect(Collectors.toSet()));
     }
 
@@ -99,6 +103,9 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
      */
     @Override
     protected Collection<P> doSelect(Collection<String> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getBaseMapper().selectBatchIds(ids);
     }
 

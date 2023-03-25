@@ -3,7 +3,9 @@ package com.github.linyuzai.domain.core;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.page.Pages;
+import com.github.linyuzai.domain.core.proxy.ListableDomainCollection;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -200,7 +202,7 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
     protected abstract Pages<P> doPage(Conditions conditions, Pages.Args page);
 
     protected C wrap(Collection<T> objects) {
-        return DomainCollection.wrap(getGenericType(), objects);
+       return new ListableDomainCollection<>(new ArrayList<>(objects)).create(getGenericType());
     }
 
     protected Class<C> getGenericType() {

@@ -3,7 +3,7 @@ package _PACKAGE_.domain._DOMAIN_.schrodinger;
 import _PACKAGE_.domain._DOMAIN_._UPPER_;
 import _PACKAGE_.domain._DOMAIN_._UPPER_Repository;
 import com.github.linyuzai.domain.core.DomainContext;
-import com.github.linyuzai.domain.core.proxy.DomainObjectProxy;
+import com.github.linyuzai.domain.core.proxy.DomainProxy;
 import com.github.linyuzai.domain.core.DomainRepository;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerDomainObject;
 import lombok.AccessLevel;
@@ -34,7 +34,7 @@ public class Schrodinger_UPPER_ extends SchrodingerDomainObject<_UPPER_> {
         }
 
         @Override
-        protected DomainObjectProxy<? extends _UPPER_> getDomainProxy() {
+        protected DomainProxy<? extends _UPPER_> getDomainProxy() {
             return new Schrodinger_UPPER_(id, context);
         }
     }

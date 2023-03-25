@@ -31,6 +31,6 @@ public class UserRepositoryImpl extends QueryDomainRepository<User, Users, UserP
 
     @Override
     protected Collection<UserPO> doSelect(Conditions conditions) {
-        return Collections.emptyList();
+        return Collections.singleton(new UserPO("3"));
     }
 }

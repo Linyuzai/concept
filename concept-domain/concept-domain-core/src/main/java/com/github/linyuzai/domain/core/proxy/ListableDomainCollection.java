@@ -1,10 +1,14 @@
-package com.github.linyuzai.domain.core;
+package com.github.linyuzai.domain.core.proxy;
 
-import com.github.linyuzai.domain.core.proxy.DomainCollectionProxy;
+import com.github.linyuzai.domain.core.DomainCollection;
+import com.github.linyuzai.domain.core.DomainObject;
+import com.github.linyuzai.domain.core.Identifiable;
+import com.github.linyuzai.domain.core.proxy.DomainProxy;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -13,7 +17,7 @@ import java.util.stream.Stream;
 
 @Getter
 @RequiredArgsConstructor
-public class ListableDomainCollection<T extends DomainObject> implements DomainCollection<T>, DomainCollectionProxy {
+public class ListableDomainCollection<T extends DomainObject> implements DomainCollection<T>, DomainProxy {
 
     @NonNull
     private final List<T> list;
@@ -48,7 +52,7 @@ public class ListableDomainCollection<T extends DomainObject> implements DomainC
     }
 
     @Override
-    public Object getInvokeCollection() {
-        return this;
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return method.invoke(this, args);
     }
 }
