@@ -8,6 +8,7 @@ import com.github.linyuzai.domain.core.exception.DomainRequiredException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -34,13 +35,26 @@ public class DomainLink {
     private static final Map<Object, Map<Object, Object>> CACHE = new ConcurrentHashMap<>();
 
     public static <T> Class<T> generic(Class<?> target, int index) {
-        return (Class<T>) CACHE
-                .computeIfAbsent(DomainLink.class, type -> new ConcurrentHashMap<>())
-                .computeIfAbsent(target, key -> {
+        return ((Map<Integer, Class<T>>) CACHE
+                .computeIfAbsent(Class.class, cls -> new ConcurrentHashMap<>())
+                .computeIfAbsent(target, type -> new ConcurrentHashMap<>()))
+                .computeIfAbsent(index, i -> {
                     Type type = target.getGenericSuperclass();
                     if (type instanceof ParameterizedType) {
                         Type[] types = ((ParameterizedType) type).getActualTypeArguments();
-                        return types[index];
+                        Type t = types[index];
+                        if (t instanceof Class) {
+                            return (Class<T>) t;
+                        }
+                        if (t instanceof TypeVariable) {
+                            Type[] bounds = ((TypeVariable<?>) t).getBounds();
+                            if (bounds.length > 0) {
+                                Type bound = bounds[0];
+                                if (bound instanceof Class) {
+                                    return (Class<T>) bound;
+                                }
+                            }
+                        }
                     }
                     throw new DomainException("Can not get generic type");
                 });

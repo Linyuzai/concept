@@ -205,7 +205,7 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
      * 字段匹配类
      */
     public Class<P> getFetchClass() {
-        return DomainLink.generic(getClass(), 0);
+        return DomainLink.generic(getClass(), 2);
     }
 
     /**

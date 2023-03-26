@@ -12,6 +12,9 @@ import java.util.Collections;
 public class DomainTest {
 
     public void test() {
+        Class type = new UserRepositoryImpl().getType();
+        System.out.println(type);
+
         UserRepository repository = new UserRepositoryImpl();
         DomainContext context = new MockDomainContext(UserRepository.class, repository);
 
