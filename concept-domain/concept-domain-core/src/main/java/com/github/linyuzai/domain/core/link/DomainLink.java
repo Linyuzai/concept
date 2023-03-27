@@ -4,7 +4,6 @@ import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.DomainRepository;
 import com.github.linyuzai.domain.core.exception.DomainException;
-import com.github.linyuzai.domain.core.exception.DomainRequiredException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -87,7 +86,7 @@ public class DomainLink {
                     if (annotation == null) {
                         Class<? extends DomainRepository<?, ?>> repository = repositoryFinder.apply(domainClass);
                         if (repository == null) {
-                            throw new DomainRequiredException("Add @DomainRepositoryLink on " + domainClass + " or custom DomainLink.setRepositoryFinder");
+                            throw new DomainException("Add @DomainRepositoryLink on " + domainClass + " or custom DomainLink.setRepositoryFinder");
                         } else {
                             return repository;
                         }
