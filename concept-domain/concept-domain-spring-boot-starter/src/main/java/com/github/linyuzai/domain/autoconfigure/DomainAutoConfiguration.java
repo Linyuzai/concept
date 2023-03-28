@@ -2,8 +2,10 @@ package com.github.linyuzai.domain.autoconfigure;
 
 import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainEventPublisher;
+import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainValidator;
 import com.github.linyuzai.domain.core.event.DomainEventAdapter;
+import com.github.linyuzai.domain.core.proxy.ProxyDomainFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,5 +44,14 @@ public class DomainAutoConfiguration {
     @ConditionalOnMissingBean
     public DomainValidator domainValidator(Validator validator) {
         return new ApplicationDomainValidator(validator);
+    }
+
+    /**
+     * 领域工厂
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public DomainFactory domainFactory(DomainContext context) {
+        return new ProxyDomainFactory(context);
     }
 }

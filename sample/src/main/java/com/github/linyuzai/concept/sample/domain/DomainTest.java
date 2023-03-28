@@ -1,10 +1,8 @@
 package com.github.linyuzai.concept.sample.domain;
 
-import com.github.linyuzai.domain.core.DomainCollection;
-import com.github.linyuzai.domain.core.DomainContext;
-import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.Identifiable;
+import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.mock.MockDomainContext;
+import com.github.linyuzai.domain.core.proxy.ProxyDomainFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,17 +15,18 @@ public class DomainTest {
 
         UserRepository repository = new UserRepositoryImpl();
         DomainContext context = new MockDomainContext(UserRepository.class, repository);
+        DomainFactory factory = new ProxyDomainFactory(context);
 
         Users select = repository.select(Arrays.asList("1", "2"));
         select.list().stream().map(Identifiable::getId).forEach(System.out::println);
 
-        User user = context.create(User.class, "1");
+        User user = factory.create(User.class, "1");
         System.out.println(user.getId());
 
-        Users wrap = context.create(Users.class, Collections.singleton(user));
+        Users wrap = factory.create(Users.class, Collections.singleton(user));
         wrap.list().stream().map(Identifiable::getId).forEach(System.out::println);
 
-        Users users = context.create(Users.class);
+        Users users = factory.create(Users.class);
         users.list().stream().map(Identifiable::getId).forEach(System.out::println);
 
         User schrodingerUser = new SchrodingerUser("4", context);
@@ -35,5 +34,9 @@ public class DomainTest {
 
         Users schrodingerUsers = new SchrodingerUsers(context);
         schrodingerUsers.list().stream().map(Identifiable::getId).forEach(System.out::println);
+
+        User u = factory.create(User.class, "3", factory.create(Users.class));
+        u.load();
+        System.out.println(u.getName());
     }
 }

@@ -34,12 +34,4 @@ public interface DomainCollection<T extends DomainObject> extends DomainObject {
      * 数量
      */
     Long count();
-
-    default void refresh() {
-        refresh(false);
-    }
-
-    default void refresh(boolean force) {
-
-    }
 }

@@ -1,9 +1,6 @@
 package com.github.linyuzai.domain.core.condition;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +9,7 @@ import java.util.Map;
 /**
  * 查询条件
  */
+@ToString
 @Getter
 public class Conditions {
 
@@ -60,10 +58,21 @@ public class Conditions {
     @Setter(AccessLevel.PROTECTED)
     private Limit limit;
 
+    public static Conditions from(Conditions source) {
+        Conditions conditions = new Conditions();
+        source.copy(conditions);
+        return conditions;
+    }
+
     //有需要可以添加其他条件
 
     public LambdaConditions lambda() {
         LambdaConditions conditions = new LambdaConditions();
+        copy(conditions);
+        return conditions;
+    }
+
+    private void copy(Conditions conditions) {
         conditions.setIgnoreIfNull(this.ignoreIfNull);
         conditions.setIgnoreIfEmpty(this.ignoreIfEmpty);
         conditions.getEquals().addAll(this.equals);
@@ -72,7 +81,6 @@ public class Conditions {
         conditions.getLikes().addAll(this.likes);
         conditions.getOrderBys().addAll(this.orderBys);
         conditions.setLimit(this.limit);
-        return conditions;
     }
 
     /**
@@ -171,6 +179,7 @@ public class Conditions {
     /**
      * = 条件
      */
+    @ToString
     @Getter
     @AllArgsConstructor
     public static class Equal {
@@ -189,6 +198,7 @@ public class Conditions {
     /**
      * is null 条件
      */
+    @ToString
     @Getter
     @AllArgsConstructor
     public static class Null {
@@ -202,6 +212,7 @@ public class Conditions {
     /**
      * in 条件
      */
+    @ToString
     @Getter
     @AllArgsConstructor
     public static class In {
@@ -220,6 +231,7 @@ public class Conditions {
     /**
      * like 条件
      */
+    @ToString
     @Getter
     @AllArgsConstructor
     public static class Like {
@@ -238,6 +250,7 @@ public class Conditions {
     /**
      * order by 条件
      */
+    @ToString
     @Getter
     @AllArgsConstructor
     public static class OrderBy {
@@ -256,6 +269,7 @@ public class Conditions {
     /**
      * limit 条件
      */
+    @ToString
     @Getter
     @AllArgsConstructor
     public static class Limit {

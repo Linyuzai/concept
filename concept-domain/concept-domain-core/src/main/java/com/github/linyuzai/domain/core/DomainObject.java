@@ -7,4 +7,11 @@ import java.io.Serializable;
  */
 public interface DomainObject extends Identifiable, Serializable {
 
+    default void load() {
+
+    }
+
+    default void release() {
+
+    }
 }

@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-public class UserRepositoryImpl<P extends UserPO> extends QueryDomainRepository<User, Users, P> implements UserRepository {
+public class UserRepositoryImpl extends QueryDomainRepository<User, Users, UserPO> implements UserRepository {
 
     @Override
     public User po2do(UserPO po) {
@@ -16,26 +16,28 @@ public class UserRepositoryImpl<P extends UserPO> extends QueryDomainRepository<
     }
 
     @Override
-    protected P doGet(String id) {
-        return (P) new UserPO(id);
+    protected UserPO doGet(String id) {
+        return new UserPO(id);
     }
 
     @Override
-    protected Collection<P> doSelect(Collection<String> ids) {
-        return (Collection<P>) ids.stream().map(UserPO::new).collect(Collectors.toList());
+    protected Collection<UserPO> doSelect(Collection<String> ids) {
+        return ids.stream().map(UserPO::new).collect(Collectors.toList());
     }
 
     @Override
-    protected P doGet(Conditions conditions) {
-        return null;
+    protected UserPO doGet(Conditions conditions) {
+        System.out.println("get:" + conditions);
+        return new UserPO("3");
     }
 
     @Override
-    protected Collection<P> doSelect(Conditions conditions) {
-        return (Collection<P>) Collections.singleton(new UserPO("3"));
+    protected Collection<UserPO> doSelect(Conditions conditions) {
+        System.out.println("select:" + conditions);
+        return Collections.singleton(new UserPO("3"));
     }
 
     public Class<?> getType() {
-       return DomainLink.generic(getClass(), 2);
+        return DomainLink.generic(getClass(), 2);
     }
 }

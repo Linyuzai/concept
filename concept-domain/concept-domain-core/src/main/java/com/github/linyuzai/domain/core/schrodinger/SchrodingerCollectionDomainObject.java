@@ -1,16 +1,21 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
-import com.github.linyuzai.domain.core.*;
+import com.github.linyuzai.domain.core.DomainCollection;
+import com.github.linyuzai.domain.core.DomainContext;
+import com.github.linyuzai.domain.core.DomainObject;
+import com.github.linyuzai.domain.core.DomainRepository;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 薛定谔模型代理
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerDomainObject<T extends DomainObject> implements DomainObject {
+public class SchrodingerCollectionDomainObject<T extends DomainObject> implements DomainObject {
 
     /**
      * 领域模型 id
@@ -18,11 +23,8 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
     @NonNull
     protected final String id;
 
-    /**
-     * 领域上下文
-     */
     @NonNull
-    protected final DomainContext context;
+    protected final DomainCollection<? extends T> collection;
 
     /**
      * 被代理的领域模型
@@ -31,7 +33,7 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
 
     public T getTarget() {
         if (this.target == null) {
-            load();
+            this.target = doGetTarget();
         }
         return this.target;
     }
@@ -40,8 +42,7 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
      * 获得被代理的对象
      */
     public T doGetTarget() {
-        DomainRepository<? extends T, ?> repository = context.get(getDomainRepositoryType());
-        T domain = repository.get(id);
+        T domain = this.collection.get(id);
         if (domain == null) {
             throw new DomainNotFoundException(getDomainObjectType(), id);
         }
@@ -50,22 +51,17 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
 
     @Override
     public void load() {
+        this.collection.load();
         this.target = doGetTarget();
     }
 
     @Override
     public void release() {
         this.target = null;
+        this.collection.release();
     }
 
     protected Class<? extends T> getDomainObjectType() {
         return DomainLink.generic(getClass(), 0);
-    }
-
-    /**
-     * 被代理的领域模型的存储
-     */
-    protected Class<? extends DomainRepository<? extends T, ?>> getDomainRepositoryType() {
-        return DomainLink.repository(getDomainObjectType());
     }
 }

@@ -69,7 +69,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
 
     protected T doGet(String id) {
         DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-        return repository.get(id);
+        return repository.get(Conditions.from(conditions).equal("id", id));
     }
 
     @Override
@@ -148,11 +148,15 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     }
 
     @Override
-    public void refresh(boolean force) {
-        if (force) {
-            targetList = null;
-        }
+    public void load() {
         list();
+    }
+
+    @Override
+    public void release() {
+        targetMap.clear();
+        targetList = null;
+        targetCount = null;
     }
 
     /**
