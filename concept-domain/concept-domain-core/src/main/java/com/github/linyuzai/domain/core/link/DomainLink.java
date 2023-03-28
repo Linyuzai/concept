@@ -15,15 +15,12 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public class DomainLink {
 
-    private static Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder = new Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>>() {
-        @Override
-        public Class<? extends DomainRepository<?, ?>> apply(Class<? extends DomainObject> domainClass) {
-            String repository = domainClass.getName() + "Repository";
-            try {
-                return (Class<? extends DomainRepository<?, ?>>) Class.forName(repository);
-            } catch (ClassNotFoundException ignore) {
-                return null;
-            }
+    private static Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder = domainClass -> {
+        String repository = domainClass.getName() + "Repository";
+        try {
+            return (Class<? extends DomainRepository<?, ?>>) Class.forName(repository);
+        } catch (ClassNotFoundException ignore) {
+            return null;
         }
     };
 
