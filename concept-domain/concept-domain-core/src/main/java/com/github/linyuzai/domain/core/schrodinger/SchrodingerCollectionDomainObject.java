@@ -32,9 +32,7 @@ public class SchrodingerCollectionDomainObject<T extends DomainObject> implement
     protected T target;
 
     public T getTarget() {
-        if (this.target == null) {
-            this.target = doGetTarget();
-        }
+        load0();
         return this.target;
     }
 
@@ -52,7 +50,13 @@ public class SchrodingerCollectionDomainObject<T extends DomainObject> implement
     @Override
     public void load() {
         this.collection.load();
-        this.target = doGetTarget();
+        load0();
+    }
+
+    private void load0() {
+        if (this.target == null) {
+            this.target = doGetTarget();
+        }
     }
 
     @Override

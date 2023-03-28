@@ -7,5 +7,5 @@ package com.github.linyuzai.domain.core;
  */
 public interface DomainBuilder<T extends DomainObject> {
 
-    T build();
+    T build(DomainValidator validator);
 }

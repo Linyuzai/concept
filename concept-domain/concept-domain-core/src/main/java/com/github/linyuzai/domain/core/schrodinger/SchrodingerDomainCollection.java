@@ -69,19 +69,16 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
 
     protected T doGet(String id) {
         DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-        return repository.get(Conditions.from(conditions).equal("id", id));
+        return repository.get(Conditions.from(conditions).equal(getIdConditionKey(), id));
+    }
+
+    protected String getIdConditionKey() {
+        return "id";
     }
 
     @Override
     public List<T> list() {
-        if (targetList == null) {
-
-            targetList = doList();
-
-            updateTargetMap();
-
-            updateTargetCount();
-        }
+        load();
         return targetList;
     }
 
@@ -96,10 +93,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     @Override
     public Stream<T> stream() {
         if (targetList == null) {
-            List<T> list = new ArrayList<>();
-            return doStream()
-                    .peek(list::add)
-                    .onClose(() -> updateTargetList(list));
+            return doStream();
         } else {
             return targetList.stream();
         }
@@ -149,7 +143,14 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
 
     @Override
     public void load() {
-        list();
+        if (targetList == null) {
+
+            updateTargetList(doList());
+
+            updateTargetMap();
+
+            updateTargetCount();
+        }
     }
 
     @Override

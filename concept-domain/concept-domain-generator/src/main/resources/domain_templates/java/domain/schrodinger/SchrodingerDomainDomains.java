@@ -3,7 +3,6 @@ package _PACKAGE_.domain._DOMAIN_.schrodinger;
 import _PACKAGE_.domain._DOMAIN_._UPPER_;
 import _PACKAGE_.domain._DOMAIN_._UPPER_Repository;
 import _PACKAGE_.domain._DOMAIN_._UPPER_s;
-import com.github.linyuzai.domain.core.ContextDomainBuilder;
 import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainRepository;
 import com.github.linyuzai.domain.core.condition.Conditions;

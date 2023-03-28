@@ -30,9 +30,7 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
     protected T target;
 
     public T getTarget() {
-        if (this.target == null) {
-            load();
-        }
+        load();
         return this.target;
     }
 
@@ -50,7 +48,9 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
 
     @Override
     public void load() {
-        this.target = doGetTarget();
+        if (this.target == null) {
+            this.target = doGetTarget();
+        }
     }
 
     @Override
