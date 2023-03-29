@@ -2,30 +2,35 @@ package com.github.linyuzai.domain.core.proxy;
 
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.schrodinger.SchrodingerCollectionDomainObject;
+import com.github.linyuzai.domain.core.schrodinger.SchrodingerOnceDomainObject;
 import lombok.NonNull;
 
 import java.lang.reflect.Method;
+import java.util.function.Predicate;
 
 /**
  * 薛定谔模型代理
  */
-public class ProxySchrodingerCollectionDomainObject extends SchrodingerCollectionDomainObject<DomainObject>
+public class ProxySchrodingerOnceDomainObject<T extends DomainObject> extends SchrodingerOnceDomainObject<T>
         implements DomainObject, DomainProxy {
 
-    public ProxySchrodingerCollectionDomainObject(@NonNull String id, @NonNull DomainCollection<? extends DomainObject> collection) {
-        super(id, collection);
+    protected final Class<T> type;
+
+    public ProxySchrodingerOnceDomainObject(Class<T> type, @NonNull DomainCollection<T> collection, @NonNull Predicate<T> predicate) {
+        super(collection, predicate);
+        this.type = type;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        //如果是 getId 则直接返回
-        if ("getId".equals(method.getName())) {
-            return id;
-        }
         if (method.getDeclaringClass() == DomainObject.class) {
             return method.invoke(this, args);
         }
         return method.invoke(getTarget(), args);
+    }
+
+    @Override
+    protected Class<? extends T> getDomainObjectType() {
+        return type;
     }
 }

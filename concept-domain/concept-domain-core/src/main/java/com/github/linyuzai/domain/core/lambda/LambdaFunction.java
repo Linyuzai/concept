@@ -15,11 +15,9 @@ import java.util.function.Function;
  * 接收 lambda 表达式
  */
 @FunctionalInterface
-public interface LambdaFunction<T, R> extends Serializable {
+public interface LambdaFunction<T, R> extends Function<T,R>, Serializable {
 
     Map<Class<?>, SerializedLambda> CACHE = new ConcurrentHashMap<>();
-
-    R get(T t);
 
     default SerializedLambda getSerializedLambda() {
         return CACHE.computeIfAbsent(this.getClass(), new MappingFunction(this));

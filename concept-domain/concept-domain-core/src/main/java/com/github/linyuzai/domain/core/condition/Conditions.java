@@ -64,6 +64,14 @@ public class Conditions {
         return conditions;
     }
 
+    public static Conditions id(String id) {
+        return new Conditions().equal("id", id);
+    }
+
+    public static Conditions ids(Collection<String> ids) {
+        return new Conditions().in("id", ids);
+    }
+
     //有需要可以添加其他条件
 
     public LambdaConditions lambda() {
