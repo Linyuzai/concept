@@ -1,7 +1,6 @@
 package com.github.linyuzai.domain.core;
 
 import com.github.linyuzai.domain.core.condition.Conditions;
-import com.github.linyuzai.domain.core.proxy.ProxySchrodingerOnceDomainCollection;
 
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -20,6 +19,8 @@ public interface DomainFactory {
     <C extends DomainCollection<?>> C createCollection(Class<C> cls);
 
     <C extends DomainCollection<?>> C createCollection(Class<C> cls, Conditions conditions);
+
+    <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids, boolean createObject);
 
     <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Predicate<T> predicate);
 

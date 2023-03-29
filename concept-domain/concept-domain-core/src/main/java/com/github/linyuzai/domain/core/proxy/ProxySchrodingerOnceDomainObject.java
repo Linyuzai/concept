@@ -2,6 +2,7 @@ package com.github.linyuzai.domain.core.proxy;
 
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
+import com.github.linyuzai.domain.core.Identifiable;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerOnceDomainObject;
 import lombok.NonNull;
 
@@ -23,7 +24,8 @@ public class ProxySchrodingerOnceDomainObject<T extends DomainObject> extends Sc
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getDeclaringClass() == DomainObject.class) {
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass == DomainObject.class || declaringClass == Identifiable.class) {
             return method.invoke(this, args);
         }
         return method.invoke(getTarget(), args);
