@@ -1,32 +1,26 @@
 package com.github.linyuzai.domain.core;
 
-import com.github.linyuzai.domain.core.event.DomainEventAdapter;
+import com.github.linyuzai.domain.core.event.DomainEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
 public abstract class AbstractDomainEventPublisher implements DomainEventPublisher {
 
-    private List<DomainEventAdapter> eventAdapters;
+    private DomainContext context;
 
     @Override
     public void publish(Object event) {
         onPublish(event);
-        if (eventAdapters != null) {
-            List<Object> events = eventAdapters.stream()
-                    .filter(it -> it.support(event))
-                    .map(it -> it.adapt(event))
-                    .collect(Collectors.toList());
-            onExchange(events);
+        doPublish(event);
+    }
+
+    protected void onPublish(Object event) {
+        if (event instanceof DomainEvent) {
+            ((DomainEvent) event).onPublish(context, this);
         }
     }
 
-    protected abstract void onPublish(Object event);
-
-    protected abstract void onExchange(Collection<?> events);
+    protected abstract void doPublish(Object event);
 }

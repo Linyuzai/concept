@@ -5,7 +5,7 @@ package com.github.linyuzai.domain.core;
  *
  * @param <T>
  */
-public interface DomainIdGenerator<T extends DomainObject> {
+public interface DomainIdGenerator<T> {
 
-    String generateId(Class<T> domainClass);
+    String generateId(T object);
 }
