@@ -6,10 +6,10 @@ import com.github.linyuzai.domain.core.DomainIdGenerator;
 /**
  * 基于 MyBatis-Plus 的 id 生成器
  */
-public abstract class MBPDomainIdGenerator implements DomainIdGenerator<Object> {
+public class MBPDomainIdGenerator<T> implements DomainIdGenerator<T> {
 
     @Override
-    public String generateId(Object object) {
+    public String generateId(T object) {
         return IdWorker.getIdStr();
     }
 }
