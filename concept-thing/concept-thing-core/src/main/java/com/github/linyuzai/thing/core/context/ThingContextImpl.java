@@ -1,7 +1,5 @@
 package com.github.linyuzai.thing.core.context;
 
-import com.github.linyuzai.thing.core.action.ThingActionChain;
-import com.github.linyuzai.thing.core.action.ThingActionChainFactory;
 import com.github.linyuzai.thing.core.event.ThingEventPublisher;
 
 import java.util.Map;
@@ -25,12 +23,6 @@ public class ThingContextImpl implements ThingContext {
     @Override
     public void remove(Object key) {
         map.remove(key);
-    }
-
-    @Override
-    public ThingActionChain actions() {
-        ThingActionChainFactory factory = get(ThingActionChainFactory.class);
-        return factory.create(this);
     }
 
     @Override

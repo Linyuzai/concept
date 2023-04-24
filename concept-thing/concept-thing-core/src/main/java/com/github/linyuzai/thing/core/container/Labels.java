@@ -12,7 +12,7 @@ public interface Labels extends Container<Label> {
 
     void setCategory(Category category);
 
-    ThingAction add(String name);
+    ThingAction add(String id, String name);
 
-    ThingAction add(String name, Function<Label, ThingAction> next);
+    ThingAction add(String id, String name, Function<Label, ThingAction> next);
 }

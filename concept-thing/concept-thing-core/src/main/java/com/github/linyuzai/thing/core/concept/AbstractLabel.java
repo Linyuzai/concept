@@ -5,9 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractLabel extends AbstractIdentify<Label> implements Label {
+public abstract class AbstractLabel extends AbstractIdentify implements Label {
 
     private String name;
-
-    private Category category;
 }

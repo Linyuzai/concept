@@ -12,15 +12,12 @@ import lombok.Setter;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Setter
 @Getter
 public abstract class AbstractAttributes extends AbstractContainer<Attribute> implements Attributes {
 
     private Thing thing;
-
-    private Map<String, List<Label>> keyLabelsCache = new LinkedHashMap<>();
 
     @Override
     public ThingAction add(Label label) {
@@ -31,33 +28,9 @@ public abstract class AbstractAttributes extends AbstractContainer<Attribute> im
     public ThingAction add(Label label, Function<Attribute, ThingAction> next) {
         Attribute attribute = create(label);
         ThingAction action = add(attribute);
-        if (next == null) {
-            return action;
-        } else {
-            ThingAction apply = next.apply(attribute);
-            ThingActionChain chain = getContext().actions();
-            return chain.next(action).next(apply);
-        }
+        return chain(action, next, attribute);
     }
 
-    @Override
-    public ThingAction add(String label) {
-        return add(label, null);
-    }
-
-    @Override
-    public ThingAction add(String label, Function<Attribute, ThingAction> next) {
-        if (!keyLabelsCache.containsKey(label)) {
-            collectLabels(getThing().getCategories(), Collections.singleton(label));
-        }
-        ThingActionChain chain = getContext().actions();
-        List<Label> labels = keyLabelsCache.get(label);
-        for (Label l : labels) {
-            ThingAction add = add(l, next);
-            chain.next(add);
-        }
-        return chain;
-    }
 
     protected Attribute create(Label label) {
         AttributeFactory factory = getContext().get(AttributeFactory.class);
@@ -70,25 +43,19 @@ public abstract class AbstractAttributes extends AbstractContainer<Attribute> im
 
     @Override
     public ThingAction update(Map<String, Object> values) {
-        ThingActionChain chain = getContext().actions();
+        ThingActionChain chain = chain();
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             Attribute attribute = get(key);
             //如果没有找到去 Category 中找对应的 Label
             if (attribute == null) {
-                Set<String> collectKeys = values.keySet()
-                        .stream()
-                        .filter(it -> !keyLabelsCache.containsKey(it))
-                        .collect(Collectors.toSet());
-                if (!collectKeys.isEmpty()) {
-                    collectLabels(getThing().getCategories(), collectKeys);
-                    List<Label> labels = keyLabelsCache.get(key);
-                    for (Label label : labels) {
-                        ThingAction add = add(label, attr -> attr.update(value));
-                        chain.next(add);
-                    }
+                Label label = getLabelFromCategories(Collections.singletonList(getThing().getCategory()), key);
+                if (label == null) {
+                    throw new IllegalArgumentException("Label not found: " + key);
                 }
+                ThingAction add = add(label, attr -> attr.update(value));
+                chain.next(add);
             } else {
                 ThingAction update = attribute.update(value);
                 chain.next(update);
@@ -97,14 +64,20 @@ public abstract class AbstractAttributes extends AbstractContainer<Attribute> im
         return chain;
     }
 
-    protected void collectLabels(Categories categories, Set<String> keys) {
-        for (Category category : categories.list()) {
-            for (Label label : category.getLabels().list()) {
-                if (keys.contains(label.getKey())) {
-                    keyLabelsCache.computeIfAbsent(label.getKey(), f -> new ArrayList<>()).add(label);
+    protected Label getLabelFromCategories(List<Category> categories, String id) {
+        List<Category> children = new ArrayList<>(categories);
+        while (!children.isEmpty()) {
+            List<Category> parents = new ArrayList<>();
+            for (Category category : children) {
+                parents.addAll(category.getParents().list());
+                Label label = category.getLabels().get(id);
+                if (label != null) {
+                    return label;
                 }
             }
-            collectLabels(category.getParents(), keys);
+            children.clear();
+            children.addAll(parents);
         }
+        return null;
     }
 }

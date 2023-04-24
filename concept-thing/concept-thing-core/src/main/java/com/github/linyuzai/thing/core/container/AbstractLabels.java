@@ -1,7 +1,6 @@
 package com.github.linyuzai.thing.core.container;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
-import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.concept.Category;
 import com.github.linyuzai.thing.core.concept.Label;
 import com.github.linyuzai.thing.core.factory.LabelFactory;
@@ -17,28 +16,22 @@ public abstract class AbstractLabels extends AbstractContainer<Label> implements
     private Category category;
 
     @Override
-    public ThingAction add(String name) {
-        return add(name, null);
+    public ThingAction add(String id, String name) {
+        return add(id, name, null);
     }
 
     @Override
-    public ThingAction add(String name, Function<Label, ThingAction> next) {
-        Label label = create(name);
+    public ThingAction add(String id, String name, Function<Label, ThingAction> next) {
+        Label label = create(id, name);
         ThingAction action = add(label);
-        if (next == null) {
-            return action;
-        } else {
-            ThingAction apply = next.apply(label);
-            ThingActionChain chain = getContext().actions();
-            return chain.next(action).next(apply);
-        }
+        return chain(action, next, label);
     }
 
-    protected Label create(String name) {
+    protected Label create(String id, String name) {
         LabelFactory factory = getContext().get(LabelFactory.class);
         Label label = factory.create();
+        label.setId(id);
         label.setName(name);
-        label.setCategory(category);
         label.setContext(getContext());
         return label;
     }

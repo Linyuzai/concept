@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractRelationship extends AbstractIdentify<Relationship> implements Relationship {
+public abstract class AbstractRelationship extends AbstractIdentify implements Relationship {
 
     private String name;
 

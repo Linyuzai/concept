@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractAttribute extends AbstractIdentify<Attribute> implements Attribute {
+public abstract class AbstractAttribute extends AbstractIdentify implements Attribute {
 
     private Label label;
 

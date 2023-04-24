@@ -1,6 +1,6 @@
 package com.github.linyuzai.thing.core.concept;
 
-public interface Relationship extends Identify<Relationship> {
+public interface Relationship extends Identify {
 
     String getName();
 

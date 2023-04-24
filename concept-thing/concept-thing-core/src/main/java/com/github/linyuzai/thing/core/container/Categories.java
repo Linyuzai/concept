@@ -11,7 +11,7 @@ public interface Categories extends Container<Category> {
 
     void setCategory(Category category);
 
-    ThingAction add(String name);
+    ThingAction add(String id, String name);
 
-    ThingAction add(String name, Function<Category, ThingAction> next);
+    ThingAction add(String id, String name, Function<Category, ThingAction> next);
 }

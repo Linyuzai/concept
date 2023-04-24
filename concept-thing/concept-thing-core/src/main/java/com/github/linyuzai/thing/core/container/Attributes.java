@@ -21,9 +21,5 @@ public interface Attributes extends Container<Attribute> {
 
     ThingAction add(Label label, Function<Attribute, ThingAction> next);
 
-    ThingAction add(String label);
-
-    ThingAction add(String label, Function<Attribute, ThingAction> next);
-
     ThingAction update(Map<String, Object> values);
 }

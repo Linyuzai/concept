@@ -1,18 +1,17 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.action.ThingActionChain;
 import com.github.linyuzai.thing.core.container.*;
 import com.github.linyuzai.thing.core.context.ThingContext;
 
-public interface Thing extends Identify<Thing> {
+public interface Thing extends Identify {
 
     String getName();
 
     void setName(String name);
 
-    Categories getCategories();
+    Category getCategory();
 
-    void setCategories(Categories categories);
+    void setCategory(Category category);
 
     Attributes getAttributes();
 
@@ -25,8 +24,6 @@ public interface Thing extends Identify<Thing> {
     ThingContext getContext();
 
     void setContext(ThingContext context);
-
-    ThingActionChain actions();
 
     void publish(Object event);
 

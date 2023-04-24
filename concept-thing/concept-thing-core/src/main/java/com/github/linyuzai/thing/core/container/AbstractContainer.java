@@ -1,6 +1,8 @@
 package com.github.linyuzai.thing.core.container;
 
 import com.github.linyuzai.thing.core.action.ThingAction;
+import com.github.linyuzai.thing.core.action.ThingActionChain;
+import com.github.linyuzai.thing.core.action.ThingActionChainFactory;
 import com.github.linyuzai.thing.core.concept.Identify;
 import com.github.linyuzai.thing.core.context.ThingContext;
 import com.github.linyuzai.thing.core.event.ThingAddedEvent;
@@ -9,18 +11,20 @@ import com.github.linyuzai.thing.core.event.ThingRemovedEvent;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 
 @Getter
 @Setter
-public abstract class AbstractContainer<T extends Identify<T>> implements Container<T> {
+public abstract class AbstractContainer<T extends Identify> implements Container<T> {
 
     private ThingContext context;
 
-    private Map<String, T> map;
+    private Map<String, T> map = initMap();
+
+    protected Map<String, T> initMap() {
+        return new LinkedHashMap<>();
+    }
 
     @Override
     public T get(String id) {
@@ -62,5 +66,19 @@ public abstract class AbstractContainer<T extends Identify<T>> implements Contai
 
     protected ThingEvent createRemovedEvent(String id, T removed) {
         return new ThingRemovedEvent(context, ThingAction.REMOVE, this, id, removed);
+    }
+
+    protected ThingActionChain chain() {
+        ThingActionChainFactory factory = getContext().get(ThingActionChainFactory.class);
+        return factory.create(getContext());
+    }
+
+    protected ThingAction chain(ThingAction action, Function<T, ThingAction> next, T arg) {
+        if (next == null) {
+            return action;
+        } else {
+            ThingAction apply = next.apply(arg);
+            return chain().next(action).next(apply);
+        }
     }
 }

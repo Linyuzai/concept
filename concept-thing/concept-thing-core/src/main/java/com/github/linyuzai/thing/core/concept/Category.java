@@ -1,10 +1,9 @@
 package com.github.linyuzai.thing.core.concept;
 
-import com.github.linyuzai.thing.core.action.ThingAction;
 import com.github.linyuzai.thing.core.container.Categories;
 import com.github.linyuzai.thing.core.container.Labels;
 
-public interface Category extends Identify<Category> {
+public interface Category extends Identify {
 
     String getName();
 
@@ -17,8 +16,4 @@ public interface Category extends Identify<Category> {
     Labels getLabels();
 
     void setLabels(Labels labels);
-
-    ThingAction addLabel(String key, String name);
-
-    ThingAction addLabel(String id, String key, String name);
 }

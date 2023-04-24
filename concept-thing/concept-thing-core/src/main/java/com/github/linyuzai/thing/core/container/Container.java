@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface Container<T extends Identify<T>> {
+public interface Container<T extends Identify> {
 
     ThingContext getContext();
 
