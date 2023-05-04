@@ -28,7 +28,12 @@ public class ProxySchrodingerOnceDomainObject<T extends DomainObject> extends Sc
         if (declaringClass == DomainObject.class || declaringClass == Identifiable.class) {
             return method.invoke(this, args);
         }
-        return method.invoke(getTarget(), args);
+        return DomainProxy.super.doInvoke(proxy, method, args);
+    }
+
+    @Override
+    public Object getProxied() {
+        return getTarget();
     }
 
     @Override

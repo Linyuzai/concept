@@ -28,7 +28,12 @@ public class ProxySchrodingerDomainObject<T extends DomainObject> extends Schrod
         if (declaringClass == DomainObject.class || declaringClass == Identifiable.class) {
             return method.invoke(this, args);
         }
-        return method.invoke(getTarget(), args);
+        return DomainProxy.super.doInvoke(proxy, method, args);
+    }
+
+    @Override
+    public Object getProxied() {
+        return getTarget();
     }
 
     @Override
