@@ -23,7 +23,7 @@ public class ProxySchrodingerDomainObject<T extends DomainObject> extends Schrod
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {
         Class<?> declaringClass = method.getDeclaringClass();
         if (declaringClass == DomainObject.class || declaringClass == Identifiable.class) {
             return method.invoke(this, args);

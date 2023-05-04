@@ -9,8 +9,6 @@ import com.github.linyuzai.domain.core.schrodinger.SchrodingerDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.lang.reflect.Method;
-
 /**
  * 薛定谔的集合模型
  */
@@ -28,11 +26,6 @@ public class ProxySchrodingerDomainCollection<T extends DomainObject> extends Sc
     public ProxySchrodingerDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainContext context, Conditions conditions) {
         super(context, conditions);
         this.type = type;
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return method.invoke(this, args);
     }
 
     protected Class<? extends DomainObject> getDomainType() {

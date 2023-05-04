@@ -29,6 +29,8 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
 
     protected Conditions conditions = Conditions.EMPTY;
 
+    protected DomainRepository<T, ?> repository;
+
     protected Map<String, T> targetMap;
 
     protected List<T> targetList;
@@ -68,8 +70,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     }
 
     protected T doGet(String id) {
-        DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-        return repository.get(Conditions.from(conditions).equal(getIdConditionKey(), id));
+        return getRepository().get(Conditions.from(conditions).equal(getIdConditionKey(), id));
     }
 
     protected String getIdConditionKey() {
@@ -83,8 +84,14 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     }
 
     protected List<T> doList() {
-        DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-        return repository.select(getConditions()).list();
+        return getRepository().select(getConditions()).list();
+    }
+
+    public DomainRepository<T, ?> getRepository() {
+        if (repository == null) {
+            repository = context.get(getDomainRepositoryType());
+        }
+        return repository;
     }
 
     /**
@@ -100,8 +107,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     }
 
     protected Stream<T> doStream() {
-        DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-        return repository.select(getConditions()).stream();
+        return getRepository().select(getConditions()).stream();
     }
 
     /**
@@ -110,8 +116,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
     @Override
     public Long count() {
         if (targetCount == null) {
-            DomainRepository<T, ?> repository = context.get(getDomainRepositoryType());
-            targetCount = repository.count(getConditions());
+            targetCount = getRepository().count(getConditions());
         }
         return targetCount;
     }
