@@ -39,17 +39,9 @@ public class DomainLink {
                     if (type instanceof ParameterizedType) {
                         Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                         Type t = types[index];
-                        if (t instanceof Class) {
-                            return (Class<T>) t;
-                        }
-                        if (t instanceof TypeVariable) {
-                            Type[] bounds = ((TypeVariable<?>) t).getBounds();
-                            if (bounds.length > 0) {
-                                Type bound = bounds[0];
-                                if (bound instanceof Class) {
-                                    return (Class<T>) bound;
-                                }
-                            }
+                        Class<T> classForType = getClassForType(t);
+                        if (classForType != null) {
+                            return classForType;
                         }
                     }
                     throw new DomainException("Can not get generic type");
@@ -64,7 +56,8 @@ public class DomainLink {
                         for (Type type : target.getGenericInterfaces()) {
                             if (type instanceof ParameterizedType) {
                                 ParameterizedType pt = (ParameterizedType) type;
-                                if (pt.getRawType() == DomainCollection.class) {
+                                Class<?> classForType = getClassForType(pt.getRawType());
+                                if (classForType != null && DomainCollection.class.isAssignableFrom(classForType)) {
                                     Type[] arguments = pt.getActualTypeArguments();
                                     return arguments[0];
                                 }
@@ -91,5 +84,22 @@ public class DomainLink {
                         return annotation.value();
                     }
                 });
+    }
+
+    public static <T> Class<T> getClassForType(Type type) {
+        if (type instanceof Class) {
+            return (Class<T>) type;
+        }
+        if (type instanceof ParameterizedType) {
+            return getClassForType(((ParameterizedType) type).getRawType());
+        }
+        if (type instanceof TypeVariable) {
+            Type[] bounds = ((TypeVariable<?>) type).getBounds();
+            if (bounds.length > 0) {
+                Type bound = bounds[0];
+                return getClassForType(bound);
+            }
+        }
+        return null;
     }
 }
