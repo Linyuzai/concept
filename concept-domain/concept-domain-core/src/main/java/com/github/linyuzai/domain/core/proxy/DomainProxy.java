@@ -1,5 +1,6 @@
 package com.github.linyuzai.domain.core.proxy;
 
+import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.DomainRepository;
@@ -141,6 +142,11 @@ public interface DomainProxy extends InvocationHandler {
     interface RepositoryAccess<T extends DomainObject> {
 
         DomainRepository<T, ?> getRepository();
+    }
+
+    interface CollectionAccess<T extends DomainObject> {
+
+        DomainCollection<T> getCollection();
     }
 
     interface ExtraAccess<T> {

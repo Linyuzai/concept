@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  */
 @Getter
 public class ProxySchrodingerOnceDomainCollection<T extends DomainObject> extends SchrodingerOnceDomainCollection<T>
-        implements DomainCollection<T>, DomainProxy, DomainProxy.ExtraAccess<Object> {
+        implements DomainCollection<T>, DomainProxy, DomainProxy.CollectionAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     protected final Class<? extends DomainCollection<?>> type;
 
@@ -29,5 +29,10 @@ public class ProxySchrodingerOnceDomainCollection<T extends DomainObject> extend
 
     protected Class<? extends T> getDomainType() {
         return DomainLink.collection(type);
+    }
+
+    @Override
+    public @NonNull DomainCollection<T> getCollection() {
+        return this;
     }
 }
