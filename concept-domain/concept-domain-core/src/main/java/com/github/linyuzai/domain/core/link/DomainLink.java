@@ -15,14 +15,21 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public class DomainLink {
 
-    private static Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder = domainClass -> {
+    private static Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder = domainClass ->
+            (Class<? extends DomainRepository<?, ?>>) getDomainRepositoryClass(domainClass);
+
+    private static Class<?> getDomainRepositoryClass(Class<?> domainClass) {
         String repository = domainClass.getName() + "Repository";
         try {
-            return (Class<? extends DomainRepository<?, ?>>) Class.forName(repository);
+            return Class.forName(repository);
         } catch (ClassNotFoundException ignore) {
-            return null;
+            Class<?> superclass = domainClass.getSuperclass();
+            if (superclass == null) {
+                return null;
+            }
+            return getDomainRepositoryClass(superclass);
         }
-    };
+    }
 
     public static void setRepositoryFinder(Function<Class<? extends DomainObject>, Class<? extends DomainRepository<?, ?>>> repositoryFinder) {
         DomainLink.repositoryFinder = repositoryFinder;
