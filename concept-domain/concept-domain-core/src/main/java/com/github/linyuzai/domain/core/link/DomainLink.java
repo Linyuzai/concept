@@ -1,8 +1,6 @@
 package com.github.linyuzai.domain.core.link;
 
-import com.github.linyuzai.domain.core.DomainCollection;
-import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.DomainRepository;
+import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.exception.DomainException;
 
 import java.lang.reflect.ParameterizedType;
@@ -23,11 +21,19 @@ public class DomainLink {
         try {
             return Class.forName(repository);
         } catch (ClassNotFoundException ignore) {
-            Class<?> superclass = domainClass.getSuperclass();
-            if (superclass == null) {
-                return null;
+            Class<?>[] interfaces = domainClass.getInterfaces();
+            for (Class<?> domainInterface : interfaces) {
+                if (DomainObject.class.isAssignableFrom(domainInterface)
+                        && domainInterface != DomainEntity.class
+                        && domainInterface != DomainValue.class
+                        && domainInterface != DomainObject.class) {
+                    Class<?> repositoryClass = getDomainRepositoryClass(domainInterface);
+                    if (repositoryClass != null) {
+                        return repositoryClass;
+                    }
+                }
             }
-            return getDomainRepositoryClass(superclass);
+            return null;
         }
     }
 
