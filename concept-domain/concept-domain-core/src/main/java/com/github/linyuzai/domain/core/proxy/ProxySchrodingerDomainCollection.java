@@ -8,15 +8,20 @@ import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * 薛定谔的集合模型
  */
 @Getter
 public class ProxySchrodingerDomainCollection<T extends DomainObject> extends SchrodingerDomainCollection<T>
-        implements DomainCollection<T>, DomainProxy {
+        implements DomainCollection<T>, DomainProxy, DomainProxy.ContextAccess,
+        DomainProxy.ConditionsAccess, DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     protected final Class<? extends DomainCollection<?>> type;
+
+    @Setter
+    protected Object extra;
 
     public ProxySchrodingerDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainContext context) {
         super(context);

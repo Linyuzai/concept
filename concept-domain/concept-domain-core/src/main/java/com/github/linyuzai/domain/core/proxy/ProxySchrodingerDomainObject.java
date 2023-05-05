@@ -6,6 +6,7 @@ import com.github.linyuzai.domain.core.Identifiable;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerDomainObject;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import java.lang.reflect.Method;
 
@@ -13,9 +14,13 @@ import java.lang.reflect.Method;
  * 薛定谔模型代理
  */
 @Getter
-public class ProxySchrodingerDomainObject<T extends DomainObject> extends SchrodingerDomainObject<T> implements DomainObject, DomainProxy {
+public class ProxySchrodingerDomainObject<T extends DomainObject> extends SchrodingerDomainObject<T>
+        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ExtraAccess<Object> {
 
     protected final Class<T> type;
+
+    @Setter
+    protected Object extra;
 
     public ProxySchrodingerDomainObject(Class<T> type, @NonNull String id, @NonNull DomainContext context) {
         super(id, context);

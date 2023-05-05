@@ -1,6 +1,9 @@
 package com.github.linyuzai.domain.core.proxy;
 
+import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainObject;
+import com.github.linyuzai.domain.core.DomainRepository;
+import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.lambda.LambdaFunction;
 import lombok.SneakyThrows;
 
@@ -123,5 +126,27 @@ public interface DomainProxy extends InvocationHandler {
         } catch (NoSuchMethodException e) {
             return getMethod(clazz.getSuperclass(), name, parameterTypes);
         }
+    }
+
+    interface ContextAccess {
+
+        DomainContext getContext();
+    }
+
+    interface ConditionsAccess {
+
+        Conditions getConditions();
+    }
+
+    interface RepositoryAccess<T extends DomainObject> {
+
+        DomainRepository<T, ?> getRepository();
+    }
+
+    interface ExtraAccess<T> {
+
+        T getExtra();
+
+        void setExtra(T custom);
     }
 }
