@@ -37,8 +37,9 @@ public interface DomainProxy extends InvocationHandler {
     default Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (method.isDefault()) {
             MethodHandle handle = DEFAULT_METHOD_HANDLES.computeIfAbsent(method, m ->
-                    getMethodHandle(method, proxy));
-            return handle.invokeWithArguments(args);
+                    getMethodHandle(method));
+            MethodHandle bind = handle.bindTo(proxy);
+            return bind.invokeWithArguments(args);
         } else {
             DomainProxyField dpf = method.getAnnotation(DomainProxyField.class);
             if (dpf != null) {
@@ -73,15 +74,14 @@ public interface DomainProxy extends InvocationHandler {
     }
 
     @SneakyThrows
-    static MethodHandle getMethodHandle(Method method, Object proxy) {
+    static MethodHandle getMethodHandle(Method method) {
         Class<?> declaringClass = method.getDeclaringClass();
         Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
                 .getDeclaredConstructor(Class.class, int.class);
         constructor.setAccessible(true);
         return constructor.
                 newInstance(declaringClass, MethodHandles.Lookup.PRIVATE).
-                unreflectSpecial(method, declaringClass).
-                bindTo(proxy);
+                unreflectSpecial(method, declaringClass);
     }
 
     @SneakyThrows
