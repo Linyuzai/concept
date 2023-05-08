@@ -18,10 +18,10 @@ public class Test {
     }
 
     public void test2(Category root) {
-        root.getParents().add("A", new Function<Category, ThingAction>() {
+        root.getParents().add("A","A", new Function<Category, ThingAction>() {
             @Override
             public ThingAction apply(Category category) {
-                return category.getParents().add("B");
+                return category.getParents().add("B","B");
             }
         }).execute();
     }
