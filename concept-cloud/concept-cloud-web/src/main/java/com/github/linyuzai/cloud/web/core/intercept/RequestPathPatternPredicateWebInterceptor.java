@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
+import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +42,8 @@ public class RequestPathPatternPredicateWebInterceptor extends PredicateWebInter
      * @return true 匹配，false 不匹配
      */
     protected boolean match(WebContext context) {
-        String path = context.get(WebContext.Request.PATH);
+        Request request = context.get(Request.class);
+        String path = request.getPath();
         for (String pattern : patterns) {
             if (matcher.match(pattern, path)) {
                 return true;

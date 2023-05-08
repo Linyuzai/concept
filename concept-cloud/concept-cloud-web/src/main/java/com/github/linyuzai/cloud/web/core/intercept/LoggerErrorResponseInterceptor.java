@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
+import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,8 @@ public class LoggerErrorResponseInterceptor implements WebInterceptor {
      * 请求的方法 + 路径
      */
     protected String getMessage(WebContext context) {
-        return context.get(WebContext.Request.METHOD) + " " + context.get(WebContext.Request.PATH);
+        Request request = context.get(Request.class);
+        return request.getMethod() + " " + request.getPath();
     }
 
     @Override

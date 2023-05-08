@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
+import com.github.linyuzai.cloud.web.core.concept.Response;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
@@ -27,7 +28,7 @@ public class WebResultResponseInterceptor implements WebInterceptor {
         //如果 WebResult 未设置
         if (!context.containsKey(WebResult.class)) {
             //获得 body
-            Object body = context.get(WebContext.Response.BODY);
+            Object body = context.get(Response.Body.class);
             //如果 body 已经是 WebResult 则直接设置
             if (body instanceof WebResult) {
                 context.put(WebResult.class, body);

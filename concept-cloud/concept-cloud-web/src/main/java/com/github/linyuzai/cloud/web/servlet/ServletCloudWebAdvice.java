@@ -1,5 +1,7 @@
 package com.github.linyuzai.cloud.web.servlet;
 
+import com.github.linyuzai.cloud.web.core.concept.Request;
+import com.github.linyuzai.cloud.web.core.concept.Response;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.context.WebContextFactory;
@@ -95,7 +97,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         context.put(MethodParameter.class, returnType);
         context.put(MediaType.class, selectedContentType);
         context.put(HttpMessageConverter.class, selectedConverterType);
-        context.put(WebContext.Response.BODY, body);
+        context.put(Response.Body.class, body);
         Object result = webConcept.interceptResponse(context, WebResultValueReturner.INSTANCE);
         invalidContext();
         return result;
@@ -128,8 +130,8 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
             context.put(HttpServletRequest.class, request);
             context.put(HttpServletResponse.class, response);
             context.put(HandlerMethod.class, handler);
-            context.put(WebContext.Request.METHOD, request.getMethod());
-            context.put(WebContext.Request.PATH, request.getRequestURI());
+            context.put(Request.class, new ServletRequest(request));
+            context.put(Response.class, new ServletResponse(response));
             validContext(context);
             return true;
         }

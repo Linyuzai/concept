@@ -68,8 +68,7 @@ public class CloudWebAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnMissingBean
-        public WebInterceptorAnnotationBeanPostProcessor webInterceptorAnnotationBeanPostProcessor() {
+        public static WebInterceptorAnnotationBeanPostProcessor webInterceptorAnnotationBeanPostProcessor() {
             return new WebInterceptorAnnotationBeanPostProcessor();
         }
 

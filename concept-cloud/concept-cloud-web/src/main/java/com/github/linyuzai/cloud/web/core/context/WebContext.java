@@ -62,15 +62,4 @@ public interface WebContext {
      * 重置/清空上下文
      */
     void reset();
-
-    interface Request {
-
-        String METHOD = "_request@method";
-
-        String PATH = "_request@path";
-    }
-
-    interface Response {
-        String BODY = "_response@body";
-    }
 }

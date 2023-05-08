@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.web.core.intercept;
 
+import com.github.linyuzai.cloud.web.core.concept.Response;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class PredicateWebInterceptor implements WebInterceptor {
     protected void onPredicate(boolean test, WebContext context) {
         //断言不通过 && 响应拦截时 && 使用原始响应体作为返回值
         if (!test && context.get(Scope.class) == Scope.RESPONSE && useResponseBodyAsWebResult) {
-            context.put(WebResult.class, context.get(WebContext.Response.BODY));
+            context.put(WebResult.class, context.get(Response.Body.class));
         }
     }
 

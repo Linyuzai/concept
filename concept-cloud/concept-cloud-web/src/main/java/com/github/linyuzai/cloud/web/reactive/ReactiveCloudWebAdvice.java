@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.web.reactive;
 
+import com.github.linyuzai.cloud.web.core.concept.Response;
 import com.github.linyuzai.cloud.web.core.concept.WebConcept;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
@@ -89,7 +90,7 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
                     return Mono.just((WebContext) valueOrContext);
                 } else {
                     return getContext().doOnNext(context -> {
-                        context.put(WebContext.Response.BODY, valueOrContext);
+                        context.put(Response.Body.class, valueOrContext);
                     });
                 }
             }).doOnNext(context -> {

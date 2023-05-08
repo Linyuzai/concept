@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.web.core.result;
 
+import com.github.linyuzai.cloud.web.core.concept.Response;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 
 /**
@@ -21,7 +22,7 @@ public abstract class AbstractWebResultFactory implements WebResultFactory {
     public WebResult<?> create(WebContext context) {
         Throwable e = context.get(Throwable.class);
         if (e == null) {
-            Object body = context.get(WebContext.Response.BODY);
+            Object body = context.get(Response.Body.class);
             return createSuccessWebResult(getSuccessMessage(context), body, context);
         } else {
             return createFailureWebResult(getFailureMessage(e, context), e, context);

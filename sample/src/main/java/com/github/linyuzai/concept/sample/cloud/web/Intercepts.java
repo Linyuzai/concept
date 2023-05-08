@@ -1,5 +1,6 @@
 package com.github.linyuzai.concept.sample.cloud.web;
 
+import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakIntercept;
@@ -10,10 +11,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.method.HandlerMethod;
-
-import javax.servlet.http.HttpServletRequest;
-
-//import javax.servlet.http.HttpServletRequest;
 
 
 @Component
@@ -35,8 +32,8 @@ public class Intercepts {
 
     @BreakIntercept
     @OnResponse
-    public boolean nonWrap(HttpServletRequest request) {
-        return request.getRequestURI().equals("/cloud-web/test-map");
+    public boolean nonWrap(Request request) {
+        return request.getPath().equals("/cloud-web/test-map");
     }
 
     @OnRequest
