@@ -19,5 +19,5 @@
 - [属性继承插件（伪 Java 多继承）](../../wiki/Concept-Inherit)
 - [MapQueue：支持元素更新的 Queue](../../wiki/Concept-MapQueue)
 - Spring Cloud & Spring Boot 基建
-  - [模块化项目生成插件（IDEA）](../../wiki/Concept-Cloud-Plugin-Intellij)
+  - [模块化项目生成插件（IDEA）（优化中...）](../../wiki/Concept-Cloud-Plugin-Intellij)
   - [全局请求响应拦截](../../wiki/Concept-Cloud-Web)
