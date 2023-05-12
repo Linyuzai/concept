@@ -164,7 +164,7 @@ public interface Connection {
          * <p>
          * 接收转发的消息
          */
-        public static final String SUBSCRIBER = "Connection@subcriber";
+        public static final String SUBSCRIBER = "Connection@subscriber";
 
         /**
          * 用于被其他服务监听的连接
