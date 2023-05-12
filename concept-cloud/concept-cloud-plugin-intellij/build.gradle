@@ -1,6 +1,7 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version "1.10.0"
+    id 'org.jetbrains.intellij' version '1.13.3'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 /*tasks.withType(JavaCompile) {
@@ -21,7 +22,7 @@ dependencies {
 
 }
 
-intellij.version = "2022.2"
+intellij.version = "2021.2"
 intellij.type = "IC"
 //intellij.type = "IU"
 intellij.plugins = ["java", "gradle"]
@@ -42,7 +43,9 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("212")
-        untilBuild.set("222.*")
+        untilBuild.set("")
+        //sinceBuild.set("212")
+        //untilBuild.set("222.*")
         //sinceBuild.set("223")
         //untilBuild.set("")
     }

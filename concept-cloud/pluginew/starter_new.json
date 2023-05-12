@@ -1,0 +1,143 @@
+{
+  "frameworkVersions": [
+    {
+      "id": "1.0.0",
+      "title": "Concept Cloud v1.0.0",
+      "default": false,
+      "springVersions": {
+        "springBoot": "2.7.6",
+        "springDependencyManagement": "1.1.0",
+        "springCloudDependencyManagement": "2021.0.4"
+      },
+      "dependencies": {
+        "websocket-loadbalance": [
+          "implementation 'com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:1.0.4'",
+          "implementation 'org.springframework.boot:spring-boot-starter-websocket'"
+        ],
+        "download": [
+          "implementation 'com.github.linyuzai:concept-download-spring-boot-starter:1.2.2'"
+        ],
+        "event": [
+          "implementation 'com.github.linyuzai:concept-event-spring-boot-starter:1.1.1'"
+        ],
+        "mapqueue": [
+          "implementation 'com.github.linyuzai:concept-mapqueue-core:1.1.0'"
+        ],
+        "plugin": [
+          "implementation 'com.github.linyuzai:concept-plugin-jar:1.0.1'"
+        ],
+        "router": [
+          "implementation 'com.github.linyuzai:concept-router-spring-boot-starter:1.0.0'"
+        ],
+        "sync-waiting": [
+          "implementation 'com.github.linyuzai:concept-sync-waiting:1.0.0'"
+        ]
+      }
+    }
+  ],
+  "dependencyCategories": [
+    {
+      "title": "Concept",
+      "dependencies": [
+        {
+          "id": "websocket-loadbalance",
+          "title": "Concept WebSocket LoadBalance",
+          "description": "多实例场景下的 WebSocket 应用",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "download",
+          "title": "Concept Download",
+          "description": "支持使用 @Download 注解简化下载功能",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Download",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "event",
+          "title": "Concept Event",
+          "description": "抽象事件概念，支持 RabbitMQ/Kafka",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Event",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "mapqueue",
+          "title": "Concept MapQueue",
+          "description": "能够更新元素的阻塞队列",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-MapQueue",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "plugin",
+          "title": "Concept Plugin",
+          "description": "提供外部加载 jar 中 Class 的功能",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Plugin",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "router",
+          "title": "Concept Router",
+          "description": "提供在开发环境下网关或 RPC 调用的路由指定功能",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Router",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "sync-waiting",
+          "title": "Concept Sync Waiting",
+          "description": "将对外异步请求转为同步的方式获得返回值",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Sync-Waiting",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        }
+      ]
+    }
+  ]
+}

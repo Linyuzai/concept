@@ -1,9 +1,11 @@
+/*
 package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.starters.remote.*;
 import com.intellij.ide.starters.shared.*;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
@@ -14,7 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,15 +27,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 @SuppressWarnings("all")
-public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder {
+public class ConceptCloudWebModuleBuilderBak extends WebStarterModuleBuilder {
 
     private final Key<Map<String, FrameworkVersionEx>> CONCEPT_CLOUD_FVE_KEY = new Key<>("CONCEPT_CLOUD_FVE_KEY");
 
     @NotNull
     @Override
-    protected Url composeGeneratorUrl(@NotNull String s, @NotNull ConceptWebStarterContext webStarterContext) {
+    protected Url composeGeneratorUrl(@NotNull String s, @NotNull WebStarterContext webStarterContext) {
         String version;
-        ConceptWebStarterFrameworkVersion frameworkVersion = webStarterContext.getFrameworkVersion();
+        WebStarterFrameworkVersion frameworkVersion = webStarterContext.getFrameworkVersion();
         if (frameworkVersion == null) {
             version = "";
         } else {
@@ -89,10 +94,10 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         if (frameworkVersionEx == null) {
             return;
         }
-        Set<ConceptWebStarterDependency> dependencies = getStarterContext().getDependencies();
+        Set<WebStarterDependency> dependencies = getStarterContext().getDependencies();
         StringBuilder builder = new StringBuilder();
         builder.append("dependencies {\n");
-        for (ConceptWebStarterDependency dependency : dependencies) {
+        for (WebStarterDependency dependency : dependencies) {
             Collection<String> collection = frameworkVersionEx.getConceptDependency(dependency.getId());
             if (collection != null) {
                 for (String s : collection) {
@@ -128,7 +133,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         if (data == null) {
             return null;
         }
-        ConceptWebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
+        WebStarterFrameworkVersion frameworkVersion = getStarterContext().getFrameworkVersion();
         if (frameworkVersion == null) {
             return null;
         }
@@ -249,7 +254,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
 
     @NotNull
     @Override
-    protected ConceptWebStarterServerOptions loadServerOptions(@NotNull String s) {
+    protected WebStarterServerOptions loadServerOptions(@NotNull String s) {
         String url;
         if (s.endsWith("/")) {
             url = s + "starter_v2.json";
@@ -257,7 +262,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             url = s + "/starter_v2.json";
         }
         JsonObject json = loadJsonData(url, null).getAsJsonObject();
-        List<ConceptWebStarterFrameworkVersion> frameworkVersions = new ArrayList<>();
+        List<WebStarterFrameworkVersion> frameworkVersions = new ArrayList<>();
         JsonArray frameworkVersionArray = json.get("frameworkVersions").getAsJsonArray();
         Map<String, FrameworkVersionEx> value = new LinkedHashMap<>();
         for (JsonElement frameworkVersionElement : frameworkVersionArray) {
@@ -266,7 +271,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             String id = frameworkVersionObject.get("id").getAsString();
             String title = frameworkVersionObject.get("title").getAsString();
             boolean isDefault = frameworkVersionObject.get("default").getAsBoolean();
-            frameworkVersions.add(new ConceptWebStarterFrameworkVersion(id, title, isDefault));
+            frameworkVersions.add(new WebStarterFrameworkVersion(id, title, isDefault));
 
             if (frameworkVersionObject.has("springVersions")) {
                 JsonObject springVersionsObject = frameworkVersionObject.get("springVersions").getAsJsonObject();
@@ -290,13 +295,13 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             value.put(id, frameworkVersionEx);
         }
         getStarterContext().putUserData(CONCEPT_CLOUD_FVE_KEY, value);
-        List<ConceptWebStarterDependencyCategory> dependencyCategories = new ArrayList<>();
+        List<WebStarterDependencyCategory> dependencyCategories = new ArrayList<>();
         JsonArray dependencyCategoryArray = json.get("dependencyCategories").getAsJsonArray();
         for (JsonElement dependencyCategoryElement : dependencyCategoryArray) {
             JsonObject dependencyCategoryObject = dependencyCategoryElement.getAsJsonObject();
             String categoryTitle = dependencyCategoryObject.get("title").getAsString();
             JsonArray dependencyArray = dependencyCategoryObject.get("dependencies").getAsJsonArray();
-            List<ConceptWebStarterDependency> dependencies = new ArrayList<>();
+            List<WebStarterDependency> dependencies = new ArrayList<>();
             for (JsonElement dependencyElement : dependencyArray) {
                 JsonObject dependencyObject = dependencyElement.getAsJsonObject();
                 String id = dependencyObject.get("id").getAsString();
@@ -313,11 +318,11 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
                 }
                 boolean isDefault = dependencyObject.get("default").getAsBoolean();
                 boolean isRequired = dependencyObject.get("required").getAsBoolean();
-                dependencies.add(new ConceptWebStarterDependency(id, dependencyTitle, description, links, isDefault, isRequired));
+                dependencies.add(new WebStarterDependency(id, dependencyTitle, description, links, isDefault, isRequired));
             }
-            dependencyCategories.add(new ConceptWebStarterDependencyCategory(categoryTitle, dependencies));
+            dependencyCategories.add(new WebStarterDependencyCategory(categoryTitle, dependencies));
         }
-        return new ConceptWebStarterServerOptions(frameworkVersions, dependencyCategories);
+        return new WebStarterServerOptions(frameworkVersions, dependencyCategories);
     }
 
     public static class FrameworkVersionEx {
@@ -356,3 +361,4 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         Map<String, Collection<String>> mapping = new LinkedHashMap<>();
     }
 }
+*/
