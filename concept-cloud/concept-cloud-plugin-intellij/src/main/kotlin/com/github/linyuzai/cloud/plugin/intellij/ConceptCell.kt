@@ -116,7 +116,7 @@ interface ConceptCellBuilder<out T : JComponent> {
      * which is that of the biggest component in the group
      */
     fun sizeGroup(name: String): ConceptCellBuilder<T>
-    fun growPolicy(growPolicy: GrowPolicy): ConceptCellBuilder<T>
+    fun growPolicy(growPolicy: ConceptGrowPolicy): ConceptCellBuilder<T>
     fun constraints(vararg constraints: CCFlags): ConceptCellBuilder<T>
 
     /**
@@ -155,8 +155,6 @@ interface ConceptCellBuilder<out T : JComponent> {
 
     fun withLeftGap(): ConceptCellBuilder<T>
 
-    @Deprecated("Prefer not to use hardcoded values")
-    @ApiStatus.ScheduledForRemoval(inVersion = "2021.3")
     fun withLeftGap(gapLeft: Int): ConceptCellBuilder<T>
 }
 
@@ -614,7 +612,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
 
     operator fun <T : JComponent> T.invoke(
         vararg constraints: CCFlags,
-        growPolicy: GrowPolicy? = null,
+        growPolicy: ConceptGrowPolicy? = null,
         @NlsContexts.DetailedDescription comment: String? = null
     ): ConceptCellBuilder<T> = component(this).apply {
         constraints(*constraints)

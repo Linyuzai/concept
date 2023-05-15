@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.shared.LibraryInfo
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.roots.ui.componentsList.components.ScrollablePanel
 import com.intellij.openapi.ui.ex.MultiLineLabel
@@ -126,7 +125,7 @@ class ConceptLibraryDescriptionPanel : ScrollablePanel(VerticalLayout(DEFAULT_VG
         for (link in item.links) {
             if (link.url.contains('{')) continue // URL templates are not supported
 
-            val linkLabel = HyperlinkLabel(link.title ?: link.type.getTitle())
+            val linkLabel = HyperlinkLabel(link.title)
             linkLabel.font = JBUI.Fonts.smallFont()
             linkLabel.setHyperlinkTarget(link.url)
             linkLabel.toolTipText = link.url

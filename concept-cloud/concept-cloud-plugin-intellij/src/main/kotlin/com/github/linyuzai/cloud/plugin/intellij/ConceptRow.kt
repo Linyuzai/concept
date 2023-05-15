@@ -158,7 +158,7 @@ abstract class ConceptRow : ConceptCell(), ConceptRowBuilder {
 
     // backward compatibility
     @Deprecated(level = DeprecationLevel.HIDDEN, message = "deprecated")
-    operator fun JComponent.invoke(vararg constraints: CCFlags, gapLeft: Int = 0, growPolicy: GrowPolicy? = null) {
+    operator fun JComponent.invoke(vararg constraints: CCFlags, gapLeft: Int = 0, growPolicy: ConceptGrowPolicy? = null) {
         invoke(constraints = *constraints, growPolicy = growPolicy).withLeftGap(gapLeft)
     }
 }

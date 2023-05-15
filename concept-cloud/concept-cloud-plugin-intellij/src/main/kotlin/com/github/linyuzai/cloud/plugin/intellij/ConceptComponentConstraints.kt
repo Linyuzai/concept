@@ -4,9 +4,6 @@ import com.intellij.openapi.actionSystem.ActionToolbar
 import com.intellij.openapi.ui.ComponentWithBrowseButton
 import com.intellij.ui.SeparatorComponent
 import com.intellij.ui.layout.CCFlags
-import com.intellij.ui.layout.GrowPolicy
-import com.intellij.ui.layout.SpacingConfiguration
-import com.intellij.ui.layout.migLayout.gapToBoundSize
 import com.intellij.util.ui.JBUI
 import net.miginfocom.layout.BoundSize
 import net.miginfocom.layout.CC
@@ -79,10 +76,10 @@ internal class ConceptDefaultComponentConstraintCreator(private val spacing: Con
         }
     }
 
-    fun applyGrowPolicy(cc: CC, growPolicy: GrowPolicy) {
+    fun applyGrowPolicy(cc: CC, growPolicy: ConceptGrowPolicy) {
         cc.horizontal.size = when (growPolicy) {
-            GrowPolicy.SHORT_TEXT -> shortTextSizeSpec
-            GrowPolicy.MEDIUM_TEXT -> mediumTextSizeSpec
+            ConceptGrowPolicy.SHORT_TEXT -> shortTextSizeSpec
+            ConceptGrowPolicy.MEDIUM_TEXT -> mediumTextSizeSpec
         }
     }
 }

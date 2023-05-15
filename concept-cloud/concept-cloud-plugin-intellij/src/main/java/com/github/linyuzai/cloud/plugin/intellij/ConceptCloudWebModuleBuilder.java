@@ -306,10 +306,9 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
                 List<ConceptLibraryLink> links = new ArrayList<>();
                 for (JsonElement linkElement : linkArray) {
                     JsonObject linkObject = linkElement.getAsJsonObject();
-                    String type = linkObject.get("type").getAsString();
                     String linkUrl = linkObject.get("url").getAsString();
                     String linkTitle = linkObject.get("title").getAsString();
-                    links.add(new ConceptLibraryLink(LibraryLinkType.valueOf(type), linkUrl, linkTitle));
+                    links.add(new ConceptLibraryLink(linkUrl, linkTitle));
                 }
                 boolean isDefault = dependencyObject.get("default").getAsBoolean();
                 boolean isRequired = dependencyObject.get("required").getAsBoolean();

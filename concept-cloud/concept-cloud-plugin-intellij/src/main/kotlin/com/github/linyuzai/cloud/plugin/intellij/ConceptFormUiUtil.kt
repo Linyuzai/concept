@@ -11,7 +11,6 @@ import com.intellij.ui.CheckboxTreeBase
 import com.intellij.ui.CheckedTreeNode
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.IdeBorderFactory
-import com.intellij.ui.layout.*
 import com.intellij.util.ui.JBInsets
 import java.awt.GridBagConstraints
 import java.awt.event.ActionEvent
@@ -28,8 +27,8 @@ import javax.swing.tree.TreeNode
 
 const val NAME_FIELD_TOP_PADDING: Int = 15
 
-fun DialogPanel.withVisualPadding(top: Int = 5): DialogPanel {
-    border = IdeBorderFactory.createEmptyBorder(JBInsets(top, 5, 0, 5))
+fun DialogPanel.withVisualPadding(): DialogPanel {
+    border = IdeBorderFactory.createEmptyBorder(JBInsets(20, 20, 20, 20))
 
     return this
 }

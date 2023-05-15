@@ -3,7 +3,6 @@ package com.github.linyuzai.cloud.plugin.intellij
 import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 
 import com.intellij.CommonBundle
-import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.ide.util.projectWizard.ProjectWizardUtil
@@ -21,8 +20,10 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.Messages
 
-fun ConceptRow.sdkComboBox(sdkModel: ProjectSdksModel, sdkProperty: GraphProperty<Sdk?>,
-                    project: Project?, moduleBuilder: ModuleBuilder): ConceptCellBuilder<JdkComboBox> {
+fun ConceptRow.sdkComboBox(
+    sdkModel: ProjectSdksModel, sdkProperty: GraphProperty<Sdk?>,
+    project: Project?, moduleBuilder: ModuleBuilder
+): ConceptCellBuilder<JdkComboBox> {
     sdkModel.reset(project)
 
     val sdkFilter = moduleBuilder::isSuitableSdkType
@@ -30,7 +31,8 @@ fun ConceptRow.sdkComboBox(sdkModel: ProjectSdksModel, sdkProperty: GraphPropert
     val moduleType: ModuleType<*> = StdModuleTypes.JAVA
 
     val selectedJdkProperty = "jdk.selected." + moduleType.id
-    val stateComponent = if (project == null) PropertiesComponent.getInstance() else PropertiesComponent.getInstance(project)
+    val stateComponent =
+        if (project == null) PropertiesComponent.getInstance() else PropertiesComponent.getInstance(project)
 
     sdkComboBox.addActionListener {
         val jdk: Sdk? = getTargetJdk(sdkComboBox, project)
@@ -59,22 +61,27 @@ private fun getTargetJdk(sdkComboBox: JdkComboBox, project: Project?): Sdk? {
 
 fun validateSdk(sdkProperty: GraphProperty<Sdk?>, sdkModel: ProjectSdksModel): Boolean {
     if (sdkProperty.get() == null) {
-        if (Messages.showDialog("Do you want to create a project with no SDK assigned?\nAn SDK is required for compiling, debugging and running applications,\nas well as for the standard SDK classes resolution.",
+        if (Messages.showDialog(
+                "Do you want to create a project with no SDK assigned?\nAn SDK is required for compiling, debugging and running applications,\nas well as for the standard SDK classes resolution.",
                 "No SDK Specified",
                 arrayOf(CommonBundle.getYesButtonText(), CommonBundle.getNoButtonText()), 1,
-                Messages.getWarningIcon()) != Messages.YES) {
+                Messages.getWarningIcon()
+            ) != Messages.YES
+        ) {
             return false
         }
     }
 
     try {
         sdkModel.apply(null, true)
-    }
-    catch (e: ConfigurationException) {
+    } catch (e: ConfigurationException) {
         //IDEA-98382 We should allow Next step if user has wrong SDK
-        if (Messages.showDialog("${e.message}\n\nDo you want to proceed?",
+        if (Messages.showDialog(
+                "${e.message}\n\nDo you want to proceed?",
                 e.title, arrayOf(CommonBundle.getYesButtonText(), CommonBundle.getNoButtonText()), 1,
-                Messages.getWarningIcon()) != Messages.YES) {
+                Messages.getWarningIcon()
+            ) != Messages.YES
+        ) {
             return false
         }
     }
@@ -89,11 +96,11 @@ fun validateJavaVersion(sdkProperty: GraphProperty<Sdk?>, javaVersion: String?):
         if (wizardVersion != null && javaVersion != null) {
             val selectedVersion = JavaSdkVersion.fromVersionString(javaVersion)
             if (selectedVersion != null && !wizardVersion.isAtLeast(selectedVersion)) {
-                Messages.showErrorDialog(JavaStartersBundle.message("message.java.version.not.supported.by.sdk",
-                    selectedVersion.description,
-                    sdk.name,
-                    wizardVersion.description),
-                    JavaStartersBundle.message("message.title.error"))
+                Messages.showErrorDialog(
+                    "Selected version of Java ${selectedVersion.description} is not supported by the project SDK '${wizardVersion.description}'. " +
+                            "  Either choose a lower version of Java or set a higher version of the SDK.\n\n" +
+                            "  To download additional SDKs, click the JDK drop-down.", "Error"
+                )
                 return false
             }
         }
@@ -102,7 +109,11 @@ fun validateJavaVersion(sdkProperty: GraphProperty<Sdk?>, javaVersion: String?):
     return true
 }
 
-fun setupNewModuleJdk(modifiableRootModel: ModifiableRootModel, selectedJdk: Sdk?, isCreatingNewProject: Boolean): Sdk? {
+fun setupNewModuleJdk(
+    modifiableRootModel: ModifiableRootModel,
+    selectedJdk: Sdk?,
+    isCreatingNewProject: Boolean
+): Sdk? {
     if (ApplicationManager.getApplication().isUnitTestMode && selectedJdk == modifiableRootModel.sdk) {
         // do not change SDK in tests
         return selectedJdk
@@ -112,8 +123,7 @@ fun setupNewModuleJdk(modifiableRootModel: ModifiableRootModel, selectedJdk: Sdk
     if (sdk != null) {
         if (isCreatingNewProject || (!isCreatingNewProject && sdk == getProjectJdk(modifiableRootModel.project))) {
             modifiableRootModel.inheritSdk()
-        }
-        else {
+        } else {
             modifiableRootModel.sdk = sdk
         }
     }

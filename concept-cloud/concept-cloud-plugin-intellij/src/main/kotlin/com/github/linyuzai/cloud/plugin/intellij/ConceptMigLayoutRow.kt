@@ -8,7 +8,6 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.panel.ComponentPanelBuilder
 import com.intellij.openapi.util.NlsContexts
-import com.intellij.ui.HideableTitledSeparator
 import com.intellij.ui.SeparatorComponent
 import com.intellij.ui.TitledSeparator
 import com.intellij.ui.UIBundle
@@ -16,8 +15,6 @@ import com.intellij.ui.components.DialogPanel
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.Label
 import com.intellij.ui.layout.*
-import com.intellij.ui.layout.attachSubRowsEnabled
-import com.intellij.ui.layout.migLayout.gapToBoundSize
 import com.intellij.util.SmartList
 import net.miginfocom.layout.*
 import org.jetbrains.annotations.Nls
@@ -658,7 +655,7 @@ private class ConceptCellBuilderImpl<T : JComponent> internal constructor(
         return this
     }
 
-    override fun growPolicy(growPolicy: GrowPolicy): ConceptCellBuilder<T> {
+    override fun growPolicy(growPolicy: ConceptGrowPolicy): ConceptCellBuilder<T> {
         builder.updateComponentConstraints(viewComponent) {
             builder.defaultComponentConstraintCreator.applyGrowPolicy(this, growPolicy)
         }

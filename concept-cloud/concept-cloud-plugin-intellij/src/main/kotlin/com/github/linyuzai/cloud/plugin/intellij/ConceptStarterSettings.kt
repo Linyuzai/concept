@@ -1,8 +1,6 @@
 @file:JvmName("ConceptStarterSettings")
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.shared.LibraryLinkType
-
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.util.NlsContexts.DialogTitle
 import com.intellij.openapi.util.NlsContexts.Label
@@ -86,7 +84,6 @@ interface ConceptLibraryInfo {
 }
 
 class ConceptLibraryLink(
-    val type: LibraryLinkType,
     @NlsSafe
     val url: String,
     @NlsSafe

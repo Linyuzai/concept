@@ -5,9 +5,6 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.layout.LCFlags
-import com.intellij.ui.layout.LayoutBuilderImpl
-import com.intellij.ui.layout.SpacingConfiguration
-import com.intellij.ui.layout.UNBOUND_RADIO_BUTTON
 import com.intellij.ui.layout.migLayout.*
 import com.intellij.ui.layout.migLayout.patched.MigLayout
 import com.intellij.ui.scale.JBUIScale

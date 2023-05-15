@@ -202,7 +202,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
             row("Name:") {
                 textField(entityNameProperty)
-                    .growPolicy(GrowPolicy.SHORT_TEXT)
+                    .growPolicy(ConceptGrowPolicy.SHORT_TEXT)
                     .withSpecialValidation(CHECK_NOT_EMPTY, CHECK_SIMPLE_NAME_FORMAT)
                     .focused()
 
@@ -246,7 +246,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
             row("Group:") {
                 textField(groupIdProperty)
-                    .growPolicy(GrowPolicy.SHORT_TEXT)
+                    .growPolicy(ConceptGrowPolicy.SHORT_TEXT)
                     .withSpecialValidation(
                         CHECK_NOT_EMPTY,
                         CHECK_NO_WHITESPACES,
@@ -257,7 +257,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
             row("Artifact:") {
                 textField(artifactIdProperty)
-                    .growPolicy(GrowPolicy.SHORT_TEXT)
+                    .growPolicy(ConceptGrowPolicy.SHORT_TEXT)
                     .withSpecialValidation(
                         CHECK_NOT_EMPTY,
                         CHECK_NO_WHITESPACES,
@@ -269,7 +269,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
             if (starterSettings.isPackageNameEditable) {
                 row("Package name:") {
                     textField(packageNameProperty)
-                        .growPolicy(GrowPolicy.SHORT_TEXT)
+                        .growPolicy(ConceptGrowPolicy.SHORT_TEXT)
                         .withSpecialValidation(
                             CHECK_NOT_EMPTY,
                             CHECK_NO_WHITESPACES,
@@ -286,13 +286,13 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
                         applicationTypesModel,
                         applicationTypeProperty,
                         SimpleListCellRenderer.create("") { it?.title ?: "" })
-                        .growPolicy(GrowPolicy.SHORT_TEXT)
+                        .growPolicy(ConceptGrowPolicy.SHORT_TEXT)
                 }.largeGapAfter()
             }
 
             row("Project SDK:") {
                 sdkComboBox(sdkModel, sdkProperty, wizardContext.project, moduleBuilder)
-                    .growPolicy(GrowPolicy.SHORT_TEXT)
+                    .growPolicy(ConceptGrowPolicy.SHORT_TEXT)
             }.largeGapAfter()
 
             if (starterSettings.languageLevels.isNotEmpty()) {
