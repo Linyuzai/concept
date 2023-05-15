@@ -91,7 +91,7 @@ internal class ConceptMigLayoutRow(private val parent: ConceptMigLayoutRow?,
 
     private var componentIndexWhenCellModeWasEnabled = -1
 
-    private val spacing: SpacingConfiguration
+    private val spacing: ConceptSpacingConfiguration
         get() = builder.spacing
 
     private var isTrailingSeparator = false

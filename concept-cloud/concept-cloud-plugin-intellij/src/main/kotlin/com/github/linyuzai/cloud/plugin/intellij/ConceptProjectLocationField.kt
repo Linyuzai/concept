@@ -8,8 +8,6 @@ import com.intellij.openapi.observable.properties.map
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.ui.layout.CellBuilder
-import com.intellij.ui.layout.Row
 
 fun ConceptRow.projectLocationField(
     locationProperty: GraphProperty<String>,

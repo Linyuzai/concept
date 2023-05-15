@@ -6,8 +6,6 @@ import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.components.Label
 import com.intellij.ui.components.noteComponent
 import com.intellij.ui.layout.*
-import com.intellij.ui.layout.CellBuilderWithButtonGroupProperty
-import com.intellij.ui.layout.RowBuilderWithButtonGroupProperty
 import org.jetbrains.annotations.Nls
 import javax.swing.ButtonGroup
 import javax.swing.JComponent

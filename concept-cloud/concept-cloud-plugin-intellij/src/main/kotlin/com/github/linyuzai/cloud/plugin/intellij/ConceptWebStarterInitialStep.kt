@@ -9,6 +9,7 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.ide.util.projectWizard.ModuleNameGenerator
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
@@ -430,7 +431,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
         serverOptionsLoadingSemaphore.down()
 
         currentRequest = ApplicationManager.getApplication().executeOnPooledThread {
-            com.intellij.ide.starters.remote.addStarterNetworkDelay()
+            addStarterNetworkDelay()
 
             val readyServerOptions = try {
                 moduleBuilder.getServerOptions(starterContext.serverUrl)
@@ -483,7 +484,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     }
 
     private fun getModalityState(): ModalityState {
-        return ModalityState.stateForComponent(wizardContext.wizard.contentComponent)
+        return ModalityState.stateForComponent(wizardContext.getUserData(AbstractWizard.KEY)!!.contentComponent)
     }
 
     private fun getDisposed(): Condition<Any> = Condition<Any> { Disposer.isDisposed(parentDisposable) }

@@ -2,7 +2,6 @@ package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.LCFlags
-import com.intellij.ui.layout.createIntelliJSpacingConfiguration
 import java.awt.Container
 import javax.swing.ButtonGroup
 import javax.swing.JComponent

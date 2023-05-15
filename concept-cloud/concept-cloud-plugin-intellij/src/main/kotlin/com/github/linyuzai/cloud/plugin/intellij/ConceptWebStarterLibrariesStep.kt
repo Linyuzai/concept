@@ -3,6 +3,7 @@ package com.github.linyuzai.cloud.plugin.intellij
 import com.intellij.ide.starters.shared.*
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
@@ -196,7 +197,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
 
     @RequiresBackgroundThread
     private fun downloadResult(progressIndicator: ProgressIndicator): ConceptDownloadResult {
-        com.intellij.ide.starters.remote.addStarterNetworkDelay()
+        addStarterNetworkDelay()
 
         val tempFile = FileUtil.createTempFile(moduleBuilder.builderId, ".tmp", true)
         val log = logger<ConceptWebStarterLibrariesStep>()
@@ -452,11 +453,11 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
         textField.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
                 searchMergingUpdateQueue.queue(Update.create("", Runnable {
-                    ModalityUiUtil.invokeLaterIfNeeded(Runnable {
+                    ModalityUiUtil.invokeLaterIfNeeded(getModalityState(), Runnable {
                         currentSearchString = textField.text
                         loadLibrariesList()
                         librariesList.repaint()
-                    }, getModalityState())
+                    })
                 }))
             }
         })
@@ -464,7 +465,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
     }
 
     protected fun getModalityState(): ModalityState {
-        return ModalityState.stateForComponent(wizardContext.wizard.contentComponent)
+        return ModalityState.stateForComponent(wizardContext.getUserData(AbstractWizard.KEY)!!.contentComponent)
     }
 
     protected fun getDisposed(): Condition<Any> = Condition<Any> { Disposer.isDisposed(parentDisposable) }

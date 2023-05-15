@@ -38,7 +38,7 @@ internal fun overrideFlags(cc: CC, flags: Array<out CCFlags>) {
     }
 }
 
-internal class ConceptDefaultComponentConstraintCreator(private val spacing: SpacingConfiguration) {
+internal class ConceptDefaultComponentConstraintCreator(private val spacing: ConceptSpacingConfiguration) {
     private val shortTextSizeSpec = ConstraintParser.parseBoundSize("${spacing.shortTextWidth}px!", false, true)
     private val mediumTextSizeSpec =
         ConstraintParser.parseBoundSize("${spacing.shortTextWidth}px::${spacing.maxShortTextWidth}px", false, true)
@@ -47,7 +47,7 @@ internal class ConceptDefaultComponentConstraintCreator(private val spacing: Spa
 
     val horizontalUnitSizeGap = gapToBoundSize(spacing.unitSize, true)
 
-    fun addGrowIfNeeded(cc: CC, component: Component, spacing: SpacingConfiguration) {
+    fun addGrowIfNeeded(cc: CC, component: Component, spacing: ConceptSpacingConfiguration) {
         when {
             component is ComponentWithBrowseButton<*> -> {
                 // yes, no max width. approved by UI team (all path fields stretched to the width of the window)

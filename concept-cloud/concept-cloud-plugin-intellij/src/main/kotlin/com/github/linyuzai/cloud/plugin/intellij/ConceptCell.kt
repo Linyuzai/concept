@@ -196,7 +196,7 @@ val ConceptCellBuilder<AbstractButton>.selected
 const val UNBOUND_RADIO_BUTTON = "unbound.radio.button"
 
 // separate class to avoid row related methods in the `cell { } `
-@CellMarker
+@ConceptCellMarker
 abstract class ConceptCell : ConceptBaseBuilder {
     /**
      * Sets how keen the component should be to grow in relation to other component **in the same cell**. Use `push` in addition if need.

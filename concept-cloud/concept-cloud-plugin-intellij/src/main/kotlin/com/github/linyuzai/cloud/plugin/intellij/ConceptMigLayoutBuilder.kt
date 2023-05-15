@@ -18,7 +18,7 @@ import java.awt.Component
 import java.awt.Container
 import javax.swing.*
 
-internal class ConceptMigLayoutBuilder(val spacing: SpacingConfiguration) : ConceptLayoutBuilderImpl {
+internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration) : ConceptLayoutBuilderImpl {
     companion object {
         private var hRelatedGap = -1
         private var vRelatedGap = -1
