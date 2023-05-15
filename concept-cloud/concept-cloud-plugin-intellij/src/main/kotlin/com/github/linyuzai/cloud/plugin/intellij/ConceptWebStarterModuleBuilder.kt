@@ -6,17 +6,14 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
-import com.intellij.ide.IdeBundle
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.ide.projectWizard.ProjectSettingsStep
-import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.ide.starters.local.StarterModuleBuilder
 import com.intellij.ide.starters.local.StarterModuleBuilder.Companion.importModule
 import com.intellij.ide.starters.local.StarterModuleBuilder.Companion.preprocessModuleCreated
 import com.intellij.ide.starters.local.StarterModuleBuilder.Companion.preprocessModuleOpened
 import com.intellij.ide.starters.shared.*
 import com.intellij.ide.util.projectWizard.*
-import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
@@ -65,7 +62,7 @@ import javax.swing.Icon
 
 abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
     protected val starterContext: ConceptWebStarterContext = ConceptWebStarterContext()
-    private val starterSettings: StarterWizardSettings by lazy { createSettings() }
+    private val starterSettings: ConceptStarterWizardSettings by lazy { createSettings() }
 
     override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
     override fun getParentGroup(): String = JavaModuleType.BUILD_TOOLS_GROUP
@@ -81,19 +78,19 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
 
     abstract fun getDefaultServerUrl(): String
 
-    protected abstract fun getLanguages(): List<StarterLanguage>
-    protected abstract fun getProjectTypes(): List<StarterProjectType>
+    protected abstract fun getLanguages(): List<ConceptStarterLanguage>
+    protected abstract fun getProjectTypes(): List<ConceptStarterProjectType>
 
     // Optional settings
 
     protected open fun getDefaultVersion(): String = DEFAULT_MODULE_VERSION
     protected open fun isPackageNameEditable(): Boolean = false
     protected open fun isExampleCodeProvided(): Boolean = false
-    protected open fun getTestFrameworks(): List<StarterTestRunner> = emptyList()
-    protected open fun getLanguageLevels(): List<StarterLanguageLevel> = emptyList()
-    protected open fun getDefaultLanguageLevel(): StarterLanguageLevel? = null
-    protected open fun getApplicationTypes(): List<StarterAppType> = emptyList()
-    protected open fun getPackagingTypes(): List<StarterAppPackaging> = emptyList()
+    protected open fun getTestFrameworks(): List<ConceptStarterTestRunner> = emptyList()
+    protected open fun getLanguageLevels(): List<ConceptStarterLanguageLevel> = emptyList()
+    protected open fun getDefaultLanguageLevel(): ConceptStarterLanguageLevel? = null
+    protected open fun getApplicationTypes(): List<ConceptStarterAppType> = emptyList()
+    protected open fun getPackagingTypes(): List<ConceptStarterAppPackaging> = emptyList()
 
     protected open fun getFilePathsToOpen(): List<String> = emptyList()
 
@@ -101,8 +98,8 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
         return sdkType is JavaSdkType && !sdkType.isDependent
     }
 
-    private fun createSettings(): StarterWizardSettings {
-        return StarterWizardSettings(
+    private fun createSettings(): ConceptStarterWizardSettings {
+        return ConceptStarterWizardSettings(
             getProjectTypes(),
             getLanguages(),
             isExampleCodeProvided(),
@@ -177,7 +174,7 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
         return ApplicationNamesInfo.getInstance().fullProductName + "/" + ApplicationInfo.getInstance().fullVersion
     }
 
-    protected open fun getCustomizedMessages(): CustomizedMessages? = null
+    protected open fun getCustomizedMessages(): ConceptCustomizedMessages? = null
 
     @RequiresBackgroundThread
     internal fun getServerOptions(serverUrl: String): ConceptWebStarterServerOptions = loadServerOptions(serverUrl)
@@ -216,7 +213,7 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
     @RequiresBackgroundThread
     protected abstract fun extractGeneratorResult(tempZipFile: File, contentEntryDir: File)
 
-    protected open fun getPluginRecommendations(): List<PluginRecommendation> = emptyList()
+    protected open fun getPluginRecommendations(): List<ConceptPluginRecommendation> = emptyList()
 
     protected open fun isReformatAfterCreation(project: Project): Boolean = true
 

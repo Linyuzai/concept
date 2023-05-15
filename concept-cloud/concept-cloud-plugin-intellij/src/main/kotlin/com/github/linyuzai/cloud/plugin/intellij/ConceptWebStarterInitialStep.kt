@@ -1,10 +1,10 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.shared.*
-import com.intellij.ide.starters.shared.ValidationFunctions.*
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.starters.local.StarterModuleBuilder
+import com.intellij.ide.starters.shared.*
+import com.intellij.ide.starters.shared.ValidationFunctions.*
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.ide.util.projectWizard.ModuleNameGenerator
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
@@ -21,14 +21,12 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.properties.map
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ui.configuration.sdkComboBox
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.roots.ui.configuration.validateJavaVersion
 import com.intellij.openapi.roots.ui.configuration.validateSdk
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.popup.IconButton
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
@@ -46,6 +44,8 @@ import java.io.File
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
+import java.nio.file.InvalidPathException
+import java.nio.file.Paths
 import java.util.concurrent.Future
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
@@ -56,7 +56,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     protected val moduleBuilder: ConceptWebStarterModuleBuilder = contextProvider.moduleBuilder
     protected val wizardContext: WizardContext = contextProvider.wizardContext
     protected val starterContext: ConceptWebStarterContext = contextProvider.starterContext
-    protected val starterSettings: StarterWizardSettings = contextProvider.settings
+    protected val starterSettings: ConceptStarterWizardSettings = contextProvider.settings
     protected val parentDisposable: Disposable = contextProvider.parentDisposable
 
     private val validatedTextComponents: MutableList<JTextField> = mutableListOf()
@@ -69,17 +69,17 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     private val packageNameProperty: GraphProperty<String> = propertyGraph.graphProperty { starterContext.packageName }
     private val sdkProperty: GraphProperty<Sdk?> = propertyGraph.graphProperty { null }
 
-    private val projectTypeProperty: GraphProperty<StarterProjectType?> =
+    private val projectTypeProperty: GraphProperty<ConceptStarterProjectType?> =
         propertyGraph.graphProperty { starterContext.projectType }
-    private val languageProperty: GraphProperty<StarterLanguage> =
+    private val languageProperty: GraphProperty<ConceptStarterLanguage> =
         propertyGraph.graphProperty { starterContext.language }
-    private val packagingProperty: GraphProperty<StarterAppPackaging?> =
+    private val packagingProperty: GraphProperty<ConceptStarterAppPackaging?> =
         propertyGraph.graphProperty { starterContext.packaging }
-    private val testFrameworkProperty: GraphProperty<StarterTestRunner?> =
+    private val testFrameworkProperty: GraphProperty<ConceptStarterTestRunner?> =
         propertyGraph.graphProperty { starterContext.testFramework }
-    private val languageLevelProperty: GraphProperty<StarterLanguageLevel?> =
+    private val languageLevelProperty: GraphProperty<ConceptStarterLanguageLevel?> =
         propertyGraph.graphProperty { starterContext.languageLevel }
-    private val applicationTypeProperty: GraphProperty<StarterAppType?> =
+    private val applicationTypeProperty: GraphProperty<ConceptStarterAppType?> =
         propertyGraph.graphProperty { starterContext.applicationType }
     private val exampleCodeProperty: GraphProperty<Boolean> =
         propertyGraph.graphProperty { starterContext.includeExamples }
@@ -88,7 +88,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     private var location: String by locationProperty
     private var groupId: String by groupIdProperty.map { it.trim() }
     private var artifactId: String by artifactIdProperty.map { it.trim() }
-    private var languageLevel: StarterLanguageLevel? by languageLevelProperty
+    private var languageLevel: ConceptStarterLanguageLevel? by languageLevelProperty
     private var packageName: String by packageNameProperty.map { it.trim() }
 
     private val contentPanel: DialogPanel by lazy { createComponent() }
@@ -97,18 +97,18 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     private val retryButton: InplaceButton by lazy { createRetryButton() }
 
     private val sdkModel: ProjectSdksModel = ProjectSdksModel()
-    private val languageLevelsModel: DefaultComboBoxModel<StarterLanguageLevel> =
-        DefaultComboBoxModel<StarterLanguageLevel>()
-    private val applicationTypesModel: DefaultComboBoxModel<StarterAppType> = DefaultComboBoxModel<StarterAppType>()
+    private val languageLevelsModel: DefaultComboBoxModel<ConceptStarterLanguageLevel> =
+        DefaultComboBoxModel<ConceptStarterLanguageLevel>()
+    private val applicationTypesModel: DefaultComboBoxModel<ConceptStarterAppType> = DefaultComboBoxModel<ConceptStarterAppType>()
 
     private lateinit var projectTypesSelector: ConceptButtonSelectorToolbar
     private lateinit var packagingTypesSelector: ConceptButtonSelectorToolbar
     private lateinit var languagesSelector: ConceptButtonSelectorToolbar
 
-    private var languages: List<StarterLanguage> = starterSettings.languages
-    private var applicationTypes: List<StarterAppType> = starterSettings.applicationTypes
-    private var projectTypes: List<StarterProjectType> = starterSettings.projectTypes
-    private var packagingTypes: List<StarterAppPackaging> = starterSettings.packagingTypes
+    private var languages: List<ConceptStarterLanguage> = starterSettings.languages
+    private var applicationTypes: List<ConceptStarterAppType> = starterSettings.applicationTypes
+    private var projectTypes: List<ConceptStarterProjectType> = starterSettings.projectTypes
+    private var packagingTypes: List<ConceptStarterAppPackaging> = starterSettings.packagingTypes
 
     @Volatile
     private var serverOptions: ConceptWebStarterServerOptions? = null
@@ -320,6 +320,22 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
             addFieldsAfter(this)
         }.withVisualPadding()
+    }
+
+    val CHECK_LOCATION_FOR_WARNING = TextValidationFunction { fieldText: String? ->
+        try {
+            val file =
+                Paths.get(FileUtil.expandUserHome(fieldText!!)).toFile()
+            if (file.exists()) {
+                val children = file.list()
+                if (children != null && children.size > 0) {
+                    return@TextValidationFunction "Directory is not empty"
+                }
+            }
+        } catch (ipe: InvalidPathException) {
+            return@TextValidationFunction null
+        }
+        null
     }
 
     private fun createServerUrlLink(): ActionLink {

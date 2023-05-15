@@ -57,7 +57,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
     protected val moduleBuilder: ConceptWebStarterModuleBuilder = contextProvider.moduleBuilder
     protected val wizardContext: WizardContext = contextProvider.wizardContext
     protected val starterContext: ConceptWebStarterContext = contextProvider.starterContext
-    protected val starterSettings: StarterWizardSettings = contextProvider.settings
+    protected val starterSettings: ConceptStarterWizardSettings = contextProvider.settings
     protected val parentDisposable: Disposable = contextProvider.parentDisposable
 
     private val topLevelPanel: JPanel = BorderLayoutPanel()
@@ -512,7 +512,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
         return librariesList.model.root as? CheckedTreeNode
     }
 
-    private fun getDependencyState(libraryInfo: LibraryInfo): ConceptDependencyState {
+    private fun getDependencyState(libraryInfo: ConceptLibraryInfo): ConceptDependencyState {
         val frameworkVersion = frameworkVersionProperty.get() ?: return ConceptDependencyAvailable
         return moduleBuilder.getDependencyStateInternal(frameworkVersion, libraryInfo as ConceptWebStarterDependency)
     }

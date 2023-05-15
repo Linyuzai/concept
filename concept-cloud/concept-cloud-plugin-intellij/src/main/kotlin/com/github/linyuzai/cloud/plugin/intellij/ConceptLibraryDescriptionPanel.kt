@@ -63,7 +63,7 @@ class ConceptLibraryDescriptionPanel : ScrollablePanel(VerticalLayout(DEFAULT_VG
         showEmptyState()
     }
 
-    fun update(library: LibraryInfo, @NlsSafe versionConstraint: String?) {
+    fun update(library: ConceptLibraryInfo, @NlsSafe versionConstraint: String?) {
         descriptionHeader.text = library.title
         descriptionVersion.text = versionConstraint ?: ""
         descriptionVersion.isVisible = versionConstraint != null
@@ -121,7 +121,7 @@ class ConceptLibraryDescriptionPanel : ScrollablePanel(VerticalLayout(DEFAULT_VG
         return JBSwingUtilities.runGlobalCGTransform(this, super.getComponentGraphics(graphics))
     }
 
-    private fun addDescriptionLinks(linksPanel: JPanel, item: LibraryInfo) {
+    private fun addDescriptionLinks(linksPanel: JPanel, item: ConceptLibraryInfo) {
         linksPanel.removeAll()
         for (link in item.links) {
             if (link.url.contains('{')) continue // URL templates are not supported

@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.shared.*
 import com.intellij.openapi.util.UserDataHolderBase
 
 class ConceptWebStarterContext : UserDataHolderBase() {
@@ -14,15 +13,15 @@ class ConceptWebStarterContext : UserDataHolderBase() {
     lateinit var serverUrl: String
     lateinit var serverOptions: ConceptWebStarterServerOptions
 
-    lateinit var language: StarterLanguage
+    lateinit var language: ConceptStarterLanguage
 
     var frameworkVersion: ConceptWebStarterFrameworkVersion? = null
-    var projectType: StarterProjectType? = null
+    var projectType: ConceptStarterProjectType? = null
     var packageName: String = DEFAULT_PACKAGE_NAME
-    var languageLevel: StarterLanguageLevel? = null
-    var packaging: StarterAppPackaging? = null
-    var applicationType: StarterAppType? = null
-    var testFramework: StarterTestRunner? = null
+    var languageLevel: ConceptStarterLanguageLevel? = null
+    var packaging: ConceptStarterAppPackaging? = null
+    var applicationType: ConceptStarterAppType? = null
+    var testFramework: ConceptStarterTestRunner? = null
     var includeExamples: Boolean = true
 
     val dependencies: MutableSet<ConceptWebStarterDependency> = HashSet()

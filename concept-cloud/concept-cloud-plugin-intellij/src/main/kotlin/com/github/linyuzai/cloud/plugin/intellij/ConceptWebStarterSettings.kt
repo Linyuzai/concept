@@ -33,12 +33,12 @@ val SERVER_GROUP_KEY: Key<String> = Key.create("group")
 val SERVER_ARTIFACT_KEY: Key<String> = Key.create("artifact")
 val SERVER_VERSION_KEY: Key<String> = Key.create("version")
 val SERVER_PACKAGE_NAME_KEY: Key<String> = Key.create("packageName")
-val SERVER_LANGUAGES: Key<List<StarterLanguage>> = Key.create("languages")
-val SERVER_LANGUAGE_LEVEL_KEY: Key<StarterLanguageLevel> = Key.create("languageLevel")
-val SERVER_LANGUAGE_LEVELS_KEY: Key<List<StarterLanguageLevel>> = Key.create("languageLevels")
-val SERVER_PROJECT_TYPES: Key<List<StarterProjectType>> = Key.create("projectTypes")
-val SERVER_APPLICATION_TYPES: Key<List<StarterAppType>> = Key.create("appTypes")
-val SERVER_PACKAGING_TYPES: Key<List<StarterAppPackaging>> = Key.create("packagingTypes")
+val SERVER_LANGUAGES: Key<List<ConceptStarterLanguage>> = Key.create("languages")
+val SERVER_LANGUAGE_LEVEL_KEY: Key<ConceptStarterLanguageLevel> = Key.create("languageLevel")
+val SERVER_LANGUAGE_LEVELS_KEY: Key<List<ConceptStarterLanguageLevel>> = Key.create("languageLevels")
+val SERVER_PROJECT_TYPES: Key<List<ConceptStarterProjectType>> = Key.create("projectTypes")
+val SERVER_APPLICATION_TYPES: Key<List<ConceptStarterAppType>> = Key.create("appTypes")
+val SERVER_PACKAGING_TYPES: Key<List<ConceptStarterAppPackaging>> = Key.create("packagingTypes")
 
 open class ConceptWebStarterFrameworkVersion(
     val id: String,
@@ -67,10 +67,10 @@ open class ConceptWebStarterDependency(
     @NlsSafe
     override val title: String,
     override val description: String? = null,
-    override val links: List<LibraryLink> = emptyList(),
+    override val links: List<ConceptLibraryLink> = emptyList(),
     override val isDefault: Boolean = false,
     override val isRequired: Boolean = false
-) : LibraryInfo {
+) : ConceptLibraryInfo {
     override fun toString(): String {
         return "WebStarterDependency(id='$id', title='$title')"
     }
@@ -80,7 +80,7 @@ class ConceptWebStarterContextProvider(
     val moduleBuilder: ConceptWebStarterModuleBuilder,
     val wizardContext: WizardContext,
     val starterContext: ConceptWebStarterContext,
-    val settings: StarterWizardSettings,
+    val settings: ConceptStarterWizardSettings,
     val parentDisposable: Disposable
 )
 

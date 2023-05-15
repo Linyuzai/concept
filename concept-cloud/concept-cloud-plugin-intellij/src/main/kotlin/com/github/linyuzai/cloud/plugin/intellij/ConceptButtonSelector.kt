@@ -52,7 +52,7 @@ private const val BUTTONS_MARGIN: Int = 2
 private class ConceptButtonSelector(
     action: ButtonSelectorAction<*>,
     presentation: Presentation,
-    place: String?,
+    place: String,
     minimumSize: Dimension,
     private val forceFieldHeight: Boolean
 ) : ActionButtonWithText(action, presentation, place, minimumSize) {

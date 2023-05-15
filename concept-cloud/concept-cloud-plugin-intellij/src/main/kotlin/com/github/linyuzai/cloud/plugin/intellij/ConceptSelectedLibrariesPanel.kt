@@ -21,8 +21,8 @@ class ConceptSelectedLibrariesPanel : JBPanelWithEmptyText(BorderLayout()) {
     private val scrollablePanel: ScrollablePanel = ScrollablePanel(VerticalLayout(UIUtil.DEFAULT_VGAP))
     private val scrollPane = ScrollPaneFactory.createScrollPane(scrollablePanel, true)
 
-    var libraryRemoveListener: ((LibraryInfo) -> Unit)? = null
-    var dependencyStateFunction: ((LibraryInfo) -> ConceptDependencyState)? = null
+    var libraryRemoveListener: ((ConceptLibraryInfo) -> Unit)? = null
+    var dependencyStateFunction: ((ConceptLibraryInfo) -> ConceptDependencyState)? = null
 
     init {
         this.background = UIUtil.getListBackground()
@@ -35,7 +35,7 @@ class ConceptSelectedLibrariesPanel : JBPanelWithEmptyText(BorderLayout()) {
         scrollPane.isVisible = false
     }
 
-    fun update(libraries: Collection<LibraryInfo>) {
+    fun update(libraries: Collection<ConceptLibraryInfo>) {
         scrollablePanel.removeAll()
 
         for (library in libraries) {
