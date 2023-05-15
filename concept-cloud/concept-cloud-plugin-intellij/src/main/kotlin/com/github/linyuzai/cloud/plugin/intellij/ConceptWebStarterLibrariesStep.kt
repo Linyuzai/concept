@@ -1,8 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.ide.starters.shared.*
-import com.intellij.ide.IdeBundle
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
@@ -171,7 +169,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
                 progressIndicator.checkCanceled()
 
                 progressIndicator.text =
-                    "message.state.downloading.template=Downloading ${moduleBuilder.presentableName} Template..."
+                    "Downloading ${moduleBuilder.presentableName} Template..."
 
                 val downloadResult: ConceptDownloadResult? = try {
                     downloadResult(progressIndicator)
@@ -271,7 +269,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
         }
     }
 
-    protected open fun addFieldsAfter(layout: LayoutBuilder) {}
+    protected open fun addFieldsAfter(layout: ConceptLayoutBuilder) {}
 
     private fun createComponent(): DialogPanel {
         val messages = starterSettings.customizedMessages

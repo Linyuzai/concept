@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.ide.starters.shared.LibraryInfo
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.roots.ui.componentsList.components.ScrollablePanel

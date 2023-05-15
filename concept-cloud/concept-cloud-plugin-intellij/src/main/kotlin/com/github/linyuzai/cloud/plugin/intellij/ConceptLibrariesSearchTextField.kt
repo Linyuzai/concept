@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonShortcuts

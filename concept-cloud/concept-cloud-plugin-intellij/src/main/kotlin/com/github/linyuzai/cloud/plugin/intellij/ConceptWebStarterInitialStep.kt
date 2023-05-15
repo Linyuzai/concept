@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.ide.starters.shared.*
 import com.intellij.ide.starters.shared.ValidationFunctions.*
 import com.intellij.icons.AllIcons
@@ -28,6 +27,7 @@ import com.intellij.openapi.roots.ui.configuration.validateSdk
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.popup.IconButton
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
@@ -100,9 +100,9 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
         DefaultComboBoxModel<StarterLanguageLevel>()
     private val applicationTypesModel: DefaultComboBoxModel<StarterAppType> = DefaultComboBoxModel<StarterAppType>()
 
-    private lateinit var projectTypesSelector: ButtonSelectorToolbar
-    private lateinit var packagingTypesSelector: ButtonSelectorToolbar
-    private lateinit var languagesSelector: ButtonSelectorToolbar
+    private lateinit var projectTypesSelector: ConceptButtonSelectorToolbar
+    private lateinit var packagingTypesSelector: ConceptButtonSelectorToolbar
+    private lateinit var languagesSelector: ConceptButtonSelectorToolbar
 
     private var languages: List<StarterLanguage> = starterSettings.languages
     private var applicationTypes: List<StarterAppType> = starterSettings.applicationTypes
@@ -397,9 +397,9 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
         return serverOptions != null
     }
 
-    protected open fun addFieldsBefore(layout: LayoutBuilder) {}
+    protected open fun addFieldsBefore(layout: ConceptLayoutBuilder) {}
 
-    protected open fun addFieldsAfter(layout: LayoutBuilder) {}
+    protected open fun addFieldsAfter(layout: ConceptLayoutBuilder) {}
 
     override fun _init() {
         super._init()
@@ -625,14 +625,14 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     }
 
     @Suppress("SameParameterValue")
-    private fun <T : JComponent> CellBuilder<T>.withSpecialValidation(vararg errorValidations: TextValidationFunction): CellBuilder<T> {
+    private fun <T : JComponent> ConceptCellBuilder<T>.withSpecialValidation(vararg errorValidations: TextValidationFunction): ConceptCellBuilder<T> {
         return this.withSpecialValidation(errorValidations.asList(), null)
     }
 
-    private fun <T : JComponent> CellBuilder<T>.withSpecialValidation(
+    private fun <T : JComponent> ConceptCellBuilder<T>.withSpecialValidation(
         errorValidations: List<TextValidationFunction>,
         warningValidation: TextValidationFunction?
-    ): CellBuilder<T> {
+    ): ConceptCellBuilder<T> {
         return withValidation(this, errorValidations, warningValidation, validatedTextComponents, parentDisposable)
     }
 }
