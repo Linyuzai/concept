@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.starters.shared.*;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
@@ -24,7 +23,7 @@ import java.util.zip.ZipFile;
 @SuppressWarnings("all")
 public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder {
 
-    private final Key<Map<String, ConceptFrameworkVersion>> CONCEPT_CLOUD_FVE_KEY = new Key<>("CONCEPT_CLOUD_FVE_KEY");
+    private final Key<Map<String, ConceptFrameworkVersion>> CONCEPT_CLOUD_CFV_KEY = new Key<>("CONCEPT_CLOUD_CFV_KEY");
 
     @NotNull
     @Override
@@ -124,7 +123,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     }
 
     private ConceptFrameworkVersion getFrameworkVersionEx() {
-        Map<String, ConceptFrameworkVersion> data = getStarterContext().getUserData(CONCEPT_CLOUD_FVE_KEY);
+        Map<String, ConceptFrameworkVersion> data = getStarterContext().getUserData(CONCEPT_CLOUD_CFV_KEY);
         if (data == null) {
             return null;
         }
@@ -289,7 +288,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             }
             value.put(id, frameworkVersion);
         }
-        getStarterContext().putUserData(CONCEPT_CLOUD_FVE_KEY, value);
+        getStarterContext().putUserData(CONCEPT_CLOUD_CFV_KEY, value);
         List<ConceptWebStarterDependencyCategory> dependencyCategories = new ArrayList<>();
         JsonArray dependencyCategoryArray = json.get("dependencyCategories").getAsJsonArray();
         for (JsonElement dependencyCategoryElement : dependencyCategoryArray) {

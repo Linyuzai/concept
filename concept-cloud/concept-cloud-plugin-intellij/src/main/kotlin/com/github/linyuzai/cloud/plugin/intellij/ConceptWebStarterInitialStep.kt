@@ -230,7 +230,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
                 }.largeGapAfter()
             }
 
-            if (starterSettings.projectTypes.isNotEmpty()) {
+            if (starterSettings.projectTypes.size > 1) {
                 val messages = starterSettings.customizedMessages
                 row(messages?.projectTypeLabel ?: "Type:") {
                     projectTypesSelector =
