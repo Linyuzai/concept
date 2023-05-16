@@ -1,4 +1,4 @@
-package com.github.linyuzai.cloud.web.core.intercept.condition;
+package com.github.linyuzai.cloud.web.core.i18n.condition;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -8,12 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 当响应拦截启用
+ * 当i18n启用
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@ConditionalOnWebInterceptionEnabled
-@ConditionalOnProperty(name = "concept.cloud.web.intercept.response.enabled", havingValue = "true", matchIfMissing = true)
-public @interface ConditionalOnWebResponseInterceptionEnabled {
+@ConditionalOnProperty(name = "concept.cloud.web.i18n.enabled", havingValue = "false")
+public @interface ConditionalOnWebI18nDisabled {
 
 }

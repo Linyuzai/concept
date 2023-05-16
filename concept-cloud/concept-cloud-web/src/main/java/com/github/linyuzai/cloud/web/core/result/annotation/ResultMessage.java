@@ -14,6 +14,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ResultMessage {
 
+    String SUCCESS = "concept.web.result.success";
+
+    String FAILURE = "concept.web.result.failure";
+
     /**
      * 成功信息
      *
