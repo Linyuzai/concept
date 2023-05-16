@@ -1,7 +1,6 @@
 apply from: '../../allprojects.gradle'
 
-apply from: '../version.gradle'
-version ConceptCloudVersion
+version '1.5.1'
 
 ext {
     set('publishName', 'Cloud Web')

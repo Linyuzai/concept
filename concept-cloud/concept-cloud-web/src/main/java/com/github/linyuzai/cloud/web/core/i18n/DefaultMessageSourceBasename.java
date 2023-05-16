@@ -29,18 +29,21 @@ public class DefaultMessageSourceBasename implements MessageSourceBasename {
         Set<String> basenames = new HashSet<>();
         Resource[] resources = applicationContext.getResources("classpath*:i18n/**");
         for (Resource resource : resources) {
+            if (!resource.isReadable()) {
+                continue;
+            }
             String filename = resource.getFilename();
-            if (filename == null) {
+            if (filename == null || filename.isEmpty()) {
                 continue;
             }
             String basename;
             int indexOf = filename.indexOf("_");
             if (indexOf == -1) {
-                basename = filename;
+                basename = filename.replace(".properties", "");
             } else {
                 basename = filename.substring(0, indexOf);
             }
-            basenames.add("i18n/" + basename.replace(".properties", ""));
+            basenames.add("i18n/" + basename);
         }
         return basenames.toArray(new String[0]);
     }
