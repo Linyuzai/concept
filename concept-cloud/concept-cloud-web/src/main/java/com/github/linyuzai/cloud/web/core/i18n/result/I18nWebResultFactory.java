@@ -30,6 +30,6 @@ public class I18nWebResultFactory extends BooleanWebResultFactory {
     }
 
     protected Locale getLocale(WebContext context) {
-        return context.get(Locale.class, Locale.CHINESE);
+        return context.get(Locale.class, Locale.getDefault());
     }
 }

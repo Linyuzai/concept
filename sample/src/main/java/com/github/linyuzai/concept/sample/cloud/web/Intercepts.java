@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.method.HandlerMethod;
 
+import java.util.Locale;
+
 
 @Component
 public class Intercepts {
@@ -28,6 +30,12 @@ public class Intercepts {
             return false;
         }
         return true;
+    }
+
+    @Order(-1)
+    @OnRequest
+    public void locale(WebContext context) {
+        context.put(Locale.class, Locale.CHINESE);
     }
 
     @BreakIntercept

@@ -6,7 +6,7 @@ import com.github.linyuzai.cloud.web.core.result.LongWebResult;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class CustomWebResultFactory extends AnnotationWebResultFactory {
 
     @Override

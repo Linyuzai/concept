@@ -40,7 +40,7 @@ public class DefaultMessageSourceBasename implements MessageSourceBasename {
             } else {
                 basename = filename.substring(0, indexOf);
             }
-            basenames.add("i18n/" + basename);
+            basenames.add("i18n/" + basename.replace(".properties", ""));
         }
         return basenames.toArray(new String[0]);
     }

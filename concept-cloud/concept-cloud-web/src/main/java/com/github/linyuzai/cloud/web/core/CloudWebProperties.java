@@ -60,7 +60,7 @@ public class CloudWebProperties {
          * been found. if this is turned off, the only fallback will be the default file (e.g.
          * "messages.properties" for basename "messages").
          */
-        private boolean fallbackToSystemLocale = true;
+        private boolean fallbackToSystemLocale = false;
 
         /**
          * Whether to always apply the MessageFormat rules, parsing even messages without
