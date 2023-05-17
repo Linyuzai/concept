@@ -59,6 +59,9 @@ public class Conditions {
     private Limit limit;
 
     public static Conditions from(Conditions source) {
+        if (source == EMPTY) {
+            return EMPTY;
+        }
         Conditions conditions = new Conditions();
         source.copy(conditions);
         return conditions;

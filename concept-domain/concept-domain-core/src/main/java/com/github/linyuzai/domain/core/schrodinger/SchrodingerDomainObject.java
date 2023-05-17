@@ -18,11 +18,10 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
     @NonNull
     protected final String id;
 
-    /**
-     * 领域上下文
-     */
     @NonNull
     protected final DomainContext context;
+
+    protected DomainRepository<T, ?> repository;
 
     /**
      * 被代理的领域模型
@@ -38,8 +37,7 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
      * 获得被代理的对象
      */
     public T doGetTarget() {
-        DomainRepository<? extends T, ?> repository = context.get(getDomainRepositoryType());
-        T domain = repository.get(id);
+        T domain = getRepository().get(id);
         if (domain == null) {
             throw new DomainNotFoundException(getDomainObjectType(), id);
         }
@@ -58,6 +56,13 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
         this.target = null;
     }
 
+    public DomainRepository<T, ?> getRepository() {
+        if (repository == null) {
+            repository = context.get(getDomainRepositoryType());
+        }
+        return repository;
+    }
+
     protected Class<? extends T> getDomainObjectType() {
         return DomainLink.generic(getClass(), 0);
     }
@@ -65,7 +70,7 @@ public class SchrodingerDomainObject<T extends DomainObject> implements DomainOb
     /**
      * 被代理的领域模型的存储
      */
-    protected Class<? extends DomainRepository<? extends T, ?>> getDomainRepositoryType() {
+    protected Class<? extends DomainRepository<T, ?>> getDomainRepositoryType() {
         return DomainLink.repository(getDomainObjectType());
     }
 }

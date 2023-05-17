@@ -21,9 +21,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SchrodingerDomainCollection<T extends DomainObject> implements DomainCollection<T> {
 
-    /**
-     * 领域上下文
-     */
     @NonNull
     protected final DomainContext context;
 

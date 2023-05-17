@@ -144,15 +144,58 @@ public interface DomainProxy extends InvocationHandler {
         DomainRepository<T, ?> getRepository();
     }
 
-    interface CollectionAccess<T extends DomainObject> {
-
-        DomainCollection<T> getCollection();
-    }
-
     interface ExtraAccess<T> {
 
         T getExtra();
 
-        void setExtra(T custom);
+        void setExtra(T extra);
+    }
+
+    interface AccessAdapter<T extends DomainObject, E>
+            extends ContextAccess, ConditionsAccess, RepositoryAccess<T>, ExtraAccess<E> {
+
+        @Override
+        default DomainContext getContext() {
+            if (getCollection() instanceof ContextAccess) {
+                return ((ContextAccess) getCollection()).getContext();
+            }
+            throw new UnsupportedOperationException("Can not access DomainContext, try");
+        }
+
+        @Override
+        default Conditions getConditions() {
+            if (getCollection() instanceof ConditionsAccess) {
+                return ((ConditionsAccess) getCollection()).getConditions();
+            }
+            throw new UnsupportedOperationException("Can not access Conditions, try");
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        default DomainRepository<T, ?> getRepository() {
+            if (getCollection() instanceof RepositoryAccess) {
+                return ((RepositoryAccess<T>) getCollection()).getRepository();
+            }
+            throw new UnsupportedOperationException("Can not access DomainRepository, try");
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        default E getExtra() {
+            if (getCollection() instanceof ExtraAccess) {
+                return ((ExtraAccess<E>) getCollection()).getExtra();
+            }
+            throw new UnsupportedOperationException("Can not access Extra, try");
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        default void setExtra(E extra) {
+            if (getCollection() instanceof ExtraAccess) {
+                ((ExtraAccess<E>) getCollection()).setExtra(extra);
+            }
+        }
+
+        DomainCollection<T> getCollection();
     }
 }

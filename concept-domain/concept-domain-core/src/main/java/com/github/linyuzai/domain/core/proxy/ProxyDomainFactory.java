@@ -70,6 +70,6 @@ public class ProxyDomainFactory implements DomainFactory {
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<? extends DomainObject> objects) {
-        return new ProxyListableDomainCollection<>(new ArrayList<>(objects)).create(cls);
+        return new ProxyListableDomainCollection<>(cls, context, new ArrayList<>(objects)).create(cls);
     }
 }

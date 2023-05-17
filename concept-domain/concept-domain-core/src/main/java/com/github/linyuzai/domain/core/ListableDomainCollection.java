@@ -15,9 +15,9 @@ import java.util.stream.Stream;
 public class ListableDomainCollection<T extends DomainObject> implements DomainCollection<T> {
 
     @NonNull
-    private final List<T> list;
+    protected final List<T> list;
 
-    private Map<String, T> map;
+    protected Map<String, T> map;
 
     @Override
     public T get(String id) {

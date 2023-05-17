@@ -6,7 +6,6 @@ import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerOnceDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 import java.util.function.Predicate;
 
@@ -15,12 +14,9 @@ import java.util.function.Predicate;
  */
 @Getter
 public class ProxySchrodingerOnceDomainCollection<T extends DomainObject> extends SchrodingerOnceDomainCollection<T>
-        implements DomainCollection<T>, DomainProxy, DomainProxy.CollectionAccess<T>, DomainProxy.ExtraAccess<Object> {
+        implements DomainCollection<T>, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
     protected final Class<? extends DomainCollection<?>> type;
-
-    @Setter
-    protected Object extra;
 
     public ProxySchrodingerOnceDomainCollection(Class<? extends DomainCollection<?>> type, @NonNull DomainCollection<T> collection, @NonNull Predicate<T> predicate) {
         super(collection, predicate);
@@ -29,10 +25,5 @@ public class ProxySchrodingerOnceDomainCollection<T extends DomainObject> extend
 
     protected Class<? extends T> getDomainType() {
         return DomainLink.collection(type);
-    }
-
-    @Override
-    public @NonNull DomainCollection<T> getCollection() {
-        return this;
     }
 }

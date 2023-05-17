@@ -202,7 +202,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
     protected abstract Pages<P> doPage(Conditions conditions, Pages.Args page);
 
     protected C wrap(Collection<T> objects) {
-       return new ProxyListableDomainCollection<>(new ArrayList<>(objects)).create(getGenericType());
+        Class<C> genericType = getGenericType();
+        return new ProxyListableDomainCollection<>(genericType, new ArrayList<>(objects))
+                .create(genericType);
     }
 
     protected Class<C> getGenericType() {

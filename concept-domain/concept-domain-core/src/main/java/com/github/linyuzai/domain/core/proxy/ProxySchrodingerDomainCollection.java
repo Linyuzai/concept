@@ -15,9 +15,8 @@ import lombok.Setter;
  */
 @Getter
 public class ProxySchrodingerDomainCollection<T extends DomainObject> extends SchrodingerDomainCollection<T>
-        implements DomainCollection<T>, DomainProxy, DomainProxy.ContextAccess,
-        DomainProxy.ConditionsAccess, DomainProxy.RepositoryAccess<T>,
-        DomainProxy.CollectionAccess<T>, DomainProxy.ExtraAccess<Object> {
+        implements DomainCollection<T>, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+        DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     protected final Class<? extends DomainCollection<?>> type;
 
@@ -36,10 +35,5 @@ public class ProxySchrodingerDomainCollection<T extends DomainObject> extends Sc
 
     protected Class<? extends DomainObject> getDomainType() {
         return DomainLink.collection(type);
-    }
-
-    @Override
-    public DomainCollection<T> getCollection() {
-        return this;
     }
 }
