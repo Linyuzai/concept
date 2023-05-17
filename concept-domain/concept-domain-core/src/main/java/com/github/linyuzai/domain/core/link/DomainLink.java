@@ -72,7 +72,7 @@ public class DomainLink {
                                 Class<?> classForType = getClassForType(pt.getRawType());
                                 if (classForType != null && DomainCollection.class.isAssignableFrom(classForType)) {
                                     Type[] arguments = pt.getActualTypeArguments();
-                                    return arguments[0];
+                                    return getClassForType(arguments[0]);
                                 }
                             }
                         }

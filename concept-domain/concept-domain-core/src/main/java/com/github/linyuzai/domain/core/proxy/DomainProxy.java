@@ -1,9 +1,6 @@
 package com.github.linyuzai.domain.core.proxy;
 
-import com.github.linyuzai.domain.core.DomainCollection;
-import com.github.linyuzai.domain.core.DomainContext;
-import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.DomainRepository;
+import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.lambda.LambdaFunction;
 import lombok.SneakyThrows;
@@ -62,6 +59,15 @@ public interface DomainProxy extends InvocationHandler {
     }
 
     default Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass == DomainObject.class ||
+                declaringClass == Identifiable.class ||
+                declaringClass == ContextAccess.class ||
+                declaringClass == ConditionsAccess.class ||
+                declaringClass == RepositoryAccess.class ||
+                declaringClass == ExtraAccess.class) {
+            return method.invoke(this, args);
+        }
         return method.invoke(getProxied(), args);
     }
 
