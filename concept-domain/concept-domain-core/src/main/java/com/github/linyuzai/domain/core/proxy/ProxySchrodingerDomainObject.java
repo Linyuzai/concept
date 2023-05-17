@@ -2,14 +2,11 @@ package com.github.linyuzai.domain.core.proxy;
 
 import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.Identifiable;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerDomainObject;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-
-import java.lang.reflect.Method;
 
 /**
  * 薛定谔模型代理

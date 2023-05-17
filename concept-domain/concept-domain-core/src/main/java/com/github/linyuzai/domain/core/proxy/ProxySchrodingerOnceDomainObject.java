@@ -2,13 +2,11 @@ package com.github.linyuzai.domain.core.proxy;
 
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.Identifiable;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerOnceDomainObject;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.lang.reflect.Method;
 import java.util.function.Predicate;
 
 /**

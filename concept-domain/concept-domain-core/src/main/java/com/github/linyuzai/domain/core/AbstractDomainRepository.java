@@ -203,11 +203,15 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
 
     protected C wrap(Collection<T> objects) {
         Class<C> genericType = getGenericType();
-        return new ProxyListableDomainCollection<>(genericType, new ArrayList<>(objects))
+        return new ProxyListableDomainCollection<>(genericType, getContext(), new ArrayList<>(objects))
                 .create(genericType);
     }
 
     protected Class<C> getGenericType() {
         return DomainLink.generic(getClass(), 1);
+    }
+
+    protected DomainContext getContext() {
+        return null;
     }
 }
