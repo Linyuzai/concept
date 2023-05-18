@@ -1,4 +1,4 @@
-package com.bytedance.juejin.login;
+package $PACKAGE$.login;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

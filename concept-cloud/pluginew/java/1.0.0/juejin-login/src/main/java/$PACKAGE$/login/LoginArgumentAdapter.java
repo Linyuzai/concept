@@ -1,4 +1,4 @@
-package com.bytedance.juejin.login;
+package $PACKAGE$.login;
 
 import org.springframework.core.MethodParameter;
 

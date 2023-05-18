@@ -1,9 +1,9 @@
-package com.bytedance.juejin.login.autoconfigure;
+package $PACKAGE$.login.autoconfigure;
 
-import com.bytedance.juejin.login.Login;
-import com.bytedance.juejin.login.LoginArgumentAdapter;
-import com.bytedance.juejin.login.LoginHandlerMethodArgumentResolver;
-import com.bytedance.juejin.login.LoginUserArgumentAdapter;
+import $PACKAGE$.login.Login;
+import $PACKAGE$.login.LoginArgumentAdapter;
+import $PACKAGE$.login.LoginHandlerMethodArgumentResolver;
+import $PACKAGE$.login.LoginUserArgumentAdapter;
 import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakIntercept;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;

@@ -1,4 +1,4 @@
-package com.bytedance.juejin.login.autoconfigure;
+package $PACKAGE$.login.autoconfigure;
 
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ public class SpringDocConfiguration {
         return GroupedOpenApi.builder()
                 .group("login")
                 .displayName("登录")
-                .packagesToScan("com.bytedance.juejin.login")
+                .packagesToScan("$PACKAGE$.login")
                 .build();
     }
 }

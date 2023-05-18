@@ -1,6 +1,6 @@
-package com.bytedance.juejin.login;
+package $PACKAGE$.login;
 
-import com.bytedance.juejin.domain.user.User;
+import $PACKAGE$.domain.user.User;
 import com.github.linyuzai.cloud.web.servlet.WebContextManager;
 
 /**

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bytedance.juejin.login.username.autoconfigure.UsernameLoginAutoConfiguration
+$PACKAGE$.login.username.autoconfigure.UsernameLoginAutoConfiguration

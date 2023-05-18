@@ -1,4 +1,4 @@
-package com.bytedance.juejin.login;
+package $PACKAGE$.login;
 
 import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;

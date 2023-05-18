@@ -1,9 +1,9 @@
-package com.bytedance.juejin.login.username;
+package $PACKAGE$.login.username;
 
-import com.bytedance.juejin.domain.user.User;
-import com.bytedance.juejin.domain.user.UserRepository;
-import com.bytedance.juejin.login.LoginVO;
-import com.bytedance.juejin.token.TokenCodec;
+import $PACKAGE$.domain.user.User;
+import $PACKAGE$.domain.user.UserRepository;
+import $PACKAGE$.login.LoginVO;
+import $PACKAGE$.token.TokenCodec;
 import com.github.linyuzai.domain.core.condition.LambdaConditions;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

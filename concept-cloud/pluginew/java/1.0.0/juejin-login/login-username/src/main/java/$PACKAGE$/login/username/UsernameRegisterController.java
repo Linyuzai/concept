@@ -1,9 +1,9 @@
-package com.bytedance.juejin.login.username;
+package $PACKAGE$.login.username;
 
-import com.bytedance.juejin.domain.user.User;
-import com.bytedance.juejin.domain.user.UserIdGenerator;
-import com.bytedance.juejin.domain.user.UserImpl;
-import com.bytedance.juejin.domain.user.UserRepository;
+import $PACKAGE$.domain.user.User;
+import $PACKAGE$.domain.user.UserIdGenerator;
+import $PACKAGE$.domain.user.UserImpl;
+import $PACKAGE$.domain.user.UserRepository;
 import com.github.linyuzai.domain.core.DomainValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
