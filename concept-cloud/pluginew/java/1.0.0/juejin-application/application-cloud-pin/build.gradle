@@ -1,6 +1,0 @@
-dependencies {
-    implementation project(':juejin-basic:basic-cloud') //微服务基础依赖
-    implementation project(':juejin-rpc:rpc-feign') //Feign实现RPC
-    implementation project(':juejin-token:token-jwt') //jwt处理token
-    implementation project(':juejin-module:module-pin') //沸点模块
-}

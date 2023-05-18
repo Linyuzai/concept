@@ -1,12 +1,9 @@
 server:
-  port: 9999
+  port: 10000
 spring:
   application:
-    name: $ARTIFACT$-application-boot
+    name: $ARTIFACT$-application-cloud-user
   datasource:
     url: jdbc:mysql://localhost:3306/$ARTIFACT$?serverTimezone=GMT%2b8
     username: root
     password: 123456
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
