@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bytedance.juejin.token.jwt.autoconfigure.JwtAutoConfiguration
+$PACKAGE$.token.jwt.autoconfigure.JwtAutoConfiguration

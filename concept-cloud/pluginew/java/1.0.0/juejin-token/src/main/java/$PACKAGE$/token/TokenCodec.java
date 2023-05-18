@@ -1,6 +1,6 @@
-package com.bytedance.juejin.token;
+package $PACKAGE$.token;
 
-import com.bytedance.juejin.domain.user.User;
+import $PACKAGE$.domain.user.User;
 
 /**
  * Token 编解码

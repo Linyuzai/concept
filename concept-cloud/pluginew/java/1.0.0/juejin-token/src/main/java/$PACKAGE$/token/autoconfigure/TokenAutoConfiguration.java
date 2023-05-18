@@ -1,6 +1,6 @@
-package com.bytedance.juejin.token.autoconfigure;
+package $PACKAGE$.token.autoconfigure;
 
-import com.bytedance.juejin.token.TokenWebInterceptor;
+import $PACKAGE$.token.TokenWebInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

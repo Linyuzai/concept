@@ -1,7 +1,7 @@
-package com.bytedance.juejin.token;
+package $PACKAGE$.token;
 
-import com.bytedance.juejin.domain.user.User;
-import com.bytedance.juejin.login.LoginContext;
+import $PACKAGE$.domain.user.User;
+import $PACKAGE$.login.LoginContext;
 import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;

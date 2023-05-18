@@ -1,7 +1,7 @@
-package com.bytedance.juejin.token.jwt;
+package $PACKAGE$.token.jwt;
 
-import com.bytedance.juejin.domain.user.User;
-import com.bytedance.juejin.token.TokenCodec;
+import $PACKAGE$.domain.user.User;
+import $PACKAGE$.token.TokenCodec;
 import com.github.linyuzai.domain.core.DomainFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -27,7 +27,7 @@ public class JwtTokenCodec implements TokenCodec {
 
     public static final String ID = "id";
 
-    private final String KEY = "juejin";
+    private final String KEY = "$ARTIFACT$";
 
     @Autowired
     private DomainFactory factory;
