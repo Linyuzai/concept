@@ -1,0 +1,11 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: juejin-application-cloud-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        enabled: false

@@ -1,0 +1,4 @@
+dependencies {
+    //implementation project(':juejin-domain:domain-log') //日志领域
+    implementation project(':juejin-domain:domain-user') //用户领域
+}

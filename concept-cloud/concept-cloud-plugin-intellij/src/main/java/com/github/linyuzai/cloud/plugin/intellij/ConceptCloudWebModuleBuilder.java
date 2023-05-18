@@ -28,18 +28,14 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     @NotNull
     @Override
     protected Url composeGeneratorUrl(@NotNull String s, @NotNull ConceptWebStarterContext webStarterContext) {
-        String version;
         ConceptWebStarterFrameworkVersion frameworkVersion = webStarterContext.getFrameworkVersion();
-        if (frameworkVersion == null) {
-            version = "";
-        } else {
-            version = "_" + frameworkVersion.getId();
-        }
+        String version = frameworkVersion.getId();
+        String location = "java/" + version + "/template.zip";
         String url;
         if (s.endsWith("/")) {
-            url = s + "java" + version + ".zip";
+            url = s + location;
         } else {
-            url = s + "/java" + version + ".zip";
+            url = s + "/" + location;
         }
         return Urls.newUnparsable(url);
     }
@@ -206,8 +202,8 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     @NotNull
     @Override
     public String getDefaultServerUrl() {
-        //return "https://raw.githubusercontent.com/Linyuzai/concept/master/concept-cloud/plugin";
-        return "https://cdn.jsdelivr.net/gh/Linyuzai/concept/concept-cloud/plugin";
+        return "https://raw.githubusercontent.com/Linyuzai/concept/master/concept-cloud/pluginew";
+        //return "https://cdn.jsdelivr.net/gh/Linyuzai/concept/concept-cloud/pluginew";
     }
 
     @NotNull

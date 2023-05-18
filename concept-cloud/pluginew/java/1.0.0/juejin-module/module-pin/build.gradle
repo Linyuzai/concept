@@ -1,0 +1,4 @@
+dependencies {
+    api project(':juejin-domain:domain-pin') //沸点领域
+    api project(':juejin-domain:domain-user') //用户领域
+}

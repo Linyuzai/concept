@@ -1,0 +1,32 @@
+rootProject.name = 'juejin'
+
+include 'juejin-application'
+include 'juejin-application:application-boot'
+include 'juejin-application:application-cloud-gateway'
+include 'juejin-application:application-cloud-pin'
+include 'juejin-application:application-cloud-system'
+
+include 'juejin-basic'
+include 'juejin-basic:basic-boot'
+include 'juejin-basic:basic-cloud'
+
+include 'juejin-domain'
+include 'juejin-domain:domain-log'
+include 'juejin-domain:domain-notification'
+include 'juejin-domain:domain-pin'
+include 'juejin-domain:domain-user'
+
+include 'juejin-login'
+include 'juejin-login:login-username'
+
+include 'juejin-module'
+include 'juejin-module:module-notification'
+include 'juejin-module:module-pin'
+include 'juejin-module:module-user'
+
+include 'juejin-rpc'
+include 'juejin-rpc:rpc-feign'
+
+include 'juejin-token'
+include 'juejin-token:token-jwt'
+

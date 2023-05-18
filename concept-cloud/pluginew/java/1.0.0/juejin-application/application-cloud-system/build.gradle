@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':juejin-basic:basic-cloud') //微服务基础依赖
+    implementation project(':juejin-login:login-username') //用户名登录
+    implementation project(':juejin-token:token-jwt') //jwt处理token
+    implementation project(':juejin-rpc:rpc-feign') //Feign实现RPC
+    implementation project(':juejin-module:module-user') //用户模块
+    implementation project(':juejin-module:module-notification') //消息模块
+}

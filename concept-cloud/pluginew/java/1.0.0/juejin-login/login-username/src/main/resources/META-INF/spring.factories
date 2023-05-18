@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bytedance.juejin.login.username.autoconfigure.UsernameLoginAutoConfiguration

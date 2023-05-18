@@ -1,0 +1,198 @@
+//定义插件
+plugins {
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+}
+
+//应用于所有模块
+allprojects {
+
+    //设置一些自定义的值
+    ext {
+        set('JuejinVersion', '1.0.0')
+    }
+
+    //应用插件
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    version "${JuejinVersion}"
+    group = 'com.bytedance'
+
+    //仓库地址
+    repositories {
+        mavenCentral()
+    }
+
+    //依赖
+    dependencies {
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        if (project.name == 'application-cloud-gateway') {
+            return
+        }
+
+        implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+
+        if (project.name.startsWith('domain-')) {
+            api 'com.github.linyuzai:concept-domain-spring-boot-starter:1.7.0'
+            return
+        }
+
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'com.github.linyuzai:concept-cloud-web:1.5.2'
+
+        if (project.name.startsWith('module-') || project.name.startsWith('basic-')) {
+
+            if (project.name.startsWith('module-')) {
+                implementation project(':juejin-basic:basic-boot')
+            }
+
+            implementation project(':juejin-login')
+
+            implementation 'com.github.linyuzai:concept-domain-mbp:1.7.0'
+
+            implementation 'mysql:mysql-connector-java'
+            implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
+        }
+    }
+
+    //依赖管理
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'
+            mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
+        }
+    }
+
+    //测试
+    test {
+        useJUnitPlatform()
+    }
+
+    //编译编码
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+    }
+
+    //application 启动模块 用 bootJar 打包，其他模块用 jar 打包
+    if (project.name.contains("application-")) {
+        bootJar.enabled = true
+        bootJar.archiveBaseName = "juejin-${project.name}"
+        jar.enabled = false
+    } else {
+        jar.enabled = true
+
+        //指定名称
+        //前缀aa方便查看压缩包
+        if (project.depth <= 1) {
+            jar.archiveBaseName = "aa-${project.name}"
+        } else {
+            jar.archiveBaseName = "aa-juejin-${project.name}"
+        }
+
+        bootJar.enabled = false
+    }
+
+    processResources {
+        //生成路由文件
+        doLast {
+            if (project.name.startsWith('application-')) {
+                //route.json
+                Set<String> moduleSet = getDependenceModuleNames(project)
+                //如果包含了业务模块
+                if (!moduleSet.isEmpty()) {
+                    //获得build目录
+                    File resourcesDir = new File(project.buildDir, '/resources/main')
+                    //创建路由文件
+                    File file = new File(resourcesDir, 'router.properties')
+                    if (!file.exists()) {
+                        file.createNewFile()
+                    }
+                    //将模块信息写入文件
+                    Properties properties = new Properties()
+                    properties.setProperty("routers", String.join(',', moduleSet))
+                    OutputStream os = new FileOutputStream(file)
+                    properties.store(os, "Routers generated file")
+                    os.close()
+                }
+
+                //i18n
+                /*Set<String> i18nSet = new HashSet<>();
+                getResourcesFiles(project, new HashSet<String>(), i18nSet)
+                File i18nBuild = new File(project.buildDir, '/resources/main/i18n')
+                if (!i18nBuild.exists()) {
+                    i18nBuild.mkdirs()
+                }
+                i18nSet.forEach {
+                    File file = new File(it, '/src/main/resources/i18n')
+                    if (file.exists()) {
+                        def arrayOfFiles = file.listFiles()
+                        if (arrayOfFiles != null) {
+                            for (final File f in arrayOfFiles) {
+                                copy {
+                                    from f
+                                    into i18nBuild
+                                }
+                            }
+                        }
+                    }
+                }*/
+            }
+        }
+    }
+
+    /*clean {
+        doLast {
+            if (isApplication(project)) {
+                //删除路由文件
+                File resourcesDir = new File(project.projectDir, '/src/main/resources')
+                File file = new File(resourcesDir, 'router.properties')
+                if (file.exists()) {
+                    file.delete()
+                }
+            }
+        }
+    }*/
+}
+
+static def getDependenceModuleNames(Project project) {
+    Set<String> mSet = new HashSet<>()
+    //遍历所有的依赖
+    project.configurations.forEach(configuration -> {
+        configuration.dependencies.forEach(dependency -> {
+            //如果是我们项目中的业务模块则添加该模块名称
+            if (dependency.group == 'com.bytedance') {
+                if (dependency.name.startsWith('module-')) {
+                    mSet.add(dependency.name.replace('module-', ''))
+                } else if (dependency.name.startsWith('login-')) {
+                    //登录模块也需要添加
+                    mSet.add('login')
+                }
+            }
+        })
+    })
+    return mSet
+}
+
+static def getResourcesFiles(Project project, Set<String> modules, Set<String> paths) {
+    if (modules.contains(project.name)) {
+        return
+    }
+    modules.add(project.name)
+    project.configurations.forEach(configuration -> {
+        configuration.dependencies.forEach(dependency -> {
+            //如果是我们项目中的业务模块则添加该模块名称
+            if (dependency.group == 'com.bytedance' && dependency instanceof ProjectDependency) {
+                paths.add(dependency.dependencyProject.projectDir.absolutePath)
+                getResourcesFiles(dependency.dependencyProject, modules, paths)
+            }
+        })
+    })
+}

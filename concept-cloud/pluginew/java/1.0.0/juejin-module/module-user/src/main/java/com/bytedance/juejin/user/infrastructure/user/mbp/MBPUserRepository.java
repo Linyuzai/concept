@@ -1,0 +1,55 @@
+package com.bytedance.juejin.user.infrastructure.user.mbp;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.bytedance.juejin.basic.boot.mbp.MBPBaseRepository;
+import com.bytedance.juejin.domain.user.User;
+import com.bytedance.juejin.domain.user.UserImpl;
+import com.bytedance.juejin.domain.user.UserRepository;
+import com.bytedance.juejin.domain.user.Users;
+import com.github.linyuzai.domain.core.DomainValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+/**
+ * 基于 MBP 的用户存储实现
+ */
+@Repository
+public class MBPUserRepository extends MBPBaseRepository<User, Users, UserPO> implements UserRepository {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private DomainValidator validator;
+
+    @Override
+    public UserPO do2po(User user) {
+        UserPO po = new UserPO();
+        po.setId(user.getId());
+        po.setUsername(user.getUsername());
+        po.setPassword(user.getPassword());
+        po.setNickname(user.getNickname());
+        po.setAvatar(user.getAvatar());
+        po.setEnabled(true);
+        po.setCreateTime(user.getCreateTime());
+        return po;
+    }
+
+    @Override
+    public User po2do(UserPO po) {
+        return new UserImpl.Builder()
+                .id(po.getId())
+                .username(po.getUsername())
+                .password(po.getPassword())
+                .nickname(po.getNickname())
+                .avatar(po.getAvatar())
+                .enabled(po.getEnabled())
+                .createTime(po.getCreateTime())
+                .build(validator);
+    }
+
+    @Override
+    public BaseMapper<UserPO> getBaseMapper() {
+        return userMapper;
+    }
+}
