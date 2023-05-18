@@ -1,9 +1,9 @@
 dependencies {
-    implementation project(':juejin-basic:basic-boot') //单体应用基础模块
+    implementation project(':$ARTIFACT$-basic:basic-boot') //单体应用基础模块
 
     implementation 'org.springframework.cloud:spring-cloud-loadbalancer'
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
+    //implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
+    //implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config'
 }
