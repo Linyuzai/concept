@@ -1,8 +1,8 @@
-package com.bytedance.juejin.rpc.autoconfigure;
+package $PACKAGE$.rpc.autoconfigure;
 
-import com.bytedance.juejin.rpc.RouterLoadBalancerClientFactory;
-import com.bytedance.juejin.rpc.user.RPCUserFacadeAdapter;
-import com.bytedance.juejin.rpc.user.RPCUserFacadeAdapterImpl;
+import $PACKAGE$.rpc.RouterLoadBalancerClientFactory;
+import $PACKAGE$.rpc.user.RPCUserFacadeAdapter;
+import $PACKAGE$.rpc.user.RPCUserFacadeAdapterImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClientsProperties;

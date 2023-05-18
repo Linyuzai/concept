@@ -1,4 +1,4 @@
-package com.bytedance.juejin.rpc.user;
+package $PACKAGE$.rpc.user;
 
 import com.github.linyuzai.domain.core.Identifiable;
 import lombok.Data;

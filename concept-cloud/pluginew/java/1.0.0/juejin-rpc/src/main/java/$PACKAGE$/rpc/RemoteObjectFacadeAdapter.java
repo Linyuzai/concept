@@ -1,4 +1,4 @@
-package com.bytedance.juejin.rpc;
+package $PACKAGE$.rpc;
 
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.Identifiable;

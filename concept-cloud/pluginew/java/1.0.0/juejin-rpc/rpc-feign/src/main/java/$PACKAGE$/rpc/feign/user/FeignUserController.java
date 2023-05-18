@@ -1,11 +1,11 @@
-package com.bytedance.juejin.rpc.feign.user;
+package $PACKAGE$.rpc.feign.user;
 
-import com.bytedance.juejin.domain.user.User;
-import com.bytedance.juejin.domain.user.UserRepository;
-import com.bytedance.juejin.domain.user.Users;
-import com.bytedance.juejin.rpc.ConditionsRO;
-import com.bytedance.juejin.rpc.user.RPCUserFacadeAdapter;
-import com.bytedance.juejin.rpc.user.UserRO;
+import $PACKAGE$.domain.user.User;
+import $PACKAGE$.domain.user.UserRepository;
+import $PACKAGE$.domain.user.Users;
+import $PACKAGE$.rpc.ConditionsRO;
+import $PACKAGE$.rpc.user.RPCUserFacadeAdapter;
+import $PACKAGE$.rpc.user.UserRO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':juejin-rpc')
-    implementation project(':juejin-domain:domain-user')
+    implementation project(':$ARTIFACT$-rpc')
+    implementation project(':$ARTIFACT$-domain:domain-user')
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }

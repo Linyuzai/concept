@@ -1,4 +1,4 @@
-package com.bytedance.juejin.rpc;
+package $PACKAGE$.rpc;
 
 import lombok.Data;
 

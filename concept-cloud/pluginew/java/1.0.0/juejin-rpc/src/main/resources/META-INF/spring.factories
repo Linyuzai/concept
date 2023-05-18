@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bytedance.juejin.rpc.autoconfigure.RPCAutoConfiguration
+$PACKAGE$.rpc.autoconfigure.RPCAutoConfiguration

@@ -1,5 +1,5 @@
 dependencies {
-    api project(':juejin-token') //token模块
-    implementation project(':juejin-domain:domain-user')
+    api project(':$ARTIFACT$-token') //token模块
+    implementation project(':$ARTIFACT$-domain:domain-user')
     implementation 'org.springframework.cloud:spring-cloud-loadbalancer'
 }

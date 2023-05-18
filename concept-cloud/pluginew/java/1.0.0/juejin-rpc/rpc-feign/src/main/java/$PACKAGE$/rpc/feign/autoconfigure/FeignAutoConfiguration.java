@@ -1,10 +1,10 @@
-package com.bytedance.juejin.rpc.feign.autoconfigure;
+package $PACKAGE$.rpc.feign.autoconfigure;
 
-import com.bytedance.juejin.login.LoginContext;
-import com.bytedance.juejin.rpc.feign.user.FeignUserController;
-import com.bytedance.juejin.rpc.feign.user.FeignUserRepository;
-import com.bytedance.juejin.domain.user.UserRepository;
-import com.bytedance.juejin.token.TokenWebInterceptor;
+import $PACKAGE$.login.LoginContext;
+import $PACKAGE$.rpc.feign.user.FeignUserController;
+import $PACKAGE$.rpc.feign.user.FeignUserRepository;
+import $PACKAGE$.domain.user.UserRepository;
+import $PACKAGE$.token.TokenWebInterceptor;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackages = "com.bytedance.juejin.rpc.feign.*")
+@EnableFeignClients(basePackages = "$PACKAGE$.rpc.feign.*")
 public class FeignAutoConfiguration {
 
     @Bean
@@ -36,7 +36,6 @@ public class FeignAutoConfiguration {
 
         @Override
         public void apply(RequestTemplate template) {
-            System.out.println(LoginContext.getToken());
             template.header(TokenWebInterceptor.TOKEN_HEADER, LoginContext.getToken());
         }
     }

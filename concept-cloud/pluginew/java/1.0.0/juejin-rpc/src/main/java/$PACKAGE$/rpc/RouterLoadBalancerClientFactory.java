@@ -1,4 +1,4 @@
-package com.bytedance.juejin.rpc;
+package $PACKAGE$.rpc;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;

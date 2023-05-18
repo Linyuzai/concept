@@ -1,7 +1,7 @@
-package com.bytedance.juejin.rpc.user;
+package $PACKAGE$.rpc.user;
 
-import com.bytedance.juejin.domain.user.User;
-import com.bytedance.juejin.domain.user.UserImpl;
+import $PACKAGE$.domain.user.User;
+import $PACKAGE$.domain.user.UserImpl;
 import com.github.linyuzai.domain.core.DomainValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
