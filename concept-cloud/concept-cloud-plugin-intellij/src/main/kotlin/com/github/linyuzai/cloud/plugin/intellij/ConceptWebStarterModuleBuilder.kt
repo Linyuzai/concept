@@ -353,7 +353,7 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
                 "Found plugins for chosen dependencies.",
                 NotificationType.INFORMATION
             )
-            .addAction(NotificationAction.create("Enable plugins...f") { _, notification ->
+            .addAction(NotificationAction.create("Enable plugins...") { _, notification ->
                 installAndEnable(toInstallOrEnable) { notification.expire() }
             })
             .notify(project)

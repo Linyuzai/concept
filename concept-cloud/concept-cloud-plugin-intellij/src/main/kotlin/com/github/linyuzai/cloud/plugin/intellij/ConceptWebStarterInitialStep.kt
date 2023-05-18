@@ -99,7 +99,8 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     private val sdkModel: ProjectSdksModel = ProjectSdksModel()
     private val languageLevelsModel: DefaultComboBoxModel<ConceptStarterLanguageLevel> =
         DefaultComboBoxModel<ConceptStarterLanguageLevel>()
-    private val applicationTypesModel: DefaultComboBoxModel<ConceptStarterAppType> = DefaultComboBoxModel<ConceptStarterAppType>()
+    private val applicationTypesModel: DefaultComboBoxModel<ConceptStarterAppType> =
+        DefaultComboBoxModel<ConceptStarterAppType>()
 
     private lateinit var projectTypesSelector: ConceptButtonSelectorToolbar
     private lateinit var packagingTypesSelector: ConceptButtonSelectorToolbar
@@ -230,6 +231,10 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
                 }.largeGapAfter()
             }
 
+            row("Language:") {
+                label("Java")
+            }.largeGapAfter()
+
             if (starterSettings.projectTypes.size > 1) {
                 val messages = starterSettings.customizedMessages
                 row(messages?.projectTypeLabel ?: "Type:") {
@@ -237,6 +242,10 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
                         buttonSelector(starterSettings.projectTypes, projectTypeProperty) { it?.title ?: "" }
                 }.largeGapAfter()
             }
+
+            row("Type:") {
+                label("Gradle")
+            }.largeGapAfter()
 
             if (starterSettings.testFrameworks.isNotEmpty()) {
                 row("Test framework:") {

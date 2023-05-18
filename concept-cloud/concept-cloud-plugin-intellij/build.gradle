@@ -22,7 +22,7 @@ dependencies {
 
 }
 
-intellij.version = "2023.1"
+intellij.version = "2021.3"
 intellij.type = "IC"
 //intellij.type = "IU"
 intellij.plugins = ["java", "gradle"]
