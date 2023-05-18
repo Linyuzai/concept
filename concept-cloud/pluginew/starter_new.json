@@ -4,7 +4,15 @@
       "id": "1.0.0",
       "title": "Concept Cloud v1.0.0",
       "default": false,
+      "intact": [
+        "gradle/wrapper/gradle-wrapper.jar",
+        ".gitignore",
+        "gradlew",
+        "gradlew.bat",
+        "HELP.md"
+      ],
       "versions": {
+        "gradle": "7.4-bin",
         "springBoot": "2.7.6",
         "springDependencyManagement": "1.1.0",
         "springCloudDependencyManagement": "2021.0.4",

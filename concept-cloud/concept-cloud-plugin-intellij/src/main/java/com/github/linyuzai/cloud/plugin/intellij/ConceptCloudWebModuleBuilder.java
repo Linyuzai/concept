@@ -58,8 +58,17 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             for (ZipEntry file : files) {
                 String fileName = transform(file.getName(), false);
                 File create = createFile(fileName, parent);
+                if (intact(file.getName())) {
+                    System.out.println("intact: " + file.getName());
+                    try (InputStream is = zf.getInputStream(file);
+                         OutputStream os = new FileOutputStream(create)) {
+                        FileUtil.copy(is, os);
+                    }
+                    continue;
+                }
                 if ("concept.gradle".equals(file.getName())) {
                     handleConceptGradle(create);
+                    continue;
                 }
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(zf.getInputStream(file), StandardCharsets.UTF_8))) {
                     String collect = br.lines().collect(Collectors.joining("\n"));
@@ -76,6 +85,14 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         } catch (Throwable e) {
             Messages.showErrorDialog("Unzip error: " + e.getMessage(), getPresentableName());
         }
+    }
+
+    private boolean intact(String name) {
+        ConceptFrameworkVersion conceptFrameworkVersion = getConceptFrameworkVersion();
+        if (conceptFrameworkVersion == null) {
+            return false;
+        }
+        return conceptFrameworkVersion.intact.contains(name);
     }
 
     private void handleConceptGradle(File file) throws IOException {
@@ -100,12 +117,14 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
 
     private String handleVersions(String content) {
         Versions versions = getVersions();
-        return content.replaceAll("\\$V_SPRING_BOOT\\$", versions.springBoot)
+        return content
+                .replaceAll("\\$V_GRADLE\\$", versions.gradle)
+                .replaceAll("\\$V_SPRING_BOOT\\$", versions.springBoot)
                 .replaceAll("\\$V_SPRING_DM\\$", versions.springDependencyManagement)
                 .replaceAll("\\$V_SPRING_CLOUD_DM\\$", versions.springCloudDependencyManagement)
                 .replaceAll("\\$V_CONCEPT_DOMAIN\\$", versions.conceptDomain)
-                .replaceAll("\\$V_CONCEPT_CLOUD_WEB\\$",versions.conceptCloudWeb)
-                .replaceAll("\\$V_MBP\\$",versions.myBatisPlus);
+                .replaceAll("\\$V_CONCEPT_CLOUD_WEB\\$", versions.conceptCloudWeb)
+                .replaceAll("\\$V_MBP\\$", versions.myBatisPlus);
     }
 
     private ConceptFrameworkVersion getConceptFrameworkVersion() {
@@ -254,7 +273,15 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             boolean isDefault = frameworkVersionObject.get("default").getAsBoolean();
             frameworkVersions.add(new ConceptWebStarterFrameworkVersion(id, title, isDefault));
 
+            JsonArray intactArray = frameworkVersionObject.get("intact").getAsJsonArray();
+            for (JsonElement intactElement : intactArray) {
+                String intact = intactElement.getAsString();
+                frameworkVersion.addIntact(intact);
+            }
+
             JsonObject versionsObject = frameworkVersionObject.get("versions").getAsJsonObject();
+
+            String gradle = versionsObject.get("gradle").getAsString();
             String springBoot = versionsObject.get("springBoot").getAsString();
             String springDependencyManagement = versionsObject.get("springDependencyManagement").getAsString();
             String springCloudDependencyManagement = versionsObject.get("springCloudDependencyManagement").getAsString();
@@ -262,7 +289,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             String conceptCloudWeb = versionsObject.get("conceptCloudWeb").getAsString();
             String myBatisPlus = versionsObject.get("myBatisPlus").getAsString();
 
-            frameworkVersion.setVersions(springBoot, springDependencyManagement,
+            frameworkVersion.setVersions(gradle, springBoot, springDependencyManagement,
                     springCloudDependencyManagement, conceptDomain, conceptCloudWeb, myBatisPlus);
 
             Map<String, Set<String>> map = new LinkedHashMap<>();
@@ -310,16 +337,24 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
 
     public static class ConceptFrameworkVersion {
 
+        Set<String> intact = new HashSet<>();
+
         Versions versions = new Versions();
 
         ConceptDependencies conceptDependencies = new ConceptDependencies();
 
-        void setVersions(String springBoot,
+        void addIntact(String intact) {
+            this.intact.add(intact);
+        }
+
+        void setVersions(String gradle,
+                         String springBoot,
                          String springDependencyManagement,
                          String springCloudDependencyManagement,
                          String conceptDomain,
                          String conceptCloudWeb,
                          String myBatisPlus) {
+            versions.gradle = gradle;
             versions.springBoot = springBoot;
             versions.springDependencyManagement = springDependencyManagement;
             versions.springCloudDependencyManagement = springCloudDependencyManagement;
@@ -338,6 +373,8 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     }
 
     public static class Versions {
+
+        String gradle;
 
         String springBoot;
 
