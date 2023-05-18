@@ -66,7 +66,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
                     String transform = transform(collect, false);
                     String content;
                     if ("build.gradle".equals(file.getName())) {
-                        content = handleSpringVersion(transform);
+                        content = handleVersions(transform);
                     } else {
                         content = transform;
                     }
@@ -76,11 +76,10 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         } catch (Throwable e) {
             Messages.showErrorDialog("Unzip error: " + e.getMessage(), getPresentableName());
         }
-        //ZipUtil.extract();
     }
 
     private void handleConceptGradle(File file) throws IOException {
-        ConceptFrameworkVersion conceptFrameworkVersion = getFrameworkVersionEx();
+        ConceptFrameworkVersion conceptFrameworkVersion = getConceptFrameworkVersion();
         if (conceptFrameworkVersion == null) {
             return;
         }
@@ -99,26 +98,17 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         FileUtil.writeToFile(file, builder.toString());
     }
 
-    private String handleSpringVersion(String content) {
-        String springBoot;
-        String springDependencyManagement;
-        String springCloudDependencyManagement;
-        SpringVersion springVersion = getSpringVersion();
-        if (springVersion == null) {
-            springBoot = "2.7.6";
-            springDependencyManagement = "1.1.0";
-            springCloudDependencyManagement = "2021.0.4";
-        } else {
-            springBoot = springVersion.springBoot;
-            springDependencyManagement = springVersion.springDependencyManagement;
-            springCloudDependencyManagement = springVersion.springCloudDependencyManagement;
-        }
-        return content.replaceAll("\\$V_SPRING_BOOT\\$", springBoot)
-                .replaceAll("\\$V_SPRING_DM\\$", springDependencyManagement)
-                .replaceAll("\\$V_SPRING_CLOUD_DM\\$", springCloudDependencyManagement);
+    private String handleVersions(String content) {
+        Versions versions = getVersions();
+        return content.replaceAll("\\$V_SPRING_BOOT\\$", versions.springBoot)
+                .replaceAll("\\$V_SPRING_DM\\$", versions.springDependencyManagement)
+                .replaceAll("\\$V_SPRING_CLOUD_DM\\$", versions.springCloudDependencyManagement)
+                .replaceAll("\\$V_CONCEPT_DOMAIN\\$", versions.conceptDomain)
+                .replaceAll("\\$V_CONCEPT_CLOUD_WEB\\$",versions.conceptCloudWeb)
+                .replaceAll("\\$V_MBP\\$",versions.myBatisPlus);
     }
 
-    private ConceptFrameworkVersion getFrameworkVersionEx() {
+    private ConceptFrameworkVersion getConceptFrameworkVersion() {
         Map<String, ConceptFrameworkVersion> data = getStarterContext().getUserData(CONCEPT_CLOUD_CFV_KEY);
         if (data == null) {
             return null;
@@ -185,12 +175,12 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
-    private SpringVersion getSpringVersion() {
-        ConceptFrameworkVersion frameworkVersion = getFrameworkVersionEx();
+    private Versions getVersions() {
+        ConceptFrameworkVersion frameworkVersion = getConceptFrameworkVersion();
         if (frameworkVersion == null) {
             return null;
         }
-        return frameworkVersion.springVersion;
+        return frameworkVersion.versions;
     }
 
     @NotNull
@@ -245,11 +235,12 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     @NotNull
     @Override
     protected ConceptWebStarterServerOptions loadServerOptions(@NotNull String s) {
+        String name = "starter_new.json";
         String url;
         if (s.endsWith("/")) {
-            url = s + "starter_v2.json";
+            url = s + name;
         } else {
-            url = s + "/starter_v2.json";
+            url = s + "/" + name;
         }
         JsonObject json = loadJsonData(url, null).getAsJsonObject();
         List<ConceptWebStarterFrameworkVersion> frameworkVersions = new ArrayList<>();
@@ -263,13 +254,16 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             boolean isDefault = frameworkVersionObject.get("default").getAsBoolean();
             frameworkVersions.add(new ConceptWebStarterFrameworkVersion(id, title, isDefault));
 
-            if (frameworkVersionObject.has("springVersions")) {
-                JsonObject springVersionsObject = frameworkVersionObject.get("springVersions").getAsJsonObject();
-                String springBoot = springVersionsObject.get("springBoot").getAsString();
-                String springDependencyManagement = springVersionsObject.get("springDependencyManagement").getAsString();
-                String springCloudDependencyManagement = springVersionsObject.get("springCloudDependencyManagement").getAsString();
-                frameworkVersion.setSpringVersion(springBoot, springDependencyManagement, springCloudDependencyManagement);
-            }
+            JsonObject versionsObject = frameworkVersionObject.get("versions").getAsJsonObject();
+            String springBoot = versionsObject.get("springBoot").getAsString();
+            String springDependencyManagement = versionsObject.get("springDependencyManagement").getAsString();
+            String springCloudDependencyManagement = versionsObject.get("springCloudDependencyManagement").getAsString();
+            String conceptDomain = versionsObject.get("conceptDomain").getAsString();
+            String conceptCloudWeb = versionsObject.get("conceptCloudWeb").getAsString();
+            String myBatisPlus = versionsObject.get("myBatisPlus").getAsString();
+
+            frameworkVersion.setVersions(springBoot, springDependencyManagement,
+                    springCloudDependencyManagement, conceptDomain, conceptCloudWeb, myBatisPlus);
 
             Map<String, Set<String>> map = new LinkedHashMap<>();
             JsonObject dependencies = frameworkVersionObject.get("dependencies").getAsJsonObject();
@@ -316,26 +310,34 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
 
     public static class ConceptFrameworkVersion {
 
-        SpringVersion springVersion = new SpringVersion();
+        Versions versions = new Versions();
 
-        ConceptDependency conceptDependency = new ConceptDependency();
+        ConceptDependencies conceptDependencies = new ConceptDependencies();
 
-        void setSpringVersion(String springBoot, String springDependencyManagement, String springCloudDependencyManagement) {
-            springVersion.springBoot = springBoot;
-            springVersion.springDependencyManagement = springDependencyManagement;
-            springVersion.springCloudDependencyManagement = springCloudDependencyManagement;
+        void setVersions(String springBoot,
+                         String springDependencyManagement,
+                         String springCloudDependencyManagement,
+                         String conceptDomain,
+                         String conceptCloudWeb,
+                         String myBatisPlus) {
+            versions.springBoot = springBoot;
+            versions.springDependencyManagement = springDependencyManagement;
+            versions.springCloudDependencyManagement = springCloudDependencyManagement;
+            versions.conceptDomain = conceptDomain;
+            versions.conceptCloudWeb = conceptCloudWeb;
+            versions.myBatisPlus = myBatisPlus;
         }
 
         void addConceptDependency(String id, Collection<String> dependencies) {
-            conceptDependency.mapping.put(id, dependencies);
+            conceptDependencies.mapping.put(id, dependencies);
         }
 
         Collection<String> getConceptDependency(String id) {
-            return conceptDependency.mapping.get(id);
+            return conceptDependencies.mapping.get(id);
         }
     }
 
-    public static class SpringVersion {
+    public static class Versions {
 
         String springBoot;
 
@@ -343,9 +345,14 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
 
         String springCloudDependencyManagement;
 
+        String conceptDomain;
+
+        String conceptCloudWeb;
+
+        String myBatisPlus;
     }
 
-    public static class ConceptDependency {
+    public static class ConceptDependencies {
 
         Map<String, Collection<String>> mapping = new LinkedHashMap<>();
     }

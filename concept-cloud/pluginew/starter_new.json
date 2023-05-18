@@ -4,10 +4,13 @@
       "id": "1.0.0",
       "title": "Concept Cloud v1.0.0",
       "default": false,
-      "springVersions": {
+      "versions": {
         "springBoot": "2.7.6",
         "springDependencyManagement": "1.1.0",
-        "springCloudDependencyManagement": "2021.0.4"
+        "springCloudDependencyManagement": "2021.0.4",
+        "conceptDomain": "1.7.0",
+        "conceptCloudWeb": "1.5.2",
+        "myBatisPlus": "3.5.2"
       },
       "dependencies": {
         "websocket-loadbalance": [

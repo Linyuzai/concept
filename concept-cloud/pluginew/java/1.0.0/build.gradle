@@ -1,24 +1,18 @@
 //定义插件
 plugins {
-    id 'org.springframework.boot' version '2.7.3'
-    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'org.springframework.boot' version '$V_SPRING_BOOT$'
+    id 'io.spring.dependency-management' version '$V_SPRING_DM$'
 }
 
 //应用于所有模块
 allprojects {
-
-    //设置一些自定义的值
-    ext {
-        set('JuejinVersion', '1.0.0')
-    }
 
     //应用插件
     apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    version "${JuejinVersion}"
-    group = 'com.bytedance'
+    group = '$GROUP$'
 
     //仓库地址
     repositories {
@@ -41,33 +35,35 @@ allprojects {
         implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
 
         if (project.name.startsWith('domain-')) {
-            api 'com.github.linyuzai:concept-domain-spring-boot-starter:1.7.0'
+            api 'com.github.linyuzai:concept-domain-spring-boot-starter:$V_CONCEPT_DOMAIN$'
             return
         }
 
         implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'com.github.linyuzai:concept-cloud-web:1.5.2'
+        implementation 'com.github.linyuzai:concept-cloud-web:$V_CONCEPT_CLOUD_WEB$'
 
         if (project.name.startsWith('module-') || project.name.startsWith('basic-')) {
 
             if (project.name.startsWith('module-')) {
-                implementation project(':juejin-basic:basic-boot')
+                implementation project(':$ARTIFACT$-basic:basic-boot')
             }
 
-            implementation project(':juejin-login')
+            implementation project(':$ARTIFACT$-login')
 
-            implementation 'com.github.linyuzai:concept-domain-mbp:1.7.0'
+            implementation 'com.github.linyuzai:concept-domain-mbp:$V_CONCEPT_DOMAIN$'
 
             implementation 'mysql:mysql-connector-java'
-            implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
+            implementation 'com.baomidou:mybatis-plus-boot-starter:$V_MBP$'
         }
     }
+
+    apply from: '../concept.gradle'
 
     //依赖管理
     dependencyManagement {
         imports {
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.4'
-            mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:$V_SPRING_CLOUD_DM$'
+            //mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
         }
     }
 
@@ -84,7 +80,7 @@ allprojects {
     //application 启动模块 用 bootJar 打包，其他模块用 jar 打包
     if (project.name.contains("application-")) {
         bootJar.enabled = true
-        bootJar.archiveBaseName = "juejin-${project.name}"
+        bootJar.archiveBaseName = "\$ARTIFACT\$-${project.name}"
         jar.enabled = false
     } else {
         jar.enabled = true
@@ -94,7 +90,7 @@ allprojects {
         if (project.depth <= 1) {
             jar.archiveBaseName = "aa-${project.name}"
         } else {
-            jar.archiveBaseName = "aa-juejin-${project.name}"
+            jar.archiveBaseName = "aa-\$ARTIFACT\$-${project.name}"
         }
 
         bootJar.enabled = false
@@ -122,44 +118,9 @@ allprojects {
                     properties.store(os, "Routers generated file")
                     os.close()
                 }
-
-                //i18n
-                /*Set<String> i18nSet = new HashSet<>();
-                getResourcesFiles(project, new HashSet<String>(), i18nSet)
-                File i18nBuild = new File(project.buildDir, '/resources/main/i18n')
-                if (!i18nBuild.exists()) {
-                    i18nBuild.mkdirs()
-                }
-                i18nSet.forEach {
-                    File file = new File(it, '/src/main/resources/i18n')
-                    if (file.exists()) {
-                        def arrayOfFiles = file.listFiles()
-                        if (arrayOfFiles != null) {
-                            for (final File f in arrayOfFiles) {
-                                copy {
-                                    from f
-                                    into i18nBuild
-                                }
-                            }
-                        }
-                    }
-                }*/
             }
         }
     }
-
-    /*clean {
-        doLast {
-            if (isApplication(project)) {
-                //删除路由文件
-                File resourcesDir = new File(project.projectDir, '/src/main/resources')
-                File file = new File(resourcesDir, 'router.properties')
-                if (file.exists()) {
-                    file.delete()
-                }
-            }
-        }
-    }*/
 }
 
 static def getDependenceModuleNames(Project project) {
@@ -168,7 +129,7 @@ static def getDependenceModuleNames(Project project) {
     project.configurations.forEach(configuration -> {
         configuration.dependencies.forEach(dependency -> {
             //如果是我们项目中的业务模块则添加该模块名称
-            if (dependency.group == 'com.bytedance') {
+            if (dependency.group == '$GROUP$') {
                 if (dependency.name.startsWith('module-')) {
                     mSet.add(dependency.name.replace('module-', ''))
                 } else if (dependency.name.startsWith('login-')) {
@@ -179,20 +140,4 @@ static def getDependenceModuleNames(Project project) {
         })
     })
     return mSet
-}
-
-static def getResourcesFiles(Project project, Set<String> modules, Set<String> paths) {
-    if (modules.contains(project.name)) {
-        return
-    }
-    modules.add(project.name)
-    project.configurations.forEach(configuration -> {
-        configuration.dependencies.forEach(dependency -> {
-            //如果是我们项目中的业务模块则添加该模块名称
-            if (dependency.group == 'com.bytedance' && dependency instanceof ProjectDependency) {
-                paths.add(dependency.dependencyProject.projectDir.absolutePath)
-                getResourcesFiles(dependency.dependencyProject, modules, paths)
-            }
-        })
-    })
 }
