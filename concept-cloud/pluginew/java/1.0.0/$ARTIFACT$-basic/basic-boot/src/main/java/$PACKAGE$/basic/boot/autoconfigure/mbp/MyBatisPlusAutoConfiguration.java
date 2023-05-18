@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * 全局的 MyBatis-Plus 配置
  */
 @Configuration
-@MapperScan(basePackages = "$PACKAGE$.*.infrastructure.*.mbp")
+@MapperScan(basePackages = "$PACKAGE$.module.*.infrastructure.*.mbp")
 public class MyBatisPlusAutoConfiguration {
 
     @Bean

@@ -1,6 +1,6 @@
 package $PACKAGE$.module.sample.domain.sample;
 
-import $PACKAGE$.module.sample.domain.sample.view.PinCreateCommand;
+import $PACKAGE$.module.sample.domain.sample.view.SampleCreateCommand;
 import com.github.linyuzai.domain.core.DomainIdGenerator;
 
 /**

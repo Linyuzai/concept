@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * Spring Doc 相关配置
  */
 @Configuration
-public class SpringDocConfiguration {
+public class SpringDocAutoConfiguration {
 
     @Bean
     public GroupedOpenApi loginOpenApi() {

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class SampleCreatedEvent {
+public class SampleDeletedEvent {
 
     private final Sample sample;
 

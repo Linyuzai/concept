@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 public class MBPSampleRepository extends MBPBaseRepository<Sample, Samples, SamplePO> implements SampleRepository {
 
     @Autowired
-    private SampleMapper pinMapper;
+    private SampleMapper sampleMapper;
 
     @Autowired
     private DomainFactory factory;

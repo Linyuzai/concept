@@ -126,4 +126,4 @@ https://juejin.cn/column/7140131104270319629
 
 ### 注意
 
-默认扫描路径为`{group}.{artifact}.*.config`
+默认扫描路径为`{group}.{artifact}.module.*.config`

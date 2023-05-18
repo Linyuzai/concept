@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import($CLASS$BootConfiguration.class)
-@ComponentScan(basePackages = "$PACKAGE$.*.config",
+@ComponentScan(basePackages = "$PACKAGE$.module.*.config",
         nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class)
 @SpringBootApplication
 public @interface $CLASS$BootApplication {

@@ -21,13 +21,23 @@ public class SampleImpl implements Sample {
 
     protected String id;
 
+    protected String sample;
+
     public static class Builder extends AbstractDomainBuilder<SampleImpl> {
 
         @NotEmpty
         protected String id;
 
+        @NotNull
+        protected String sample;
+
         public Builder id(String id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder sample(String sample) {
+            this.sample = sample;
             return this;
         }
 
@@ -38,8 +48,7 @@ public class SampleImpl implements Sample {
 
         @Override
         protected SampleImpl build() {
-            return new SampleImpl(
-                    id);
+            return new SampleImpl(id, sample);
         }
     }
 }

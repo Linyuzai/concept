@@ -9,4 +9,5 @@ import com.github.linyuzai.domain.core.DomainEntity;
  */
 public interface Sample extends DomainEntity {
 
+    String getSample();
 }

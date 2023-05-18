@@ -25,7 +25,7 @@ public class SampleService {
      */
     public void create(Sample sample, User user) {
         sampleRepository.create(sample);
-        eventPublisher.publish(new SampleCreatedEvent(club, user));
+        eventPublisher.publish(new SampleCreatedEvent(sample, user));
     }
 
     /**

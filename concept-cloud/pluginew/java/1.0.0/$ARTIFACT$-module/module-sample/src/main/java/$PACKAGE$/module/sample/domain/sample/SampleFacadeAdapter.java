@@ -2,9 +2,9 @@ package $PACKAGE$.module.sample.domain.sample;
 
 import $PACKAGE$.domain.sample.Sample;
 import $PACKAGE$.domain.user.User;
-import $PACKAGE$.sample.domain.sample.view.SampleCreateCommand;
-import $PACKAGE$.sample.domain.sample.view.SampleQuery;
-import $PACKAGE$.sample.domain.sample.view.SampleVO;
+import $PACKAGE$.module.sample.domain.sample.view.SampleCreateCommand;
+import $PACKAGE$.module.sample.domain.sample.view.SampleQuery;
+import $PACKAGE$.module.sample.domain.sample.view.SampleVO;
 import com.github.linyuzai.domain.core.condition.Conditions;
 
 /**

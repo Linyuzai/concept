@@ -1,7 +1,7 @@
-package com.bytedance.juejin.login.username.autoconfigure;
+package $PACKAGE$.login.username.autoconfigure;
 
-import com.bytedance.juejin.login.username.UsernameLoginController;
-import com.bytedance.juejin.login.username.UsernameRegisterController;
+import $PACKAGE$.login.username.UsernameLoginController;
+import $PACKAGE$.login.username.UsernameRegisterController;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
