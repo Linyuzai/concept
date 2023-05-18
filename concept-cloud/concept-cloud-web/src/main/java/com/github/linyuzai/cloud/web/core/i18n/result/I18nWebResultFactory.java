@@ -20,12 +20,18 @@ public class I18nWebResultFactory extends BooleanWebResultFactory {
     @Override
     protected String getSuccessMessage(WebContext context) {
         String successMessage = super.getSuccessMessage(context);
+        if (successMessage == null) {
+            return null;
+        }
         return messageSource.getMessage(successMessage, null, getLocale(context));
     }
 
     @Override
     protected String getFailureMessage(Throwable e, WebContext context) {
         String failureMessage = super.getFailureMessage(e, context);
+        if (failureMessage == null) {
+            return null;
+        }
         return messageSource.getMessage(failureMessage, null, getLocale(context));
     }
 
