@@ -57,7 +57,7 @@ allprojects {
         }
     }
 
-    apply from: '../concept.gradle'
+    apply from: new File(rootDir, 'concept.gradle').absolutePath
 
     //依赖管理
     dependencyManagement {
@@ -78,9 +78,10 @@ allprojects {
     }
 
     //application 启动模块 用 bootJar 打包，其他模块用 jar 打包
+    String prefix = '$ARTIFACT$'
     if (project.name.contains("application-")) {
         bootJar.enabled = true
-        bootJar.archiveBaseName = "\$ARTIFACT\$-${project.name}"
+        bootJar.archiveBaseName = "$prefix-${project.name}"
         jar.enabled = false
     } else {
         jar.enabled = true
@@ -90,7 +91,7 @@ allprojects {
         if (project.depth <= 1) {
             jar.archiveBaseName = "aa-${project.name}"
         } else {
-            jar.archiveBaseName = "aa-\$ARTIFACT\$-${project.name}"
+            jar.archiveBaseName = "aa-$prefix-${project.name}"
         }
 
         bootJar.enabled = false

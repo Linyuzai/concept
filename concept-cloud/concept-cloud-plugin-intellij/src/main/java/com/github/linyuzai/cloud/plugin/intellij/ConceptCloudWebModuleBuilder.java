@@ -74,7 +74,8 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
                     String collect = br.lines().collect(Collectors.joining("\n"));
                     String transform = transform(collect, false);
                     String content;
-                    if ("build.gradle".equals(file.getName())) {
+                    if ("gradle/wrapper/gradle-wrapper.properties".equals(file.getName())
+                            || "build.gradle".equals(file.getName())) {
                         content = handleVersions(transform);
                     } else {
                         content = transform;
