@@ -59,7 +59,6 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
                 String fileName = transform(file.getName(), false);
                 File create = createFile(fileName, parent);
                 if (intact(file.getName())) {
-                    System.out.println("intact: " + file.getName());
                     try (InputStream is = zf.getInputStream(file);
                          OutputStream os = new FileOutputStream(create)) {
                         FileUtil.copy(is, os);
@@ -293,7 +292,6 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
             frameworkVersion.setVersions(gradle, springBoot, springDependencyManagement,
                     springCloudDependencyManagement, conceptDomain, conceptCloudWeb, myBatisPlus);
 
-            Map<String, Set<String>> map = new LinkedHashMap<>();
             JsonObject dependencies = frameworkVersionObject.get("dependencies").getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : dependencies.entrySet()) {
                 JsonArray array = entry.getValue().getAsJsonArray();
@@ -301,8 +299,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
                 for (JsonElement element : array) {
                     set.add(element.getAsString());
                 }
-                map.put(entry.getKey(), set);
-                frameworkVersion.addConceptDependency(id, set);
+                frameworkVersion.addConceptDependency(entry.getKey(), set);
             }
             value.put(id, frameworkVersion);
         }
