@@ -45,6 +45,18 @@
         <moduleBuilder builderClass="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudWebModuleBuilder"/>
     </extensions>
 
+    <actions>
+        <group id="g_concept_cloud" text="Concept Cloud" popup="true"
+               class="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudGroup">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+        </group>
+        <action class="com.github.linyuzai.cloud.plugin.intellij.GenerateDomainAndModuleAction"
+                id="a_concept_cloud_domain_and_module" description="Generate domain and module"
+                text="Generate Domain and Module">
+            <add-to-group group-id="g_concept_cloud"/>
+        </action>
+    </actions>
+
     <change-notes><![CDATA[
       1.1.0 add spring versions to starter_v2.json
     ]]></change-notes>

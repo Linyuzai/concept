@@ -1,12 +1,18 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.BundleBase
+import com.intellij.application.options.ModulesComboBox
 import com.intellij.icons.AllIcons
+import com.intellij.ide.util.ClassFilter
+import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.ActionButton
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtil
+import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
@@ -17,6 +23,9 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.JavaCodeFragment
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.*
 import com.intellij.ui.components.*
 import com.intellij.ui.components.fields.ExpandableTextField
@@ -64,8 +73,7 @@ internal fun <T> createPropertyBinding(prop: KMutableProperty0<T>, propType: Cla
                 val getter = receiverClass.getMethod(getterName)
                 val setter = receiverClass.getMethod(setterName, propType)
                 return ConceptPropertyBinding({ getter.invoke(receiver) as T }, { setter.invoke(receiver, it) })
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 // ignore
             }
 
@@ -73,8 +81,7 @@ internal fun <T> createPropertyBinding(prop: KMutableProperty0<T>, propType: Cla
                 val field = receiverClass.getDeclaredField(name)
                 field.isAccessible = true
                 return ConceptPropertyBinding({ field.get(receiver) as T }, { field.set(receiver, it) })
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 // ignore
             }
         }
@@ -96,13 +103,19 @@ inline fun <reified T : Any> KMutableProperty0<T?>.toNullableBinding(defaultValu
 
 class ConceptValidationInfoBuilder(val component: JComponent) {
     fun error(@NlsContexts.DialogMessage message: String): ValidationInfo = ValidationInfo(message, component)
-    fun warning(@NlsContexts.DialogMessage message: String): ValidationInfo = ValidationInfo(message, component).asWarning().withOKEnabled()
+    fun warning(@NlsContexts.DialogMessage message: String): ValidationInfo =
+        ValidationInfo(message, component).asWarning().withOKEnabled()
 }
 
 interface ConceptCellBuilder<out T : JComponent> {
     val component: T
 
-    fun comment(@NlsContexts.DetailedDescription text: String, maxLineLength: Int = 70, forComponent: Boolean = false): ConceptCellBuilder<T>
+    fun comment(
+        @NlsContexts.DetailedDescription text: String,
+        maxLineLength: Int = 70,
+        forComponent: Boolean = false
+    ): ConceptCellBuilder<T>
+
     fun commentComponent(component: JComponent, forComponent: Boolean = false): ConceptCellBuilder<T>
     fun focused(): ConceptCellBuilder<T>
     fun withValidationOnApply(callback: ConceptValidationInfoBuilder.(T) -> ValidationInfo?): ConceptCellBuilder<T>
@@ -143,7 +156,10 @@ interface ConceptCellBuilder<out T : JComponent> {
     fun visible(isVisible: Boolean)
     fun visibleIf(predicate: ComponentPredicate): ConceptCellBuilder<T>
 
-    fun withErrorOnApplyIf(@NlsContexts.DialogMessage message: String, callback: (T) -> Boolean): ConceptCellBuilder<T> {
+    fun withErrorOnApplyIf(
+        @NlsContexts.DialogMessage message: String,
+        callback: (T) -> Boolean
+    ): ConceptCellBuilder<T> {
         withValidationOnApply { if (callback(it)) error(message) else null }
         return this
     }
@@ -188,6 +204,18 @@ fun <T : AbstractButton> ConceptCellBuilder<T>.withSelectedBinding(modelBinding:
     return withBinding(AbstractButton::isSelected, AbstractButton::setSelected, modelBinding)
 }
 
+fun <T : ModulesComboBox> ConceptCellBuilder<T>.withModulesComboBoxBinding(modelBinding: ConceptPropertyBinding<Module?>): ConceptCellBuilder<T> {
+    return withBinding(ModulesComboBox::getSelectedModule, ModulesComboBox::setSelectedModule, modelBinding)
+}
+
+fun <T : ReferenceEditorComboWithBrowseButton> ConceptCellBuilder<T>.withClassesComboBoxBinding(modelBinding: ConceptPropertyBinding<String>): ConceptCellBuilder<T> {
+    return withBinding(
+        ReferenceEditorComboWithBrowseButton::getText,
+        ReferenceEditorComboWithBrowseButton::setText,
+        modelBinding
+    )
+}
+
 val ConceptCellBuilder<AbstractButton>.selected
     get() = component.selected
 
@@ -219,24 +247,30 @@ abstract class ConceptCell : ConceptBaseBuilder {
     val pushY = CCFlags.pushY
     val push = CCFlags.push
 
-    fun label(@NlsContexts.Label text: String,
-              style: UIUtil.ComponentStyle? = null,
-              fontColor: UIUtil.FontColor? = null,
-              bold: Boolean = false): ConceptCellBuilder<JLabel> {
+    fun label(
+        @NlsContexts.Label text: String,
+        style: UIUtil.ComponentStyle? = null,
+        fontColor: UIUtil.FontColor? = null,
+        bold: Boolean = false
+    ): ConceptCellBuilder<JLabel> {
         val label = Label(text, style, fontColor, bold)
         return component(label)
     }
 
-    fun label(@NlsContexts.Label text: String,
-              font: JBFont,
-              fontColor: UIUtil.FontColor? = null): ConceptCellBuilder<JLabel> {
+    fun label(
+        @NlsContexts.Label text: String,
+        font: JBFont,
+        fontColor: UIUtil.FontColor? = null
+    ): ConceptCellBuilder<JLabel> {
         val label = Label(text, fontColor = fontColor, font = font)
         return component(label)
     }
 
-    fun link(@NlsContexts.LinkLabel text: String,
-             style: UIUtil.ComponentStyle? = null,
-             action: () -> Unit): ConceptCellBuilder<JComponent> {
+    fun link(
+        @NlsContexts.LinkLabel text: String,
+        style: UIUtil.ComponentStyle? = null,
+        action: () -> Unit
+    ): ConceptCellBuilder<JComponent> {
         val result = Link(text, style, action)
         return component(result)
     }
@@ -246,22 +280,31 @@ abstract class ConceptCell : ConceptBaseBuilder {
         return component(result)
     }
 
-    fun buttonFromAction(@NlsContexts.Button text: String, @NonNls actionPlace: String, action: AnAction): ConceptCellBuilder<JButton> {
+    fun buttonFromAction(
+        @NlsContexts.Button text: String,
+        @NonNls actionPlace: String,
+        action: AnAction
+    ): ConceptCellBuilder<JButton> {
         val button = JButton(BundleBase.replaceMnemonicAmpersand(text))
         button.addActionListener { ActionUtil.invokeAction(action, button, actionPlace, null, null) }
         return component(button)
     }
 
-    fun button(@NlsContexts.Button text: String, actionListener: (event: ActionEvent) -> Unit): ConceptCellBuilder<JButton> {
+    fun button(
+        @NlsContexts.Button text: String,
+        actionListener: (event: ActionEvent) -> Unit
+    ): ConceptCellBuilder<JButton> {
         val button = JButton(BundleBase.replaceMnemonicAmpersand(text))
         button.addActionListener(actionListener)
         return component(button)
     }
 
-    inline fun checkBox(@NlsContexts.Checkbox text: String,
-                        isSelected: Boolean = false,
-                        @NlsContexts.DetailedDescription comment: String? = null,
-                        crossinline actionListener: (event: ActionEvent, component: JCheckBox) -> Unit): ConceptCellBuilder<JBCheckBox> {
+    inline fun checkBox(
+        @NlsContexts.Checkbox text: String,
+        isSelected: Boolean = false,
+        @NlsContexts.DetailedDescription comment: String? = null,
+        crossinline actionListener: (event: ActionEvent, component: JCheckBox) -> Unit
+    ): ConceptCellBuilder<JBCheckBox> {
         return checkBox(text, isSelected, comment)
             .applyToComponent {
                 addActionListener(ActionListener { actionListener(it, this) })
@@ -269,61 +312,92 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     @JvmOverloads
-    fun checkBox(@NlsContexts.Checkbox text: String,
-                 isSelected: Boolean = false,
-                 @NlsContexts.DetailedDescription comment: String? = null): ConceptCellBuilder<JBCheckBox> {
+    fun checkBox(
+        @NlsContexts.Checkbox text: String,
+        isSelected: Boolean = false,
+        @NlsContexts.DetailedDescription comment: String? = null
+    ): ConceptCellBuilder<JBCheckBox> {
         val result = JBCheckBox(text, isSelected)
         return result(comment = comment)
     }
 
-    fun checkBox(@NlsContexts.Checkbox text: String, prop: KMutableProperty0<Boolean>, @NlsContexts.DetailedDescription comment: String? = null): ConceptCellBuilder<JBCheckBox> {
+    fun checkBox(
+        @NlsContexts.Checkbox text: String,
+        prop: KMutableProperty0<Boolean>,
+        @NlsContexts.DetailedDescription comment: String? = null
+    ): ConceptCellBuilder<JBCheckBox> {
         return checkBox(text, prop.toBinding(), comment)
     }
 
-    fun checkBox(@NlsContexts.Checkbox text: String, getter: () -> Boolean, setter: (Boolean) -> Unit, @NlsContexts.DetailedDescription comment: String? = null): ConceptCellBuilder<JBCheckBox> {
+    fun checkBox(
+        @NlsContexts.Checkbox text: String,
+        getter: () -> Boolean,
+        setter: (Boolean) -> Unit,
+        @NlsContexts.DetailedDescription comment: String? = null
+    ): ConceptCellBuilder<JBCheckBox> {
         return checkBox(text, ConceptPropertyBinding(getter, setter), comment)
     }
 
-    private fun checkBox(@NlsContexts.Checkbox text: String,
-                         modelBinding: ConceptPropertyBinding<Boolean>,
-                         @NlsContexts.DetailedDescription comment: String?): ConceptCellBuilder<JBCheckBox> {
+    private fun checkBox(
+        @NlsContexts.Checkbox text: String,
+        modelBinding: ConceptPropertyBinding<Boolean>,
+        @NlsContexts.DetailedDescription comment: String?
+    ): ConceptCellBuilder<JBCheckBox> {
         val component = JBCheckBox(text, modelBinding.get())
         return component(comment = comment).withSelectedBinding(modelBinding)
     }
 
-    fun checkBox(@NlsContexts.Checkbox text: String,
-                 property: GraphProperty<Boolean>,
-                 @NlsContexts.DetailedDescription comment: String? = null): ConceptCellBuilder<JBCheckBox> {
+    fun checkBox(
+        @NlsContexts.Checkbox text: String,
+        property: GraphProperty<Boolean>,
+        @NlsContexts.DetailedDescription comment: String? = null
+    ): ConceptCellBuilder<JBCheckBox> {
         val component = JBCheckBox(text, property.get())
         return component(comment = comment).withGraphProperty(property).applyToComponent { component.bind(property) }
     }
 
-    open fun radioButton(@NlsContexts.RadioButton text: String, @Nls comment: String? = null): ConceptCellBuilder<JBRadioButton> {
+    open fun radioButton(
+        @NlsContexts.RadioButton text: String,
+        @Nls comment: String? = null
+    ): ConceptCellBuilder<JBRadioButton> {
         val component = JBRadioButton(text)
         component.putClientProperty(UNBOUND_RADIO_BUTTON, true)
         return component(comment = comment)
     }
 
-    open fun radioButton(@NlsContexts.RadioButton text: String, getter: () -> Boolean, setter: (Boolean) -> Unit, @Nls comment: String? = null): ConceptCellBuilder<JBRadioButton> {
+    open fun radioButton(
+        @NlsContexts.RadioButton text: String,
+        getter: () -> Boolean,
+        setter: (Boolean) -> Unit,
+        @Nls comment: String? = null
+    ): ConceptCellBuilder<JBRadioButton> {
         val component = JBRadioButton(text, getter())
         return component(comment = comment).withSelectedBinding(ConceptPropertyBinding(getter, setter))
     }
 
-    open fun radioButton(@NlsContexts.RadioButton text: String, prop: KMutableProperty0<Boolean>, @Nls comment: String? = null): ConceptCellBuilder<JBRadioButton> {
+    open fun radioButton(
+        @NlsContexts.RadioButton text: String,
+        prop: KMutableProperty0<Boolean>,
+        @Nls comment: String? = null
+    ): ConceptCellBuilder<JBRadioButton> {
         val component = JBRadioButton(text, prop.get())
         return component(comment = comment).withSelectedBinding(prop.toBinding())
     }
 
-    fun <T> comboBox(model: ComboBoxModel<T>,
-                     getter: () -> T?,
-                     setter: (T?) -> Unit,
-                     renderer: ListCellRenderer<T?>? = null): ConceptCellBuilder<ComboBox<T>> {
+    fun <T> comboBox(
+        model: ComboBoxModel<T>,
+        getter: () -> T?,
+        setter: (T?) -> Unit,
+        renderer: ListCellRenderer<T?>? = null
+    ): ConceptCellBuilder<ComboBox<T>> {
         return comboBox(model, ConceptPropertyBinding(getter, setter), renderer)
     }
 
-    fun <T> comboBox(model: ComboBoxModel<T>,
-                     modelBinding: ConceptPropertyBinding<T?>,
-                     renderer: ListCellRenderer<T?>? = null): ConceptCellBuilder<ComboBox<T>> {
+    fun <T> comboBox(
+        model: ComboBoxModel<T>,
+        modelBinding: ConceptPropertyBinding<T?>,
+        renderer: ListCellRenderer<T?>? = null
+    ): ConceptCellBuilder<ComboBox<T>> {
         return component(ComboBox(model))
             .applyToComponent {
                 this.renderer = renderer ?: SimpleListCellRenderer.create("") { it.toString() }
@@ -354,9 +428,118 @@ abstract class ConceptCell : ConceptBaseBuilder {
             .applyToComponent { bind(property) }
     }
 
-    fun textField(prop: KMutableProperty0<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> = textField(prop.toBinding(), columns)
+    fun modulesComboBox(project: Project, property: GraphProperty<Module?>): ConceptCellBuilder<ModulesComboBox> {
+        return modulesComboBox(project, property::get, property::set)
+            .withGraphProperty(property)
+            .applyToComponent { bind(property) }
+    }
 
-    fun textField(getter: () -> String, setter: (String) -> Unit, columns: Int? = null) = textField(ConceptPropertyBinding(getter, setter), columns)
+    fun modulesComboBox(
+        project: Project,
+        getter: () -> Module?,
+        setter: (Module?) -> Unit
+    ): ConceptCellBuilder<ModulesComboBox> {
+        return modulesComboBox(project, ConceptPropertyBinding(getter, setter))
+    }
+
+    fun modulesComboBox(
+        project: Project,
+        modelBinding: ConceptPropertyBinding<Module?>
+    ): ConceptCellBuilder<ModulesComboBox> {
+        return component(ModulesComboBox())
+            .applyToComponent {
+                val allModules = ModuleUtil.getModulesOfType(project, StdModuleTypes.JAVA)
+                val modules: MutableList<Module> = ArrayList()
+                for (module in allModules) {
+                    if (module.name.endsWith(".main")) {
+                        continue
+                    }
+                    if (module.name.endsWith(".test")) {
+                        continue
+                    }
+                    modules.add(module)
+                }
+                setModules(modules)
+                //fillModules(project, StdModuleTypes.JAVA)
+                //this.renderer = renderer ?: SimpleListCellRenderer.create("") { it.toString() }
+                selectedModule = modelBinding.get()
+            }
+            .withBinding(
+                { component -> component.selectedModule },
+                { component, value -> component.selectedModule = value },
+                modelBinding
+            )
+    }
+
+    fun classesComboBox(
+        project: Project,
+        recentsKey: String,
+        property: GraphProperty<String>
+    ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
+        return classesComboBox(project, recentsKey, property::get, property::set)
+            .withGraphProperty(property)
+            .applyToComponent { bind(property) }
+    }
+
+    fun classesComboBox(
+        project: Project,
+        recentsKey: String,
+        getter: () -> String,
+        setter: (String) -> Unit
+    ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
+        return classesComboBox(project, recentsKey, ConceptPropertyBinding(getter, setter))
+    }
+
+    fun classesComboBox(
+        project: Project,
+        recentsKey: String,
+        modelBinding: ConceptPropertyBinding<String>
+    ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
+        return component(
+            ReferenceEditorComboWithBrowseButton(
+                null,
+                modelBinding.get(),
+                project,
+                true,
+                JavaCodeFragment.VisibilityChecker.PROJECT_SCOPE_VISIBLE,
+                recentsKey
+            )
+        ).applyToComponent {
+
+            text = modelBinding.get()
+            addActionListener(ActionListener {
+                val chooser = TreeClassChooserFactory.getInstance(project).createWithInnerClassesScopeChooser(
+                    "Choose User Domain Class", GlobalSearchScope.projectScope(project),
+                    ClassFilter.ALL, null
+                )
+                val targetClassName: String? = text
+                if (targetClassName != null) {
+                    val aClass = JavaPsiFacade.getInstance(project)
+                        .findClass(targetClassName, GlobalSearchScope.allScope(project))
+                    if (aClass != null) {
+                        chooser.selectDirectory(aClass.containingFile.containingDirectory)
+                    } /*else {
+                            chooser.selectDirectory(mySourceClass.getContainingFile().getContainingDirectory())
+                        }*/
+                }
+                chooser.showDialog()
+                val aClass = chooser.selected
+                if (aClass != null) {
+                    text = aClass.qualifiedName
+                }
+            })
+        }.withBinding(
+            { component -> component.text },
+            { component, value -> component.text = value },
+            modelBinding
+        )
+    }
+
+    fun textField(prop: KMutableProperty0<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> =
+        textField(prop.toBinding(), columns)
+
+    fun textField(getter: () -> String, setter: (String) -> Unit, columns: Int? = null) =
+        textField(ConceptPropertyBinding(getter, setter), columns)
 
     fun textField(binding: ConceptPropertyBinding<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> {
         return component(JBTextField(binding.get(), columns ?: 0))
@@ -369,24 +552,39 @@ abstract class ConceptCell : ConceptBaseBuilder {
             .applyToComponent { bind(property) }
     }
 
-    fun textArea(prop: KMutableProperty0<String>, rows: Int? = null, columns: Int? = null): ConceptCellBuilder<JBTextArea> = textArea(prop.toBinding(), rows, columns)
+    fun textArea(
+        prop: KMutableProperty0<String>,
+        rows: Int? = null,
+        columns: Int? = null
+    ): ConceptCellBuilder<JBTextArea> = textArea(prop.toBinding(), rows, columns)
 
-    fun textArea(getter: () -> String, setter: (String) -> Unit, rows: Int? = null, columns: Int? = null) = textArea(ConceptPropertyBinding(getter, setter), rows, columns)
+    fun textArea(getter: () -> String, setter: (String) -> Unit, rows: Int? = null, columns: Int? = null) =
+        textArea(ConceptPropertyBinding(getter, setter), rows, columns)
 
-    fun textArea(binding: ConceptPropertyBinding<String>, rows: Int? = null, columns: Int? = null): ConceptCellBuilder<JBTextArea> {
+    fun textArea(
+        binding: ConceptPropertyBinding<String>,
+        rows: Int? = null,
+        columns: Int? = null
+    ): ConceptCellBuilder<JBTextArea> {
         return component(JBTextArea(binding.get(), rows ?: 0, columns ?: 0))
             .withTextBinding(binding)
     }
 
-    fun textArea(property: GraphProperty<String>, rows: Int? = null, columns: Int? = null): ConceptCellBuilder<JBTextArea> {
+    fun textArea(
+        property: GraphProperty<String>,
+        rows: Int? = null,
+        columns: Int? = null
+    ): ConceptCellBuilder<JBTextArea> {
         return textArea(property::get, property::set, rows, columns)
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
     }
 
-    fun scrollableTextArea(prop: KMutableProperty0<String>, rows: Int? = null): ConceptCellBuilder<JBTextArea> = scrollableTextArea(prop.toBinding(), rows)
+    fun scrollableTextArea(prop: KMutableProperty0<String>, rows: Int? = null): ConceptCellBuilder<JBTextArea> =
+        scrollableTextArea(prop.toBinding(), rows)
 
-    fun scrollableTextArea(getter: () -> String, setter: (String) -> Unit, rows: Int? = null) = scrollableTextArea(ConceptPropertyBinding(getter, setter), rows)
+    fun scrollableTextArea(getter: () -> String, setter: (String) -> Unit, rows: Int? = null) =
+        scrollableTextArea(ConceptPropertyBinding(getter, setter), rows)
 
     fun scrollableTextArea(binding: ConceptPropertyBinding<String>, rows: Int? = null): ConceptCellBuilder<JBTextArea> {
         val textArea = JBTextArea(binding.get(), rows ?: 0, 0)
@@ -401,37 +599,75 @@ abstract class ConceptCell : ConceptBaseBuilder {
             .applyToComponent { bind(property) }
     }
 
-    fun intTextField(prop: KMutableProperty0<Int>, columns: Int? = null, range: IntRange? = null): ConceptCellBuilder<JBTextField> {
+    fun intTextField(
+        prop: KMutableProperty0<Int>,
+        columns: Int? = null,
+        range: IntRange? = null
+    ): ConceptCellBuilder<JBTextField> {
         return intTextField(prop.toBinding(), columns, range)
     }
 
-    fun intTextField(getter: () -> Int, setter: (Int) -> Unit, columns: Int? = null, range: IntRange? = null): ConceptCellBuilder<JBTextField> {
+    fun intTextField(
+        getter: () -> Int,
+        setter: (Int) -> Unit,
+        columns: Int? = null,
+        range: IntRange? = null
+    ): ConceptCellBuilder<JBTextField> {
         return intTextField(ConceptPropertyBinding(getter, setter), columns, range)
     }
 
-    fun intTextField(binding: ConceptPropertyBinding<Int>, columns: Int? = null, range: IntRange? = null): ConceptCellBuilder<JBTextField> {
+    fun intTextField(
+        binding: ConceptPropertyBinding<Int>,
+        columns: Int? = null,
+        range: IntRange? = null
+    ): ConceptCellBuilder<JBTextField> {
         return textField(
             { binding.get().toString() },
-            { value -> value.toIntOrNull()?.let { intValue -> binding.set(range?.let { intValue.coerceIn(it.first, it.last) } ?: intValue) } },
+            { value ->
+                value.toIntOrNull()
+                    ?.let { intValue -> binding.set(range?.let { intValue.coerceIn(it.first, it.last) } ?: intValue) }
+            },
             columns
         ).withValidationOnInput {
             val value = it.text.toIntOrNull()
             when {
                 value == null -> error(UIBundle.message("please.enter.a.number"))
-                range != null && value !in range -> error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
+                range != null && value !in range -> error(
+                    UIBundle.message(
+                        "please.enter.a.number.from.0.to.1",
+                        range.first,
+                        range.last
+                    )
+                )
+
                 else -> null
             }
         }
     }
 
-    fun spinner(prop: KMutableProperty0<Int>, minValue: Int, maxValue: Int, step: Int = 1): ConceptCellBuilder<JBIntSpinner> {
+    fun spinner(
+        prop: KMutableProperty0<Int>,
+        minValue: Int,
+        maxValue: Int,
+        step: Int = 1
+    ): ConceptCellBuilder<JBIntSpinner> {
         val spinner = JBIntSpinner(prop.get(), minValue, maxValue, step)
         return component(spinner).withBinding(JBIntSpinner::getNumber, JBIntSpinner::setNumber, prop.toBinding())
     }
 
-    fun spinner(getter: () -> Int, setter: (Int) -> Unit, minValue: Int, maxValue: Int, step: Int = 1): ConceptCellBuilder<JBIntSpinner> {
+    fun spinner(
+        getter: () -> Int,
+        setter: (Int) -> Unit,
+        minValue: Int,
+        maxValue: Int,
+        step: Int = 1
+    ): ConceptCellBuilder<JBIntSpinner> {
         val spinner = JBIntSpinner(getter(), minValue, maxValue, step)
-        return component(spinner).withBinding(JBIntSpinner::getNumber, JBIntSpinner::setNumber, ConceptPropertyBinding(getter, setter))
+        return component(spinner).withBinding(
+            JBIntSpinner::getNumber,
+            JBIntSpinner::setNumber,
+            ConceptPropertyBinding(getter, setter)
+        )
     }
 
     fun textFieldWithHistoryWithBrowseButton(
@@ -443,11 +679,21 @@ abstract class ConceptCell : ConceptBaseBuilder {
         historyProvider: (() -> List<String>)? = null,
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
     ): ConceptCellBuilder<TextFieldWithHistoryWithBrowseButton> {
-        val textField = textFieldWithHistoryWithBrowseButton(project, browseDialogTitle, fileChooserDescriptor, historyProvider, fileChosen)
+        val textField = textFieldWithHistoryWithBrowseButton(
+            project,
+            browseDialogTitle,
+            fileChooserDescriptor,
+            historyProvider,
+            fileChosen
+        )
         val modelBinding = ConceptPropertyBinding(getter, setter)
         textField.text = modelBinding.get()
         return component(textField)
-            .withBinding(TextFieldWithHistoryWithBrowseButton::getText, TextFieldWithHistoryWithBrowseButton::setText, modelBinding)
+            .withBinding(
+                TextFieldWithHistoryWithBrowseButton::getText,
+                TextFieldWithHistoryWithBrowseButton::setText,
+                modelBinding
+            )
     }
 
     fun textFieldWithBrowseButton(
@@ -518,12 +764,22 @@ abstract class ConceptCell : ConceptBaseBuilder {
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
     ): ConceptCellBuilder<TextFieldWithBrowseButton> {
-        return textFieldWithBrowseButton(property::get, property::set, browseDialogTitle, project, fileChooserDescriptor, fileChosen)
+        return textFieldWithBrowseButton(
+            property::get,
+            property::set,
+            browseDialogTitle,
+            project,
+            fileChooserDescriptor,
+            fileChosen
+        )
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
     }
 
-    fun actionButton(action: AnAction, dimension: Dimension = ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE): ConceptCellBuilder<ActionButton> {
+    fun actionButton(
+        action: AnAction,
+        dimension: Dimension = ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE
+    ): ConceptCellBuilder<ActionButton> {
         val actionButton = ActionButton(action, action.templatePresentation, ActionPlaces.UNKNOWN, dimension)
         return actionButton()
     }
@@ -549,27 +805,35 @@ abstract class ConceptCell : ConceptBaseBuilder {
         return component(label)
     }
 
-    fun expandableTextField(getter: () -> String,
-                            setter: (String) -> Unit,
-                            parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
-                            joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER)
+    fun expandableTextField(
+        getter: () -> String,
+        setter: (String) -> Unit,
+        parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
+        joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER
+    )
             : ConceptCellBuilder<ExpandableTextField> {
         return ExpandableTextField(parser, joiner)()
-            .withBinding({ editor -> editor.text.orEmpty() },
+            .withBinding(
+                { editor -> editor.text.orEmpty() },
                 { editor, value -> editor.text = value },
-                ConceptPropertyBinding(getter, setter))
+                ConceptPropertyBinding(getter, setter)
+            )
     }
 
-    fun expandableTextField(prop: KMutableProperty0<String>,
-                            parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
-                            joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER)
+    fun expandableTextField(
+        prop: KMutableProperty0<String>,
+        parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
+        joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER
+    )
             : ConceptCellBuilder<ExpandableTextField> {
         return expandableTextField(prop::get, prop::set, parser, joiner)
     }
 
-    fun expandableTextField(prop: GraphProperty<String>,
-                            parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
-                            joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER)
+    fun expandableTextField(
+        prop: GraphProperty<String>,
+        parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
+        joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER
+    )
             : ConceptCellBuilder<ExpandableTextField> {
         return expandableTextField(prop::get, prop::set, parser, joiner)
             .withGraphProperty(prop)
@@ -580,7 +844,11 @@ abstract class ConceptCell : ConceptBaseBuilder {
      * @see LayoutBuilder.titledRow
      */
     @JvmOverloads
-    fun panel(@NlsContexts.BorderTitle title: String, wrappedComponent: Component, hasSeparator: Boolean = true): ConceptCellBuilder<JPanel> {
+    fun panel(
+        @NlsContexts.BorderTitle title: String,
+        wrappedComponent: Component,
+        hasSeparator: Boolean = true
+    ): ConceptCellBuilder<JPanel> {
         val panel = Panel(title, hasSeparator)
         panel.add(wrappedComponent)
         return component(panel)
@@ -676,6 +944,10 @@ fun <T> ComboBox<T>.bind(property: GraphProperty<T>) {
     }
 }
 
+fun <T> ReferenceEditorComboWithBrowseButton.bind(property: GraphProperty<T>) {
+    (childComponent as ComboBox<T>).bind(property)
+}
+
 private val TextFieldWithBrowseButton.emptyText
     get() = (textField as JBTextField).emptyText
 
@@ -715,8 +987,7 @@ private fun AtomicBoolean.lockOrSkip(action: () -> Unit) {
     if (!compareAndSet(false, true)) return
     try {
         action()
-    }
-    finally {
+    } finally {
         set(false)
     }
 }
