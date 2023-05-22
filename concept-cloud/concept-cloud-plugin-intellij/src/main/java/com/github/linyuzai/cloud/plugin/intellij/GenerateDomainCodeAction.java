@@ -15,6 +15,8 @@ import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class GenerateDomainAndModuleAction extends AnAction {
+public class GenerateDomainCodeAction extends AnAction {
 
     public static class Settings {
 
@@ -157,17 +159,10 @@ public class GenerateDomainAndModuleAction extends AnAction {
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
-        DialogBuilder dialog = new DialogBuilder(project);
-        dialog.setTitle("Generate Domain and Module Code");
-        dialog.setCenterPanel(CustomComponents.createGenerateDomainAndModule(project, settings));
-        //dialog.addOkAction();
-        dialog.setOkOperation(() -> {
-            System.out.println(settings.getName());
-            System.out.println(settings.getUserClassName());
-            System.out.println(settings.getDomainModule());
-            System.out.println(settings.getModuleModule());
+        CustomComponents.showGenerateDomainCodeDialog(project, settings, () -> {
+            Messages.showMessageDialog("Ok", "Ok", null);
+            return null;
         });
-        dialog.showModal(false);
     }
 
     private String suggestUserClassName(Module module) {

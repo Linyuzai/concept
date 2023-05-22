@@ -331,7 +331,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
                             addToTop(JBLabel(
                                 messages?.selectedDependenciesLabel ?: "Added dependencies:"
                             ).apply {
-                                border = JBUI.Borders.empty(0, 0, DEFAULT_VGAP * 2, 0)
+                                border = JBUI.Borders.emptyBottom(DEFAULT_VGAP * 2)
                             })
                             addToCenter(selectedLibrariesPanel)
                         }, gridConstraint(0, 1))
