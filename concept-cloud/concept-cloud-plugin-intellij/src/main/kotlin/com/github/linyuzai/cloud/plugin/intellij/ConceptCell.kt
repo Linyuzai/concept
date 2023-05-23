@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
+import com.github.linyuzai.cloud.plugin.intellij.domain.DomainProp
 import com.intellij.BundleBase
 import com.intellij.application.options.ModulesComboBox
 import com.intellij.icons.AllIcons
@@ -8,6 +9,7 @@ import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.ActionButton
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.module.Module
@@ -473,27 +475,36 @@ abstract class ConceptCell : ConceptBaseBuilder {
 
     fun classesComboBox(
         project: Project,
+        prop: DomainProp? = null,
         recentsKey: String,
-        property: GraphProperty<String>
+        chooserTitle: String,
+        property: GraphProperty<String>,
+        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
-        return classesComboBox(project, recentsKey, property::get, property::set)
+        return classesComboBox(project, prop, recentsKey, chooserTitle, property::get, property::set, init)
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
     }
 
     fun classesComboBox(
         project: Project,
+        prop: DomainProp? = null,
         recentsKey: String,
+        chooserTitle: String,
         getter: () -> String,
-        setter: (String) -> Unit
+        setter: (String) -> Unit,
+        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
-        return classesComboBox(project, recentsKey, ConceptPropertyBinding(getter, setter))
+        return classesComboBox(project, prop, recentsKey, chooserTitle, ConceptPropertyBinding(getter, setter), init)
     }
 
     fun classesComboBox(
         project: Project,
+        prop: DomainProp? = null,
         recentsKey: String,
-        modelBinding: ConceptPropertyBinding<String>
+        chooserTitle: String,
+        modelBinding: ConceptPropertyBinding<String>,
+        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
         return component(
             ReferenceEditorComboWithBrowseButton(
@@ -503,13 +514,18 @@ abstract class ConceptCell : ConceptBaseBuilder {
                 true,
                 JavaCodeFragment.VisibilityChecker.PROJECT_SCOPE_VISIBLE,
                 recentsKey
-            )
+            ).apply {
+                if (init != null) {
+                    init()
+                }
+            }
         ).applyToComponent {
-
+            /*RecentsManager.getInstance(project)
+                    .registerRecentEntry("GenerateDomainAndModule@User", recentsKey)*/
             text = modelBinding.get()
             addActionListener(ActionListener {
                 val chooser = TreeClassChooserFactory.getInstance(project).createWithInnerClassesScopeChooser(
-                    "Choose User Domain Class", GlobalSearchScope.projectScope(project),
+                    chooserTitle, GlobalSearchScope.projectScope(project),
                     ClassFilter.ALL, null
                 )
                 val targetClassName: String? = text
@@ -528,6 +544,32 @@ abstract class ConceptCell : ConceptBaseBuilder {
                     text = aClass.qualifiedName
                 }
             })
+
+            if (prop != null) {
+                childComponent.apply {
+                    addDocumentListener(object : DocumentListener {
+
+                        override fun documentChanged(event: com.intellij.openapi.editor.event.DocumentEvent) {
+                            if (!prop.smartFill) {
+                                return
+                            }
+                            val lastIndexOf = text.lastIndexOf(".")
+                            if (lastIndexOf > 0) {
+                                val substring = text.substring(lastIndexOf).trim()
+                                if (substring.length == 1) {
+                                    prop.onClassNameUpdateListener?.invoke("")
+                                } else {
+                                    val s = substring.substring(1)
+                                    val t = s[0].lowercase() + s.substring(1)
+                                    prop.onClassNameUpdateListener?.invoke(t)
+                                }
+                            }
+                            prop.smartFill = true
+                        }
+                    })
+                }
+            }
+
         }.withBinding(
             { component -> component.text },
             { component, value -> component.text = value },
@@ -854,8 +896,19 @@ abstract class ConceptCell : ConceptBaseBuilder {
         return component(panel)
     }
 
-    fun scrollPane(component: Component): ConceptCellBuilder<JScrollPane> {
-        return component(JBScrollPane(component))
+    fun scrollPane(
+        component: Component,
+        minimumSize: Dimension? = null,
+        init: (JScrollPane.() -> Unit)? = null
+    ): ConceptCellBuilder<JScrollPane> {
+        return component(JBScrollPane(component).apply {
+            if (minimumSize != null) {
+                this.minimumSize = minimumSize
+            }
+            if (init != null) {
+                init()
+            }
+        })
     }
 
     fun comment(@NlsContexts.DetailedDescription text: String, maxLineLength: Int = -1): ConceptCellBuilder<JLabel> {

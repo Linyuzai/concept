@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij;
 
-import com.github.linyuzai.cloud.plugin.intellij.custom.CustomComponents;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;

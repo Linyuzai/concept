@@ -132,7 +132,7 @@ class ConceptLibraryDescriptionPanel : ScrollablePanel(VerticalLayout(DEFAULT_VG
 
             linksPanel.add(BorderLayoutPanel().apply {
                 addToCenter(linkLabel)
-                border = JBUI.Borders.empty(0, 0, 0, DEFAULT_HGAP / 2)
+                border = JBUI.Borders.emptyRight(DEFAULT_HGAP / 2)
             })
         }
         linksPanel.revalidate()

@@ -1,6 +1,7 @@
 package com.github.linyuzai.cloud.plugin.intellij;
 
-import com.github.linyuzai.cloud.plugin.intellij.custom.CustomComponents;
+import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
+import com.github.linyuzai.cloud.plugin.intellij.domain.DomainProp;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -11,22 +12,22 @@ import com.intellij.openapi.observable.properties.GraphPropertyImpl;
 import com.intellij.openapi.observable.properties.PropertyGraph;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class GenerateDomainCodeAction extends AnAction {
 
-    public static class Settings {
+    public static class Model {
 
         private String name = "";
 
@@ -35,6 +36,12 @@ public class GenerateDomainCodeAction extends AnAction {
         private Module domainModule;
 
         private Module moduleModule;
+
+        private final List<DomainProp> domainProps = new CopyOnWriteArrayList<>();
+
+        private final Collection<Consumer<DomainProp>> onDomainPropAddListeners = new CopyOnWriteArrayList<>();
+
+        private final Collection<Consumer<DomainProp>> onDomainPropRemoveListeners = new CopyOnWriteArrayList<>();
 
         private final PropertyGraph propertyGraph = new PropertyGraph();
 
@@ -45,6 +52,33 @@ public class GenerateDomainCodeAction extends AnAction {
         private final GraphProperty<Module> domainModuleProperty = new GraphPropertyImpl<>(propertyGraph, () -> domainModule);
 
         private final GraphProperty<Module> moduleModuleProperty = new GraphPropertyImpl<>(propertyGraph, () -> moduleModule);
+
+        public DomainProp addDomainProp() {
+            DomainProp prop = new DomainProp(domainProps.size());
+            domainProps.add(prop);
+            for (Consumer<DomainProp> onDomainPropAddListener : onDomainPropAddListeners) {
+                onDomainPropAddListener.accept(prop);
+            }
+            return prop;
+        }
+
+        public void removeDomainProp(int index) {
+            DomainProp remove = domainProps.remove(index);
+            for (int i = index; i < domainProps.size(); i++) {
+                domainProps.get(i).setIndex(i);
+            }
+            for (Consumer<DomainProp> onDomainPropRemoveListener : onDomainPropRemoveListeners) {
+                onDomainPropRemoveListener.accept(remove);
+            }
+        }
+
+        public void addOnDomainPropAddListener(Consumer<DomainProp> listener) {
+            onDomainPropAddListeners.add(listener);
+        }
+
+        public void addOnDomainPropRemoveListener(Consumer<DomainProp> listener) {
+            onDomainPropRemoveListeners.add(listener);
+        }
 
         public GraphProperty<String> getNameProperty() {
             return nameProperty;
@@ -108,7 +142,7 @@ public class GenerateDomainCodeAction extends AnAction {
             Messages.showMessageDialog("No project selected", "Error", null);
             return;
         }
-        final Settings settings = new Settings();
+        final Model model = new Model();
 
         String projectName = project.getName();
 
@@ -138,28 +172,28 @@ public class GenerateDomainCodeAction extends AnAction {
         if (userDomainModule != null) {
             String suggestUserClassName = suggestUserClassName(userDomainModule);
             if (suggestUserClassName != null) {
-                settings.setUserClassName(suggestUserClassName);
+                model.setUserClassName(suggestUserClassName);
             }
         }
 
         if (domainModule != null) {
-            if (settings.getUserClassName().isEmpty()) {
+            if (model.getUserClassName().isEmpty()) {
                 String suggestUserClassName = suggestUserClassName(domainModule);
                 if (suggestUserClassName != null) {
-                    settings.setUserClassName(suggestUserClassName);
+                    model.setUserClassName(suggestUserClassName);
                 }
             }
-            settings.setDomainModule(domainModule);
+            model.setDomainModule(domainModule);
         }
 
         if (moduleModule != null) {
-            settings.setModuleModule(moduleModule);
+            model.setModuleModule(moduleModule);
         }
 
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
-        CustomComponents.showGenerateDomainCodeDialog(project, settings, () -> {
+        DomainComponents.showGenerateDomainCodeDialog(project, model, () -> {
             Messages.showMessageDialog("Ok", "Ok", null);
             return null;
         });
