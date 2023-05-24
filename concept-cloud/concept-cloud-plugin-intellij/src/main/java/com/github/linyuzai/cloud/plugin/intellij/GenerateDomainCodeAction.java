@@ -1,15 +1,12 @@
 package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
-import com.github.linyuzai.cloud.plugin.intellij.domain.DomainProp;
+import com.github.linyuzai.cloud.plugin.intellij.domain.DomainModel;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.module.StdModuleTypes;
-import com.intellij.openapi.observable.properties.GraphProperty;
-import com.intellij.openapi.observable.properties.GraphPropertyImpl;
-import com.intellij.openapi.observable.properties.PropertyGraph;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.Messages;
@@ -20,114 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class GenerateDomainCodeAction extends AnAction {
-
-    public static class Model {
-
-        private String name = "";
-
-        private String userClassName = "";
-
-        private Module domainModule;
-
-        private Module moduleModule;
-
-        private final List<DomainProp> domainProps = new CopyOnWriteArrayList<>();
-
-        private final Collection<Consumer<DomainProp>> onDomainPropAddListeners = new CopyOnWriteArrayList<>();
-
-        private final Collection<Consumer<DomainProp>> onDomainPropRemoveListeners = new CopyOnWriteArrayList<>();
-
-        private final PropertyGraph propertyGraph = new PropertyGraph();
-
-        private final GraphProperty<String> nameProperty = new GraphPropertyImpl<>(propertyGraph, () -> name);
-
-        private final GraphProperty<String> userClassNameProperty = new GraphPropertyImpl<>(propertyGraph, () -> userClassName);
-
-        private final GraphProperty<Module> domainModuleProperty = new GraphPropertyImpl<>(propertyGraph, () -> domainModule);
-
-        private final GraphProperty<Module> moduleModuleProperty = new GraphPropertyImpl<>(propertyGraph, () -> moduleModule);
-
-        public DomainProp addDomainProp() {
-            DomainProp prop = new DomainProp(domainProps.size());
-            domainProps.add(prop);
-            for (Consumer<DomainProp> onDomainPropAddListener : onDomainPropAddListeners) {
-                onDomainPropAddListener.accept(prop);
-            }
-            return prop;
-        }
-
-        public void removeDomainProp(int index) {
-            DomainProp remove = domainProps.remove(index);
-            for (int i = index; i < domainProps.size(); i++) {
-                domainProps.get(i).setIndex(i);
-            }
-            for (Consumer<DomainProp> onDomainPropRemoveListener : onDomainPropRemoveListeners) {
-                onDomainPropRemoveListener.accept(remove);
-            }
-        }
-
-        public void addOnDomainPropAddListener(Consumer<DomainProp> listener) {
-            onDomainPropAddListeners.add(listener);
-        }
-
-        public void addOnDomainPropRemoveListener(Consumer<DomainProp> listener) {
-            onDomainPropRemoveListeners.add(listener);
-        }
-
-        public GraphProperty<String> getNameProperty() {
-            return nameProperty;
-        }
-
-        public GraphProperty<String> getUserClassNameProperty() {
-            return userClassNameProperty;
-        }
-
-        public GraphProperty<Module> getDomainModuleProperty() {
-            return domainModuleProperty;
-        }
-
-        public GraphProperty<Module> getModuleModuleProperty() {
-            return moduleModuleProperty;
-        }
-
-        public String getName() {
-            return nameProperty.get();
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getUserClassName() {
-            return userClassNameProperty.get();
-        }
-
-        public void setUserClassName(String userClassName) {
-            this.userClassName = userClassName;
-        }
-
-        public Module getDomainModule() {
-            return domainModuleProperty.get();
-        }
-
-        public void setDomainModule(Module domainModule) {
-            this.domainModule = domainModule;
-        }
-
-        public Module getModuleModule() {
-            return moduleModuleProperty.get();
-        }
-
-        public void setModuleModule(Module moduleModule) {
-            this.moduleModule = moduleModule;
-        }
-    }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
@@ -142,7 +34,6 @@ public class GenerateDomainCodeAction extends AnAction {
             Messages.showMessageDialog("No project selected", "Error", null);
             return;
         }
-        final Model model = new Model();
 
         String projectName = project.getName();
 
@@ -169,32 +60,32 @@ public class GenerateDomainCodeAction extends AnAction {
             }
         }
 
+        String userClassName = "";
+
         if (userDomainModule != null) {
             String suggestUserClassName = suggestUserClassName(userDomainModule);
             if (suggestUserClassName != null) {
-                model.setUserClassName(suggestUserClassName);
+                userClassName = suggestUserClassName;
             }
         }
 
         if (domainModule != null) {
-            if (model.getUserClassName().isEmpty()) {
+            if (userClassName.isEmpty()) {
                 String suggestUserClassName = suggestUserClassName(domainModule);
                 if (suggestUserClassName != null) {
-                    model.setUserClassName(suggestUserClassName);
+                    userClassName = suggestUserClassName;
                 }
             }
-            model.setDomainModule(domainModule);
         }
 
-        if (moduleModule != null) {
-            model.setModuleModule(moduleModule);
-        }
+        final DomainModel model = DomainModel.create(userClassName, domainModule, "", "");
 
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
         DomainComponents.showGenerateDomainCodeDialog(project, model, () -> {
             Messages.showMessageDialog("Ok", "Ok", null);
+            System.out.println(model);
             return null;
         });
     }

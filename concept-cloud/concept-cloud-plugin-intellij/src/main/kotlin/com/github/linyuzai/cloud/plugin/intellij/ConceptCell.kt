@@ -28,6 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaCodeFragment
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.refactoring.ui.ClassNameReferenceEditor
 import com.intellij.ui.*
 import com.intellij.ui.components.*
 import com.intellij.ui.components.fields.ExpandableTextField
@@ -35,6 +36,7 @@ import com.intellij.ui.layout.*
 import com.intellij.util.Function
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.ui.JBFont
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.StatusText
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.annotations.ApiStatus
@@ -475,36 +477,30 @@ abstract class ConceptCell : ConceptBaseBuilder {
 
     fun classesComboBox(
         project: Project,
-        prop: DomainProp? = null,
         recentsKey: String,
-        chooserTitle: String,
         property: GraphProperty<String>,
-        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
+        init: ReferenceEditorComboWithBrowseButton.() -> Unit
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
-        return classesComboBox(project, prop, recentsKey, chooserTitle, property::get, property::set, init)
+        return classesComboBox(project, recentsKey, property::get, property::set, init)
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
     }
 
     fun classesComboBox(
         project: Project,
-        prop: DomainProp? = null,
         recentsKey: String,
-        chooserTitle: String,
         getter: () -> String,
         setter: (String) -> Unit,
-        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
+        init: ReferenceEditorComboWithBrowseButton.() -> Unit
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
-        return classesComboBox(project, prop, recentsKey, chooserTitle, ConceptPropertyBinding(getter, setter), init)
+        return classesComboBox(project, recentsKey, ConceptPropertyBinding(getter, setter), init)
     }
 
     fun classesComboBox(
         project: Project,
-        prop: DomainProp? = null,
         recentsKey: String,
-        chooserTitle: String,
         modelBinding: ConceptPropertyBinding<String>,
-        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
+        init: ReferenceEditorComboWithBrowseButton.() -> Unit
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
         return component(
             ReferenceEditorComboWithBrowseButton(
@@ -514,36 +510,40 @@ abstract class ConceptCell : ConceptBaseBuilder {
                 true,
                 JavaCodeFragment.VisibilityChecker.PROJECT_SCOPE_VISIBLE,
                 recentsKey
-            ).apply {
-                if (init != null) {
-                    init()
-                }
-            }
+            ).apply(init)
         ).applyToComponent {
-            /*RecentsManager.getInstance(project)
-                    .registerRecentEntry("GenerateDomainAndModule@User", recentsKey)*/
             text = modelBinding.get()
-            addActionListener(ActionListener {
+            addActionListener {
                 val chooser = TreeClassChooserFactory.getInstance(project).createWithInnerClassesScopeChooser(
-                    chooserTitle, GlobalSearchScope.projectScope(project),
+                    "Choose Class", GlobalSearchScope.projectScope(project),
                     ClassFilter.ALL, null
                 )
                 val targetClassName: String? = text
-                if (targetClassName != null) {
-                    val aClass = JavaPsiFacade.getInstance(project)
+                if (!targetClassName.isNullOrBlank()) {
+                    val targetClass = JavaPsiFacade.getInstance(project)
                         .findClass(targetClassName, GlobalSearchScope.allScope(project))
-                    if (aClass != null) {
-                        chooser.selectDirectory(aClass.containingFile.containingDirectory)
-                    } /*else {
-                            chooser.selectDirectory(mySourceClass.getContainingFile().getContainingDirectory())
-                        }*/
+                    if (targetClass != null) {
+                        chooser.selectDirectory(targetClass.containingFile.containingDirectory)
+                    }
                 }
                 chooser.showDialog()
                 val aClass = chooser.selected
                 if (aClass != null) {
                     text = aClass.qualifiedName
                 }
-            })
+            }
+        }.withBinding(
+            { component -> component.text },
+            { component, value -> component.text = value },
+            modelBinding
+        )
+        /*return component(ClassNameReferenceEditor(project,null).apply{
+            border = JBUI.Borders.empty()
+            if (init != null) {
+                init()
+            }
+        }).applyToComponent {
+            text = modelBinding.get()
 
             if (prop != null) {
                 childComponent.apply {
@@ -574,7 +574,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
             { component -> component.text },
             { component, value -> component.text = value },
             modelBinding
-        )
+        )*/
     }
 
     fun textField(prop: KMutableProperty0<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> =
@@ -999,6 +999,16 @@ fun <T> ComboBox<T>.bind(property: GraphProperty<T>) {
 
 fun <T> ReferenceEditorComboWithBrowseButton.bind(property: GraphProperty<T>) {
     (childComponent as ComboBox<T>).bind(property)
+}
+
+fun ClassNameReferenceEditor.bind(property: GraphProperty<String>) {
+    text = property.get()
+    property.afterChange {
+        text = it
+    }
+    property.afterReset {
+        text = property.get()
+    }
 }
 
 private val TextFieldWithBrowseButton.emptyText

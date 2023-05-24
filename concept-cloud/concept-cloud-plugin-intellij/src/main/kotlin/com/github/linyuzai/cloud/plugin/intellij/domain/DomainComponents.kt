@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
-import com.github.linyuzai.cloud.plugin.intellij.GenerateDomainCodeAction.Model
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
@@ -18,7 +17,7 @@ import java.awt.event.AdjustmentListener
 object DomainComponents {
 
     @JvmStatic
-    fun showGenerateDomainCodeDialog(project: Project, model: Model, callback: () -> Unit) {
+    fun showGenerateDomainCodeDialog(project: Project, model: DomainModel, callback: () -> Unit) {
         val dialog = DialogBuilder(project)
         dialog.setTitle("Generate Domain Code")
         val panel = BorderLayoutPanel().apply {
@@ -36,7 +35,7 @@ object DomainComponents {
     }
 
     @JvmStatic
-    fun createGenerateDomainPanel(project: Project, model: Model): DialogPanel {
+    fun createGenerateDomainPanel(project: Project, model: DomainModel): DialogPanel {
 
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
@@ -45,7 +44,8 @@ object DomainComponents {
 
             row("User Domain Class:") {
                 classesComboBox(
-                    project, null, "GenerateDomainAndModule@User", "Choose User Domain Class",
+                    project,
+                    "GenerateDomainAndModule@User",
                     model.userClassNameProperty
                 ) {
 
@@ -57,13 +57,13 @@ object DomainComponents {
             }
 
             row("Domain Class Name:") {
-                textField(model.nameProperty)
+                textField(model.domainNameProperty)
             }
 
             row("Domain Class Props:") {
                 val addButton = InplaceButton(
                     IconButton(
-                        "Add",
+                        "Add prop",
                         AllIcons.General.InlineAdd, AllIcons.General.InlineAddHover
                     )
                 ) {
@@ -125,6 +125,7 @@ object DomainComponents {
             }
 
             row {
+                //scrollableTextArea({""},{})
                 scrollPane(JBTextArea(1, 40).apply {
                     isEditable = false
                 })
@@ -133,12 +134,12 @@ object DomainComponents {
     }
 
     @JvmStatic
-    fun createGenerateDomainAndModule(project: Project, model: Model): DialogPanel {
+    fun createGenerateDomainAndModule(project: Project, model: DomainModel): DialogPanel {
 
         return panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Name:") {
-                textField(model.nameProperty)
+                textField(model.domainNameProperty)
             }
 
             row("User Domain Class:") {
@@ -152,10 +153,6 @@ object DomainComponents {
 
             row("Domains Module:") {
                 modulesComboBox(project, model.domainModuleProperty)
-            }
-
-            row("Modules Module:") {
-                modulesComboBox(project, model.moduleModuleProperty)
             }
         }
     }

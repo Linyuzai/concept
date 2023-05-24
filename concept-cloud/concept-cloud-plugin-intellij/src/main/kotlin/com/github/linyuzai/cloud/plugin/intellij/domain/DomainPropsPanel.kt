@@ -2,31 +2,22 @@ package com.github.linyuzai.cloud.plugin.intellij.domain
 
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.intellij.icons.AllIcons.Actions
-import com.intellij.ide.util.ClassFilter
-import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.componentsList.components.ScrollablePanel
 import com.intellij.openapi.ui.popup.IconButton
-import com.intellij.psi.JavaCodeFragment
-import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.InplaceButton
 import com.intellij.ui.JBColor
-import com.intellij.ui.ReferenceEditorComboWithBrowseButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.layout.LCFlags
-import com.intellij.ui.layout.jbTextField
 import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Cursor
-import java.awt.Dimension
-import java.awt.event.ActionListener
 
 class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
 
@@ -39,20 +30,6 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
     }
 
     fun addProp(prop: DomainProp, revalidate: Boolean = true) {
-
-        val nameText = JBTextField().apply {
-            document.addDocumentListener(object : DocumentAdapter() {
-
-                override fun textChanged(e: javax.swing.event.DocumentEvent) {
-                    prop.smartFill = false
-                }
-            })
-
-            prop.onClassNameUpdateListener = {
-                text = it
-            }
-        }
-
 
         val removeButton = InplaceButton(
             IconButton(
@@ -74,31 +51,61 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
         propPanel.addToCenter(panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Prop Class:") {
-                classesComboBox(project,
-                    prop,
-                    "DomainProp",
-                    "Choose Domain Prop Class",
-                    { "" },
-                    {}) {
+                classesComboBox(project, "DomainProp", prop.className) {
                     removeButton.setTransform(0, -JBUIScale.scale(2.coerceAtLeast(font.size / 15)))
-                    post = {
-                        childComponent.requestFocus()
-                        childComponent.requestFocusInWindow()
+                    childComponent.apply {
+
+                        addDocumentListener(object : DocumentListener {
+
+                            override fun documentChanged(event: DocumentEvent) {
+                                if (!prop.smartFill) {
+                                    return
+                                }
+                                val lastIndexOf = text.lastIndexOf(".")
+                                if (lastIndexOf > 0) {
+                                    val substring = text.substring(lastIndexOf).trim()
+                                    if (substring.length == 1) {
+                                        prop.onClassNameUpdateListener?.invoke("")
+                                    } else {
+                                        val s = substring.substring(1)
+                                        val t = s[0].lowercase() + s.substring(1)
+                                        prop.onClassNameUpdateListener?.invoke(t)
+                                    }
+                                }
+                                prop.smartFill = true
+                            }
+                        })
+
+                        post = {
+                            //requestFocus()
+                            requestFocusInWindow()
+                        }
                     }
                 }
             }.largeGapAfter()
 
             row("Prop Name:") {
-                component(nameText)
+                component(JBTextField().apply {
+                    document.addDocumentListener(object : DocumentAdapter() {
+
+                        override fun textChanged(e: javax.swing.event.DocumentEvent) {
+                            prop.smartFill = false
+                        }
+                    })
+
+                    prop.onClassNameUpdateListener = {
+                        text = it
+                    }
+                })
             }.largeGapAfter()
 
             row("Prop Valid:") {
-                checkBox("NotNull", { false }, {})
-                checkBox("NotEmpty", { false }, {})
+                checkBox("Not null", prop.propNotNull)
+                checkBox("Not empty", prop.propNotEmpty)
             }.largeGapAfter()
 
             row("Prop Comment:") {
-                textField({ "" }, { })
+                textField(prop.propComment)
             }.largeGapAfter()
         })
 
