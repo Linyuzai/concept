@@ -2,8 +2,7 @@ package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainModel;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.module.StdModuleTypes;
@@ -23,8 +22,7 @@ public class GenerateDomainCodeAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        e.getPresentation().setEnabledAndVisible(project != null);
+        e.getPresentation().setEnabledAndVisible(ConceptCloudSupport.isEnabled(e));
     }
 
     @Override
@@ -35,27 +33,45 @@ public class GenerateDomainCodeAction extends AnAction {
             return;
         }
 
+        Module selectModule = e.getData(LangDataKeys.MODULE);
+        PsiElement psiElement = e.getData(LangDataKeys.PSI_ELEMENT);
+
+        String domainPackage = "";
+        String domainClassName = "";
+
+        if (psiElement instanceof PsiDirectory) {
+            PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackageInSources((PsiDirectory) psiElement);
+            if (psiPackage != null) {
+                domainPackage = psiPackage.getQualifiedName();
+                String packageName = psiPackage.getName();
+                if (packageName != null) {
+                    domainClassName = packageName.substring(0, 1).toUpperCase() +
+                            packageName.substring(1);
+                }
+            }
+        }
+
         String projectName = project.getName();
 
-        String moduleModuleName = projectName + "." + projectName + "-module";
         String domainModuleName = projectName + "." + projectName + "-domain";
         String userDomainModuleName = domainModuleName + ".domain-user";
 
         Collection<Module> modules = ModuleUtil.getModulesOfType(project, StdModuleTypes.JAVA);
 
-        Module moduleModule = null;
         Module domainModule = null;
         Module userDomainModule = null;
 
         for (Module module : modules) {
-            if (moduleModuleName.equals(module.getName())) {
-                moduleModule = module;
+            if (selectModule != null &&
+                    selectModule.getName().endsWith(".main") &&
+                    selectModule.getName().equals(module.getName() + ".main")) {
+                selectModule = module;
             } else if (domainModuleName.equals(module.getName())) {
                 domainModule = module;
             } else if (userDomainModuleName.equals(module.getName())) {
                 userDomainModule = module;
             }
-            if (moduleModule != null && domainModule != null && userDomainModule != null) {
+            if (domainModule != null && userDomainModule != null) {
                 break;
             }
         }
@@ -78,14 +94,13 @@ public class GenerateDomainCodeAction extends AnAction {
             }
         }
 
-        final DomainModel model = DomainModel.create(userClassName, domainModule, "", "");
+        final DomainModel model = DomainModel.create(userClassName, selectModule, domainPackage, domainClassName);
 
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
         DomainComponents.showGenerateDomainCodeDialog(project, model, () -> {
             Messages.showMessageDialog("Ok", "Ok", null);
-            System.out.println(model);
             return null;
         });
     }

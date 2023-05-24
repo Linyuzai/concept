@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.github.linyuzai.cloud.plugin.intellij.domain.DomainProp
 import com.intellij.BundleBase
 import com.intellij.application.options.ModulesComboBox
 import com.intellij.icons.AllIcons
@@ -9,7 +8,6 @@ import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.ActionButton
-import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.module.Module
@@ -29,6 +27,7 @@ import com.intellij.psi.JavaCodeFragment
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.refactoring.ui.ClassNameReferenceEditor
+import com.intellij.refactoring.ui.PackageNameReferenceEditorCombo
 import com.intellij.ui.*
 import com.intellij.ui.components.*
 import com.intellij.ui.components.fields.ExpandableTextField
@@ -36,7 +35,6 @@ import com.intellij.ui.layout.*
 import com.intellij.util.Function
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.ui.JBFont
-import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.StatusText
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.annotations.ApiStatus
@@ -473,6 +471,46 @@ abstract class ConceptCell : ConceptBaseBuilder {
                 { component, value -> component.selectedModule = value },
                 modelBinding
             )
+    }
+
+    fun packagesComboBox(
+        project: Project,
+        recentsKey: String,
+        property: GraphProperty<String>
+    ): ConceptCellBuilder<PackageNameReferenceEditorCombo> {
+        return packagesComboBox(project, recentsKey, property::get, property::set)
+            .withGraphProperty(property)
+            .applyToComponent { bind(property) }
+    }
+
+    fun packagesComboBox(
+        project: Project,
+        recentsKey: String,
+        getter: () -> String,
+        setter: (String) -> Unit
+    ): ConceptCellBuilder<PackageNameReferenceEditorCombo> {
+        return packagesComboBox(project, recentsKey, ConceptPropertyBinding(getter, setter))
+    }
+
+    fun packagesComboBox(
+        project: Project,
+        recentsKey: String,
+        modelBinding: ConceptPropertyBinding<String>
+    ): ConceptCellBuilder<PackageNameReferenceEditorCombo> {
+        return component(
+            PackageNameReferenceEditorCombo(
+                modelBinding.get(),
+                project,
+                recentsKey,
+                "Choose Destination Package"
+            )
+        ).applyToComponent {
+
+        }.withBinding(
+            { component -> component.text },
+            { component, value -> component.text = value },
+            modelBinding
+        )
     }
 
     fun classesComboBox(

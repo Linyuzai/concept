@@ -11,12 +11,12 @@ data class DomainModel(
     var initUserClassName: String,
     var initDomainModule: Module?,
     var initDomainPackage: String,
-    var initDomainName: String,
+    var initDomainClassName: String,
     val propertyGraph: PropertyGraph = PropertyGraph(),
     val userClassNameProperty: GraphProperty<String> = GraphPropertyImpl(propertyGraph) { initUserClassName },
     val domainModuleProperty: GraphProperty<Module?> = GraphPropertyImpl(propertyGraph) { initDomainModule },
     val domainPackageProperty: GraphProperty<String> = GraphPropertyImpl(propertyGraph) { initDomainPackage },
-    val domainNameProperty: GraphProperty<String> = GraphPropertyImpl(propertyGraph) { initDomainName },
+    val domainClassNameProperty: GraphProperty<String> = GraphPropertyImpl(propertyGraph) { initDomainClassName },
     private val domainProps: MutableList<DomainProp> = CopyOnWriteArrayList(),
     private val onDomainPropAddListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList(),
     private val onDomainPropRemoveListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList()
@@ -28,8 +28,8 @@ data class DomainModel(
             userClassName: String,
             domainModule: Module?,
             domainPackage: String,
-            domainName: String
-        ): DomainModel = DomainModel(userClassName, domainModule, domainPackage, domainName)
+            domainClassName: String
+        ): DomainModel = DomainModel(userClassName, domainModule, domainPackage, domainClassName)
     }
 
     fun addDomainProp(): DomainProp {

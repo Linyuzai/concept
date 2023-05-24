@@ -45,19 +45,23 @@ object DomainComponents {
             row("User Domain Class:") {
                 classesComboBox(
                     project,
-                    "GenerateDomainAndModule@User",
+                    "UserDomainClass",
                     model.userClassNameProperty
                 ) {
 
                 }
             }
 
-            row("Domains Module:") {
+            row("Domain Module (.main):") {
                 modulesComboBox(project, model.domainModuleProperty)
             }
 
+            row("Domain Package:") {
+                packagesComboBox(project,"DomainPackages", model.domainPackageProperty)
+            }
+
             row("Domain Class Name:") {
-                textField(model.domainNameProperty)
+                textField(model.domainClassNameProperty)
             }
 
             row("Domain Class Props:") {
@@ -139,7 +143,7 @@ object DomainComponents {
         return panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Name:") {
-                textField(model.domainNameProperty)
+                textField(model.domainClassNameProperty)
             }
 
             row("User Domain Class:") {
