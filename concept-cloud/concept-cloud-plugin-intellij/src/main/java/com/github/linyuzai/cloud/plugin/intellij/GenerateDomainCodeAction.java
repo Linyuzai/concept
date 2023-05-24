@@ -9,6 +9,7 @@ import com.intellij.openapi.module.StdModuleTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -94,12 +95,13 @@ public class GenerateDomainCodeAction extends AnAction {
             }
         }
 
-        final DomainModel model = DomainModel.create(userClassName, selectModule, domainPackage, domainClassName);
+        final DomainModel model = new DomainModel(userClassName, selectModule, domainPackage, domainClassName);
 
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
         DomainComponents.showGenerateDomainCodeDialog(project, model, () -> {
+            LocalFileSystem.getInstance().refresh(true);
             Messages.showMessageDialog("Ok", "Ok", null);
             return null;
         });

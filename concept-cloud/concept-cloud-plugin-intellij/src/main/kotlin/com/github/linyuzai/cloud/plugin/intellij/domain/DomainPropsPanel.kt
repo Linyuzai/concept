@@ -10,7 +10,6 @@ import com.intellij.openapi.ui.popup.IconButton
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.InplaceButton
 import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.layout.LCFlags
 import com.intellij.ui.scale.JBUIScale
@@ -51,7 +50,7 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
         propPanel.addToCenter(panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Prop Class:") {
-                classesComboBox(project, "DomainProp", prop.className) {
+                classesComboBox(project, "DomainProp", prop.propClass) {
                     removeButton.setTransform(0, -JBUIScale.scale(2.coerceAtLeast(font.size / 15)))
                     childComponent.apply {
 
@@ -85,7 +84,7 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
             }.largeGapAfter()
 
             row("Prop Name:") {
-                component(JBTextField().apply {
+                textField(prop.propName) {
                     document.addDocumentListener(object : DocumentAdapter() {
 
                         override fun textChanged(e: javax.swing.event.DocumentEvent) {
@@ -96,7 +95,7 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
                     prop.onClassNameUpdateListener = {
                         text = it
                     }
-                })
+                }
             }.largeGapAfter()
 
             row("Prop Valid:") {

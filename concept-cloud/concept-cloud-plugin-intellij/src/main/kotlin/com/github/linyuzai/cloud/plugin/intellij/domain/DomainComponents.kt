@@ -21,13 +21,13 @@ object DomainComponents {
         val dialog = DialogBuilder(project)
         dialog.setTitle("Generate Domain Code")
         val panel = BorderLayoutPanel().apply {
-            val dimension = Dimension(920, 0)
-            size = dimension
+            val dimension = Dimension(950, 500)
+            //preferredSize = dimension
             minimumSize = dimension
         }
 
         panel.addToCenter(createGenerateDomainPanel(project, model))
-        panel.addToRight(createPreviewDomainPanel())
+        panel.addToRight(createPreviewDomainPanel(model))
         dialog.setCenterPanel(panel)
         if (dialog.showAndGet()) {
             callback.invoke()
@@ -46,10 +46,8 @@ object DomainComponents {
                 classesComboBox(
                     project,
                     "UserDomainClass",
-                    model.userClassNameProperty
-                ) {
-
-                }
+                    model.userClassProperty
+                ) {}
             }
 
             row("Domain Module (.main):") {
@@ -57,7 +55,7 @@ object DomainComponents {
             }
 
             row("Domain Package:") {
-                packagesComboBox(project,"DomainPackages", model.domainPackageProperty)
+                packagesComboBox(project, "DomainPackages", model.domainPackageProperty)
             }
 
             row("Domain Class Name:") {
@@ -83,9 +81,11 @@ object DomainComponents {
                     }
                     model.addOnDomainPropAddListener { prop ->
                         addProp(prop)
+                        model.preview()
                     }
                     model.addOnDomainPropRemoveListener { prop ->
                         removeProp(prop)
+                        model.preview()
                     }
                 }, minimumSize = Dimension(0, 200)) {
                     model.addOnDomainPropAddListener {
@@ -122,7 +122,7 @@ object DomainComponents {
         }
     }
 
-    fun createPreviewDomainPanel(): DialogPanel {
+    fun createPreviewDomainPanel(model: DomainModel): DialogPanel {
         return panel(LCFlags.fillX, LCFlags.fillY) {
             row("Preview:") {
 
@@ -132,6 +132,9 @@ object DomainComponents {
                 //scrollableTextArea({""},{})
                 scrollPane(JBTextArea(1, 40).apply {
                     isEditable = false
+                    model.domainPreviewProperty.afterChange {
+                        text = it
+                    }
                 })
             }
         }

@@ -8,6 +8,7 @@ import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.ActionButton
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.module.Module
@@ -546,14 +547,14 @@ abstract class ConceptCell : ConceptBaseBuilder {
                 modelBinding.get(),
                 project,
                 true,
-                JavaCodeFragment.VisibilityChecker.PROJECT_SCOPE_VISIBLE,
+                JavaCodeFragment.VisibilityChecker.EVERYTHING_VISIBLE,
                 recentsKey
             ).apply(init)
         ).applyToComponent {
             text = modelBinding.get()
             addActionListener {
                 val chooser = TreeClassChooserFactory.getInstance(project).createWithInnerClassesScopeChooser(
-                    "Choose Class", GlobalSearchScope.projectScope(project),
+                    "Choose Class", GlobalSearchScope.allScope(project),
                     ClassFilter.ALL, null
                 )
                 val targetClassName: String? = text
@@ -615,19 +616,35 @@ abstract class ConceptCell : ConceptBaseBuilder {
         )*/
     }
 
-    fun textField(prop: KMutableProperty0<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> =
-        textField(prop.toBinding(), columns)
+    fun textField(
+        prop: KMutableProperty0<String>,
+        columns: Int? = null,
+        init: (JBTextField.() -> Unit)? = null
+    ): ConceptCellBuilder<JBTextField> = textField(prop.toBinding(), columns, init)
 
-    fun textField(getter: () -> String, setter: (String) -> Unit, columns: Int? = null) =
-        textField(ConceptPropertyBinding(getter, setter), columns)
+    fun textField(
+        getter: () -> String,
+        setter: (String) -> Unit,
+        columns: Int? = null,
+        init: (JBTextField.() -> Unit)? = null
+    ): ConceptCellBuilder<JBTextField> = textField(ConceptPropertyBinding(getter, setter), columns, init)
 
-    fun textField(binding: ConceptPropertyBinding<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> {
-        return component(JBTextField(binding.get(), columns ?: 0))
-            .withTextBinding(binding)
+    fun textField(
+        binding: ConceptPropertyBinding<String>,
+        columns: Int? = null,
+        init: (JBTextField.() -> Unit)? = null
+    ): ConceptCellBuilder<JBTextField> {
+        return component(JBTextField(binding.get(), columns ?: 0).apply {
+            init?.invoke(this)
+        }).withTextBinding(binding)
     }
 
-    fun textField(property: GraphProperty<String>, columns: Int? = null): ConceptCellBuilder<JBTextField> {
-        return textField(property::get, property::set, columns)
+    fun textField(
+        property: GraphProperty<String>,
+        columns: Int? = null,
+        init: (JBTextField.() -> Unit)? = null
+    ): ConceptCellBuilder<JBTextField> {
+        return textField(property::get, property::set, columns, init)
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
     }
@@ -1035,8 +1052,22 @@ fun <T> ComboBox<T>.bind(property: GraphProperty<T>) {
     }
 }
 
-fun <T> ReferenceEditorComboWithBrowseButton.bind(property: GraphProperty<T>) {
-    (childComponent as ComboBox<T>).bind(property)
+fun ReferenceEditorComboWithBrowseButton.bind(property: GraphProperty<String>) {
+    /*(childComponent as ComboBox<T>).bind(property)*/
+    val mutex = AtomicBoolean()
+    property.afterChange {
+        mutex.lockOrSkip {
+            text = it
+        }
+    }
+    childComponent.addDocumentListener(object : DocumentListener {
+
+        override fun documentChanged(event: com.intellij.openapi.editor.event.DocumentEvent) {
+            mutex.lockOrSkip {
+                property.set(text)
+            }
+        }
+    })
 }
 
 fun ClassNameReferenceEditor.bind(property: GraphProperty<String>) {
