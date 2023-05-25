@@ -24,6 +24,18 @@ data class DomainModel(
     private val onDomainPropAddListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList()
     private val onDomainPropRemoveListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList()
 
+    companion object {
+
+        @JvmStatic
+        val RECENTS_KEY_USER_DOMAIN_CLASS = "ConceptCloud@UserDomainClass"
+
+        @JvmStatic
+        val RECENTS_KEY_DOMAIN_PACKAGE = "ConceptCloud@DomainPackage"
+
+        @JvmStatic
+        val RECENTS_KEY_DOMAIN_PROP_CLASS = "ConceptCloud@DomainPropClass"
+    }
+
     fun addDomainProp(): DomainProp {
         val prop = DomainProp(this, domainProps.size)
         domainProps.add(prop)
@@ -82,7 +94,7 @@ data class DomainModel(
                     }
                 }
                 prop.propNotEmpty.get().apply {
-                    if(this) {
+                    if (this) {
                         append("  @NotEmpty\n")
                         imports.add("javax.validation.constraints.NotEmpty")
                     }

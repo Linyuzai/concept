@@ -7,17 +7,16 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.module.StdModuleTypes;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.PsiShortNamesCache;
+import com.intellij.ui.RecentsManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
 
 public class GenerateDomainCodeAction extends AnAction {
 
@@ -31,6 +30,13 @@ public class GenerateDomainCodeAction extends AnAction {
         Project project = e.getProject();
         if (project == null) {
             Messages.showMessageDialog("No project selected", "Error", null);
+            return;
+        }
+
+        VirtualFile virtualFile = e.getData(LangDataKeys.VIRTUAL_FILE);
+
+        if (virtualFile == null) {
+            Messages.showMessageDialog("No directory selected", "Error", null);
             return;
         }
 
@@ -77,38 +83,66 @@ public class GenerateDomainCodeAction extends AnAction {
             }
         }
 
-        String userClassName = "";
+        String userClassName = suggestUserClassName(project);
 
-        if (userDomainModule != null) {
-            String suggestUserClassName = suggestUserClassName(userDomainModule);
-            if (suggestUserClassName != null) {
-                userClassName = suggestUserClassName;
-            }
-        }
-
-        if (domainModule != null) {
-            if (userClassName.isEmpty()) {
-                String suggestUserClassName = suggestUserClassName(domainModule);
-                if (suggestUserClassName != null) {
-                    userClassName = suggestUserClassName;
-                }
-            }
-        }
-
-        final DomainModel model = new DomainModel(userClassName, selectModule, domainPackage, domainClassName);
+        final DomainModel model = new DomainModel(userClassName == null ? "" : userClassName,
+                selectModule, domainPackage, domainClassName);
 
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
         DomainComponents.showGenerateDomainCodeDialog(project, model, () -> {
+            RecentsManager recentsManager = RecentsManager.getInstance(project);
+            recentsManager.registerRecentEntry(
+                    DomainModel.getRECENTS_KEY_USER_DOMAIN_CLASS(),
+                    model.getUserClassProperty().get());
+            recentsManager.registerRecentEntry(
+                    DomainModel.getRECENTS_KEY_DOMAIN_PACKAGE(),
+                    model.getDomainPackageProperty().get());
+
+            String path = virtualFile.getCanonicalPath();
+
             LocalFileSystem.getInstance().refresh(true);
             Messages.showMessageDialog("Ok", "Ok", null);
             return null;
         });
     }
 
-    private String suggestUserClassName(Module module) {
-        Collection<VirtualFile> files = findFile(module, "User.java");
+    private PsiClass getUserDomainClass(PsiClass[] classes) {
+        for (PsiClass psiClass : classes) {
+            PsiClass[] interfaces = psiClass.getInterfaces();
+            if (interfaces.length == 0) {
+                continue;
+            }
+            for (PsiClass anInterface : interfaces) {
+                if ("com.github.linyuzai.domain.core.DomainEntity"
+                        .equals(anInterface.getQualifiedName())) {
+                    return psiClass;
+                }
+            }
+            PsiClass aClass = getUserDomainClass(interfaces);
+            if (aClass != null) {
+                return aClass;
+            }
+        }
+        return null;
+    }
+
+    private String suggestUserClassName(Project project) {
+        final PsiShortNamesCache cache = PsiShortNamesCache.getInstance(project);
+        PsiClass[] allClasses = cache.getClassesByName("User", GlobalSearchScope.allScope(project));
+        PsiClass userDomainClass = getUserDomainClass(allClasses);
+        if (userDomainClass == null) {
+            PsiClass[] classes = cache.getClassesByName("User", GlobalSearchScope.projectScope(project));
+            if (classes.length == 1) {
+                return classes[0].getQualifiedName();
+            } else {
+                return null;
+            }
+        } else {
+            return userDomainClass.getQualifiedName();
+        }
+        /*Collection<VirtualFile> files = findFile(module, "User.java");
         for (VirtualFile file : files) {
             PsiFile psiFile = PsiManager.getInstance(module.getProject()).findFile(file);
             if (psiFile != null) {
@@ -121,21 +155,21 @@ public class GenerateDomainCodeAction extends AnAction {
                 }
             }
         }
-        return null;
+        return null;*/
     }
 
-    private Collection<VirtualFile> findFile(Module module, String name) {
+    /*private Collection<VirtualFile> findFile(Module module, String name) {
         return findFile(module, virtualFile -> name.equals(virtualFile.getName()));
-    }
+    }*/
 
-    private Collection<VirtualFile> findFile(Module module, Predicate<VirtualFile> predicate) {
+    /*private Collection<VirtualFile> findFile(Module module, Predicate<VirtualFile> predicate) {
         VirtualFile virtualFile = ProjectUtil.guessModuleDir(module);
         List<VirtualFile> files = new ArrayList<>();
         findFile0(virtualFile, predicate, files);
         return files;
-    }
+    }*/
 
-    private void findFile0(VirtualFile virtualFile, Predicate<VirtualFile> predicate, Collection<VirtualFile> files) {
+    /*private void findFile0(VirtualFile virtualFile, Predicate<VirtualFile> predicate, Collection<VirtualFile> files) {
         if (virtualFile == null) {
             return;
         }
@@ -149,7 +183,7 @@ public class GenerateDomainCodeAction extends AnAction {
                 files.add(virtualFile);
             }
         }
-    }
+    }*/
 
     /*private void a() {
 

@@ -17,6 +17,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Cursor
+import java.awt.event.ItemEvent
 
 class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
 
@@ -50,9 +51,16 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
         propPanel.addToCenter(panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Prop Class:") {
-                classesComboBox(project, "DomainProp", prop.propClass) {
+                classesComboBox(project, DomainModel.RECENTS_KEY_DOMAIN_PROP_CLASS, prop.propClass) {
                     removeButton.setTransform(0, -JBUIScale.scale(2.coerceAtLeast(font.size / 15)))
+
                     childComponent.apply {
+
+                        addItemListener {
+                            if (it.stateChange == ItemEvent.SELECTED) {
+                                //println(it.item)
+                            }
+                        }
 
                         addDocumentListener(object : DocumentListener {
 

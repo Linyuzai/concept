@@ -37,15 +37,12 @@ object DomainComponents {
     @JvmStatic
     fun createGenerateDomainPanel(project: Project, model: DomainModel): DialogPanel {
 
-        /*val aClass = JavaPsiFacade.getInstance(project)
-                .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
-
         return panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("User Domain Class:") {
                 classesComboBox(
                     project,
-                    "UserDomainClass",
+                    DomainModel.RECENTS_KEY_USER_DOMAIN_CLASS,
                     model.userClassProperty
                 ) {}
             }
@@ -55,7 +52,11 @@ object DomainComponents {
             }
 
             row("Domain Package:") {
-                packagesComboBox(project, "DomainPackages", model.domainPackageProperty)
+                packagesComboBox(
+                    project,
+                    DomainModel.RECENTS_KEY_DOMAIN_PACKAGE,
+                    model.domainPackageProperty
+                )
             }
 
             row("Domain Class Name:") {
