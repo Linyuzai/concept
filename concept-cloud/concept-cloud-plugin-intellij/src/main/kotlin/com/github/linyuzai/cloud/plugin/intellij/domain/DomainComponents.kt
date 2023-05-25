@@ -124,7 +124,7 @@ object DomainComponents {
 
     fun createPreviewDomainPanel(model: DomainModel): DialogPanel {
         return panel(LCFlags.fillX, LCFlags.fillY) {
-            row("Preview:") {
+            row("Preview (pseudo code):") {
 
             }
 

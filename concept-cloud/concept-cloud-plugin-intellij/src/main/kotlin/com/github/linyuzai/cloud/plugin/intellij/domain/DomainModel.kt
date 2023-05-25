@@ -54,24 +54,43 @@ data class DomainModel(
     fun preview() {
         val imports = mutableSetOf<String>()
         imports.add(userClassProperty.get())
-        val fields = StringBuilder()
+        val fields = mutableListOf<String>()
         for (prop in domainProps) {
             val className = prop.propClass.get()
 
             imports.add(className)
 
             val lastIndexOf = className.lastIndexOf(".")
-            fields.append("  private ")
-                .append(
-                    if (lastIndexOf > 0 && className.length > 1) {
-                        className.substring(lastIndexOf + 1)
-                    } else {
-                        className
+            val classSampleName = if (lastIndexOf > 0 && className.length > 1) {
+                className.substring(lastIndexOf + 1)
+            } else {
+                className
+            }
+
+            val field = buildString {
+                prop.propComment.get().apply {
+                    if (isNotBlank()) {
+                        append("  /*\n")
+                        append("   * $this\n")
+                        append("   */\n")
                     }
-                )
-                .append(" ")
-                .append(prop.propName.get())
-                .append(";\n\n")
+                }
+                prop.propNotNull.get().apply {
+                    if (this) {
+                        append("  @NotNull\n")
+                        imports.add("javax.validation.constraints.NotNull")
+                    }
+                }
+                prop.propNotEmpty.get().apply {
+                    if(this) {
+                        append("  @NotEmpty\n")
+                        imports.add("javax.validation.constraints.NotEmpty")
+                    }
+                }
+                append("  private $classSampleName ${prop.propName.get()};\n")
+            }
+
+            fields.add(field)
         }
         val text = """
 package ${domainPackageProperty.get()};
@@ -79,7 +98,7 @@ package ${domainPackageProperty.get()};
 ${imports.filter { !it.startsWith("java.lang.") }.joinToString(";\nimport ", "import ", ";\n")}
 public class ${domainClassNameProperty.get()} {
                 
-$fields
+${fields.joinToString(separator = "\n")}
 }"""
         domainPreviewProperty.set(text)
     }
