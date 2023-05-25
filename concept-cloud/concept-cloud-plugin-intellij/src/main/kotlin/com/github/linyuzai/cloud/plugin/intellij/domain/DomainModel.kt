@@ -14,11 +14,11 @@ data class DomainModel(
     val initDomainClassName: String
 ) {
     val propertyGraph: PropertyGraph = PropertyGraph()
-    val userClassProperty: GraphProperty<String> = property { initUserClass }
-    val domainModuleProperty: GraphProperty<Module?> = property { initDomainModule }
-    val domainPackageProperty: GraphProperty<String> = property { initDomainPackage }
-    val domainClassNameProperty: GraphProperty<String> = property { initDomainClassName }
-    val domainPreviewProperty: GraphProperty<String> = property(false) { "" }
+    val userClass: GraphProperty<String> = property { initUserClass }
+    val domainModule: GraphProperty<Module?> = property { initDomainModule }
+    val domainPackage: GraphProperty<String> = property { initDomainPackage }
+    val domainClassName: GraphProperty<String> = property { initDomainClassName }
+    val domainPreview: GraphProperty<String> = property(false) { "" }
 
     private val domainProps: MutableList<DomainProp> = CopyOnWriteArrayList()
     private val onDomainPropAddListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList()
@@ -65,7 +65,7 @@ data class DomainModel(
 
     fun preview() {
         val imports = mutableSetOf<String>()
-        imports.add(userClassProperty.get())
+        //imports.add(userClass.get())
         val fields = mutableListOf<String>()
         for (prop in domainProps) {
             val className = prop.propClass.get()
@@ -82,7 +82,7 @@ data class DomainModel(
             val field = buildString {
                 prop.propComment.get().apply {
                     if (isNotBlank()) {
-                        append("  /*\n")
+                        append("  /**\n")
                         append("   * $this\n")
                         append("   */\n")
                     }
@@ -104,15 +104,21 @@ data class DomainModel(
 
             fields.add(field)
         }
-        val text = """
-package ${domainPackageProperty.get()};
 
-${imports.filter { !it.startsWith("java.lang.") }.joinToString(";\nimport ", "import ", ";\n")}
-public class ${domainClassNameProperty.get()} {
-                
-${fields.joinToString(separator = "\n")}
-}"""
-        domainPreviewProperty.set(text)
+        val content = buildString {
+            append("package ${domainPackage.get()};\n\n")
+            if (imports.filterNot { it.startsWith("java.lang.") }.sorted().onEach {
+                    append("import $it;\n")
+                }.isNotEmpty()) {
+                append("\n")
+            }
+            append("public class ${domainClassName.get()} {\n\n")
+            fields.forEach {
+                append("$it\n")
+            }
+            append("}\n")
+        }
+        domainPreview.set(content)
     }
 }
 

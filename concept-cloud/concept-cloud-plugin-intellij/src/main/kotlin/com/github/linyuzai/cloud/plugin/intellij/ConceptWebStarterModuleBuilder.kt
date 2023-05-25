@@ -66,7 +66,7 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
 
     override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
     override fun getParentGroup(): String = JavaModuleType.BUILD_TOOLS_GROUP
-    override fun getWeight(): Int = JavaModuleBuilder.BUILD_SYSTEM_WEIGHT + 10
+    override fun getWeight(): Int = 0/*JavaModuleBuilder.BUILD_SYSTEM_WEIGHT + 10*/
     open fun getHelpId(): String? = null
 
     // Required settings

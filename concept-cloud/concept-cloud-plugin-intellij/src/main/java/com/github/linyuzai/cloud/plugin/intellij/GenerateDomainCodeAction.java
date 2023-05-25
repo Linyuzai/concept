@@ -2,13 +2,17 @@ package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainModel;
+import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.module.StdModuleTypes;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -16,9 +20,12 @@ import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.ui.RecentsManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Collection;
 
 public class GenerateDomainCodeAction extends AnAction {
+
+    private static final String TITLE = "Generate Domain Code";
 
     @Override
     public void update(@NotNull AnActionEvent e) {
@@ -29,14 +36,20 @@ public class GenerateDomainCodeAction extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) {
-            Messages.showMessageDialog("No project selected", "Error", null);
+            Messages.showErrorDialog("No project selected", TITLE);
             return;
         }
 
         VirtualFile virtualFile = e.getData(LangDataKeys.VIRTUAL_FILE);
 
         if (virtualFile == null) {
-            Messages.showMessageDialog("No directory selected", "Error", null);
+            Messages.showErrorDialog("No directory selected", TITLE);
+            return;
+        }
+
+        String path = virtualFile.getCanonicalPath();
+        if (path == null) {
+            Messages.showErrorDialog("Can not get directory path", TITLE);
             return;
         }
 
@@ -61,12 +74,10 @@ public class GenerateDomainCodeAction extends AnAction {
         String projectName = project.getName();
 
         String domainModuleName = projectName + "." + projectName + "-domain";
-        String userDomainModuleName = domainModuleName + ".domain-user";
 
         Collection<Module> modules = ModuleUtil.getModulesOfType(project, StdModuleTypes.JAVA);
 
         Module domainModule = null;
-        Module userDomainModule = null;
 
         for (Module module : modules) {
             if (selectModule != null &&
@@ -75,12 +86,14 @@ public class GenerateDomainCodeAction extends AnAction {
                 selectModule = module;
             } else if (domainModuleName.equals(module.getName())) {
                 domainModule = module;
-            } else if (userDomainModuleName.equals(module.getName())) {
-                userDomainModule = module;
             }
-            if (domainModule != null && userDomainModule != null) {
+            if (selectModule != null && domainModule != null) {
                 break;
             }
+        }
+
+        if (selectModule == null) {
+            selectModule = domainModule;
         }
 
         String userClassName = suggestUserClassName(project);
@@ -91,21 +104,34 @@ public class GenerateDomainCodeAction extends AnAction {
         /*val aClass = JavaPsiFacade.getInstance(project)
                 .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
 
-        DomainComponents.showGenerateDomainCodeDialog(project, model, () -> {
+        if (DomainComponents.showGenerateDomainCodeDialog(project, model)) {
             RecentsManager recentsManager = RecentsManager.getInstance(project);
             recentsManager.registerRecentEntry(
                     DomainModel.getRECENTS_KEY_USER_DOMAIN_CLASS(),
-                    model.getUserClassProperty().get());
+                    model.getUserClass().get());
             recentsManager.registerRecentEntry(
                     DomainModel.getRECENTS_KEY_DOMAIN_PACKAGE(),
-                    model.getDomainPackageProperty().get());
+                    model.getDomainPackage().get());
 
-            String path = virtualFile.getCanonicalPath();
+            ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+                try {
+                    File dir = new File(path);
+                    File domainFile = new File(dir, model.getDomainClassName().get() + ".java");
+                    boolean newFile = domainFile.createNewFile();
+                    FileUtil.writeToFile(domainFile, model.getDomainPreview().get());
 
-            LocalFileSystem.getInstance().refresh(true);
-            Messages.showMessageDialog("Ok", "Ok", null);
-            return null;
-        });
+                    VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir);
+                    VfsUtil.markDirtyAndRefresh(false, true, false, vf);
+
+                } catch (Throwable error) {
+                    Messages.showErrorDialog(error.getMessage(), "Generate Domain Code");
+                }
+            }, "Generate domain code...", true, project);
+
+            LocalFileSystem.getInstance().refresh(false);
+
+            new ReformatCodeProcessor(project, selectModule, false).run();
+        }
     }
 
     private PsiClass getUserDomainClass(PsiClass[] classes) {

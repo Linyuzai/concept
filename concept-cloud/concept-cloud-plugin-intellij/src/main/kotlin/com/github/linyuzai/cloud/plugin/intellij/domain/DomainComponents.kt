@@ -17,7 +17,7 @@ import java.awt.event.AdjustmentListener
 object DomainComponents {
 
     @JvmStatic
-    fun showGenerateDomainCodeDialog(project: Project, model: DomainModel, callback: () -> Unit) {
+    fun showGenerateDomainCodeDialog(project: Project, model: DomainModel): Boolean {
         val dialog = DialogBuilder(project)
         dialog.setTitle("Generate Domain Code")
         val panel = BorderLayoutPanel().apply {
@@ -29,9 +29,8 @@ object DomainComponents {
         panel.addToCenter(createGenerateDomainPanel(project, model))
         panel.addToRight(createPreviewDomainPanel(model))
         dialog.setCenterPanel(panel)
-        if (dialog.showAndGet()) {
-            callback.invoke()
-        }
+        model.preview()
+        return dialog.showAndGet()
     }
 
     @JvmStatic
@@ -43,24 +42,24 @@ object DomainComponents {
                 classesComboBox(
                     project,
                     DomainModel.RECENTS_KEY_USER_DOMAIN_CLASS,
-                    model.userClassProperty
+                    model.userClass
                 ) {}
             }
 
             row("Domain Module (.main):") {
-                modulesComboBox(project, model.domainModuleProperty)
+                modulesComboBox(project, model.domainModule)
             }
 
             row("Domain Package:") {
                 packagesComboBox(
                     project,
                     DomainModel.RECENTS_KEY_DOMAIN_PACKAGE,
-                    model.domainPackageProperty
+                    model.domainPackage
                 )
             }
 
             row("Domain Class Name:") {
-                textField(model.domainClassNameProperty)
+                textField(model.domainClassName)
             }
 
             row("Domain Class Props:") {
@@ -133,7 +132,7 @@ object DomainComponents {
                 //scrollableTextArea({""},{})
                 scrollPane(JBTextArea(1, 40).apply {
                     isEditable = false
-                    model.domainPreviewProperty.afterChange {
+                    model.domainPreview.afterChange {
                         text = it
                     }
                 })
@@ -147,7 +146,7 @@ object DomainComponents {
         return panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Name:") {
-                textField(model.domainClassNameProperty)
+                textField(model.domainClassName)
             }
 
             row("User Domain Class:") {
@@ -160,7 +159,7 @@ object DomainComponents {
             }
 
             row("Domains Module:") {
-                modulesComboBox(project, model.domainModuleProperty)
+                modulesComboBox(project, model.domainModule)
             }
         }
     }
