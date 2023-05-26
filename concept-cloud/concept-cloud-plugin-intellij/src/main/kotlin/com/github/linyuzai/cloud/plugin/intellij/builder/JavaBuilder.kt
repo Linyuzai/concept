@@ -5,7 +5,7 @@ import java.io.File
 
 data class JavaBuilder(val _name: String) : ContentGenerator() {
 
-    var _package: String = ""
+    private var _package = ""
 
     val _imports = mutableSetOf<String>()
 
@@ -15,6 +15,13 @@ data class JavaBuilder(val _name: String) : ContentGenerator() {
 
     fun _interface(_name: String, _init: InterfaceBuilder.() -> Unit): InterfaceBuilder {
         val builder = InterfaceBuilder(this, _name)
+        builder._init()
+        add(builder)
+        return builder
+    }
+
+    fun _class(_name: String, _init: ClassBuilder.() -> Unit): ClassBuilder {
+        val builder = ClassBuilder(this, _name)
         builder._init()
         add(builder)
         return builder
@@ -41,15 +48,19 @@ data class JavaBuilder(val _name: String) : ContentGenerator() {
 
 data class InterfaceBuilder(val _java: JavaBuilder, val _name: String) : ContentGenerator() {
 
+    private var _access = ""
+
     private val _interfaces = mutableListOf<Pair<String, Array<out String>>>()
+
+    private var _comment = ""
+
+    fun _public() {
+        this._access = "public"
+    }
 
     fun _extends(_type: String, vararg _generic: String) {
         _interfaces.add(_type to _generic)
         _java._imports.add(_type)
-    }
-
-    fun _extendsDomainEntity() {
-        _extends("com.github.linyuzai.domain.core.DomainEntity")
     }
 
     fun _method(_name: String, _init: MethodBuilder.() -> Unit): MethodBuilder {
@@ -59,19 +70,20 @@ data class InterfaceBuilder(val _java: JavaBuilder, val _name: String) : Content
         return builder
     }
 
+    fun _comment(_comment: String) {
+        this._comment = _comment
+    }
+
     override fun content(): String {
         return buildString {
-            append("public interface $_name ")
-            if (_interfaces.isNotEmpty()) {
-                append("extends ")
-                _interfaces.forEach {
-                    append(it.first.toSampleName())
-                    if (it.second.isNotEmpty()) {
-                        append(it.second.joinToString(",", "<", ">")
-                        { s -> s.toSampleName() })
-                    }
-                }
-            }
+            addComment(_comment)
+
+            addAccess(_access)
+
+            append("interface $_name ")
+
+            addInterfaces("extends", _interfaces)
+
             append("{\n\n")
             append(children())
             append("}")
@@ -79,44 +91,144 @@ data class InterfaceBuilder(val _java: JavaBuilder, val _name: String) : Content
     }
 }
 
-data class ClassBuilder(val _name: String) {
+data class ClassBuilder(val _java: JavaBuilder, val _name: String) : ContentGenerator() {
 
-    fun _implement(_type: String, vararg _generic: String) {
+    private var _access = ""
 
+    private var _static = false
+
+    private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
+
+    private var _extends = Pair<String, Array<out String>>("", emptyArray())
+
+    private val _interfaces = mutableListOf<Pair<String, Array<out String>>>()
+
+    fun _public() {
+        this._access = "public"
     }
 
-    fun _implementDomainEntity() {
-        _implement("com.github.linyuzai.domain.core.DomainEntity")
+    fun _static() {
+        this._static = true
     }
 
-    fun annotations(vararg type: String) {
-
+    fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
+        this._annotations.add(_type to _params)
+        this._java._imports.add(_type)
+        _params.forEach {
+            this._java._imports.add(it.second.first)
+        }
     }
 
-    fun annotation() {
-
+    fun _extends(_type: String, vararg _generic: String) {
+        this._extends = _type to _generic
+        this._java._imports.add(_type)
     }
 
-    fun field(modifier: String, name: String, type: String) {
-
+    fun _implements(_type: String, vararg _generic: String) {
+        _interfaces.add(_type to _generic)
+        _java._imports.add(_type)
     }
 
-    fun fieldProtected(name: String, type: String) {
-        field("protected", name, type)
+    fun _field(_name: String, _init: FieldBuilder.() -> Unit): FieldBuilder {
+        val builder = FieldBuilder(_java, _name)
+        builder._init()
+        add(builder)
+        return builder
+    }
+
+    fun _method(_name: String, _init: MethodBuilder.() -> Unit): MethodBuilder {
+        val builder = MethodBuilder(_java, _name)
+        builder._init()
+        add(builder)
+        return builder
+    }
+
+    fun _class(_name: String, _init: ClassBuilder.() -> Unit): ClassBuilder {
+        val builder = ClassBuilder(_java, _name)
+        builder._init()
+        add(builder)
+        return builder
+    }
+
+    override fun content(): String {
+        return buildString {
+
+            addAnnotations(_annotations)
+
+            addAccess(_access)
+
+            if (_static) {
+                append("static ")
+            }
+
+            append("class $_name ")
+
+            if (_extends.first.isNotEmpty()) {
+                append("extends ")
+                append(_extends.first.toSampleName())
+                if (_extends.second.isNotEmpty()) {
+                    append(_extends.second.joinToString(",", "<", ">")
+                    { s -> s.toSampleName() })
+                }
+                append(" ")
+            }
+
+            addInterfaces("implements", _interfaces)
+
+            append("{\n\n")
+            append(children())
+            append("}")
+        }
     }
 }
 
-data class MethodBuilder(val _java: JavaBuilder, val _name: String) : ContentGenerator() {
+data class MethodBuilder(private val _java: JavaBuilder, private val _name: String) : ContentGenerator() {
 
-    var _return: String = ""
+    private var _access = ""
 
-    var _comment: String = ""
+    private val _params = mutableListOf<Pair<String, String>>()
 
-    var _hasBody: Boolean = false
+    private var _return = ""
+
+    private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
+
+    private var _comment = ""
+
+    private var _hasBody = false
+
+    private var _body = ""
+
+    fun _public() {
+        this._access = "public"
+    }
+
+    fun _protected() {
+        this._access = "protected"
+    }
+
+    fun _param(_type: String, _name: String) {
+        _params(_type to _name)
+    }
+
+    fun _params(vararg _params: Pair<String, String>) {
+        this._params.addAll(_params)
+    }
 
     fun _return(_return: String) {
         this._return = _return
-        _java._imports.add(_return)
+        this._java._imports.add(_return)
+    }
+
+    fun _override() {
+        this._annotation("java.lang.Override")
+    }
+
+    fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
+        this._annotations.add(_type to _params)
+        this._java._imports.add(_type)
+        _params.forEach {
+            this._java._imports.add(it.second.first)
+        }
     }
 
     fun _comment(_comment: String) {
@@ -124,35 +236,71 @@ data class MethodBuilder(val _java: JavaBuilder, val _name: String) : ContentGen
     }
 
     fun _body(_body: String) {
-        _hasBody = true
-    }
-
-    fun annotation(type: String) {
-
-    }
-
-    fun annotation() {
-
+        this._hasBody = true
+        this._body = _body
     }
 
     override fun content(): String {
         return buildString {
-            if (_comment.isNotBlank()) {
-                append("/**\n")
-                append(" * $_comment\n")
-                append(" */\n")
-            }
-            _return.toSampleName().apply {
-                append("$this ${_name.toGetter("boolean" == this)}()")
-            }
+            addComment(_comment)
+
+            addAccess(_access)
+
+            val args = _params.joinToString(",") { "${it.first} ${it.second}" }
+
+            append("${_return.toSampleName()} $_name($args)")
 
             if (_hasBody) {
                 append("{\n")
-                append(children())
+                append(_body)
                 append("}")
             } else {
                 append(";\n")
             }
+        }
+    }
+}
+
+data class FieldBuilder(private val _java: JavaBuilder, private val _name: String) : ContentGenerator() {
+
+    private var _access = ""
+
+    private var _type = ""
+
+    private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
+
+    private var _comment = ""
+
+    fun _protected() {
+        this._access = "protected"
+    }
+
+    fun _type(_type: String) {
+        this._type = _type
+        this._java._imports.add(_type)
+    }
+
+    fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
+        this._annotations.add(_type to _params)
+        this._java._imports.add(_type)
+        _params.forEach {
+            this._java._imports.add(it.second.first)
+        }
+    }
+
+    fun _comment(_comment: String) {
+        this._comment = _comment
+    }
+
+    override fun content(): String {
+        return buildString {
+            addComment(_comment)
+
+            addAnnotations(_annotations)
+
+            addAccess(_access)
+
+            append("${_type.toSampleName()} $_name;\n")
         }
     }
 }
@@ -192,4 +340,47 @@ fun String.toGetter(ifIs: Boolean): String {
         "get$temp"
     }
 }
+
+fun StringBuilder.addComment(_comment: String) {
+    if (_comment.isNotBlank()) {
+        append("/**\n")
+        append(" * $_comment\n")
+        append(" */\n")
+    }
+}
+
+fun StringBuilder.addAnnotations(_annotations: List<Pair<String, Array<out Pair<String, Pair<String, String>>>>>) {
+    if (_annotations.isNotEmpty()) {
+        _annotations.forEach {
+            append("@${it.first.toSampleName()}")
+            if (it.second.isNotEmpty()) {
+                it.second.joinToString(",", "(", ")") { param ->
+                    "${param.first} = ${param.second.first.toSampleName()}.${param.second.second}"
+                }
+            }
+        }
+        append("\n")
+    }
+}
+
+fun StringBuilder.addAccess(_access: String) {
+    if (_access.isNotBlank()) {
+        append("$_access ")
+    }
+}
+
+fun StringBuilder.addInterfaces(implementsOrExtends: String, _interfaces: List<Pair<String, Array<out String>>>) {
+    if (_interfaces.isNotEmpty()) {
+        append("$implementsOrExtends ")
+        _interfaces.forEach {
+            append(it.first.toSampleName())
+            if (it.second.isNotEmpty()) {
+                append(it.second.joinToString(",", "<", ">")
+                { s -> s.toSampleName() })
+            }
+        }
+        append(" ")
+    }
+}
+
 

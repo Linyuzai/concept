@@ -12,13 +12,14 @@ data class DomainModel(
     val initUserClass: String,
     val initDomainModule: Module?,
     val initDomainPackage: String,
-    val initDomainClassName: String
+    val initDomainObjectClassName: String
 ) {
     val propertyGraph: PropertyGraph = PropertyGraph()
     val userClass: GraphProperty<String> = property { initUserClass }
     val domainModule: GraphProperty<Module?> = property { initDomainModule }
     val domainPackage: GraphProperty<String> = property { initDomainPackage }
-    val domainClassName: GraphProperty<String> = property { initDomainClassName }
+    val domainObjectClassName: GraphProperty<String> = property { initDomainObjectClassName }
+    val domainCollectionClassName: GraphProperty<String> = property { "${initDomainObjectClassName}s" }
     val domainClassComment: GraphProperty<String> = property { "" }
     val domainPreview: GraphProperty<String> = property(false) { "" }
 
@@ -124,7 +125,7 @@ data class DomainModel(
                     append(" */\n")
                 }
             }
-            append("public class ${domainClassName.get()} {\n\n")
+            append("public class ${domainObjectClassName.get()} {\n\n")
             fields.forEach {
                 append("$it\n")
             }

@@ -58,8 +58,12 @@ object DomainComponents {
                 )
             }
 
-            row("Domain Class Name:") {
-                textField(model.domainClassName)
+            row("Domain Object Class Name:") {
+                textField(model.domainObjectClassName)
+            }
+
+            row("Domain Collection Class Name:") {
+                textField(model.domainCollectionClassName)
             }
 
             row("Domain Class Comment:") {
@@ -150,7 +154,7 @@ object DomainComponents {
         return panel(LCFlags.fillX, LCFlags.fillY) {
 
             row("Name:") {
-                textField(model.domainClassName)
+                textField(model.domainObjectClassName)
             }
 
             row("User Domain Class:") {
