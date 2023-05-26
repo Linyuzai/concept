@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
+import com.github.linyuzai.cloud.plugin.intellij.builder.toSampleName
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.GraphPropertyImpl
@@ -18,9 +19,11 @@ data class DomainModel(
     val domainModule: GraphProperty<Module?> = property { initDomainModule }
     val domainPackage: GraphProperty<String> = property { initDomainPackage }
     val domainClassName: GraphProperty<String> = property { initDomainClassName }
+    val domainClassComment: GraphProperty<String> = property { "" }
     val domainPreview: GraphProperty<String> = property(false) { "" }
 
-    private val domainProps: MutableList<DomainProp> = CopyOnWriteArrayList()
+    val domainProps: MutableList<DomainProp> = CopyOnWriteArrayList()
+
     private val onDomainPropAddListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList()
     private val onDomainPropRemoveListeners: MutableCollection<Consumer<DomainProp>> = CopyOnWriteArrayList()
 
@@ -72,12 +75,14 @@ data class DomainModel(
 
             imports.add(className)
 
-            val lastIndexOf = className.lastIndexOf(".")
+            /*val lastIndexOf = className.lastIndexOf(".")
             val classSampleName = if (lastIndexOf > 0 && className.length > 1) {
                 className.substring(lastIndexOf + 1)
             } else {
                 className
-            }
+            }*/
+
+            val classSampleName = className.toSampleName()
 
             val field = buildString {
                 prop.propComment.get().apply {
@@ -111,6 +116,13 @@ data class DomainModel(
                     append("import $it;\n")
                 }.isNotEmpty()) {
                 append("\n")
+            }
+            domainClassComment.get().apply {
+                if (isNotBlank()) {
+                    append("/**\n")
+                    append(" * $this\n")
+                    append(" */\n")
+                }
             }
             append("public class ${domainClassName.get()} {\n\n")
             fields.forEach {

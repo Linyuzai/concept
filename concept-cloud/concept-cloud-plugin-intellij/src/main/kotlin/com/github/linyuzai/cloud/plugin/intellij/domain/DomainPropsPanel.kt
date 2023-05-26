@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
+import com.github.linyuzai.cloud.plugin.intellij.builder.toSampleName
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.intellij.icons.AllIcons.Actions
 import com.intellij.openapi.editor.event.DocumentEvent
@@ -68,7 +69,14 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
                                 if (!prop.smartFill) {
                                     return
                                 }
-                                val lastIndexOf = text.lastIndexOf(".")
+                                val name = text.toSampleName()
+                                if (name.isBlank()) {
+                                    prop.onClassNameUpdateListener?.invoke("")
+                                } else {
+                                    val n = name[0].lowercase() + name.substring(1)
+                                    prop.onClassNameUpdateListener?.invoke(n)
+                                }
+                                /*val lastIndexOf = text.lastIndexOf(".")
                                 if (lastIndexOf > 0) {
                                     val substring = text.substring(lastIndexOf).trim()
                                     if (substring.length == 1) {
@@ -78,7 +86,7 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
                                         val t = s[0].lowercase() + s.substring(1)
                                         prop.onClassNameUpdateListener?.invoke(t)
                                     }
-                                }
+                                }*/
                                 prop.smartFill = true
                             }
                         })

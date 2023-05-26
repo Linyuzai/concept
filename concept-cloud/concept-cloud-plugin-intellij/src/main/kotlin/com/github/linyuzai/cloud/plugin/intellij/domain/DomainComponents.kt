@@ -62,6 +62,10 @@ object DomainComponents {
                 textField(model.domainClassName)
             }
 
+            row("Domain Class Comment:") {
+                textField(model.domainClassComment)
+            }
+
             row("Domain Class Props:") {
                 val addButton = InplaceButton(
                     IconButton(
@@ -81,7 +85,7 @@ object DomainComponents {
                     }
                     model.addOnDomainPropAddListener { prop ->
                         addProp(prop)
-                        model.preview()
+                        //model.preview()
                     }
                     model.addOnDomainPropRemoveListener { prop ->
                         removeProp(prop)

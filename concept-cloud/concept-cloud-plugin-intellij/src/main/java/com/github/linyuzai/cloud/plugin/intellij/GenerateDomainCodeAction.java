@@ -1,6 +1,7 @@
 package com.github.linyuzai.cloud.plugin.intellij;
 
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
+import com.github.linyuzai.cloud.plugin.intellij.domain.DomainFileGenerator;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainModel;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.actionSystem.*;
@@ -116,9 +117,10 @@ public class GenerateDomainCodeAction extends AnAction {
             ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
                 try {
                     File dir = new File(path);
-                    File domainFile = new File(dir, model.getDomainClassName().get() + ".java");
+                    /*File domainFile = new File(dir, model.getDomainClassName().get() + ".java");
                     boolean newFile = domainFile.createNewFile();
-                    FileUtil.writeToFile(domainFile, model.getDomainPreview().get());
+                    FileUtil.writeToFile(domainFile, model.getDomainPreview().get());*/
+                    DomainFileGenerator.generate(model, dir);
 
                     VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir);
                     VfsUtil.markDirtyAndRefresh(false, true, false, vf);
