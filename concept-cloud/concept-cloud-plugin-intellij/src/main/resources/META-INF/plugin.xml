@@ -49,17 +49,15 @@
         <group id="g_concept_cloud" text="Concept Cloud" popup="true"
                class="com.github.linyuzai.cloud.plugin.intellij.ConceptCloudGroup">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <action class="com.github.linyuzai.cloud.plugin.intellij.GenerateDomainCodeAction"
+                    id="a_concept_cloud_domain_code" description="Generate domain code"
+                    icon="AllIcons.Nodes.Module" text="Generate Domain Code...">
+            </action>
+            <action class="com.github.linyuzai.cloud.plugin.intellij.GenerateModuleCodeAction"
+                    id="a_concept_cloud_module_code" description="Generate module code"
+                    icon="AllIcons.Nodes.Module" text="Generate Module Code...">
+            </action>
         </group>
-        <action class="com.github.linyuzai.cloud.plugin.intellij.GenerateDomainCodeAction"
-                id="a_concept_cloud_domain_code" description="Generate domain code"
-                text="Generate Domain Code...">
-            <add-to-group group-id="g_concept_cloud"/>
-        </action>
-        <action class="com.github.linyuzai.cloud.plugin.intellij.GenerateModuleCodeAction"
-                id="a_concept_cloud_module_code" description="Generate module code"
-                text="Generate Module Code...">
-            <add-to-group group-id="g_concept_cloud"/>
-        </action>
     </actions>
 
     <change-notes><![CDATA[

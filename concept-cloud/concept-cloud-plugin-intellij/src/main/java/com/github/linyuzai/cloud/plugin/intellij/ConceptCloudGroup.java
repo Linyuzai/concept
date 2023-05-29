@@ -8,9 +8,6 @@ public class ConceptCloudGroup extends DefaultActionGroup {
 
     public ConceptCloudGroup() {
         addSeparator();
-        addSeparator();
-        addSeparator();
-        addSeparator();
     }
 
     @Override

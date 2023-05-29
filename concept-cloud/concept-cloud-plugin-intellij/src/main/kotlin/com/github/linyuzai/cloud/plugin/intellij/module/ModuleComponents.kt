@@ -10,7 +10,7 @@ import com.intellij.ui.layout.LCFlags
 object ModuleComponents {
 
     @JvmStatic
-    fun createGenerateModuleCodeDialog(project: Project, model: ModuleModel,title:String): DialogBuilder {
+    fun createGenerateModuleCodeDialog(project: Project, model: ModuleModel, title: String): DialogBuilder {
         val dialog = DialogBuilder(project)
         dialog.setTitle(title)
         val panel = createGenerateModulePanel(project, model)
