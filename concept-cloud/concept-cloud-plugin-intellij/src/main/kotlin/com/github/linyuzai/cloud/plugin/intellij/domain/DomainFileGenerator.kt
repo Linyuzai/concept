@@ -134,8 +134,10 @@ object DomainFileGenerator {
                         _override()
                         _protected()
                         _return(domainObjectImplClassName)
-                        val args = model.domainProps.joinToString(",") { it.propName.get() }
-                        _body("return new $domainObjectImplClassName(id,$args);")
+                        val argList = model.domainProps.map { it.propName.get() }.toMutableList()
+                        argList.add(0, "id")
+                        val args = argList.joinToString(",")
+                        _body("return new $domainObjectImplClassName($args);")
                     }
                 }
             }

@@ -15,6 +15,6 @@ public class ConceptCloudGroup extends DefaultActionGroup {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(ConceptCloudSupport.isEnabled(e));
+        e.getPresentation().setEnabledAndVisible(ConceptCloudUtils.isSupport(e));
     }
 }

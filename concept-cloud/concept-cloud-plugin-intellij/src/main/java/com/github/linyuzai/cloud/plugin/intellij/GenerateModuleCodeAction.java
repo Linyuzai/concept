@@ -1,263 +1,106 @@
 package com.github.linyuzai.cloud.plugin.intellij;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.module.StdModuleTypes;
-import com.intellij.openapi.observable.properties.GraphProperty;
-import com.intellij.openapi.observable.properties.GraphPropertyImpl;
-import com.intellij.openapi.observable.properties.PropertyGraph;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.github.linyuzai.cloud.plugin.intellij.module.ModuleComponents;
+import com.github.linyuzai.cloud.plugin.intellij.module.ModuleFileGenerator;
+import com.github.linyuzai.cloud.plugin.intellij.module.ModuleModel;
+import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassOwner;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.PsiPackage;
+import com.intellij.psi.util.PsiUtil;
+import com.intellij.ui.RecentsManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
+import java.io.File;
 
-public class GenerateModuleCodeAction extends AnAction {
+public class GenerateModuleCodeAction extends GenerateCodeAction {
 
-    public static class Settings {
-
-        private String name = "";
-
-        private String userClassName = "";
-
-        private Module domainModule;
-
-        private Module moduleModule;
-
-        private final PropertyGraph propertyGraph = new PropertyGraph();
-
-        private final GraphProperty<String> nameProperty = new GraphPropertyImpl<>(propertyGraph, () -> name);
-
-        private final GraphProperty<String> userClassNameProperty = new GraphPropertyImpl<>(propertyGraph, () -> userClassName);
-
-        private final GraphProperty<Module> domainModuleProperty = new GraphPropertyImpl<>(propertyGraph, () -> domainModule);
-
-        private final GraphProperty<Module> moduleModuleProperty = new GraphPropertyImpl<>(propertyGraph, () -> moduleModule);
-
-        public GraphProperty<String> getNameProperty() {
-            return nameProperty;
-        }
-
-        public GraphProperty<String> getUserClassNameProperty() {
-            return userClassNameProperty;
-        }
-
-        public GraphProperty<Module> getDomainModuleProperty() {
-            return domainModuleProperty;
-        }
-
-        public GraphProperty<Module> getModuleModuleProperty() {
-            return moduleModuleProperty;
-        }
-
-        public String getName() {
-            return nameProperty.get();
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getUserClassName() {
-            return userClassNameProperty.get();
-        }
-
-        public void setUserClassName(String userClassName) {
-            this.userClassName = userClassName;
-        }
-
-        public Module getDomainModule() {
-            return domainModuleProperty.get();
-        }
-
-        public void setDomainModule(Module domainModule) {
-            this.domainModule = domainModule;
-        }
-
-        public Module getModuleModule() {
-            return moduleModuleProperty.get();
-        }
-
-        public void setModuleModule(Module moduleModule) {
-            this.moduleModule = moduleModule;
-        }
+    @Override
+    public String getDialogTitle() {
+        return "Generate Module Code";
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        e.getPresentation().setEnabledAndVisible(project != null);
+    public String getProgressTitle() {
+        return "Generate module code...";
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) {
-            Messages.showMessageDialog("No project selected", "Error", null);
-            return;
-        }
-        final Settings settings = new Settings();
+    public DialogBuilder createDialogBuilder(Context context) {
+        String className = ConceptCloudUtils.uppercaseFirst(context.selectPackage);
+        PsiClass domainObjectClass = ConceptCloudUtils.searchDomainObjectClass(className,
+                context.project, true);
+        PsiClass[] classes = getClassesInPackage(context, domainObjectClass);
 
-        String projectName = project.getName();
+        PsiClass domainCollectionClass = ConceptCloudUtils.getClassPredicateInterface(classes,
+                psiInterface -> "com.github.linyuzai.domain.core.DomainCollection"
+                        .equals(psiInterface.getQualifiedName()));
 
-        String moduleModuleName = projectName + "." + projectName + "-module";
-        String domainModuleName = projectName + "." + projectName + "-domain";
-        String userDomainModuleName = domainModuleName + ".domain-user";
+        PsiClass domainServiceClass = getClassByName(classes, className + "Service");
 
-        Collection<Module> modules = ModuleUtil.getModulesOfType(project, StdModuleTypes.JAVA);
+        PsiClass domainRepositoryClass = ConceptCloudUtils.getClassPredicateInterface(classes,
+                psiInterface -> "com.github.linyuzai.domain.core.DomainRepository"
+                        .equals(psiInterface.getQualifiedName()));
 
-        Module moduleModule = null;
-        Module domainModule = null;
-        Module userDomainModule = null;
+        String domainObjectClassName = domainObjectClass == null ? "" :
+                domainObjectClass.getQualifiedName();
 
-        for (Module module : modules) {
-            if (moduleModuleName.equals(module.getName())) {
-                moduleModule = module;
-            } else if (domainModuleName.equals(module.getName())) {
-                domainModule = module;
-            } else if (userDomainModuleName.equals(module.getName())) {
-                userDomainModule = module;
-            }
-            if (moduleModule != null && domainModule != null && userDomainModule != null) {
-                break;
-            }
-        }
+        String domainCollectionClassName = domainCollectionClass == null ? "" :
+                domainCollectionClass.getQualifiedName();
 
-        if (userDomainModule != null) {
-            String suggestUserClassName = suggestUserClassName(userDomainModule);
-            if (suggestUserClassName != null) {
-                settings.setUserClassName(suggestUserClassName);
-            }
-        }
+        String domainServiceClassName = domainServiceClass == null ? "" :
+                domainServiceClass.getQualifiedName();
 
-        if (domainModule != null) {
-            if (settings.getUserClassName().isEmpty()) {
-                String suggestUserClassName = suggestUserClassName(domainModule);
-                if (suggestUserClassName != null) {
-                    settings.setUserClassName(suggestUserClassName);
-                }
-            }
-            settings.setDomainModule(domainModule);
-        }
+        String domainRepositoryClassName = domainRepositoryClass == null ? "" :
+                domainRepositoryClass.getQualifiedName();
 
-        if (moduleModule != null) {
-            settings.setModuleModule(moduleModule);
-        }
+        final ModuleModel model = new ModuleModel(context.userClassName,
+                context.selectModule, context.fullPackage,
+                domainObjectClassName == null ? "" : domainObjectClassName,
+                domainCollectionClassName == null ? "" : domainCollectionClassName,
+                domainServiceClassName == null ? "" : domainServiceClassName,
+                domainRepositoryClassName == null ? "" : domainRepositoryClassName);
 
-        /*val aClass = JavaPsiFacade.getInstance(project)
-                .findClass(targetClassName, GlobalSearchScope.projectScope(project))*/
+        context.model = model;
 
-        //CustomComponents.showGenerateDomainDialog(project, settings);
+        return ModuleComponents.createGenerateModuleCodeDialog(context.project, model, getDialogTitle());
     }
 
-    private String suggestUserClassName(Module module) {
-        Collection<VirtualFile> files = findFile(module, "User.java");
-        for (VirtualFile file : files) {
-            PsiFile psiFile = PsiManager.getInstance(module.getProject()).findFile(file);
-            if (psiFile != null) {
-                PsiClassOwner psiClassOwner = (PsiClassOwner) psiFile;
-                PsiClass[] classes = psiClassOwner.getClasses();
-                for (PsiClass psiClass : classes) {
-                    if ("User".equals(psiClass.getName())) {
-                        return psiClass.getQualifiedName();
-                    }
-                }
+    private PsiClass getClassByName(PsiClass[] classes, String className) {
+        for (PsiClass psiClass : classes) {
+            if (className.equals(psiClass.getName())) {
+                return psiClass;
             }
         }
         return null;
     }
 
-    private Collection<VirtualFile> findFile(Module module, String name) {
-        return findFile(module, virtualFile -> name.equals(virtualFile.getName()));
-    }
-
-    private Collection<VirtualFile> findFile(Module module, Predicate<VirtualFile> predicate) {
-        VirtualFile virtualFile = ProjectUtil.guessModuleDir(module);
-        List<VirtualFile> files = new ArrayList<>();
-        findFile0(virtualFile, predicate, files);
-        return files;
-    }
-
-    private void findFile0(VirtualFile virtualFile, Predicate<VirtualFile> predicate, Collection<VirtualFile> files) {
-        if (virtualFile == null) {
-            return;
+    private PsiClass[] getClassesInPackage(Context context, PsiClass psiClass) {
+        if (psiClass == null) {
+            return new PsiClass[0];
         }
-        if (virtualFile.isDirectory()) {
-            VirtualFile[] children = virtualFile.getChildren();
-            for (VirtualFile child : children) {
-                findFile0(child, predicate, files);
-            }
-        } else {
-            if (predicate.test(virtualFile)) {
-                files.add(virtualFile);
-            }
+        String packageName = PsiUtil.getPackageName(psiClass);
+        if (packageName == null) {
+            return new PsiClass[0];
         }
+        PsiPackage psiPackage = JavaPsiFacade.getInstance(context.project).findPackage(packageName);
+        if (psiPackage == null) {
+            return new PsiClass[0];
+        }
+        return psiPackage.getClasses();
     }
 
-    /*private void a() {
+    @Override
+    public void onOk(Context context) {
+        RecentsManager.getInstance(context.project).registerRecentEntry(
+                RECENTS_KEY_USER_DOMAIN_CLASS, getModel(context).getUserClass().get());
+    }
 
-        //MoveMembersDialog
-        JPanel panel = new JPanel(new BorderLayout());
+    @Override
+    public void writeFile(File file, Context context) {
+        ModuleFileGenerator.generate(getModel(context), file);
+    }
 
-        JPanel _panel;
-        Box box = Box.createVerticalBox();
-
-        _panel = new JPanel(new BorderLayout());
-        JTextField sourceClassField = new JTextField();
-        sourceClassField.setText(mySourceClassName);
-        sourceClassField.setEditable(false);
-        _panel.add(new JLabel(RefactoringBundle.message("move.members.move.members.from.label")), BorderLayout.NORTH);
-        _panel.add(sourceClassField, BorderLayout.CENTER);
-        box.add(_panel);
-
-        box.add(Box.createVerticalStrut(10));
-
-        _panel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel(RefactoringBundle.message("move.members.to.fully.qualified.name.label"));
-        label.setLabelFor(myTfTargetClassName);
-        _panel.add(label, BorderLayout.NORTH);
-        _panel.add(myTfTargetClassName, BorderLayout.CENTER);
-        _panel.add(myIntroduceEnumConstants, BorderLayout.SOUTH);
-        box.add(_panel);
-
-        myTfTargetClassName.getChildComponent().getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void documentChanged(@NotNull DocumentEvent e) {
-                myMemberInfoModel.updateTargetClass();
-                validateButtons();
-            }
-        });
-
-        panel.add(box, BorderLayout.CENTER);
-        panel.add(Box.createVerticalStrut(10), BorderLayout.SOUTH);
-
-        validateButtons();
-        return panel;
-    }*/
-
-    /*private ReferenceEditorComboWithBrowseButton createPackageChooser() {
-        //MoveClassesOrPackagesDialog
-        final ReferenceEditorComboWithBrowseButton packageChooser =
-                new PackageNameReferenceEditorCombo("", myProject, RECENTS_KEY, RefactoringBundle.message("choose.destination.package"));
-        final Document document = packageChooser.getChildComponent().getDocument();
-        document.addDocumentListener(new DocumentListener() {
-            @Override
-            public void documentChanged(@NotNull DocumentEvent e) {
-                validateButtons();
-            }
-        });
-
-        return packageChooser;
-    }*/
+    private ModuleModel getModel(Context context) {
+        return (ModuleModel) context.model;
+    }
 }

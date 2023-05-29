@@ -31,9 +31,6 @@ data class DomainModel(
     companion object {
 
         @JvmStatic
-        val RECENTS_KEY_USER_DOMAIN_CLASS = "ConceptCloud@UserDomainClass"
-
-        @JvmStatic
         val RECENTS_KEY_DOMAIN_PACKAGE = "ConceptCloud@DomainPackage"
 
         @JvmStatic

@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
+import com.github.linyuzai.cloud.plugin.intellij.GenerateCodeAction
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
@@ -17,9 +18,9 @@ import java.awt.event.AdjustmentListener
 object DomainComponents {
 
     @JvmStatic
-    fun showGenerateDomainCodeDialog(project: Project, model: DomainModel): Boolean {
+    fun createGenerateDomainCodeDialog(project: Project, model: DomainModel, title: String): DialogBuilder {
         val dialog = DialogBuilder(project)
-        dialog.setTitle("Generate Domain Code")
+        dialog.setTitle(title)
         val panel = BorderLayoutPanel().apply {
             val dimension = Dimension(950, 500)
             //preferredSize = dimension
@@ -30,7 +31,7 @@ object DomainComponents {
         panel.addToRight(createPreviewDomainPanel(model))
         dialog.setCenterPanel(panel)
         model.preview()
-        return dialog.showAndGet()
+        return dialog
     }
 
     @JvmStatic
@@ -41,7 +42,7 @@ object DomainComponents {
             row("User Domain Class:") {
                 classesComboBox(
                     project,
-                    DomainModel.RECENTS_KEY_USER_DOMAIN_CLASS,
+                    GenerateCodeAction.RECENTS_KEY_USER_DOMAIN_CLASS,
                     model.userClass
                 ) {}
             }
@@ -144,30 +145,6 @@ object DomainComponents {
                         text = it
                     }
                 })
-            }
-        }
-    }
-
-    @JvmStatic
-    fun createGenerateDomainAndModule(project: Project, model: DomainModel): DialogPanel {
-
-        return panel(LCFlags.fillX, LCFlags.fillY) {
-
-            row("Name:") {
-                textField(model.domainObjectClassName)
-            }
-
-            row("User Domain Class:") {
-                /*classesComboBox(
-                    project,
-                    "GenerateDomainAndModule@User",
-                    "Choose User Domain Class",
-                    model.userClassNameProperty
-                )*/
-            }
-
-            row("Domains Module:") {
-                modulesComboBox(project, model.domainModule)
             }
         }
     }
