@@ -7,10 +7,14 @@ data class JavaBuilder(val _name: String) : ContentGenerator() {
 
     private var _package = ""
 
-    val _imports = mutableSetOf<String>()
+    private val _imports = mutableSetOf<String>()
 
     fun _package(_package: String) {
         this._package = _package
+    }
+
+    fun _import(_import: String) {
+        this._imports.add(_import)
     }
 
     fun _interface(_name: String, _init: InterfaceBuilder.() -> Unit): InterfaceBuilder {
@@ -60,7 +64,7 @@ data class InterfaceBuilder(val _java: JavaBuilder, val _name: String) : Content
 
     fun _extends(_type: String, vararg _generic: String) {
         _interfaces.add(_type to _generic)
-        _java._imports.add(_type)
+        _java._import(_type)
     }
 
     fun _method(_name: String, _init: MethodBuilder.() -> Unit): MethodBuilder {
@@ -113,20 +117,20 @@ data class ClassBuilder(val _java: JavaBuilder, val _name: String) : ContentGene
 
     fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
         this._annotations.add(_type to _params)
-        this._java._imports.add(_type)
+        this._java._import(_type)
         _params.forEach {
-            this._java._imports.add(it.second.first)
+            this._java._import(it.second.first)
         }
     }
 
     fun _extends(_type: String, vararg _generic: String) {
         this._extends = _type to _generic
-        this._java._imports.add(_type)
+        this._java._import(_type)
     }
 
     fun _implements(_type: String, vararg _generic: String) {
         _interfaces.add(_type to _generic)
-        _java._imports.add(_type)
+        _java._import(_type)
     }
 
     fun _field(_name: String, _init: FieldBuilder.() -> Unit): FieldBuilder {
@@ -212,11 +216,14 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
 
     fun _params(vararg _params: Pair<String, String>) {
         this._params.addAll(_params)
+        _params.forEach {
+            this._java._import(it.first)
+        }
     }
 
     fun _return(_return: String) {
         this._return = _return
-        this._java._imports.add(_return)
+        this._java._import(_return)
     }
 
     fun _override() {
@@ -225,9 +232,9 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
 
     fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
         this._annotations.add(_type to _params)
-        this._java._imports.add(_type)
+        this._java._import(_type)
         _params.forEach {
-            this._java._imports.add(it.second.first)
+            this._java._import(it.second.first)
         }
     }
 
@@ -240,13 +247,17 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
         this._body = _body
     }
 
+    fun _body(vararg _body: String) {
+        this._body(_body.joinToString(""))
+    }
+
     override fun content(): String {
         return buildString {
             addComment(_comment)
 
             addAccess(_access)
 
-            val args = _params.joinToString(",") { "${it.first} ${it.second}" }
+            val args = _params.joinToString(",") { "${it.first.toSampleName()} ${it.second}" }
 
             append("${_return.toSampleName()} $_name($args)")
 
@@ -265,6 +276,8 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
 
     private var _access = ""
 
+    private var _final = false
+
     private var _type = ""
 
     private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
@@ -275,16 +288,20 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
         this._access = "protected"
     }
 
+    fun _final() {
+        this._final = true
+    }
+
     fun _type(_type: String) {
         this._type = _type
-        this._java._imports.add(_type)
+        this._java._import(_type)
     }
 
     fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
         this._annotations.add(_type to _params)
-        this._java._imports.add(_type)
+        this._java._import(_type)
         _params.forEach {
-            this._java._imports.add(it.second.first)
+            this._java._import(it.second.first)
         }
     }
 
@@ -299,6 +316,10 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
             addAnnotations(_annotations)
 
             addAccess(_access)
+
+            if (_final) {
+                append("final ")
+            }
 
             append("${_type.toSampleName()} $_name;\n")
         }
@@ -324,16 +345,20 @@ abstract class ContentGenerator {
     }
 }
 
-inline fun _java(_package: String, init: JavaBuilder.() -> Unit): JavaBuilder {
-    val builder = JavaBuilder(_package)
+inline fun _java(_name: String, init: JavaBuilder.() -> Unit): JavaBuilder {
+    val builder = JavaBuilder(_name)
     builder.init()
     return builder
 }
 
 fun String.toSampleName() = this.substringAfterLast(".")
 
+fun String.uppercaseFirst() = this[0].uppercase() + this.substring(1)
+
+fun String.lowercaseFirst() = this[0].lowercase() + this.substring(1)
+
 fun String.toGetter(ifIs: Boolean): String {
-    val temp = this[0].uppercase() + this.substring(1)
+    val temp = uppercaseFirst()
     return if (ifIs) {
         "is$temp"
     } else {
@@ -354,9 +379,9 @@ fun StringBuilder.addAnnotations(_annotations: List<Pair<String, Array<out Pair<
         _annotations.forEach {
             append("@${it.first.toSampleName()}")
             if (it.second.isNotEmpty()) {
-                it.second.joinToString(",", "(", ")") { param ->
+                append(it.second.joinToString(",", "(", ")") { param ->
                     "${param.first} = ${param.second.first.toSampleName()}.${param.second.second}"
-                }
+                })
             }
         }
         append("\n")
