@@ -51,18 +51,15 @@ public class ConceptCloudUtils {
     public static PsiClass getClassPredicateInterface(PsiClass[] classes, Predicate<PsiClass> predicate) {
         for (PsiClass psiClass : classes) {
             PsiClass[] interfaces = psiClass.getInterfaces();
-            if (interfaces.length == 0) {
-                continue;
-            }
             for (PsiClass anInterface : interfaces) {
                 if (predicate.test(anInterface)) {
                     return psiClass;
                 }
             }
-            PsiClass aClass = getClassPredicateInterface(interfaces, predicate);
+            /*PsiClass aClass = getClassPredicateInterface(interfaces, predicate);
             if (aClass != null) {
                 return aClass;
-            }
+            }*/
         }
         return null;
     }

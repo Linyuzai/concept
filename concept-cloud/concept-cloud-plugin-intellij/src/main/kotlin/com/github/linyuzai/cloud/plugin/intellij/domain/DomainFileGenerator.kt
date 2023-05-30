@@ -221,21 +221,19 @@ object DomainFileGenerator {
             _class(domainServiceClassName) {
                 _public()
 
-                val autowiredAnnotation = "org.springframework.beans.factory.annotation.Autowired"
-
                 val domainRepositoryParam = domainRepositoryClassName.lowercaseFirst()
 
-                _annotation("org.springframework.stereotype.Service")
+                _annotation(ANNOTATION_SERVICE)
                 _field(domainRepositoryParam) {
                     _protected()
                     _type(domainRepositoryClassName)
-                    _annotation(autowiredAnnotation)
+                    _annotation(ANNOTATION_AUTOWIRED)
                 }
 
                 _field("eventPublisher") {
                     _protected()
-                    _type("com.github.linyuzai.domain.core.DomainEventPublisher")
-                    _annotation(autowiredAnnotation)
+                    _type(TYPE_DOMAIN_EVENT_PUBLISHER)
+                    _annotation(ANNOTATION_AUTOWIRED)
                 }
 
                 _method("create") {

@@ -5,7 +5,9 @@ import java.io.File
 
 const val ANNOTATION_NOT_NULL = "javax.validation.constraints.NotNull"
 const val ANNOTATION_NOT_EMPTY = "javax.validation.constraints.NotEmpty"
+const val ANNOTATION_SERVICE = "org.springframework.stereotype.Service"
 const val ANNOTATION_COMPONENT = "org.springframework.stereotype.Component"
+const val ANNOTATION_AUTOWIRED = "org.springframework.beans.factory.annotation.Autowired"
 const val ANNOTATION_GETTER = "lombok.Getter"
 const val ANNOTATION_DATA = "lombok.Data"
 const val ANNOTATION_NO_ARGS_CONSTRUCTOR = "lombok.NoArgsConstructor"
@@ -20,12 +22,15 @@ const val TYPE_DOMAIN_ENTITY = "com.github.linyuzai.domain.core.DomainEntity"
 const val TYPE_DOMAIN_COLLECTION = "com.github.linyuzai.domain.core.DomainCollection"
 const val TYPE_DOMAIN_REPOSITORY = "com.github.linyuzai.domain.core.DomainRepository"
 const val TYPE_DOMAIN_ID_GENERATOR = "com.github.linyuzai.domain.core.DomainIdGenerator"
+const val TYPE_DOMAIN_VALIDATOR = "com.github.linyuzai.domain.core.DomainValidator"
+const val TYPE_DOMAIN_EVENT_PUBLISHER = "com.github.linyuzai.domain.core.DomainEventPublisher"
 const val TYPE_DOMAIN_CONDITIONS = "com.github.linyuzai.domain.core.condition.Conditions"
+const val TYPE_DOMAIN_LAMBDA_CONDITIONS = "com.github.linyuzai.domain.core.condition.LambdaConditions"
 
 const val PARAM_ID = "id"
 const val PARAM_DESCRIPTION = "description"
 val PARAM_ACCESS_PROTECTED = "access" to ("lombok.AccessLevel" to "PROTECTED")
-fun paramDesc(desc: String): Pair<String, Pair<String, String>> {
+fun schemaDescription(desc: String): Pair<String, Pair<String, String>> {
     return PARAM_DESCRIPTION to ("" to "\"$desc\"")
 }
 
@@ -286,6 +291,15 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
         this._body(_body.joinToString(""))
     }
 
+    fun _todo(_todo: String = _name, returnNull: Boolean = true) {
+        val todo = "//TODO $_todo"
+        if (returnNull) {
+            this._body(todo, "return null;")
+        } else {
+            this._body(todo)
+        }
+    }
+
     override fun content(): String {
         return buildString {
             addComment(_comment)
@@ -415,10 +429,15 @@ fun StringBuilder.addAnnotations(_annotations: List<Pair<String, Array<out Pair<
             append("@${it.first.toSampleName()}")
             if (it.second.isNotEmpty()) {
                 append(it.second.joinToString(",", "(", ")") { param ->
-                    if (param.second.first.isEmpty()) {
-                        "${param.first} = ${param.second.second}"
-                    } else {
-                        "${param.first} = ${param.second.first.toSampleName()}.${param.second.second}"
+                    buildString {
+                        if (param.first.isNotBlank()) {
+                            append("${param.first}=")
+                        }
+                        if (param.second.first.isEmpty()) {
+                            append(param.second.second)
+                        } else {
+                            append("${param.second.first.toSampleName()}.${param.second.second}")
+                        }
                     }
                 })
             }

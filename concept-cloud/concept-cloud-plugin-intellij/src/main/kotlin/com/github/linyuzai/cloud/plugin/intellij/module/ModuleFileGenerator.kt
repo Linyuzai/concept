@@ -23,7 +23,7 @@ object ModuleFileGenerator {
             _class(createCommand) {
                 _public()
                 _annotation(ANNOTATION_DATA)
-                _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}创建命令"))
+                _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}创建命令"))
             }
         }.writeTo(viewDir)
 
@@ -33,11 +33,11 @@ object ModuleFileGenerator {
             _class(updateCommand) {
                 _public()
                 _annotation(ANNOTATION_DATA)
-                _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}更新命令"))
+                _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}更新命令"))
                 _field(PARAM_ID) {
                     _protected()
                     _type(TYPE_STRING)
-                    _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}ID"))
+                    _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}ID"))
                 }
             }
         }.writeTo(viewDir)
@@ -48,11 +48,11 @@ object ModuleFileGenerator {
             _class(deleteCommand) {
                 _public()
                 _annotation(ANNOTATION_DATA)
-                _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}删除命令"))
+                _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}删除命令"))
                 _field(PARAM_ID) {
                     _protected()
                     _type(TYPE_STRING)
-                    _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}ID"))
+                    _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}ID"))
                 }
             }
         }.writeTo(viewDir)
@@ -63,11 +63,11 @@ object ModuleFileGenerator {
             _class(vo) {
                 _public()
                 _annotation(ANNOTATION_DATA)
-                _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}视图"))
+                _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}视图"))
                 _field(PARAM_ID) {
                     _protected()
                     _type(TYPE_STRING)
-                    _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}ID"))
+                    _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}ID"))
                 }
             }
         }.writeTo(viewDir)
@@ -78,7 +78,7 @@ object ModuleFileGenerator {
             _class(query) {
                 _public()
                 _annotation(ANNOTATION_DATA)
-                _annotation(ANNOTATION_SCHEMA, paramDesc("${desc}查询条件"))
+                _annotation(ANNOTATION_SCHEMA, schemaDescription("${desc}查询条件"))
             }
         }.writeTo(viewDir)
 
@@ -91,7 +91,7 @@ object ModuleFileGenerator {
                 _extends(TYPE_DOMAIN_ID_GENERATOR, "$viewPackage.$createCommand")
 
             }
-        }
+        }.writeTo(dir)
 
         val facadeAdapter = "${domainObjectClassName}FacadeAdapter"
         _java("$facadeAdapter.java") {
@@ -127,7 +127,7 @@ object ModuleFileGenerator {
             }
         }.writeTo(dir)
 
-        /*val facadeAdapterImpl = "${facadeAdapter}Impl"
+        val facadeAdapterImpl = "${facadeAdapter}Impl"
         _java("$facadeAdapterImpl.java") {
             _package(modulePackage)
             _class(facadeAdapterImpl) {
@@ -137,32 +137,52 @@ object ModuleFileGenerator {
 
                 _implements(facadeAdapter)
 
+                _field(idGenerator.lowercaseFirst()) {
+                    _protected()
+                    _annotation(ANNOTATION_AUTOWIRED)
+                    _type(idGenerator)
+                }
+
+                _field("validator") {
+                    _protected()
+                    _annotation(ANNOTATION_AUTOWIRED)
+                    _type(TYPE_DOMAIN_VALIDATOR)
+                }
+
                 _method("from") {
                     _override()
                     _return(domainObjectClass)
                     _param("$viewPackage.$createCommand", "create")
-                    _comment("创建命令视图转领域模型")
+                    _todo()
                 }
 
                 _method("from") {
+                    _override()
                     _return(domainObjectClass)
                     _param("$viewPackage.$updateCommand", "update")
                     _param(domainObjectClass, "old")
-                    _comment("更新命令视图转领域模型")
+                    _todo()
                 }
 
                 _method("do2vo") {
+                    _override()
                     _return("$viewPackage.$vo")
                     _param(domainObjectClass, domainObjectParam)
-                    _comment("领域模型转视图")
+                    _todo()
                 }
 
                 _method("toConditions") {
+                    _override()
                     _return(TYPE_DOMAIN_CONDITIONS)
                     _param("$viewPackage.$query", "query")
-                    _comment("查询转条件")
+                    _body("return new ${TYPE_DOMAIN_LAMBDA_CONDITIONS.toSampleName()}();")
+                    _import(TYPE_DOMAIN_LAMBDA_CONDITIONS)
                 }
             }
-        }.writeTo(dir)*/
+        }.writeTo(dir)
+
+        if (model.myBatisPlus.get()) {
+
+        }
     }
 }
