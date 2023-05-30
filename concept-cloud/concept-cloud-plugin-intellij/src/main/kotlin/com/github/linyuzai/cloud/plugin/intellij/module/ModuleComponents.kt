@@ -75,6 +75,10 @@ object ModuleComponents {
                 ) {}
             }
 
+            row("Domain Description:") {
+                textField(model.domainDescription)
+            }
+
             row("Infrastructure:") {
                 checkBox("MyBatisPlus", model.myBatisPlus)
             }

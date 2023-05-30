@@ -40,6 +40,7 @@ data class JavaBuilder(val _name: String) : ContentGenerator() {
         return buildString {
             append("package $_package;\n")
             _imports.filterNot { it.startsWith("java.lang.") }
+                .filter { it.isNotBlank() }
                 .filter { it.contains(".") }
                 .sorted()
                 .forEach {
@@ -380,7 +381,11 @@ fun StringBuilder.addAnnotations(_annotations: List<Pair<String, Array<out Pair<
             append("@${it.first.toSampleName()}")
             if (it.second.isNotEmpty()) {
                 append(it.second.joinToString(",", "(", ")") { param ->
-                    "${param.first} = ${param.second.first.toSampleName()}.${param.second.second}"
+                    if (param.second.first.isEmpty()) {
+                        "${param.first} = ${param.second.second}"
+                    } else {
+                        "${param.first} = ${param.second.first.toSampleName()}.${param.second.second}"
+                    }
                 })
             }
         }

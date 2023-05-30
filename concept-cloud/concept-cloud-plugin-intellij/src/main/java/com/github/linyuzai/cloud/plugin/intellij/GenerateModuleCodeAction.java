@@ -4,9 +4,9 @@ import com.github.linyuzai.cloud.plugin.intellij.module.ModuleComponents;
 import com.github.linyuzai.cloud.plugin.intellij.module.ModuleFileGenerator;
 import com.github.linyuzai.cloud.plugin.intellij.module.ModuleModel;
 import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiPackage;
+import com.intellij.psi.*;
+import com.intellij.psi.javadoc.PsiDocComment;
+import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.RecentsManager;
 
@@ -29,6 +29,7 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
         String className = ConceptCloudUtils.uppercaseFirst(context.selectPackage);
         PsiClass domainObjectClass = ConceptCloudUtils.searchDomainObjectClass(className,
                 context.project, true);
+
         PsiClass[] classes = getClassesInPackage(context, domainObjectClass);
 
         PsiClass domainCollectionClass = ConceptCloudUtils.getClassPredicateInterface(classes,
@@ -58,11 +59,30 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
                 domainObjectClassName == null ? "" : domainObjectClassName,
                 domainCollectionClassName == null ? "" : domainCollectionClassName,
                 domainServiceClassName == null ? "" : domainServiceClassName,
-                domainRepositoryClassName == null ? "" : domainRepositoryClassName);
+                domainRepositoryClassName == null ? "" : domainRepositoryClassName,
+                getDomainDescriptionByComment(domainObjectClass));
 
         context.model = model;
 
         return ModuleComponents.createGenerateModuleCodeDialog(context.project, model, getDialogTitle());
+    }
+
+    private String getDomainDescriptionByComment(PsiClass psiClass) {
+        if (psiClass == null) {
+            return "";
+        }
+        PsiDocComment comment = psiClass.getDocComment();
+        if (comment == null) {
+            return "";
+        }
+        for (PsiElement child : comment.getChildren()) {
+            if (child instanceof PsiDocToken) {
+                if (((PsiDocToken) child).getTokenType() == JavaDocTokenType.DOC_COMMENT_DATA) {
+                    return child.getText().trim();
+                }
+            }
+        }
+        return "";
     }
 
     private PsiClass getClassByName(PsiClass[] classes, String className) {

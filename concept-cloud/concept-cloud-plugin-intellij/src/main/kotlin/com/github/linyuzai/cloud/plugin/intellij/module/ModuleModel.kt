@@ -12,7 +12,8 @@ data class ModuleModel(
     val initDomainObjectClass: String,
     val initDomainCollectionClass: String,
     val initDomainServiceClass: String,
-    val initDomainRepositoryClass: String
+    val initDomainRepositoryClass: String,
+    val initDomainDescription: String
 ) {
     val propertyGraph: PropertyGraph = PropertyGraph()
     val userClass: GraphProperty<String> = property { initUserClass }
@@ -22,6 +23,7 @@ data class ModuleModel(
     val domainCollectionClass: GraphProperty<String> = property { initDomainCollectionClass }
     val domainServiceClass: GraphProperty<String> = property { initDomainServiceClass }
     val domainRepositoryClass: GraphProperty<String> = property { initDomainRepositoryClass }
+    val domainDescription: GraphProperty<String> = property { initDomainDescription }
     val myBatisPlus: GraphProperty<Boolean> = property { true }
 
     companion object {
