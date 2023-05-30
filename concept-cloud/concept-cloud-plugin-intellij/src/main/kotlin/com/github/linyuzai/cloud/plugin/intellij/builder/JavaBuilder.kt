@@ -3,6 +3,32 @@ package com.github.linyuzai.cloud.plugin.intellij.builder
 import com.intellij.openapi.util.io.FileUtil
 import java.io.File
 
+const val ANNOTATION_NOT_NULL = "javax.validation.constraints.NotNull"
+const val ANNOTATION_NOT_EMPTY = "javax.validation.constraints.NotEmpty"
+const val ANNOTATION_COMPONENT = "org.springframework.stereotype.Component"
+const val ANNOTATION_GETTER = "lombok.Getter"
+const val ANNOTATION_DATA = "lombok.Data"
+const val ANNOTATION_NO_ARGS_CONSTRUCTOR = "lombok.NoArgsConstructor"
+const val ANNOTATION_ALL_ARGS_CONSTRUCTOR = "lombok.AllArgsConstructor"
+const val ANNOTATION_REQUIRED_ARGS_CONSTRUCTOR = "lombok.RequiredArgsConstructor"
+const val ANNOTATION_SCHEMA = "io.swagger.v3.oas.annotations.media.Schema"
+
+const val TYPE_STRING = "java.lang.String"
+const val TYPE_VOID = "void"
+const val TYPE_DOMAIN_VALUE = "com.github.linyuzai.domain.core.DomainValue"
+const val TYPE_DOMAIN_ENTITY = "com.github.linyuzai.domain.core.DomainEntity"
+const val TYPE_DOMAIN_COLLECTION = "com.github.linyuzai.domain.core.DomainCollection"
+const val TYPE_DOMAIN_REPOSITORY = "com.github.linyuzai.domain.core.DomainRepository"
+const val TYPE_DOMAIN_ID_GENERATOR = "com.github.linyuzai.domain.core.DomainIdGenerator"
+const val TYPE_DOMAIN_CONDITIONS = "com.github.linyuzai.domain.core.condition.Conditions"
+
+const val PARAM_ID = "id"
+const val PARAM_DESCRIPTION = "description"
+val PARAM_ACCESS_PROTECTED = "access" to ("lombok.AccessLevel" to "PROTECTED")
+fun paramDesc(desc: String): Pair<String, Pair<String, String>> {
+    return PARAM_DESCRIPTION to ("" to "\"$desc\"")
+}
+
 data class JavaBuilder(val _name: String) : ContentGenerator() {
 
     private var _package = ""
@@ -108,6 +134,8 @@ data class ClassBuilder(val _java: JavaBuilder, val _name: String) : ContentGene
 
     private val _interfaces = mutableListOf<Pair<String, Array<out String>>>()
 
+    private var _comment = ""
+
     fun _public() {
         this._access = "public"
     }
@@ -155,8 +183,14 @@ data class ClassBuilder(val _java: JavaBuilder, val _name: String) : ContentGene
         return builder
     }
 
+    fun _comment(_comment: String) {
+        this._comment = _comment
+    }
+
     override fun content(): String {
         return buildString {
+
+            addComment(_comment)
 
             addAnnotations(_annotations)
 

@@ -8,9 +8,11 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static com.github.linyuzai.cloud.plugin.intellij.builder.JavaBuilderKt.TYPE_DOMAIN_ENTITY;
+import static com.github.linyuzai.cloud.plugin.intellij.builder.JavaBuilderKt.TYPE_DOMAIN_VALUE;
 
 public class ConceptCloudUtils {
 
@@ -67,8 +69,8 @@ public class ConceptCloudUtils {
 
     public static PsiClass getDomainObjectClass(PsiClass[] classes) {
         return getClassPredicateInterface(classes, psiInterface ->
-                "com.github.linyuzai.domain.core.DomainEntity"
-                        .equals(psiInterface.getQualifiedName()));
+                TYPE_DOMAIN_ENTITY.equals(psiInterface.getQualifiedName()) ||
+                        TYPE_DOMAIN_VALUE.equals(psiInterface.getQualifiedName()));
     }
 
     public static PsiClass searchClass(String name, Project project, boolean forceDomain,

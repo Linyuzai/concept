@@ -1,9 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
-import com.github.linyuzai.cloud.plugin.intellij.builder._java
-import com.github.linyuzai.cloud.plugin.intellij.builder.lowercaseFirst
-import com.github.linyuzai.cloud.plugin.intellij.builder.toGetter
-import com.github.linyuzai.cloud.plugin.intellij.builder.toSampleName
+import com.github.linyuzai.cloud.plugin.intellij.builder.*
 import java.io.File
 
 object DomainFileGenerator {
@@ -16,7 +13,7 @@ object DomainFileGenerator {
             _package(domainPackage)
             _interface(domainObjectClassName) {
                 _public()
-                _extends("com.github.linyuzai.domain.core.DomainEntity")
+                _extends(TYPE_DOMAIN_ENTITY)
                 model.domainProps.forEach {
                     val pClass = it.propClass.get()
                     _method(it.propName.get().toGetter("boolean" == pClass)) {
@@ -33,10 +30,7 @@ object DomainFileGenerator {
             _package(domainPackage)
             _interface(domainCollectionClassName) {
                 _public()
-                _extends(
-                    "com.github.linyuzai.domain.core.DomainCollection",
-                    domainObjectClassName
-                )
+                _extends(TYPE_DOMAIN_COLLECTION, domainObjectClassName)
             }
         }.writeTo(dir)
 
@@ -46,13 +40,12 @@ object DomainFileGenerator {
             _interface(domainRepositoryClassName) {
                 _public()
                 _extends(
-                    "com.github.linyuzai.domain.core.DomainRepository",
-                    domainObjectClassName, domainCollectionClassName
+                    TYPE_DOMAIN_REPOSITORY,
+                    domainObjectClassName,
+                    domainCollectionClassName
                 )
             }
         }.writeTo(dir)
-
-        val stringType = "java.lang.String"
 
         val domainObjectImplClassName = "${domainObjectClassName}Impl"
         _java("$domainObjectImplClassName.java") {
@@ -61,19 +54,13 @@ object DomainFileGenerator {
                 _public()
                 _implements(domainObjectClassName)
 
-                _annotation("lombok.Getter")
-                _annotation(
-                    "lombok.NoArgsConstructor",
-                    "access" to ("lombok.AccessLevel" to "PROTECTED")
-                )
-                _annotation(
-                    "lombok.AllArgsConstructor",
-                    "access" to ("lombok.AccessLevel" to "PROTECTED")
-                )
+                _annotation(ANNOTATION_GETTER)
+                _annotation(ANNOTATION_NO_ARGS_CONSTRUCTOR, PARAM_ACCESS_PROTECTED)
+                _annotation(ANNOTATION_ALL_ARGS_CONSTRUCTOR, PARAM_ACCESS_PROTECTED)
 
-                _field("id") {
+                _field(PARAM_ID) {
                     _protected()
-                    _type(stringType)
+                    _type(TYPE_STRING)
                 }
 
                 model.domainProps.forEach {
@@ -91,30 +78,27 @@ object DomainFileGenerator {
                         domainObjectImplClassName
                     )
 
-                    val notNullAnnotation = "javax.validation.constraints.NotNull"
-                    val notEmptyAnnotation = "javax.validation.constraints.NotEmpty"
-
-                    _field("id") {
+                    _field(PARAM_ID) {
                         _protected()
-                        _type(stringType)
-                        _annotation(notEmptyAnnotation)
+                        _type(TYPE_STRING)
+                        _annotation(ANNOTATION_NOT_EMPTY)
                     }
                     model.domainProps.forEach {
                         _field(it.propName.get()) {
                             _protected()
                             _type(it.propClass.get())
                             if (it.propNotNull.get()) {
-                                _annotation(notNullAnnotation)
+                                _annotation(ANNOTATION_NOT_NULL)
                             }
                             if (it.propNotEmpty.get()) {
-                                _annotation(notEmptyAnnotation)
+                                _annotation(ANNOTATION_NOT_EMPTY)
                             }
                         }
                     }
 
-                    _method("id") {
+                    _method(PARAM_ID) {
                         _public()
-                        _param(stringType, "id")
+                        _param(TYPE_STRING, PARAM_ID)
                         _return("Builder")
                         _body("this.id=id;", "return this;")
                     }
@@ -147,9 +131,6 @@ object DomainFileGenerator {
 
         val eventPackage = "$domainPackage.event"
 
-        val getterAnnotation = "lombok.Getter"
-        val requiredArgsConstructorAnnotation = "lombok.RequiredArgsConstructor"
-
         val domainObjectParam = domainObjectClassName.lowercaseFirst()
         val newDomainObjectParam = "new$domainObjectClassName"
         val oldDomainObjectParam = "old$domainObjectClassName"
@@ -163,8 +144,8 @@ object DomainFileGenerator {
             _class(createEventClassName) {
                 _public()
 
-                _annotation(getterAnnotation)
-                _annotation(requiredArgsConstructorAnnotation)
+                _annotation(ANNOTATION_GETTER)
+                _annotation(ANNOTATION_REQUIRED_ARGS_CONSTRUCTOR)
 
                 _field(domainObjectParam) {
                     _protected()
@@ -187,8 +168,8 @@ object DomainFileGenerator {
             _class(updateEventClassName) {
                 _public()
 
-                _annotation(getterAnnotation)
-                _annotation(requiredArgsConstructorAnnotation)
+                _annotation(ANNOTATION_GETTER)
+                _annotation(ANNOTATION_REQUIRED_ARGS_CONSTRUCTOR)
 
                 _field(newDomainObjectParam) {
                     _protected()
@@ -217,8 +198,8 @@ object DomainFileGenerator {
             _class(deleteEventClassName) {
                 _public()
 
-                _annotation(getterAnnotation)
-                _annotation(requiredArgsConstructorAnnotation)
+                _annotation(ANNOTATION_GETTER)
+                _annotation(ANNOTATION_REQUIRED_ARGS_CONSTRUCTOR)
 
                 _field(domainObjectParam) {
                     _protected()
@@ -259,7 +240,7 @@ object DomainFileGenerator {
 
                 _method("create") {
                     _public()
-                    _return("void")
+                    _return(TYPE_VOID)
                     _param(domainObjectClassName, domainObjectParam)
                     _param(userClassName, userParam)
                     val args = "$domainObjectParam,$userParam"
@@ -272,7 +253,7 @@ object DomainFileGenerator {
 
                 _method("update") {
                     _public()
-                    _return("void")
+                    _return(TYPE_VOID)
 
                     _param(domainObjectClassName, newDomainObjectParam)
                     _param(domainObjectClassName, oldDomainObjectParam)
@@ -290,7 +271,7 @@ object DomainFileGenerator {
 
                 _method("delete") {
                     _public()
-                    _return("void")
+                    _return(TYPE_VOID)
                     _param(domainObjectClassName, domainObjectParam)
                     _param(userClassName, userParam)
                     val args = "$domainObjectParam,$userParam"

@@ -12,6 +12,9 @@ import com.intellij.ui.RecentsManager;
 
 import java.io.File;
 
+import static com.github.linyuzai.cloud.plugin.intellij.builder.JavaBuilderKt.TYPE_DOMAIN_COLLECTION;
+import static com.github.linyuzai.cloud.plugin.intellij.builder.JavaBuilderKt.TYPE_DOMAIN_REPOSITORY;
+
 public class GenerateModuleCodeAction extends GenerateCodeAction {
 
     @Override
@@ -33,14 +36,12 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
         PsiClass[] classes = getClassesInPackage(context, domainObjectClass);
 
         PsiClass domainCollectionClass = ConceptCloudUtils.getClassPredicateInterface(classes,
-                psiInterface -> "com.github.linyuzai.domain.core.DomainCollection"
-                        .equals(psiInterface.getQualifiedName()));
+                psiInterface -> TYPE_DOMAIN_COLLECTION.equals(psiInterface.getQualifiedName()));
 
         PsiClass domainServiceClass = getClassByName(classes, className + "Service");
 
         PsiClass domainRepositoryClass = ConceptCloudUtils.getClassPredicateInterface(classes,
-                psiInterface -> "com.github.linyuzai.domain.core.DomainRepository"
-                        .equals(psiInterface.getQualifiedName()));
+                psiInterface -> TYPE_DOMAIN_REPOSITORY.equals(psiInterface.getQualifiedName()));
 
         String domainObjectClassName = domainObjectClass == null ? "" :
                 domainObjectClass.getQualifiedName();
