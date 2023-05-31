@@ -8,6 +8,7 @@ object ModuleFileGenerator {
     @JvmStatic
     fun generate(model: ModuleModel, dir: File) {
         val userClass = model.userClass.get()
+        val loginClass = model.loginAnnotationClass.get()
         val modulePackage = model.modulePackage.get()
         val domainObjectClass = model.domainObjectClass.get()
         val domainObjectClassName = domainObjectClass.toSampleName()
@@ -24,20 +25,20 @@ object ModuleFileGenerator {
         val viewPackage = "$modulePackage.view"
         val viewDir = File(dir, "view")
 
-        val createCommand = "${domainObjectClassName}CreateCommand"
-        _java("$createCommand.java") {
+        val createCommandClassName = "${domainObjectClassName}CreateCommand"
+        _java("$createCommandClassName.java") {
             _package(viewPackage)
-            _class(createCommand) {
+            _class(createCommandClassName) {
                 _public()
                 _annotation(ANNOTATION_DATA)
                 _annotation(ANNOTATION_SCHEMA, schemaDescription("${description}创建命令"))
             }
         }.writeTo(viewDir)
 
-        val updateCommand = "${domainObjectClassName}UpdateCommand"
-        _java("$updateCommand.java") {
+        val updateCommandClassName = "${domainObjectClassName}UpdateCommand"
+        _java("$updateCommandClassName.java") {
             _package(viewPackage)
-            _class(updateCommand) {
+            _class(updateCommandClassName) {
                 _public()
                 _annotation(ANNOTATION_DATA)
                 _annotation(ANNOTATION_SCHEMA, schemaDescription("${description}更新命令"))
@@ -49,10 +50,10 @@ object ModuleFileGenerator {
             }
         }.writeTo(viewDir)
 
-        val deleteCommand = "${domainObjectClassName}DeleteCommand"
-        _java("$deleteCommand.java") {
+        val deleteCommandClassName = "${domainObjectClassName}DeleteCommand"
+        _java("$deleteCommandClassName.java") {
             _package(viewPackage)
-            _class(deleteCommand) {
+            _class(deleteCommandClassName) {
                 _public()
                 _annotation(ANNOTATION_DATA)
                 _annotation(ANNOTATION_SCHEMA, schemaDescription("${description}删除命令"))
@@ -64,10 +65,10 @@ object ModuleFileGenerator {
             }
         }.writeTo(viewDir)
 
-        val vo = "${domainObjectClassName}VO"
-        _java("$vo.java") {
+        val voClassName = "${domainObjectClassName}VO"
+        _java("$voClassName.java") {
             _package(viewPackage)
-            _class(vo) {
+            _class(voClassName) {
                 _public()
                 _annotation(ANNOTATION_DATA)
                 _annotation(ANNOTATION_SCHEMA, schemaDescription("${description}视图"))
@@ -79,76 +80,86 @@ object ModuleFileGenerator {
             }
         }.writeTo(viewDir)
 
-        val query = "${domainObjectClassName}Query"
-        _java("$query.java") {
+        val queryClassName = "${domainObjectClassName}Query"
+        _java("$queryClassName.java") {
             _package(viewPackage)
-            _class(query) {
+            _class(queryClassName) {
                 _public()
                 _annotation(ANNOTATION_DATA)
                 _annotation(ANNOTATION_SCHEMA, schemaDescription("${description}查询条件"))
             }
         }.writeTo(viewDir)
 
-        val idGenerator = "${domainObjectClassName}IdGenerator"
-        _java("$idGenerator.java") {
+        val idGeneratorClassName = "${domainObjectClassName}IdGenerator"
+        _java("$idGeneratorClassName.java") {
             _package(modulePackage)
-            _interface(idGenerator) {
+            _interface(idGeneratorClassName) {
                 _public()
                 _comment("${description}ID生成器")
-                _extends(TYPE_DOMAIN_ID_GENERATOR, "$viewPackage.$createCommand")
+                _extends(TYPE_DOMAIN_ID_GENERATOR, "$viewPackage.$createCommandClassName")
 
             }
         }.writeTo(dir)
 
-        val facadeAdapter = "${domainObjectClassName}FacadeAdapter"
-        val facadeAdapterParam = facadeAdapter.lowercaseFirst()
-        _java("$facadeAdapter.java") {
+        val facadeAdapterClassName = "${domainObjectClassName}FacadeAdapter"
+        val facadeAdapterParam = facadeAdapterClassName.lowercaseFirst()
+        _java("$facadeAdapterClassName.java") {
             _package(modulePackage)
-            _interface(facadeAdapter) {
+            _interface(facadeAdapterClassName) {
                 _public()
                 _comment("领域模型/视图 转换适配器")
 
                 _method("from") {
                     _return(domainObjectClass)
-                    _param("$viewPackage.$createCommand", "create")
+                    _param("create") {
+                        _type("$viewPackage.$createCommandClassName")
+                    }
                     _comment("创建命令视图转领域模型")
                 }
 
                 _method("from") {
                     _return(domainObjectClass)
-                    _param("$viewPackage.$updateCommand", "update")
-                    _param(domainObjectClass, "old")
+                    _param("update") {
+                        _type("$viewPackage.$updateCommandClassName")
+                    }
+                    _param("old") {
+                        _type(domainObjectClass)
+                    }
                     _comment("更新命令视图转领域模型")
                 }
 
                 _method("do2vo") {
-                    _return("$viewPackage.$vo")
-                    _param(domainObjectClass, domainObjectParam)
+                    _return("$viewPackage.$voClassName")
+                    _param(domainObjectParam) {
+                        _type(domainObjectClass)
+                    }
                     _comment("领域模型转视图")
                 }
 
                 _method("toConditions") {
                     _return(TYPE_DOMAIN_CONDITIONS)
-                    _param("$viewPackage.$query", "query")
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
                     _comment("查询转条件")
                 }
             }
         }.writeTo(dir)
 
-        val facadeAdapterImpl = "${facadeAdapter}Impl"
-        _java("$facadeAdapterImpl.java") {
+        val facadeAdapterImplClassName = "${facadeAdapterClassName}Impl"
+        _java("$facadeAdapterImplClassName.java") {
             _package(modulePackage)
-            _class(facadeAdapterImpl) {
+            _class(facadeAdapterImplClassName) {
                 _public()
                 _comment("领域模型/视图 转换适配器实现")
                 _annotation(ANNOTATION_COMPONENT)
 
-                _implements(facadeAdapter)
+                _implements(facadeAdapterClassName)
 
-                _field(idGenerator.lowercaseFirst()) {
+                _field(idGeneratorClassName.lowercaseFirst()) {
                     _protected()
                     _annotation(ANNOTATION_AUTOWIRED)
-                    _type(idGenerator)
+                    _type(idGeneratorClassName)
                 }
 
                 _field("validator") {
@@ -161,7 +172,9 @@ object ModuleFileGenerator {
                     _override()
                     _public()
                     _return(domainObjectClass)
-                    _param("$viewPackage.$createCommand", "create")
+                    _param("create") {
+                        _type("$viewPackage.$createCommandClassName")
+                    }
                     _todo()
                 }
 
@@ -169,16 +182,22 @@ object ModuleFileGenerator {
                     _override()
                     _public()
                     _return(domainObjectClass)
-                    _param("$viewPackage.$updateCommand", "update")
-                    _param(domainObjectClass, "old")
+                    _param("update") {
+                        _type("$viewPackage.$updateCommandClassName")
+                    }
+                    _param("old") {
+                        _type(domainObjectClass)
+                    }
                     _todo()
                 }
 
                 _method("do2vo") {
                     _override()
                     _public()
-                    _return("$viewPackage.$vo")
-                    _param(domainObjectClass, domainObjectParam)
+                    _return("$viewPackage.$voClassName")
+                    _param(domainObjectParam) {
+                        _type(domainObjectClass)
+                    }
                     _todo()
                 }
 
@@ -186,56 +205,67 @@ object ModuleFileGenerator {
                     _override()
                     _public()
                     _return(TYPE_DOMAIN_CONDITIONS)
-                    _param("$viewPackage.$query", "query")
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
                     _body("return new ${TYPE_DOMAIN_LAMBDA_CONDITIONS.toSampleName()}();")
                     _import(TYPE_DOMAIN_LAMBDA_CONDITIONS)
                 }
             }
         }.writeTo(dir)
 
-        val searcher = "${domainObjectClassName}Searcher"
-        _java("$searcher.java") {
+        val searcherClassName = "${domainObjectClassName}Searcher"
+        val searcherParam = searcherClassName.lowercaseFirst()
+        _java("$searcherClassName.java") {
             _package(modulePackage)
-            _interface(searcher) {
+            _interface(searcherClassName) {
                 _public()
                 _comment("搜索")
 
                 _method("get") {
-                    _return("$viewPackage.$vo")
-                    _param(TYPE_STRING, PARAM_ID)
+                    _return("$viewPackage.$voClassName")
+                    _param(PARAM_ID) {
+                        _type(TYPE_STRING)
+                    }
                     _comment("根据ID获得视图")
                 }
 
                 _method("list") {
-                    _return("List<$vo>", false)
+                    _return("List<$voClassName>", false)
                     _import(TYPE_LIST)
-                    _param("$viewPackage.$query", "query")
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
                     _comment("列表查询")
                 }
 
                 _method("page") {
-                    _return("Pages<$vo>", false)
+                    _return("Pages<$voClassName>", false)
                     _import(TYPE_PAGES)
-                    _param("$viewPackage.$query", "query")
-                    _param("Pages.Args", "page", false)
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
+                    _param("page") {
+                        _type("Pages.Args", false)
+                    }
                     _comment("分页查询")
                 }
             }
         }.writeTo(dir)
 
-        val searcherImpl = "${searcher}Impl"
-        _java("$searcherImpl.java") {
+        val searcherImplClassName = "${searcherClassName}Impl"
+        _java("$searcherImplClassName.java") {
             _package(modulePackage)
-            _class(searcherImpl) {
+            _class(searcherImplClassName) {
                 _public()
                 _annotation(ANNOTATION_COMPONENT)
                 _comment("搜索实现")
-                _implements(searcher)
+                _implements(searcherClassName)
 
                 _field(facadeAdapterParam) {
                     _protected()
                     _annotation(ANNOTATION_AUTOWIRED)
-                    _type(facadeAdapter)
+                    _type(facadeAdapterClassName)
                 }
 
                 _field(domainRepositoryParam) {
@@ -249,8 +279,10 @@ object ModuleFileGenerator {
                 _method("get") {
                     _override()
                     _public()
-                    _return("$viewPackage.$vo")
-                    _param(TYPE_STRING, PARAM_ID)
+                    _return("$viewPackage.$voClassName")
+                    _param(PARAM_ID) {
+                        _type(TYPE_STRING)
+                    }
                     _body(
                         "$domainObjectClassName $domainObjectParam=$domainRepositoryParam.get(id);",
                         "if ($domainObjectParam == null) {return null;}",
@@ -261,9 +293,11 @@ object ModuleFileGenerator {
                 _method("list") {
                     _override()
                     _public()
-                    _return("List<$vo>", false)
+                    _return("List<$voClassName>", false)
                     _import(TYPE_LIST)
-                    _param("$viewPackage.$query", "query")
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
                     _body(
                         "return $domainRepositoryParam.select($facadeAdapterParam.toConditions(query))",
                         ".list()",
@@ -277,10 +311,14 @@ object ModuleFileGenerator {
                 _method("page") {
                     _override()
                     _public()
-                    _return("Pages<$vo>", false)
+                    _return("Pages<$voClassName>", false)
                     _import(TYPE_PAGES)
-                    _param("$viewPackage.$query", "query")
-                    _param("Pages.Args", "page", false)
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
+                    _param("page") {
+                        _type("Pages.Args", false)
+                    }
                     _body(
                         "return $domainRepositoryParam",
                         ".page($facadeAdapterParam.toConditions(query), page)",
@@ -290,10 +328,11 @@ object ModuleFileGenerator {
             }
         }.writeTo(dir)
 
-        val applicationService = "${domainObjectClassName}ApplicationService"
-        _java("$applicationService.java") {
+        val applicationServiceClassName = "${domainObjectClassName}ApplicationService"
+        val applicationServiceParam = applicationServiceClassName.lowercaseFirst()
+        _java("$applicationServiceClassName.java") {
             _package(modulePackage)
-            _class(applicationService) {
+            _class(applicationServiceClassName) {
                 _public()
                 _comment("应用服务")
                 _annotation(ANNOTATION_SERVICE)
@@ -309,7 +348,7 @@ object ModuleFileGenerator {
                 _field(facadeAdapterParam) {
                     _protected()
                     _annotation(ANNOTATION_AUTOWIRED)
-                    _type(facadeAdapter)
+                    _type(facadeAdapterClassName)
                 }
 
                 _field(domainRepositoryParam) {
@@ -320,9 +359,12 @@ object ModuleFileGenerator {
 
                 _method("create") {
                     _public()
-                    _return(TYPE_VOID)
-                    _param("$viewPackage.$createCommand", "create")
-                    _param(userClass, "user")
+                    _param("create") {
+                        _type("$viewPackage.$createCommandClassName")
+                    }
+                    _param("user") {
+                        _type(userClass)
+                    }
                     _body(
                         "$domainObjectClassName $domainObjectParam=$facadeAdapterParam.from(create);",
                         "$domainServiceParam.create($domainObjectParam,user);"
@@ -331,9 +373,12 @@ object ModuleFileGenerator {
 
                 _method("update") {
                     _public()
-                    _return(TYPE_VOID)
-                    _param("$viewPackage.$updateCommand", "update")
-                    _param(userClass, "user")
+                    _param("update") {
+                        _type("$viewPackage.$updateCommandClassName")
+                    }
+                    _param("user") {
+                        _type(userClass)
+                    }
                     _body(
                         "$domainObjectClassName old$domainObjectClassName=$domainRepositoryParam.get(update.getId());",
                         "if(old$domainObjectClassName == null) {",
@@ -346,9 +391,12 @@ object ModuleFileGenerator {
 
                 _method("delete") {
                     _public()
-                    _return(TYPE_VOID)
-                    _param("$viewPackage.$deleteCommand", "delete")
-                    _param(userClass, "user")
+                    _param("delete") {
+                        _type("$viewPackage.$deleteCommandClassName")
+                    }
+                    _param("user") {
+                        _type(userClass)
+                    }
                     _body(
                         "$domainObjectClassName $domainObjectParam=$domainRepositoryParam.get(delete.getId());",
                         "if($domainObjectParam == null) {",
@@ -360,7 +408,114 @@ object ModuleFileGenerator {
             }
         }.writeTo(dir)
 
+        val controllerClassName = "${domainObjectClassName}Controller"
+        _java("$controllerClassName.java") {
+            _package(modulePackage)
+            _class(controllerClassName) {
+                _public()
 
+                _annotation(ANNOTATION_TAG, tagName(description))
+                _annotation(ANNOTATION_REST_CONTROLLER)
+                _annotation(ANNOTATION_REQUEST_MAPPING, annotationValue(domainObjectParam))
+
+                _field(applicationServiceParam) {
+                    _protected()
+                    _annotation(ANNOTATION_AUTOWIRED)
+                    _type(applicationServiceClassName)
+                }
+
+                _field(searcherParam) {
+                    _protected()
+                    _annotation(ANNOTATION_AUTOWIRED)
+                    _type(searcherClassName)
+                }
+
+                _method("create") {
+                    _public()
+                    _annotation(ANNOTATION_OPERATION, operationSummary("创建$description"))
+                    _annotation(ANNOTATION_POST_MAPPING)
+                    _param("create") {
+                        _annotation(ANNOTATION_REQUEST_BODY)
+                        _type("$viewPackage.$createCommandClassName")
+                    }
+                    _param("user") {
+                        _annotation(loginClass)
+                        _type(userClass)
+                    }
+                    _body("$applicationServiceParam.create(create, user);")
+                }
+
+                _method("update") {
+                    _public()
+                    _annotation(ANNOTATION_OPERATION, operationSummary("更新$description"))
+                    _annotation(ANNOTATION_PUT_MAPPING)
+                    _param("update") {
+                        _annotation(ANNOTATION_REQUEST_BODY)
+                        _type("$viewPackage.$updateCommandClassName")
+                    }
+                    _param("user") {
+                        _annotation(loginClass)
+                        _type(userClass)
+                    }
+                    _body("$applicationServiceParam.update(update, user);")
+                }
+
+                _method("delete") {
+                    _public()
+                    _annotation(ANNOTATION_OPERATION, operationSummary("删除$description"))
+                    _annotation(ANNOTATION_DELETE_MAPPING)
+                    _param("delete") {
+                        _annotation(ANNOTATION_REQUEST_BODY)
+                        _type("$viewPackage.$deleteCommandClassName")
+                    }
+                    _param("user") {
+                        _annotation(loginClass)
+                        _type(userClass)
+                    }
+                    _body("$applicationServiceParam.delete(delete, user);")
+                }
+
+                _method("get") {
+                    _public()
+                    _annotation(ANNOTATION_OPERATION, operationSummary("${description}详情"))
+                    _annotation(ANNOTATION_GET_MAPPING, annotationValue("{id}"))
+                    _return("$viewPackage.$voClassName")
+                    _param("id") {
+                        _annotation(ANNOTATION_PARAMETER, parameterDescription("${description}ID"))
+                        _annotation(ANNOTATION_PATH_VARIABLE)
+                        _type(TYPE_STRING)
+                    }
+                    _body("return $searcherParam.get(id);")
+                }
+
+                _method("list") {
+                    _public()
+                    _annotation(ANNOTATION_OPERATION, operationSummary("${description}列表"))
+                    _annotation(ANNOTATION_GET_MAPPING, annotationValue("list"))
+                    _return("List<$voClassName>", false)
+                    _import(TYPE_LIST)
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
+                    _body("return $searcherParam.list(query);")
+                }
+
+                _method("page") {
+                    _public()
+                    _annotation(ANNOTATION_OPERATION, operationSummary("${description}分页"))
+                    _annotation(ANNOTATION_GET_MAPPING, annotationValue("page"))
+                    _return("Pages<$voClassName>", false)
+                    _import(TYPE_PAGES)
+                    _param("query") {
+                        _type("$viewPackage.$queryClassName")
+                    }
+                    _param("page") {
+                        _type("Pages.Args", false)
+                    }
+                    _body("return $searcherParam.page(query, page);")
+                }
+            }
+        }.writeTo(dir)
 
         if (model.myBatisPlus.get()) {
 

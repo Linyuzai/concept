@@ -5,6 +5,14 @@ import java.io.File
 
 const val ANNOTATION_NOT_NULL = "javax.validation.constraints.NotNull"
 const val ANNOTATION_NOT_EMPTY = "javax.validation.constraints.NotEmpty"
+const val ANNOTATION_REST_CONTROLLER = "org.springframework.web.bind.annotation.RestController"
+const val ANNOTATION_REQUEST_MAPPING = "org.springframework.web.bind.annotation.RequestMapping"
+const val ANNOTATION_REQUEST_BODY = "org.springframework.web.bind.annotation.RequestBody"
+const val ANNOTATION_POST_MAPPING = "org.springframework.web.bind.annotation.PostMapping"
+const val ANNOTATION_PUT_MAPPING = "org.springframework.web.bind.annotation.PutMapping"
+const val ANNOTATION_DELETE_MAPPING = "org.springframework.web.bind.annotation.DeleteMapping"
+const val ANNOTATION_GET_MAPPING = "org.springframework.web.bind.annotation.GetMapping"
+const val ANNOTATION_PATH_VARIABLE = "org.springframework.web.bind.annotation.PathVariable"
 const val ANNOTATION_SERVICE = "org.springframework.stereotype.Service"
 const val ANNOTATION_COMPONENT = "org.springframework.stereotype.Component"
 const val ANNOTATION_AUTOWIRED = "org.springframework.beans.factory.annotation.Autowired"
@@ -13,9 +21,11 @@ const val ANNOTATION_DATA = "lombok.Data"
 const val ANNOTATION_NO_ARGS_CONSTRUCTOR = "lombok.NoArgsConstructor"
 const val ANNOTATION_ALL_ARGS_CONSTRUCTOR = "lombok.AllArgsConstructor"
 const val ANNOTATION_REQUIRED_ARGS_CONSTRUCTOR = "lombok.RequiredArgsConstructor"
+const val ANNOTATION_TAG = "io.swagger.v3.oas.annotations.tags.Tag"
 const val ANNOTATION_SCHEMA = "io.swagger.v3.oas.annotations.media.Schema"
+const val ANNOTATION_OPERATION = "io.swagger.v3.oas.annotations.Operation"
+const val ANNOTATION_PARAMETER = "io.swagger.v3.oas.annotations.Parameter"
 
-const val TYPE_VOID = "void"
 const val TYPE_STRING = "java.lang.String"
 const val TYPE_LIST = "java.util.List"
 const val TYPE_COLLECTORS = "java.util.stream.Collectors"
@@ -33,9 +43,27 @@ const val TYPE_DOMAIN_NOT_FOUND_EXCEPTION = "com.github.linyuzai.domain.core.exc
 
 const val PARAM_ID = "id"
 const val PARAM_DESCRIPTION = "description"
+const val PARAM_NAME = "name"
+const val PARAM_SUMMARY = "summary"
 val PARAM_ACCESS_PROTECTED = "access" to ("lombok.AccessLevel" to "PROTECTED")
 fun schemaDescription(desc: String): Pair<String, Pair<String, String>> {
     return PARAM_DESCRIPTION to ("" to "\"$desc\"")
+}
+
+fun tagName(name: String): Pair<String, Pair<String, String>> {
+    return PARAM_NAME to ("" to "\"$name\"")
+}
+
+fun operationSummary(summary: String): Pair<String, Pair<String, String>> {
+    return PARAM_SUMMARY to ("" to "\"$summary\"")
+}
+
+fun parameterDescription(desc: String): Pair<String, Pair<String, String>> {
+    return PARAM_DESCRIPTION to ("" to "\"$desc\"")
+}
+
+fun annotationValue(value: String): Pair<String, Pair<String, String>> {
+    return "" to ("" to "\"$value\"")
 }
 
 data class JavaBuilder(val _name: String) : ContentGenerator() {
@@ -237,9 +265,9 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
 
     private var _access = ""
 
-    private val _params = mutableListOf<Pair<String, String>>()
+    private val _params = mutableListOf<FieldBuilder>()
 
-    private var _return = ""
+    private var _return = "void"
 
     private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
 
@@ -257,11 +285,11 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
         this._access = "protected"
     }
 
-    fun _param(_type: String, _name: String, _import: Boolean = true) {
-        this._params.add(_type to _name)
-        if (_import) {
-            this._java._import(_type)
-        }
+    fun _param(_name: String, _init: FieldBuilder.() -> Unit): FieldBuilder {
+        val builder = FieldBuilder(_java, _name)
+        builder._init()
+        this._params.add(builder)
+        return builder
     }
 
     fun _return(_return: String, _import: Boolean = true) {
@@ -313,7 +341,7 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
 
             addAccess(_access)
 
-            val args = _params.joinToString(",") { "${it.first.toSampleName()} ${it.second}" }
+            val args = _params.joinToString(",") { it._asParam() }
 
             append("${_return.toSampleName()} $_name($args)")
 
@@ -348,9 +376,11 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
         this._final = true
     }
 
-    fun _type(_type: String) {
+    fun _type(_type: String, _import: Boolean = true) {
         this._type = _type
-        this._java._import(_type)
+        if (_import) {
+            this._java._import(_type)
+        }
     }
 
     fun _annotation(_type: String, vararg _params: Pair<String, Pair<String, String>>) {
@@ -363,6 +393,16 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
 
     fun _comment(_comment: String) {
         this._comment = _comment
+    }
+
+    fun _asParam(): String {
+        return buildString {
+            addAnnotations(_annotations)
+
+            addAccess(_access)
+
+            append("${_type.toSampleName()} $_name")
+        }
     }
 
     override fun content(): String {
@@ -455,7 +495,7 @@ fun StringBuilder.addAnnotations(_annotations: List<Pair<String, Array<out Pair<
                 })
             }
         }
-        append("\n")
+        append(" ")
     }
 }
 

@@ -26,6 +26,8 @@ public abstract class GenerateCodeAction extends AnAction {
 
     public static final String RECENTS_KEY_USER_DOMAIN_CLASS = "ConceptCloud@UserDomainClass";
 
+    public static final String RECENTS_KEY_LOGIN_ANNOTATION_CLASS = "ConceptCloud@LoginAnnotationClass";
+
     public static class Context {
 
         Project project;

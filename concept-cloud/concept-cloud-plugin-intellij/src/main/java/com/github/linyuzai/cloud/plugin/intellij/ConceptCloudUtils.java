@@ -70,16 +70,27 @@ public class ConceptCloudUtils {
                         TYPE_DOMAIN_VALUE.equals(psiInterface.getQualifiedName()));
     }
 
-    public static PsiClass searchClass(String name, Project project, boolean forceDomain,
-                                       Function<PsiClass[], PsiClass> domainFilter) {
+    public static PsiClass searchInterface(String name, Project project) {
+        return searchClass(name, project, true, psiClasses -> {
+            for (PsiClass psiClass : psiClasses) {
+                if (psiClass.isInterface()) {
+                    return psiClass;
+                }
+            }
+            return null;
+        });
+    }
+
+    public static PsiClass searchClass(String name, Project project, boolean forceAllScopeFilter,
+                                       Function<PsiClass[], PsiClass> allScopeFilter) {
         if (name == null) {
             return null;
         }
         final PsiShortNamesCache cache = PsiShortNamesCache.getInstance(project);
         PsiClass[] allClasses = cache.getClassesByName(name, GlobalSearchScope.allScope(project));
-        PsiClass psiClass = domainFilter.apply(allClasses);
+        PsiClass psiClass = allScopeFilter.apply(allClasses);
         if (psiClass == null) {
-            if (forceDomain) {
+            if (forceAllScopeFilter) {
                 return null;
             }
             PsiClass[] classes = cache.getClassesByName(name, GlobalSearchScope.projectScope(project));

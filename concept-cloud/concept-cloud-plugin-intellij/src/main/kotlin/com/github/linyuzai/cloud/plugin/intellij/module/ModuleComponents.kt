@@ -31,6 +31,14 @@ object ModuleComponents {
                 ) {}
             }
 
+            row("Login Annotation Class:") {
+                classesComboBox(
+                    project,
+                    GenerateCodeAction.RECENTS_KEY_LOGIN_ANNOTATION_CLASS,
+                    model.loginAnnotationClass
+                ) {}
+            }
+
             row("Module Module (.main):") {
                 modulesComboBox(project, model.moduleModule)
             }

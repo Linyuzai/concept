@@ -98,7 +98,9 @@ object DomainFileGenerator {
 
                     _method(PARAM_ID) {
                         _public()
-                        _param(TYPE_STRING, PARAM_ID)
+                        _param(PARAM_ID) {
+                            _type(TYPE_STRING)
+                        }
                         _return("Builder")
                         _body("this.id=id;", "return this;")
                     }
@@ -107,7 +109,9 @@ object DomainFileGenerator {
                         val mn = it.propName.get()
                         _method(mn) {
                             _public()
-                            _param(it.propClass.get(), mn)
+                            _param(mn) {
+                                _type(it.propClass.get())
+                            }
                             _return("Builder")
                             _comment(it.propComment.get())
                             _body("this.$mn=$mn;", "return this;")
@@ -238,9 +242,12 @@ object DomainFileGenerator {
 
                 _method("create") {
                     _public()
-                    _return(TYPE_VOID)
-                    _param(domainObjectClassName, domainObjectParam)
-                    _param(userClassName, userParam)
+                    _param(domainObjectParam) {
+                        _type(domainObjectClassName)
+                    }
+                    _param(userParam) {
+                        _type(userClassName)
+                    }
                     val args = "$domainObjectParam,$userParam"
                     _body(
                         "$domainRepositoryParam.create($domainObjectParam);",
@@ -251,11 +258,16 @@ object DomainFileGenerator {
 
                 _method("update") {
                     _public()
-                    _return(TYPE_VOID)
 
-                    _param(domainObjectClassName, newDomainObjectParam)
-                    _param(domainObjectClassName, oldDomainObjectParam)
-                    _param(userClassName, userParam)
+                    _param(newDomainObjectParam) {
+                        _type(domainObjectClassName)
+                    }
+                    _param(oldDomainObjectParam) {
+                        _type(domainObjectClassName)
+                    }
+                    _param(userParam) {
+                        _type(userClassName)
+                    }
 
                     val args = "$newDomainObjectParam,$oldDomainObjectParam,$userParam"
 
@@ -269,9 +281,13 @@ object DomainFileGenerator {
 
                 _method("delete") {
                     _public()
-                    _return(TYPE_VOID)
-                    _param(domainObjectClassName, domainObjectParam)
-                    _param(userClassName, userParam)
+
+                    _param(domainObjectParam) {
+                        _type(domainObjectClassName)
+                    }
+                    _param(userParam) {
+                        _type(userClassName)
+                    }
                     val args = "$domainObjectParam,$userParam"
                     _body(
                         "$domainRepositoryParam.delete($domainObjectParam);",

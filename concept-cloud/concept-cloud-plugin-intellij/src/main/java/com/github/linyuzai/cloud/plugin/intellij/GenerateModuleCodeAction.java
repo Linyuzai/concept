@@ -29,6 +29,8 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
 
     @Override
     public DialogBuilder createDialogBuilder(Context context) {
+        PsiClass loginAnnotationClass = ConceptCloudUtils.searchInterface("Login", context.project);
+
         String className = ConceptCloudUtils.uppercaseFirst(context.selectPackage);
         PsiClass domainObjectClass = ConceptCloudUtils.searchDomainObjectClass(className,
                 context.project, true);
@@ -43,6 +45,9 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
         PsiClass domainRepositoryClass = ConceptCloudUtils.getClassPredicateInterface(classes,
                 psiInterface -> TYPE_DOMAIN_REPOSITORY.equals(psiInterface.getQualifiedName()));
 
+        String loginAnnotationClassName = loginAnnotationClass == null ? "" :
+                loginAnnotationClass.getQualifiedName();
+
         String domainObjectClassName = domainObjectClass == null ? "" :
                 domainObjectClass.getQualifiedName();
 
@@ -56,6 +61,7 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
                 domainRepositoryClass.getQualifiedName();
 
         final ModuleModel model = new ModuleModel(context.userClassName,
+                loginAnnotationClassName == null ? "" : loginAnnotationClassName,
                 context.selectModule, context.fullPackage,
                 domainObjectClassName == null ? "" : domainObjectClassName,
                 domainCollectionClassName == null ? "" : domainCollectionClassName,
@@ -114,6 +120,8 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
     public void onOk(Context context) {
         RecentsManager.getInstance(context.project).registerRecentEntry(
                 RECENTS_KEY_USER_DOMAIN_CLASS, getModel(context).getUserClass().get());
+        RecentsManager.getInstance(context.project).registerRecentEntry(
+                RECENTS_KEY_LOGIN_ANNOTATION_CLASS, getModel(context).getLoginAnnotationClass().get());
     }
 
     @Override

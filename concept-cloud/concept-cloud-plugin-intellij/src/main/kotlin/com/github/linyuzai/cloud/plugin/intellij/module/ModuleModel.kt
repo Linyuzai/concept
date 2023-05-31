@@ -7,6 +7,7 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 
 data class ModuleModel(
     val initUserClass: String,
+    val initLoginAnnotationClass: String,
     val initModuleModule: Module?,
     val initModulePackage: String,
     val initDomainObjectClass: String,
@@ -17,6 +18,7 @@ data class ModuleModel(
 ) {
     val propertyGraph: PropertyGraph = PropertyGraph()
     val userClass: GraphProperty<String> = property { initUserClass }
+    val loginAnnotationClass: GraphProperty<String> = property { initLoginAnnotationClass }
     val moduleModule: GraphProperty<Module?> = property { initModuleModule }
     val modulePackage: GraphProperty<String> = property { initModulePackage }
     val domainObjectClass: GraphProperty<String> = property { initDomainObjectClass }
