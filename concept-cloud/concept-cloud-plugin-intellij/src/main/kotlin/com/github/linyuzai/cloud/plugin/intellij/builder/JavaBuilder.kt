@@ -15,8 +15,10 @@ const val ANNOTATION_ALL_ARGS_CONSTRUCTOR = "lombok.AllArgsConstructor"
 const val ANNOTATION_REQUIRED_ARGS_CONSTRUCTOR = "lombok.RequiredArgsConstructor"
 const val ANNOTATION_SCHEMA = "io.swagger.v3.oas.annotations.media.Schema"
 
-const val TYPE_STRING = "java.lang.String"
 const val TYPE_VOID = "void"
+const val TYPE_STRING = "java.lang.String"
+const val TYPE_LIST = "java.util.List"
+const val TYPE_COLLECTORS = "java.util.stream.Collectors"
 const val TYPE_DOMAIN_VALUE = "com.github.linyuzai.domain.core.DomainValue"
 const val TYPE_DOMAIN_ENTITY = "com.github.linyuzai.domain.core.DomainEntity"
 const val TYPE_DOMAIN_COLLECTION = "com.github.linyuzai.domain.core.DomainCollection"
@@ -24,8 +26,10 @@ const val TYPE_DOMAIN_REPOSITORY = "com.github.linyuzai.domain.core.DomainReposi
 const val TYPE_DOMAIN_ID_GENERATOR = "com.github.linyuzai.domain.core.DomainIdGenerator"
 const val TYPE_DOMAIN_VALIDATOR = "com.github.linyuzai.domain.core.DomainValidator"
 const val TYPE_DOMAIN_EVENT_PUBLISHER = "com.github.linyuzai.domain.core.DomainEventPublisher"
+const val TYPE_PAGES = "com.github.linyuzai.domain.core.page.Pages"
 const val TYPE_DOMAIN_CONDITIONS = "com.github.linyuzai.domain.core.condition.Conditions"
 const val TYPE_DOMAIN_LAMBDA_CONDITIONS = "com.github.linyuzai.domain.core.condition.LambdaConditions"
+const val TYPE_DOMAIN_NOT_FOUND_EXCEPTION = "com.github.linyuzai.domain.core.exception.DomainNotFoundException"
 
 const val PARAM_ID = "id"
 const val PARAM_DESCRIPTION = "description"
@@ -97,6 +101,9 @@ data class InterfaceBuilder(val _java: JavaBuilder, val _name: String) : Content
     fun _extends(_type: String, vararg _generic: String) {
         _interfaces.add(_type to _generic)
         _java._import(_type)
+        _generic.forEach {
+            _java._import(it)
+        }
     }
 
     fun _method(_name: String, _init: MethodBuilder.() -> Unit): MethodBuilder {
@@ -250,20 +257,18 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
         this._access = "protected"
     }
 
-    fun _param(_type: String, _name: String) {
-        _params(_type to _name)
-    }
-
-    fun _params(vararg _params: Pair<String, String>) {
-        this._params.addAll(_params)
-        _params.forEach {
-            this._java._import(it.first)
+    fun _param(_type: String, _name: String, _import: Boolean = true) {
+        this._params.add(_type to _name)
+        if (_import) {
+            this._java._import(_type)
         }
     }
 
-    fun _return(_return: String) {
+    fun _return(_return: String, _import: Boolean = true) {
         this._return = _return
-        this._java._import(_return)
+        if (_import) {
+            this._java._import(_return)
+        }
     }
 
     fun _override() {
@@ -288,11 +293,11 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
     }
 
     fun _body(vararg _body: String) {
-        this._body(_body.joinToString(""))
+        this._body(_body.joinToString("\n"))
     }
 
     fun _todo(_todo: String = _name, returnNull: Boolean = true) {
-        val todo = "//TODO $_todo"
+        val todo = "\t\t//TODO $_todo"
         if (returnNull) {
             this._body(todo, "return null;")
         } else {
@@ -303,6 +308,8 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
     override fun content(): String {
         return buildString {
             addComment(_comment)
+
+            addAnnotations(_annotations)
 
             addAccess(_access)
 
@@ -400,7 +407,13 @@ inline fun _java(_name: String, init: JavaBuilder.() -> Unit): JavaBuilder {
     return builder
 }
 
-fun String.toSampleName() = this.substringAfterLast(".")
+val IGNORE_SAMPLE_NAME_ARRAY = arrayOf("Pages.Args")
+
+fun String.toSampleName() = if (IGNORE_SAMPLE_NAME_ARRAY.contains(this)) {
+    this
+} else {
+    this.substringAfterLast(".")
+}
 
 fun String.uppercaseFirst() = this[0].uppercase() + this.substring(1)
 
