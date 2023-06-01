@@ -3,7 +3,6 @@ package com.github.linyuzai.mapqueue.core.concurrent;
 import com.github.linyuzai.mapqueue.core.concept.MapQueueElement;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -2033,7 +2032,6 @@ public abstract class AbstractBlockingMapQueueTemp<K, V> implements BlockingMapQ
             return AbstractBlockingMapQueueTemp.this.pollValue();
         }
 
-        @Nullable
         @Override
         public V poll(long timeout, @NonNull TimeUnit unit) throws InterruptedException {
             return AbstractBlockingMapQueueTemp.this.pollValue(timeout, unit);

@@ -9,6 +9,7 @@ ext {
 }
 
 dependencies {
+    compileOnly "com.baomidou:mybatis-plus-boot-starter:${MyBatisPlusVersion}"
     compileOnly project(':concept-domain:concept-domain-core')
 }
 

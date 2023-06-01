@@ -9,6 +9,8 @@ ext {
 }
 
 dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'
     compileOnly project(':concept-router:concept-router-core')
 }
 

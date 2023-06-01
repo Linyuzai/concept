@@ -9,6 +9,8 @@ ext {
 }
 
 dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure'
+    compileOnly 'org.springframework.kafka:spring-kafka'
     compileOnly project(':concept-event:concept-event-core')
 }
 

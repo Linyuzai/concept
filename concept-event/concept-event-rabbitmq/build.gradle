@@ -9,6 +9,7 @@ ext {
 }
 
 dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
     compileOnly project(':concept-event:concept-event-core')
 }
 

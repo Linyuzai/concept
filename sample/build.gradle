@@ -16,8 +16,8 @@ dependencies {
     annotationProcessor "com.github.linyuzai:concept-inherit-processor:1.0.0"*/
 
     implementation project(path: ':concept-inherit:concept-inherit-core', configuration: 'default')
-    implementation project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
-    annotationProcessor project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
+    //implementation project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
+    //annotationProcessor project(path: ':concept-inherit:concept-inherit-processor', configuration: 'default')
 
     //implementation 'com.github.linyuzai:concept-mapqueue-core:1.1.0'
     implementation project(path: ':concept-mapqueue:concept-mapqueue-core', configuration: 'default')

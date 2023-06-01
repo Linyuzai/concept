@@ -9,6 +9,13 @@ plugins {
 
 allprojects {
 
+    ext {
+        set('SpringDocVersion', '1.6.13')
+        set('MyBatisPlusVersion', '3.5.2')
+        set('NettyVersion', '4.1.85.Final')
+        set('XnioVersion', '3.8.6.Final')
+    }
+
     group = 'com.github.linyuzai'
 
     repositories {
@@ -40,7 +47,7 @@ allprojects {
 
     dependencies {
 
-        compileOnly 'org.springframework.cloud:spring-cloud-starter'
+        /*compileOnly 'org.springframework.cloud:spring-cloud-starter'
         compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'
 
         compileOnly 'org.springframework.boot:spring-boot-starter'
@@ -52,11 +59,11 @@ allprojects {
 
         compileOnly 'org.springframework.kafka:spring-kafka'
 
-        compileOnly 'org.springdoc:springdoc-openapi-ui:1.6.13'
-        compileOnly 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
+        compileOnly "org.springdoc:springdoc-openapi-ui:${SpringDocVersion}"
+        compileOnly "com.baomidou:mybatis-plus-boot-starter:${MyBatisPlusVersion}"
 
-        compileOnly 'org.jboss.xnio:xnio-api:3.8.6.Final'
-        compileOnly 'io.netty:netty-all:4.1.85.Final'
+        compileOnly "org.jboss.xnio:xnio-api:${XnioVersion}"
+        compileOnly "io.netty:netty-all:${NettyVersion}"*/
 
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
@@ -76,7 +83,7 @@ allprojects {
         useJUnitPlatform()
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = "UTF-8"
     }
 

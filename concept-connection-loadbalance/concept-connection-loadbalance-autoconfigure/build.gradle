@@ -8,6 +8,7 @@ ext {
 }
 
 dependencies {
+    compileOnly 'org.springframework.cloud:spring-cloud-starter'
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
 }

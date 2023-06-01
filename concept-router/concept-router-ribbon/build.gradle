@@ -13,6 +13,7 @@ dependencies {
     compileOnly 'org.springframework.cloud:spring-cloud-starter-gateway:2.2.5.RELEASE'
     compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.5.RELEASE'
     compileOnly 'org.springframework.cloud:spring-cloud-starter-netflix-ribbon:2.2.5.RELEASE'
+    compileOnly 'org.springframework.cloud:spring-cloud-openfeign-core:2.2.5.RELEASE'
     compileOnly 'com.netflix.servo:servo-core:0.12.21'
 }
 

@@ -8,6 +8,7 @@ ext {
 }
 
 dependencies {
+    compileOnly "io.netty:netty-all:${NettyVersion}"
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
 }
 

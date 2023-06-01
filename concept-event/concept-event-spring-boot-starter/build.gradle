@@ -10,6 +10,8 @@ ext {
 
 dependencies {
 
+    compileOnly 'org.springframework.boot:spring-boot-starter'
+
     //compile "com.github.linyuzai:concept-event-core:${ConceptEventVersion}"
     //compile "com.github.linyuzai:concept-event-kafka:${ConceptEventVersion}"
     //compile "com.github.linyuzai:concept-event-rabbitmq:${ConceptEventVersion}"

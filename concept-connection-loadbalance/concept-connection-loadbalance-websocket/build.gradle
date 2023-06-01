@@ -8,6 +8,9 @@ ext {
 }
 
 dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
+    compileOnly "org.jboss.xnio:xnio-api:${XnioVersion}"
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
 }
 

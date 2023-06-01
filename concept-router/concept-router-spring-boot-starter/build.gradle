@@ -9,6 +9,11 @@ ext {
 }
 
 dependencies {
+
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'
+
     //compile "com.github.linyuzai:concept-router-core:${ConceptRouterVersion}"
     //compile "com.github.linyuzai:concept-router-loadbalancer:${ConceptRouterVersion}"
     //compile "com.github.linyuzai:concept-router-ribbon:${ConceptRouterVersion}"
@@ -16,6 +21,10 @@ dependencies {
     compileOnly project(':concept-router:concept-router-core')
     compileOnly project(':concept-router:concept-router-loadbalancer')
     compileOnly project(':concept-router:concept-router-ribbon')
+
+    implementation 'org.webjars:vue:2.6.11'
+    implementation 'org.webjars.npm:vue-resource:1.5.1'
+    implementation 'org.webjars.npm:element-ui:2.15.1'
 }
 
 apply from: '../../publish.gradle'

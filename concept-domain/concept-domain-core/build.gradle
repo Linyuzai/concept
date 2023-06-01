@@ -9,6 +9,7 @@ ext {
 }
 
 dependencies {
+    compileOnly "org.springdoc:springdoc-openapi-ui:${SpringDocVersion}"
 }
 
 apply from: '../../publish.gradle'
