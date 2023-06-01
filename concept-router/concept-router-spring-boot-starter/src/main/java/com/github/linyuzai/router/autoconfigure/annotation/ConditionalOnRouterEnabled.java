@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
-@ConditionalOnClass(Registration.class)
+@ConditionalOnClass(name = "org.springframework.cloud.client.serviceregistry.Registration")
 @ConditionalOnProperty(name = "concept.router.enabled", havingValue = "true", matchIfMissing = true)
 public @interface ConditionalOnRouterEnabled {
 }
