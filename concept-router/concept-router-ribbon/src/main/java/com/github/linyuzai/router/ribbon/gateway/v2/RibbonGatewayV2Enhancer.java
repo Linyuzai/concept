@@ -8,32 +8,37 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cloud.gateway.filter.LoadBalancerClientFilter;
 import org.springframework.cloud.netflix.ribbon.SpringClientFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 
 /**
  * 增强网关拦截器和 {@link SpringClientFactory}
  */
-@AllArgsConstructor
-public class RibbonGatewayV2Enhancer implements BeanPostProcessor {
+public class RibbonGatewayV2Enhancer implements BeanPostProcessor, ApplicationContextAware {
 
-    private final ApplicationContext context;
-
-    private final RouterConcept concept;
+    private ApplicationContext applicationContext;
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
+        //noinspection deprecation
         if (bean instanceof LoadBalancerClientFilter) {
             if (bean instanceof RouterLoadBalancerClientFilterV2) {
                 return bean;
             }
-            return new RouterLoadBalancerClientFilterV2(context);
+            return new RouterLoadBalancerClientFilterV2(applicationContext);
         }
         if (bean instanceof SpringClientFactory) {
             if (bean instanceof RouterSpringClientFactory) {
                 return bean;
             }
+            RouterConcept concept = applicationContext.getBean(RouterConcept.class);
             return new RouterSpringClientFactory((SpringClientFactory) bean, concept);
         }
         return bean;
+    }
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

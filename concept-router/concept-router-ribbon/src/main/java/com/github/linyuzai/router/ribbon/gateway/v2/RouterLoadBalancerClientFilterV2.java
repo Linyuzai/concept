@@ -16,6 +16,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 /**
  * 重写网关拦截器
  */
+@SuppressWarnings("deprecation")
 public class RouterLoadBalancerClientFilterV2 extends LoadBalancerClientFilter {
 
     public RouterLoadBalancerClientFilterV2(ApplicationContext context) {

@@ -1,6 +1,8 @@
 package com.github.linyuzai.router.autoconfigure.annotation;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.client.serviceregistry.Registration;
 
 import java.lang.annotation.*;
 
@@ -10,6 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
+@ConditionalOnClass(Registration.class)
 @ConditionalOnProperty(name = "concept.router.enabled", havingValue = "true", matchIfMissing = true)
 public @interface ConditionalOnRouterEnabled {
 }

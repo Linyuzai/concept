@@ -14,6 +14,9 @@ allprojects {
         set('MyBatisPlusVersion', '3.5.2')
         set('NettyVersion', '4.1.85.Final')
         set('XnioVersion', '3.8.6.Final')
+        set('VueVersion', '2.6.11')
+        set('VueResourceVersion', '1.5.1')
+        set('ElementUIVersion', '2.15.1')
     }
 
     group = 'com.github.linyuzai'

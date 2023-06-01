@@ -1,0 +1,4 @@
+com.github.linyuzai.router.autoconfigure.RouterAutoConfiguration
+com.github.linyuzai.router.autoconfigure.RouterLoadbalancerAutoConfiguration
+com.github.linyuzai.router.autoconfigure.RouterRibbonAutoConfiguration
+com.github.linyuzai.router.autoconfigure.RouterManagementAutoConfiguration

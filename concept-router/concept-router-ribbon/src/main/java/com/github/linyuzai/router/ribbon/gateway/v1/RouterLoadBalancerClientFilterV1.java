@@ -6,7 +6,6 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.cloud.gateway.filter.LoadBalancerClientFilter;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.cloud.netflix.ribbon.RibbonLoadBalancerClient;
@@ -27,7 +26,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
  * 该代码为 spring boot 2.2.5
  */
 public class RouterLoadBalancerClientFilterV1 implements GlobalFilter, Ordered {
-    private static final Log log = LogFactory.getLog(LoadBalancerClientFilter.class);
+    private static final Log log = LogFactory.getLog(RouterLoadBalancerClientFilterV1.class);
     public static final int LOAD_BALANCER_CLIENT_FILTER_ORDER = 10100;
     private final LoadBalancerClient loadBalancer;
 

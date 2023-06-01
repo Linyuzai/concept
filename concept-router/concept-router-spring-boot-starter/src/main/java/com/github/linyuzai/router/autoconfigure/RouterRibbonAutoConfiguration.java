@@ -1,13 +1,11 @@
 package com.github.linyuzai.router.autoconfigure;
 
 import com.github.linyuzai.router.autoconfigure.annotation.ConditionalOnRouterEnabled;
-import com.github.linyuzai.router.core.concept.RouterConcept;
 import com.github.linyuzai.router.ribbon.feign.RibbonFeignEnhancer;
 import com.github.linyuzai.router.ribbon.gateway.v1.RibbonGatewayV1Enhancer;
 import com.github.linyuzai.router.ribbon.gateway.v2.RibbonGatewayV2Enhancer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,9 +20,8 @@ public class RouterRibbonAutoConfiguration {
     public static class GatewayV1Configuration {
 
         @Bean
-        public RibbonGatewayV1Enhancer ribbonGatewayV1Enhancer(ApplicationContext context,
-                                                                          RouterConcept concept) {
-            return new RibbonGatewayV1Enhancer(context, concept);
+        public static RibbonGatewayV1Enhancer ribbonGatewayV1Enhancer() {
+            return new RibbonGatewayV1Enhancer();
         }
     }
 
@@ -36,9 +33,8 @@ public class RouterRibbonAutoConfiguration {
     public static class GatewayV2Configuration {
 
         @Bean
-        public RibbonGatewayV2Enhancer ribbonGatewayV2Enhancer(ApplicationContext context,
-                                                                          RouterConcept concept) {
-            return new RibbonGatewayV2Enhancer(context, concept);
+        public static RibbonGatewayV2Enhancer ribbonGatewayV2Enhancer() {
+            return new RibbonGatewayV2Enhancer();
         }
     }
 
@@ -48,8 +44,8 @@ public class RouterRibbonAutoConfiguration {
     public static class FeignConfiguration {
 
         @Bean
-        public RibbonFeignEnhancer ribbonFeignEnhancer(RouterConcept concept) {
-            return new RibbonFeignEnhancer(concept);
+        public static RibbonFeignEnhancer ribbonFeignEnhancer() {
+            return new RibbonFeignEnhancer();
         }
     }
 }

@@ -31,8 +31,10 @@ public class RouterManagementAutoConfiguration {
 
         @Override
         public void addResourceHandlers(org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/concept-router/**")
+            registry.addResourceHandler("/concept-router/**", "/concept/router/**")
                     .addResourceLocations("classpath:/concept/router/");
+            registry.addResourceHandler("/webjars/**")
+                    .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
     }
 
@@ -43,8 +45,10 @@ public class RouterManagementAutoConfiguration {
 
         @Override
         public void addResourceHandlers(org.springframework.web.reactive.config.ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/concept-router/**")
+            registry.addResourceHandler("/concept-router/**", "/concept/router/**")
                     .addResourceLocations("classpath:/concept/router/");
+            registry.addResourceHandler("/webjars/**")
+                    .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
     }
 }
