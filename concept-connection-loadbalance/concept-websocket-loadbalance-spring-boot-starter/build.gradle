@@ -10,6 +10,11 @@ ext {
 dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //api "com.github.linyuzai:concept-connection-loadbalance-core:${ConceptConnectionLoadbalanceVersion}"
+    //api "com.github.linyuzai:concept-connection-loadbalance-websocket:${ConceptConnectionLoadbalanceVersion}"
+    //api "com.github.linyuzai:concept-connection-loadbalance-autoconfigure:${ConceptConnectionLoadbalanceVersion}"
+
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure')
