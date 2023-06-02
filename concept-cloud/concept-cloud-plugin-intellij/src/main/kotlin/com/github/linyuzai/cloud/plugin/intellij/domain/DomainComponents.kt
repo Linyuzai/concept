@@ -22,7 +22,7 @@ object DomainComponents {
         val dialog = DialogBuilder(project)
         dialog.setTitle(title)
         val panel = BorderLayoutPanel().apply {
-            val dimension = Dimension(950, 500)
+            val dimension = Dimension(1000, 500)
             //preferredSize = dimension
             minimumSize = dimension
         }
@@ -72,7 +72,7 @@ object DomainComponents {
             }
 
             row("Domain Class Props:") {
-                val addButton = InplaceButton(
+                /*val addButton = InplaceButton(
                     IconButton(
                         "Add prop",
                         AllIcons.General.InlineAdd, AllIcons.General.InlineAddHover
@@ -80,7 +80,10 @@ object DomainComponents {
                 ) {
                     model.addDomainProp()
                 }
-                component(addButton)
+                component(addButton)*/
+                button("Add Prop") {
+                    model.addDomainProp()
+                }
             }
 
             row {

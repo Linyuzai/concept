@@ -80,11 +80,15 @@ object ModuleComponents {
                     project,
                     ModuleModel.RECENTS_KEY_MODULE_DOMAIN_REPOSITORY_CLASS,
                     model.domainRepositoryClass
-                ) {}
+                ) {
+                    //childComponent.addDocumentListener()
+                }
             }
 
             row("Domain Description:") {
-                textField(model.domainDescription)
+                textField(model.domainDescription) {
+                    //document.addDocumentListener()
+                }
             }
 
             row("Infrastructure:") {
