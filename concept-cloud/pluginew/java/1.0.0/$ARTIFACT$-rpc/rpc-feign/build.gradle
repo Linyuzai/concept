@@ -1,5 +1,4 @@
 dependencies {
-    implementation project(':$ARTIFACT$-rpc')
-    implementation project(':$ARTIFACT$-domain:domain-user')
+    api project(':$ARTIFACT$-rpc')
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }

@@ -11,6 +11,7 @@ import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 
 /**
  * Token 拦截器
@@ -30,15 +31,29 @@ public class TokenWebInterceptor implements WebInterceptor {
      */
     @Override
     public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
-        Request request = context.get(Request.class);
-        String token = request.getHeader(TOKEN_HEADER);
-        if (token == null) {
-            throw new IllegalArgumentException("Token not found");
+        HandlerMethod hm = context.get(HandlerMethod.class);
+        Token annotation = hm.getMethodAnnotation(Token.class);
+        if (annotation == null || annotation.required()) {
+            Request request = context.get(Request.class);
+            if (shouldIntercept(request)) {
+                String token = request.getHeader(TOKEN_HEADER);
+                if (token == null) {
+                    throw new IllegalArgumentException("Token not found");
+                }
+                User user = tokenCodec.decode(handleToken(token));
+                LoginContext.setUser(user);
+                LoginContext.setToken(token);
+            }
         }
-        User user = tokenCodec.decode(handleToken(token));
-        LoginContext.setUser(user);
-        LoginContext.setToken(token);
-        return chain.next(context, returner);
+    }
+
+    private boolean shouldIntercept(Request request) {
+        String path = request.getPath();
+        if (path.startsWith("/concept-router/") || path.startsWith("/concept/router/")) {
+            //协同路由
+            return false;
+        }
+        return true;
     }
 
     private String handleToken(String token) {

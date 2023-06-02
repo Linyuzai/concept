@@ -518,6 +518,8 @@ object ModuleFileGenerator {
         }.writeTo(dir)
 
         if (model.myBatisPlus.get()) {
+            val mbpPackage = "$modulePackage.infrastructure.${domainObjectClass.uppercase()}.mbp"
+            val mbpDir = File(dir, "infrastructure/${domainObjectClass.uppercase()}/mbp")
 
         }
     }

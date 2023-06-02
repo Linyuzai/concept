@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':$ARTIFACT$-basic:basic-boot') //单体应用基础模块
+    api project(':$ARTIFACT$-basic:basic-boot') //单体应用基础模块
 
     implementation 'org.springframework.cloud:spring-cloud-loadbalancer'
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'

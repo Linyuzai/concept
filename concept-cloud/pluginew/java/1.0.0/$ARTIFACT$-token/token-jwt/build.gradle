@@ -1,4 +1,4 @@
 dependencies {
-    implementation project(':$ARTIFACT$-token')
+    api project(':$ARTIFACT$-token')
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
 }
