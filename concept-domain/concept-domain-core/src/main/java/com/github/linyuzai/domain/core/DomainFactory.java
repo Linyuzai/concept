@@ -27,4 +27,6 @@ public interface DomainFactory {
     <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Collection<String> ids);
 
     <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<? extends DomainObject> objects);
+
+    <C extends DomainCollection<?>> C createEmptyCollection(Class<C> cls);
 }

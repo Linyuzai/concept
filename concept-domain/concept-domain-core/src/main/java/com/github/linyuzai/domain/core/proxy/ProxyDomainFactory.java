@@ -72,4 +72,9 @@ public class ProxyDomainFactory implements DomainFactory {
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<? extends DomainObject> objects) {
         return new ProxyListableDomainCollection<>(cls, context, new ArrayList<>(objects)).create(cls);
     }
+
+    @Override
+    public <C extends DomainCollection<?>> C createEmptyCollection(Class<C> cls) {
+        return createCollection(cls, Collections.emptyList());
+    }
 }
