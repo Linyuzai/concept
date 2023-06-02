@@ -14,8 +14,12 @@ const val ANNOTATION_DELETE_MAPPING = "org.springframework.web.bind.annotation.D
 const val ANNOTATION_GET_MAPPING = "org.springframework.web.bind.annotation.GetMapping"
 const val ANNOTATION_PATH_VARIABLE = "org.springframework.web.bind.annotation.PathVariable"
 const val ANNOTATION_SERVICE = "org.springframework.stereotype.Service"
+const val ANNOTATION_REPOSITORY = "org.springframework.stereotype.Repository"
 const val ANNOTATION_COMPONENT = "org.springframework.stereotype.Component"
 const val ANNOTATION_AUTOWIRED = "org.springframework.beans.factory.annotation.Autowired"
+const val ANNOTATION_CONFIGURATION = "org.springframework.context.annotation.Configuration"
+const val ANNOTATION_BEAN = "org.springframework.context.annotation.Bean"
+const val ANNOTATION_CONDITIONAL_ON_MISSING_BEAN = "org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean"
 const val ANNOTATION_GETTER = "lombok.Getter"
 const val ANNOTATION_DATA = "lombok.Data"
 const val ANNOTATION_NO_ARGS_CONSTRUCTOR = "lombok.NoArgsConstructor"
@@ -25,10 +29,16 @@ const val ANNOTATION_TAG = "io.swagger.v3.oas.annotations.tags.Tag"
 const val ANNOTATION_SCHEMA = "io.swagger.v3.oas.annotations.media.Schema"
 const val ANNOTATION_OPERATION = "io.swagger.v3.oas.annotations.Operation"
 const val ANNOTATION_PARAMETER = "io.swagger.v3.oas.annotations.Parameter"
+const val ANNOTATION_TABLE_NAME = "com.baomidou.mybatisplus.annotation.TableName"
+const val ANNOTATION_TABLE_ID = "com.baomidou.mybatisplus.annotation.TableId"
+const val ANNOTATION_TABLE_LOGIC = "com.baomidou.mybatisplus.annotation.TableLogic"
 
+const val TYPE_BOOLEAN = "java.lang.Boolean"
 const val TYPE_STRING = "java.lang.String"
+const val TYPE_DATE = "java.util.Date"
 const val TYPE_LIST = "java.util.List"
 const val TYPE_COLLECTORS = "java.util.stream.Collectors"
+const val TYPE_IDENTIFIABLE = "com.github.linyuzai.domain.core.Identifiable"
 const val TYPE_DOMAIN_VALUE = "com.github.linyuzai.domain.core.DomainValue"
 const val TYPE_DOMAIN_ENTITY = "com.github.linyuzai.domain.core.DomainEntity"
 const val TYPE_DOMAIN_COLLECTION = "com.github.linyuzai.domain.core.DomainCollection"
@@ -40,12 +50,16 @@ const val TYPE_PAGES = "com.github.linyuzai.domain.core.page.Pages"
 const val TYPE_DOMAIN_CONDITIONS = "com.github.linyuzai.domain.core.condition.Conditions"
 const val TYPE_DOMAIN_LAMBDA_CONDITIONS = "com.github.linyuzai.domain.core.condition.LambdaConditions"
 const val TYPE_DOMAIN_NOT_FOUND_EXCEPTION = "com.github.linyuzai.domain.core.exception.DomainNotFoundException"
+const val TYPE_MBP_DOMAIN_REPOSITORY = "com.github.linyuzai.domain.mbp.MBPDomainRepository"
+const val TYPE_MBP_DOMAIN_ID_GENERATOR = "com.github.linyuzai.domain.mbp.MBPDomainIdGenerator"
+const val TYPE_BASE_MAPPER = "com.baomidou.mybatisplus.core.mapper.BaseMapper"
 
 const val PARAM_ID = "id"
 const val PARAM_DESCRIPTION = "description"
 const val PARAM_NAME = "name"
 const val PARAM_SUMMARY = "summary"
 val PARAM_ACCESS_PROTECTED = "access" to ("lombok.AccessLevel" to "PROTECTED")
+val PARAM_ID_TYPE_INPUT = "type" to ("com.baomidou.mybatisplus.annotation.IdType" to "INPUT")
 fun schemaDescription(desc: String): Pair<String, Pair<String, String>> {
     return PARAM_DESCRIPTION to ("" to "\"$desc\"")
 }
@@ -65,6 +79,8 @@ fun parameterDescription(desc: String): Pair<String, Pair<String, String>> {
 fun annotationValue(value: String): Pair<String, Pair<String, String>> {
     return "" to ("" to "\"$value\"")
 }
+
+val IGNORE_CLASS_ARRAY = arrayOf("Pages.Args")
 
 data class JavaBuilder(val _name: String) : ContentGenerator() {
 
@@ -102,10 +118,12 @@ data class JavaBuilder(val _name: String) : ContentGenerator() {
     override fun content(): String {
         return buildString {
             append("package $_package;\n")
-            _imports.filterNot { it.startsWith("java.lang.") }
+            _imports.asSequence()
+                .filterNot { it.startsWith("java.lang.") }
+                .filterNot { IGNORE_CLASS_ARRAY.contains(it) }
                 .filter { it.isNotBlank() }
                 .filter { it.contains(".") }
-                .sorted()
+                .sorted().toList()
                 .forEach {
                     append("import $it;\n")
                 }
@@ -195,11 +213,17 @@ data class ClassBuilder(val _java: JavaBuilder, val _name: String) : ContentGene
     fun _extends(_type: String, vararg _generic: String) {
         this._extends = _type to _generic
         this._java._import(_type)
+        _generic.forEach {
+            this._java._import(it)
+        }
     }
 
     fun _implements(_type: String, vararg _generic: String) {
-        _interfaces.add(_type to _generic)
-        _java._import(_type)
+        this._interfaces.add(_type to _generic)
+        this._java._import(_type)
+        _generic.forEach {
+            this._java._import(it)
+        }
     }
 
     fun _field(_name: String, _init: FieldBuilder.() -> Unit): FieldBuilder {
@@ -244,11 +268,7 @@ data class ClassBuilder(val _java: JavaBuilder, val _name: String) : ContentGene
 
             if (_extends.first.isNotEmpty()) {
                 append("extends ")
-                append(_extends.first.toSampleName())
-                if (_extends.second.isNotEmpty()) {
-                    append(_extends.second.joinToString(",", "<", ">")
-                    { s -> s.toSampleName() })
-                }
+                addGeneric(_extends)
                 append(" ")
             }
 
@@ -267,7 +287,7 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
 
     private val _params = mutableListOf<FieldBuilder>()
 
-    private var _return = "void"
+    private var _return = Pair<String, Array<out String>>("void", emptyArray())
 
     private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
 
@@ -292,10 +312,11 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
         return builder
     }
 
-    fun _return(_return: String, _import: Boolean = true) {
-        this._return = _return
-        if (_import) {
-            this._java._import(_return)
+    fun _return(_type: String, vararg _generic: String) {
+        this._return = _type to _generic
+        this._java._import(_type)
+        _generic.forEach {
+            this._java._import(it)
         }
     }
 
@@ -343,7 +364,8 @@ data class MethodBuilder(private val _java: JavaBuilder, private val _name: Stri
 
             val args = _params.joinToString(",") { it._asParam() }
 
-            append("${_return.toSampleName()} $_name($args)")
+            addGeneric(_return)
+            append(" $_name($args)")
 
             if (_hasBody) {
                 append("{\n")
@@ -362,11 +384,15 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
 
     private var _final = false
 
-    private var _type = ""
+    private var _type = Pair<String, Array<out String>>("", emptyArray())
 
     private val _annotations = mutableListOf<Pair<String, Array<out Pair<String, Pair<String, String>>>>>()
 
     private var _comment = ""
+
+    fun _private() {
+        this._access = "private"
+    }
 
     fun _protected() {
         this._access = "protected"
@@ -376,10 +402,11 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
         this._final = true
     }
 
-    fun _type(_type: String, _import: Boolean = true) {
-        this._type = _type
-        if (_import) {
-            this._java._import(_type)
+    fun _type(_type: String, vararg _generic: String) {
+        this._type = _type to _generic
+        this._java._import(_type)
+        _generic.forEach {
+            this._java._import(it)
         }
     }
 
@@ -401,7 +428,8 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
 
             addAccess(_access)
 
-            append("${_type.toSampleName()} $_name")
+            addGeneric(_type)
+            append(" $_name")
         }
     }
 
@@ -417,7 +445,8 @@ data class FieldBuilder(private val _java: JavaBuilder, private val _name: Strin
                 append("final ")
             }
 
-            append("${_type.toSampleName()} $_name;\n")
+            addGeneric(_type)
+            append(" $_name;\n")
         }
     }
 }
@@ -447,9 +476,8 @@ inline fun _java(_name: String, init: JavaBuilder.() -> Unit): JavaBuilder {
     return builder
 }
 
-val IGNORE_SAMPLE_NAME_ARRAY = arrayOf("Pages.Args")
 
-fun String.toSampleName() = if (IGNORE_SAMPLE_NAME_ARRAY.contains(this)) {
+fun String.toSampleName() = if (IGNORE_CLASS_ARRAY.contains(this)) {
     this
 } else {
     this.substringAfterLast(".")
@@ -466,6 +494,10 @@ fun String.toGetter(ifIs: Boolean): String {
     } else {
         "get$temp"
     }
+}
+
+fun String.toUnderlineCase(): String {
+    return replace(Regex("[A-Z]"), "_\$0").lowercase()
 }
 
 fun StringBuilder.addComment(_comment: String) {
@@ -509,13 +541,17 @@ fun StringBuilder.addInterfaces(implementsOrExtends: String, _interfaces: List<P
     if (_interfaces.isNotEmpty()) {
         append("$implementsOrExtends ")
         _interfaces.forEach {
-            append(it.first.toSampleName())
-            if (it.second.isNotEmpty()) {
-                append(it.second.joinToString(",", "<", ">")
-                { s -> s.toSampleName() })
-            }
+            addGeneric(it)
         }
         append(" ")
+    }
+}
+
+fun StringBuilder.addGeneric(pair: Pair<String, Array<out String>>) {
+    append(pair.first.toSampleName())
+    if (pair.second.isNotEmpty()) {
+        append(pair.second.joinToString(",", "<", ">")
+        { s -> s.toSampleName() })
     }
 }
 

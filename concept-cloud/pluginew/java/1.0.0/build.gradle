@@ -81,7 +81,7 @@ allprojects {
     String prefix = '$ARTIFACT$'
     if (project.name.contains("application-")) {
         bootJar.enabled = true
-        bootJar.archiveBaseName = "$prefix-${project.name}"
+        bootJar.archiveBaseName.set("$prefix-${project.name}")
         jar.enabled = false
     } else {
         jar.enabled = true
@@ -89,9 +89,9 @@ allprojects {
         //指定名称
         //前缀aa方便查看压缩包
         if (project.depth <= 1) {
-            jar.archiveBaseName = "aa-${project.name}"
+            jar.archiveBaseName.set("aa-${project.name}")
         } else {
-            jar.archiveBaseName = "aa-$prefix-${project.name}"
+            jar.archiveBaseName.set("aa-$prefix-${project.name}")
         }
 
         bootJar.enabled = false

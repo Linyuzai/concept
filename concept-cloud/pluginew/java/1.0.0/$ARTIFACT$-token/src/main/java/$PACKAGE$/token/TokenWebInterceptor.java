@@ -45,6 +45,7 @@ public class TokenWebInterceptor implements WebInterceptor {
                 LoginContext.setToken(token);
             }
         }
+        return chain.next(context, returner);
     }
 
     private boolean shouldIntercept(Request request) {

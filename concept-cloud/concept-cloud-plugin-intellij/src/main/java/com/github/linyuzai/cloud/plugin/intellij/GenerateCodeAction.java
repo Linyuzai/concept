@@ -47,6 +47,19 @@ public abstract class GenerateCodeAction extends AnAction {
         String userClassName;
 
         Object model;
+
+        public void withParentPackage() {
+            if (psiPackage == null || path == null) {
+                return;
+            }
+            PsiPackage parentPackage = psiPackage.getParentPackage();
+            File parentFile = new File(path).getParentFile();
+            if (parentPackage == null || parentFile == null) {
+                return;
+            }
+            psiPackage = parentPackage;
+            path = parentFile.getPath();
+        }
     }
 
     @Override

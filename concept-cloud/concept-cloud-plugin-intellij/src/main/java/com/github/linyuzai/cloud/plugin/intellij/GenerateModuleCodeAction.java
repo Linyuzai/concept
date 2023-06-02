@@ -60,9 +60,12 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
         String domainRepositoryClassName = domainRepositoryClass == null ? "" :
                 domainRepositoryClass.getQualifiedName();
 
+        context.withParentPackage();//to domain
+        context.withParentPackage();//to module
+
         final ModuleModel model = new ModuleModel(context.userClassName,
                 loginAnnotationClassName == null ? "" : loginAnnotationClassName,
-                context.selectModule, context.fullPackage,
+                context.selectModule, getModulePackage(context.psiPackage),
                 domainObjectClassName == null ? "" : domainObjectClassName,
                 domainCollectionClassName == null ? "" : domainCollectionClassName,
                 domainServiceClassName == null ? "" : domainServiceClassName,
@@ -72,6 +75,13 @@ public class GenerateModuleCodeAction extends GenerateCodeAction {
         context.model = model;
 
         return ModuleComponents.createGenerateModuleCodeDialog(context.project, model, getDialogTitle());
+    }
+
+    private String getModulePackage(PsiPackage psiPackage) {
+        if (psiPackage == null) {
+            return "";
+        }
+        return psiPackage.getQualifiedName();
     }
 
     private String getDomainDescriptionByComment(PsiClass psiClass) {

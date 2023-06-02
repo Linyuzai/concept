@@ -16,13 +16,13 @@
         "springBoot": "2.7.6",
         "springDependencyManagement": "1.1.0",
         "springCloudDependencyManagement": "2021.0.4",
-        "conceptDomain": "1.7.0",
-        "conceptCloudWeb": "1.5.2",
+        "conceptDomain": "1.7.1",
+        "conceptCloudWeb": "1.5.3",
         "myBatisPlus": "3.5.2"
       },
       "dependencies": {
         "websocket-loadbalance": [
-          "implementation 'com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:1.0.4'",
+          "implementation 'com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:1.1.0'",
           "implementation 'org.springframework.boot:spring-boot-starter-websocket'"
         ],
         "download": [
@@ -38,7 +38,7 @@
           "implementation 'com.github.linyuzai:concept-plugin-jar:1.0.1'"
         ],
         "router": [
-          "implementation 'com.github.linyuzai:concept-router-spring-boot-starter:1.0.0'"
+          "implementation 'com.github.linyuzai:concept-router-spring-boot-starter:1.1.0'"
         ],
         "sync-waiting": [
           "implementation 'com.github.linyuzai:concept-sync-waiting:1.0.0'"
