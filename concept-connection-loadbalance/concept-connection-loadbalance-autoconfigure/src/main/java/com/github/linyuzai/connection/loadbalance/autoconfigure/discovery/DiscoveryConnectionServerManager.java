@@ -34,26 +34,6 @@ public class DiscoveryConnectionServerManager implements ConnectionServerManager
         this.local = new ServiceInstanceConnectionServer(registration);
     }
 
-    @Override
-    public void add(ConnectionServer server) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void remove(ConnectionServer server) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isEqual(ConnectionServer server1, ConnectionServer server2) {
-        return server1.getHost().equals(server2.getHost()) && server1.getPort() == server2.getPort();
-    }
-
     /**
      * 获得所有除自身外的服务实例
      *

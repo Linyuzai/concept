@@ -135,7 +135,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             connectionSubscriber.subscribe(server, this, connection -> {
                 onEstablish(connection);
                 if (sendServerMsg) {
-                    connection.send(createMessage(connectionServerManager.getLocal()));
+                    ConnectionServer local = connectionServerManager.getLocal();
+                    if (local != null) {
+                        connection.send(createMessage(local));
+                    }
                 }
             });
         } catch (Throwable e) {
@@ -668,7 +671,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected void preBuild() {
             if (connectionServerManager == null) {
-                throw new ConnectionLoadBalanceException("ConnectionServerProvider is null");
+                throw new ConnectionLoadBalanceException("ConnectionServerManager is null");
             }
             if (connectionSubscriber == null) {
                 throw new ConnectionLoadBalanceException("ConnectionSubscriber is null");

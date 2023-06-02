@@ -12,10 +12,12 @@ import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecut
 import com.github.linyuzai.connection.loadbalance.core.extension.SampleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,13 +44,31 @@ public class ConnectionLoadBalanceConfiguration {
         return new ScopeHelper(context, sns);
     }
 
-    @Bean
-    @ConnectionScope
-    @ConditionalOnMissingBean
-    @ConditionalOnClass({DiscoveryClient.class, Registration.class})
-    public ConnectionServerManager connectionServerProvider(DiscoveryClient client,
-                                                            Registration registration) {
-        return new DiscoveryConnectionServerManager(client, registration);
+    @ConditionalOnClass(name = {
+            "org.springframework.cloud.client.discovery.DiscoveryClient",
+            "org.springframework.cloud.client.serviceregistry.Registration"})
+    public static class DiscoveryConnectionServerManagerConfiguration {
+
+        @Bean
+        @ConnectionScope
+        @ConditionalOnMissingBean
+        public ConnectionServerManager connectionServerManager(DiscoveryClient client,
+                                                               Registration registration) {
+            return new DiscoveryConnectionServerManager(client, registration);
+        }
+    }
+
+    @ConditionalOnMissingClass({
+            "org.springframework.cloud.client.discovery.DiscoveryClient",
+            "org.springframework.cloud.client.serviceregistry.Registration"})
+    public static class ImplConnectionServerManagerConfiguration {
+
+        @Bean
+        @ConnectionScope
+        @ConditionalOnMissingBean
+        public ConnectionServerManager connectionServerManager() {
+            return new ConnectionServerManagerImpl();
+        }
     }
 
     @Bean

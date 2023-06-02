@@ -7,13 +7,21 @@ import java.util.List;
  */
 public interface ConnectionServerManager {
 
-    void add(ConnectionServer server);
+    default void add(ConnectionServer server) {
+        throw new UnsupportedOperationException();
+    }
 
-    void remove(ConnectionServer server);
+    default void remove(ConnectionServer server) {
+        throw new UnsupportedOperationException();
+    }
 
-    void clear();
+    default void clear() {
+        throw new UnsupportedOperationException();
+    }
 
-    boolean isEqual(ConnectionServer server1, ConnectionServer server2);
+    default boolean isEqual(ConnectionServer server1, ConnectionServer server2) {
+        return server1.getHost().equals(server2.getHost()) && server1.getPort() == server2.getPort();
+    }
 
     ConnectionServer getLocal();
 

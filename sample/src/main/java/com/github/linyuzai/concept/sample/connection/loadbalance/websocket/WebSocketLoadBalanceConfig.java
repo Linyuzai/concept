@@ -51,7 +51,7 @@ public class WebSocketLoadBalanceConfig {
     }
 
     @Bean
-    public ConnectionServerManager connectionServerProvider() {
+    public ConnectionServerManager connectionServerManager() {
         return new ConnectionServerManager() {
             @Override
             public void add(ConnectionServer server) {
