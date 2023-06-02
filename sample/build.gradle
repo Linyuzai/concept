@@ -9,6 +9,8 @@ version = '0.0.1-SNAPSHOT'
 dependencies {
 
     implementation project(path: ':concept-domain:concept-domain-core', configuration: 'default')
+    implementation project(path: ':concept-domain:concept-domain-mbp', configuration: 'default')
+    compileOnly "com.baomidou:mybatis-plus-boot-starter:${MyBatisPlusVersion}"
 
     implementation project(path: ':concept-cloud:concept-cloud-web', configuration: 'default')
 

@@ -4,10 +4,20 @@ import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.mock.MockDomainContext;
 import com.github.linyuzai.domain.core.proxy.ProxyDomainFactory;
+import com.github.linyuzai.domain.mbp.MBPDomainIdGenerator;
 
 import java.util.Arrays;
 
 public class DomainTest {
+
+    public void testIdGenerator() {
+        UserIdGenerator idGenerator = MBPDomainIdGenerator.create(UserIdGenerator.class);
+        String id = idGenerator.generateId(null);
+        System.out.println(id);
+        System.out.println(idGenerator.toString());
+        System.out.println(idGenerator.equals(idGenerator));
+        System.out.println(idGenerator.hashCode());
+    }
 
     public void test() {
         UserRepository repository = new UserRepositoryImpl();
