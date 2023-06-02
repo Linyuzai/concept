@@ -3,8 +3,8 @@ package $PACKAGE$.module.user.config;
 import $PACKAGE$.domain.user.UserIdGenerator;
 import $PACKAGE$.domain.user.UserRepository;
 import $PACKAGE$.module.user.domain.user.*;
-import $PACKAGE$.module.user.infrastructure.user.mbp.MBPUserIdGenerator;
 import $PACKAGE$.module.user.infrastructure.user.mbp.MBPUserRepository;
+import com.github.linyuzai.domain.mbp.MBPDomainIdGenerator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +39,7 @@ public class DomainUserConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public UserIdGenerator userIdGenerator() {
-            return new MBPUserIdGenerator();
+            return MBPDomainIdGenerator.create(UserIdGenerator.class);
         }
 
         @Bean

@@ -3,8 +3,8 @@ package $PACKAGE$.module.sample.config;
 import $PACKAGE$.domain.sample.SampleRepository;
 import $PACKAGE$.domain.sample.SampleService;
 import $PACKAGE$.module.sample.domain.sample.*;
-import $PACKAGE$.module.sample.infrastructure.sample.mbp.MBPSampleIdGenerator;
 import $PACKAGE$.module.sample.infrastructure.sample.mbp.MBPSampleRepository;
+import com.github.linyuzai.domain.mbp.MBPDomainIdGenerator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,7 +54,7 @@ public class DomainSampleConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public SampleIdGenerator sampleIdGenerator() {
-            return new MBPSampleIdGenerator();
+            return MBPDomainIdGenerator.create(SampleIdGenerator.class);
         }
 
         @Bean
