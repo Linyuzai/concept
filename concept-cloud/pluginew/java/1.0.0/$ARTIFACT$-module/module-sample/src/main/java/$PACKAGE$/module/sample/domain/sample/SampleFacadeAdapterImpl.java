@@ -4,6 +4,7 @@ import $PACKAGE$.domain.sample.Sample;
 import $PACKAGE$.domain.sample.SampleImpl;
 import $PACKAGE$.domain.user.User;
 import $PACKAGE$.module.sample.domain.sample.view.SampleCreateCommand;
+import $PACKAGE$.module.sample.domain.sample.view.SampleUpdateCommand;
 import $PACKAGE$.module.sample.domain.sample.view.SampleQuery;
 import $PACKAGE$.module.sample.domain.sample.view.SampleUserVO;
 import $PACKAGE$.module.sample.domain.sample.view.SampleVO;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 沸点领域模型转换适配器实现
+ * 领域模型转换适配器实现
  */
 @Component
 public class SampleFacadeAdapterImpl implements SampleFacadeAdapter {
@@ -30,10 +31,22 @@ public class SampleFacadeAdapterImpl implements SampleFacadeAdapter {
     private DomainValidator validator;
 
     @Override
-    public Sample from(SampleCreateCommand create, User user) {
+    public Sample from(SampleCreateCommand create) {
         String id = sampleIdGenerator.generateId(create);
         return new SampleImpl.Builder()
                 .id(id)
+                .user(null)
+                .users(factory.createEmptyCollection(Users.class))
+                .build(validator);
+    }
+
+    @Override
+    public Sample from(SampleUpdateCommand update, Sample old) {
+        return new SampleImpl.Builder()
+                .id(old.getId())
+                .sample(update.getSample())
+                .user(old.getUser())
+                .users(old.getUsers())
                 .build(validator);
     }
 
@@ -41,6 +54,12 @@ public class SampleFacadeAdapterImpl implements SampleFacadeAdapter {
     public SampleVO do2vo(Sample sample) {
         SampleVO vo = new SampleVO();
         vo.setId(sample.getId());
+        vo.setUser(getUser(sample.getUser()));
+        vo.setUsers(sample.getUsers()
+                .list()
+                .stream()
+                .map(this::getUser)
+                .collect(Collectors.toList()));
         return vo;
     }
 

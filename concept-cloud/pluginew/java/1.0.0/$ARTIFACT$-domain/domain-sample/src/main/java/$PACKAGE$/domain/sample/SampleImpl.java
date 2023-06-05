@@ -23,6 +23,10 @@ public class SampleImpl implements Sample {
 
     protected String sample;
 
+    protected User user;
+
+    protected Users users;
+
     public static class Builder extends AbstractDomainBuilder<SampleImpl> {
 
         @NotEmpty
@@ -30,6 +34,12 @@ public class SampleImpl implements Sample {
 
         @NotNull
         protected String sample;
+
+        @NotNull
+        protected User user;
+
+        @NotNull
+        protected Users users;
 
         public Builder id(String id) {
             this.id = id;
@@ -41,6 +51,16 @@ public class SampleImpl implements Sample {
             return this;
         }
 
+        public Builder user(User user) {
+            this.user = user;
+            return this;
+        }
+
+        public Builder users(Users users) {
+            this.users = users;
+            return this;
+        }
+
         @Override
         protected void init() {
 
@@ -48,7 +68,7 @@ public class SampleImpl implements Sample {
 
         @Override
         protected SampleImpl build() {
-            return new SampleImpl(id, sample);
+            return new SampleImpl(id, sample, user, users);
         }
     }
 }

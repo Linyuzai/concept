@@ -21,6 +21,8 @@ class SamplePO implements Identifiable {
 
     private String sample;
 
+    private String userId;
+
     @TableLogic
     private Boolean deleted;
 }

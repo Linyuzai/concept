@@ -8,6 +8,9 @@ import com.github.linyuzai.domain.core.page.Pages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 查询实现
  */
@@ -27,6 +30,15 @@ public class SampleSearcherImpl implements SampleSearcher {
             return null;
         }
         return sampleFacadeAdapter.do2vo(sample);
+    }
+
+    @Override
+    public List<SampleVO> list(SampleQuery query) {
+        return sampleRepository.select(sampleFacadeAdapter.toConditions(query))
+                .list()
+                .stream()
+                .map(sampleFacadeAdapter::do2vo)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -3,6 +3,7 @@ package $PACKAGE$.module.sample.domain.sample;
 import $PACKAGE$.domain.user.User;
 import $PACKAGE$.login.Login;
 import $PACKAGE$.module.sample.domain.sample.view.SampleCreateCommand;
+import $PACKAGE$.module.sample.domain.sample.view.SampleUpdateCommand;
 import $PACKAGE$.module.sample.domain.sample.view.SampleDeleteCommand;
 import $PACKAGE$.module.sample.domain.sample.view.SampleQuery;
 import $PACKAGE$.module.sample.domain.sample.view.SampleVO;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "示例")
 @RestController
@@ -30,6 +33,12 @@ public class SampleController {
         sampleApplicationService.create(create, user);
     }
 
+    @Operation(summary = "更新")
+    @PutMapping
+    public void update(@RequestBody SampleUpdateCommand update, @Login User user) {
+        sampleApplicationService.update(update, user);
+    }
+
     @Operation(summary = "删除")
     @DeleteMapping
     public void delete(@RequestBody SampleDeleteCommand delete, @Login User user) {
@@ -40,6 +49,12 @@ public class SampleController {
     @GetMapping("/{id}")
     public SampleVO get(@Parameter(description = "ID") @PathVariable String id) {
         return sampleSearcher.get(id);
+    }
+
+    @Operation(summary = "列表查询")
+    @GetMapping("list")
+    public List<SampleVO> list(SampleQuery query) {
+        return sampleSearcher.list(query);
     }
 
     @Operation(summary = "分页查询")

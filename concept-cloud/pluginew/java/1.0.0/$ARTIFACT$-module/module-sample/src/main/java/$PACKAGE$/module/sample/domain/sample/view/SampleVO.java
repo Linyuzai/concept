@@ -6,15 +6,18 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "沸点视图")
+@Schema(description = "示例视图")
 public class SampleVO {
 
-    @Schema(description = "沸点ID")
+    @Schema(description = "示例ID")
     private String id;
 
-    @Schema(description = "沸点内容")
+    @Schema(description = "示例内容")
     private String sample;
 
     @Schema(description = "用户")
     private SampleUserVO user;
+
+    @Schema(description = "用户列表")
+    private List<SampleUserVO> users;
 }
