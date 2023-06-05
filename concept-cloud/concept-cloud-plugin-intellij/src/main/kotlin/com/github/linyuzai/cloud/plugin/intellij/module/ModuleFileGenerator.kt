@@ -653,6 +653,7 @@ object ModuleFileGenerator {
                     _annotation(ANNOTATION_CONDITIONAL_ON_MISSING_BEAN)
                     _return("$domainPackage.$facadeAdapterClassName")
                     _body("return new $facadeAdapterImplClassName();")
+                    _import("$domainPackage.$facadeAdapterImplClassName")
                 }
 
                 _method(searcherParam) {
@@ -661,6 +662,7 @@ object ModuleFileGenerator {
                     _annotation(ANNOTATION_CONDITIONAL_ON_MISSING_BEAN)
                     _return("$domainPackage.$searcherClassName")
                     _body("return new $searcherImplClassName();")
+                    _import("$domainPackage.$searcherImplClassName")
                 }
 
                 if (model.myBatisPlus.get()) {
