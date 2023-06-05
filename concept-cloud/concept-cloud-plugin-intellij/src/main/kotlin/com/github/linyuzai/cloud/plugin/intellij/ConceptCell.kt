@@ -505,9 +505,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
                 recentsKey,
                 "Choose Destination Package"
             )
-        ).applyToComponent {
-
-        }.withBinding(
+        ).withBinding(
             { component -> component.text },
             { component, value -> component.text = value },
             modelBinding
@@ -518,7 +516,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
         project: Project,
         recentsKey: String,
         property: GraphProperty<String>,
-        init: ReferenceEditorComboWithBrowseButton.() -> Unit
+        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
         return classesComboBox(project, recentsKey, property::get, property::set, init)
             .withGraphProperty(property)
@@ -530,7 +528,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
         recentsKey: String,
         getter: () -> String,
         setter: (String) -> Unit,
-        init: ReferenceEditorComboWithBrowseButton.() -> Unit
+        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
         return classesComboBox(project, recentsKey, ConceptPropertyBinding(getter, setter), init)
     }
@@ -539,7 +537,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
         project: Project,
         recentsKey: String,
         modelBinding: ConceptPropertyBinding<String>,
-        init: ReferenceEditorComboWithBrowseButton.() -> Unit
+        init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
         return component(
             ReferenceEditorComboWithBrowseButton(
@@ -549,7 +547,9 @@ abstract class ConceptCell : ConceptBaseBuilder {
                 true,
                 JavaCodeFragment.VisibilityChecker.EVERYTHING_VISIBLE,
                 recentsKey
-            ).apply(init)
+            ).apply {
+                init?.invoke(this)
+            }
         ).applyToComponent {
             text = modelBinding.get()
             addActionListener {

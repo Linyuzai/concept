@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij;
 
+import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -110,7 +111,7 @@ public abstract class GenerateCodeAction extends AnAction {
 
         context.userClassName = userClass == null ? "" : userClass.getQualifiedName();
 
-        DialogBuilder dialog = createDialogBuilder(context);
+        ConceptDialog dialog = createDialog(context);
         if (dialog.showAndGet()) {
             onOk(context);
             ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
@@ -143,7 +144,7 @@ public abstract class GenerateCodeAction extends AnAction {
         }
     }
 
-    public abstract DialogBuilder createDialogBuilder(Context context);
+    public abstract ConceptDialog createDialog(Context context);
 
     public abstract void onOk(Context context);
 

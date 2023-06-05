@@ -18,14 +18,12 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Cursor
-import java.awt.event.ItemEvent
 
-class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
+class DomainPropsPanel(private val project: Project) : ScrollablePanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
 
     var propRemoveListener: ((DomainProp) -> Unit)? = null
 
     init {
-
         border = JBUI.Borders.empty(5, 5, 5, 15)
         background = UIUtil.getListBackground()
     }
@@ -57,11 +55,11 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
 
                     childComponent.apply {
 
-                        addItemListener {
+                        /*addItemListener {
                             if (it.stateChange == ItemEvent.SELECTED) {
-                                //println(it.item)
+
                             }
-                        }
+                        }*/
 
                         addDocumentListener(object : DocumentListener {
 
@@ -76,17 +74,6 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
                                     val n = name[0].lowercase() + name.substring(1)
                                     prop.onClassNameUpdateListener?.invoke(n)
                                 }
-                                /*val lastIndexOf = text.lastIndexOf(".")
-                                if (lastIndexOf > 0) {
-                                    val substring = text.substring(lastIndexOf).trim()
-                                    if (substring.length == 1) {
-                                        prop.onClassNameUpdateListener?.invoke("")
-                                    } else {
-                                        val s = substring.substring(1)
-                                        val t = s[0].lowercase() + s.substring(1)
-                                        prop.onClassNameUpdateListener?.invoke(t)
-                                    }
-                                }*/
                                 prop.smartFill = true
                             }
                         })
@@ -114,7 +101,7 @@ class DomainPropsPanel(val project: Project) : ScrollablePanel(VerticalLayout(UI
                 }
             }.largeGapAfter()
 
-            row("Prop Valid:") {
+            row("Prop Validation:") {
                 checkBox("Not null", prop.propNotNull)
                 checkBox("Not empty", prop.propNotEmpty)
             }.largeGapAfter()

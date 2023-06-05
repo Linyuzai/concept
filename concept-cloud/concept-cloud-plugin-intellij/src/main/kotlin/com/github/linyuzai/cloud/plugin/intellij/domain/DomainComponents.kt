@@ -1,13 +1,13 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
-import com.github.linyuzai.cloud.plugin.intellij.GenerateCodeAction
-import com.github.linyuzai.cloud.plugin.intellij.panel
-import com.intellij.icons.AllIcons
+import com.github.linyuzai.cloud.plugin.intellij.*
+import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog
+import com.github.linyuzai.cloud.plugin.intellij.util.withClassValidation
+import com.github.linyuzai.cloud.plugin.intellij.util.withPackageValidation
+import com.github.linyuzai.cloud.plugin.intellij.util.withTextValidation
+import com.intellij.ide.starters.shared.ValidationFunctions
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogBuilder
-import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.popup.IconButton
-import com.intellij.ui.InplaceButton
+import com.intellij.openapi.ui.*
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.layout.LCFlags
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -18,8 +18,8 @@ import java.awt.event.AdjustmentListener
 object DomainComponents {
 
     @JvmStatic
-    fun createGenerateDomainCodeDialog(project: Project, model: DomainModel, title: String): DialogBuilder {
-        val dialog = DialogBuilder(project)
+    fun createGenerateDomainCodeDialog(project: Project, model: DomainModel, title: String): ConceptDialog {
+        val dialog = ConceptDialog(project)
         dialog.setTitle(title)
         val panel = BorderLayoutPanel().apply {
             val dimension = Dimension(1000, 500)
@@ -27,7 +27,9 @@ object DomainComponents {
             minimumSize = dimension
         }
 
-        panel.addToCenter(createGenerateDomainPanel(project, model))
+        val dialogPanel = createGenerateDomainPanel(project, model, dialog)
+
+        panel.addToCenter(dialogPanel)
         panel.addToRight(createPreviewDomainPanel(model))
         dialog.setCenterPanel(panel)
         model.preview()
@@ -35,7 +37,11 @@ object DomainComponents {
     }
 
     @JvmStatic
-    fun createGenerateDomainPanel(project: Project, model: DomainModel): DialogPanel {
+    fun createGenerateDomainPanel(
+        project: Project,
+        model: DomainModel,
+        dialog: ConceptDialog
+    ): DialogPanel {
 
         return panel(LCFlags.fillX, LCFlags.fillY) {
 
@@ -44,7 +50,10 @@ object DomainComponents {
                     project,
                     GenerateCodeAction.RECENTS_KEY_USER_DOMAIN_CLASS,
                     model.userClass
-                ) {}
+                ).withClassValidation(
+                    dialog,
+                    ValidationFunctions.CHECK_NOT_EMPTY
+                )
             }
 
             row("Domain Module (.main):") {
@@ -56,15 +65,28 @@ object DomainComponents {
                     project,
                     DomainModel.RECENTS_KEY_DOMAIN_PACKAGE,
                     model.domainPackage
+                ).withPackageValidation(
+                    dialog,
+                    ValidationFunctions.CHECK_NOT_EMPTY
                 )
             }
 
             row("Domain Object Class Name:") {
                 textField(model.domainObjectClassName)
+                    .withTextValidation(
+                        dialog,
+                        ValidationFunctions.CHECK_NOT_EMPTY,
+                        ValidationFunctions.CHECK_SIMPLE_NAME_FORMAT,
+                    )
             }
 
             row("Domain Collection Class Name:") {
                 textField(model.domainCollectionClassName)
+                    .withTextValidation(
+                        dialog,
+                        ValidationFunctions.CHECK_NOT_EMPTY,
+                        ValidationFunctions.CHECK_SIMPLE_NAME_FORMAT,
+                    )
             }
 
             row("Domain Class Comment:") {

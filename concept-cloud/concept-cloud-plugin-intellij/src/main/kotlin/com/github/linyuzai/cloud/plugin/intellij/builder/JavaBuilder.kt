@@ -19,7 +19,8 @@ const val ANNOTATION_COMPONENT = "org.springframework.stereotype.Component"
 const val ANNOTATION_AUTOWIRED = "org.springframework.beans.factory.annotation.Autowired"
 const val ANNOTATION_CONFIGURATION = "org.springframework.context.annotation.Configuration"
 const val ANNOTATION_BEAN = "org.springframework.context.annotation.Bean"
-const val ANNOTATION_CONDITIONAL_ON_MISSING_BEAN = "org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean"
+const val ANNOTATION_CONDITIONAL_ON_MISSING_BEAN =
+    "org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean"
 const val ANNOTATION_GETTER = "lombok.Getter"
 const val ANNOTATION_DATA = "lombok.Data"
 const val ANNOTATION_NO_ARGS_CONSTRUCTOR = "lombok.NoArgsConstructor"
@@ -510,7 +511,7 @@ fun StringBuilder.addComment(_comment: String) {
 
 fun StringBuilder.addAnnotations(_annotations: List<Pair<String, Array<out Pair<String, Pair<String, String>>>>>) {
     if (_annotations.isNotEmpty()) {
-        _annotations.forEach {
+        _annotations.filter { it.first.isNotBlank() }.forEach {
             append("@${it.first.toSampleName()}")
             if (it.second.isNotEmpty()) {
                 append(it.second.joinToString(",", "(", ")") { param ->

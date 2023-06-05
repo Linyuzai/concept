@@ -119,17 +119,16 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
     private val serverOptionsLoadingSemaphore: Semaphore = Semaphore()
     private val serverSettingsButton: InplaceButton = InplaceButton(
-        IconButton("Configure", AllIcons.General.Gear, AllIcons.General.GearHover),
-        ActionListener {
-            configureServer()
-        }
-    )
+        IconButton("Configure", AllIcons.General.Gear, AllIcons.General.GearHover)
+    ) {
+        configureServer()
+    }
 
     init {
-        Disposer.register(parentDisposable, Disposable {
+        Disposer.register(parentDisposable) {
             sdkModel.disposeUIResources()
             currentRequest?.cancel(true)
-        })
+        }
     }
 
     override fun getComponent(): JComponent = contentPanel

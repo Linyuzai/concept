@@ -3,6 +3,7 @@ package com.github.linyuzai.cloud.plugin.intellij;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainFileGenerator;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainModel;
+import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.ui.RecentsManager;
 
@@ -21,7 +22,7 @@ public class GenerateDomainCodeAction extends GenerateCodeAction {
     }
 
     @Override
-    public DialogBuilder createDialogBuilder(Context context) {
+    public ConceptDialog createDialog(Context context) {
         final DomainModel model = new DomainModel(context.userClassName,
                 context.selectModule, context.fullPackage,
                 ConceptCloudUtils.uppercaseFirst(context.selectPackage));
@@ -33,8 +34,10 @@ public class GenerateDomainCodeAction extends GenerateCodeAction {
 
     @Override
     public void onOk(Context context) {
+        DomainModel model = getModel(context);
+        model.validProps();
         RecentsManager.getInstance(context.project).registerRecentEntry(
-                RECENTS_KEY_USER_DOMAIN_CLASS, getModel(context).getUserClass().get());
+                RECENTS_KEY_USER_DOMAIN_CLASS, model.getUserClass().get());
     }
 
     @Override

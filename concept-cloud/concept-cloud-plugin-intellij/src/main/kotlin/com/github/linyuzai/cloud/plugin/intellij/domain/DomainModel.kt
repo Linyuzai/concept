@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
+import com.github.linyuzai.cloud.plugin.intellij.builder.lowercaseFirst
 import com.github.linyuzai.cloud.plugin.intellij.builder.toSampleName
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -62,6 +63,17 @@ data class DomainModel(
 
     fun addOnDomainPropRemoveListener(listener: Consumer<DomainProp>) {
         onDomainPropRemoveListeners.add(listener)
+    }
+
+    fun validProps() {
+        domainProps.removeIf {
+            it.propClass.get().isBlank()
+        }
+        domainProps.forEach {
+            if (it.propName.get().isBlank()) {
+                it.propName.set(it.propClass.get().toSampleName().lowercaseFirst())
+            }
+        }
     }
 
     fun preview() {
