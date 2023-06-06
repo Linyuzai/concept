@@ -81,12 +81,13 @@ public interface DomainProxy extends InvocationHandler {
 
     @SneakyThrows
     static MethodHandle getMethodHandle(Method method) {
+        //MethodHandles.lookup().unreflectSpecial()
         Class<?> declaringClass = method.getDeclaringClass();
         Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
                 .getDeclaredConstructor(Class.class, int.class);
         constructor.setAccessible(true);
         return constructor.
-                newInstance(declaringClass, MethodHandles.Lookup.PRIVATE).
+                newInstance(declaringClass, MethodHandles.Lookup.PUBLIC | MethodHandles.Lookup.PRIVATE).
                 unreflectSpecial(method, declaringClass);
     }
 
@@ -165,7 +166,7 @@ public interface DomainProxy extends InvocationHandler {
             if (getCollection() instanceof ContextAccess) {
                 return ((ContextAccess) getCollection()).getContext();
             }
-            throw new UnsupportedOperationException("Can not access DomainContext, try");
+            throw new UnsupportedOperationException("Can not access DomainContext");
         }
 
         @Override
@@ -173,7 +174,7 @@ public interface DomainProxy extends InvocationHandler {
             if (getCollection() instanceof ConditionsAccess) {
                 return ((ConditionsAccess) getCollection()).getConditions();
             }
-            throw new UnsupportedOperationException("Can not access Conditions, try");
+            throw new UnsupportedOperationException("Can not access Conditions");
         }
 
         @SuppressWarnings("unchecked")
@@ -182,7 +183,7 @@ public interface DomainProxy extends InvocationHandler {
             if (getCollection() instanceof RepositoryAccess) {
                 return ((RepositoryAccess<T>) getCollection()).getRepository();
             }
-            throw new UnsupportedOperationException("Can not access DomainRepository, try");
+            throw new UnsupportedOperationException("Can not access DomainRepository");
         }
 
         @SuppressWarnings("unchecked")
@@ -191,7 +192,7 @@ public interface DomainProxy extends InvocationHandler {
             if (getCollection() instanceof ExtraAccess) {
                 return ((ExtraAccess<E>) getCollection()).getExtra();
             }
-            throw new UnsupportedOperationException("Can not access Extra, try");
+            throw new UnsupportedOperationException("Can not access Extra");
         }
 
         @SuppressWarnings("unchecked")
@@ -199,7 +200,9 @@ public interface DomainProxy extends InvocationHandler {
         default void setExtra(E extra) {
             if (getCollection() instanceof ExtraAccess) {
                 ((ExtraAccess<E>) getCollection()).setExtra(extra);
+                return;
             }
+            throw new UnsupportedOperationException("Can not access Extra");
         }
 
         DomainCollection<T> getCollection();

@@ -3,22 +3,10 @@ package com.github.linyuzai.concept.sample.domain;
 import com.github.linyuzai.domain.core.QueryDomainRepository;
 import com.github.linyuzai.domain.core.condition.Conditions;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UserRepositoryImpl extends QueryDomainRepository<User, Users<User>, UserPO> implements UserRepository {
-
-    private final Map<String, UserPO> map = new HashMap<>();
-
-    public UserRepositoryImpl() {
-        for (int i = 0; i < 5; i++) {
-            String id = String.valueOf(i);
-            map.put(id, new UserPO(id));
-        }
-    }
 
     @Override
     public User po2do(UserPO po) {
@@ -27,21 +15,43 @@ public class UserRepositoryImpl extends QueryDomainRepository<User, Users<User>,
 
     @Override
     protected UserPO doGet(String id) {
-        return map.get(id);
+        System.out.println("模拟数据库查询 > doGet(id)");
+        return new UserPO(id);
     }
 
     @Override
     protected Collection<UserPO> doSelect(Collection<String> ids) {
+        System.out.println("模拟数据库查询 > doSelect(ids)");
         return ids.stream().map(UserPO::new).collect(Collectors.toList());
     }
 
     @Override
     protected UserPO doGet(Conditions conditions) {
-        return map.get("0");
+        System.out.println("模拟数据库查询 > doGet(conditions)");
+        for (Conditions.Equal equal : conditions.getEquals()) {
+            if (equal.getKey().equals("id")) {
+                return new UserPO(equal.getValue().toString());
+            }
+        }
+        return null;
     }
 
     @Override
     protected Collection<UserPO> doSelect(Conditions conditions) {
-        return map.values();
+        System.out.println("模拟数据库查询 > doSelect(conditions)");
+        Collection<UserPO> pos = new ArrayList<>();
+        for (Conditions.Equal equal : conditions.getEquals()) {
+            if (equal.getKey().equals("id")) {
+                pos.add(new UserPO(equal.getValue().toString()));
+            }
+        }
+        for (Conditions.In in : conditions.getIns()) {
+            if (in.getKey().equals("id")) {
+                for (Object value : in.getValues()) {
+                    pos.add(new UserPO(value.toString()));
+                }
+            }
+        }
+        return pos;
     }
 }

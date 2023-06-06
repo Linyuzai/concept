@@ -36,4 +36,9 @@ public class UserImpl implements User {
     public void setExtra(Object extra) {
 
     }
+
+    @Override
+    public String getName() {
+        return "name:" + id;
+    }
 }

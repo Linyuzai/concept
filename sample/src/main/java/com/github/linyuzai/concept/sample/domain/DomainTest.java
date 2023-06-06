@@ -6,9 +6,15 @@ import com.github.linyuzai.domain.core.mock.MockDomainContext;
 import com.github.linyuzai.domain.core.proxy.ProxyDomainFactory;
 import com.github.linyuzai.domain.mbp.MBPDomainIdGenerator;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class DomainTest {
+
+    public DomainFactory getDomainFactory() {
+        UserRepository repository = new UserRepositoryImpl();
+        DomainContext context = new MockDomainContext(UserRepository.class, repository);
+        return new ProxyDomainFactory(context);
+    }
 
     public void testIdGenerator() {
         UserIdGenerator idGenerator = MBPDomainIdGenerator.create(UserIdGenerator.class);
@@ -20,66 +26,128 @@ public class DomainTest {
     }
 
     public void test() {
-        UserRepository repository = new UserRepositoryImpl();
-        DomainContext context = new MockDomainContext(UserRepository.class, repository);
-        DomainFactory factory = new ProxyDomainFactory(context);
+        testFactory10();
+    }
 
-        //Users select = repository.select(Arrays.asList("1", "2"));
-        //select.list().stream().map(Identifiable::getId).forEach(System.out::println);
+    public void testFactory1() {
+        DomainFactory factory = getDomainFactory();
+        User user = factory.createObject(User.class, "1");
+        System.out.println(user.getId());
+        user.test0();
+    }
 
-        /*User user = factory.createObject(User.class, "1");
-        System.out.println(user.getId());*/
+    public void testFactory2() {
+        DomainFactory factory = getDomainFactory();
+        User user = factory.createObject(User.class, new Conditions().equal("id", "2"));
+        System.out.println(user.getId());
+        user.test0();
+    }
 
-        //Users wrap = factory.createCollection(Users.class, Collections.singleton(user));
-        //wrap.list().stream().map(Identifiable::getId).forEach(System.out::println);
+    public void testFactory3() {
+        DomainFactory factory = getDomainFactory();
+        Users2 users = factory.createCollection(Users2.class, Arrays.asList("3", "_3"));
+        User user = factory.createObject(User.class, users, "3");
+        System.out.println(user.getId());
+        user.test0();
+    }
 
-        //Users users = factory.createCollection(Users.class);
-        //users.list().stream().map(Identifiable::getId).forEach(System.out::println);
+    public void testFactory4() {
+        DomainFactory factory = getDomainFactory();
+        Users2 users = factory.createCollection(Users2.class, Arrays.asList("4", "_4"));
+        User user = factory.createObject(User.class, users, u -> u.getId().equals("4"));
+        System.out.println(user.getId());
+        user.test0();
+    }
 
-        //User schrodingerUser = new SchrodingerUser("4", context);
-        //System.out.println(schrodingerUser.getId());
+    public void testFactory5() {
+        DomainFactory factory = getDomainFactory();
+        Map<String, String> idMapping = new LinkedHashMap<>();
+        idMapping.put("5", "5");
+        idMapping.put("_5", "_5");
+        Map<String, User> map = factory.createObject(User.class, Users2.class,
+                Arrays.asList("5", "_5"), idMapping);
+        for (Map.Entry<String, User> entry : map.entrySet()) {
+            System.out.println(entry.getKey());
+            User user = entry.getValue();
+            System.out.println(user.getId());
+            user.test0();
+            System.out.println("===============");
+        }
+    }
 
-        //Users schrodingerUsers = new SchrodingerUsers(context);
-        //schrodingerUsers.list().stream().map(Identifiable::getId).forEach(System.out::println);
+    public void testFactory6() {
+        DomainFactory factory = getDomainFactory();
+        //TODO user.test() = null
+        Users2 users = factory.createCollection(Users2.class, Arrays.asList("6", "_6"));
+        for (User user : users.list()) {
+            System.out.println(user.getId());
+            user.test0();
+            System.out.println("===============");
+        }
+        users.test1();
+        users.test2();
+    }
 
-        //User u = factory.createObject(User.class, factory.createCollection(Users.class), "doSelect1");
-        //System.out.println(u.getName());
+    public void testFactory7() {
+        DomainFactory factory = getDomainFactory();
+        //TODO user.test() = null
+        Users2 users = factory.createCollection(Users2.class, new Conditions()
+                .in("id", Arrays.asList("7", "_7")));
+        for (User user : users.list()) {
+            System.out.println(user.getId());
+            user.test0();
+            System.out.println("===============");
+        }
+        users.test1();
+        users.test2();
+    }
 
-        //Users us = factory.createCollection(Users.class, factory.createCollection(Users.class), Arrays.asList("doSelect1", "doSelect2"));
-        //us.list().stream().map(Identifiable::getId).forEach(System.out::println);
+    public void testFactory8() {
+        DomainFactory factory = getDomainFactory();
+        Users2 us = factory.createCollection(Users2.class, Arrays.asList("8", "_8"));
+        //TODO user.test() = null
+        Users2 users = factory.createCollection(Users2.class, us, Arrays.asList("8"));
+        for (User user : users.list()) {
+            System.out.println(user.getId());
+            user.test0();
+            System.out.println("===============");
+        }
+        users.test1();
+        users.test2();
+    }
 
-        User user0 = factory.createObject(User.class, "0");
-        System.out.println("user0: " + user0.getId());
-        user0.test0();
-        System.out.println();
+    public void testFactory9() {
+        DomainFactory factory = getDomainFactory();
+        Users2 us = factory.createCollection(Users2.class, Arrays.asList("9", "_9"));
+        //TODO user.test() = null
+        Users2 users = factory.createCollection(Users2.class, us, u -> u.getId().equals("9"));
+        for (User user : users.list()) {
+            System.out.println(user.getId());
+            user.test0();
+            System.out.println("===============");
+        }
+        users.test1();
+        users.test2();
+    }
 
-        User user1 = factory.createObject(User.class, factory.createCollection(Users2.class), "0");
-        System.out.println("user1: " + user1.getId());
-        user1.test0();
-        System.out.println();
-
-        Users2 users0 = factory.createCollection(Users2.class, Arrays.asList(new UserImpl("0"), new UserImpl("1")));
-        users0.stream().forEach(it -> System.out.println("users0: " + it.getId()));
-        users0.test1();
-        users0.test2();
-        System.out.println();
-
-        Users2 users1 = factory.createCollection(Users2.class);
-        users1.stream().forEach(it -> System.out.println("users1: " + it.getId()));
-        users1.test1();
-        users1.test2();
-        System.out.println();
-
-        Users2 users2 = factory.createCollection(Users2.class, factory.createCollection(Users2.class), Arrays.asList("0", "1"));
-        users2.stream().forEach(it -> System.out.println("users2: " + it.getId()));
-        users2.test1();
-        users2.test2();
-        System.out.println();
-
-        Users<User> select = repository.select(new Conditions());
-        select.test1();
-        System.out.println("=============");
-        context.aware(select);
-        select.test1();
+    public void testFactory10() {
+        DomainFactory factory = getDomainFactory();
+        Map<String, List<String>> idsMapping = new LinkedHashMap<>();
+        idsMapping.put("10", Arrays.asList("10"));
+        idsMapping.put("_10", Arrays.asList("_10"));
+        Map<String, Users2> map = factory.createCollection(User.class, Users2.class,
+                Arrays.asList("10", "_10"), idsMapping);
+        for (Map.Entry<String, Users2> entry : map.entrySet()) {
+            System.out.println(entry.getKey());
+            Users2 users = entry.getValue();
+            for (User user : users.list()) {
+                System.out.println(user.getId());
+                user.test0();
+                System.out.println("===============");
+            }
+            users.test1();
+            users.test2();
+            System.out.println("===============");
+        }
     }
 }

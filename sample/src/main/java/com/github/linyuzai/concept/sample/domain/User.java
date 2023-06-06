@@ -7,9 +7,11 @@ public interface User extends DomainEntity,
         DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<User>, DomainProxy.ExtraAccess<Object> {
 
+    String getName();
+
     default void test0() {
         System.out.println("test0");
-        System.out.println(this);
+        System.out.println(getName());
         System.out.println(getContext());
         System.out.println(getConditions());
         System.out.println(getRepository());

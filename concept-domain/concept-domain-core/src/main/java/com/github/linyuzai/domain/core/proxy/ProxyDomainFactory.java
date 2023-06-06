@@ -69,10 +69,10 @@ public class ProxyDomainFactory implements DomainFactory {
     }
 
     @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, Collection<String>> idsMapping) {
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, ? extends Collection<String>> idsMapping) {
         C collection = createCollection(cCls, limitedIds);
         Map<String, C> map = new LinkedHashMap<>();
-        for (Map.Entry<String, Collection<String>> entry : idsMapping.entrySet()) {
+        for (Map.Entry<String, ? extends Collection<String>> entry : idsMapping.entrySet()) {
             List<T> list = new ArrayList<>();
             for (String id : entry.getValue()) {
                 T object = createObject(dCls, collection, id);
