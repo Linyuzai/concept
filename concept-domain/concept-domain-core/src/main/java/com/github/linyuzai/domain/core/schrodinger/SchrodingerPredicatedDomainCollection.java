@@ -1,8 +1,6 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
 import com.github.linyuzai.domain.core.*;
-import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
-import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,7 @@ import java.util.stream.Stream;
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerOnceDomainCollection<T extends DomainObject> implements DomainCollection<T> {
+public class SchrodingerPredicatedDomainCollection<T extends DomainObject> implements DomainCollection<T> {
 
     @NonNull
     protected final DomainCollection<T> collection;
@@ -32,10 +30,23 @@ public class SchrodingerOnceDomainCollection<T extends DomainObject> implements 
     public T get(String id) {
         load();
         T domain = collection.get(id);
+        if (domain == null) {
+            return null;
+        }
         if (predicate.test(domain)) {
             return domain;
         }
-        throw new DomainNotFoundException(getDomainType(), id);
+        return null;
+    }
+
+    @Override
+    public boolean contains(String id) {
+        load();
+        T domain = collection.get(id);
+        if (domain == null) {
+            return false;
+        }
+        return predicate.test(domain);
     }
 
 
@@ -72,12 +83,5 @@ public class SchrodingerOnceDomainCollection<T extends DomainObject> implements 
     @Override
     public void release() {
         collection.release();
-    }
-
-    /**
-     * 领域模型类
-     */
-    protected Class<? extends T> getDomainType() {
-        return DomainLink.generic(getClass(), 0);
     }
 }

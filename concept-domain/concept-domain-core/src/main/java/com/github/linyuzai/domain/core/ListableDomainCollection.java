@@ -25,6 +25,11 @@ public class ListableDomainCollection<T extends DomainObject> implements DomainC
     }
 
     @Override
+    public boolean contains(String id) {
+        return getMap().containsKey(id);
+    }
+
+    @Override
     public List<T> list() {
         return list;
     }

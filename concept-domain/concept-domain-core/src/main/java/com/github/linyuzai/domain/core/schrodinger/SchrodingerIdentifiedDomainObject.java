@@ -10,16 +10,16 @@ import lombok.*;
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerDomainObject<T extends DomainObject> implements DomainObject {
+public class SchrodingerIdentifiedDomainObject<T extends DomainObject> implements DomainObject {
+
+    @NonNull
+    protected final DomainContext context;
 
     /**
      * 领域模型 id
      */
     @NonNull
     protected final String id;
-
-    @NonNull
-    protected final DomainContext context;
 
     protected DomainRepository<T, ?> repository;
 

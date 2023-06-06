@@ -9,7 +9,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,9 +20,10 @@ import java.util.stream.Stream;
 /**
  * 薛定谔的集合模型
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerDomainCollection<T extends DomainObject> implements DomainCollection<T> {
+public class SchrodingerCachedDomainCollection<T extends DomainObject> implements DomainCollection<T> {
 
     @NonNull
     protected final DomainContext context;
@@ -34,7 +38,7 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
 
     protected Long targetCount;
 
-    public SchrodingerDomainCollection(@NonNull DomainContext context, Conditions conditions) {
+    public SchrodingerCachedDomainCollection(@NonNull DomainContext context, Conditions conditions) {
         this.context = context;
         this.conditions = conditions;
     }
@@ -64,6 +68,28 @@ public class SchrodingerDomainCollection<T extends DomainObject> implements Doma
         } else {
             return exist;
         }
+    }
+
+    @Override
+    public boolean contains(String id) {
+        if (id == null) {
+            throw new DomainIdRequiredException(getDomainType());
+        }
+        if (targetMap == null) {
+            targetMap = new HashMap<>();
+        }
+        T exist = targetMap.get(id);
+        if (exist == null) {
+            T domain = doGet(id);
+            if (domain == null) {
+                return false;
+            }
+            targetMap.put(id, domain);
+
+            updateTargetList(id);
+
+        }
+        return true;
     }
 
     protected T doGet(String id) {

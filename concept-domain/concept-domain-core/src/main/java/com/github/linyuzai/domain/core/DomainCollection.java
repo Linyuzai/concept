@@ -21,6 +21,11 @@ public interface DomainCollection<T extends DomainObject> extends DomainObject {
     T get(String id);
 
     /**
+     * 是否存在对应的 id
+     */
+    boolean contains(String id);
+
+    /**
      * 列表查询
      */
     List<T> list();

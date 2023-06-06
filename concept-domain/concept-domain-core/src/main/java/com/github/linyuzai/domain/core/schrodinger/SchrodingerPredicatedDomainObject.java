@@ -2,7 +2,7 @@ package com.github.linyuzai.domain.core.schrodinger;
 
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.exception.DomainException;
+import com.github.linyuzai.domain.core.exception.DomainMultipleFoundException;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerOnceDomainObject<T extends DomainObject> implements DomainObject {
+public class SchrodingerPredicatedDomainObject<T extends DomainObject> implements DomainObject {
 
     @NonNull
     protected final DomainCollection<T> collection;
@@ -49,13 +49,15 @@ public class SchrodingerOnceDomainObject<T extends DomainObject> implements Doma
                 .stream()
                 .filter(predicate)
                 .collect(Collectors.toList());
-        if (list.size() == 0) {
-            throw new DomainNotFoundException(getDomainObjectType());
+        int size = list.size();
+        switch (size) {
+            case 0:
+                throw new DomainNotFoundException(getDomainObjectType());
+            case 1:
+                return list.get(0);
+            default:
+                throw new DomainMultipleFoundException(getDomainObjectType(), size);
         }
-        if (list.size() > 1) {
-            throw new DomainException("Multiple domain object found: " + list.size());
-        }
-        return list.get(0);
     }
 
     @Override

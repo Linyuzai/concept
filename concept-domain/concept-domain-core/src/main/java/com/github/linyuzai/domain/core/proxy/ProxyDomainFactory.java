@@ -5,7 +5,6 @@ import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.condition.Conditions;
-import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,61 +19,78 @@ public class ProxyDomainFactory implements DomainFactory {
 
     @Override
     public <T extends DomainObject> T createObject(Class<T> cls, String id) {
-        return new ProxySchrodingerDomainObject<>(cls, id, context).create(cls);
+        return new ProxySchrodingerIdentifiedDomainObject<>(cls, context, id).create(cls);
     }
 
     @Override
-    public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, Predicate<T> predicate) {
-        return new ProxySchrodingerOnceDomainObject<>(cls, collection, predicate).create(cls);
+    public <T extends DomainObject> T createObject(Class<T> cls, Conditions conditions) {
+        return new ProxySchrodingerConditionsDomainObject<>(cls, context, conditions).create(cls);
     }
 
     @Override
     public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, String id) {
-        return createObject(cls, collection, t -> t.getId().equals(id));
+        return new ProxySchrodingerLimitedDomainObject<>(cls, collection, id).create(cls);
     }
 
     @Override
-    public <C extends DomainCollection<?>> C createCollection(Class<C> cls) {
-        return new ProxySchrodingerDomainCollection<C>(cls, context).create(cls);
+    public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, Predicate<T> predicate) {
+        return new ProxySchrodingerPredicatedDomainObject<>(cls, collection, predicate).create(cls);
+    }
+
+    @Override
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, String> idMapping) {
+        C collection = createCollection(cCls, limitedIds);
+        Map<String, T> map = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : idMapping.entrySet()) {
+            T object = createObject(dCls, collection, entry.getValue());
+            map.put(entry.getKey(), object);
+        }
+        return map;
     }
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Conditions conditions) {
-        return new ProxySchrodingerDomainCollection<C>(cls, context, conditions).create(cls);
+        return new ProxySchrodingerConditionsDomainCollection<C>(cls, context, conditions).create(cls);
     }
 
     @Override
-    public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids, boolean createObject) {
-        if (createObject) {
-            List<DomainObject> objects = new ArrayList<>();
-            for (String id : ids) {
-                DomainObject object = createObject(DomainLink.collection(cls), id);
-                objects.add(object);
-            }
-            return createCollection(cls, objects);
-        } else {
-            return createCollection(cls, Conditions.ids(ids));
-        }
-    }
-
-    @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Predicate<T> predicate) {
-        return new ProxySchrodingerOnceDomainCollection<T>(cls, collection, predicate).create(cls);
+    public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids) {
+        return new ProxySchrodingerIdentifiedDomainCollection<>(cls, context, ids).create(cls);
     }
 
     @Override
     public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Collection<String> ids) {
-        Set<String> set = new HashSet<>(ids);
-        return createCollection(cls, collection, t -> set.contains(t.getId()));
+        return new ProxySchrodingerLimitedDomainCollection<>(cls, collection, ids).create(cls);
     }
 
     @Override
-    public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<? extends DomainObject> objects) {
+    public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Predicate<T> predicate) {
+        return new ProxySchrodingerPredicatedDomainCollection<T>(cls, collection, predicate).create(cls);
+    }
+
+    @Override
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, Collection<String>> idsMapping) {
+        C collection = createCollection(cCls, limitedIds);
+        Map<String, C> map = new LinkedHashMap<>();
+        for (Map.Entry<String, Collection<String>> entry : idsMapping.entrySet()) {
+            List<T> list = new ArrayList<>();
+            for (String id : entry.getValue()) {
+                T object = createObject(dCls, collection, id);
+                list.add(object);
+            }
+            C wrap = wrapCollection(cCls, list);
+            map.put(entry.getKey(), wrap);
+        }
+        return map;
+    }
+
+    @Override
+    public <C extends DomainCollection<?>> C wrapCollection(Class<C> cls, Collection<? extends DomainObject> objects) {
         return new ProxyListableDomainCollection<>(cls, context, new ArrayList<>(objects)).create(cls);
     }
 
     @Override
-    public <C extends DomainCollection<?>> C createEmptyCollection(Class<C> cls) {
-        return createCollection(cls, Collections.emptyList());
+    public <C extends DomainCollection<?>> C emptyCollection(Class<C> cls) {
+        return wrapCollection(cls, Collections.emptyList());
     }
 }
