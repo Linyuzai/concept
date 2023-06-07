@@ -15,9 +15,10 @@ import java.util.Collection;
 public class ProxySchrodingerLimitedDomainCollection<T extends DomainObject> extends SchrodingerLimitedDomainCollection<T>
         implements DomainCollection<T>, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
+    @NonNull
     protected final Class<? extends DomainCollection<?>> type;
 
-    public ProxySchrodingerLimitedDomainCollection(Class<? extends DomainCollection<?>> type,
+    public ProxySchrodingerLimitedDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
                                                    @NonNull DomainCollection<T> collection,
                                                    @NonNull Collection<String> ids) {
         super(collection, ids);

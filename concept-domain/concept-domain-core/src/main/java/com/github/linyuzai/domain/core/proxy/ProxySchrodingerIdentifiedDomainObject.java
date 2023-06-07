@@ -16,6 +16,7 @@ public class ProxySchrodingerIdentifiedDomainObject<T extends DomainObject> exte
         implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
+    @NonNull
     protected final Class<T> type;
 
     protected Conditions conditions;
@@ -23,7 +24,7 @@ public class ProxySchrodingerIdentifiedDomainObject<T extends DomainObject> exte
     @Setter
     protected Object extra;
 
-    public ProxySchrodingerIdentifiedDomainObject(Class<T> type,
+    public ProxySchrodingerIdentifiedDomainObject(@NonNull Class<T> type,
                                                   @NonNull DomainContext context,
                                                   @NonNull String id) {
         super(context, id);

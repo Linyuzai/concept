@@ -50,12 +50,12 @@ public class ProxyDomainFactory implements DomainFactory {
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Conditions conditions) {
-        return new ProxySchrodingerConditionsDomainCollection<C>(cls, context, conditions).create(cls);
+        return new ProxySchrodingerConditionsDomainCollection<C>(cls, context, this, conditions).create(cls);
     }
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids) {
-        return new ProxySchrodingerIdentifiedDomainCollection<>(cls, context, ids).create(cls);
+        return new ProxySchrodingerIdentifiedDomainCollection<>(cls, context, this, ids).create(cls);
     }
 
     @Override
@@ -82,6 +82,11 @@ public class ProxyDomainFactory implements DomainFactory {
             map.put(entry.getKey(), wrap);
         }
         return map;
+    }
+
+    @Override
+    public <T extends DomainObject> T wrapObject(Class<T> cls, DomainObject object) {
+        return new ProxyExtendableDomainObject<>(cls, context, object).create(cls);
     }
 
     @Override

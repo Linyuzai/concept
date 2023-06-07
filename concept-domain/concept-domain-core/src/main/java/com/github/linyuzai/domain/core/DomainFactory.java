@@ -31,6 +31,8 @@ public interface DomainFactory {
 
     <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, ? extends Collection<String>> idsMapping);
 
+    <T extends DomainObject> T wrapObject(Class<T> cls, T object);
+
     <C extends DomainCollection<?>> C wrapCollection(Class<C> cls, Collection<? extends DomainObject> objects);
 
     <C extends DomainCollection<?>> C emptyCollection(Class<C> cls);

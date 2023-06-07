@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -28,12 +29,18 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject> implemen
      */
     @Override
     public T get(String id) {
+        if (!ids.contains(id)) {
+            return null;
+        }
         load();
         return collection.get(id);
     }
 
     @Override
     public boolean contains(String id) {
+        if (!ids.contains(id)) {
+            return false;
+        }
         load();
         return collection.contains(id);
     }
@@ -42,7 +49,7 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject> implemen
     @Override
     public List<T> list() {
         load();
-        return collection.list();
+        return collection.list().stream().filter(it -> ids.contains(it.getId())).collect(Collectors.toList());
     }
 
     /**
@@ -51,7 +58,7 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject> implemen
     @Override
     public Stream<T> stream() {
         load();
-        return collection.stream();
+        return collection.stream().filter(it -> ids.contains(it.getId()));
     }
 
     /**
@@ -60,9 +67,8 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject> implemen
     @Override
     public Long count() {
         load();
-        return collection.count();
+        return collection.list().stream().filter(it -> ids.contains(it.getId())).count();
     }
-
 
     @Override
     public void load() {

@@ -32,7 +32,7 @@ public interface DomainProxy extends InvocationHandler {
 
     @Override
     default Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.isDefault()) {
+        if (method.isDefault() && !isAccess(method.getDeclaringClass())) {
             MethodHandle handle = DEFAULT_METHOD_HANDLES.computeIfAbsent(method, m ->
                     getMethodHandle(method));
             MethodHandle bind = handle.bindTo(proxy);
@@ -62,13 +62,17 @@ public interface DomainProxy extends InvocationHandler {
         Class<?> declaringClass = method.getDeclaringClass();
         if (declaringClass == DomainObject.class ||
                 declaringClass == Identifiable.class ||
-                declaringClass == ContextAccess.class ||
-                declaringClass == ConditionsAccess.class ||
-                declaringClass == RepositoryAccess.class ||
-                declaringClass == ExtraAccess.class) {
+                isAccess(declaringClass)) {
             return method.invoke(this, args);
         }
         return method.invoke(getProxied(), args);
+    }
+
+    default boolean isAccess(Class<?> clazz) {
+        return clazz == ContextAccess.class ||
+                clazz == ConditionsAccess.class ||
+                clazz == RepositoryAccess.class ||
+                clazz == ExtraAccess.class;
     }
 
     default Object getProxied() {
@@ -136,26 +140,40 @@ public interface DomainProxy extends InvocationHandler {
         }
     }
 
+    static boolean hasAccessOrAnnotation(Class<? extends DomainObject> type) {
+        return true;
+    }
+
     interface ContextAccess {
 
-        DomainContext getContext();
+        default DomainContext getContext() {
+            return null;
+        }
     }
 
     interface ConditionsAccess {
 
-        Conditions getConditions();
+        default Conditions getConditions() {
+            return null;
+        }
     }
 
     interface RepositoryAccess<T extends DomainObject> {
 
-        DomainRepository<T, ?> getRepository();
+        default DomainRepository<T, ?> getRepository() {
+            return null;
+        }
     }
 
     interface ExtraAccess<T> {
 
-        T getExtra();
+        default T getExtra() {
+            return null;
+        }
 
-        void setExtra(T extra);
+        default void setExtra(T extra) {
+
+        }
     }
 
     interface AccessAdapter<T extends DomainObject, E>

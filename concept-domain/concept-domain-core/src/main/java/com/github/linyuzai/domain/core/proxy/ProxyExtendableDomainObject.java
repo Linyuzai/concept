@@ -7,18 +7,18 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Getter
 @Setter
-public class ProxyListableDomainCollection<T extends DomainObject> extends ListableDomainCollection<T>
-        implements DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+public class ProxyExtendableDomainObject<T extends DomainObject> implements DomainObject, DomainProxy,
+        DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object>,
         DomainContext.Aware {
 
     @NonNull
-    protected final Class<? extends DomainCollection<?>> type;
+    protected final T object;
+
+    @NonNull
+    protected final Class<? extends DomainObject> type;
 
     protected DomainContext context;
 
@@ -28,26 +28,23 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
 
     protected Object extra;
 
-    public ProxyListableDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                         @NonNull List<T> list) {
-        super(list);
-        this.type = type;
-    }
-
-    public ProxyListableDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                         DomainContext context,
-                                         @NonNull List<T> list) {
-        super(list);
+    public ProxyExtendableDomainObject(@NonNull Class<? extends DomainObject> type,
+                                       DomainContext context,
+                                       @NonNull T object) {
         this.type = type;
         this.context = context;
+        this.object = object;
+    }
+
+    @Override
+    public String getId() {
+        return object.getId();
     }
 
     @Override
     public Conditions getConditions() {
         if (conditions == null) {
-            conditions = Conditions.ids(list.stream()
-                    .map(Identifiable::getId)
-                    .collect(Collectors.toList()));
+            conditions = Conditions.id(object.getId());
         }
         return conditions;
     }
@@ -59,7 +56,7 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
                 return null;
             }
             Class<? extends DomainRepository<T, ?>> rType =
-                    DomainLink.repository(DomainLink.collection(type));
+                    DomainLink.repository(type);
             repository = context.get(rType);
         }
         return repository;

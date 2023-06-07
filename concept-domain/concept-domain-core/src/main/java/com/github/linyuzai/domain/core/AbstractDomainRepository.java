@@ -7,6 +7,7 @@ import com.github.linyuzai.domain.core.proxy.ProxyListableDomainCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -143,6 +144,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      */
     @Override
     public void delete(Conditions conditions) {
+        if (intercept(conditions)) {
+            return;
+        }
         doDelete(conditions);
     }
 
@@ -156,6 +160,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      */
     @Override
     public T get(Conditions conditions) {
+        if (intercept(conditions)) {
+            return null;
+        }
         P po = doGet(conditions);
         if (po == null) {
             return null;
@@ -170,6 +177,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
 
     @Override
     public C select(Conditions conditions) {
+        if (intercept(conditions)) {
+            return wrap(Collections.emptyList());
+        }
         return wrap(pos2dos(doSelect(conditions)));
     }
 
@@ -180,6 +190,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      */
     @Override
     public Long count(Conditions conditions) {
+        if (intercept(conditions)) {
+            return 0L;
+        }
         return doCount(conditions);
     }
 
@@ -200,6 +213,18 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      * 条件查询分页
      */
     protected abstract Pages<P> doPage(Conditions conditions, Pages.Args page);
+
+    /**
+     * 如果拼接出来 id in () 这样的条件直接返回空
+     */
+    protected boolean intercept(Conditions conditions) {
+        for (Conditions.In in : conditions.getIns()) {
+            if (in.getValues().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     protected C wrap(Collection<T> objects) {
         Class<C> genericType = getGenericType();

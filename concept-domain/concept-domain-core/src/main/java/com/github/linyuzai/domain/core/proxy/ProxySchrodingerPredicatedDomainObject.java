@@ -15,9 +15,10 @@ import java.util.function.Predicate;
 public class ProxySchrodingerPredicatedDomainObject<T extends DomainObject> extends SchrodingerPredicatedDomainObject<T>
         implements DomainObject, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
+    @NonNull
     protected final Class<T> type;
 
-    public ProxySchrodingerPredicatedDomainObject(Class<T> type,
+    public ProxySchrodingerPredicatedDomainObject(@NonNull Class<T> type,
                                                   @NonNull DomainCollection<T> collection,
                                                   @NonNull Predicate<T> predicate) {
         super(collection, predicate);
