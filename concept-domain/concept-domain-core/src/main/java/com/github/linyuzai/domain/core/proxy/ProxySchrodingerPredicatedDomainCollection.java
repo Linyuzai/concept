@@ -12,7 +12,8 @@ import java.util.function.Predicate;
  * 薛定谔的集合模型
  */
 @Getter
-public class ProxySchrodingerPredicatedDomainCollection<T extends DomainObject> extends SchrodingerPredicatedDomainCollection<T>
+public class ProxySchrodingerPredicatedDomainCollection<T extends DomainObject>
+        extends SchrodingerPredicatedDomainCollection<T>
         implements DomainCollection<T>, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
     @NonNull

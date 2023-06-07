@@ -11,6 +11,7 @@ import java.lang.reflect.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 /**
  * 领域代理
@@ -55,7 +56,7 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         }*/
         if (method.isDefault()) {
             boolean useCache = method.isAnnotationPresent(DomainProxyCache.class);
-            Map<Method, Object> cache = getCache();
+            Map<Method, Object> cache = withPropertyKey(DomainProxyCache.class, LinkedHashMap::new);
             if (useCache && cache.containsKey(method)) {
                 return cache.get(method);
             }
@@ -80,17 +81,6 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
                 clazz == ConditionsAccess.class ||
                 clazz == RepositoryAccess.class ||
                 clazz == ExtraAccess.class;
-    }
-
-    default Map<Method, Object> getCache() {
-        Map<Method, Object> cache = getProperty(DomainProxyCache.class);
-        if (cache == null) {
-            Map<Method, Object> init = new LinkedHashMap<>();
-            setProperty(DomainProxyCache.class, init);
-            return init;
-        } else {
-            return cache;
-        }
     }
 
     default Object getProxied() {
@@ -159,15 +149,18 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         if (!type.isInterface()) {
             return false;
         }
+        if (ContextAccess.class.isAssignableFrom(type) ||
+                ConditionsAccess.class.isAssignableFrom(type) ||
+                RepositoryAccess.class.isAssignableFrom(type) ||
+                ExtraAccess.class.isAssignableFrom(type)) {
+            return true;
+        }
         for (Method method : type.getMethods()) {
             if (method.isAnnotationPresent(DomainProxyCache.class)) {
                 return true;
             }
         }
-        return ContextAccess.class.isAssignableFrom(type) ||
-                ConditionsAccess.class.isAssignableFrom(type) ||
-                RepositoryAccess.class.isAssignableFrom(type) ||
-                ExtraAccess.class.isAssignableFrom(type);
+        return false;
     }
 
     interface ContextAccess {
@@ -177,10 +170,14 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         }
     }
 
-    interface ConditionsAccess {
+    interface ConditionsAccess<T> {
 
         default Conditions getConditions() {
             return null;
+        }
+
+        default Predicate<T> getPredicate() {
+            return it -> true;
         }
     }
 
@@ -191,24 +188,19 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         }
     }
 
-    interface ExtraAccess<T> {
+    interface ExtraAccess<T> extends DomainProperties {
 
         default T getExtra() {
-            if (this instanceof DomainProperties) {
-                return ((DomainProperties) this).getProperty(ExtraAccess.class);
-            }
-            throw new UnsupportedOperationException();
+            return getProperty(ExtraAccess.class);
         }
 
         default void setExtra(T extra) {
-            if (this instanceof DomainProperties) {
-                ((DomainProperties) this).setProperty(ExtraAccess.class, extra);
-            }
-            throw new UnsupportedOperationException();
+            setProperty(ExtraAccess.class, extra);
         }
     }
 
-    interface AccessAdapter<T extends DomainObject, E> extends ContextAccess, ConditionsAccess, RepositoryAccess<T>, ExtraAccess<E> {
+    interface AccessAdapter<T extends DomainObject, E> extends ContextAccess,
+            ConditionsAccess<T>, RepositoryAccess<T>, ExtraAccess<E> {
 
         @Override
         default DomainContext getContext() {
@@ -218,10 +210,11 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
             throw new UnsupportedOperationException("Can not access DomainContext");
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         default Conditions getConditions() {
             if (getCollection() instanceof ConditionsAccess) {
-                return ((ConditionsAccess) getCollection()).getConditions();
+                return ((ConditionsAccess<T>) getCollection()).getConditions();
             }
             throw new UnsupportedOperationException("Can not access Conditions");
         }

@@ -12,7 +12,8 @@ import java.util.function.Predicate;
  * 薛定谔模型代理
  */
 @Getter
-public class ProxySchrodingerPredicatedDomainObject<T extends DomainObject> extends SchrodingerPredicatedDomainObject<T>
+public class ProxySchrodingerPredicatedDomainObject<T extends DomainObject>
+        extends SchrodingerPredicatedDomainObject<T>
         implements DomainObject, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
     @NonNull

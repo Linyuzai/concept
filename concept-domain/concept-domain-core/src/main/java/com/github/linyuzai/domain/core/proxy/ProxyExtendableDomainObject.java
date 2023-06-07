@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class ProxyExtendableDomainObject<T extends DomainObject> extends AbstractDomainProperties
         implements DomainObject, DomainProxy,
-        DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+        DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object>,
         DomainContext.Aware {
 
@@ -22,10 +22,6 @@ public class ProxyExtendableDomainObject<T extends DomainObject> extends Abstrac
     protected final Class<? extends DomainObject> type;
 
     protected DomainContext context;
-
-    protected Conditions conditions;
-
-    protected DomainRepository<T, ?> repository;
 
     public ProxyExtendableDomainObject(@NonNull Class<? extends DomainObject> type,
                                        DomainContext context,
@@ -47,22 +43,18 @@ public class ProxyExtendableDomainObject<T extends DomainObject> extends Abstrac
 
     @Override
     public Conditions getConditions() {
-        if (conditions == null) {
-            conditions = Conditions.id(object.getId());
-        }
-        return conditions;
+        return withPropertyKey(Conditions.class, () -> Conditions.id(object.getId()));
     }
 
     @Override
     public DomainRepository<T, ?> getRepository() {
-        if (repository == null) {
+        return withPropertyValue(DomainRepository.class, () -> {
             if (context == null) {
                 return null;
             }
-            Class<? extends DomainRepository<T, ?>> rType =
+            Class<? extends DomainRepository<T, ?>> clazz =
                     DomainLink.repository(type);
-            repository = context.get(rType);
-        }
-        return repository;
+            return context.get(clazz);
+        });
     }
 }

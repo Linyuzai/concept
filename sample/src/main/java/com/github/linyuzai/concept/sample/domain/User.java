@@ -12,6 +12,7 @@ public interface User extends DomainEntity,
     default void test0() {
         System.out.println("test0");
         System.out.println(getName());
+        setExtra("test0");
         System.out.println(getContext());
         System.out.println(getConditions());
         System.out.println(getRepository());

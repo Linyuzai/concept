@@ -10,6 +10,7 @@ public interface Users<T extends User> extends DomainCollection<T>,
     default void test1() {
         System.out.println("test1");
         System.out.println(this);
+        setExtra("test1");
         System.out.println(getContext());
         System.out.println(getConditions());
         System.out.println(getRepository());

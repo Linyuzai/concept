@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class ProxyListableDomainCollection<T extends DomainObject> extends ListableDomainCollection<T>
-        implements DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+        implements DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object>,
         DomainContext.Aware {
 
@@ -21,10 +21,6 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
     protected final Class<? extends DomainCollection<?>> type;
 
     protected DomainContext context;
-
-    protected Conditions conditions;
-
-    protected DomainRepository<T, ?> repository;
 
     public ProxyListableDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
                                          @NonNull List<T> list) {
@@ -42,24 +38,20 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
 
     @Override
     public Conditions getConditions() {
-        if (conditions == null) {
-            conditions = Conditions.ids(list.stream()
-                    .map(Identifiable::getId)
-                    .collect(Collectors.toList()));
-        }
-        return conditions;
+        return withPropertyKey(Conditions.class, () -> Conditions.ids(list.stream()
+                .map(Identifiable::getId)
+                .collect(Collectors.toList())));
     }
 
     @Override
     public DomainRepository<T, ?> getRepository() {
-        if (repository == null) {
+        return withPropertyValue(DomainRepository.class, () -> {
             if (context == null) {
                 return null;
             }
-            Class<? extends DomainRepository<T, ?>> rType =
-                    DomainLink.repository(DomainLink.collection(type));
-            repository = context.get(rType);
-        }
-        return repository;
+            Class<? extends DomainRepository<T, ?>> clazz =
+                    DomainLink.repository(type);
+            return context.get(clazz);
+        });
     }
 }

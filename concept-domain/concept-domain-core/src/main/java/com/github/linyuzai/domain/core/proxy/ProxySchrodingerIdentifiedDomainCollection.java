@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class ProxySchrodingerIdentifiedDomainCollection<T extends DomainObject>
         extends SchrodingerIdentifiedDomainCollection<T>
         implements DomainCollection<T>, Function<T, T>,
-        DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+        DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull
@@ -28,8 +28,6 @@ public class ProxySchrodingerIdentifiedDomainCollection<T extends DomainObject>
 
     @NonNull
     protected final DomainFactory factory;
-
-    protected Conditions conditions;
 
     public ProxySchrodingerIdentifiedDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
                                                       @NonNull DomainContext context,
@@ -47,10 +45,7 @@ public class ProxySchrodingerIdentifiedDomainCollection<T extends DomainObject>
 
     @Override
     public Conditions getConditions() {
-        if (conditions == null) {
-            conditions = Conditions.ids(ids);
-        }
-        return conditions;
+        return withPropertyKey(Conditions.class, () -> Conditions.ids(ids));
     }
 
     @Override

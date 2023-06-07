@@ -13,6 +13,8 @@ import java.util.Map;
 @Getter
 public class Conditions {
 
+    public static final String KEY_ID = "id";
+
     public static final Conditions EMPTY = new Conditions();
 
     /**
@@ -68,11 +70,11 @@ public class Conditions {
     }
 
     public static Conditions id(String id) {
-        return new Conditions().equal("id", id);
+        return new Conditions().equal(KEY_ID, id);
     }
 
     public static Conditions ids(Collection<String> ids) {
-        return new Conditions().in("id", ids);
+        return new Conditions().in(KEY_ID, ids);
     }
 
     //有需要可以添加其他条件

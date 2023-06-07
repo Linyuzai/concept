@@ -77,7 +77,6 @@ public class DomainTest {
 
     public void testFactory6() {
         DomainFactory factory = getDomainFactory();
-        //TODO user.test() = null
         Users2 users = factory.createCollection(Users2.class, Arrays.asList("6", "_6"));
         for (User user : users.list()) {
             System.out.println(user.getId());
@@ -90,7 +89,6 @@ public class DomainTest {
 
     public void testFactory7() {
         DomainFactory factory = getDomainFactory();
-        //TODO user.test() = null
         Users2 users = factory.createCollection(Users2.class, new Conditions()
                 .in("id", Arrays.asList("7", "_7")));
         for (User user : users.list()) {
@@ -105,7 +103,6 @@ public class DomainTest {
     public void testFactory8() {
         DomainFactory factory = getDomainFactory();
         Users2 us = factory.createCollection(Users2.class, Arrays.asList("8", "_8"));
-        //TODO user.test() = null
         Users2 users = factory.createCollection(Users2.class, us, Arrays.asList("8"));
         for (User user : users.list()) {
             System.out.println(user.getId());
@@ -119,7 +116,6 @@ public class DomainTest {
     public void testFactory9() {
         DomainFactory factory = getDomainFactory();
         Users2 us = factory.createCollection(Users2.class, Arrays.asList("9", "_9"));
-        //TODO user.test() = null
         Users2 users = factory.createCollection(Users2.class, us, u -> u.getId().equals("9"));
         for (User user : users.list()) {
             System.out.println(user.getId());

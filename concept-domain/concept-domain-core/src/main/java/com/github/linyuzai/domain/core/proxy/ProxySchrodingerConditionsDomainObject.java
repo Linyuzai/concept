@@ -11,8 +11,9 @@ import lombok.NonNull;
  * 薛定谔模型代理
  */
 @Getter
-public class ProxySchrodingerConditionsDomainObject<T extends DomainObject> extends SchrodingerConditionsDomainObject<T>
-        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+public class ProxySchrodingerConditionsDomainObject<T extends DomainObject>
+        extends SchrodingerConditionsDomainObject<T>
+        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull

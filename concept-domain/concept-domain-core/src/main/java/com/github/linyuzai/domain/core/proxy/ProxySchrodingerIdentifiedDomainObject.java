@@ -11,14 +11,13 @@ import lombok.NonNull;
  * 薛定谔模型代理
  */
 @Getter
-public class ProxySchrodingerIdentifiedDomainObject<T extends DomainObject> extends SchrodingerIdentifiedDomainObject<T>
-        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+public class ProxySchrodingerIdentifiedDomainObject<T extends DomainObject>
+        extends SchrodingerIdentifiedDomainObject<T>
+        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull
     protected final Class<T> type;
-
-    protected Conditions conditions;
 
     public ProxySchrodingerIdentifiedDomainObject(@NonNull Class<T> type,
                                                   @NonNull DomainContext context,
@@ -39,9 +38,6 @@ public class ProxySchrodingerIdentifiedDomainObject<T extends DomainObject> exte
 
     @Override
     public Conditions getConditions() {
-        if (conditions == null) {
-            conditions = Conditions.id(id);
-        }
-        return conditions;
+        return withPropertyKey(Conditions.class, () -> Conditions.id(id));
     }
 }

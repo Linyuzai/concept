@@ -19,7 +19,7 @@ import java.util.function.Function;
 public class ProxySchrodingerConditionsDomainCollection<T extends DomainObject>
         extends SchrodingerConditionsDomainCollection<T>
         implements DomainCollection<T>, Function<T, T>,
-        DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
+        DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull
