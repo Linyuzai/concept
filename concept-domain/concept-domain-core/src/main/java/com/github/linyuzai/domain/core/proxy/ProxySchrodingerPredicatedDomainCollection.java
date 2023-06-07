@@ -2,7 +2,6 @@ package com.github.linyuzai.domain.core.proxy;
 
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerPredicatedDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;

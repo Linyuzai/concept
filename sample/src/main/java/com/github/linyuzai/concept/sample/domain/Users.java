@@ -1,9 +1,7 @@
 package com.github.linyuzai.concept.sample.domain;
 
 import com.github.linyuzai.domain.core.DomainCollection;
-import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.proxy.DomainProxy;
-import com.github.linyuzai.domain.core.proxy.DomainProxyMethod;
 
 public interface Users<T extends User> extends DomainCollection<T>,
         DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,

@@ -1,5 +1,6 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
+import com.github.linyuzai.domain.core.AbstractDomainProperties;
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
@@ -13,7 +14,8 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerLimitedDomainObject<T extends DomainObject> implements DomainObject {
+public class SchrodingerLimitedDomainObject<T extends DomainObject>
+        extends AbstractDomainProperties implements DomainObject {
 
     @NonNull
     protected final DomainCollection<T> collection;

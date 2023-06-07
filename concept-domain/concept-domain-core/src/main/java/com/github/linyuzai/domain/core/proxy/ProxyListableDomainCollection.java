@@ -26,8 +26,6 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
 
     protected DomainRepository<T, ?> repository;
 
-    protected Object extra;
-
     public ProxyListableDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
                                          @NonNull List<T> list) {
         super(list);

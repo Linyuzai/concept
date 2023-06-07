@@ -9,7 +9,6 @@ import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerConditionsDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 import java.util.function.Function;
 
@@ -29,9 +28,6 @@ public class ProxySchrodingerConditionsDomainCollection<T extends DomainObject>
     @NonNull
     protected final DomainFactory factory;
 
-    @Setter
-    protected Object extra;
-
     public ProxySchrodingerConditionsDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
                                                       @NonNull DomainContext context,
                                                       @NonNull DomainFactory factory,
@@ -48,7 +44,7 @@ public class ProxySchrodingerConditionsDomainCollection<T extends DomainObject>
 
     @Override
     protected Function<T, T> mapping() {
-        if (DomainProxy.hasAccessOrAnnotation(getDomainObjectType())) {
+        if (DomainProxy.hasAccess(getDomainObjectType())) {
             return this;
         }
         return super.mapping();

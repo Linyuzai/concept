@@ -8,13 +8,14 @@ import lombok.SneakyThrows;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.*;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 领域代理
  */
-public interface DomainProxy extends InvocationHandler {
+public interface DomainProxy extends DomainProperties, InvocationHandler {
 
     Map<Method, MethodHandle> DEFAULT_METHOD_HANDLES = new ConcurrentHashMap<>();
 
@@ -32,40 +33,46 @@ public interface DomainProxy extends InvocationHandler {
 
     @Override
     default Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.isDefault() && !isAccess(method.getDeclaringClass())) {
-            MethodHandle handle = DEFAULT_METHOD_HANDLES.computeIfAbsent(method, m ->
-                    getMethodHandle(method));
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass == DomainObject.class || declaringClass == Identifiable.class || isAccess(declaringClass)) {
+            return method.invoke(this, args);
+        }
+        /*DomainProxyField dpf = method.getAnnotation(DomainProxyField.class);
+        if (dpf != null) {
+            Field proxyField = PROXY_FIELDS.computeIfAbsent(method, m -> {
+                String name = getProxyAnnotationValue(dpf.value(), method.getName());
+                return getProxyField(name, getProxied());
+            });
+            return proxyField.get(getProxied());
+        }
+        DomainProxyMethod dpm = method.getAnnotation(DomainProxyMethod.class);
+        if (dpm != null) {
+            Method proxyMethod = PROXY_METHODS.computeIfAbsent(method, m -> {
+                String name = getProxyAnnotationValue(dpm.value(), method.getName());
+                return getProxyMethod(name, method.getParameterTypes(), getProxied());
+            });
+            return proxyMethod.invoke(getProxied(), args);
+        }*/
+        if (method.isDefault()) {
+            boolean useCache = method.isAnnotationPresent(DomainProxyCache.class);
+            Map<Method, Object> cache = getCache();
+            if (useCache && cache.containsKey(method)) {
+                return cache.get(method);
+            }
+            MethodHandle handle = DEFAULT_METHOD_HANDLES.computeIfAbsent(method, m -> getMethodHandle(method));
             MethodHandle bind = handle.bindTo(proxy);
-            return bind.invokeWithArguments(args);
+            Object value = bind.invokeWithArguments(args);
+            if (useCache) {
+                cache.put(method, value);
+            }
+            return value;
         } else {
-            DomainProxyField dpf = method.getAnnotation(DomainProxyField.class);
-            if (dpf != null) {
-                Field proxyField = PROXY_FIELDS.computeIfAbsent(method, m -> {
-                    String name = getProxyAnnotationValue(dpf.value(), method.getName());
-                    return getProxyField(name, getProxied());
-                });
-                return proxyField.get(getProxied());
-            }
-            DomainProxyMethod dpm = method.getAnnotation(DomainProxyMethod.class);
-            if (dpm != null) {
-                Method proxyMethod = PROXY_METHODS.computeIfAbsent(method, m -> {
-                    String name = getProxyAnnotationValue(dpm.value(), method.getName());
-                    return getProxyMethod(name, method.getParameterTypes(), getProxied());
-                });
-                return proxyMethod.invoke(getProxied(), args);
-            }
-            return doInvoke(proxy, method, args);
+            return doInvoke(getProxied(), method, args);
         }
     }
 
-    default Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Class<?> declaringClass = method.getDeclaringClass();
-        if (declaringClass == DomainObject.class ||
-                declaringClass == Identifiable.class ||
-                isAccess(declaringClass)) {
-            return method.invoke(this, args);
-        }
-        return method.invoke(getProxied(), args);
+    default Object doInvoke(Object proxied, Method method, Object[] args) throws Throwable {
+        return method.invoke(proxied, args);
     }
 
     default boolean isAccess(Class<?> clazz) {
@@ -73,6 +80,17 @@ public interface DomainProxy extends InvocationHandler {
                 clazz == ConditionsAccess.class ||
                 clazz == RepositoryAccess.class ||
                 clazz == ExtraAccess.class;
+    }
+
+    default Map<Method, Object> getCache() {
+        Map<Method, Object> cache = getProperty(DomainProxyCache.class);
+        if (cache == null) {
+            Map<Method, Object> init = new LinkedHashMap<>();
+            setProperty(DomainProxyCache.class, init);
+            return init;
+        } else {
+            return cache;
+        }
     }
 
     default Object getProxied() {
@@ -87,12 +105,9 @@ public interface DomainProxy extends InvocationHandler {
     static MethodHandle getMethodHandle(Method method) {
         //MethodHandles.lookup().unreflectSpecial()
         Class<?> declaringClass = method.getDeclaringClass();
-        Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
-                .getDeclaredConstructor(Class.class, int.class);
+        Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
         constructor.setAccessible(true);
-        return constructor.
-                newInstance(declaringClass, MethodHandles.Lookup.PUBLIC | MethodHandles.Lookup.PRIVATE).
-                unreflectSpecial(method, declaringClass);
+        return constructor.newInstance(declaringClass, MethodHandles.Lookup.PUBLIC | MethodHandles.Lookup.PRIVATE).unreflectSpecial(method, declaringClass);
     }
 
     @SneakyThrows
@@ -140,8 +155,19 @@ public interface DomainProxy extends InvocationHandler {
         }
     }
 
-    static boolean hasAccessOrAnnotation(Class<? extends DomainObject> type) {
-        return true;
+    static boolean hasAccess(Class<? extends DomainObject> type) {
+        if (!type.isInterface()) {
+            return false;
+        }
+        for (Method method : type.getMethods()) {
+            if (method.isAnnotationPresent(DomainProxyCache.class)) {
+                return true;
+            }
+        }
+        return ContextAccess.class.isAssignableFrom(type) ||
+                ConditionsAccess.class.isAssignableFrom(type) ||
+                RepositoryAccess.class.isAssignableFrom(type) ||
+                ExtraAccess.class.isAssignableFrom(type);
     }
 
     interface ContextAccess {
@@ -168,16 +194,21 @@ public interface DomainProxy extends InvocationHandler {
     interface ExtraAccess<T> {
 
         default T getExtra() {
-            return null;
+            if (this instanceof DomainProperties) {
+                return ((DomainProperties) this).getProperty(ExtraAccess.class);
+            }
+            throw new UnsupportedOperationException();
         }
 
         default void setExtra(T extra) {
-
+            if (this instanceof DomainProperties) {
+                ((DomainProperties) this).setProperty(ExtraAccess.class, extra);
+            }
+            throw new UnsupportedOperationException();
         }
     }
 
-    interface AccessAdapter<T extends DomainObject, E>
-            extends ContextAccess, ConditionsAccess, RepositoryAccess<T>, ExtraAccess<E> {
+    interface AccessAdapter<T extends DomainObject, E> extends ContextAccess, ConditionsAccess, RepositoryAccess<T>, ExtraAccess<E> {
 
         @Override
         default DomainContext getContext() {

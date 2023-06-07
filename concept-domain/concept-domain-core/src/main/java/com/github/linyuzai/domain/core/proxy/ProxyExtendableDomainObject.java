@@ -9,7 +9,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProxyExtendableDomainObject<T extends DomainObject> implements DomainObject, DomainProxy,
+public class ProxyExtendableDomainObject<T extends DomainObject> extends AbstractDomainProperties
+        implements DomainObject, DomainProxy,
         DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object>,
         DomainContext.Aware {
@@ -26,8 +27,6 @@ public class ProxyExtendableDomainObject<T extends DomainObject> implements Doma
 
     protected DomainRepository<T, ?> repository;
 
-    protected Object extra;
-
     public ProxyExtendableDomainObject(@NonNull Class<? extends DomainObject> type,
                                        DomainContext context,
                                        @NonNull T object) {
@@ -39,6 +38,11 @@ public class ProxyExtendableDomainObject<T extends DomainObject> implements Doma
     @Override
     public String getId() {
         return object.getId();
+    }
+
+    @Override
+    public Object getProxied() {
+        return object;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
+import com.github.linyuzai.domain.core.AbstractDomainProperties;
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.exception.DomainMultipleFoundException;
@@ -20,7 +21,8 @@ import static com.github.linyuzai.domain.core.schrodinger.AbstractSchrodingerDom
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerPredicatedDomainObject<T extends DomainObject> implements DomainObject {
+public class SchrodingerPredicatedDomainObject<T extends DomainObject>
+        extends AbstractDomainProperties implements DomainObject {
 
     @NonNull
     protected final DomainCollection<T> collection;

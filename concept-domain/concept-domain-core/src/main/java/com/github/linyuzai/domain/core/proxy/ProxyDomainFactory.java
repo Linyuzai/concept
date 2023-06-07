@@ -85,7 +85,7 @@ public class ProxyDomainFactory implements DomainFactory {
     }
 
     @Override
-    public <T extends DomainObject> T wrapObject(Class<T> cls, DomainObject object) {
+    public <T extends DomainObject> T wrapObject(Class<T> cls, T object) {
         return new ProxyExtendableDomainObject<>(cls, context, object).create(cls);
     }
 

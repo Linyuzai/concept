@@ -1,5 +1,6 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
+import com.github.linyuzai.domain.core.AbstractDomainProperties;
 import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.DomainRepository;
@@ -17,7 +18,8 @@ import java.util.List;
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class AbstractSchrodingerDomainObject<T extends DomainObject> implements DomainObject {
+public abstract class AbstractSchrodingerDomainObject<T extends DomainObject>
+        extends AbstractDomainProperties implements DomainObject {
 
     @NonNull
     protected final DomainContext context;

@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 
 @Getter
 @RequiredArgsConstructor
-public class ListableDomainCollection<T extends DomainObject> implements DomainCollection<T> {
+public class ListableDomainCollection<T extends DomainObject> extends AbstractDomainProperties
+        implements DomainCollection<T> {
 
     @NonNull
     protected final List<T> list;

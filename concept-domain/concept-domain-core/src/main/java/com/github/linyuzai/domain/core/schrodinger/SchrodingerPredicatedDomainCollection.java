@@ -15,7 +15,8 @@ import java.util.stream.Stream;
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerPredicatedDomainCollection<T extends DomainObject> implements DomainCollection<T> {
+public class SchrodingerPredicatedDomainCollection<T extends DomainObject>
+        extends AbstractDomainProperties implements DomainCollection<T> {
 
     @NonNull
     protected final DomainCollection<T> collection;

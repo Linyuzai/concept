@@ -6,7 +6,6 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerConditionsDomainObject;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 /**
  * 薛定谔模型代理
@@ -18,9 +17,6 @@ public class ProxySchrodingerConditionsDomainObject<T extends DomainObject> exte
 
     @NonNull
     protected final Class<T> type;
-
-    @Setter
-    protected Object extra;
 
     public ProxySchrodingerConditionsDomainObject(@NonNull Class<T> type,
                                                   @NonNull DomainContext context,

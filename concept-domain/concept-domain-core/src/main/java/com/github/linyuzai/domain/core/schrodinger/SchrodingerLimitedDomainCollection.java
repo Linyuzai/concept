@@ -1,5 +1,6 @@
 package com.github.linyuzai.domain.core.schrodinger;
 
+import com.github.linyuzai.domain.core.AbstractDomainProperties;
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import lombok.Getter;
@@ -16,7 +17,8 @@ import java.util.stream.Stream;
  */
 @Getter
 @RequiredArgsConstructor
-public class SchrodingerLimitedDomainCollection<T extends DomainObject> implements DomainCollection<T> {
+public class SchrodingerLimitedDomainCollection<T extends DomainObject>
+        extends AbstractDomainProperties implements DomainCollection<T> {
 
     @NonNull
     protected final DomainCollection<T> collection;
