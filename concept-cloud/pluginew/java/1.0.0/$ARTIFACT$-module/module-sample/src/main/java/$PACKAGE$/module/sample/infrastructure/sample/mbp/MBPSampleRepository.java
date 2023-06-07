@@ -11,7 +11,6 @@ import $PACKAGE$.domain.user.User;
 import $PACKAGE$.domain.user.Users;
 import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainValidator;
-import com.github.linyuzai.domain.core.condition.LambdaConditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,15 +49,20 @@ public class MBPSampleRepository extends MBPBaseRepository<Sample, Samples, Samp
 
     @Override
     public Sample po2do(SamplePO po) {
+        //根据 userId 生成一个 User，该方法不会立即查询数据库，而会等到调用 User 的方法获取数据时才会触发查询
         User user = po.getUserId() == null ? null : factory.createObject(User.class, po.getUserId());
+
+        //获得和 sampleId 关联的数据对象
         List<SampleUserPO> sampleUsers = sampleUserMapper
                 .selectList(Wrappers.<SampleUserPO>lambdaQuery()
-                        .eq(SampleUserPO::getId, po.getId()));
+                        .eq(SampleUserPO::getSampleId, po.getId()));
+        //处理获得 sampleId 关联的 userId 集合
         Set<String> userIds = sampleUsers.stream()
                 .map(SampleUserPO::getUserId)
                 .collect(Collectors.toSet());
-        Users users = factory.createCollection(Users.class,
-                new LambdaConditions().in(User::getId, userIds));
+        //根据 userId 集合生成 Users，该方法不会立即查询数据库，而会等到调用 Users 的方法获取数据时才会触发查询
+        Users users = factory.createCollection(Users.class, userIds);
+
         return new SampleImpl.Builder()
                 .id(po.getId())
                 .user(user)
@@ -66,6 +70,53 @@ public class MBPSampleRepository extends MBPBaseRepository<Sample, Samples, Samp
                 .build(validator);
     }
 
+    /**
+     * 查询列表或分页查询时会多次调用 {@link #po2do(SamplePO)} 方法导致多次查询数据库
+     * <p>
+     * 可重写该方法实现只查询一次数据库
+     */
+    @Override
+    public Collection<Sample> pos2dos(Collection<? extends SamplePO> pos) {
+        List<Sample> samples = new ArrayList<>();
+
+        //id 和 userId 的关联 Map
+        Map<String, String> userIdMap = pos.stream()
+                .collect(Collectors.toMap(SamplePO::getId, SamplePO::getUserId));
+        //获得 sample id 和 User 的 Map，该方法不会立即查询数据库，而会等到调用 Users 的方法获取数据时才会触发查询
+        Map<String, User> userMap = factory.createObject(Users.class, userIdMap);
+
+        //根据 sampleId 集合获得所有的关联对象
+        Set<String> ids = pos.stream().map(SamplePO::getId).collect(Collectors.toSet());
+        List<SampleUserPO> sups = sampleUserMapper
+                .selectList(Wrappers.<SampleUserPO>lambdaQuery()
+                        .in(SampleUserPO::getSampleId, ids));
+        //处理获得 sampleId 和 userIds 的关联 Map
+        Map<String, Set<String>> sampleUsersIdMap = sups.stream()
+                .collect(Collectors.groupingBy(SampleUserPO::getSampleId,
+                        Collectors.mapping(SampleUserPO::getUserId, Collectors.toSet())));
+
+        //获得 sample id 和 Users 的 Map，该方法不会立即查询数据库，而会等到调用 Users 的方法获取数据时才会触发查询
+        Map<String, Users> sampleUsersMap = factory.createCollection(Users.class, sampleUsersIdMap);
+
+        for (SamplePO po : pos) {
+            Sample sample = new SampleImpl.Builder()
+                    .id(po.getId())
+                    .user(userMap.get(po.getUserId()))
+                    .users(sampleUsersMap.get(po.getUserId()))
+                    .build(validator);
+            samples.add(sample);
+        }
+        return samples;
+    }
+
+    /**
+     * 如果有关联表
+     * <p>
+     * 可以重写该方法添加关联关系
+     *
+     * @see com.github.linyuzai.domain.core.DomainRepository#create(DomainObject)
+     * @see com.github.linyuzai.domain.core.DomainRepository#create(DomainCollection)
+     */
     @Transactional
     @Override
     public void create(Sample sample) {
@@ -79,6 +130,14 @@ public class MBPSampleRepository extends MBPBaseRepository<Sample, Samples, Samp
 
     }
 
+    /**
+     * 如果有关联表
+     * <p>
+     * 可以重写该方法删除关联关系
+     *
+     * @see com.github.linyuzai.domain.core.DomainRepository#delete(DomainObject)
+     * @see com.github.linyuzai.domain.core.DomainRepository#delete(DomainCollection)
+     */
     @Transactional
     @Override
     public void delete(Sample sample) {
