@@ -31,6 +31,6 @@ public class ProxySchrodingerLimitedDomainCollection<T extends DomainObject>
     public Conditions getConditions() {
         return withPropertyKey(Conditions.class, () ->
                 Conditions.from(AccessAdapter.super.getConditions())
-                        .in(Conditions.KEY_ID, ids));
+                        .in(Conditions.ID, ids));
     }
 }

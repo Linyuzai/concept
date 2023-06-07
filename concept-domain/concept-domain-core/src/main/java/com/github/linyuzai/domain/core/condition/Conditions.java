@@ -13,7 +13,7 @@ import java.util.Map;
 @Getter
 public class Conditions {
 
-    public static final String KEY_ID = "id";
+    public static final String ID = "id";
 
     public static final Conditions EMPTY = new Conditions();
 
@@ -70,14 +70,14 @@ public class Conditions {
     }
 
     public static Conditions id(String id) {
-        return new Conditions().equal(KEY_ID, id);
+        return new Conditions().equal(ID, id);
     }
 
     public static Conditions ids(Collection<String> ids) {
-        return new Conditions().in(KEY_ID, ids);
+        return new Conditions().in(ID, ids);
     }
 
-    //有需要可以添加其他条件
+    //有需要可以继承添加其他条件
 
     public LambdaConditions lambda() {
         LambdaConditions conditions = new LambdaConditions();
@@ -120,7 +120,7 @@ public class Conditions {
      * 添加 in
      */
     public Conditions in(String key, Collection<?> values) {
-        if (notIgnore(key) && notIgnore(values)) {
+        if (notIgnore(key) /*&& notIgnore(values)*/) {
             ins.add(new In(key, values));
         }
         return this;

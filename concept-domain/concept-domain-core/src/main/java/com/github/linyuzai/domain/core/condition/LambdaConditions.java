@@ -1,10 +1,7 @@
 package com.github.linyuzai.domain.core.condition;
 
 import com.github.linyuzai.domain.core.lambda.LambdaFunction;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.lang.invoke.SerializedLambda;
 import java.util.Collection;
@@ -13,15 +10,17 @@ import java.util.Collection;
  * 支持 lambda 的查询条件
  */
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class LambdaConditions extends Conditions {
 
     private boolean defaultPrependClass;
 
     @Override
     public LambdaConditions lambda() {
+        return this;
+    }
+
+    public LambdaConditions defaultPrependClass(boolean prepend) {
+        this.defaultPrependClass = prepend;
         return this;
     }
 

@@ -97,7 +97,7 @@ public class SchrodingerCachedDomainCollection<T extends DomainObject> implement
     }
 
     protected String getIdConditionKey() {
-        return Conditions.KEY_ID;
+        return Conditions.ID;
     }
 
     @Override
