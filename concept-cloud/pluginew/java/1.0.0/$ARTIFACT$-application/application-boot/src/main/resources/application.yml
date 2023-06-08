@@ -1,5 +1,3 @@
-server:
-  port: 9999
 spring:
   application:
     name: $ARTIFACT$-application-boot

@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -113,9 +112,6 @@ public class MBPSampleRepository extends MBPDomainRepository<Sample, Samples, Sa
      * 如果有关联表
      * <p>
      * 可以重写该方法添加关联关系
-     *
-     * @see com.github.linyuzai.domain.core.DomainRepository#create(DomainObject)
-     * @see com.github.linyuzai.domain.core.DomainRepository#create(DomainCollection)
      */
     @Transactional
     @Override
@@ -134,9 +130,6 @@ public class MBPSampleRepository extends MBPDomainRepository<Sample, Samples, Sa
      * 如果有关联表
      * <p>
      * 可以重写该方法删除关联关系
-     *
-     * @see com.github.linyuzai.domain.core.DomainRepository#delete(DomainObject)
-     * @see com.github.linyuzai.domain.core.DomainRepository#delete(DomainCollection)
      */
     @Transactional
     @Override

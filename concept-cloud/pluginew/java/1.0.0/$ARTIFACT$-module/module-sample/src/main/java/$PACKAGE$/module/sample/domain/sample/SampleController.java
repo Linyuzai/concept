@@ -18,7 +18,7 @@ import java.util.List;
 
 @Tag(name = "示例")
 @RestController
-@RequestMapping("/sample")
+@RequestMapping("sample")
 public class SampleController {
 
     @Autowired
@@ -46,7 +46,7 @@ public class SampleController {
     }
 
     @Operation(summary = "详情")
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public SampleVO get(@Parameter(description = "ID") @PathVariable String id) {
         return sampleSearcher.get(id);
     }
@@ -58,7 +58,7 @@ public class SampleController {
     }
 
     @Operation(summary = "分页查询")
-    @GetMapping("/page")
+    @GetMapping("page")
     public Pages<SampleVO> page(SampleQuery query, Pages.Args page) {
         return sampleSearcher.page(query, page);
     }

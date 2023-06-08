@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "用户")
 @RestController
-@RequestMapping("/user")
+@RequestMapping("user")
 public class UserController {
 
     @Autowired
     private UserSearcher userSearcher;
 
     @Operation(summary = "用户详情")
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public UserVO get(@Parameter(description = "用户ID") @PathVariable String id) {
         return userSearcher.get(id);
     }

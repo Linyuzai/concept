@@ -9,7 +9,8 @@
         ".gitignore",
         "gradlew",
         "gradlew.bat",
-        "HELP.md"
+        "HELP.md",
+        "sql/sample.sql"
       ],
       "versions": {
         "gradle": "7.4-bin",

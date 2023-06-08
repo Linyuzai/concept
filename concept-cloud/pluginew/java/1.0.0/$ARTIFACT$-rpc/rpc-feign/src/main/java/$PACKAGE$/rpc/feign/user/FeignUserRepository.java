@@ -1,6 +1,5 @@
 package $PACKAGE$.rpc.feign.user;
 
-import $PACKAGE$.rpc.ConditionsRO;
 import $PACKAGE$.rpc.Response;
 import $PACKAGE$.rpc.user.RPCUserFacadeAdapter;
 import $PACKAGE$.rpc.user.UserRO;
@@ -48,18 +47,25 @@ public class FeignUserRepository extends QueryDomainRepository<User, Users, User
 
     @Override
     protected Collection<UserRO> doSelect(Collection<String> ids) {
-        throw new UnsupportedOperationException();
+        Response<List<UserRO>> response = userFeignClient.list(ids);
+        if (response.getResult()) {
+            return response.getObject();
+        }
+        throw new RuntimeException(response.getMessage());
     }
 
     @Override
     protected UserRO doGet(Conditions conditions) {
-        throw new UnsupportedOperationException();
+        Response<UserRO> response = userFeignClient.get(conditions);
+        if (response.getResult()) {
+            return response.getObject();
+        }
+        throw new RuntimeException(response.getMessage());
     }
 
     @Override
     protected Collection<UserRO> doSelect(Conditions conditions) {
-        ConditionsRO ro = rpcUserFacadeAdapter.conditions2ro(conditions);
-        Response<List<UserRO>> response = userFeignClient.list(ro);
+        Response<List<UserRO>> response = userFeignClient.list(conditions);
         if (response.getResult()) {
             return response.getObject();
         }

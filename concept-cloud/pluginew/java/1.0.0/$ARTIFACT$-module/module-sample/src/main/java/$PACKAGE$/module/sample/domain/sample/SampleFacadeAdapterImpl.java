@@ -3,6 +3,7 @@ package $PACKAGE$.module.sample.domain.sample;
 import $PACKAGE$.domain.sample.Sample;
 import $PACKAGE$.domain.sample.SampleImpl;
 import $PACKAGE$.domain.user.User;
+import $PACKAGE$.domain.user.Users;
 import $PACKAGE$.module.sample.domain.sample.view.SampleCreateCommand;
 import $PACKAGE$.module.sample.domain.sample.view.SampleUpdateCommand;
 import $PACKAGE$.module.sample.domain.sample.view.SampleQuery;
@@ -14,6 +15,8 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.condition.LambdaConditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 /**
  * 领域模型转换适配器实现
@@ -36,7 +39,7 @@ public class SampleFacadeAdapterImpl implements SampleFacadeAdapter {
         return new SampleImpl.Builder()
                 .id(id)
                 .user(null)
-                .users(factory.createEmptyCollection(Users.class))
+                .users(factory.emptyCollection(Users.class))
                 .build(validator);
     }
 
