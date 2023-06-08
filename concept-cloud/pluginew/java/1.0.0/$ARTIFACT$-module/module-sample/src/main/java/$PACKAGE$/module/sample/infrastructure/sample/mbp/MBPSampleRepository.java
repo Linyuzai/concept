@@ -2,7 +2,6 @@ package $PACKAGE$.module.sample.infrastructure.sample.mbp;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import $PACKAGE$.basic.boot.mbp.MBPBaseRepository;
 import $PACKAGE$.domain.sample.Sample;
 import $PACKAGE$.domain.sample.SampleImpl;
 import $PACKAGE$.domain.sample.SampleRepository;
@@ -11,6 +10,7 @@ import $PACKAGE$.domain.user.User;
 import $PACKAGE$.domain.user.Users;
 import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainValidator;
+import com.github.linyuzai.domain.mbp.MBPDomainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * 基于 MBP 的示例存储实现
  */
 @Repository
-public class MBPSampleRepository extends MBPBaseRepository<Sample, Samples, SamplePO> implements SampleRepository {
+public class MBPSampleRepository extends MBPDomainRepository<Sample, Samples, SamplePO> implements SampleRepository {
 
     @Autowired
     private SampleMapper sampleMapper;
