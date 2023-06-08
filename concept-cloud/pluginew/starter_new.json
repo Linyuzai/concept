@@ -54,7 +54,7 @@
         {
           "id": "websocket-loadbalance",
           "title": "Concept WebSocket LoadBalance",
-          "description": "多实例场景下的 WebSocket 应用",
+          "description": "多实例服务场景下的 WebSocket 无感知应用",
           "links": [
             {
               "type": "WEBSITE",
@@ -82,7 +82,7 @@
         {
           "id": "event",
           "title": "Concept Event",
-          "description": "抽象事件概念，支持 RabbitMQ/Kafka",
+          "description": "事件模型，支持 RabbitMQ/Kafka",
           "links": [
             {
               "type": "WEBSITE",
