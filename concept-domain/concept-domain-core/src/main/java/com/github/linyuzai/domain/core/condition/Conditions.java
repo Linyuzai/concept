@@ -4,13 +4,13 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * 查询条件
  */
 @ToString
 @Getter
+@Setter(AccessLevel.PROTECTED)
 public class Conditions {
 
     public static final String ID = "id";
@@ -18,46 +18,43 @@ public class Conditions {
     public static final Conditions EMPTY = new Conditions();
 
     /**
-     * 如果是 null 则不拼接
+     * 如果 key 是 null 则不拼接
      */
-    @Setter
-    private boolean ignoreIfNull = true;
+    private boolean ignoreIfNullKey = true;
 
     /**
-     * 如果是 空字符串或空集合 则不拼接
+     * 如果 key 是 空字符串 则不拼接
      */
-    @Setter
-    private boolean ignoreIfEmpty = true;
+    private boolean ignoreIfEmptyKey = true;
 
     /**
      * = 条件
      */
-    private final Collection<Equal> equals = new ArrayList<>();
+    private Collection<Equal> equals = new ArrayList<>();
 
     /**
      * is null 条件
      */
-    private final Collection<Null> nulls = new ArrayList<>();
+    private Collection<Null> nulls = new ArrayList<>();
 
     /**
      * in 条件
      */
-    private final Collection<In> ins = new ArrayList<>();
+    private Collection<In> ins = new ArrayList<>();
 
     /**
      * like 条件
      */
-    private final Collection<Like> likes = new ArrayList<>();
+    private Collection<Like> likes = new ArrayList<>();
 
     /**
      * order by 条件
      */
-    private final Collection<OrderBy> orderBys = new ArrayList<>();
+    private Collection<OrderBy> orderBys = new ArrayList<>();
 
     /**
      * limit
      */
-    @Setter(AccessLevel.PROTECTED)
     private Limit limit;
 
     public static Conditions from(Conditions source) {
@@ -86,8 +83,8 @@ public class Conditions {
     }
 
     private void copy(Conditions conditions) {
-        conditions.setIgnoreIfNull(this.ignoreIfNull);
-        conditions.setIgnoreIfEmpty(this.ignoreIfEmpty);
+        conditions.setIgnoreIfNullKey(this.ignoreIfNullKey);
+        conditions.setIgnoreIfEmptyKey(this.ignoreIfEmptyKey);
         conditions.getEquals().addAll(this.equals);
         conditions.getNulls().addAll(this.nulls);
         conditions.getIns().addAll(this.ins);
@@ -96,11 +93,21 @@ public class Conditions {
         conditions.setLimit(this.limit);
     }
 
+    public Conditions ignoreIfNullKey(boolean ignore) {
+        this.ignoreIfNullKey = ignore;
+        return this;
+    }
+
+    public Conditions ignoreIfEmptyKey(boolean ignore) {
+        this.ignoreIfEmptyKey = ignore;
+        return this;
+    }
+
     /**
      * 添加 =
      */
     public Conditions equal(String key, Object value) {
-        if (notIgnore(key) && notIgnore(value)) {
+        if (notIgnore(key)) {
             equals.add(new Equal(key, value));
         }
         return this;
@@ -110,8 +117,22 @@ public class Conditions {
      * 添加 is null
      */
     public Conditions isNull(String key) {
+        return isNull(key, false);
+    }
+
+    /**
+     * 添加 is null
+     */
+    public Conditions isNotNull(String key) {
+        return isNull(key, true);
+    }
+
+    /**
+     * 添加 null 条件
+     */
+    public Conditions isNull(String key, boolean not) {
         if (notIgnore(key)) {
-            nulls.add(new Null(key));
+            nulls.add(new Null(key, not));
         }
         return this;
     }
@@ -120,7 +141,7 @@ public class Conditions {
      * 添加 in
      */
     public Conditions in(String key, Collection<?> values) {
-        if (notIgnore(key) /*&& notIgnore(values)*/) {
+        if (notIgnore(key)) {
             ins.add(new In(key, values));
         }
         return this;
@@ -130,12 +151,25 @@ public class Conditions {
      * 添加 like
      */
     public Conditions like(String key, String value) {
-        if (notIgnore(key) && notIgnore(value)) {
+        if (notIgnore(key)) {
             likes.add(new Like(key, value));
         }
         return this;
     }
 
+    /**
+     * 添加 order by asc
+     */
+    public Conditions orderBy(String key) {
+        return orderBy(key, false);
+    }
+
+    /**
+     * 添加 order by
+     */
+    public Conditions orderByDesc(String key) {
+        return orderBy(key, true);
+    }
 
     /**
      * 添加 order by
@@ -164,22 +198,12 @@ public class Conditions {
     }
 
     protected boolean notIgnore(Object value) {
-        if (ignoreIfNull) {
+        if (ignoreIfNullKey) {
             if (value == null) {
                 return false;
             }
         }
-        if (ignoreIfEmpty) {
-            if (value instanceof Collection) {
-                if (((Collection<?>) value).isEmpty()) {
-                    return false;
-                }
-            }
-            if (value instanceof Map) {
-                if (((Map<?, ?>) value).isEmpty()) {
-                    return false;
-                }
-            }
+        if (ignoreIfEmptyKey) {
             if (value instanceof CharSequence) {
                 if (((CharSequence) value).length() == 0) {
                     return false;
@@ -195,17 +219,19 @@ public class Conditions {
     @ToString
     @Getter
     @AllArgsConstructor
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Equal {
 
         /**
          * = 的 key
          */
-        private final String key;
+        private String key;
 
         /**
          * = 的 value
          */
-        private final Object value;
+        private Object value;
     }
 
     /**
@@ -214,12 +240,16 @@ public class Conditions {
     @ToString
     @Getter
     @AllArgsConstructor
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Null {
 
         /**
          * is null 的 key
          */
         private String key;
+
+        private boolean not;
     }
 
     /**
@@ -228,17 +258,19 @@ public class Conditions {
     @ToString
     @Getter
     @AllArgsConstructor
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class In {
 
         /**
          * in 的 key
          */
-        private final String key;
+        private String key;
 
         /**
          * in 的 values
          */
-        private final Collection<?> values;
+        private Collection<?> values;
     }
 
     /**
@@ -247,17 +279,19 @@ public class Conditions {
     @ToString
     @Getter
     @AllArgsConstructor
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Like {
 
         /**
          * like 的 key
          */
-        private final String key;
+        private String key;
 
         /**
          * like 的 value
          */
-        private final String value;
+        private String value;
     }
 
     /**
@@ -266,17 +300,19 @@ public class Conditions {
     @ToString
     @Getter
     @AllArgsConstructor
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class OrderBy {
 
         /**
          * order by 的 key
          */
-        private final String key;
+        private String key;
 
         /**
          * order by 是否倒序
          */
-        private final boolean desc;
+        private boolean desc;
     }
 
     /**
@@ -285,16 +321,18 @@ public class Conditions {
     @ToString
     @Getter
     @AllArgsConstructor
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Limit {
 
         /**
          * limit 开始下标
          */
-        private final long start;
+        private long start;
 
         /**
          * limit 数量
          */
-        private final long size;
+        private long size;
     }
 }

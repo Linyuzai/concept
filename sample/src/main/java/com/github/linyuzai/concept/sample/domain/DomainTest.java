@@ -1,10 +1,13 @@
 package com.github.linyuzai.concept.sample.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.linyuzai.domain.core.*;
 import com.github.linyuzai.domain.core.condition.Conditions;
+import com.github.linyuzai.domain.core.condition.LambdaConditions;
 import com.github.linyuzai.domain.core.mock.MockDomainContext;
 import com.github.linyuzai.domain.core.proxy.ProxyDomainFactory;
 import com.github.linyuzai.domain.mbp.MBPDomainIdGenerator;
+import lombok.SneakyThrows;
 
 import java.util.*;
 
@@ -27,6 +30,23 @@ public class DomainTest {
 
     public void test() {
         testFactory10();
+    }
+
+    @SneakyThrows
+    public void testConditions() {
+        ObjectMapper mapper = new ObjectMapper();
+        Conditions conditions = new Conditions()
+                .equal("a", "1")
+                .isNull("b")
+                .in("c", Arrays.asList("2", "3"))
+                .like("d", "4")
+                .orderBy("e")
+                .limit(2);
+        System.out.println(conditions);
+        String s = mapper.writeValueAsString(conditions);
+        System.out.println(s);
+        Conditions value = mapper.readValue(s, LambdaConditions.class);
+        System.out.println(value);
     }
 
     public void testFactory1() {
@@ -64,8 +84,7 @@ public class DomainTest {
         Map<String, String> idMapping = new LinkedHashMap<>();
         idMapping.put("5", "5");
         idMapping.put("_5", "_5");
-        Map<String, User> map = factory.createObject(User.class, Users2.class,
-                Arrays.asList("5", "_5"), idMapping);
+        Map<String, User> map = factory.createObject(Users2.class, idMapping);
         for (Map.Entry<String, User> entry : map.entrySet()) {
             System.out.println(entry.getKey());
             User user = entry.getValue();
@@ -131,8 +150,7 @@ public class DomainTest {
         Map<String, List<String>> idsMapping = new LinkedHashMap<>();
         idsMapping.put("10", Arrays.asList("10"));
         idsMapping.put("_10", Arrays.asList("_10"));
-        Map<String, Users2> map = factory.createCollection(User.class, Users2.class,
-                Arrays.asList("10", "_10"), idsMapping);
+        Map<String, Users2> map = factory.createCollection(Users2.class, idsMapping);
         for (Map.Entry<String, Users2> entry : map.entrySet()) {
             System.out.println(entry.getKey());
             Users2 users = entry.getValue();

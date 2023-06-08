@@ -5,11 +5,13 @@ import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.condition.Conditions;
+import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -35,6 +37,11 @@ public class ProxyDomainFactory implements DomainFactory {
     @Override
     public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, Predicate<T> predicate) {
         return new ProxySchrodingerPredicatedDomainObject<>(cls, collection, predicate).create(cls);
+    }
+
+    @Override
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<C> cls, Map<String, String> idMapping) {
+        return createObject(DomainLink.collection(cls), cls, new HashSet<>(idMapping.values()), idMapping);
     }
 
     @Override
@@ -66,6 +73,15 @@ public class ProxyDomainFactory implements DomainFactory {
     @Override
     public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Predicate<T> predicate) {
         return new ProxySchrodingerPredicatedDomainCollection<T>(cls, collection, predicate).create(cls);
+    }
+
+    @Override
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<C> cls, Map<String, ? extends Collection<String>> idsMapping) {
+        Set<String> limitedIds = idsMapping.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+        return createCollection(DomainLink.collection(cls), cls, limitedIds, idsMapping);
     }
 
     @Override

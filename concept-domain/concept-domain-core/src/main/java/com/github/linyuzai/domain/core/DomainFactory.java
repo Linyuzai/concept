@@ -19,6 +19,8 @@ public interface DomainFactory {
 
     <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, Predicate<T> predicate);
 
+    <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<C> cls, Map<String, String> idMapping);
+
     <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, String> idMapping);
 
     <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids);
@@ -28,6 +30,8 @@ public interface DomainFactory {
     <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Collection<String> ids);
 
     <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Predicate<T> predicate);
+
+    <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<C> cls, Map<String, ? extends Collection<String>> idsMapping);
 
     <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, ? extends Collection<String>> idsMapping);
 

@@ -160,8 +160,13 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
         QueryWrapper<P> wrapper = new QueryWrapper<>();
         conditions.getEquals().forEach(it ->
                 wrapper.eq(fetchColumn(getFetchClass(), it.getKey()), it.getValue()));
-        conditions.getNulls().forEach(it ->
-                wrapper.isNull(fetchColumn(getFetchClass(), it.getKey())));
+        conditions.getNulls().forEach(it -> {
+            if (it.isNot()) {
+                wrapper.isNotNull(fetchColumn(getFetchClass(), it.getKey()));
+            } else {
+                wrapper.isNull(fetchColumn(getFetchClass(), it.getKey()));
+            }
+        });
         conditions.getIns().forEach(it ->
                 wrapper.in(fetchColumn(getFetchClass(), it.getKey()), it.getValues()));
         conditions.getLikes().forEach(it ->
@@ -173,6 +178,10 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
                 wrapper.orderByAsc(fetchColumn(getFetchClass(), it.getKey()));
             }
         });
+        Conditions.Limit limit = conditions.getLimit();
+        if (limit != null) {
+            wrapper.last("limit " + limit.getStart() + ", " + limit.getSize());
+        }
         return wrapper;
     }
 

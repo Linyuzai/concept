@@ -50,7 +50,7 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
                 return null;
             }
             Class<? extends DomainRepository<T, ?>> clazz =
-                    DomainLink.repository(type);
+                    DomainLink.repository(DomainLink.collection(type));
             return context.get(clazz);
         });
     }
