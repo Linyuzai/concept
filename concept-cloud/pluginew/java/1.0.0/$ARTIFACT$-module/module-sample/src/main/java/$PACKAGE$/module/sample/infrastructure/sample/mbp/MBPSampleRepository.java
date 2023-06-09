@@ -64,6 +64,7 @@ public class MBPSampleRepository extends MBPDomainRepository<Sample, Samples, Sa
 
         return new SampleImpl.Builder()
                 .id(po.getId())
+                .sample(po.getSample())
                 .user(user)
                 .users(users)
                 .build(validator);
@@ -100,8 +101,9 @@ public class MBPSampleRepository extends MBPDomainRepository<Sample, Samples, Sa
         for (SamplePO po : pos) {
             Sample sample = new SampleImpl.Builder()
                     .id(po.getId())
-                    .user(userMap.get(po.getUserId()))
-                    .users(sampleUsersMap.get(po.getUserId()))
+                    .sample(po.getSample())
+                    .user(userMap.get(po.getId()))
+                    .users(sampleUsersMap.get(po.getId()))
                     .build(validator);
             samples.add(sample);
         }

@@ -68,7 +68,11 @@ public class SampleFacadeAdapterImpl implements SampleFacadeAdapter {
 
     @Override
     public Conditions toConditions(SampleQuery query) {
-        return new LambdaConditions().equal(Sample::getSample, query.getSample());
+        LambdaConditions conditions = new LambdaConditions();
+        if (query.getSample() != null) {
+            conditions.equal(Sample::getSample, query.getSample());
+        }
+        return conditions;
     }
 
     private SampleUserVO getUser(User user) {
