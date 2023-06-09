@@ -150,23 +150,25 @@ public class DomainTest {
 
     public void testFactory10() {
         DomainFactory factory = getDomainFactory();
-        Map<String, Users2> map = factory.createCollection(Users2.class, Arrays.asList("10", "_10"), ids -> {
+        Map<String, Users2> map = factory.createCollection(Users2.class, Arrays.asList("10", "_10", "_"), ids -> {
             System.out.println("mapping");
             Map<String, List<String>> idsMapping = new LinkedHashMap<>();
             idsMapping.put("10", Arrays.asList("10"));
             idsMapping.put("_10", Arrays.asList("_10"));
+            idsMapping.put("_", Collections.emptyList());
             return idsMapping;
         });
         for (Map.Entry<String, Users2> entry : map.entrySet()) {
             System.out.println(entry.getKey());
             Users2 users = entry.getValue();
-            for (User user : users.list()) {
+            List<User> list = users.list();
+            for (User user : list) {
                 System.out.println(user.getId());
-                user.test0();
+                //user.test0();
                 System.out.println("===============");
             }
-            users.test1();
-            users.test2();
+            /*users.test1();
+            users.test2();*/
             System.out.println("===============");
         }
     }

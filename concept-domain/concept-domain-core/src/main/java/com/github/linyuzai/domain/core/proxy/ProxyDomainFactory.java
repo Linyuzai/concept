@@ -70,12 +70,11 @@ public class ProxyDomainFactory implements DomainFactory {
 
         Map<String, T> map = new LinkedHashMap<>();
         for (String ownerId : ownerIds) {
-            Map<String, String> apply = function.apply(ownerIds);
-            String id = apply.get(ownerId);
-            if (id == null) {
-                continue;
-            }
-            T object = createObject(dCls, () -> collection.get(id));
+            T object = createObject(dCls, () -> {
+                Map<String, String> apply = function.apply(ownerIds);
+                String id = apply.get(ownerId);
+                return collection.get(id);
+            });
             map.put(ownerId, object);
         }
 
@@ -130,11 +129,13 @@ public class ProxyDomainFactory implements DomainFactory {
 
         Map<String, C> map = new LinkedHashMap<>();
         for (String ownerId : ownerIds) {
-            Map<String, ? extends Collection<String>> apply = function.apply(ownerIds);
-            Collection<String> ids = apply.get(ownerId);
-            C c = createCollection(cCls, () -> ids.stream()
-                    .map(collection::get)
-                    .collect(Collectors.toList()));
+            C c = createCollection(cCls, () -> {
+                Map<String, ? extends Collection<String>> apply = function.apply(ownerIds);
+                Collection<String> ids = apply.get(ownerId);
+                return ids.stream()
+                        .map(collection::get)
+                        .collect(Collectors.toList());
+            });
             map.put(ownerId, c);
         }
         return map;
@@ -162,15 +163,18 @@ public class ProxyDomainFactory implements DomainFactory {
 
         private R result;
 
-        private boolean mark;
+        private volatile boolean first = true;
 
         @Override
         public R apply(T t) {
-            if (mark) {
-                return result;
+            if (first) {
+                synchronized (this) {
+                    if (first) {
+                        result = function.apply(t);
+                        first = false;
+                    }
+                }
             }
-            result = function.apply(t);
-            mark = true;
             return result;
         }
     }
