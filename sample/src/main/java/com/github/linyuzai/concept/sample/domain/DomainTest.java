@@ -81,10 +81,13 @@ public class DomainTest {
 
     public void testFactory5() {
         DomainFactory factory = getDomainFactory();
-        Map<String, String> idMapping = new LinkedHashMap<>();
-        idMapping.put("5", "5");
-        idMapping.put("_5", "_5");
-        Map<String, User> map = factory.createObject(Users2.class, idMapping);
+        Map<String, User> map = factory.createObject(Users2.class, Arrays.asList("5", "_5"), ids -> {
+            System.out.println("mapping");
+            Map<String, String> idMapping = new LinkedHashMap<>();
+            idMapping.put("5", "5");
+            idMapping.put("_5", "_5");
+            return idMapping;
+        });
         for (Map.Entry<String, User> entry : map.entrySet()) {
             System.out.println(entry.getKey());
             User user = entry.getValue();
@@ -147,10 +150,13 @@ public class DomainTest {
 
     public void testFactory10() {
         DomainFactory factory = getDomainFactory();
-        Map<String, List<String>> idsMapping = new LinkedHashMap<>();
-        idsMapping.put("10", Arrays.asList("10"));
-        idsMapping.put("_10", Arrays.asList("_10"));
-        Map<String, Users2> map = factory.createCollection(Users2.class, idsMapping);
+        Map<String, Users2> map = factory.createCollection(Users2.class, Arrays.asList("10", "_10"), ids -> {
+            System.out.println("mapping");
+            Map<String, List<String>> idsMapping = new LinkedHashMap<>();
+            idsMapping.put("10", Arrays.asList("10"));
+            idsMapping.put("_10", Arrays.asList("_10"));
+            return idsMapping;
+        });
         for (Map.Entry<String, Users2> entry : map.entrySet()) {
             System.out.println(entry.getKey());
             Users2 users = entry.getValue();
