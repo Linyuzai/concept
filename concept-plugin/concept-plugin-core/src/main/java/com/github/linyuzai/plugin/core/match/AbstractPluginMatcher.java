@@ -31,14 +31,14 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
     public AbstractPluginMatcher(@NonNull Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginPath.class) {
-                String[] packages = ((PluginPath) annotation).value();
-                if (packages.length > 0) {
-                    pathFilter = new PathFilter(packages);
+                String[] paths = ((PluginPath) annotation).value();
+                if (paths.length > 0) {
+                    pathFilter = new PathFilter(paths);
                 }
             } else if (annotation.annotationType() == PluginName.class) {
-                String[] classNames = ((PluginName) annotation).value();
-                if (classNames.length > 0) {
-                    nameFilter = new NameFilter(classNames);
+                String[] names = ((PluginName) annotation).value();
+                if (names.length > 0) {
+                    nameFilter = new NameFilter(names);
                 }
             }
         }
