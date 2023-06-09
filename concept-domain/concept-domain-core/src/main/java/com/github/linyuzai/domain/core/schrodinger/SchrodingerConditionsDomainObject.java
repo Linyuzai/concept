@@ -26,7 +26,7 @@ public class SchrodingerConditionsDomainObject<T extends DomainObject>
     /**
      * 获得被代理的对象
      */
-    public T doGetTarget() {
+    protected T doGetTarget() {
         DomainCollection<T> select = getRepository().select(conditions);
         return list2one(getDomainObjectType(), select.list());
     }

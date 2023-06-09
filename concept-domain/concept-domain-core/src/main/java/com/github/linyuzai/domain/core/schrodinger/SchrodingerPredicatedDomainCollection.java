@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,37 +28,35 @@ public class SchrodingerPredicatedDomainCollection<T extends DomainObject>
     @NonNull
     protected final Predicate<T> predicate;
 
+    protected Map<String, T> target;
+
+    public Map<String, T> getTarget() {
+        if (this.target == null) {
+            load();
+        }
+        return this.target;
+    }
+
+    protected Collection<T> doGetTarget() {
+        return collection.list().stream().filter(predicate).collect(Collectors.toList());
+    }
+
     /**
      * 根据 id 获得领域模型
      */
     @Override
     public T get(String id) {
-        load();
-        T domain = collection.get(id);
-        if (domain == null) {
-            return null;
-        }
-        if (predicate.test(domain)) {
-            return domain;
-        }
-        return null;
+        return getTarget().get(id);
     }
 
     @Override
     public boolean contains(String id) {
-        load();
-        T domain = collection.get(id);
-        if (domain == null) {
-            return false;
-        }
-        return predicate.test(domain);
+        return getTarget().containsKey(id);
     }
-
 
     @Override
     public List<T> list() {
-        load();
-        return collection.list().stream().filter(predicate).collect(Collectors.toList());
+        return new ArrayList<>(getTarget().values());
     }
 
     /**
@@ -62,8 +64,7 @@ public class SchrodingerPredicatedDomainCollection<T extends DomainObject>
      */
     @Override
     public Stream<T> stream() {
-        load();
-        return collection.stream().filter(predicate);
+        return getTarget().values().stream();
     }
 
     /**
@@ -71,18 +72,19 @@ public class SchrodingerPredicatedDomainCollection<T extends DomainObject>
      */
     @Override
     public Long count() {
-        load();
-        return collection.list().stream().filter(predicate).count();
-    }
-
-
-    @Override
-    public void load() {
-        collection.load();
+        return Integer.valueOf(getTarget().size()).longValue();
     }
 
     @Override
-    public void release() {
-        collection.release();
+    public synchronized void load() {
+        if (this.target == null) {
+            this.target = doGetTarget().stream()
+                    .collect(Collectors.toMap(Identifiable::getId, Function.identity()));
+        }
+    }
+
+    @Override
+    public synchronized void release() {
+        target = null;
     }
 }

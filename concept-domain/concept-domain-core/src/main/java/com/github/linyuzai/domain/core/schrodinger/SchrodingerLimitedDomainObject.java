@@ -32,14 +32,16 @@ public class SchrodingerLimitedDomainObject<T extends DomainObject>
     protected T target;
 
     public T getTarget() {
-        load();
+        if (this.target == null) {
+            load();
+        }
         return this.target;
     }
 
     /**
      * 获得被代理的对象
      */
-    public T doGetTarget() {
+    protected T doGetTarget() {
         T domain = collection.get(id);
         if (domain == null) {
             throw new DomainNotFoundException(getDomainObjectType(), id);
@@ -48,14 +50,14 @@ public class SchrodingerLimitedDomainObject<T extends DomainObject>
     }
 
     @Override
-    public void load() {
+    public synchronized void load() {
         if (this.target == null) {
             this.target = doGetTarget();
         }
     }
 
     @Override
-    public void release() {
+    public synchronized void release() {
         this.target = null;
     }
 

@@ -37,36 +37,26 @@ public abstract class AbstractSchrodingerDomainObject<T extends DomainObject>
     }
 
     public T getTarget() {
-        load();
+        if (this.target == null) {
+            load();
+        }
         return this.target;
     }
 
     /**
      * 获得被代理的对象
      */
-    public abstract T doGetTarget();
-
-    public static <E> E list2one(Class<? extends E> type, List<E> list) {
-        int size = list.size();
-        switch (size) {
-            case 0:
-                throw new DomainNotFoundException(type);
-            case 1:
-                return list.get(0);
-            default:
-                throw new DomainMultipleFoundException(type, size);
-        }
-    }
+    protected abstract T doGetTarget();
 
     @Override
-    public void load() {
+    public synchronized void load() {
         if (this.target == null) {
             this.target = doGetTarget();
         }
     }
 
     @Override
-    public void release() {
+    public synchronized void release() {
         this.target = null;
     }
 
@@ -86,5 +76,17 @@ public abstract class AbstractSchrodingerDomainObject<T extends DomainObject>
      */
     protected Class<? extends DomainRepository<T, ?>> getDomainRepositoryType() {
         return DomainLink.repository(getDomainObjectType());
+    }
+
+    public static <E> E list2one(Class<? extends E> type, List<E> list) {
+        int size = list.size();
+        switch (size) {
+            case 0:
+                throw new DomainNotFoundException(type);
+            case 1:
+                return list.get(0);
+            default:
+                throw new DomainMultipleFoundException(type, size);
+        }
     }
 }

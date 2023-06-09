@@ -13,7 +13,7 @@ import lombok.NonNull;
 @Getter
 public class ProxySchrodingerIdentifiedDomainObject<T extends DomainObject>
         extends SchrodingerIdentifiedDomainObject<T>
-        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
+        implements DomainObject, DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull

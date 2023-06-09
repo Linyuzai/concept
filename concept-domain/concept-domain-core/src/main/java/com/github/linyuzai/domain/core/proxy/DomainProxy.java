@@ -170,14 +170,10 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         }
     }
 
-    interface ConditionsAccess<T> {
+    interface ConditionsAccess {
 
         default Conditions getConditions() {
             return null;
-        }
-
-        default Predicate<T> getPredicate() {
-            return it -> true;
         }
     }
 
@@ -200,7 +196,7 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
     }
 
     interface AccessAdapter<T extends DomainObject, E> extends ContextAccess,
-            ConditionsAccess<T>, RepositoryAccess<T>, ExtraAccess<E> {
+            ConditionsAccess, RepositoryAccess<T>, ExtraAccess<E> {
 
         @Override
         default DomainContext getContext() {
@@ -210,11 +206,10 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
             throw new UnsupportedOperationException("Can not access DomainContext");
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         default Conditions getConditions() {
             if (getCollection() instanceof ConditionsAccess) {
-                return ((ConditionsAccess<T>) getCollection()).getConditions();
+                return ((ConditionsAccess) getCollection()).getConditions();
             }
             throw new UnsupportedOperationException("Can not access Conditions");
         }

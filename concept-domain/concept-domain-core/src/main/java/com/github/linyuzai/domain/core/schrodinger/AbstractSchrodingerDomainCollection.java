@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,11 +31,13 @@ public abstract class AbstractSchrodingerDomainCollection<T extends DomainObject
     protected Map<String, T> target;
 
     public Map<String, T> getTarget() {
-        load();
+        if (this.target == null) {
+            load();
+        }
         return this.target;
     }
 
-    public abstract List<T> doGetTarget();
+    protected abstract Collection<T> doGetTarget();
 
     /**
      * 根据 id 获得领域模型
@@ -60,13 +63,6 @@ public abstract class AbstractSchrodingerDomainCollection<T extends DomainObject
         return new ArrayList<>(getTarget().values());
     }
 
-    public DomainRepository<T, ?> getRepository() {
-        if (repository == null) {
-            repository = context.get(getDomainRepositoryType());
-        }
-        return repository;
-    }
-
     /**
      * 流式数据查询
      */
@@ -83,21 +79,28 @@ public abstract class AbstractSchrodingerDomainCollection<T extends DomainObject
         return Integer.valueOf(getTarget().size()).longValue();
     }
 
-    protected Function<T, T> mapping() {
-        return Function.identity();
-    }
-
     @Override
-    public void load() {
+    public synchronized void load() {
         if (this.target == null) {
             this.target = doGetTarget().stream()
                     .collect(Collectors.toMap(Identifiable::getId, mapping()));
         }
     }
 
+    protected Function<T, T> mapping() {
+        return Function.identity();
+    }
+
     @Override
-    public void release() {
+    public synchronized void release() {
         target = null;
+    }
+
+    public DomainRepository<T, ?> getRepository() {
+        if (repository == null) {
+            repository = context.get(getDomainRepositoryType());
+        }
+        return repository;
     }
 
     /**

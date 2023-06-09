@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 薛定谔的集合模型
@@ -15,7 +14,7 @@ public class SchrodingerIdentifiedDomainCollection<T extends DomainObject>
         extends AbstractSchrodingerDomainCollection<T> implements DomainCollection<T> {
 
     @NonNull
-    protected Collection<String> ids;
+    protected final Collection<String> ids;
 
     public SchrodingerIdentifiedDomainCollection(@NonNull DomainContext context,
                                                  @NonNull Collection<String> ids) {
@@ -24,7 +23,7 @@ public class SchrodingerIdentifiedDomainCollection<T extends DomainObject>
     }
 
     @Override
-    public List<T> doGetTarget() {
+    protected Collection<T> doGetTarget() {
         return getRepository().select(ids).list();
     }
 }

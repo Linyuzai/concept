@@ -41,14 +41,16 @@ public class SchrodingerPredicatedDomainObject<T extends DomainObject>
     }
 
     public T getTarget() {
-        load();
+        if (this.target == null) {
+            load();
+        }
         return this.target;
     }
 
     /**
      * 获得被代理的对象
      */
-    public T doGetTarget() {
+    protected T doGetTarget() {
         List<T> list = this.collection.list()
                 .stream()
                 .filter(predicate)
@@ -57,17 +59,15 @@ public class SchrodingerPredicatedDomainObject<T extends DomainObject>
     }
 
     @Override
-    public void load() {
-        this.collection.load();
+    public synchronized void load() {
         if (this.target == null) {
             this.target = doGetTarget();
         }
     }
 
     @Override
-    public void release() {
+    public synchronized void release() {
         this.target = null;
-        this.collection.release();
     }
 
     protected Class<? extends T> getDomainObjectType() {

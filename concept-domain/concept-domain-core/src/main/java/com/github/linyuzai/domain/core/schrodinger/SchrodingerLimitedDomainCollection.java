@@ -3,12 +3,16 @@ package com.github.linyuzai.domain.core.schrodinger;
 import com.github.linyuzai.domain.core.AbstractDomainProperties;
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
+import com.github.linyuzai.domain.core.Identifiable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +31,22 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject>
     protected final Collection<String> ids;
 
     /**
+     * 被代理的领域模型
+     */
+    protected Map<String, T> target;
+
+    public Map<String, T> getTarget() {
+        if (this.target == null) {
+            load();
+        }
+        return this.target;
+    }
+
+    protected Collection<T> doGetTarget() {
+        return collection.list().stream().filter(it -> ids.contains(it.getId())).collect(Collectors.toList());
+    }
+
+    /**
      * 根据 id 获得领域模型
      */
     @Override
@@ -34,24 +54,18 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject>
         if (!ids.contains(id)) {
             return null;
         }
-        load();
-        return collection.get(id);
+        return getTarget().get(id);
     }
 
     @Override
     public boolean contains(String id) {
-        if (!ids.contains(id)) {
-            return false;
-        }
-        load();
-        return collection.contains(id);
+        return ids.contains(id);
     }
 
 
     @Override
     public List<T> list() {
-        load();
-        return collection.list().stream().filter(it -> ids.contains(it.getId())).collect(Collectors.toList());
+        return new ArrayList<>(getTarget().values());
     }
 
     /**
@@ -59,8 +73,7 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject>
      */
     @Override
     public Stream<T> stream() {
-        load();
-        return collection.stream().filter(it -> ids.contains(it.getId()));
+        return getTarget().values().stream();
     }
 
     /**
@@ -68,17 +81,19 @@ public class SchrodingerLimitedDomainCollection<T extends DomainObject>
      */
     @Override
     public Long count() {
-        load();
-        return collection.list().stream().filter(it -> ids.contains(it.getId())).count();
+        return Integer.valueOf(getTarget().size()).longValue();
     }
 
     @Override
-    public void load() {
-        collection.load();
+    public synchronized void load() {
+        if (this.target == null) {
+            this.target = doGetTarget().stream()
+                    .collect(Collectors.toMap(Identifiable::getId, Function.identity()));
+        }
     }
 
     @Override
-    public void release() {
-        collection.release();
+    public synchronized void release() {
+        this.target = null;
     }
 }

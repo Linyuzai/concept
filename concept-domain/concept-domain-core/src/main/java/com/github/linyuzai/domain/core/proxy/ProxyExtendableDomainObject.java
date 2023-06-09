@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class ProxyExtendableDomainObject<T extends DomainObject> extends AbstractDomainProperties
         implements DomainObject, DomainProxy,
-        DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
+        DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object>,
         DomainContext.Aware {
 

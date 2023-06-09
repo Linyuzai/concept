@@ -23,7 +23,7 @@ public class SchrodingerIdentifiedDomainObject<T extends DomainObject>
     /**
      * 获得被代理的对象
      */
-    public T doGetTarget() {
+    protected T doGetTarget() {
         T domain = getRepository().get(id);
         if (domain == null) {
             throw new DomainNotFoundException(getDomainObjectType(), id);

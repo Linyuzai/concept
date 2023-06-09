@@ -8,9 +8,12 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Getter
@@ -30,6 +33,11 @@ public class ProxyDomainFactory implements DomainFactory {
     }
 
     @Override
+    public <T extends DomainObject> T createObject(Class<T> cls, Supplier<T> supplier) {
+        return new ProxySchrodingerDeferredDomainObject<>(cls, context, supplier).create(cls);
+    }
+
+    @Override
     public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, String id) {
         return new ProxySchrodingerLimitedDomainObject<>(cls, collection, id).create(cls);
     }
@@ -40,24 +48,48 @@ public class ProxyDomainFactory implements DomainFactory {
     }
 
     @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<C> cls, Map<String, String> idMapping) {
-        return createObject(DomainLink.collection(cls), cls, new HashSet<>(idMapping.values()), idMapping);
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(
+            Class<C> cls, Collection<String> ownerIds, Function<Collection<String>,
+            Map<String, String>> idMapping) {
+        return createObject(DomainLink.collection(cls), cls, ownerIds, idMapping);
     }
 
     @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, String> idMapping) {
-        C collection = createCollection(cCls, limitedIds);
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(
+            Class<T> dCls, Class<C> cCls, Collection<String> ownerIds,
+            Function<Collection<String>, Map<String, String>> idMapping) {
+        CachedFunction<Collection<String>, Map<String, String>> function =
+                new CachedFunction<>(idMapping);
+        C collection = createCollection(cCls, () -> {
+            Set<String> ids = new HashSet<>(function.apply(ownerIds).values());
+            C c = createCollection(cCls, ids);
+            return ids.stream()
+                    .map(it -> createObject(dCls, c, it))
+                    .collect(Collectors.toList());
+        });
+
         Map<String, T> map = new LinkedHashMap<>();
-        for (Map.Entry<String, String> entry : idMapping.entrySet()) {
-            T object = createObject(dCls, collection, entry.getValue());
-            map.put(entry.getKey(), object);
+        for (String ownerId : ownerIds) {
+            Map<String, String> apply = function.apply(ownerIds);
+            String id = apply.get(ownerId);
+            if (id == null) {
+                continue;
+            }
+            T object = createObject(dCls, () -> collection.get(id));
+            map.put(ownerId, object);
         }
+
         return map;
     }
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Conditions conditions) {
         return new ProxySchrodingerConditionsDomainCollection<C>(cls, context, this, conditions).create(cls);
+    }
+
+    @Override
+    public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, Supplier<Collection<T>> supplier) {
+        return new ProxySchrodingerDeferredDomainCollection<>(cls, context, this, supplier).create(cls);
     }
 
     @Override
@@ -76,26 +108,34 @@ public class ProxyDomainFactory implements DomainFactory {
     }
 
     @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<C> cls, Map<String, ? extends Collection<String>> idsMapping) {
-        Set<String> limitedIds = idsMapping.values()
-                .stream()
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
-        return createCollection(DomainLink.collection(cls), cls, limitedIds, idsMapping);
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<C> cls, Collection<String> ownerIds, Function<Collection<String>, Map<String, ? extends Collection<String>>> idsMapping) {
+        return createCollection(DomainLink.collection(cls), cls, ownerIds, idsMapping);
     }
 
     @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Map<String, ? extends Collection<String>> idsMapping) {
-        C collection = createCollection(cCls, limitedIds);
+    public <T extends DomainObject, C extends DomainCollection<T>> Map<String, C> createCollection(Class<T> dCls, Class<C> cCls, Collection<String> ownerIds, Function<Collection<String>, Map<String, ? extends Collection<String>>> idsMapping) {
+        CachedFunction<Collection<String>, Map<String, ? extends Collection<String>>> function =
+                new CachedFunction<>(idsMapping);
+        C collection = createCollection(cCls, () -> {
+            Set<String> ids = function.apply(ownerIds)
+                    .values()
+                    .stream()
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
+            C c = createCollection(cCls, ids);
+            return ids.stream()
+                    .map(it -> createObject(dCls, c, it))
+                    .collect(Collectors.toList());
+        });
+
         Map<String, C> map = new LinkedHashMap<>();
-        for (Map.Entry<String, ? extends Collection<String>> entry : idsMapping.entrySet()) {
-            List<T> list = new ArrayList<>();
-            for (String id : entry.getValue()) {
-                T object = createObject(dCls, collection, id);
-                list.add(object);
-            }
-            C wrap = wrapCollection(cCls, list);
-            map.put(entry.getKey(), wrap);
+        for (String ownerId : ownerIds) {
+            Map<String, ? extends Collection<String>> apply = function.apply(ownerIds);
+            Collection<String> ids = apply.get(ownerId);
+            C c = createCollection(cCls, () -> ids.stream()
+                    .map(collection::get)
+                    .collect(Collectors.toList()));
+            map.put(ownerId, c);
         }
         return map;
     }
@@ -113,5 +153,25 @@ public class ProxyDomainFactory implements DomainFactory {
     @Override
     public <C extends DomainCollection<?>> C emptyCollection(Class<C> cls) {
         return wrapCollection(cls, Collections.emptyList());
+    }
+
+    @RequiredArgsConstructor
+    private static class CachedFunction<T, R> implements Function<T, R> {
+
+        private final Function<T, R> function;
+
+        private R result;
+
+        private boolean mark;
+
+        @Override
+        public R apply(T t) {
+            if (mark) {
+                return result;
+            }
+            result = function.apply(t);
+            mark = true;
+            return result;
+        }
     }
 }

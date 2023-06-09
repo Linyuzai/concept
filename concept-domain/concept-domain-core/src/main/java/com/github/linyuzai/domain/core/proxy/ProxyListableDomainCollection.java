@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class ProxyListableDomainCollection<T extends DomainObject> extends ListableDomainCollection<T>
-        implements DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess<T>,
+        implements DomainProxy, DomainProxy.ContextAccess, DomainProxy.ConditionsAccess,
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object>,
         DomainContext.Aware {
 

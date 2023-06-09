@@ -24,7 +24,7 @@ public class SchrodingerConditionsDomainCollection<T extends DomainObject>
     }
 
     @Override
-    public List<T> doGetTarget() {
+    protected Collection<T> doGetTarget() {
         return getRepository().select(conditions).list();
     }
 }
