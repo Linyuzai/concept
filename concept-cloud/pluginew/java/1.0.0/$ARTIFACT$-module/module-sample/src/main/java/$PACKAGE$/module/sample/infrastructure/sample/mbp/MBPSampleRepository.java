@@ -79,31 +79,35 @@ public class MBPSampleRepository extends MBPDomainRepository<Sample, Samples, Sa
     public Collection<Sample> pos2dos(Collection<? extends SamplePO> pos) {
         List<Sample> samples = new ArrayList<>();
 
-        //id 和 userId 的关联 Map
-        Map<String, String> userIdMap = pos.stream()
-                .collect(Collectors.toMap(SamplePO::getId, SamplePO::getUserId));
-        //获得 sample id 和 User 的 Map，该方法不会立即查询数据库，而会等到调用 Users 的方法获取数据时才会触发查询
-        Map<String, User> userMap = factory.createObject(Users.class, userIdMap);
+        //获得 Sample id 集合
+        Set<String> sampleIds = pos.stream()
+                .map(SamplePO::getId)
+                .collect(Collectors.toSet());
 
-        //根据 sampleId 集合获得所有的关联对象
-        Set<String> ids = pos.stream().map(SamplePO::getId).collect(Collectors.toSet());
-        List<SampleUserPO> sups = sampleUserMapper
-                .selectList(Wrappers.<SampleUserPO>lambdaQuery()
-                        .in(SampleUserPO::getSampleId, ids));
-        //处理获得 sampleId 和 userIds 的关联 Map
-        Map<String, Set<String>> sampleUsersIdMap = sups.stream()
-                .collect(Collectors.groupingBy(SampleUserPO::getSampleId,
-                        Collectors.mapping(SampleUserPO::getUserId, Collectors.toSet())));
+        //获得 sample id 和 User 的 Map，该方法不会立即查询数据库，而会等到调用 Users 的方法获取数据时才会触发查询
+        Map<String, User> userMap = factory.createObject(Users.class, sampleIds, ids -> {
+            //Sample id 和 userId 的关联 Map
+            return pos.stream().collect(Collectors.toMap(SamplePO::getId, SamplePO::getUserId));
+        });
 
         //获得 sample id 和 Users 的 Map，该方法不会立即查询数据库，而会等到调用 Users 的方法获取数据时才会触发查询
-        Map<String, Users> sampleUsersMap = factory.createCollection(Users.class, sampleUsersIdMap);
+        Map<String, Users> usersMap = factory.createCollection(Users.class, sampleIds, ids -> {
+            //根据 sampleId 集合获得所有的关联对象
+            List<SampleUserPO> sampleUserList = sampleUserMapper
+                    .selectList(Wrappers.<SampleUserPO>lambdaQuery()
+                            .in(SampleUserPO::getSampleId, sampleIds));
+            //处理获得 sampleId 和 userIds 的关联 Map
+            return sampleUserList.stream()
+                    .collect(Collectors.groupingBy(SampleUserPO::getSampleId,
+                            Collectors.mapping(SampleUserPO::getUserId, Collectors.toSet())));
+        });
 
         for (SamplePO po : pos) {
             Sample sample = new SampleImpl.Builder()
                     .id(po.getId())
                     .sample(po.getSample())
                     .user(userMap.get(po.getId()))
-                    .users(sampleUsersMap.get(po.getId()))
+                    .users(usersMap.get(po.getId()))
                     .build(validator);
             samples.add(sample);
         }
