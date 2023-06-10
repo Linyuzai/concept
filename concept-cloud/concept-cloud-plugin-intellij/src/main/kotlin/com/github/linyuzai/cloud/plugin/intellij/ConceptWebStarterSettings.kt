@@ -6,7 +6,6 @@ import com.intellij.ide.starters.shared.*
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.util.io.Decompressor
 import org.jetbrains.annotations.Nls
@@ -42,7 +41,7 @@ val SERVER_PACKAGING_TYPES: Key<List<ConceptStarterAppPackaging>> = Key.create("
 
 open class ConceptWebStarterFrameworkVersion(
     val id: String,
-    @NlsSafe val title: String,
+    val title: String,
     val isDefault: Boolean
 ) {
     override fun toString(): String {
@@ -51,7 +50,7 @@ open class ConceptWebStarterFrameworkVersion(
 }
 
 open class ConceptWebStarterDependencyCategory(
-    @NlsSafe
+
     val title: String,
     val dependencies: List<ConceptWebStarterDependency>
 ) {
@@ -64,7 +63,7 @@ open class ConceptWebStarterDependencyCategory(
 
 open class ConceptWebStarterDependency(
     val id: String,
-    @NlsSafe
+
     override val title: String,
     override val description: String? = null,
     override val links: List<ConceptLibraryLink> = emptyList(),
@@ -89,7 +88,7 @@ sealed class ConceptDependencyState
 class ConceptDependencyUnavailable(
     @Nls(capitalization = Nls.Capitalization.Sentence)
     val message: String?,
-    @NlsSafe
+
     val hint: String? = null
 ) : ConceptDependencyState()
 
@@ -118,7 +117,8 @@ fun unzipSubfolder(tempZipFile: File, contentEntryDir: File) {
         }
         if (rootFolders.size != 1) {
             throw ConceptUnexpectedArchiveStructureException(
-                "The archive should have 1 subdirectory, but has: " + rootFolders.joinToString(","))
+                "The archive should have 1 subdirectory, but has: " + rootFolders.joinToString(",")
+            )
         }
         rootFolderName = rootFolders.iterator().next()
     }

@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-@SuppressWarnings("all")
 public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder {
 
     private final Key<Map<String, ConceptFrameworkVersion>> CONCEPT_CLOUD_CFV_KEY = new Key<>("CONCEPT_CLOUD_CFV_KEY");
@@ -29,7 +28,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     @Override
     protected Url composeGeneratorUrl(@NotNull String s, @NotNull ConceptWebStarterContext webStarterContext) {
         ConceptWebStarterFrameworkVersion frameworkVersion = webStarterContext.getFrameworkVersion();
-        String version = frameworkVersion.getId();
+        String version = frameworkVersion == null ? "VERSION_NULL" : frameworkVersion.getId();
         String location = "java/" + version + "/template.zip";
         String url;
         if (s.endsWith("/")) {
@@ -117,6 +116,9 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
 
     private String handleVersions(String content) {
         Versions versions = getVersions();
+        if (versions == null) {
+            return content;
+        }
         return content
                 .replaceAll("\\$V_GRADLE\\$", versions.gradle)
                 .replaceAll("\\$V_SPRING_BOOT\\$", versions.springBoot)
@@ -143,7 +145,7 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
     private void createDir(String name, File parent) {
         File file = new File(parent, name);
         if (!file.exists()) {
-            file.mkdirs();
+            boolean mkdirs = file.mkdirs();
         }
     }
 
@@ -151,11 +153,11 @@ public class ConceptCloudWebModuleBuilder extends ConceptWebStarterModuleBuilder
         File file = new File(parent, name);
         File parentFile = new File(transform(file.getParent(), true));
         if (!parentFile.exists()) {
-            parentFile.mkdirs();
+            boolean mkdirs = parentFile.mkdirs();
         }
         File create = new File(parentFile, file.getName());
         if (!create.exists()) {
-            create.createNewFile();
+            boolean newFile = create.createNewFile();
         }
         return create;
     }

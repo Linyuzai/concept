@@ -1,5 +1,8 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
+import com.github.linyuzai.cloud.plugin.intellij.ConceptGraphProperty
+import com.github.linyuzai.cloud.plugin.intellij.ConceptGraphPropertyImpl
+import com.github.linyuzai.cloud.plugin.intellij.ConceptPropertyGraph
 import com.github.linyuzai.cloud.plugin.intellij.builder.lowercaseFirst
 import com.github.linyuzai.cloud.plugin.intellij.builder.toSampleName
 import com.intellij.openapi.module.Module
@@ -15,14 +18,14 @@ data class DomainModel(
     val initDomainPackage: String,
     val initDomainObjectClassName: String
 ) {
-    val propertyGraph: PropertyGraph = PropertyGraph()
-    val userClass: GraphProperty<String> = property { initUserClass }
-    val domainModule: GraphProperty<Module?> = property { initDomainModule }
-    val domainPackage: GraphProperty<String> = property { initDomainPackage }
-    val domainObjectClassName: GraphProperty<String> = property { initDomainObjectClassName }
-    val domainCollectionClassName: GraphProperty<String> = property { "${initDomainObjectClassName}s" }
-    val domainClassComment: GraphProperty<String> = property { "" }
-    val domainPreview: GraphProperty<String> = property(false) { "" }
+    val propertyGraph: ConceptPropertyGraph = ConceptPropertyGraph()
+    val userClass: ConceptGraphProperty<String> = property { initUserClass }
+    val domainModule: ConceptGraphProperty<Module?> = property { initDomainModule }
+    val domainPackage: ConceptGraphProperty<String> = property { initDomainPackage }
+    val domainObjectClassName: ConceptGraphProperty<String> = property { initDomainObjectClassName }
+    val domainCollectionClassName: ConceptGraphProperty<String> = property { "${initDomainObjectClassName}s" }
+    val domainClassComment: ConceptGraphProperty<String> = property { "" }
+    val domainPreview: ConceptGraphProperty<String> = property(false) { "" }
 
     val domainProps: MutableList<DomainProp> = CopyOnWriteArrayList()
 
@@ -147,17 +150,17 @@ data class DomainModel(
 data class DomainProp(
     val model: DomainModel,
     var index: Int,
-    var propClass: GraphProperty<String> = model.property { "" },
-    var propName: GraphProperty<String> = model.property { "" },
-    var propNotNull: GraphProperty<Boolean> = model.property { false },
-    var propNotEmpty: GraphProperty<Boolean> = model.property { false },
-    var propComment: GraphProperty<String> = model.property { "" },
+    var propClass: ConceptGraphProperty<String> = model.property { "" },
+    var propName: ConceptGraphProperty<String> = model.property { "" },
+    var propNotNull: ConceptGraphProperty<Boolean> = model.property { false },
+    var propNotEmpty: ConceptGraphProperty<Boolean> = model.property { false },
+    var propComment: ConceptGraphProperty<String> = model.property { "" },
     var smartFill: Boolean = true,
     var onClassNameUpdateListener: ((String) -> Unit)? = null
 )
 
-fun <T> DomainModel.property(preview: Boolean = true, init: () -> T): GraphProperty<T> {
-    return GraphPropertyImpl(this.propertyGraph, init).apply {
+fun <T> DomainModel.property(preview: Boolean = true, init: () -> T): ConceptGraphProperty<T> {
+    return ConceptGraphPropertyImpl(this.propertyGraph, init).apply {
         if (preview) {
             afterChange {
                 preview()

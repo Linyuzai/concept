@@ -1,7 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.OnePixelDivider
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
@@ -560,9 +559,9 @@ private class ConceptCellBuilderImpl<T : JComponent> internal constructor(
     private val viewComponent: JComponent = component
 ) : ConceptCellBuilder<T>, ConceptCheckboxCellBuilder, ConceptScrollPaneCellBuilder {
     private var applyIfEnabled = false
-    private var property: GraphProperty<*>? = null
+    private var property: ConceptGraphProperty<*>? = null
 
-    override fun withGraphProperty(property: GraphProperty<*>): ConceptCellBuilder<T> {
+    override fun withGraphProperty(property: ConceptGraphProperty<*>): ConceptCellBuilder<T> {
         this.property = property
         return this
     }

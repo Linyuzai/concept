@@ -2,13 +2,12 @@ package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
-import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.TitledSeparator
 import java.awt.Cursor
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
-class ConceptHideableTitledSeparator(@NlsContexts.Separator title: String) : TitledSeparator(title) {
+class ConceptHideableTitledSeparator(title: String) : TitledSeparator(title) {
 
     private var isExpanded: Boolean = true
 

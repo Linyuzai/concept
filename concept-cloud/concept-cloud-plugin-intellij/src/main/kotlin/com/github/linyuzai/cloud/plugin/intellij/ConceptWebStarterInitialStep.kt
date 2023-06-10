@@ -1,7 +1,10 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
+import com.intellij.CommonBundle
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
+import com.intellij.ide.JavaUiBundle
+import com.intellij.ide.starters.JavaStartersBundle
 import com.intellij.ide.starters.local.StarterModuleBuilder
 import com.intellij.ide.starters.shared.*
 import com.intellij.ide.starters.shared.ValidationFunctions.*
@@ -15,21 +18,19 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.observable.properties.GraphProperty
-import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
-import com.intellij.openapi.observable.properties.PropertyGraph
-import com.intellij.openapi.observable.properties.map
+import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.projectRoots.JavaSdk
+import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
-import com.intellij.openapi.roots.ui.configuration.validateJavaVersion
-import com.intellij.openapi.roots.ui.configuration.validateSdk
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.IconButton
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.NlsContexts
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.ui.InplaceButton
@@ -44,8 +45,6 @@ import java.io.File
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
-import java.nio.file.InvalidPathException
-import java.nio.file.Paths
 import java.util.concurrent.Future
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
@@ -61,28 +60,28 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
     private val validatedTextComponents: MutableList<JTextField> = mutableListOf()
 
-    protected val propertyGraph: PropertyGraph = PropertyGraph()
-    private val entityNameProperty: GraphProperty<String> = propertyGraph.graphProperty(::suggestName)
-    private val locationProperty: GraphProperty<String> = propertyGraph.graphProperty(::suggestLocationByName)
-    private val groupIdProperty: GraphProperty<String> = propertyGraph.graphProperty { starterContext.group }
-    private val artifactIdProperty: GraphProperty<String> = propertyGraph.graphProperty { entityName }
-    private val packageNameProperty: GraphProperty<String> = propertyGraph.graphProperty { starterContext.packageName }
-    private val sdkProperty: GraphProperty<Sdk?> = propertyGraph.graphProperty { null }
+    protected val propertyGraph: ConceptPropertyGraph = ConceptPropertyGraph()
+    private val entityNameProperty: ConceptGraphProperty<String> = propertyGraph.property(::suggestName)
+    private val locationProperty: ConceptGraphProperty<String> = propertyGraph.property(::suggestLocationByName)
+    private val groupIdProperty: ConceptGraphProperty<String> = propertyGraph.property { starterContext.group }
+    private val artifactIdProperty: ConceptGraphProperty<String> = propertyGraph.property { entityName }
+    private val packageNameProperty: ConceptGraphProperty<String> = propertyGraph.property { starterContext.packageName }
+    private val sdkProperty: ConceptGraphProperty<Sdk?> = propertyGraph.property { null }
 
-    private val projectTypeProperty: GraphProperty<ConceptStarterProjectType?> =
-        propertyGraph.graphProperty { starterContext.projectType }
-    private val languageProperty: GraphProperty<ConceptStarterLanguage> =
-        propertyGraph.graphProperty { starterContext.language }
-    private val packagingProperty: GraphProperty<ConceptStarterAppPackaging?> =
-        propertyGraph.graphProperty { starterContext.packaging }
-    private val testFrameworkProperty: GraphProperty<ConceptStarterTestRunner?> =
-        propertyGraph.graphProperty { starterContext.testFramework }
-    private val languageLevelProperty: GraphProperty<ConceptStarterLanguageLevel?> =
-        propertyGraph.graphProperty { starterContext.languageLevel }
-    private val applicationTypeProperty: GraphProperty<ConceptStarterAppType?> =
-        propertyGraph.graphProperty { starterContext.applicationType }
-    private val exampleCodeProperty: GraphProperty<Boolean> =
-        propertyGraph.graphProperty { starterContext.includeExamples }
+    private val projectTypeProperty: ConceptGraphProperty<ConceptStarterProjectType?> =
+        propertyGraph.property { starterContext.projectType }
+    private val languageProperty: ConceptGraphProperty<ConceptStarterLanguage> =
+        propertyGraph.property { starterContext.language }
+    private val packagingProperty: ConceptGraphProperty<ConceptStarterAppPackaging?> =
+        propertyGraph.property { starterContext.packaging }
+    private val testFrameworkProperty: ConceptGraphProperty<ConceptStarterTestRunner?> =
+        propertyGraph.property { starterContext.testFramework }
+    private val languageLevelProperty: ConceptGraphProperty<ConceptStarterLanguageLevel?> =
+        propertyGraph.property { starterContext.languageLevel }
+    private val applicationTypeProperty: ConceptGraphProperty<ConceptStarterAppType?> =
+        propertyGraph.property { starterContext.applicationType }
+    private val exampleCodeProperty: ConceptGraphProperty<Boolean> =
+        propertyGraph.property { starterContext.includeExamples }
 
     private var entityName: String by entityNameProperty.map { it.trim() }
     private var location: String by locationProperty
@@ -330,22 +329,6 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
         }.withVisualPadding()
     }
 
-    val CHECK_LOCATION_FOR_WARNING = TextValidationFunction { fieldText: String? ->
-        try {
-            val file =
-                Paths.get(FileUtil.expandUserHome(fieldText!!)).toFile()
-            if (file.exists()) {
-                val children = file.list()
-                if (children != null && children.size > 0) {
-                    return@TextValidationFunction "Directory is not empty"
-                }
-            }
-        } catch (ipe: InvalidPathException) {
-            return@TextValidationFunction null
-        }
-        null
-    }
-
     private fun createServerUrlLink(): ActionLink {
         val result = ActionLink(urlPreview(starterContext.serverUrl)) {
             BrowserUtil.browse(starterContext.serverUrl)
@@ -393,6 +376,66 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
         }
 
         return checkServerOptionsLoaded()
+    }
+
+    fun validateSdk(sdkProperty: ConceptGraphProperty<Sdk?>, sdkModel: ProjectSdksModel): Boolean {
+        return validateAndGetSdkValidationMessage(sdkProperty, sdkModel) == null
+    }
+
+    private fun validateAndGetSdkValidationMessage(sdkProperty: ConceptGraphProperty<Sdk?>, sdkModel: ProjectSdksModel): @NlsContexts.DialogMessage String? {
+        if (sdkProperty.get() == null) {
+            if (Messages.showDialog(
+                    JavaUiBundle.message("prompt.confirm.project.no.jdk"),
+                    JavaUiBundle.message("title.no.jdk.specified"),
+                    arrayOf(CommonBundle.getYesButtonText(), CommonBundle.getNoButtonText()), 1,
+                    Messages.getWarningIcon()) != Messages.YES) {
+                return JavaUiBundle.message("title.no.jdk.specified")
+            }
+        }
+
+        try {
+            sdkModel.apply(null, true)
+        }
+        catch (e: ConfigurationException) {
+            //IDEA-98382 We should allow Next step if user has wrong SDK
+            if (Messages.showDialog(
+                    JavaUiBundle.message("dialog.message.0.do.you.want.to.proceed", e.message),
+                    e.title, arrayOf(CommonBundle.getYesButtonText(), CommonBundle.getNoButtonText()), 1,
+                    Messages.getWarningIcon()) != Messages.YES) {
+                return e.message ?: e.title
+            }
+        }
+        return null
+    }
+
+    fun validateJavaVersion(sdkProperty: ConceptGraphProperty<Sdk?>, javaVersion: String?, technologyName: String? = null): Boolean {
+        val sdk = sdkProperty.get()
+        if (sdk != null) {
+            val wizardVersion = JavaSdk.getInstance().getVersion(sdk)
+            if (wizardVersion != null && javaVersion != null) {
+                val selectedVersion = JavaSdkVersion.fromVersionString(javaVersion)
+                if (selectedVersion != null && !wizardVersion.isAtLeast(selectedVersion)) {
+                    val message = if (technologyName == null) {
+                        JavaStartersBundle.message("message.java.version.not.supported.by.sdk",
+                            selectedVersion.description,
+                            sdk.name)
+                    }
+                    else {
+                        JavaStartersBundle.message("message.java.version.not.supported.by.sdk.for.technology",
+                            technologyName,
+                            selectedVersion.description,
+                            sdk.name,
+                            wizardVersion.description)
+                    }
+
+                    Messages.showErrorDialog(message, JavaStartersBundle.message("message.title.error"))
+
+                    return false
+                }
+            }
+        }
+
+        return true
     }
 
     private fun checkServerOptionsLoaded(): Boolean {
@@ -512,6 +555,7 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     }
 
     private fun getDisposed(): Condition<Any> = Condition<Any> { Disposer.isDisposed(parentDisposable) }
+    //ComponentManager.isDisposed()
 
     private fun configureServer() {
         val currentServerUrl = starterContext.serverUrl
@@ -650,13 +694,13 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
     }
 
     @Suppress("SameParameterValue")
-    private fun <T : JComponent> ConceptCellBuilder<T>.withSpecialValidation(vararg errorValidations: TextValidationFunction): ConceptCellBuilder<T> {
+    private fun <T : JComponent> ConceptCellBuilder<T>.withSpecialValidation(vararg errorValidations: ConceptTextValidationFunction): ConceptCellBuilder<T> {
         return this.withSpecialValidation(errorValidations.asList(), null)
     }
 
     private fun <T : JComponent> ConceptCellBuilder<T>.withSpecialValidation(
-        errorValidations: List<TextValidationFunction>,
-        warningValidation: TextValidationFunction?
+        errorValidations: List<ConceptTextValidationFunction>,
+        warningValidation: ConceptTextValidationFunction?
     ): ConceptCellBuilder<T> {
         return withValidation(this, errorValidations, warningValidation, validatedTextComponents, parentDisposable)
     }

@@ -5,7 +5,6 @@ import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog
 import com.github.linyuzai.cloud.plugin.intellij.util.withClassValidation
 import com.github.linyuzai.cloud.plugin.intellij.util.withPackageValidation
 import com.github.linyuzai.cloud.plugin.intellij.util.withTextValidation
-import com.intellij.ide.starters.shared.ValidationFunctions
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.*
 import com.intellij.ui.components.JBTextArea
@@ -52,7 +51,7 @@ object DomainComponents {
                     model.userClass
                 ).withClassValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -67,7 +66,7 @@ object DomainComponents {
                     model.domainPackage
                 ).withPackageValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -75,8 +74,8 @@ object DomainComponents {
                 textField(model.domainObjectClassName)
                     .withTextValidation(
                         dialog,
-                        ValidationFunctions.CHECK_NOT_EMPTY,
-                        ValidationFunctions.CHECK_SIMPLE_NAME_FORMAT,
+                        CHECK_NOT_EMPTY,
+                        CHECK_SIMPLE_NAME_FORMAT,
                     )
             }
 
@@ -84,8 +83,8 @@ object DomainComponents {
                 textField(model.domainCollectionClassName)
                     .withTextValidation(
                         dialog,
-                        ValidationFunctions.CHECK_NOT_EMPTY,
-                        ValidationFunctions.CHECK_SIMPLE_NAME_FORMAT,
+                        CHECK_NOT_EMPTY,
+                        CHECK_SIMPLE_NAME_FORMAT,
                     )
             }
 

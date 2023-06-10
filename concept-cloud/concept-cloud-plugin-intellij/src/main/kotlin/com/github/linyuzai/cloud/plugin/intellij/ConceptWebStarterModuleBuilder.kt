@@ -1,4 +1,4 @@
-package com.github.linyuzai.cloud.plugin.intellij;
+package com.github.linyuzai.cloud.plugin.intellij
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
@@ -66,7 +66,7 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
 
     override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
     override fun getParentGroup(): String = JavaModuleType.BUILD_TOOLS_GROUP
-    override fun getWeight(): Int = 0/*JavaModuleBuilder.BUILD_SYSTEM_WEIGHT + 10*/
+    override fun getWeight(): Int = 2000/*JavaModuleBuilder.BUILD_SYSTEM_WEIGHT + 10*/
     open fun getHelpId(): String? = null
 
     // Required settings
@@ -354,7 +354,13 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
                 NotificationType.INFORMATION
             )
             .addAction(NotificationAction.create("Enable plugins...") { _, notification ->
-                installAndEnable(toInstallOrEnable) { notification.expire() }
+                installAndEnable(
+                    null, toInstallOrEnable,
+                    showDialog = true,
+                    selectAlInDialog = false,
+                    modalityState = null
+                ) { notification.expire() }
+                //installAndEnable(toInstallOrEnable) { notification.expire() }
             })
             .notify(project)
 

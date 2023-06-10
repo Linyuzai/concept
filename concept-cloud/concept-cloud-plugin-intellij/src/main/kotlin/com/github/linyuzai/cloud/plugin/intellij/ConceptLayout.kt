@@ -1,7 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.components.DialogPanel
 import com.intellij.ui.layout.LCFlags
 import com.intellij.util.ui.JBUI
@@ -9,7 +8,7 @@ import javax.swing.border.Border
 
 inline fun panel(
     vararg constraints: LCFlags,
-    @NlsContexts.DialogTitle title: String? = null,
+    title: String? = null,
     border: Border = JBUI.Borders.empty(10, 20, 5, 20),
     init: ConceptLayoutBuilder.() -> Unit
 ): DialogPanel {
@@ -25,9 +24,6 @@ inline fun panel(
 @PublishedApi
 internal fun initPanel(builder: ConceptLayoutBuilder, panel: DialogPanel) {
     panel.preferredFocusedComponent = builder.builder.preferredFocusedComponent
-    panel.validateCallbacks = builder.builder.validateCallbacks
-    panel.componentValidateCallbacks = builder.builder.componentValidateCallbacks
-    panel.customValidationRequestors = builder.builder.customValidationRequestors
     panel.applyCallbacks = builder.builder.applyCallbacks
     panel.resetCallbacks = builder.builder.resetCallbacks
     panel.isModifiedCallbacks = builder.builder.isModifiedCallbacks

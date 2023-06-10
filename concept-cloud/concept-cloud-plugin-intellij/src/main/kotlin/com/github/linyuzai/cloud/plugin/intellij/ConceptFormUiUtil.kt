@@ -3,7 +3,6 @@ package com.github.linyuzai.cloud.plugin.intellij
 import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog
 import com.intellij.ide.IdeBundle
 import com.intellij.ide.starters.JavaStartersBundle
-import com.intellij.ide.starters.shared.TextValidationFunction
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.ui.*
@@ -43,8 +42,8 @@ internal fun gridConstraint(col: Int, row: Int): GridBagConstraints {
 
 fun <T : JComponent> withValidationForText(
     builder: ConceptCellBuilder<T>,
-    errorChecks: List<TextValidationFunction>,
-    warningChecks: TextValidationFunction?,
+    errorChecks: List<ConceptTextValidationFunction>,
+    warningChecks: ConceptTextValidationFunction?,
     dialog: ConceptDialog
 ): ConceptCellBuilder<T> {
     if (errorChecks.isEmpty()) return builder
@@ -101,8 +100,8 @@ fun <T : JComponent> withValidationForText(
 
 fun <T : JComponent> withValidationForEditorCombo(
     builder: ConceptCellBuilder<T>,
-    errorChecks: List<TextValidationFunction>,
-    warningChecks: TextValidationFunction?,
+    errorChecks: List<ConceptTextValidationFunction>,
+    warningChecks: ConceptTextValidationFunction?,
     dialog: ConceptDialog
 ): ConceptCellBuilder<T> {
     if (errorChecks.isEmpty()) return builder
@@ -148,8 +147,8 @@ fun <T : JComponent> withValidationForEditorCombo(
 
 fun <T : JComponent> withValidation(
     builder: ConceptCellBuilder<T>,
-    errorChecks: List<TextValidationFunction>,
-    warningChecks: TextValidationFunction?,
+    errorChecks: List<ConceptTextValidationFunction>,
+    warningChecks: ConceptTextValidationFunction?,
     validatedTextComponents: MutableList<JTextField>,
     parentDisposable: Disposable
 ): ConceptCellBuilder<T> {

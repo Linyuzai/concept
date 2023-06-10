@@ -1,44 +1,42 @@
 @file:JvmName("ConceptStarterSettings")
+
 package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.openapi.projectRoots.JavaSdkVersion
-import com.intellij.openapi.util.NlsContexts.DialogTitle
-import com.intellij.openapi.util.NlsContexts.Label
-import com.intellij.openapi.util.NlsSafe
 
 data class ConceptStarterLanguage(
     val id: String,
-    @NlsSafe val title: String,
+    val title: String,
     val languageId: String,
     val isBuiltIn: Boolean = false,
-    @NlsSafe val description: String? = null
+    val description: String? = null
 )
 
 data class ConceptStarterTestRunner(
     val id: String,
-    @NlsSafe val title: String
+    val title: String
 )
 
 data class ConceptStarterProjectType(
     val id: String,
-    @NlsSafe val title: String,
-    @NlsSafe val description: String? = null
+    val title: String,
+    val description: String? = null
 )
 
 data class ConceptStarterAppType(
     val id: String,
-    @NlsSafe val title: String
+    val title: String
 )
 
 data class ConceptStarterAppPackaging(
     val id: String,
-    @NlsSafe val title: String,
-    @NlsSafe val description: String? = null
+    val title: String,
+    val description: String? = null
 )
 
 data class ConceptStarterLanguageLevel(
     val id: String,
-    @NlsSafe val title: String,
+    val title: String,
     /**
      * Version string that can be parsed with [JavaSdkVersion.fromVersionString].
      */
@@ -46,12 +44,12 @@ data class ConceptStarterLanguageLevel(
 )
 
 class ConceptCustomizedMessages {
-    var projectTypeLabel: @Label String? = null
-    var serverUrlDialogTitle: @DialogTitle String? = null
-    var dependenciesLabel: @Label String? = null
-    var selectedDependenciesLabel: @Label String? = null
-    var noDependenciesSelectedLabel: @Label String? = null
-    var frameworkVersionLabel: @Label String? = null
+    var projectTypeLabel: String? = null
+    var serverUrlDialogTitle: String? = null
+    var dependenciesLabel: String? = null
+    var selectedDependenciesLabel: String? = null
+    var noDependenciesSelectedLabel: String? = null
+    var frameworkVersionLabel: String? = null
 }
 
 class ConceptStarterWizardSettings(
@@ -75,7 +73,6 @@ class ConceptPluginRecommendation(
 }
 
 interface ConceptLibraryInfo {
-    @get:NlsSafe
     val title: String
     val description: String?
     val links: List<ConceptLibraryLink>
@@ -84,9 +81,9 @@ interface ConceptLibraryInfo {
 }
 
 class ConceptLibraryLink(
-    @NlsSafe
+
     val url: String,
-    @NlsSafe
+
     val title: String? = null
 )
 

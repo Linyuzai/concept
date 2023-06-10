@@ -4,7 +4,6 @@ import com.github.linyuzai.cloud.plugin.intellij.domain.DomainComponents;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainFileGenerator;
 import com.github.linyuzai.cloud.plugin.intellij.domain.DomainModel;
 import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog;
-import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.ui.RecentsManager;
 
 import java.io.File;

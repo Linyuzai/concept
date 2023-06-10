@@ -72,7 +72,7 @@ internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration)
         try {
             body()
 
-            resetCallbacks.getOrPut(null, { SmartList() }).add {
+            resetCallbacks.getOrPut(null) { SmartList() }.add {
                 selectRadioButtonInGroup(buttonGroup)
             }
 
@@ -138,7 +138,7 @@ internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration)
 
         val rowConstraints = AC()
         (container as JComponent).putClientProperty(
-            DialogWrapper.IS_VISUAL_PADDING_COMPENSATED_ON_COMPONENT_LEVEL_KEY,
+            "isVisualPaddingCompensatedOnComponentLevel",
             false
         )
         var isLayoutInsetsAdjusted = false

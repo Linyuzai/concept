@@ -1,11 +1,11 @@
 package com.github.linyuzai.cloud.plugin.intellij.module
 
+import com.github.linyuzai.cloud.plugin.intellij.CHECK_NOT_EMPTY
 import com.github.linyuzai.cloud.plugin.intellij.GenerateCodeAction
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog
 import com.github.linyuzai.cloud.plugin.intellij.util.withClassValidation
 import com.github.linyuzai.cloud.plugin.intellij.util.withPackageValidation
-import com.intellij.ide.starters.shared.ValidationFunctions
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
@@ -39,7 +39,7 @@ object ModuleComponents {
                     model.userClass
                 ).withClassValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -62,7 +62,7 @@ object ModuleComponents {
                     model.modulePackage
                 ).withPackageValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -124,7 +124,7 @@ object ModuleComponents {
                     })
                 }.withClassValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -142,7 +142,7 @@ object ModuleComponents {
                     })
                 }.withClassValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -160,7 +160,7 @@ object ModuleComponents {
                     })
                 }.withClassValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 
@@ -178,7 +178,7 @@ object ModuleComponents {
                     })
                 }.withClassValidation(
                     dialog,
-                    ValidationFunctions.CHECK_NOT_EMPTY
+                    CHECK_NOT_EMPTY
                 )
             }
 

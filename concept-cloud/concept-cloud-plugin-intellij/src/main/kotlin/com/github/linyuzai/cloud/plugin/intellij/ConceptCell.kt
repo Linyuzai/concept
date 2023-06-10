@@ -14,14 +14,13 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.module.StdModuleTypes
-import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.panel.ComponentPanelBuilder
 import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.util.NlsContexts
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaCodeFragment
@@ -39,12 +38,12 @@ import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.StatusText
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.annotations.ApiStatus
+import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.awt.event.ItemEvent
 import java.awt.event.MouseEvent
 import java.util.*
@@ -105,8 +104,8 @@ inline fun <reified T : Any> KMutableProperty0<T?>.toNullableBinding(defaultValu
 }
 
 class ConceptValidationInfoBuilder(val component: JComponent) {
-    fun error(@NlsContexts.DialogMessage message: String): ValidationInfo = ValidationInfo(message, component)
-    fun warning(@NlsContexts.DialogMessage message: String): ValidationInfo =
+    fun error(message: String): ValidationInfo = ValidationInfo(message, component)
+    fun warning(message: String): ValidationInfo =
         ValidationInfo(message, component).asWarning().withOKEnabled()
 }
 
@@ -114,7 +113,7 @@ interface ConceptCellBuilder<out T : JComponent> {
     val component: T
 
     fun comment(
-        @NlsContexts.DetailedDescription text: String,
+        text: String,
         maxLineLength: Int = 70,
         forComponent: Boolean = false
     ): ConceptCellBuilder<T>
@@ -151,7 +150,7 @@ interface ConceptCellBuilder<out T : JComponent> {
         return this
     }
 
-    fun withGraphProperty(property: GraphProperty<*>): ConceptCellBuilder<T>
+    fun withGraphProperty(property: ConceptGraphProperty<*>): ConceptCellBuilder<T>
 
     fun enabled(isEnabled: Boolean)
     fun enableIf(predicate: ComponentPredicate): ConceptCellBuilder<T>
@@ -160,14 +159,13 @@ interface ConceptCellBuilder<out T : JComponent> {
     fun visibleIf(predicate: ComponentPredicate): ConceptCellBuilder<T>
 
     fun withErrorOnApplyIf(
-        @NlsContexts.DialogMessage message: String,
+        message: String,
         callback: (T) -> Boolean
     ): ConceptCellBuilder<T> {
         withValidationOnApply { if (callback(it)) error(message) else null }
         return this
     }
 
-    @ApiStatus.Internal
     fun shouldSaveOnApply(): Boolean
 
     fun withLargeLeftGap(): ConceptCellBuilder<T>
@@ -224,6 +222,42 @@ val ConceptCellBuilder<AbstractButton>.selected
 
 const val UNBOUND_RADIO_BUTTON = "unbound.radio.button"
 
+const val MNEMONIC = 0x1B.toChar()
+
+@Contract("null -> null; !null -> !null")
+fun replaceMnemonicAmpersand(value: @Nls String?): @Nls String? {
+    if (value == null || value.indexOf('&') < 0 || value.indexOf(MNEMONIC) >= 0) {
+        return value
+    }
+    val builder = StringBuilder()
+    val macMnemonic = value.contains("&&")
+    var i = 0
+    while (i < value.length) {
+        val c = value[i]
+        if (c == '\\') {
+            if (i < value.length - 1 && value[i + 1] == '&') {
+                builder.append('&')
+                i++
+            } else {
+                builder.append(c)
+            }
+        } else if (c == '&') {
+            if (i < value.length - 1 && value[i + 1] == '&') {
+                if (SystemInfoRt.isMac) {
+                    builder.append(MNEMONIC)
+                }
+                i++
+            } else if (!SystemInfoRt.isMac || !macMnemonic) {
+                builder.append(MNEMONIC)
+            }
+        } else {
+            builder.append(c)
+        }
+        i++
+    }
+    return builder.toString()
+}
+
 // separate class to avoid row related methods in the `cell { } `
 @ConceptCellMarker
 abstract class ConceptCell : ConceptBaseBuilder {
@@ -251,7 +285,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     val push = CCFlags.push
 
     fun label(
-        @NlsContexts.Label text: String,
+        text: String,
         style: UIUtil.ComponentStyle? = null,
         fontColor: UIUtil.FontColor? = null,
         bold: Boolean = false
@@ -261,7 +295,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun label(
-        @NlsContexts.Label text: String,
+        text: String,
         font: JBFont,
         fontColor: UIUtil.FontColor? = null
     ): ConceptCellBuilder<JLabel> {
@@ -270,7 +304,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun link(
-        @NlsContexts.LinkLabel text: String,
+        text: String,
         style: UIUtil.ComponentStyle? = null,
         action: () -> Unit
     ): ConceptCellBuilder<JComponent> {
@@ -278,89 +312,89 @@ abstract class ConceptCell : ConceptBaseBuilder {
         return component(result)
     }
 
-    fun browserLink(@NlsContexts.LinkLabel text: String, url: String): ConceptCellBuilder<JComponent> {
+    fun browserLink(text: String, url: String): ConceptCellBuilder<JComponent> {
         val result = BrowserLink(text, url)
         return component(result)
     }
 
     fun buttonFromAction(
-        @NlsContexts.Button text: String,
+        text: String,
         @NonNls actionPlace: String,
         action: AnAction
     ): ConceptCellBuilder<JButton> {
-        val button = JButton(BundleBase.replaceMnemonicAmpersand(text))
+        val button = JButton(replaceMnemonicAmpersand(text))
         button.addActionListener { ActionUtil.invokeAction(action, button, actionPlace, null, null) }
         return component(button)
     }
 
     fun button(
-        @NlsContexts.Button text: String,
+        text: String,
         actionListener: (event: ActionEvent) -> Unit
     ): ConceptCellBuilder<JButton> {
-        val button = JButton(BundleBase.replaceMnemonicAmpersand(text))
+        val button = JButton(replaceMnemonicAmpersand(text))
         button.addActionListener(actionListener)
         return component(button)
     }
 
     inline fun checkBox(
-        @NlsContexts.Checkbox text: String,
+        text: String,
         isSelected: Boolean = false,
-        @NlsContexts.DetailedDescription comment: String? = null,
+        comment: String? = null,
         crossinline actionListener: (event: ActionEvent, component: JCheckBox) -> Unit
     ): ConceptCellBuilder<JBCheckBox> {
         return checkBox(text, isSelected, comment)
             .applyToComponent {
-                addActionListener(ActionListener { actionListener(it, this) })
+                addActionListener { actionListener(it, this) }
             }
     }
 
     @JvmOverloads
     fun checkBox(
-        @NlsContexts.Checkbox text: String,
+        text: String,
         isSelected: Boolean = false,
-        @NlsContexts.DetailedDescription comment: String? = null
+        comment: String? = null
     ): ConceptCellBuilder<JBCheckBox> {
         val result = JBCheckBox(text, isSelected)
         return result(comment = comment)
     }
 
     fun checkBox(
-        @NlsContexts.Checkbox text: String,
+        text: String,
         prop: KMutableProperty0<Boolean>,
-        @NlsContexts.DetailedDescription comment: String? = null
+        comment: String? = null
     ): ConceptCellBuilder<JBCheckBox> {
         return checkBox(text, prop.toBinding(), comment)
     }
 
     fun checkBox(
-        @NlsContexts.Checkbox text: String,
+        text: String,
         getter: () -> Boolean,
         setter: (Boolean) -> Unit,
-        @NlsContexts.DetailedDescription comment: String? = null
+        comment: String? = null
     ): ConceptCellBuilder<JBCheckBox> {
         return checkBox(text, ConceptPropertyBinding(getter, setter), comment)
     }
 
     private fun checkBox(
-        @NlsContexts.Checkbox text: String,
+        text: String,
         modelBinding: ConceptPropertyBinding<Boolean>,
-        @NlsContexts.DetailedDescription comment: String?
+        comment: String?
     ): ConceptCellBuilder<JBCheckBox> {
         val component = JBCheckBox(text, modelBinding.get())
         return component(comment = comment).withSelectedBinding(modelBinding)
     }
 
     fun checkBox(
-        @NlsContexts.Checkbox text: String,
-        property: GraphProperty<Boolean>,
-        @NlsContexts.DetailedDescription comment: String? = null
+        text: String,
+        property: ConceptGraphProperty<Boolean>,
+        comment: String? = null
     ): ConceptCellBuilder<JBCheckBox> {
         val component = JBCheckBox(text, property.get())
         return component(comment = comment).withGraphProperty(property).applyToComponent { component.bind(property) }
     }
 
     open fun radioButton(
-        @NlsContexts.RadioButton text: String,
+        text: String,
         @Nls comment: String? = null
     ): ConceptCellBuilder<JBRadioButton> {
         val component = JBRadioButton(text)
@@ -369,7 +403,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     open fun radioButton(
-        @NlsContexts.RadioButton text: String,
+        text: String,
         getter: () -> Boolean,
         setter: (Boolean) -> Unit,
         @Nls comment: String? = null
@@ -379,7 +413,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     open fun radioButton(
-        @NlsContexts.RadioButton text: String,
+        text: String,
         prop: KMutableProperty0<Boolean>,
         @Nls comment: String? = null
     ): ConceptCellBuilder<JBRadioButton> {
@@ -423,7 +457,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
 
     fun <T> comboBox(
         model: ComboBoxModel<T>,
-        property: GraphProperty<T>,
+        property: ConceptGraphProperty<T>,
         renderer: ListCellRenderer<T?>? = null
     ): ConceptCellBuilder<ComboBox<T>> {
         return comboBox(model, ConceptPropertyBinding(property::get, property::set).toNullable(), renderer)
@@ -431,7 +465,10 @@ abstract class ConceptCell : ConceptBaseBuilder {
             .applyToComponent { bind(property) }
     }
 
-    fun modulesComboBox(project: Project, property: GraphProperty<Module?>): ConceptCellBuilder<ModulesComboBox> {
+    fun modulesComboBox(
+        project: Project,
+        property: ConceptGraphProperty<Module?>
+    ): ConceptCellBuilder<ModulesComboBox> {
         return modulesComboBox(project, property::get, property::set)
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
@@ -477,7 +514,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     fun packagesComboBox(
         project: Project,
         recentsKey: String,
-        property: GraphProperty<String>
+        property: ConceptGraphProperty<String>
     ): ConceptCellBuilder<PackageNameReferenceEditorCombo> {
         return packagesComboBox(project, recentsKey, property::get, property::set)
             .withGraphProperty(property)
@@ -515,7 +552,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     fun classesComboBox(
         project: Project,
         recentsKey: String,
-        property: GraphProperty<String>,
+        property: ConceptGraphProperty<String>,
         init: (ReferenceEditorComboWithBrowseButton.() -> Unit)? = null
     ): ConceptCellBuilder<ReferenceEditorComboWithBrowseButton> {
         return classesComboBox(project, recentsKey, property::get, property::set, init)
@@ -640,7 +677,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun textField(
-        property: GraphProperty<String>,
+        property: ConceptGraphProperty<String>,
         columns: Int? = null,
         init: (JBTextField.() -> Unit)? = null
     ): ConceptCellBuilder<JBTextField> {
@@ -668,7 +705,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun textArea(
-        property: GraphProperty<String>,
+        property: ConceptGraphProperty<String>,
         rows: Int? = null,
         columns: Int? = null
     ): ConceptCellBuilder<JBTextArea> {
@@ -690,7 +727,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
             .withTextBinding(binding)
     }
 
-    fun scrollableTextArea(property: GraphProperty<String>, rows: Int? = null): ConceptCellBuilder<JBTextArea> {
+    fun scrollableTextArea(property: ConceptGraphProperty<String>, rows: Int? = null): ConceptCellBuilder<JBTextArea> {
         return scrollableTextArea(property::get, property::set, rows)
             .withGraphProperty(property)
             .applyToComponent { bind(property) }
@@ -770,7 +807,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     fun textFieldWithHistoryWithBrowseButton(
         getter: () -> String,
         setter: (String) -> Unit,
-        @NlsContexts.DialogTitle browseDialogTitle: String,
+        browseDialogTitle: String,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         historyProvider: (() -> List<String>)? = null,
@@ -794,7 +831,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun textFieldWithBrowseButton(
-        @NlsContexts.DialogTitle browseDialogTitle: String? = null,
+        browseDialogTitle: String? = null,
         value: String? = null,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
@@ -807,7 +844,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
 
     fun textFieldWithBrowseButton(
         prop: KMutableProperty0<String>,
-        @NlsContexts.DialogTitle browseDialogTitle: String? = null,
+        browseDialogTitle: String? = null,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
@@ -819,7 +856,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     fun textFieldWithBrowseButton(
         getter: () -> String,
         setter: (String) -> Unit,
-        @NlsContexts.DialogTitle browseDialogTitle: String? = null,
+        browseDialogTitle: String? = null,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
@@ -830,7 +867,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
 
     fun textFieldWithBrowseButton(
         modelBinding: ConceptPropertyBinding<String>,
-        @NlsContexts.DialogTitle browseDialogTitle: String? = null,
+        browseDialogTitle: String? = null,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
@@ -843,9 +880,9 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun textFieldWithBrowseButton(
-        property: GraphProperty<String>,
-        emptyTextProperty: GraphProperty<String>,
-        @NlsContexts.DialogTitle browseDialogTitle: String? = null,
+        property: ConceptGraphProperty<String>,
+        emptyTextProperty: ConceptGraphProperty<String>,
+        browseDialogTitle: String? = null,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
@@ -855,8 +892,8 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun textFieldWithBrowseButton(
-        property: GraphProperty<String>,
-        @NlsContexts.DialogTitle browseDialogTitle: String? = null,
+        property: ConceptGraphProperty<String>,
+        browseDialogTitle: String? = null,
         project: Project? = null,
         fileChooserDescriptor: FileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
         fileChosen: ((chosenFile: VirtualFile) -> String)? = null
@@ -927,7 +964,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 
     fun expandableTextField(
-        prop: GraphProperty<String>,
+        prop: ConceptGraphProperty<String>,
         parser: Function<in String, out MutableList<String>> = ParametersListUtil.DEFAULT_LINE_PARSER,
         joiner: Function<in MutableList<String>, String> = ParametersListUtil.DEFAULT_LINE_JOINER
     )
@@ -942,7 +979,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
      */
     @JvmOverloads
     fun panel(
-        @NlsContexts.BorderTitle title: String,
+        title: String,
         wrappedComponent: Component,
         hasSeparator: Boolean = true
     ): ConceptCellBuilder<JPanel> {
@@ -966,11 +1003,11 @@ abstract class ConceptCell : ConceptBaseBuilder {
         })
     }
 
-    fun comment(@NlsContexts.DetailedDescription text: String, maxLineLength: Int = -1): ConceptCellBuilder<JLabel> {
+    fun comment(text: String, maxLineLength: Int = -1): ConceptCellBuilder<JLabel> {
         return component(ComponentPanelBuilder.createCommentComponent(text, true, maxLineLength, true))
     }
 
-    fun commentNoWrap(@NlsContexts.DetailedDescription text: String): ConceptCellBuilder<JLabel> {
+    fun commentNoWrap(text: String): ConceptCellBuilder<JLabel> {
         return component(ComponentPanelBuilder.createNonWrappingCommentComponent(text))
     }
 
@@ -989,7 +1026,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     operator fun <T : JComponent> T.invoke(
         vararg constraints: CCFlags,
         growPolicy: ConceptGrowPolicy? = null,
-        @NlsContexts.DetailedDescription comment: String? = null
+        comment: String? = null
     ): ConceptCellBuilder<T> = component(this).apply {
         constraints(*constraints)
         if (comment != null) comment(comment)
@@ -997,7 +1034,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     }
 }
 
-private fun JBCheckBox.bind(property: GraphProperty<Boolean>) {
+private fun JBCheckBox.bind(property: ConceptGraphProperty<Boolean>) {
     val mutex = AtomicBoolean()
     property.afterChange {
         mutex.lockOrSkip {
@@ -1035,7 +1072,7 @@ fun <T> listCellRenderer(renderer: SimpleListCellRenderer<T?>.(value: T, index: 
     }
 }
 
-fun <T> ComboBox<T>.bind(property: GraphProperty<T>) {
+fun <T> ComboBox<T>.bind(property: ConceptGraphProperty<T>) {
     val mutex = AtomicBoolean()
     property.afterChange {
         mutex.lockOrSkip {
@@ -1052,7 +1089,7 @@ fun <T> ComboBox<T>.bind(property: GraphProperty<T>) {
     }
 }
 
-fun ReferenceEditorComboWithBrowseButton.bind(property: GraphProperty<String>) {
+fun ReferenceEditorComboWithBrowseButton.bind(property: ConceptGraphProperty<String>) {
     /*(childComponent as ComboBox<T>).bind(property)*/
     val mutex = AtomicBoolean()
     property.afterChange {
@@ -1070,7 +1107,7 @@ fun ReferenceEditorComboWithBrowseButton.bind(property: GraphProperty<String>) {
     })
 }
 
-fun ClassNameReferenceEditor.bind(property: GraphProperty<String>) {
+fun ClassNameReferenceEditor.bind(property: ConceptGraphProperty<String>) {
     text = property.get()
     property.afterChange {
         text = it
@@ -1083,7 +1120,7 @@ fun ClassNameReferenceEditor.bind(property: GraphProperty<String>) {
 private val TextFieldWithBrowseButton.emptyText
     get() = (textField as JBTextField).emptyText
 
-fun StatusText.bind(property: GraphProperty<String>) {
+fun StatusText.bind(property: ConceptGraphProperty<String>) {
     text = property.get()
     property.afterChange {
         text = it
@@ -1093,11 +1130,11 @@ fun StatusText.bind(property: GraphProperty<String>) {
     }
 }
 
-fun TextFieldWithBrowseButton.bind(property: GraphProperty<String>) {
+fun TextFieldWithBrowseButton.bind(property: ConceptGraphProperty<String>) {
     textField.bind(property)
 }
 
-fun JTextComponent.bind(property: GraphProperty<String>) {
+fun JTextComponent.bind(property: ConceptGraphProperty<String>) {
     val mutex = AtomicBoolean()
     property.afterChange {
         mutex.lockOrSkip {

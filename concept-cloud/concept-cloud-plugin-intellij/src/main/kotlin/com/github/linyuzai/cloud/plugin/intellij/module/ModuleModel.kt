@@ -1,6 +1,9 @@
 package com.github.linyuzai.cloud.plugin.intellij.module
 
 import com.github.linyuzai.cloud.plugin.intellij.ConceptCloudUtils
+import com.github.linyuzai.cloud.plugin.intellij.ConceptGraphProperty
+import com.github.linyuzai.cloud.plugin.intellij.ConceptGraphPropertyImpl
+import com.github.linyuzai.cloud.plugin.intellij.ConceptPropertyGraph
 import com.github.linyuzai.cloud.plugin.intellij.builder.TYPE_DOMAIN_COLLECTION
 import com.github.linyuzai.cloud.plugin.intellij.builder.TYPE_DOMAIN_REPOSITORY
 import com.intellij.openapi.module.Module
@@ -25,17 +28,17 @@ data class ModuleModel(
     val initDomainServiceClass: String,
     val initDomainDescription: String
 ) {
-    val propertyGraph: PropertyGraph = PropertyGraph()
-    val userClass: GraphProperty<String> = property { initUserClass }
-    val loginAnnotationClass: GraphProperty<String> = property { initLoginAnnotationClass }
-    val moduleModule: GraphProperty<Module?> = property { initModuleModule }
-    val modulePackage: GraphProperty<String> = property { initModulePackage }
-    val domainObjectClass: GraphProperty<String> = property { initDomainObjectClass }
-    val domainCollectionClass: GraphProperty<String> = property { initDomainCollectionClass }
-    val domainRepositoryClass: GraphProperty<String> = property { initDomainRepositoryClass }
-    val domainServiceClass: GraphProperty<String> = property { initDomainServiceClass }
-    val domainDescription: GraphProperty<String> = property { initDomainDescription }
-    val myBatisPlus: GraphProperty<Boolean> = property { true }
+    val propertyGraph: ConceptPropertyGraph = ConceptPropertyGraph()
+    val userClass: ConceptGraphProperty<String> = property { initUserClass }
+    val loginAnnotationClass: ConceptGraphProperty<String> = property { initLoginAnnotationClass }
+    val moduleModule: ConceptGraphProperty<Module?> = property { initModuleModule }
+    val modulePackage: ConceptGraphProperty<String> = property { initModulePackage }
+    val domainObjectClass: ConceptGraphProperty<String> = property { initDomainObjectClass }
+    val domainCollectionClass: ConceptGraphProperty<String> = property { initDomainCollectionClass }
+    val domainRepositoryClass: ConceptGraphProperty<String> = property { initDomainRepositoryClass }
+    val domainServiceClass: ConceptGraphProperty<String> = property { initDomainServiceClass }
+    val domainDescription: ConceptGraphProperty<String> = property { initDomainDescription }
+    val myBatisPlus: ConceptGraphProperty<Boolean> = property { true }
 
     var autoFindDomainCollectionClass = true
     var autoFindDomainRepositoryClass = true
@@ -124,6 +127,6 @@ data class ModuleModel(
     }
 }
 
-fun <T> ModuleModel.property(init: () -> T): GraphProperty<T> {
-    return GraphPropertyImpl(this.propertyGraph, init)
+fun <T> ModuleModel.property(init: () -> T): ConceptGraphProperty<T> {
+    return ConceptGraphPropertyImpl(this.propertyGraph, init)
 }

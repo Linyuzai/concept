@@ -1,6 +1,5 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-
 import net.miginfocom.layout.BoundSize
 import net.miginfocom.layout.LC
 import net.miginfocom.layout.UnitValue

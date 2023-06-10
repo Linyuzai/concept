@@ -1,22 +1,17 @@
 package com.github.linyuzai.cloud.plugin.intellij
 
-import com.intellij.ide.starters.shared.*
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.observable.properties.GraphProperty
-import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
-import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.*
@@ -69,9 +64,9 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
     private val selectedLibrariesPanel: ConceptSelectedLibrariesPanel by lazy { createSelectedLibrariesPanel() }
     private val frameworkVersionsModel: DefaultComboBoxModel<ConceptWebStarterFrameworkVersion> = DefaultComboBoxModel()
 
-    protected val propertyGraph: PropertyGraph = PropertyGraph()
-    private val frameworkVersionProperty: GraphProperty<ConceptWebStarterFrameworkVersion?> =
-        propertyGraph.graphProperty { null }
+    protected val propertyGraph: ConceptPropertyGraph = ConceptPropertyGraph()
+    private val frameworkVersionProperty: ConceptGraphProperty<ConceptWebStarterFrameworkVersion?> =
+        propertyGraph.property { null }
     private val selectedDependencies: MutableSet<ConceptWebStarterDependency> = mutableSetOf()
 
     private var currentSearchString: String = ""
@@ -203,7 +198,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
         val log = logger<ConceptWebStarterLibrariesStep>()
 
         val url = moduleBuilder.getGeneratorUrlInternal(starterContext.serverUrl, starterContext).toExternalForm()
-        log.info("Loading project from ${url}")
+        log.info("Loading project from $url")
 
         return HttpRequests
             .request(url)
@@ -241,7 +236,6 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
             })
     }
 
-    @NlsSafe
     private fun getFilename(contentDisposition: String?): String {
         val filenameField = "filename="
         if (StringUtil.isEmpty(contentDisposition)) return "unknown"

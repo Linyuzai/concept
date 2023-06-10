@@ -21,7 +21,7 @@ import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.Messages
 
 fun ConceptRow.sdkComboBox(
-    sdkModel: ProjectSdksModel, sdkProperty: GraphProperty<Sdk?>,
+    sdkModel: ProjectSdksModel, sdkProperty: ConceptGraphProperty<Sdk?>,
     project: Project?, moduleBuilder: ModuleBuilder
 ): ConceptCellBuilder<JdkComboBox> {
     sdkModel.reset(project)

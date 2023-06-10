@@ -8,7 +8,7 @@
 
     <version>2.0.0</version>
 
-    <idea-version since-build="213.5744.223"/>
+    <idea-version since-build="213.5744.223" until-build="232.0"/>
 
     <description><![CDATA[
         基于 Gradle 和 Spring Cloud 的多模块生成插件<br>

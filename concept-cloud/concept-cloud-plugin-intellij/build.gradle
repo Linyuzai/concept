@@ -43,7 +43,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("213.5744.223")
-        untilBuild.set("")
+        untilBuild.set("232.0")
         //sinceBuild.set("212")
         //untilBuild.set("222.*")
         //sinceBuild.set("223")

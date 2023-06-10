@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ex.ActionButtonLook
 import com.intellij.openapi.actionSystem.impl.ActionButton
 import com.intellij.openapi.actionSystem.impl.ActionButtonWithText
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl
-import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.NlsActions
 import java.awt.Dimension
@@ -13,7 +12,7 @@ import java.awt.Insets
 import java.util.function.Supplier
 import kotlin.math.max
 
-fun <T> ConceptRow.buttonSelector(options: Collection<T>, property: GraphProperty<T>, renderer: (T) -> String): ConceptButtonSelectorToolbar {
+fun <T> ConceptRow.buttonSelector(options: Collection<T>, property: ConceptGraphProperty<T>, renderer: (T) -> String): ConceptButtonSelectorToolbar {
     val actionGroup = DefaultActionGroup(options.map { ButtonSelectorAction(it, property, renderer(it)) })
     val toolbar = ConceptButtonSelectorToolbar("ButtonSelector", actionGroup, true)
     toolbar.targetComponent = null // any data context is supported, suppress warning
@@ -22,14 +21,14 @@ fun <T> ConceptRow.buttonSelector(options: Collection<T>, property: GraphPropert
 }
 
 class ButtonSelectorAction<T> @JvmOverloads constructor(private val option: T,
-                                                        private val property: GraphProperty<T>,
+                                                        private val property: ConceptGraphProperty<T>,
                                                         optionText: Supplier<@NlsActions.ActionText String>,
                                                         optionDescription: Supplier<@NlsActions.ActionText String>? = null)
     : ToggleAction(optionText, optionDescription ?: Supplier { null }, null), DumbAware {
 
     @JvmOverloads
     constructor(option: T,
-                property: GraphProperty<T>,
+                property: ConceptGraphProperty<T>,
                 @NlsActions.ActionText optionText: String,
                 @NlsActions.ActionDescription optionDescription: String? = null) :
             this(option, property, Supplier { optionText }, optionDescription?.let { Supplier { optionDescription } })

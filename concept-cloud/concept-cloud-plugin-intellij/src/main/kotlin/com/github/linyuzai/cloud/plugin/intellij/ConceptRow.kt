@@ -2,7 +2,6 @@ package com.github.linyuzai.cloud.plugin.intellij
 
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.panel.ComponentPanelBuilder
-import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.components.Label
 import com.intellij.ui.components.noteComponent
 import com.intellij.ui.layout.*
@@ -13,7 +12,7 @@ import javax.swing.JLabel
 import kotlin.reflect.KMutableProperty0
 
 interface ConceptBaseBuilder {
-    fun withButtonGroup(@NlsContexts.BorderTitle title: String?, buttonGroup: ButtonGroup, body: () -> Unit)
+    fun withButtonGroup(title: String?, buttonGroup: ButtonGroup, body: () -> Unit)
 
     fun withButtonGroup(buttonGroup: ButtonGroup, body: () -> Unit) {
         withButtonGroup(null, buttonGroup, body)
@@ -23,16 +22,18 @@ interface ConceptBaseBuilder {
         buttonGroup(null, init)
     }
 
-    fun buttonGroup(@NlsContexts.BorderTitle title:String? = null, init: () -> Unit) {
+    fun buttonGroup(title: String? = null, init: () -> Unit) {
         withButtonGroup(title, ButtonGroup(), init)
     }
 }
 
 interface ConceptRowBuilder : ConceptBaseBuilder {
-    fun createChildRow(label: JLabel? = null,
-                       isSeparated: Boolean = false,
-                       noGrid: Boolean = false,
-                       @Nls title: String? = null): ConceptRow
+    fun createChildRow(
+        label: JLabel? = null,
+        isSeparated: Boolean = false,
+        noGrid: Boolean = false,
+        @Nls title: String? = null
+    ): ConceptRow
 
     fun createNoteOrCommentRow(component: JComponent): ConceptRow
 
@@ -46,7 +47,7 @@ interface ConceptRowBuilder : ConceptBaseBuilder {
         return createChildRow(label?.let { Label(it) }, isSeparated = separated).apply(init)
     }
 
-    fun titledRow(@NlsContexts.BorderTitle title: String, init: ConceptRow.() -> Unit): ConceptRow
+    fun titledRow(title: String, init: ConceptRow.() -> Unit): ConceptRow
 
     /**
      * Creates row with a huge gap after it, that can be used to group related components.
@@ -58,7 +59,7 @@ interface ConceptRowBuilder : ConceptBaseBuilder {
      * Creates row with hideable decorator.
      * It allows to hide some information under the titled decorator
      */
-    fun hideableRow(@NlsContexts.Separator title: String, init: ConceptRow.() -> Unit): ConceptRow
+    fun hideableRow(title: String, init: ConceptRow.() -> Unit): ConceptRow
 
     /**
      * Hyperlinks are supported (`<a href=""></a>`), new lines and `<br>` are supported only if no links (file issue if need).
@@ -74,36 +75,56 @@ interface ConceptRowBuilder : ConceptBaseBuilder {
     /**
      * Creates a nested UI DSL panel, with a grid which is independent of this pane.
      */
-    fun nestedPanel(@NlsContexts.BorderTitle title: String? = null, init: ConceptLayoutBuilder.() -> Unit): ConceptCellBuilder<DialogPanel>
+    fun nestedPanel(title: String? = null, init: ConceptLayoutBuilder.() -> Unit): ConceptCellBuilder<DialogPanel>
 
     fun onGlobalApply(callback: () -> Unit): ConceptRow
     fun onGlobalReset(callback: () -> Unit): ConceptRow
     fun onGlobalIsModified(callback: () -> Boolean): ConceptRow
 }
 
-inline fun <reified T : Any> ConceptInnerCell.buttonGroup(prop: KMutableProperty0<T>, crossinline init: ConceptCellBuilderWithButtonGroupProperty<T>.() -> Unit) {
+inline fun <reified T : Any> ConceptInnerCell.buttonGroup(
+    prop: KMutableProperty0<T>,
+    crossinline init: ConceptCellBuilderWithButtonGroupProperty<T>.() -> Unit
+) {
     buttonGroup(prop.toBinding(), init)
 }
 
-inline fun <reified T : Any> ConceptInnerCell.buttonGroup(noinline getter: () -> T, noinline setter: (T) -> Unit, crossinline init: ConceptCellBuilderWithButtonGroupProperty<T>.() -> Unit) {
+inline fun <reified T : Any> ConceptInnerCell.buttonGroup(
+    noinline getter: () -> T,
+    noinline setter: (T) -> Unit,
+    crossinline init: ConceptCellBuilderWithButtonGroupProperty<T>.() -> Unit
+) {
     buttonGroup(ConceptPropertyBinding(getter, setter), init)
 }
 
-inline fun <reified T : Any> ConceptInnerCell.buttonGroup(binding: ConceptPropertyBinding<T>, crossinline init: ConceptCellBuilderWithButtonGroupProperty<T>.() -> Unit) {
+inline fun <reified T : Any> ConceptInnerCell.buttonGroup(
+    binding: ConceptPropertyBinding<T>,
+    crossinline init: ConceptCellBuilderWithButtonGroupProperty<T>.() -> Unit
+) {
     withButtonGroup(ButtonGroup()) {
         ConceptCellBuilderWithButtonGroupProperty(binding).init()
     }
 }
 
-inline fun <reified T : Any> ConceptRowBuilder.buttonGroup(prop: KMutableProperty0<T>, crossinline init: ConceptRowBuilderWithButtonGroupProperty<T>.() -> Unit) {
+inline fun <reified T : Any> ConceptRowBuilder.buttonGroup(
+    prop: KMutableProperty0<T>,
+    crossinline init: ConceptRowBuilderWithButtonGroupProperty<T>.() -> Unit
+) {
     buttonGroup(prop.toBinding(), init)
 }
 
-inline fun <reified T : Any> ConceptRowBuilder.buttonGroup(noinline getter: () -> T, noinline setter: (T) -> Unit, crossinline init: ConceptRowBuilderWithButtonGroupProperty<T>.() -> Unit) {
+inline fun <reified T : Any> ConceptRowBuilder.buttonGroup(
+    noinline getter: () -> T,
+    noinline setter: (T) -> Unit,
+    crossinline init: ConceptRowBuilderWithButtonGroupProperty<T>.() -> Unit
+) {
     buttonGroup(ConceptPropertyBinding(getter, setter), init)
 }
 
-inline fun <reified T : Any> ConceptRowBuilder.buttonGroup(binding: ConceptPropertyBinding<T>, crossinline init: ConceptRowBuilderWithButtonGroupProperty<T>.() -> Unit) {
+inline fun <reified T : Any> ConceptRowBuilder.buttonGroup(
+    binding: ConceptPropertyBinding<T>,
+    crossinline init: ConceptRowBuilderWithButtonGroupProperty<T>.() -> Unit
+) {
     withButtonGroup(ButtonGroup()) {
         ConceptRowBuilderWithButtonGroupProperty(this, binding).init()
     }
@@ -158,7 +179,11 @@ abstract class ConceptRow : ConceptCell(), ConceptRowBuilder {
 
     // backward compatibility
     @Deprecated(level = DeprecationLevel.HIDDEN, message = "deprecated")
-    operator fun JComponent.invoke(vararg constraints: CCFlags, gapLeft: Int = 0, growPolicy: ConceptGrowPolicy? = null) {
+    operator fun JComponent.invoke(
+        vararg constraints: CCFlags,
+        gapLeft: Int = 0,
+        growPolicy: ConceptGrowPolicy? = null
+    ) {
         invoke(constraints = *constraints, growPolicy = growPolicy).withLeftGap(gapLeft)
     }
 }
