@@ -32,6 +32,7 @@ import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.DumbAwareRunnable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.projectRoots.JavaSdk
@@ -230,13 +231,13 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
 
         preprocessModuleCreated(module, this, starterContext.frameworkVersion?.id)
 
-        StartupManager.getInstance(project).runAfterOpened {
+        StartupManager.getInstance(project).registerPostStartupActivity(DumbAwareRunnable {
             // a hack to avoid "Assertion failed: Network shouldn't be accessed in EDT or inside read action"
             ApplicationManager.getApplication().invokeLater(
                 { extractAndImport(module) },
                 ModalityState.NON_MODAL, module.disposed
             )
-        }
+        })
     }
 
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
