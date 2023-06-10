@@ -354,13 +354,13 @@ abstract class ConceptWebStarterModuleBuilder : ModuleBuilder() {
                 NotificationType.INFORMATION
             )
             .addAction(NotificationAction.create("Enable plugins...") { _, notification ->
-                installAndEnable(
+                /*installAndEnable(
                     null, toInstallOrEnable,
                     showDialog = true,
                     selectAlInDialog = false,
                     modalityState = null
-                ) { notification.expire() }
-                //installAndEnable(toInstallOrEnable) { notification.expire() }
+                ) { notification.expire() }*/
+                installAndEnable(toInstallOrEnable) { notification.expire() }
             })
             .notify(project)
 
