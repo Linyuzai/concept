@@ -4,7 +4,7 @@ import $PACKAGE$.basic.cloud.$CLASS$CloudApplication;
 import org.springframework.boot.SpringApplication;
 
 /**
- * 微服务用户和消息启动类
+ * 微服务用户启动类
  */
 @$CLASS$CloudApplication
 public class CloudUserApplication {

@@ -3,3 +3,9 @@ server:
 spring:
   application:
     name: $ARTIFACT$-application-cloud-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        enabled: false

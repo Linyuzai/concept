@@ -63,7 +63,7 @@ allprojects {
     dependencyManagement {
         imports {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:$V_SPRING_CLOUD_DM$'
-            //mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
+            mavenBom 'com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1'
         }
     }
 

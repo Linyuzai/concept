@@ -4,7 +4,7 @@ import $PACKAGE$.basic.cloud.$CLASS$CloudApplication;
 import org.springframework.boot.SpringApplication;
 
 /**
- * 微服务沸点启动类
+ * 微服务示例启动类
  */
 @$CLASS$CloudApplication
 public class CloudSampleApplication {

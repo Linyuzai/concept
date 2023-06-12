@@ -5,6 +5,7 @@ import $PACKAGE$.domain.user.UserRepository;
 import $PACKAGE$.domain.user.Users;
 import $PACKAGE$.rpc.user.RPCUserFacadeAdapter;
 import $PACKAGE$.rpc.user.UserRO;
+import $PACKAGE$.token.Token;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ public class FeignUserController {
     /**
      * 根据用户 id 获得用户信息
      */
+    @Token(required = false)
     @GetMapping("{id}")
     public UserRO get(@PathVariable String id) {
         User user = userRepository.get(id);
@@ -43,6 +45,7 @@ public class FeignUserController {
      * <p>
      * 避免参数过长用 POST
      */
+    @Token(required = false)
     @PostMapping("conditions")
     public UserRO get(@RequestBody Conditions conditions) {
         User user = userRepository.get(conditions);
@@ -57,6 +60,7 @@ public class FeignUserController {
      * <p>
      * 避免参数过长用 POST
      */
+    @Token(required = false)
     @PostMapping("list/ids")
     public List<UserRO> list(@RequestBody Collection<String> ids) {
         Users users = userRepository.select(ids);
@@ -68,6 +72,7 @@ public class FeignUserController {
      * <p>
      * 避免参数过长用 POST
      */
+    @Token(required = false)
     @PostMapping("list/conditions")
     public List<UserRO> conditions(@RequestBody Conditions conditions) {
         Users users = userRepository.select(conditions);
