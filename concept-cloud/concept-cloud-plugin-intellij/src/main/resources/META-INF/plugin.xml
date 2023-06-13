@@ -6,26 +6,11 @@
         Linyuzai
     </vendor>
 
-    <version>2.0.0</version>
+    <version>1.0.0</version>
 
     <idea-version since-build="213.5744.223" until-build="232.0"/>
 
     <description><![CDATA[
-        基于 Gradle 和 Spring Cloud 的多模块生成插件<br>
-        <br>
-        支持模块任意组合，同时支持单体应用和微服务<br>
-        <br>
-        创建项目：File -> New -> Project -> Concept Cloud<br>
-        <br>
-        生成领域代码：选中 domain 模块下的包 -> 右键 -> Concept Cloud -> Generate Domain Code...<br>
-        <br>
-        生成模块代码：选中 module 模块下的包 -> 右键 -> Concept Cloud -> Generate Module Code...<br>
-        <br>
-        <a href="https://juejin.cn/column/7140131104270319629"><b>掘金专栏</b></a><br>
-        <br>
-        <a href="https://github.com/Linyuzai/concept/wiki/Concept-Cloud-Plugin-Intellij"><b>Wiki</b></a><br>
-        <br>
-
         Generate a multiple modules project based on Gradle that supports both Spring Cloud and Spring Boot.<br>
         <br>
         Usage: File -> New -> Project -> Concept Cloud<br>
@@ -77,19 +62,5 @@
     </actions>
 
     <change-notes><![CDATA[
-      1.1.0<br>
-      - 配置优化<br>
-      <br>
-      2.0.0<br>
-      - 全新的项目结构<br>
-      - 领域和模块生成功能<br>
-      <br>
-      <hr>
-      1.1.0<br>
-      - add spring versions<br>
-      <br>
-      2.0.0<br>
-      - new project structure<br>
-      - code generator<br>
     ]]></change-notes>
 </idea-plugin>
