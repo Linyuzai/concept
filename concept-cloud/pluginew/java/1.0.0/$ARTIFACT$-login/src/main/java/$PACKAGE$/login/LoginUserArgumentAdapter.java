@@ -23,7 +23,7 @@ public class LoginUserArgumentAdapter implements LoginArgumentAdapter {
     @Override
     public Object adapt(MethodParameter parameter) {
         Login annotation = parameter.getMethodAnnotation(Login.class);
-        User user = LoginContext.getUser();
+        User user = LoginContext.getLogin();
         if (user == null) {
             if (!Objects.requireNonNull(annotation).required()) {
                 return null;

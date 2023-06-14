@@ -1,6 +1,8 @@
 package $PACKAGE$.rpc.autoconfigure;
 
 import $PACKAGE$.rpc.RouterLoadBalancerClientFactory;
+import $PACKAGE$.rpc.sample.RPCSampleFacadeAdapter;
+import $PACKAGE$.rpc.sample.RPCSampleFacadeAdapterImpl;
 import $PACKAGE$.rpc.user.RPCUserFacadeAdapter;
 import $PACKAGE$.rpc.user.RPCUserFacadeAdapterImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -17,6 +19,12 @@ public class RPCAutoConfiguration {
     public LoadBalancerClientFactory routerLoadBalancerClientFactory(LoadBalancerClientsProperties properties,
                                                                      DiscoveryClient discoveryClient) {
         return new RouterLoadBalancerClientFactory(properties, discoveryClient);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RPCSampleFacadeAdapter rpcSampleFacadeAdapter() {
+        return new RPCSampleFacadeAdapterImpl();
     }
 
     @Bean

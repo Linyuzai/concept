@@ -43,6 +43,7 @@ public class TokenWebInterceptor implements WebInterceptor {
                 }
                 User user = tokenCodec.decode(handleToken(token));
                 context.put(User.class, user);
+                TokenContext.setToken(token);
             }
         }
         return chain.next(context, returner);

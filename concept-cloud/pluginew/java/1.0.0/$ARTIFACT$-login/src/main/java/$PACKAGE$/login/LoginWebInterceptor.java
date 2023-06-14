@@ -2,7 +2,6 @@ package $PACKAGE$.login;
 
 import $PACKAGE$.domain.user.User;
 import $PACKAGE$.token.TokenWebInterceptor;
-import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
 import com.github.linyuzai.cloud.web.core.intercept.WebInterceptor;
@@ -21,11 +20,8 @@ public class LoginWebInterceptor implements WebInterceptor {
      */
     @Override
     public Object intercept(WebContext context, ValueReturner returner, WebInterceptorChain chain) {
-        Request request = context.get(Request.class);
-        String token = request.getHeader(TokenWebInterceptor.TOKEN_HEADER);
         User user = context.get(User.class);
-        LoginContext.setToken(token);
-        LoginContext.setUser(user);
+        LoginContext.setLogin(user);
         return chain.next(context, returner);
     }
 }

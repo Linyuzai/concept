@@ -23,9 +23,9 @@ public interface DomainFactory {
 
     <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, Predicate<T> predicate);
 
-    <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<C> cls, Collection<String> limitedIds, Function<Collection<String>, Map<String, String>> idMapping);
+    <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<C> cls, Collection<String> ownerIds, Function<Collection<String>, Map<String, String>> idMapping);
 
-    <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<T> dCls, Class<C> cCls, Collection<String> limitedIds, Function<Collection<String>, Map<String, String>> idMapping);
+    <T extends DomainObject, C extends DomainCollection<T>> Map<String, T> createObject(Class<T> dCls, Class<C> cCls, Collection<String> ownerIds, Function<Collection<String>, Map<String, String>> idMapping);
 
     <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids);
 
