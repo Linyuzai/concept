@@ -1,5 +1,6 @@
 dependencies {
     api project(':$ARTIFACT$-token')
+    api project(':$ARTIFACT$-domain:domain-sample')
     api project(':$ARTIFACT$-domain:domain-user')
     implementation 'org.springframework.cloud:spring-cloud-loadbalancer'
 }

@@ -31,7 +31,7 @@ public interface UserFeignClient {
     Response<UserRO> get(@RequestBody Conditions conditions);
 
     /**
-     * 根据 id 列表获得用户信息
+     * 根据 id 列表获得用户信息列表
      */
     @PostMapping("/feign/user/list/ids")
     Response<List<UserRO>> list(@RequestBody Collection<String> ids);
