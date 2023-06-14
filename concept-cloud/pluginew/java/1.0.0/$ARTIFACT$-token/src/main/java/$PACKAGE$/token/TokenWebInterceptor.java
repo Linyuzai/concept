@@ -1,7 +1,6 @@
 package $PACKAGE$.token;
 
 import $PACKAGE$.domain.user.User;
-import $PACKAGE$.login.LoginContext;
 import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.context.WebContext;
 import com.github.linyuzai.cloud.web.core.intercept.ValueReturner;
@@ -16,12 +15,14 @@ import org.springframework.web.method.HandlerMethod;
 /**
  * Token 拦截器
  */
-@Order(0)
+@Order(TokenWebInterceptor.ORDER)
 @OnRequest
 @Component
 public class TokenWebInterceptor implements WebInterceptor {
 
     public static final String TOKEN_HEADER = "Authorization";
+
+    public static final int ORDER = 0;
 
     @Autowired
     private TokenCodec tokenCodec;
@@ -41,8 +42,7 @@ public class TokenWebInterceptor implements WebInterceptor {
                     throw new IllegalArgumentException("Token not found");
                 }
                 User user = tokenCodec.decode(handleToken(token));
-                LoginContext.setUser(user);
-                LoginContext.setToken(token);
+                context.put(User.class, user);
             }
         }
         return chain.next(context, returner);

@@ -1,3 +1,3 @@
 dependencies {
-    api project(':$ARTIFACT$-domain:domain-user') //用户领域
+    api project(':$ARTIFACT$-token')
 }

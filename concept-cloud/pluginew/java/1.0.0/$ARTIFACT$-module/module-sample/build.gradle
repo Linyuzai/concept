@@ -1,4 +1,4 @@
 dependencies {
-    api project(':$ARTIFACT$-token') //token模块
-    api project(':$ARTIFACT$-domain:domain-sample') //示例领域
+    api project(':$ARTIFACT$-token')
+    api project(':$ARTIFACT$-domain:domain-sample')
 }

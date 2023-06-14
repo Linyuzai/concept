@@ -4,6 +4,7 @@ import $PACKAGE$.login.Login;
 import $PACKAGE$.login.LoginArgumentAdapter;
 import $PACKAGE$.login.LoginHandlerMethodArgumentResolver;
 import $PACKAGE$.login.LoginUserArgumentAdapter;
+import $PACKAGE$.login.LoginWebInterceptor;
 import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakIntercept;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;
@@ -26,6 +27,12 @@ public class LoginAutoConfiguration {
     public boolean nonIntercept(Request request) {
         return request.getPath().startsWith("/login/") ||
                 request.getPath().startsWith("/register/");
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LoginWebInterceptor loginWebInterceptor() {
+        return new LoginWebInterceptor();
     }
 
     @Bean

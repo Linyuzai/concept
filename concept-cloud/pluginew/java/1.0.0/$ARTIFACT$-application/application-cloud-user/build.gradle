@@ -1,7 +1,7 @@
 dependencies {
     implementation project(':$ARTIFACT$-basic:basic-cloud') //微服务基础依赖
     implementation project(':$ARTIFACT$-login:login-username') //用户名登录
-    implementation project(':$ARTIFACT$-token:token-jwt') //jwt处理token
+    implementation project(':$ARTIFACT$-token:token-jwt') //jwt实现token
     implementation project(':$ARTIFACT$-rpc:rpc-feign') //Feign实现RPC
-    implementation project(':$ARTIFACT$-module:module-user') //用户模块
+    implementation project(':$ARTIFACT$-module:module-user')
 }
