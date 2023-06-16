@@ -10,6 +10,7 @@ import $PACKAGE$.token.TokenContext;
 import $PACKAGE$.token.TokenWebInterceptor;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
@@ -23,15 +24,15 @@ public class FeignAutoConfiguration {
     public static class SampleConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
-        public SampleRepository sampleRepository() {
-            return new FeignSampleRepository();
+        @ConditionalOnBean(SampleRepository.class)
+        public FeignSampleController feignSampleController() {
+            return new FeignSampleController();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public FeignSampleController feignSampleController() {
-            return new FeignSampleController();
+        public SampleRepository sampleRepository() {
+            return new FeignSampleRepository();
         }
     }
 
@@ -39,15 +40,15 @@ public class FeignAutoConfiguration {
     public static class UserConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
-        public UserRepository userRepository() {
-            return new FeignUserRepository();
+        @ConditionalOnBean(UserRepository.class)
+        public FeignUserController feignUserController() {
+            return new FeignUserController();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public FeignUserController feignUserController() {
-            return new FeignUserController();
+        public UserRepository userRepository() {
+            return new FeignUserRepository();
         }
     }
 
