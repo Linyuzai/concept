@@ -1,4 +1,4 @@
-package $PACKAGE$.basic.boot;
+package $PACKAGE$.basic;
 
 import org.springframework.context.annotation.Configuration;
 

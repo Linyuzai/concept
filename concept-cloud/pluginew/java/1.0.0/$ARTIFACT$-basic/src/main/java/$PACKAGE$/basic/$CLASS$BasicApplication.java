@@ -1,4 +1,4 @@
-package $PACKAGE$.basic.boot;
+package $PACKAGE$.basic;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import($CLASS$BootConfiguration.class)
+@Import($CLASS$BasicConfiguration.class)
 @ComponentScan(basePackages = "$PACKAGE$.module.*.config",
         nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class)
 @SpringBootApplication
