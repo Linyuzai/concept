@@ -37,6 +37,11 @@ public class FeignUserRepository extends QueryDomainRepository<User, Users, User
     }
 
     @Override
+    public Collection<User> pos2dos(Collection<? extends UserRO> pos) {
+        return rpcUserFacadeAdapter.ros2dos(pos);
+    }
+
+    @Override
     protected UserRO doGet(String id) {
         Response<UserRO> response = userFeignClient.get(id);
         if (response.getResult()) {

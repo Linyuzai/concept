@@ -37,6 +37,11 @@ public class FeignSampleRepository extends QueryDomainRepository<Sample, Samples
     }
 
     @Override
+    public Collection<Sample> pos2dos(Collection<? extends SampleRO> pos) {
+        return rpcSampleFacadeAdapter.ros2dos(pos);
+    }
+
+    @Override
     protected SampleRO doGet(String id) {
         Response<SampleRO> response = sampleFeignClient.get(id);
         if (response.getResult()) {
