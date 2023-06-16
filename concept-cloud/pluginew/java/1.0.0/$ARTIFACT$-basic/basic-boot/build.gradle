@@ -1,4 +1,4 @@
 dependencies {
-    api project(':$ARTIFACT$-login')
+    api project(':$ARTIFACT$-basic')
     implementation 'org.hibernate.validator:hibernate-validator'
 }

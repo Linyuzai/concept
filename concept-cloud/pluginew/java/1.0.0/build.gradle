@@ -42,18 +42,16 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'com.github.linyuzai:concept-cloud-web:$V_CONCEPT_CLOUD_WEB$'
 
-        if (project.name.startsWith('module-') || project.name.startsWith('basic-')) {
-
-            if (project.name.startsWith('module-')) {
-                implementation project(':$ARTIFACT$-basic:basic-boot')
-            }
-
-            implementation project(':$ARTIFACT$-login')
-
+        if (project.name.startsWith('module-')) {
+            api project(':$ARTIFACT$-basic')
+            api project(':$ARTIFACT$-login')
             implementation 'com.github.linyuzai:concept-domain-mbp:$V_CONCEPT_DOMAIN$'
+            return
+        }
 
+        if (project.name == '$ARTIFACT$-basic') {
+            api 'com.baomidou:mybatis-plus-boot-starter:$V_MBP$'
             implementation 'mysql:mysql-connector-java'
-            implementation 'com.baomidou:mybatis-plus-boot-starter:$V_MBP$'
         }
     }
 

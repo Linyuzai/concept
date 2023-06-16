@@ -1,7 +1,6 @@
 package $PACKAGE$.basic.cloud;
 
-import $PACKAGE$.basic.boot.$CLASS$BootApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import $PACKAGE$.basic.$CLASS$BasicApplication;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -15,7 +14,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import($CLASS$CloudConfiguration.class)
-@$CLASS$BootApplication
-@SpringBootApplication
+@$CLASS$BasicApplication
 public @interface $CLASS$CloudApplication {
 }

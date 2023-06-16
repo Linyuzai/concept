@@ -1,4 +1,4 @@
-package $PACKAGE$.basic.boot.autoconfigure.swagger;
+package $PACKAGE$.basic.autoconfigure.swagger;
 
 import com.github.linyuzai.cloud.web.core.concept.Request;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakIntercept;

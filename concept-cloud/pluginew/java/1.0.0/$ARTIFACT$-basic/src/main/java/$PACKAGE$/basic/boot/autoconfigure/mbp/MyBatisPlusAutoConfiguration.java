@@ -1,4 +1,4 @@
-package $PACKAGE$.basic.boot.autoconfigure.mbp;
+package $PACKAGE$.basic.autoconfigure.mbp;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

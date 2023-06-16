@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+$PACKAGE$.basic.autoconfigure.mbp.MyBatisPlusAutoConfiguration,\
+$PACKAGE$.basic.autoconfigure.swagger.SpringDocAutoConfiguration
