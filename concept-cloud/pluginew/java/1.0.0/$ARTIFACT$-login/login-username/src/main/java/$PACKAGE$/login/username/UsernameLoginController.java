@@ -29,7 +29,7 @@ public class UsernameLoginController {
     public LoginAuthorization usernameLogin(@RequestParam String username, @RequestParam String password) {
         User user = userRepository.get(new LambdaConditions().equal(User::getUsername, username));
         if (user == null || !user.getPassword().equals(password)) {
-            throw new RuntimeException("login.username-or-password.error");
+            throw new IllegalArgumentException("login.username-or-password.error");
         }
         if (!user.getEnabled()) {
             throw new IllegalStateException("login.account.disabled");
