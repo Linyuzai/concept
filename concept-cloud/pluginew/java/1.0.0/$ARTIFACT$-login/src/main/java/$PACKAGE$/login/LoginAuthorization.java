@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "登录视图")
-public class LoginVO {
+public class LoginAuthorization {
 
     @Schema(description = "用户ID")
     private String id;
