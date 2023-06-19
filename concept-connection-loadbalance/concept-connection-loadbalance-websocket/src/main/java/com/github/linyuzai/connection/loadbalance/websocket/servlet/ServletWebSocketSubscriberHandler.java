@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.socket.CloseStatus;
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 public class ServletWebSocketSubscriberHandler implements WebSocketHandler {
 
-    private final WebSocketLoadBalanceConcept concept;
+    private final ConnectionLoadBalanceConcept concept;
 
     private final Consumer<WebSocketSession> consumer;
 

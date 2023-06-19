@@ -2,13 +2,10 @@ package com.github.linyuzai.connection.loadbalance.websocket;
 
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConceptConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketDefaultEndpointConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketConceptConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketDefaultEndpointConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketConceptConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketDefaultEndpointConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketLoadBalanceConfiguration;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -30,22 +27,19 @@ public enum WebSocketType {
      * 使用 javax 配置
      */
     JAVAX(JavaxWebSocketDefaultEndpointConfiguration.class,
-            JavaxWebSocketConceptConfiguration.class,
-            JavaxWebSocketLoadBalanceConfiguration.class),
+            JavaxWebSocketConceptConfiguration.class),
 
     /**
      * 使用 servlet 配置
      */
     SERVLET(ServletWebSocketDefaultEndpointConfiguration.class,
-            ServletWebSocketConceptConfiguration.class,
-            ServletWebSocketLoadBalanceConfiguration.class),
+            ServletWebSocketConceptConfiguration.class),
 
     /**
      * 使用 reactive 配置
      */
     REACTIVE(ReactiveWebSocketDefaultEndpointConfiguration.class,
-            ReactiveWebSocketConceptConfiguration.class,
-            ReactiveWebSocketLoadBalanceConfiguration.class);
+            ReactiveWebSocketConceptConfiguration.class);
 
     private final Class<?> defaultEndpoint;
 

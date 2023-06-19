@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,22 +21,13 @@ public class JavaxWebSocketConnectionSubscriber extends
 
     private Class<?> clientClass = JavaxWebSocketSubscriberEndpoint.class;
 
-    public JavaxWebSocketConnectionSubscriber(String protocol) {
-        super(protocol);
-    }
-
     public JavaxWebSocketConnectionSubscriber(Class<?> clientClass) {
-        this.clientClass = clientClass;
-    }
-
-    public JavaxWebSocketConnectionSubscriber(String protocol, Class<?> clientClass) {
-        super(protocol);
         this.clientClass = clientClass;
     }
 
     @SneakyThrows
     @Override
-    public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<JavaxWebSocketConnection> consumer) {
+    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept, Consumer<JavaxWebSocketConnection> consumer) {
         Session session = getContainer().connectToServer(clientClass, uri);
         consumer.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
     }

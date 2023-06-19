@@ -4,6 +4,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEventListener;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 连接订阅处理器
@@ -12,7 +15,12 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
  * <p>
  * 对该服务实例反向连接
  */
+@Getter
+@Setter
+@AllArgsConstructor
 public class ConnectionSubscribeHandler implements MessageReceiveEventListener {
+
+    private ServerConnectionSubscriber<?> connectionSubscriber;
 
     @Override
     public String getConnectionType() {
@@ -21,8 +29,10 @@ public class ConnectionSubscribeHandler implements MessageReceiveEventListener {
 
     @Override
     public void onMessage(Message message, Connection connection) {
-        ConnectionServer server = message.getPayload();
-        connection.getMetadata().put(ConnectionServer.class, server);
-        connection.getConcept().subscribe(server, true);
+        if (message.isType(ConnectionServer.class)) {
+            ConnectionServer server = message.getPayload();
+            connection.getMetadata().put(ConnectionServer.class, server);
+            connectionSubscriber.subscribe(server, connection.getConcept());
+        }
     }
 }

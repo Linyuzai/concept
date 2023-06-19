@@ -68,8 +68,10 @@ public class WebSocketLoadBalanceConfiguration {
     public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
             WebSocketLoadBalanceProperties properties,
             WebSocketScopeHelper helper) {
+        ConnectionSubscriber connectionSubscriber = helper.getBean(ConnectionSubscriber.class);
         ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
         return new ScheduledConnectionLoadBalanceMonitor(
+                connectionSubscriber,
                 factory.create(ConnectionLoadBalanceMonitor.class),
                 properties.getLoadBalance().getMonitor().getPeriod());
     }

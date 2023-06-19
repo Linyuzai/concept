@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.ContainerWebSocketConnectionSubscriber;
 import lombok.NoArgsConstructor;
@@ -27,12 +28,8 @@ public class ServletWebSocketConnectionSubscriber extends
         jettyPresent = ClassUtils.isPresent("org.eclipse.jetty.websocket.client.WebSocketClient", loader);
     }
 
-    public ServletWebSocketConnectionSubscriber(String protocol) {
-        super(protocol);
-    }
-
     @Override
-    public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<ServletWebSocketConnection> consumer) {
+    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept, Consumer<ServletWebSocketConnection> consumer) {
         WebSocketClient client = newWebSocketClient();
         ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
                 consumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));

@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapt
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketScope;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,6 @@ public class JavaxWebSocketConceptConfiguration {
 
     @Bean
     @WebSocketScope
-    @ConditionalOnMissingBean
     public ConnectionFactory connectionFactory() {
         return new JavaxWebSocketConnectionFactory();
     }
@@ -24,14 +24,27 @@ public class JavaxWebSocketConceptConfiguration {
     @Bean
     @WebSocketScope
     @ConditionalOnMissingBean
-    public ConnectionSubscriber connectionSubscriber(WebSocketLoadBalanceProperties properties) {
-        return new JavaxWebSocketConnectionSubscriber(properties.getLoadBalance().getProtocol());
-    }
-
-    @Bean
-    @WebSocketScope
-    @ConditionalOnMissingBean
     public MessageCodecAdapter messageCodecAdapter() {
         return new JavaxWebSocketMessageCodecAdapter();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnMissingBean(ConnectionSubscriber.class)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    public static class LoadBalanceConfiguration {
+
+        @Bean
+        @WebSocketScope
+        public ConnectionSubscriber connectionSubscriber(WebSocketLoadBalanceProperties properties) {
+            JavaxWebSocketConnectionSubscriber subscriber = new JavaxWebSocketConnectionSubscriber();
+            subscriber.setProtocol(properties.getLoadBalance().getProtocol());
+            return subscriber;
+        }
+
+        @Bean
+        public JavaxWebSocketLoadBalanceEndpoint javaxWebSocketLoadBalanceEndpoint(WebSocketLoadBalanceConcept concept) {
+            concept.holdInstance();
+            return new JavaxWebSocketLoadBalanceEndpoint();
+        }
     }
 }

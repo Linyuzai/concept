@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.core.extension;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.select.MessageHeaderSelector;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 基于路径的连接选择器
@@ -10,6 +11,7 @@ import lombok.Getter;
  * 配合 {@link PathMessage} 使用
  */
 @Getter
+@RequiredArgsConstructor
 public abstract class PathSelector extends MessageHeaderSelector {
 
     public static final String KEY = "path";
@@ -20,9 +22,9 @@ public abstract class PathSelector extends MessageHeaderSelector {
         this("");
     }
 
-    public PathSelector(String prefix) {
-        super(KEY);
-        this.prefix = prefix;
+    @Override
+    public String getHeaderName() {
+        return KEY;
     }
 
     @Override

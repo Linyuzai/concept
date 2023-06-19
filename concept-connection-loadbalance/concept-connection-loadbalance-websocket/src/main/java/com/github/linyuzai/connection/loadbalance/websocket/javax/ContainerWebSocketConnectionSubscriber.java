@@ -14,14 +14,10 @@ import javax.websocket.WebSocketContainer;
  * 基于 {@link WebSocketContainer} 的连接订阅者
  */
 @NoArgsConstructor
-public abstract class ContainerWebSocketConnectionSubscriber<T extends WebSocketConnection> extends WebSocketConnectionSubscriber<T>
-        implements ServletContextAware {
+public abstract class ContainerWebSocketConnectionSubscriber<T extends WebSocketConnection>
+        extends WebSocketConnectionSubscriber<T> implements ServletContextAware {
 
     private volatile WebSocketContainer container;
-
-    public ContainerWebSocketConnectionSubscriber(String protocol) {
-        super(protocol);
-    }
 
     public WebSocketContainer getContainer() {
         if (container == null) {

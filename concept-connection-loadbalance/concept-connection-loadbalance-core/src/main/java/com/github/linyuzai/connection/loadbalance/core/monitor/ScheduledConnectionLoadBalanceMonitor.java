@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptDestroyEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -16,12 +17,15 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ScheduledConnectionLoadBalanceMonitor implements ConnectionLoadBalanceMonitor, ConnectionEventListener {
 
-    private ConnectionLoadBalanceConcept concept;
+    @NonNull
+    private final ConnectionSubscriber subscriber;
 
     @NonNull
     private final ScheduledExecutorService executor;
 
     private final long period;
+
+    private ConnectionLoadBalanceConcept concept;
 
     public void start() {
         executor.scheduleAtFixedRate(this::subscribe, period, period, TimeUnit.MILLISECONDS);
@@ -29,7 +33,7 @@ public class ScheduledConnectionLoadBalanceMonitor implements ConnectionLoadBala
 
     public void subscribe() {
         concept.publish(new LoadBalanceMonitorEvent());
-        concept.subscribe(true);
+        subscriber.subscribe(concept);
     }
 
     public void stop() {

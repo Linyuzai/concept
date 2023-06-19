@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceException;
@@ -19,7 +20,8 @@ import java.util.function.Consumer;
  * {@link ReactiveWebSocketConnection} 的连接订阅者
  */
 @NoArgsConstructor
-public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSubscriber<ReactiveWebSocketConnection> {
+public class ReactiveWebSocketConnectionSubscriber extends
+        WebSocketConnectionSubscriber<ReactiveWebSocketConnection> {
 
     private static final boolean tomcatPresent;
 
@@ -37,12 +39,8 @@ public class ReactiveWebSocketConnectionSubscriber extends WebSocketConnectionSu
         reactorNettyPresent = ClassUtils.isPresent("reactor.netty.http.websocket.WebsocketInbound", loader);
     }
 
-    public ReactiveWebSocketConnectionSubscriber(String protocol) {
-        super(protocol);
-    }
-
     @Override
-    public void doSubscribe(URI uri, WebSocketLoadBalanceConcept concept, Consumer<ReactiveWebSocketConnection> consumer) {
+    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept, Consumer<ReactiveWebSocketConnection> consumer) {
         WebSocketClient client = newWebSocketClient();
         ReactiveWebSocketSubscriberHandler handler =
                 new ReactiveWebSocketSubscriberHandler(concept, (session, sink) ->

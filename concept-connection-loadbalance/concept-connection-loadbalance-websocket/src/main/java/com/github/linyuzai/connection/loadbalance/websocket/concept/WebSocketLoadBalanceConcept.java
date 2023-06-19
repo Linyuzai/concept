@@ -8,7 +8,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ServerConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionFactory;
 
 import java.util.List;
@@ -56,6 +58,12 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
                 messageCodecAdapter = new WebSocketMessageCodecAdapter();
             }
 
+            if (connectionSubscriber instanceof ServerConnectionSubscriber) {
+                //添加连接反向订阅处理器
+                ServerConnectionSubscriber<?> scs = (ServerConnectionSubscriber<?>) connectionSubscriber;
+                eventListeners.add(0, new ConnectionSubscribeHandler(scs));
+            }
+
             preBuild();
 
             if (connectionFactories.isEmpty()) {
@@ -67,7 +75,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
                     connectionServerManager,
                     connectionSubscriber,
                     connectionFactories,
-                    connectionSelectors,
+                    withFilterChain(),
                     messageFactories,
                     messageCodecAdapter,
                     eventPublisher);

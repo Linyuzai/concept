@@ -32,6 +32,13 @@ public interface Message {
      */
     <T> T getPayload();
 
+    default boolean isType(Class<?> type) {
+        if (type == null) {
+            return false;
+        }
+        return type.isInstance(getPayload());
+    }
+
     boolean isBroadcast();
 
     void setBroadcast(boolean broadcast);

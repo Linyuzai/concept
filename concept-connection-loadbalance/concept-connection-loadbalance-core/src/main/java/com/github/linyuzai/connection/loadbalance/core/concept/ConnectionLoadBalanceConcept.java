@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 import java.util.Collection;
 import java.util.Map;
@@ -21,28 +21,13 @@ public interface ConnectionLoadBalanceConcept {
     void destroy();
 
     /**
-     * 尝试订阅所有服务实例
-     *
-     * @param sendServerMsg 是否发送服务实例消息
-     */
-    void subscribe(boolean sendServerMsg);
-
-    /**
-     * 尝试订阅服务实例
-     *
-     * @param server        需要订阅的服务实例
-     * @param sendServerMsg 是否发送服务实例消息
-     */
-    void subscribe(ConnectionServer server, boolean sendServerMsg);
-
-    /**
      * 创建连接
      *
      * @param o        底层连接
      * @param metadata 元数据
      * @return 连接
      */
-    Connection create(Object o, Map<Object, Object> metadata);
+    Connection createConnection(Object o, Map<Object, Object> metadata);
 
     /**
      * 当连接建立时调用
@@ -110,6 +95,14 @@ public interface ConnectionLoadBalanceConcept {
      * @param e          异常
      */
     void onError(Connection connection, Throwable e);
+
+    /**
+     * 创建消息
+     *
+     * @param o 消息数据
+     * @return {@link Message} 实例
+     */
+    Message createMessage(Object o);
 
     /**
      * 发送消息

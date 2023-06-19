@@ -20,7 +20,7 @@ public class UserMessage extends ObjectMessage {
 
     public UserMessage(Object payload, Collection<String> userIds) {
         super(payload);
-        setBroadcast(false);
+        //setBroadcast(false); 默认可以多端连接
         getHeaders().put(UserSelector.KEY, String.join(",", userIds));
     }
 }

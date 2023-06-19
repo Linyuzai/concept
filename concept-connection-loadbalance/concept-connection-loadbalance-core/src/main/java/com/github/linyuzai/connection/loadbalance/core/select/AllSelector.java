@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * 不进行过滤的选择器
  */
-public class AllSelector extends AbstractConnectionSelector {
+public class AllSelector extends AbstractConnectionSelector implements FilterConnectionSelector {
 
     @Override
     public boolean support(Message message) {

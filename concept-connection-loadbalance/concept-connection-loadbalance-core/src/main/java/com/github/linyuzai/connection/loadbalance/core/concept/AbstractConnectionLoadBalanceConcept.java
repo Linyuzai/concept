@@ -9,10 +9,9 @@ import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepo
 import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelector;
+import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelectorChain;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.Getter;
 import lombok.NonNull;
@@ -76,7 +75,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void initialize() {
-        subscribe(true);
+        connectionSubscriber.subscribe(this);
         publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 
@@ -94,80 +93,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
-    @Override
-    public void subscribe(boolean sendServerMsg) {
-        List<ConnectionServer> servers = connectionServerManager.getConnectionServers();
-        for (ConnectionServer server : servers) {
-            subscribe(server, sendServerMsg);
-        }
-    }
-
-    /**
-     * 尝试订阅服务实例
-     * <p>
-     * 当对应的连接存在时
-     * <p>
-     * 如果存活 {@link Connection#isAlive()} 就不进行重复订阅
-     * <p>
-     * 否则关闭之前的连接并重新订阅
-     * <p>
-     * 加锁防止主动订阅和被动订阅冲突
-     * <p>
-     * 当接收到服务实例信息时会反向订阅 {@link ConnectionSubscribeHandler}
-     *
-     * @param server        需要订阅的服务实例
-     * @param sendServerMsg 是否发送服务实例消息
-     */
-    @Override
-    public synchronized void subscribe(ConnectionServer server, boolean sendServerMsg) {
-        //需要判断是否已经订阅对应的服务
-        Connection exist = getSubscriberConnection(server);
-        if (exist != null) {
-            if (exist.isAlive()) {
-                //如果连接还存活则直接返回
-                return;
-            } else {
-                //否则关闭连接
-                exist.close("NotAlive");
-            }
-        }
-        try {
-            connectionSubscriber.subscribe(server, this, connection -> {
-                onEstablish(connection);
-                if (sendServerMsg) {
-                    ConnectionServer local = connectionServerManager.getLocal();
-                    if (local != null) {
-                        connection.send(createMessage(local));
-                    }
-                }
-            });
-        } catch (Throwable e) {
-            publish(new ConnectionSubscribeErrorEvent(server, e));
-        }
-    }
-
-    /**
-     * 获得订阅了对应服务实例的连接
-     * <p>
-     * 如不存在则返回 null
-     *
-     * @param server 服务实例
-     * @return 对应的连接或 null
-     */
-    public Connection getSubscriberConnection(ConnectionServer server) {
-        if (server == null) {
-            return null;
-        }
-        Collection<Connection> connections = connectionRepository.select(Connection.Type.SUBSCRIBER);
-        for (Connection connection : connections) {
-            ConnectionServer exist = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
-            if (connectionServerManager.isEqual(server, exist)) {
-                return connection;
-            }
-        }
-        return null;
-    }
-
     /**
      * 创建连接
      * <p>
@@ -178,7 +103,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      * @return 连接
      */
     @Override
-    public Connection create(Object o, Map<Object, Object> metadata) {
+    public Connection createConnection(Object o, Map<Object, Object> metadata) {
         ConnectionFactory factory = getConnectionFactory(o, metadata);
         if (factory == null) {
             throw new ConnectionLoadBalanceException("No ConnectionFactory available with " + o);
@@ -208,7 +133,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     @Override
     public Connection onEstablish(Object o, Map<Object, Object> metadata) {
-        Connection connection = create(o, metadata);
+        Connection connection = createConnection(o, metadata);
         onEstablish(connection);
         return connection;
     }
@@ -351,6 +276,32 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
+     * 创建消息
+     * <p>
+     * 如果已经是 {@link Message} 则直接返回
+     * <p>
+     * 通过适配消息工厂 {@link MessageFactory} 创建消息
+     *
+     * @param o 消息数据
+     * @return {@link Message} 实例
+     */
+    @Override
+    public Message createMessage(Object o) {
+        if (o instanceof Message) {
+            return (Message) o;
+        }
+        MessageFactory messageFactory = getMessageFactory(o);
+        if (messageFactory == null) {
+            throw new ConnectionLoadBalanceException("No MessageFactory available with " + o);
+        }
+        Message message = messageFactory.create(o);
+        if (message == null) {
+            throw new ConnectionLoadBalanceException("Message can not be created with " + o);
+        }
+        return message;
+    }
+
+    /**
      * 将消息包装成 {@link Message}
      * <p>
      * 适配对应的连接选择器 {@link ConnectionSelector}
@@ -396,31 +347,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Message message = createMessage(msg);
         message.getHeaders().putAll(headers);
         send(message);
-    }
-
-    /**
-     * 创建消息
-     * <p>
-     * 如果已经是 {@link Message} 则直接返回
-     * <p>
-     * 通过适配消息工厂 {@link MessageFactory} 创建消息
-     *
-     * @param msg 消息数据
-     * @return {@link Message} 实例
-     */
-    public Message createMessage(Object msg) {
-        if (msg instanceof Message) {
-            return (Message) msg;
-        }
-        MessageFactory messageFactory = getMessageFactory(msg);
-        if (messageFactory == null) {
-            throw new ConnectionLoadBalanceException("No MessageFactory available with " + msg);
-        }
-        Message message = messageFactory.create(msg);
-        if (message == null) {
-            throw new ConnectionLoadBalanceException("Message can not be created with " + msg);
-        }
-        return message;
     }
 
     /**
@@ -694,12 +620,25 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                 eventPublisher = new DefaultConnectionEventPublisher();
             }
 
-            //添加连接反向订阅处理器
-            eventListeners.add(0, new ConnectionSubscribeHandler());
             //添加消息转发处理器
             eventListeners.add(0, new MessageForwardHandler());
 
             eventPublisher.register(eventListeners);
+        }
+
+        protected List<ConnectionSelector> withFilterChain() {
+            List<ConnectionSelector> selectors = new ArrayList<>();
+            List<FilterConnectionSelector> filterSelectors = new ArrayList<>();
+            for (ConnectionSelector selector : connectionSelectors) {
+                if (selector instanceof FilterConnectionSelector &&
+                        ((FilterConnectionSelector) selector).asFilter()) {
+                    filterSelectors.add((FilterConnectionSelector) selector);
+                } else {
+                    selectors.add(selector);
+                }
+            }
+            selectors.add(new FilterConnectionSelectorChain(filterSelectors));
+            return selectors;
         }
     }
 }
