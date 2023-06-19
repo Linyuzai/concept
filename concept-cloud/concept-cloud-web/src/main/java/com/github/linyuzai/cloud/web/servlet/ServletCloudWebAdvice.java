@@ -98,9 +98,7 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
         context.put(MediaType.class, selectedContentType);
         context.put(HttpMessageConverter.class, selectedConverterType);
         context.put(Response.Body.class, body);
-        Object result = webConcept.interceptResponse(context, WebResultValueReturner.INSTANCE);
-        invalidContext();
-        return result;
+        return webConcept.interceptResponse(context, WebResultValueReturner.INSTANCE);
     }
 
     protected WebContext getContext() {
@@ -134,6 +132,13 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
             context.put(Response.class, new ServletResponse(response));
             validContext(context);
             return true;
+        }
+
+        @Override
+        public void afterCompletion(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull Object handler, Exception ex) throws Exception {
+            invalidContext();
         }
     }
 }

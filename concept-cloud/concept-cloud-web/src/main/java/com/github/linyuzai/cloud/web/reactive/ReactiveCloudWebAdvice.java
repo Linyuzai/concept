@@ -147,11 +147,13 @@ public class ReactiveCloudWebAdvice extends ResponseBodyResultHandler {
             }
         }
 
+        @NonNull
         @Override
         public Class<?> getParameterType() {
             return type;
         }
 
+        @NonNull
         @Override
         public Type getGenericParameterType() {
             return type;

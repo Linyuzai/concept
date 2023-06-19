@@ -38,12 +38,12 @@ public class WebContextImpl implements WebContext {
     }
 
     @Override
-    public Map<Object, Object> toMap() {
-        return Collections.unmodifiableMap(context);
+    public void reset() {
+        context.clear();
     }
 
     @Override
-    public void reset() {
-        context.clear();
+    public Map<Object, Object> toMap() {
+        return Collections.unmodifiableMap(context);
     }
 }

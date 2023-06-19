@@ -52,14 +52,14 @@ public interface WebContext {
     void remove(Object key);
 
     /**
+     * 重置/清空上下文
+     */
+    void reset();
+
+    /**
      * 转成只读 {@link Map}
      *
      * @return {@link Map} 结构的上下文
      */
     Map<Object, Object> toMap();
-
-    /**
-     * 重置/清空上下文
-     */
-    void reset();
 }

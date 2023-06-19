@@ -7,6 +7,7 @@ import com.github.linyuzai.cloud.web.core.intercept.annotation.BreakIntercept;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnRequest;
 import com.github.linyuzai.cloud.web.core.intercept.annotation.OnResponse;
 import com.github.linyuzai.cloud.web.core.result.WebResult;
+import com.github.linyuzai.cloud.web.servlet.WebContextManager;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -17,6 +18,20 @@ import java.util.Locale;
 
 @Component
 public class Intercepts {
+
+    static {
+        WebContextManager.register(new WebContextManager.Listener() {
+            @Override
+            public void onContextSet(WebContext context) {
+                System.out.println("Context Set");
+            }
+
+            @Override
+            public void onContextInvalid(WebContext context) {
+                System.out.println("Context Invalid");
+            }
+        });
+    }
 
     //@OnWebResponse(Predicate.class)
     /*public boolean onlyTestMap(HttpServletRequest request) {

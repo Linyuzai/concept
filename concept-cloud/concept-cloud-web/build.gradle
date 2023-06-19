@@ -1,6 +1,6 @@
 apply from: '../../allprojects.gradle'
 
-version '1.5.3'
+version '1.5.4'
 
 ext {
     set('publishName', 'Cloud Web')
