@@ -18,7 +18,7 @@
         "springDependencyManagement": "1.1.0",
         "springCloudDependencyManagement": "2021.0.4",
         "conceptDomain": "1.8.3",
-        "conceptCloudWeb": "1.5.3",
+        "conceptCloudWeb": "1.5.4",
         "myBatisPlus": "3.5.2"
       },
       "dependencies": {
