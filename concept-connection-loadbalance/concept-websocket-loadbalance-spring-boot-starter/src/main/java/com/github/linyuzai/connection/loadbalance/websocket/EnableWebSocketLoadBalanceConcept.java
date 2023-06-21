@@ -15,8 +15,7 @@ import java.lang.annotation.*;
 @Inherited
 @EnableConnectionLoadBalanceConfiguration
 @EnableConfigurationProperties(WebSocketLoadBalanceProperties.class)
-@Import({WebSocketScopeName.class,
-        WebSocketLoadBalanceConfiguration.class,
+@Import({WebSocketLoadBalanceConfiguration.class,
         WebSocketLoadBalanceImportSelector.class})
 public @interface EnableWebSocketLoadBalanceConcept {
 }

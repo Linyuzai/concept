@@ -1,31 +1,16 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
-import com.github.linyuzai.connection.loadbalance.autoconfigure.discovery.DiscoveryConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.event.ApplicationConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ConnectionScope;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ConnectionScopeRegister;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ScopeHelper;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ScopeName;
 import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
-import com.github.linyuzai.connection.loadbalance.core.extension.SampleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerImpl;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactoryImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.GenericApplicationContext;
-
-import java.util.List;
 
 /**
  * 连接负载均衡配置
@@ -34,62 +19,18 @@ import java.util.List;
 public class ConnectionLoadBalanceConfiguration {
 
     @Bean
-    public ConnectionScopeRegister connectionScopeRegister(List<ScopeName> sns) {
-        return new ConnectionScopeRegister(sns);
+    public ConnectionRepositoryFactory connectionRepositoryFactory() {
+        return new ConnectionRepositoryFactoryImpl();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public ScopeHelper scopeHelper(GenericApplicationContext context, List<ScopeName> sns) {
-        return new ScopeHelper(context, sns);
-    }
-
-    @ConditionalOnClass(name = {
-            "org.springframework.cloud.client.discovery.DiscoveryClient",
-            "org.springframework.cloud.client.serviceregistry.Registration"})
-    public static class DiscoveryConnectionServerManagerConfiguration {
-
-        @Bean
-        @ConnectionScope
-        @ConditionalOnMissingBean
-        public ConnectionServerManager connectionServerManager(DiscoveryClient client,
-                                                               Registration registration) {
-            return new DiscoveryConnectionServerManager(client, registration);
-        }
-    }
-
-    @ConditionalOnMissingClass({
-            "org.springframework.cloud.client.discovery.DiscoveryClient",
-            "org.springframework.cloud.client.serviceregistry.Registration"})
-    public static class ImplConnectionServerManagerConfiguration {
-
-        @Bean
-        @ConnectionScope
-        @ConditionalOnMissingBean
-        public ConnectionServerManager connectionServerManager() {
-            return new ConnectionServerManagerImpl();
-        }
-    }
-
-    @Bean
-    @ConnectionScope
-    @ConditionalOnMissingBean
     public ErrorHandler errorHandler() {
         Log log = LogFactory.getLog(ErrorLogger.class);
         return new ErrorLogger(log::info, log::error);
     }
 
     @Bean
-    @ConnectionScope
-    @ConditionalOnMissingBean
     public ConnectionEventPublisher connectionEventPublisher(ApplicationEventPublisher publisher) {
         return new ApplicationConnectionEventPublisher(publisher);
-    }
-
-    @Bean
-    @ConnectionScope
-    @ConditionalOnMissingBean
-    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
-        return new SampleThreadScheduledExecutorServiceFactory();
     }
 }

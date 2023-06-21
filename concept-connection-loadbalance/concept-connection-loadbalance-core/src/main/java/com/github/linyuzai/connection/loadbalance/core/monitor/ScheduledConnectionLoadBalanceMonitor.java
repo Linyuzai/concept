@@ -32,7 +32,7 @@ public class ScheduledConnectionLoadBalanceMonitor implements ConnectionLoadBala
     }
 
     public void subscribe() {
-        concept.publish(new LoadBalanceMonitorEvent());
+        concept.getEventPublisher().publish(new LoadBalanceMonitorEvent());
         subscriber.subscribe(concept);
     }
 

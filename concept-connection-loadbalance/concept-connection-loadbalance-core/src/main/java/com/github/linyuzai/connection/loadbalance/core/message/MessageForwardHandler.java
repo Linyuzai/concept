@@ -18,9 +18,9 @@ public class MessageForwardHandler implements MessageReceiveEventListener {
     public void onMessage(Message message, Connection connection) {
         try {
             connection.getConcept().send(message);
-            connection.getConcept().publish(new MessageForwardEvent(connection, message));
+            connection.getConcept().getEventPublisher().publish(new MessageForwardEvent(connection, message));
         } catch (Throwable e) {
-            connection.getConcept().publish(new MessageForwardErrorEvent(connection, message, e));
+            connection.getConcept().getEventPublisher().publish(new MessageForwardErrorEvent(connection, message, e));
         }
     }
 }

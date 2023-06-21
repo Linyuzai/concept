@@ -79,6 +79,8 @@ public class WebSocketLoadBalanceProperties {
     @Data
     public static class LoadBalanceProperties {
 
+        private Subscriber subscriber = Subscriber.WEBSOCKET;
+
         /**
          * 订阅协议
          */
@@ -98,6 +100,11 @@ public class WebSocketLoadBalanceProperties {
          * 心跳配置
          */
         private HeartbeatProperties heartbeat = new HeartbeatProperties();
+
+        public enum Subscriber {
+
+            WEBSOCKET, REDISSON_TOPIC, CUSTOM
+        }
 
         @Data
         public static class MonitorProperties {

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 /**
  * 默认的连接仓库
  */
-public class DefaultConnectionRepository implements ConnectionRepository {
+public class ConnectionRepositoryImpl implements ConnectionRepository {
 
     protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();
 

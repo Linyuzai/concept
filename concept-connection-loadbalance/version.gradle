@@ -1,1 +1,2 @@
-ext.'ConceptConnectionLoadbalanceVersion' = '1.1.1'
+//ext.'ConceptConnectionLoadbalanceVersion' = '1.1.1'
+ext.'ConceptConnectionLoadbalanceVersion' = 'local'

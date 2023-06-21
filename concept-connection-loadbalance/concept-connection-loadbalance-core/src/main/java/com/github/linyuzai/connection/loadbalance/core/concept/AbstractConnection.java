@@ -44,7 +44,7 @@ public abstract class AbstractConnection implements Connection {
      */
     protected long lastHeartbeat;
 
-    public AbstractConnection(String type) {
+    public AbstractConnection(@NonNull String type) {
         this(type, null);
     }
 
@@ -62,6 +62,7 @@ public abstract class AbstractConnection implements Connection {
         if (!isAlive()) {
             return;
         }
+        onMessagePrepared(message);
         if (message instanceof PingMessage) {
             ping((PingMessage) message);
         } else if (message instanceof PongMessage) {
@@ -71,6 +72,10 @@ public abstract class AbstractConnection implements Connection {
             Object encode = encoder.encode(message);
             doSend(encode);
         }
+    }
+
+    protected void onMessagePrepared(Message message) {
+
     }
 
     public abstract void ping(PingMessage ping);
@@ -89,7 +94,7 @@ public abstract class AbstractConnection implements Connection {
             doClose(cr);
         } catch (Throwable e) {
             concept.onClose(this, cr);
-            concept.publish(new ConnectionCloseErrorEvent(this, cr, e));
+            concept.getEventPublisher().publish(new ConnectionCloseErrorEvent(this, cr, e));
         }
     }
 

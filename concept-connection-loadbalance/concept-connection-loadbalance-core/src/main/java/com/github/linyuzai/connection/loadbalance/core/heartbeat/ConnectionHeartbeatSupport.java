@@ -82,16 +82,16 @@ public abstract class ConnectionHeartbeatSupport implements ConnectionEventListe
      */
     public void sendPing() {
         for (String connectionType : connectionTypes) {
-            Collection<Connection> connections = concept.getConnections(connectionType);
+            Collection<Connection> connections = concept.getConnectionRepository().select(connectionType);
             Message message = createPingMessage();
             for (Connection connection : connections) {
                 try {
                     connection.send(message);
                 } catch (Throwable e) {
-                    concept.publish(new HeartbeatSendErrorEvent(connection, e));
+                    concept.getEventPublisher().publish(new HeartbeatSendErrorEvent(connection, e));
                 }
             }
-            concept.publish(new HeartbeatSendEvent(connections, connectionType));
+            concept.getEventPublisher().publish(new HeartbeatSendEvent(connections, connectionType));
         }
     }
 
@@ -101,13 +101,13 @@ public abstract class ConnectionHeartbeatSupport implements ConnectionEventListe
     public void closeTimeout() {
         long now = System.currentTimeMillis();
         for (String connectionType : connectionTypes) {
-            Collection<Connection> connections = concept.getConnections(connectionType);
+            Collection<Connection> connections = concept.getConnectionRepository().select(connectionType);
             for (Connection connection : connections) {
                 long lastHeartbeat = connection.getLastHeartbeat();
                 if (now - lastHeartbeat > timeout) {
                     connection.setAlive(false);
                     connection.close("HeartbeatTimeout");
-                    concept.publish(new HeartbeatTimeoutEvent(connection));
+                    concept.getEventPublisher().publish(new HeartbeatTimeoutEvent(connection));
                 }
             }
         }

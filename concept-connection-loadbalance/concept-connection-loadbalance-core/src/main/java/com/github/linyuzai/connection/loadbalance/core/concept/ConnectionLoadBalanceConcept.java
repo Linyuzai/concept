@@ -1,8 +1,16 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -119,27 +127,19 @@ public interface ConnectionLoadBalanceConcept {
      */
     void send(Object msg, Map<String, String> headers);
 
-    /**
-     * 发布事件
-     *
-     * @param event 事件
-     */
-    void publish(Object event);
+    ConnectionRepository getConnectionRepository();
 
-    /**
-     * 获得连接
-     *
-     * @param id   连接 id
-     * @param type 连接类型
-     * @return 连接
-     */
-    Connection getConnection(Object id, String type);
+    ConnectionServerManager getConnectionServerManager();
 
-    /**
-     * 获得连接集合
-     *
-     * @param type 连接类型
-     * @return 连接集合
-     */
-    Collection<Connection> getConnections(String type);
+    ConnectionSubscriber getConnectionSubscriber();
+
+    List<ConnectionFactory> getConnectionFactories();
+
+    List<ConnectionSelector> getConnectionSelectors();
+
+    List<MessageFactory> getMessageFactories();
+
+    MessageCodecAdapter getMessageCodecAdapter();
+
+    ConnectionEventPublisher getEventPublisher();
 }

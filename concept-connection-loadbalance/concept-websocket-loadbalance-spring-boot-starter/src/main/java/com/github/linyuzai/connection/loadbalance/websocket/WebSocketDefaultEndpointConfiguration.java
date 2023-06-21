@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 public class WebSocketDefaultEndpointConfiguration {
 
     @Bean
-    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.path-selector",
             name = "enabled", havingValue = "true")
     public DefaultEndpointPathSelector defaultEndpointPathSelector() {
@@ -17,7 +16,6 @@ public class WebSocketDefaultEndpointConfiguration {
     }
 
     @Bean
-    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.user-selector",
             name = "enabled", havingValue = "true")
     public UserSelector userSelector() {
@@ -25,7 +23,6 @@ public class WebSocketDefaultEndpointConfiguration {
     }
 
     @Bean
-    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.user-selector",
             name = "enabled", havingValue = "true")
     public DefaultEndpointUserMetadataRegister defaultEndpointUserMetadataRegister() {

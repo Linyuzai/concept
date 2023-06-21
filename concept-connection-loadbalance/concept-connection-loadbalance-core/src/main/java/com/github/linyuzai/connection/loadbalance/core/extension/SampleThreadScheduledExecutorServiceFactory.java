@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.extension;
 
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScopedFactory;
 import lombok.AllArgsConstructor;
 
 import java.util.concurrent.Executors;
@@ -9,7 +10,8 @@ import java.util.concurrent.ScheduledExecutorService;
  * 默认线程池工厂
  */
 @AllArgsConstructor
-public class SampleThreadScheduledExecutorServiceFactory implements ScheduledExecutorServiceFactory {
+public class SampleThreadScheduledExecutorServiceFactory extends AbstractScopedFactory<ScheduledExecutorService>
+        implements ScheduledExecutorServiceFactory {
 
     private final ScheduledExecutorService service;
 
@@ -21,7 +23,7 @@ public class SampleThreadScheduledExecutorServiceFactory implements ScheduledExe
     }
 
     @Override
-    public ScheduledExecutorService create(Object key) {
+    public ScheduledExecutorService create(String scope) {
         return service;
     }
 }

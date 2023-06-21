@@ -3,7 +3,6 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import lombok.*;
 
 import java.net.URI;
@@ -14,15 +13,11 @@ import java.util.function.Consumer;
 /**
  * 来接订阅者的抽象类
  */
-@Getter
-@Setter
 public abstract class ServerConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 
-    private ConnectionServerManager connectionServerManager;
-
     @Override
-    public void subscribe(ConnectionLoadBalanceConcept concept) {
-        List<ConnectionServer> servers = connectionServerManager.getConnectionServers();
+    public synchronized void subscribe(ConnectionLoadBalanceConcept concept) {
+        List<ConnectionServer> servers = concept.getConnectionServerManager().getConnectionServers();
         for (ConnectionServer server : servers) {
             subscribe(server, concept);
         }
@@ -58,13 +53,13 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
         try {
             doSubscribe(server, concept, connection -> {
                 concept.onEstablish(connection);
-                ConnectionServer local = connectionServerManager.getLocal();
+                ConnectionServer local = concept.getConnectionServerManager().getLocal();
                 if (local != null) {
                     connection.send(concept.createMessage(local));
                 }
             });
         } catch (Throwable e) {
-            concept.publish(new ConnectionSubscribeErrorEvent(server, e));
+            concept.getEventPublisher().publish(new ConnectionSubscribeErrorEvent(server, e));
         }
     }
 
@@ -80,10 +75,10 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
         if (server == null) {
             return null;
         }
-        Collection<Connection> connections = concept.getConnections(Connection.Type.SUBSCRIBER);
+        Collection<Connection> connections = concept.getConnectionRepository().select(Connection.Type.SUBSCRIBER);
         for (Connection connection : connections) {
             ConnectionServer exist = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
-            if (connectionServerManager.isEqual(server, exist)) {
+            if (concept.getConnectionServerManager().isEqual(server, exist)) {
                 return connection;
             }
         }

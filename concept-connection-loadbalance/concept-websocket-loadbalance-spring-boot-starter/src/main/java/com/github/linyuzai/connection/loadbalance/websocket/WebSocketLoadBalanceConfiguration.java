@@ -1,123 +1,109 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
-import com.github.linyuzai.connection.loadbalance.autoconfigure.scope.ScopeHelper;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.discovery.DiscoveryConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
+import com.github.linyuzai.connection.loadbalance.core.extension.SampleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapterFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.monitor.ConnectionLoadBalanceMonitor;
-import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
-import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
-import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
-import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
 
     @Bean
-    public WebSocketScopeHelper webSocketScopeHelper(ScopeHelper helper) {
-        return new WebSocketScopeHelper(helper);
+    public ConnectionSubscribeHandler connectionSubscribeHandler() {
+        return new ConnectionSubscribeHandler();
+    }
+
+    @ConditionalOnClass({DiscoveryClient.class, Registration.class})
+    @Configuration(proxyBeanMethods = false)
+    public static class DiscoveryConnectionServerManagerConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ConnectionServerManagerFactory connectionServerManagerFactory(DiscoveryClient client,
+                                                                             Registration registration) {
+            return new DiscoveryConnectionServerManagerFactory(client, registration)
+                    .addScopes(WebSocketScoped.NAME);
+        }
+    }
+
+    @ConditionalOnMissingClass({
+            "org.springframework.cloud.client.discovery.DiscoveryClient",
+            "org.springframework.cloud.client.serviceregistry.Registration"})
+    @Configuration(proxyBeanMethods = false)
+    public static class ImplConnectionServerManagerConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ConnectionServerManagerFactory connectionServerManagerFactory() {
+            return new ConnectionServerManagerFactoryImpl()
+                    .addScopes(WebSocketScoped.NAME);
+        }
     }
 
     @Bean
-    @WebSocketScope
     @ConditionalOnMissingBean
-    public ConnectionRepository connectionRepository() {
-        return new DefaultConnectionRepository();
+    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
+        return new SampleThreadScheduledExecutorServiceFactory();
     }
 
     @Bean
-    @WebSocketScope
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance",
-            name = "logger", havingValue = "true", matchIfMissing = true)
-    public ConnectionSubscribeLogger connectionSubscribeLogger() {
-        Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
-        return new ConnectionSubscribeLogger(log::info, log::error);
-    }
-
-    @Bean
-    @WebSocketScope
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
-            name = "logger", havingValue = "true", matchIfMissing = true)
-    public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
-        Log log = LogFactory.getLog(LoadBalanceMonitorLogger.class);
-        return new LoadBalanceMonitorLogger(log::info, log::error);
-    }
-
-    @Bean
-    @WebSocketScope
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.monitor",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
-            WebSocketLoadBalanceProperties properties,
-            WebSocketScopeHelper helper) {
-        ConnectionSubscriber connectionSubscriber = helper.getBean(ConnectionSubscriber.class);
-        ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
-        return new ScheduledConnectionLoadBalanceMonitor(
-                connectionSubscriber,
-                factory.create(ConnectionLoadBalanceMonitor.class),
-                properties.getLoadBalance().getMonitor().getPeriod());
-    }
-
-    @Bean
-    @WebSocketScope
-    @ConditionalOnProperty(prefix = "concept.websocket.load-balance.heartbeat",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatManager loadBalanceConnectionHeartbeatManager(
-            WebSocketLoadBalanceProperties properties,
-            WebSocketScopeHelper helper) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getLoadBalance().getHeartbeat();
-        ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
-        return new ConnectionHeartbeatManager(
-                Arrays.asList(Connection.Type.SUBSCRIBER, Connection.Type.OBSERVABLE),
-                heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatManager.class));
-    }
-
-    @Bean
-    @WebSocketScope
     @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatManager clientConnectionHeartbeatManager(
             WebSocketLoadBalanceProperties properties,
-            WebSocketScopeHelper helper) {
+            ScheduledExecutorServiceFactory factory) {
         WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
-        ScheduledExecutorServiceFactory factory = helper.getBean(ScheduledExecutorServiceFactory.class);
         return new ConnectionHeartbeatManager(Connection.Type.CLIENT,
                 heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(ConnectionHeartbeatManager.class));
+                factory.create(WebSocketScoped.NAME));
     }
 
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
-    public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(WebSocketScopeHelper helper) {
+    public WebSocketLoadBalanceConcept webSocketLoadBalanceConcept(
+            List<ConnectionRepositoryFactory> connectionRepositoryFactories,
+            List<ConnectionServerManagerFactory> connectionServerManagerFactories,
+            List<ConnectionSubscriberFactory> connectionSubscriberFactories,
+            List<ConnectionFactory> connectionFactories,
+            List<ConnectionSelector> connectionSelectors,
+            List<MessageFactory> messageFactories,
+            List<MessageCodecAdapterFactory> messageCodecAdapterFactories,
+            List<ConnectionEventPublisherFactory> eventPublisherFactories,
+            List<ConnectionEventListener> eventListeners) {
         return new WebSocketLoadBalanceConcept.Builder()
-                .connectionRepository(helper.getBean(ConnectionRepository.class))
-                .connectionServerManager(helper.getBean(ConnectionServerManager.class))
-                .connectionSubscriber(helper.getBean(ConnectionSubscriber.class))
-                .addConnectionFactories(helper.getBeans(ConnectionFactory.class))
-                .addConnectionSelectors(helper.getBeans(ConnectionSelector.class))
-                .addMessageFactories(helper.getBeans(MessageFactory.class))
-                .messageCodecAdapter(helper.getBean(MessageCodecAdapter.class))
-                .eventPublisher(helper.getBean(ConnectionEventPublisher.class))
-                .addEventListeners(helper.getBeans(ConnectionEventListener.class))
+                .addConnectionRepositoryFactories(connectionRepositoryFactories)
+                .addConnectionServerManagerFactories(connectionServerManagerFactories)
+                .addConnectionSubscriberFactories(connectionSubscriberFactories)
+                .addConnectionFactories(connectionFactories)
+                .addConnectionSelectors(connectionSelectors)
+                .addMessageFactories(messageFactories)
+                .addMessageCodecAdapterFactories(messageCodecAdapterFactories)
+                .addEventPublisherFactories(eventPublisherFactories)
+                .addEventListeners(eventListeners)
                 .build();
     }
 }

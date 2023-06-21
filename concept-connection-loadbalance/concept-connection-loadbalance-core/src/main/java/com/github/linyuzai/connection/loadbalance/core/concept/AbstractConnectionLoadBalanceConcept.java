@@ -6,65 +6,72 @@ import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
-import com.github.linyuzai.connection.loadbalance.core.repository.DefaultConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
+import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelectorChain;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * {@link ConnectionLoadBalanceConcept} 抽象类
  */
 @Getter
+@Setter
 @RequiredArgsConstructor
 public abstract class AbstractConnectionLoadBalanceConcept implements ConnectionLoadBalanceConcept {
 
     /**
      * 连接仓库
      */
-    protected final ConnectionRepository connectionRepository;
+    protected ConnectionRepository connectionRepository;
 
     /**
      * 服务实例提供者
      */
-    protected final ConnectionServerManager connectionServerManager;
+    protected ConnectionServerManager connectionServerManager;
 
     /**
      * 连接订阅者
      */
-    protected final ConnectionSubscriber connectionSubscriber;
+    protected ConnectionSubscriber connectionSubscriber;
 
     /**
      * 连接工厂
      */
-    protected final List<ConnectionFactory> connectionFactories;
+    protected List<ConnectionFactory> connectionFactories;
 
     /**
      * 连接选择器
      */
-    protected final List<ConnectionSelector> connectionSelectors;
+    protected List<ConnectionSelector> connectionSelectors;
 
     /**
      * 消息工厂
      */
-    protected final List<MessageFactory> messageFactories;
+    protected List<MessageFactory> messageFactories;
 
     /**
      * 消息编解码适配器
      */
-    protected final MessageCodecAdapter messageCodecAdapter;
+    protected MessageCodecAdapter messageCodecAdapter;
 
     /**
      * 事件发布者
      */
-    protected final ConnectionEventPublisher eventPublisher;
+    protected ConnectionEventPublisher eventPublisher;
 
     /**
      * 初始化
@@ -76,7 +83,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void initialize() {
         connectionSubscriber.subscribe(this);
-        publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
+        eventPublisher.publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 
     /**
@@ -90,7 +97,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void destroy() {
         //Spring会帮忙调用close方法
         //connectionRepository.stream().forEach(connection -> connection.close("ServerStop"));
-        publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
+        eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
     /**
@@ -156,7 +163,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         connection.setMessageEncoder(messageCodecAdapter.getMessageEncoder(type));
         connection.setMessageDecoder(messageCodecAdapter.getMessageDecoder(type));
         connectionRepository.add(connection);
-        publish(new ConnectionEstablishEvent(connection));
+        eventPublisher.publish(new ConnectionEstablishEvent(connection));
     }
 
     /**
@@ -174,7 +181,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void onClose(Object id, String type, Object reason) {
         Connection connection = connectionRepository.get(id, type);
         if (connection == null) {
-            publish(new UnknownCloseEvent(id, type, reason, this));
+            eventPublisher.publish(new UnknownCloseEvent(id, type, reason, this));
             return;
         }
         onClose(connection, reason);
@@ -192,7 +199,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void onClose(@NonNull Connection connection, Object reason) {
         Connection remove = connectionRepository.remove(connection);
         if (remove != null) {
-            publish(new ConnectionCloseEvent(remove, reason));
+            eventPublisher.publish(new ConnectionCloseEvent(remove, reason));
         }
     }
 
@@ -211,7 +218,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void onMessage(Object id, String type, Object message) {
         Connection connection = connectionRepository.get(id, type);
         if (connection == null) {
-            publish(new UnknownMessageEvent(id, type, message, this));
+            eventPublisher.publish(new UnknownMessageEvent(id, type, message, this));
         } else {
             onMessage(connection, message);
         }
@@ -236,10 +243,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             MessageDecoder decoder = connection.getMessageDecoder();
             decode = decoder.decode(message);
         } catch (Throwable e) {
-            publish(new MessageDecodeErrorEvent(connection, e));
+            eventPublisher.publish(new MessageDecodeErrorEvent(connection, e));
             return;
         }
-        publish(new MessageReceiveEvent(connection, decode));
+        eventPublisher.publish(new MessageReceiveEvent(connection, decode));
     }
 
     /**
@@ -256,7 +263,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void onError(Object id, String type, Throwable e) {
         Connection connection = connectionRepository.get(id, type);
         if (connection == null) {
-            publish(new UnknownErrorEvent(id, type, e, this));
+            eventPublisher.publish(new UnknownErrorEvent(id, type, e, this));
         } else {
             onError(connection, e);
         }
@@ -272,7 +279,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void onError(@NonNull Connection connection, Throwable e) {
-        publish(new ConnectionErrorEvent(connection, e));
+        eventPublisher.publish(new ConnectionErrorEvent(connection, e));
     }
 
     /**
@@ -324,18 +331,18 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         ConnectionSelector selector = getConnectionSelector(message);
         Collection<Connection> connections = selector.select(message, connectionRepository, this);
         if (connections == null || connections.isEmpty()) {
-            publish(new DeadMessageEvent(message));
+            eventPublisher.publish(new DeadMessageEvent(message));
             return;
         }
-        publish(new MessagePrepareEvent(message, connections));
+        eventPublisher.publish(new MessagePrepareEvent(message, connections));
         for (Connection connection : connections) {
             try {
                 connection.send(message);
             } catch (Throwable e) {
-                publish(new MessageSendErrorEvent(connection, message, e));
+                eventPublisher.publish(new MessageSendErrorEvent(connection, message, e));
             }
         }
-        publish(new MessageSendEvent(message, connections));
+        eventPublisher.publish(new MessageSendEvent(message, connections));
     }
 
     @Override
@@ -379,101 +386,56 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         return null;
     }
 
-    @Override
-    public void publish(Object event) {
-        eventPublisher.publish(event);
-    }
-
-    @Override
-    public Connection getConnection(Object id, String type) {
-        return connectionRepository.get(id, type);
-    }
-
-    @Override
-    public Collection<Connection> getConnections(String type) {
-        return connectionRepository.select(type);
-    }
-
-
     @SuppressWarnings("unchecked")
+    @RequiredArgsConstructor
     public static class AbstractBuilder<T extends AbstractBuilder<T>> {
 
-        protected ConnectionRepository connectionRepository;
+        protected final String scope;
 
-        protected ConnectionServerManager connectionServerManager;
+        protected List<ConnectionRepositoryFactory> connectionRepositoryFactories = new ArrayList<>();
 
-        protected ConnectionSubscriber connectionSubscriber;
+        protected List<ConnectionServerManagerFactory> connectionServerManagerFactories = new ArrayList<>();
+
+        protected List<ConnectionSubscriberFactory> connectionSubscriberFactories = new ArrayList<>();
 
         protected List<ConnectionFactory> connectionFactories = new ArrayList<>();
 
         protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
 
-        protected MessageCodecAdapter messageCodecAdapter;
+        protected List<MessageCodecAdapterFactory> messageCodecAdapterFactories = new ArrayList<>();
 
         protected List<MessageFactory> messageFactories = new ArrayList<>();
 
-        protected ConnectionEventPublisher eventPublisher;
+        protected List<ConnectionEventPublisherFactory> eventPublisherFactories = new ArrayList<>();
 
         protected List<ConnectionEventListener> eventListeners = new ArrayList<>();
 
         /**
-         * 设置连接仓库
-         *
-         * @param repository 连接仓库
-         * @return Builder
+         * 添加连接仓库工厂
          */
-        public T connectionRepository(ConnectionRepository repository) {
-            this.connectionRepository = repository;
+        public T addConnectionRepositoryFactories(Collection<? extends ConnectionRepositoryFactory> factories) {
+            this.connectionRepositoryFactories.addAll(factories);
             return (T) this;
         }
 
         /**
-         * 设置服务实例提供者
-         *
-         * @param manager 服务实例提供者
-         * @return Builder
+         * 添加服务实例管理器工厂
          */
-        public T connectionServerManager(ConnectionServerManager manager) {
-            this.connectionServerManager = manager;
+        public T addConnectionServerManagerFactories(Collection<? extends ConnectionServerManagerFactory> factories) {
+            this.connectionServerManagerFactories.addAll(factories);
             return (T) this;
         }
 
         /**
-         * 设置连接订阅者
-         *
-         * @param subscriber 连接订阅者
-         * @return Builder
+         * 添加连接订阅者工厂
          */
-        public T connectionSubscriber(ConnectionSubscriber subscriber) {
-            this.connectionSubscriber = subscriber;
+        public T addConnectionSubscriberFactories(Collection<? extends ConnectionSubscriberFactory> factories) {
+            this.connectionSubscriberFactories.addAll(factories);
             return (T) this;
         }
 
         /**
          * 添加连接工厂
-         *
-         * @param factory 连接工厂
-         * @return Builder
-         */
-        public T addConnectionFactory(ConnectionFactory factory) {
-            return addConnectionFactories(factory);
-        }
-
-        /**
-         * 添加连接工厂
-         *
-         * @param factories 连接工厂
-         * @return Builder
-         */
-        public T addConnectionFactories(ConnectionFactory... factories) {
-            return addConnectionFactories(Arrays.asList(factories));
-        }
-
-        /**
-         * 添加连接工厂
-         *
-         * @param factories 连接工厂
-         * @return Builder
          */
         public T addConnectionFactories(Collection<? extends ConnectionFactory> factories) {
             this.connectionFactories.addAll(factories);
@@ -482,29 +444,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         /**
          * 添加连接选择器
-         *
-         * @param selector 连接选择器
-         * @return Builder
-         */
-        public T addConnectionSelector(ConnectionSelector selector) {
-            return addConnectionSelectors(selector);
-        }
-
-        /**
-         * 添加连接选择器
-         *
-         * @param selectors 连接选择器
-         * @return Builder
-         */
-        public T addConnectionSelectors(ConnectionSelector... selectors) {
-            return addConnectionSelectors(Arrays.asList(selectors));
-        }
-
-        /**
-         * 添加连接选择器
-         *
-         * @param selectors 连接选择器
-         * @return Builder
          */
         public T addConnectionSelectors(Collection<? extends ConnectionSelector> selectors) {
             this.connectionSelectors.addAll(selectors);
@@ -512,41 +451,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 设置消息编解码适配器
-         *
-         * @param adapter 消息编解码适配器
-         * @return Builder
+         * 添加消息编解码适配器工厂
          */
-        public T messageCodecAdapter(MessageCodecAdapter adapter) {
-            this.messageCodecAdapter = adapter;
+        public T addMessageCodecAdapterFactories(Collection<? extends MessageCodecAdapterFactory> factories) {
+            this.messageCodecAdapterFactories.addAll(factories);
             return (T) this;
         }
 
         /**
          * 添加消息工厂
-         *
-         * @param factory 消息工厂
-         * @return Builder
-         */
-        public T addMessageFactory(MessageFactory factory) {
-            return addMessageFactories(factory);
-        }
-
-        /**
-         * 添加消息工厂
-         *
-         * @param factories 消息工厂
-         * @return Builder
-         */
-        public T addMessageFactories(MessageFactory... factories) {
-            return addMessageFactories(Arrays.asList(factories));
-        }
-
-        /**
-         * 添加消息工厂
-         *
-         * @param factories 消息工厂
-         * @return Builder
          */
         public T addMessageFactories(Collection<? extends MessageFactory> factories) {
             this.messageFactories.addAll(factories);
@@ -554,61 +467,30 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 设置事件发布者
-         *
-         * @param publisher 事件发布者
-         * @return Builder
+         * 添加事件发布者工厂
          */
-        public T eventPublisher(ConnectionEventPublisher publisher) {
-            this.eventPublisher = publisher;
+        public T addEventPublisherFactories(Collection<? extends ConnectionEventPublisherFactory> factories) {
+            this.eventPublisherFactories.addAll(factories);
             return (T) this;
         }
 
         /**
          * 添加事件监听器
-         *
-         * @param listener 事件监听器
-         * @return Builder
          */
         public T addEventListener(ConnectionEventListener listener) {
-            return addEventListeners(listener);
+            this.eventListeners.add(listener);
+            return (T) this;
         }
 
         /**
          * 添加事件监听器
-         *
-         * @param listeners 事件监听器
-         * @return Builder
-         */
-        public T addEventListeners(ConnectionEventListener... listeners) {
-            return addEventListeners(Arrays.asList(listeners));
-        }
-
-        /**
-         * 添加事件监听器
-         *
-         * @param listeners 事件监听器
-         * @return Builder
          */
         public T addEventListeners(Collection<ConnectionEventListener> listeners) {
             this.eventListeners.addAll(listeners);
             return (T) this;
         }
 
-        protected void preBuild() {
-            if (connectionServerManager == null) {
-                throw new ConnectionLoadBalanceException("ConnectionServerManager is null");
-            }
-            if (connectionSubscriber == null) {
-                throw new ConnectionLoadBalanceException("ConnectionSubscriber is null");
-            }
-            if (messageCodecAdapter == null) {
-                throw new ConnectionLoadBalanceException("MessageCodecAdapter is null");
-            }
-
-            if (connectionRepository == null) {
-                connectionRepository = new DefaultConnectionRepository();
-            }
+        protected void init() {
 
             //添加一个全选器在最后
             connectionSelectors.add(new AllSelector());
@@ -616,14 +498,25 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             //添加一个任意对象的消息工厂
             messageFactories.add(new ObjectMessageFactory());
 
-            if (eventPublisher == null) {
-                eventPublisher = new DefaultConnectionEventPublisher();
-            }
-
             //添加消息转发处理器
             eventListeners.add(0, new MessageForwardHandler());
+        }
 
-            eventPublisher.register(eventListeners);
+        protected <C, F extends ScopedFactory<C>> C withScope(Class<C> type, Collection<F> factories) {
+            return withScope(type, factories, null);
+        }
+
+        protected <C, F extends ScopedFactory<C>> C withScope(Class<C> type, Collection<F> factories, Consumer<C> consumer) {
+            for (F factory : factories) {
+                if (factory.support(scope)) {
+                    C c = factory.create(scope);
+                    if (consumer != null) {
+                        consumer.accept(c);
+                    }
+                    return c;
+                }
+            }
+            throw new ConnectionLoadBalanceException(type.getName() + " not found");
         }
 
         protected List<ConnectionSelector> withFilterChain() {
