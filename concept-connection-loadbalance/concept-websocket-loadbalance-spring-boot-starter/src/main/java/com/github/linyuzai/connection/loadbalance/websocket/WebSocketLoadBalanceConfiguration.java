@@ -11,6 +11,7 @@ import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeart
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapterFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
+import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
@@ -52,11 +54,13 @@ public class WebSocketLoadBalanceConfiguration {
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatManager clientConnectionHeartbeatManager(
             WebSocketLoadBalanceProperties properties,
-            ScheduledExecutorServiceFactory factory) {
-        WebSocketLoadBalanceProperties.HeartbeatProperties heartbeat = properties.getServer().getHeartbeat();
+            List<ScheduledExecutorServiceFactory> factories) {
+        long timeout = properties.getServer().getHeartbeat().getTimeout();
+        long period = properties.getServer().getHeartbeat().getPeriod();
+        ScheduledExecutorService service = ScopedFactory
+                .create(WebSocketScoped.NAME, ScheduledExecutorService.class, factories);
         return new ConnectionHeartbeatManager(Connection.Type.CLIENT,
-                heartbeat.getTimeout(), heartbeat.getPeriod(),
-                factory.create(WebSocketScoped.NAME));
+                timeout, period, service).addScopes(WebSocketScoped.NAME);
     }
 
     @Bean(destroyMethod = "destroy")
