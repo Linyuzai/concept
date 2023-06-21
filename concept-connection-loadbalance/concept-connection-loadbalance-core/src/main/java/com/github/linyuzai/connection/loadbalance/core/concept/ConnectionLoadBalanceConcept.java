@@ -12,6 +12,7 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * 连接负载均衡概念
@@ -86,6 +87,15 @@ public interface ConnectionLoadBalanceConcept {
      * @param message    消息数据
      */
     void onMessage(Connection connection, Object message);
+
+    /**
+     * 当连接接收消息时调用
+     *
+     * @param connection 连接
+     * @param message    消息数据
+     * @param predicate  过滤条件
+     */
+    void onMessage(Connection connection, Object message, Predicate<Message> predicate);
 
     /**
      * 当连接异常时调用

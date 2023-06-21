@@ -1,16 +1,18 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.event;
 
-import com.github.linyuzai.connection.loadbalance.core.event.DefaultConnectionEventPublisher;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherImpl;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * 支持 {@link org.springframework.context.event.EventListener} 的事件发布器
  */
-@AllArgsConstructor
-public class ApplicationConnectionEventPublisher extends DefaultConnectionEventPublisher {
+@Getter
+@RequiredArgsConstructor
+public class ApplicationConnectionEventPublisher extends ConnectionEventPublisherImpl {
 
-    private ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public void publish(Object event) {

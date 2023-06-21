@@ -2,9 +2,8 @@ package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import javax.websocket.Session;
@@ -15,15 +14,11 @@ import java.util.function.Consumer;
  * {@link JavaxWebSocketConnection} 的连接订阅者
  */
 @Getter
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class JavaxWebSocketConnectionSubscriber extends
         ContainerWebSocketConnectionSubscriber<JavaxWebSocketConnection> {
 
-    private Class<?> clientClass = JavaxWebSocketSubscriberEndpoint.class;
-
-    public JavaxWebSocketConnectionSubscriber(Class<?> clientClass) {
-        this.clientClass = clientClass;
-    }
+    private final Class<?> clientClass;
 
     @SneakyThrows
     @Override

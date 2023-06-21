@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEventListener;
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 /**
@@ -12,7 +13,7 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
  * <p>
  * 对该服务实例反向连接
  */
-public class ConnectionSubscribeHandler implements MessageReceiveEventListener {
+public class ConnectionSubscribeHandler extends AbstractScoped implements MessageReceiveEventListener {
 
     @Override
     public String getConnectionType() {

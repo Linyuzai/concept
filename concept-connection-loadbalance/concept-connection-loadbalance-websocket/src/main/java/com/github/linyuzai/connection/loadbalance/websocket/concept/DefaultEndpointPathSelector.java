@@ -10,7 +10,8 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
  * <p>
  * 配合 {@link PathMessage} 使用
  */
-public class DefaultEndpointPathSelector extends PathSelector implements FilterConnectionSelector {
+public class DefaultEndpointPathSelector extends PathSelector
+        implements FilterConnectionSelector, WebSocketScoped {
 
     public DefaultEndpointPathSelector() {
         super(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX);
@@ -19,5 +20,10 @@ public class DefaultEndpointPathSelector extends PathSelector implements FilterC
     @Override
     public String getPath(Connection connection) {
         return ((WebSocketConnection) connection).getUri().getPath();
+    }
+
+    @Override
+    public boolean support(String scope) {
+        return WebSocketScoped.super.support(scope);
     }
 }

@@ -9,4 +9,8 @@ import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectio
  */
 public abstract class WebSocketConnectionFactory<T extends WebSocketConnection>
         extends AbstractConnectionFactory<T, WebSocketLoadBalanceConcept> {
+
+    public WebSocketConnectionFactory() {
+        addScopes(WebSocketScoped.NAME);
+    }
 }

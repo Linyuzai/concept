@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.scope.Scoped;
+
 import java.util.Map;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Map;
  * <p>
  * 用于将底层连接包装成 {@link Connection} 实例
  */
-public interface ConnectionFactory {
+public interface ConnectionFactory extends Scoped {
 
     /**
      * 是否支持

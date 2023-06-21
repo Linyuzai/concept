@@ -23,4 +23,9 @@ public class MessageForwardHandler implements MessageReceiveEventListener {
             connection.getConcept().getEventPublisher().publish(new MessageForwardErrorEvent(connection, message, e));
         }
     }
+
+    @Override
+    public boolean support(String scope) {
+        return true;
+    }
 }

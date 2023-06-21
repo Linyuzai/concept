@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.logger;
 
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.AllArgsConstructor;
 
@@ -10,7 +11,7 @@ import java.util.function.Consumer;
  * 日志支持类
  */
 @AllArgsConstructor
-public class ConnectionLoadBalanceLogger {
+public class ConnectionLoadBalanceLogger extends AbstractScoped {
 
     private Consumer<String> info;
 

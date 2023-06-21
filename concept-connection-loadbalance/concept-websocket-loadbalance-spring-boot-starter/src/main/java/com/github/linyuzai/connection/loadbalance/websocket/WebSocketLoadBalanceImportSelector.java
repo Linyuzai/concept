@@ -10,20 +10,27 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.web.context.ConfigurableWebEnvironment;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
+
 public class WebSocketLoadBalanceImportSelector implements ImportSelector, EnvironmentAware {
 
     private Environment environment;
 
     @Override
     public String @NonNull [] selectImports(@NonNull AnnotationMetadata metadata) {
+        WebSocketType type = getType();
+        return Arrays.stream(type.getConfigurationClasses())
+                .map(Class::getName)
+                .toArray(String[]::new);
+    }
+
+    private WebSocketType getType() {
         WebSocketType type = environment.getProperty("concept.websocket.type",
                 WebSocketType.class, WebSocketType.AUTO);
         if (type == WebSocketType.AUTO) {
-            type = deduceServerType();
+            return deduceServerType();
         }
-        boolean enableDefaultEndpoint = environment.getProperty("concept.websocket.server.default-endpoint.enabled",
-                boolean.class, true);
-        return type.getConfigurations(enableDefaultEndpoint);
+        return type;
     }
 
     /**

@@ -70,4 +70,14 @@ public class RedissonTopicConnection extends AbstractConnection {
     public void close(String reason) {
         doClose(reason);
     }
+
+    @Override
+    public boolean isAlive() {
+        return true;
+    }
+
+    @Override
+    public long getLastHeartbeat() {
+        return System.currentTimeMillis();
+    }
 }

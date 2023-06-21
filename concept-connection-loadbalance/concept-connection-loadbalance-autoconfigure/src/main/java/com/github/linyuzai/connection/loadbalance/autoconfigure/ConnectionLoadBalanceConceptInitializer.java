@@ -1,7 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.Ordered;
@@ -11,10 +12,11 @@ import java.util.List;
 /**
  * {@link ConnectionLoadBalanceConcept} 初始化器
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ConnectionLoadBalanceConceptInitializer implements ApplicationRunner, Ordered {
 
-    private List<ConnectionLoadBalanceConcept> concepts;
+    private final List<ConnectionLoadBalanceConcept> concepts;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

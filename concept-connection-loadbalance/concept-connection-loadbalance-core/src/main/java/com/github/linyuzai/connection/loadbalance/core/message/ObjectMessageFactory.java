@@ -14,4 +14,9 @@ public class ObjectMessageFactory implements MessageFactory {
     public Message create(Object message) {
         return new ObjectMessage(message);
     }
+
+    @Override
+    public boolean support(String scope) {
+        return true;
+    }
 }

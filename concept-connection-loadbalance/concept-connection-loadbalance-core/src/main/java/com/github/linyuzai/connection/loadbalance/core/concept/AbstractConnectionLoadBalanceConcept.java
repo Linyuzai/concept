@@ -8,6 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.scope.Scoped;
 import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -24,6 +25,7 @@ import lombok.Setter;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * {@link ConnectionLoadBalanceConcept} 抽象类
@@ -238,10 +240,18 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void onMessage(@NonNull Connection connection, Object message) {
+        onMessage(connection, message, msg -> true);
+    }
+
+    @Override
+    public void onMessage(Connection connection, Object message, Predicate<Message> predicate) {
         Message decode;
         try {
             MessageDecoder decoder = connection.getMessageDecoder();
             decode = decoder.decode(message);
+            if (!predicate.test(decode)) {
+                return;
+            }
         } catch (Throwable e) {
             eventPublisher.publish(new MessageDecodeErrorEvent(connection, e));
             return;
@@ -502,24 +512,23 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             eventListeners.add(0, new MessageForwardHandler());
         }
 
+        protected <S extends Scoped> List<S> withScope(Collection<S> collection) {
+            return Scoped.filter(scope, collection);
+        }
+
         protected <C, F extends ScopedFactory<C>> C withScope(Class<C> type, Collection<F> factories) {
             return withScope(type, factories, null);
         }
 
         protected <C, F extends ScopedFactory<C>> C withScope(Class<C> type, Collection<F> factories, Consumer<C> consumer) {
-            for (F factory : factories) {
-                if (factory.support(scope)) {
-                    C c = factory.create(scope);
-                    if (consumer != null) {
-                        consumer.accept(c);
-                    }
-                    return c;
-                }
+            C c = ScopedFactory.create(scope, type, factories);
+            if (consumer != null) {
+                consumer.accept(c);
             }
-            throw new ConnectionLoadBalanceException(type.getName() + " not found");
+            return c;
         }
 
-        protected List<ConnectionSelector> withFilterChain() {
+        protected List<ConnectionSelector> withFilterChain(Collection<ConnectionSelector> connectionSelectors) {
             List<ConnectionSelector> selectors = new ArrayList<>();
             List<FilterConnectionSelector> filterSelectors = new ArrayList<>();
             for (ConnectionSelector selector : connectionSelectors) {

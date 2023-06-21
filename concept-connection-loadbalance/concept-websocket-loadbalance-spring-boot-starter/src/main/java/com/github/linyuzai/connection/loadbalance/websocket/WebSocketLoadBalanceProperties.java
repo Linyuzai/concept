@@ -103,7 +103,7 @@ public class WebSocketLoadBalanceProperties {
 
         public enum Subscriber {
 
-            WEBSOCKET, REDISSON_TOPIC, CUSTOM
+            WEBSOCKET, REDISSON_TOPIC
         }
 
         @Data

@@ -11,7 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({ConnectionLoadBalanceConfiguration.class,
-        ConnectionLoadBalanceConceptInitializer.class})
+@Import(ConnectionLoadBalanceConfiguration.class)
 public @interface EnableConnectionLoadBalanceConfiguration {
 }

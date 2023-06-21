@@ -12,7 +12,7 @@ dependencies {
     compileOnly "org.redisson:redisson:${RedissonVersion}"
 
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
-    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
+    //compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
 }
 
 apply from: '../../publish.gradle'

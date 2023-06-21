@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * 默认线程池工厂
  */
 @AllArgsConstructor
-public class SampleThreadScheduledExecutorServiceFactory extends AbstractScopedFactory<ScheduledExecutorService>
+public class SingleThreadScheduledExecutorServiceFactory extends AbstractScopedFactory<ScheduledExecutorService>
         implements ScheduledExecutorServiceFactory {
 
     private final ScheduledExecutorService service;
@@ -18,7 +18,7 @@ public class SampleThreadScheduledExecutorServiceFactory extends AbstractScopedF
     /**
      * 复用 {@link Executors#newSingleThreadScheduledExecutor()} 创建的 {@link ScheduledExecutorService}
      */
-    public SampleThreadScheduledExecutorServiceFactory() {
+    public SingleThreadScheduledExecutorServiceFactory() {
         this(Executors.newSingleThreadScheduledExecutor());
     }
 

@@ -5,9 +5,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * 默认的事件发布者
  */
-public class DefaultConnectionEventPublisher extends AbstractConnectionEventPublisher {
+public class ConnectionEventPublisherImpl extends AbstractConnectionEventPublisher {
 
-    public DefaultConnectionEventPublisher() {
+    public ConnectionEventPublisherImpl() {
         super(new CopyOnWriteArrayList<>());
     }
 }

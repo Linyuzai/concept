@@ -9,6 +9,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ import java.util.Collection;
  * 心跳管理支持类
  */
 @RequiredArgsConstructor
-public abstract class ConnectionHeartbeatSupport implements ConnectionEventListener {
+public abstract class ConnectionHeartbeatSupport extends AbstractScoped implements ConnectionEventListener {
 
     private ConnectionLoadBalanceConcept concept;
 

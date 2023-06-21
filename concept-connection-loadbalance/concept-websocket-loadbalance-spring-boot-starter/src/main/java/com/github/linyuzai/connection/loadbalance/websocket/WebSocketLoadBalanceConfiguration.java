@@ -1,11 +1,11 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
-import com.github.linyuzai.connection.loadbalance.autoconfigure.discovery.DiscoveryConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
-import com.github.linyuzai.connection.loadbalance.core.extension.SampleThreadScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.extension.SingleThreadScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapterFactory;
@@ -13,17 +13,12 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,42 +27,24 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
 
-    @Bean
-    public ConnectionSubscribeHandler connectionSubscribeHandler() {
-        return new ConnectionSubscribeHandler();
-    }
-
-    @ConditionalOnClass({DiscoveryClient.class, Registration.class})
     @Configuration(proxyBeanMethods = false)
-    public static class DiscoveryConnectionServerManagerConfiguration {
+    public static class RedissonTopicConfiguration {
 
-        @Bean
-        @ConditionalOnMissingBean
-        public ConnectionServerManagerFactory connectionServerManagerFactory(DiscoveryClient client,
-                                                                             Registration registration) {
-            return new DiscoveryConnectionServerManagerFactory(client, registration)
-                    .addScopes(WebSocketScoped.NAME);
-        }
-    }
-
-    @ConditionalOnMissingClass({
-            "org.springframework.cloud.client.discovery.DiscoveryClient",
-            "org.springframework.cloud.client.serviceregistry.Registration"})
-    @Configuration(proxyBeanMethods = false)
-    public static class ImplConnectionServerManagerConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public ConnectionServerManagerFactory connectionServerManagerFactory() {
-            return new ConnectionServerManagerFactoryImpl()
-                    .addScopes(WebSocketScoped.NAME);
-        }
+        /*@Bean
+        public RedissonTopicConnectionSubscriberFactory redissonTopicConnectionSubscriberFactory() {
+            return new RedissonTopicConnectionSubscriberFactory();
+        }*/
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public ScheduledExecutorServiceFactory scheduledExecutorServiceFactory() {
-        return new SampleThreadScheduledExecutorServiceFactory();
+    public ConnectionSubscribeHandler connectionSubscribeHandler() {
+        return new ConnectionSubscribeHandler().addScopes(WebSocketScoped.NAME);
+    }
+
+    @Bean
+    public SingleThreadScheduledExecutorServiceFactory wsSingleThreadScheduledExecutorServiceFactory() {
+        return new SingleThreadScheduledExecutorServiceFactory()
+                .addScopes(WebSocketScoped.NAME);
     }
 
     @Bean

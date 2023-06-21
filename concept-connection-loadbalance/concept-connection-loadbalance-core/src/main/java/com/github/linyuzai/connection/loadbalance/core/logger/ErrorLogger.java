@@ -18,4 +18,9 @@ public class ErrorLogger extends ConnectionLoadBalanceLogger implements ErrorHan
     public void onError(Throwable e, Object o) {
         error("Exception occurred", e);
     }
+
+    @Override
+    public boolean support(String scope) {
+        return true;
+    }
 }

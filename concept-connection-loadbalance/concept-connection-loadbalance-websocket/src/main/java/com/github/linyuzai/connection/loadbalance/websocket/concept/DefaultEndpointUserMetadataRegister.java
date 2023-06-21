@@ -10,7 +10,7 @@ import com.github.linyuzai.connection.loadbalance.core.extension.UserSelector;
  * <p>
  * 配合 {@link UserMessage} {@link UserSelector} 使用
  */
-public class DefaultEndpointUserMetadataRegister implements LifecycleListener {
+public class DefaultEndpointUserMetadataRegister implements LifecycleListener, WebSocketScoped {
 
     public static final String NAME = "userId";
 

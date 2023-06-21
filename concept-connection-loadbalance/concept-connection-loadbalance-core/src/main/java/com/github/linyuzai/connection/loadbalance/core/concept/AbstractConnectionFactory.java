@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
+
 import java.util.Map;
 
 /**
@@ -8,7 +10,8 @@ import java.util.Map;
  * @param <Con>     连接类
  * @param <Concept> {@link ConnectionLoadBalanceConcept} 类型
  */
-public abstract class AbstractConnectionFactory<Con extends Connection, Concept extends ConnectionLoadBalanceConcept> implements ConnectionFactory {
+public abstract class AbstractConnectionFactory<Con extends Connection, Concept extends ConnectionLoadBalanceConcept>
+        extends AbstractScoped implements ConnectionFactory {
 
     @SuppressWarnings("unchecked")
     @Override
