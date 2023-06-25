@@ -1,8 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.JacksonTextMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.SampleMessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTextMessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 
 /**
  * 消息编解码适配器的抽象类
@@ -42,42 +46,54 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息编码器
      */
-    public abstract MessageEncoder getClientMessageEncoder();
+    public MessageEncoder getClientMessageEncoder() {
+        return new JacksonTextMessageEncoder();
+    }
 
     /**
      * 接收客户端消息的消息解码器
      *
      * @return 消息解码器
      */
-    public abstract MessageDecoder getClientMessageDecoder();
+    public MessageDecoder getClientMessageDecoder() {
+        return new SampleMessageDecoder();
+    }
 
     /**
      * 订阅时发送服务信息的消息编码器
      *
      * @return 消息编码器
      */
-    public abstract MessageEncoder getSubscribeMessageEncoder();
+    public MessageEncoder getSubscribeMessageEncoder() {
+        return new JacksonTextMessageEncoder();
+    }
 
     /**
      * 订阅时接收服务信息的消息解码器
      *
      * @return 消息解码器
      */
-    public abstract MessageDecoder getSubscribeMessageDecoder();
+    public MessageDecoder getSubscribeMessageDecoder() {
+        return new JacksonSubscribeMessageDecoder();
+    }
 
     /**
      * 转发消息的消息编码器
      *
      * @return 消息编码器
      */
-    public abstract MessageEncoder getForwardMessageEncoder();
+    public MessageEncoder getForwardMessageEncoder() {
+        return new JacksonTextMessageEncoder(true);
+    }
 
     /**
      * 接收消息转发的消息解码器
      *
      * @return 消息解码器
      */
-    public abstract MessageDecoder getForwardMessageDecoder();
+    public MessageDecoder getForwardMessageDecoder() {
+        return new JacksonTextMessageDecoder();
+    }
 
     public MessageEncoder getUndefinedTypeMessageEncoder(String type) {
         throw new UnsupportedOperationException();

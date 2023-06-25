@@ -8,7 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectio
  * @param <T> 连接类
  */
 public abstract class WebSocketConnectionFactory<T extends WebSocketConnection>
-        extends AbstractConnectionFactory<T, WebSocketLoadBalanceConcept> {
+        extends AbstractConnectionFactory<T> {
 
     public WebSocketConnectionFactory() {
         addScopes(WebSocketScoped.NAME);

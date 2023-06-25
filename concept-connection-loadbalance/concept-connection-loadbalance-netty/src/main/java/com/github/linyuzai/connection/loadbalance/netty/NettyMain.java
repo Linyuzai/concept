@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty;
 
-import com.github.linyuzai.connection.loadbalance.netty.websocket.WebSocketLoadBalanceHandler;
+import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -52,7 +52,7 @@ public class NettyMain {
                             //帧 继承抽象类 WebSocketFrame 有六个子类 帧的处理由管道中下一个handler进行处理
                             //WebSocket请求形式 ：ws://localhost:1234/hello
                             pipeline.addLast(new WebSocketServerProtocolHandler("/hello"));
-                            pipeline.addLast(new WebSocketLoadBalanceHandler(null));
+                            pipeline.addLast(new NettyLoadBalanceHandler(null));
                         }
                     });
             ChannelFuture channelFuture = bootstrap.bind(1234).sync();
