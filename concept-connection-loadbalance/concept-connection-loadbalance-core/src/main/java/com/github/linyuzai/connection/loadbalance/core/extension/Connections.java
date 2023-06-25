@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.core.extension;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,12 @@ public class Connections implements Connection {
     public Map<Object, Object> getMetadata() {
         Connection connection = get();
         return connection == null ? Collections.emptyMap() : connection.getMetadata();
+    }
+
+    @Override
+    public List<MessageSendInterceptor> getMessageSendInterceptors() {
+        Connection connection = get();
+        return connection == null ? Collections.emptyList() : connection.getMessageSendInterceptors();
     }
 
     @Override

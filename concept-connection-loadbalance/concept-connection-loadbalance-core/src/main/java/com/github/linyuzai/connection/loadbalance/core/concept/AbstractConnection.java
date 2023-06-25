@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionCloseErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -10,8 +11,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 连接抽象类
@@ -20,7 +24,9 @@ import java.util.Map;
 @Setter
 public abstract class AbstractConnection implements Connection {
 
-    protected final Map<Object, Object> metadata = new LinkedHashMap<>();
+    protected final Map<Object, Object> metadata = Collections.synchronizedMap(new LinkedHashMap<>());
+
+    protected final List<MessageSendInterceptor> messageSendInterceptors = new CopyOnWriteArrayList<>();
 
     @NonNull
     protected String type;
@@ -62,20 +68,20 @@ public abstract class AbstractConnection implements Connection {
         if (!isAlive()) {
             return;
         }
-        onMessagePrepared(message);
         if (message instanceof PingMessage) {
             ping((PingMessage) message);
         } else if (message instanceof PongMessage) {
             pong((PongMessage) message);
         } else {
+            for (MessageSendInterceptor interceptor : messageSendInterceptors) {
+                if (!interceptor.intercept(message, this)) {
+                    return;
+                }
+            }
             MessageEncoder encoder = getMessageEncoder();
             Object encode = encoder.encode(message);
             doSend(encode);
         }
-    }
-
-    protected void onMessagePrepared(Message message) {
-
     }
 
     public abstract void ping(PingMessage ping);

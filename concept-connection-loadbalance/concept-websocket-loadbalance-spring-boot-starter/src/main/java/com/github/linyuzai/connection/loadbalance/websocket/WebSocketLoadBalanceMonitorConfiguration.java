@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeart
 import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import org.apache.commons.logging.Log;
@@ -18,6 +19,11 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class WebSocketLoadBalanceMonitorConfiguration {
+
+    @Bean
+    public ConnectionSubscribeHandler connectionSubscribeHandler() {
+        return new ConnectionSubscribeHandler().addScopes(WebSocketScoped.NAME);
+    }
 
     @Bean
     @ConditionalOnProperty(value = "concept.websocket.load-balance.logger", havingValue = "true", matchIfMissing = true)

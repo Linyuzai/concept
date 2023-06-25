@@ -1,10 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import lombok.NonNull;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +43,13 @@ public interface Connection {
      * @return 连接的元数据
      */
     Map<Object, Object> getMetadata();
+
+    /**
+     * 获得消息发送拦截器列表
+     *
+     * @return 消息发送拦截器列表
+     */
+    List<MessageSendInterceptor> getMessageSendInterceptors();
 
     /**
      * 设置消息编码器

@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRedisTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
@@ -14,15 +16,17 @@ import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepo
 import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -58,9 +62,33 @@ public class WebSocketLoadBalanceConfiguration {
         }
     }
 
-    @Bean
-    public ConnectionSubscribeHandler connectionSubscribeHandler() {
-        return new ConnectionSubscribeHandler().addScopes(WebSocketScoped.NAME);
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDIS_TOPIC")
+    public static class RedisTopicConfiguration {
+
+        @Bean
+        public RedisTopicConnectionSubscriberFactory redisTopicConnectionSubscriberFactory(RedisTemplate<?, ?> redisTemplate) {
+            RedisTopicConnectionSubscriberFactory factory = new RedisTopicConnectionSubscriberFactory();
+            factory.setRedisTemplate(redisTemplate);
+            factory.addScopes(WebSocketScoped.NAME);
+            return factory;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDIS_TOPIC")
+    public static class ReactiveRedisTopicConfiguration {
+
+        @Bean
+        public ReactiveRedisTopicConnectionSubscriberFactory reactiveRedisTopicConnectionSubscriberFactory(
+                ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
+            ReactiveRedisTopicConnectionSubscriberFactory factory = new ReactiveRedisTopicConnectionSubscriberFactory();
+            factory.setReactiveRedisTemplate(reactiveRedisTemplate);
+            factory.addScopes(WebSocketScoped.NAME);
+            return factory;
+        }
     }
 
     @Bean

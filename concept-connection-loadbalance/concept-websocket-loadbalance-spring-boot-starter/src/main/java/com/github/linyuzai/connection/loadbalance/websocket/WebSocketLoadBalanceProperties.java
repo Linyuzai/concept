@@ -107,7 +107,13 @@ public class WebSocketLoadBalanceProperties {
 
         public enum Protocol {
 
-            WEBSOCKET, WEBSOCKET_SSL, REDISSON_TOPIC, REDISSON_SHARED_TOPIC
+            WEBSOCKET,
+            WEBSOCKET_SSL,
+
+            REDISSON_TOPIC,
+            REDISSON_SHARED_TOPIC,
+
+            REDIS_TOPIC
         }
 
         @Data
