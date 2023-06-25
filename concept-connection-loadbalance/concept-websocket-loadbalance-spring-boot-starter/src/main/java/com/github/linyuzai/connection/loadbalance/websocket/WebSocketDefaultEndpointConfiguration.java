@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.websocket;
 import com.github.linyuzai.connection.loadbalance.core.extension.UserSelector;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointPathSelector;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointUserMetadataRegister;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
@@ -11,8 +12,10 @@ public class WebSocketDefaultEndpointConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.path-selector",
             name = "enabled", havingValue = "true")
-    public DefaultEndpointPathSelector defaultEndpointPathSelector() {
-        return new DefaultEndpointPathSelector();
+    public DefaultEndpointPathSelector defaultEndpointPathSelector(WebSocketLoadBalanceProperties properties) {
+        String prefix = WebSocketLoadBalanceConcept.
+                formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
+        return new DefaultEndpointPathSelector(prefix);
     }
 
     @Bean

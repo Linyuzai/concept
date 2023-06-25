@@ -27,13 +27,32 @@ public class JavaxWebSocketLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber", havingValue = "WEBSOCKET", matchIfMissing = true)
-    public static class WebSocketSubscriberConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET", matchIfMissing = true)
+    public static class WebSocketProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
 
         @Bean
-        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory(WebSocketLoadBalanceProperties properties) {
+        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory() {
             JavaxWebSocketConnectionSubscriberFactory factory = new JavaxWebSocketConnectionSubscriberFactory();
-            factory.setProtocol(properties.getLoadBalance().getProtocol());
+            factory.setProtocol("ws");
+            return factory;
+        }
+
+        @Bean
+        public JavaxWebSocketLoadBalanceEndpoint javaxWebSocketLoadBalanceEndpoint(WebSocketLoadBalanceConcept concept) {
+            concept.holdInstance();
+            return new JavaxWebSocketLoadBalanceEndpoint();
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET_SSL")
+    public static class WebSocketSSLProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+
+        @Bean
+        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory() {
+            JavaxWebSocketConnectionSubscriberFactory factory = new JavaxWebSocketConnectionSubscriberFactory();
+            factory.setProtocol("wss");
             return factory;
         }
 

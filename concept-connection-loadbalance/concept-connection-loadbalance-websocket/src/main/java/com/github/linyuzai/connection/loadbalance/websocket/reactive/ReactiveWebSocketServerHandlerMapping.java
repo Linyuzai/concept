@@ -15,9 +15,10 @@ import java.util.Map;
 public class ReactiveWebSocketServerHandlerMapping extends SimpleUrlHandlerMapping {
 
     public ReactiveWebSocketServerHandlerMapping(WebSocketLoadBalanceConcept concept,
+                                                 String prefix,
                                                  DefaultEndpointCustomizer customizer) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**", new ReactiveWebSocketServerHandler(concept));
+        map.put(prefix + "**", new ReactiveWebSocketServerHandler(concept));
         setUrlMap(map);
         setOrder(100);
         if (customizer != null) {

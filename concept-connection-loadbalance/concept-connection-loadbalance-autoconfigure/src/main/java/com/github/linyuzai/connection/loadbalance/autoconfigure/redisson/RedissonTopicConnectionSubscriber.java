@@ -13,6 +13,8 @@ import org.redisson.api.listener.StatusListener;
 @RequiredArgsConstructor
 public class RedissonTopicConnectionSubscriber implements ConnectionSubscriber {
 
+    public static final String PREFIX = "ConceptConnectionLB@";
+
     private final RedissonClient client;
 
     private final boolean shared;
@@ -20,47 +22,56 @@ public class RedissonTopicConnectionSubscriber implements ConnectionSubscriber {
     @Override
     public synchronized void subscribe(ConnectionLoadBalanceConcept concept) {
         ConnectionServer local = concept.getConnectionServerManager().getLocal();
-        String name = getTopicName(local);
+        String id = getId(local);
         RTopic topic;
         if (shared) {
-            topic = client.getShardedTopic(name);
+            topic = client.getShardedTopic(id);
         } else {
-            topic = client.getTopic(name);
+            topic = client.getTopic(id);
         }
         topic.addListener(new StatusListener() {
 
             @Override
             public void onSubscribe(String channel) {
-                System.out.println(channel);
+                System.out.println("onSubscribe:" + channel);
             }
 
             @Override
             public void onUnsubscribe(String channel) {
-                System.out.println(channel);
+                System.out.println("onUnsubscribe:" + channel);
             }
         });
-        RedissonTopicConnection connection = newConnection(topic, Connection.Type.SUBSCRIBER);
+
+        String from = getFrom(local);
+
+        RedissonTopicConnection connection = new RedissonTopicConnection(Connection.Type.OBSERVABLE);
+        connection.setId(id);
+        connection.setFrom(from);
+        connection.setTopic(topic);
         int listener = topic.addListener(Object.class, (channel, object) -> {
-            concept.onMessage(connection, object, msg -> {
-                return true;
-            });
-            System.out.println(channel);
+            System.out.println("onMessage:" + channel + "," + object);
+            concept.onMessage(connection, object, msg -> !from.equals(msg.getFrom()));
         });
         connection.setListener(listener);
         concept.onEstablish(connection);
-        concept.onEstablish(newConnection(topic, Connection.Type.OBSERVABLE));
     }
 
-    protected RedissonTopicConnection newConnection(RTopic topic, String type) {
-        return new RedissonTopicConnection(topic, client, type);
+    protected String getFrom(ConnectionServer local) {
+        return local == null ? useUnknownIfNull(null) : useUnknownIfNull(local.getInstanceId());
     }
 
-    protected String getTopicName(ConnectionServer local) {
-        String p = "ConceptConnectionLB@";
+    protected String getId(ConnectionServer local) {
         if (local == null) {
-            return p + "master";
+            return PREFIX + useUnknownIfNull(null);
         } else {
-            return p + local.getServiceId();
+            return PREFIX + useUnknownIfNull(local.getServiceId());
         }
+    }
+
+    protected String useUnknownIfNull(String s) {
+        if (s == null) {
+            return "Unknown";
+        }
+        return s;
     }
 }

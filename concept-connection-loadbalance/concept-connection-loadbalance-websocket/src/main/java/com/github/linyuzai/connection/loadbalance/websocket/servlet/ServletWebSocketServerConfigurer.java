@@ -17,17 +17,18 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 
     private final WebSocketLoadBalanceConcept concept;
 
-    private final DefaultEndpointCustomizer customizer;
+    private final String prefix;
 
-    private final PrefixUrlPathHelper helper = new PrefixUrlPathHelper(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX);
+    private final DefaultEndpointCustomizer customizer;
 
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
         if (registry instanceof ServletWebSocketHandlerRegistry) {
+            PrefixUrlPathHelper helper = new PrefixUrlPathHelper(prefix);
             ((ServletWebSocketHandlerRegistry) registry).setUrlPathHelper(helper);
         }
-        WebSocketHandlerRegistration registration = registry.addHandler(new ServletWebSocketServerHandler(concept),
-                        WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "**")
+        WebSocketHandlerRegistration registration = registry
+                .addHandler(new ServletWebSocketServerHandler(concept), prefix + "**")
                 .setAllowedOrigins("*");
         if (customizer != null) {
             customizer.customize(registration);

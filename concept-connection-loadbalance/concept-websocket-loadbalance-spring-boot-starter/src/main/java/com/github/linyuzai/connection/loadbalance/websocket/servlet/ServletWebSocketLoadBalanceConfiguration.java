@@ -29,13 +29,31 @@ public class ServletWebSocketLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber", havingValue = "WEBSOCKET", matchIfMissing = true)
-    public static class WebSocketSubscriberConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET", matchIfMissing = true)
+    public static class WebSocketProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
 
         @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(WebSocketLoadBalanceProperties properties) {
+        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
             ServletWebSocketConnectionSubscriberFactory factory = new ServletWebSocketConnectionSubscriberFactory();
-            factory.setProtocol(properties.getLoadBalance().getProtocol());
+            factory.setProtocol("ws");
+            return factory;
+        }
+
+        @Bean
+        public ServletWebSocketLoadBalanceConfigurer servletWebSocketLoadBalanceConfigurer(WebSocketLoadBalanceConcept concept) {
+            return new ServletWebSocketLoadBalanceConfigurer(concept);
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET_SSL")
+    public static class WebSocketSSLProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+
+        @Bean
+        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
+            ServletWebSocketConnectionSubscriberFactory factory = new ServletWebSocketConnectionSubscriberFactory();
+            factory.setProtocol("wss");
             return factory;
         }
 
@@ -55,8 +73,11 @@ public class ServletWebSocketLoadBalanceConfiguration {
         @ConditionalOnMissingBean
         public ServletWebSocketServerConfigurer servletWebSocketServerConfigurer(
                 WebSocketLoadBalanceConcept concept,
+                WebSocketLoadBalanceProperties properties,
                 @Autowired(required = false) DefaultEndpointCustomizer customizer) {
-            return new ServletWebSocketServerConfigurer(concept, customizer);
+            String prefix = WebSocketLoadBalanceConcept
+                    .formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
+            return new ServletWebSocketServerConfigurer(concept, prefix, customizer);
         }
     }
 }

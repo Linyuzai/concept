@@ -18,6 +18,9 @@ public class ConnectionLoadBalanceLogger extends AbstractScoped {
     private BiConsumer<String, Throwable> error;
 
     public String getServer(ConnectionServer server) {
+        if (server == null) {
+            return "Unknown server";
+        }
         return server.getServiceId() + ":" + server.getHost() + ":" + server.getPort();
     }
 

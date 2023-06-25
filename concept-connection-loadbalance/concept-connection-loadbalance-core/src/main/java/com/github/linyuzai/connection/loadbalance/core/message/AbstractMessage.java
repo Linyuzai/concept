@@ -43,4 +43,14 @@ public abstract class AbstractMessage<T> implements Message {
             getHeaders().remove(Message.FORWARD);
         }
     }
+
+    @Override
+    public String getFrom() {
+        return getHeaders().get(Message.FROM);
+    }
+
+    @Override
+    public void setFrom(String from) {
+        getHeaders().put(Message.FORWARD, from);
+    }
 }

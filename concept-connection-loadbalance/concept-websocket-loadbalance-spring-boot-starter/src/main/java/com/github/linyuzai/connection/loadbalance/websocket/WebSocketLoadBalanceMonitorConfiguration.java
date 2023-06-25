@@ -52,7 +52,6 @@ public class WebSocketLoadBalanceMonitorConfiguration {
     public ConnectionHeartbeatManager loadBalanceConnectionHeartbeatManager(
             WebSocketLoadBalanceProperties properties,
             List<ScheduledExecutorServiceFactory> factories) {
-
         long timeout = properties.getLoadBalance().getHeartbeat().getTimeout();
         long period = properties.getLoadBalance().getHeartbeat().getPeriod();
         ScheduledExecutorService service = ScopedFactory

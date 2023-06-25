@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -47,6 +48,11 @@ public class WebSocketLoadBalanceProperties {
             private boolean enabled = true;
 
             /**
+             * 默认端点前缀，默认值：/concept-websocket/
+             */
+            private String prefix = WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX;
+
+            /**
              * 路径选择器
              */
             private PathSelectorProperties pathSelector = new PathSelectorProperties();
@@ -79,12 +85,10 @@ public class WebSocketLoadBalanceProperties {
     @Data
     public static class LoadBalanceProperties {
 
-        private Subscriber subscriber = Subscriber.WEBSOCKET;
-
         /**
-         * 订阅协议
+         * 订阅协议，默认 WEBSOCKET
          */
-        private String protocol = "ws";
+        private Protocol protocol = Protocol.WEBSOCKET;
 
         /**
          * 订阅日志
@@ -101,9 +105,9 @@ public class WebSocketLoadBalanceProperties {
          */
         private HeartbeatProperties heartbeat = new HeartbeatProperties();
 
-        public enum Subscriber {
+        public enum Protocol {
 
-            WEBSOCKET, REDISSON_TOPIC
+            WEBSOCKET, WEBSOCKET_SSL, REDISSON_TOPIC, REDISSON_SHARED_TOPIC
         }
 
         @Data

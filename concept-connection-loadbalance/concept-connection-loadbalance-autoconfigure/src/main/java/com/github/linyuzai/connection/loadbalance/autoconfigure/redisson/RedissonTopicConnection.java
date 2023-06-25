@@ -1,36 +1,35 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.redisson;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
 
 import java.util.Map;
 
 @Getter
+@Setter
 public class RedissonTopicConnection extends AbstractConnection {
 
-    private final RTopic topic;
+    private Object id;
 
-    private final RedissonClient client;
+    private String from;
+
+    private RTopic topic;
 
     @Setter
     private Integer listener;
 
-    public RedissonTopicConnection(RTopic topic, RedissonClient client, String type) {
+    public RedissonTopicConnection(String type) {
         super(type);
-        this.topic = topic;
-        this.client = client;
     }
 
-    public RedissonTopicConnection(RTopic topic, RedissonClient client, String type, Map<Object, Object> metadata) {
+    public RedissonTopicConnection(String type, Map<Object, Object> metadata) {
         super(type, metadata);
-        this.topic = topic;
-        this.client = client;
     }
 
     @Override
@@ -57,13 +56,13 @@ public class RedissonTopicConnection extends AbstractConnection {
     }
 
     @Override
-    public void doSend(Object message) {
-        topic.publish(message);
+    protected void onMessagePrepared(Message message) {
+        message.setFrom(from);
     }
 
     @Override
-    public Object getId() {
-        return topic;
+    public void doSend(Object message) {
+        topic.publish(message);
     }
 
     @Override

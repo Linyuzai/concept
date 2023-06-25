@@ -13,13 +13,16 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 public class DefaultEndpointPathSelector extends PathSelector
         implements FilterConnectionSelector, WebSocketScoped {
 
-    public DefaultEndpointPathSelector() {
-        super(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX);
+    public DefaultEndpointPathSelector(String prefix) {
+        super(prefix);
     }
 
     @Override
     public String getPath(Connection connection) {
-        return ((WebSocketConnection) connection).getUri().getPath();
+        if (connection instanceof WebSocketConnection) {
+            return ((WebSocketConnection) connection).getUri().getPath();
+        }
+        return null;
     }
 
     @Override

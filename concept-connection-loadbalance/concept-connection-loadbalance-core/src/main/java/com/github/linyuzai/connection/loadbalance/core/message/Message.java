@@ -10,12 +10,17 @@ public interface Message {
     /**
      * 标记该消息进行广播
      */
-    String BROADCAST = "concept-connection-broadcast";
+    String BROADCAST = "_broadcast";
 
     /**
      * 标记该消息已经经过转发
      */
-    String FORWARD = "concept-connection-forward";
+    String FORWARD = "_forward";
+
+    /**
+     * 标记该消息由哪个实例发送
+     */
+    String FROM = "_from";
 
     /**
      * 获得消息头
@@ -46,4 +51,8 @@ public interface Message {
     boolean isForward();
 
     void setForward(boolean forward);
+
+    String getFrom();
+
+    void setFrom(String from);
 }

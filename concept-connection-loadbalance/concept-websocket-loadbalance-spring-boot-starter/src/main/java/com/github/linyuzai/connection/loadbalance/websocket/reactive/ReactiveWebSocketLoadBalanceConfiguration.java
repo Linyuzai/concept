@@ -29,13 +29,31 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber", havingValue = "WEBSOCKET", matchIfMissing = true)
-    public static class WebSocketSubscriberConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET", matchIfMissing = true)
+    public static class WebSocketProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
 
         @Bean
-        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(WebSocketLoadBalanceProperties properties) {
+        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory() {
             ReactiveWebSocketConnectionSubscriberFactory factory = new ReactiveWebSocketConnectionSubscriberFactory();
-            factory.setProtocol(properties.getLoadBalance().getProtocol());
+            factory.setProtocol("ws");
+            return factory;
+        }
+
+        @Bean
+        public ReactiveWebSocketLoadBalanceHandlerMapping reactiveWebSocketLoadBalanceHandlerMapping(WebSocketLoadBalanceConcept concept) {
+            return new ReactiveWebSocketLoadBalanceHandlerMapping(concept);
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET_SSL")
+    public static class WebSocketSSLProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+
+        @Bean
+        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory() {
+            ReactiveWebSocketConnectionSubscriberFactory factory = new ReactiveWebSocketConnectionSubscriberFactory();
+            factory.setProtocol("wss");
             return factory;
         }
 
@@ -60,8 +78,11 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
         @ConditionalOnMissingBean
         public ReactiveWebSocketServerHandlerMapping reactiveWebSocketServerHandlerMapping(
                 WebSocketLoadBalanceConcept concept,
+                WebSocketLoadBalanceProperties properties,
                 @Autowired(required = false) DefaultEndpointCustomizer customizer) {
-            return new ReactiveWebSocketServerHandlerMapping(concept, customizer);
+            String prefix = WebSocketLoadBalanceConcept
+                    .formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
+            return new ReactiveWebSocketServerHandlerMapping(concept, prefix, customizer);
         }
     }
 }

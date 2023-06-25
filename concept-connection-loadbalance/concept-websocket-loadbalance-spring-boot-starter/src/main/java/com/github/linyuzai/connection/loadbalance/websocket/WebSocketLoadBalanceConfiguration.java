@@ -18,6 +18,7 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -30,12 +31,31 @@ import java.util.concurrent.ScheduledExecutorService;
 public class WebSocketLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDISSON_TOPIC")
     public static class RedissonTopicConfiguration {
 
-        /*@Bean
-        public RedissonTopicConnectionSubscriberFactory redissonTopicConnectionSubscriberFactory() {
-            return new RedissonTopicConnectionSubscriberFactory();
-        }*/
+        @Bean
+        public RedissonTopicConnectionSubscriberFactory redissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
+            RedissonTopicConnectionSubscriberFactory factory = new RedissonTopicConnectionSubscriberFactory();
+            factory.setRedissonClient(redissonClient);
+            factory.setShared(false);
+            factory.addScopes(WebSocketScoped.NAME);
+            return factory;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDISSON_SHARED_TOPIC")
+    public static class RedissonSharedTopicConfiguration {
+
+        @Bean
+        public RedissonTopicConnectionSubscriberFactory redissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
+            RedissonTopicConnectionSubscriberFactory factory = new RedissonTopicConnectionSubscriberFactory();
+            factory.setRedissonClient(redissonClient);
+            factory.setShared(true);
+            factory.addScopes(WebSocketScoped.NAME);
+            return factory;
+        }
     }
 
     @Bean

@@ -20,6 +20,18 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
      */
     public static final String SERVER_ENDPOINT_PREFIX = "/concept-websocket/";
 
+    public static String formatPrefix(String prefix) {
+        StringBuilder builder = new StringBuilder();
+        if (!prefix.startsWith("/")) {
+            builder.append("/");
+        }
+        builder.append(prefix);
+        if (!prefix.endsWith("/")) {
+            builder.append("/");
+        }
+        return builder.toString();
+    }
+
     private static WebSocketLoadBalanceConcept instance;
 
     public static WebSocketLoadBalanceConcept getInstance() {
