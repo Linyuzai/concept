@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.discovery;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import lombok.AllArgsConstructor;
@@ -34,13 +35,18 @@ public class DiscoveryConnectionServerManager implements ConnectionServerManager
         this.local = new ServiceInstanceConnectionServer(registration);
     }
 
+    @Override
+    public ConnectionServer getLocal(ConnectionLoadBalanceConcept concept) {
+        return local;
+    }
+
     /**
      * 获得所有除自身外的服务实例
      *
      * @return 所有除自身外的服务实例
      */
     @Override
-    public List<ConnectionServer> getConnectionServers() {
+    public List<ConnectionServer> getConnectionServers(ConnectionLoadBalanceConcept concept) {
         List<ConnectionServer> servers = new ArrayList<>();
         List<ServiceInstance> instances = discoveryClient.getInstances(registration.getServiceId());
         for (ServiceInstance instance : instances) {

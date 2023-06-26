@@ -1,6 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 连接订阅者
@@ -12,4 +14,32 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 public interface ConnectionSubscriber {
 
     void subscribe(ConnectionLoadBalanceConcept concept);
+
+    default void subscribe() {
+        subscribe(null);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    class Delegate implements ConnectionSubscriber {
+
+        private final ConnectionLoadBalanceConcept concept;
+
+        private final ConnectionSubscriber delegate;
+
+        public static ConnectionSubscriber delegate(ConnectionLoadBalanceConcept concept,
+                                        ConnectionSubscriber delegate) {
+            return new Delegate(concept, delegate);
+        }
+
+        @Override
+        public void subscribe(ConnectionLoadBalanceConcept concept) {
+            delegate.subscribe(concept);
+        }
+
+        @Override
+        public void subscribe() {
+            delegate.subscribe(concept);
+        }
+    }
 }

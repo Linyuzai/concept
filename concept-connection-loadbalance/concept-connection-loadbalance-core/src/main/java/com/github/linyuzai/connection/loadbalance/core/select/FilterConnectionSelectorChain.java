@@ -3,7 +3,6 @@ package com.github.linyuzai.connection.loadbalance.core.select;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -16,18 +15,18 @@ public class FilterConnectionSelectorChain implements ConnectionSelector {
     private final List<FilterConnectionSelector> selectors;
 
     @Override
-    public boolean support(Message message) {
+    public boolean support(Message message, ConnectionLoadBalanceConcept concept) {
         return true;
     }
 
     @Override
-    public Collection<Connection> select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept) {
+    public Collection<Connection> select(Message message, ConnectionLoadBalanceConcept concept) {
         List<Connection> connections = null;
         for (ConnectionSelector selector : selectors) {
-            if (!selector.support(message)) {
+            if (!selector.support(message, concept)) {
                 continue;
             }
-            Collection<Connection> select = selector.select(message, repository, concept);
+            Collection<Connection> select = selector.select(message, concept);
             if (select == null || select.isEmpty()) {
                 return select;
             }

@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeException;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -29,7 +30,7 @@ public class JacksonSubscribeMessageDecoder implements MessageDecoder {
     }
 
     @Override
-    public Message decode(Object message) {
+    public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
         return new SubscribeMessage(parse(message));
     }
 

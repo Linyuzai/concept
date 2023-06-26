@@ -1,17 +1,19 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+
 /**
  * {@link ObjectMessage} 的消息工厂
  */
 public class ObjectMessageFactory implements MessageFactory {
 
     @Override
-    public boolean support(Object message) {
+    public boolean support(Object message, ConnectionLoadBalanceConcept concept) {
         return true;
     }
 
     @Override
-    public Message create(Object message) {
+    public Message create(Object message, ConnectionLoadBalanceConcept concept) {
         return new ObjectMessage(message);
     }
 

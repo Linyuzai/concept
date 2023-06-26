@@ -17,7 +17,8 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
 
     @Override
     public synchronized void subscribe(ConnectionLoadBalanceConcept concept) {
-        List<ConnectionServer> servers = concept.getConnectionServerManager().getConnectionServers();
+        List<ConnectionServer> servers = concept.getConnectionServerManager()
+                .getConnectionServers();
         for (ConnectionServer server : servers) {
             subscribe(server, concept);
         }
@@ -36,7 +37,7 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
      * <p>
      * 当接收到服务实例信息时会反向订阅 {@link ConnectionSubscribeHandler}
      *
-     * @param server        需要订阅的服务实例
+     * @param server 需要订阅的服务实例
      */
     public void subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
         //需要判断是否已经订阅对应的服务
@@ -75,7 +76,8 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
         if (server == null) {
             return null;
         }
-        Collection<Connection> connections = concept.getConnectionRepository().select(Connection.Type.SUBSCRIBER);
+        Collection<Connection> connections = concept.getConnectionRepository()
+                .select(Connection.Type.SUBSCRIBER);
         for (Connection connection : connections) {
             ConnectionServer exist = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
             if (concept.getConnectionServerManager().isEqual(server, exist)) {

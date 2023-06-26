@@ -13,7 +13,7 @@ import java.util.Map;
 public class JavaxWebSocketConnectionFactory extends WebSocketConnectionFactory<JavaxWebSocketConnection> {
 
     @Override
-    public boolean support(Object o, Map<Object, Object> metadata) {
+    public boolean support(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
         return o instanceof Session;
     }
 

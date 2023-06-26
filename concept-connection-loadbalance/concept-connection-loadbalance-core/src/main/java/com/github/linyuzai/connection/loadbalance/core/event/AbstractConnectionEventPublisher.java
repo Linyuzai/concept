@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.event;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -26,7 +27,7 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
      * @param event 事件
      */
     @Override
-    public void publish(Object event) {
+    public void publish(Object event, ConnectionLoadBalanceConcept concept) {
         for (ConnectionEventListener listener : listeners) {
             try {
                 listener.onEvent(event);
@@ -46,7 +47,12 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
     }
 
     @Override
-    public void register(Collection<? extends ConnectionEventListener> listeners) {
+    public void register(ConnectionEventListener listener, ConnectionLoadBalanceConcept concept) {
+        this.listeners.add(listener);
+    }
+
+    @Override
+    public void register(Collection<? extends ConnectionEventListener> listeners, ConnectionLoadBalanceConcept concept) {
         this.listeners.addAll(listeners);
     }
 }

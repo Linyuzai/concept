@@ -15,7 +15,7 @@ public class NettyConnectionFactory extends AbstractConnectionFactory<NettyConne
     }
 
     @Override
-    public boolean support(Object o, Map<Object, Object> metadata) {
+    public boolean support(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
         return o instanceof ChannelHandlerContext || o instanceof Channel;
     }
 

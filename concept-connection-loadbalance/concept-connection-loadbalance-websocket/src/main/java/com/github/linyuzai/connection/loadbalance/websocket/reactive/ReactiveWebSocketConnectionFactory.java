@@ -15,7 +15,7 @@ import java.util.Map;
 public class ReactiveWebSocketConnectionFactory extends WebSocketConnectionFactory<ReactiveWebSocketConnection> {
 
     @Override
-    public boolean support(Object o, Map<Object, Object> metadata) {
+    public boolean support(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
         return o instanceof Object[] &&
                 ((Object[]) o).length == 2 &&
                 ((Object[]) o)[0] instanceof WebSocketSession &&

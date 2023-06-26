@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
@@ -14,18 +15,18 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override
-    public MessageDecoder getClientMessageDecoder() {
-        return new ReactiveMessageDecoder(super.getClientMessageDecoder());
+    public MessageDecoder getClientMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new ReactiveMessageDecoder(super.getClientMessageDecoder(concept));
     }
 
     @Override
-    public MessageDecoder getSubscribeMessageDecoder() {
-        return new ReactiveMessageDecoder(super.getSubscribeMessageDecoder());
+    public MessageDecoder getSubscribeMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new ReactiveMessageDecoder(super.getSubscribeMessageDecoder(concept));
     }
 
     @Override
-    public MessageDecoder getForwardMessageDecoder() {
-        return new ReactiveMessageDecoder(super.getForwardMessageDecoder());
+    public MessageDecoder getForwardMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new ReactiveMessageDecoder(super.getForwardMessageDecoder(concept));
     }
 
     @AllArgsConstructor
@@ -34,7 +35,7 @@ public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecA
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message) {
+        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
             if (message instanceof WebSocketMessage) {
                 WebSocketMessage.Type type = ((WebSocketMessage) message).getType();
                 if (type == WebSocketMessage.Type.TEXT) {

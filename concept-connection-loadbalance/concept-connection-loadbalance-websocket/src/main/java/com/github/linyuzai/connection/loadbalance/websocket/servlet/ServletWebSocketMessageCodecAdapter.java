@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
@@ -14,18 +15,18 @@ import org.springframework.web.socket.WebSocketMessage;
 public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override
-    public MessageDecoder getClientMessageDecoder() {
-        return new ServletMessageDecoder(super.getClientMessageDecoder());
+    public MessageDecoder getClientMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new ServletMessageDecoder(super.getClientMessageDecoder(concept));
     }
 
     @Override
-    public MessageDecoder getSubscribeMessageDecoder() {
-        return new ServletMessageDecoder(super.getSubscribeMessageDecoder());
+    public MessageDecoder getSubscribeMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new ServletMessageDecoder(super.getSubscribeMessageDecoder(concept));
     }
 
     @Override
-    public MessageDecoder getForwardMessageDecoder() {
-        return new ServletMessageDecoder(super.getForwardMessageDecoder());
+    public MessageDecoder getForwardMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new ServletMessageDecoder(super.getForwardMessageDecoder(concept));
     }
 
     @AllArgsConstructor
@@ -34,7 +35,7 @@ public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAd
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message) {
+        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
             if (message instanceof WebSocketMessage) {
                 if (message instanceof org.springframework.web.socket.TextMessage) {
                     return decoder.decode(((org.springframework.web.socket.TextMessage) message).getPayload());

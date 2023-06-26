@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.message.encode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +39,7 @@ public class JacksonTextMessageEncoder implements MessageEncoder {
 
     @SneakyThrows
     @Override
-    public String encode(Message message) {
+    public String encode(Message message, ConnectionLoadBalanceConcept concept) {
         Object payload = getPayload(message);
         if (payload instanceof String) {
             return (String) payload;

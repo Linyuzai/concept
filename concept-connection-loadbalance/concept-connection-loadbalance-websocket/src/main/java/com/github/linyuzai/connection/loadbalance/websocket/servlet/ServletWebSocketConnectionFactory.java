@@ -13,7 +13,7 @@ import java.util.Map;
 public class ServletWebSocketConnectionFactory extends WebSocketConnectionFactory<ServletWebSocketConnection> {
 
     @Override
-    public boolean support(Object o, Map<Object, Object> metadata) {
+    public boolean support(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
         return o instanceof WebSocketSession;
     }
 

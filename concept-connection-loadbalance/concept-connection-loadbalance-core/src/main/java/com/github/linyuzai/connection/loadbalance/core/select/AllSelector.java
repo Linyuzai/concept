@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.select;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 import java.util.Collection;
@@ -11,7 +12,7 @@ import java.util.Collection;
 public class AllSelector extends AbstractConnectionSelector implements FilterConnectionSelector {
 
     @Override
-    public boolean support(Message message) {
+    public boolean support(Message message, ConnectionLoadBalanceConcept concept) {
         return true;
     }
 

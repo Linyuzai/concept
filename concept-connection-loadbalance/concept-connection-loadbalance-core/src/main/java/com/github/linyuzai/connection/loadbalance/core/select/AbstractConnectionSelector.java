@@ -20,7 +20,8 @@ import java.util.List;
 public abstract class AbstractConnectionSelector implements ConnectionSelector {
 
     @Override
-    public Collection<Connection> select(Message message, ConnectionRepository repository, ConnectionLoadBalanceConcept concept) {
+    public Collection<Connection> select(Message message, ConnectionLoadBalanceConcept concept) {
+        ConnectionRepository repository = concept.getConnectionRepository();
         Collection<Connection> clients = repository.select(Connection.Type.CLIENT);
         Collection<Connection> select;
         if (clients.isEmpty()) {

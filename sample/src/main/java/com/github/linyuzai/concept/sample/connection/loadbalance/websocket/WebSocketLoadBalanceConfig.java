@@ -1,12 +1,15 @@
 package com.github.linyuzai.concept.sample.connection.loadbalance.websocket;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageHandler;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.websocket.EnableWebSocketLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketEventListener;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +24,7 @@ public class WebSocketLoadBalanceConfig {
 
     @Bean
     public MessageHandler messageHandler() {
-        return new MessageHandler() {
+        return new WebSocketMessageHandler() {
             @Override
             public void onMessage(Message message, Connection connection) {
                 System.out.println("Message " + message.getPayload());
@@ -31,7 +34,7 @@ public class WebSocketLoadBalanceConfig {
 
     @Bean
     public ConnectionEventListener connectionEventListener() {
-        return new ConnectionEventListener() {
+        return new WebSocketEventListener() {
             @Override
             public void onEvent(Object event) {
                 if (event instanceof ConnectionEvent) {
@@ -54,27 +57,27 @@ public class WebSocketLoadBalanceConfig {
     public ConnectionServerManager connectionServerManager() {
         return new ConnectionServerManager() {
             @Override
-            public void add(ConnectionServer server) {
+            public void add(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
 
             }
 
             @Override
-            public void remove(ConnectionServer server) {
+            public void remove(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
 
             }
 
             @Override
-            public void clear() {
+            public void clear(ConnectionLoadBalanceConcept concept) {
 
             }
 
             @Override
-            public boolean isEqual(ConnectionServer server1, ConnectionServer server2) {
+            public boolean isEqual(ConnectionServer server1, ConnectionServer server2, ConnectionLoadBalanceConcept concept) {
                 return false;
             }
 
             @Override
-            public ConnectionServer getLocal() {
+            public ConnectionServer getLocal(ConnectionLoadBalanceConcept concept) {
                 return new ConnectionServer() {
                     @Override
                     public String getInstanceId() {
@@ -119,7 +122,7 @@ public class WebSocketLoadBalanceConfig {
             }
 
             @Override
-            public List<ConnectionServer> getConnectionServers() {
+            public List<ConnectionServer> getConnectionServers(ConnectionLoadBalanceConcept concept) {
                 return Collections.emptyList();
             }
         };

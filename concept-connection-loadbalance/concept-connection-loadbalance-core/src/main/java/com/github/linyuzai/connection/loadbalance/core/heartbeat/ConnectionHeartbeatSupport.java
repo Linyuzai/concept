@@ -83,7 +83,8 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
      */
     public void sendPing() {
         for (String connectionType : connectionTypes) {
-            Collection<Connection> connections = concept.getConnectionRepository().select(connectionType);
+            Collection<Connection> connections = concept.getConnectionRepository()
+                    .select(connectionType);
             Message message = createPingMessage();
             for (Connection connection : connections) {
                 try {

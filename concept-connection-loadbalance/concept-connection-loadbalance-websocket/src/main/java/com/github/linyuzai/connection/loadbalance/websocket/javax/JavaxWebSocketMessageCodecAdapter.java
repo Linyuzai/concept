@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -12,18 +13,18 @@ import lombok.AllArgsConstructor;
 public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override
-    public MessageDecoder getClientMessageDecoder() {
-        return new JavaxMessageDecoder(super.getClientMessageDecoder());
+    public MessageDecoder getClientMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new JavaxMessageDecoder(super.getClientMessageDecoder(concept));
     }
 
     @Override
-    public MessageDecoder getSubscribeMessageDecoder() {
-        return new JavaxMessageDecoder(super.getSubscribeMessageDecoder());
+    public MessageDecoder getSubscribeMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new JavaxMessageDecoder(super.getSubscribeMessageDecoder(concept));
     }
 
     @Override
-    public MessageDecoder getForwardMessageDecoder() {
-        return new JavaxMessageDecoder(super.getForwardMessageDecoder());
+    public MessageDecoder getForwardMessageDecoder(ConnectionLoadBalanceConcept concept) {
+        return new JavaxMessageDecoder(super.getForwardMessageDecoder(concept));
     }
 
     @AllArgsConstructor
@@ -32,7 +33,7 @@ public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdap
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message) {
+        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
             if (message instanceof javax.websocket.PongMessage) {
                 return new BinaryPongMessage(((javax.websocket.PongMessage) message).getApplicationData());
             }

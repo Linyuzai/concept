@@ -14,6 +14,7 @@ import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeart
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapterFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifierFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifierFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -109,6 +110,12 @@ public class WebSocketLoadBalanceConfiguration {
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
+    }
+
+    @Bean
+    public MessageIdempotentVerifierFactory messageIdempotentVerifierFactory() {
+        return new MessageIdempotentVerifierFactoryImpl()
+                .addScopes(WebSocketScoped.NAME);
     }
 
     @Bean
