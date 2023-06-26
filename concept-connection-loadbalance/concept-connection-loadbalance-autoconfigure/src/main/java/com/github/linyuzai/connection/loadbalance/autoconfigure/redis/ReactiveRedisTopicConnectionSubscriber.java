@@ -22,7 +22,7 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractConnectionSu
         connection.setTopic(topic);
         connection.setReactiveRedisTemplate(reactiveRedisTemplate);
         Disposable disposable = reactiveRedisTemplate.listenTo(new ChannelTopic(topic)).subscribe(
-                message -> onMessage(connection, message.getMessage()),
+                message -> onMessage(connection, message),
                 e -> concept.onError(connection, e));
         connection.setCloseCallback(reason -> {
             if (!disposable.isDisposed()) {

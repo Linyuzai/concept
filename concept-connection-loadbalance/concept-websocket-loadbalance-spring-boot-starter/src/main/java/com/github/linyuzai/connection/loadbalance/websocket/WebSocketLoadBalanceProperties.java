@@ -113,7 +113,9 @@ public class WebSocketLoadBalanceProperties {
             REDISSON_TOPIC,
             REDISSON_SHARED_TOPIC,
 
-            REDIS_TOPIC
+            REDIS_TOPIC,
+
+            RABBIT_FANOUT
         }
 
         @Data

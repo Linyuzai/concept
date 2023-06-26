@@ -12,9 +12,8 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
 
     @Override
     public synchronized void subscribe(ConnectionLoadBalanceConcept concept) {
-        ConnectionServer local = concept.getConnectionServerManager().getLocal();
-        String topic = getTopic(local);
-        String from = getFrom(local);
+        String topic = getTopic(concept);
+        String from = getFrom(concept);
         Connection connection = create(topic, concept);
         connection.getMessageSendInterceptors().add((message, con) -> {
             message.setFrom(from);
@@ -29,17 +28,22 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
 
     protected void onMessage(Connection connection, Object message) {
         connection.getConcept().onMessage(connection, message, msg ->
-                !getFrom(connection.getConcept().getConnectionServerManager().getLocal())
-                        .equals(msg.getFrom()));
+                !getFrom(connection.getConcept()).equals(msg.getFrom()));
     }
 
-    protected String getFrom(ConnectionServer local) {
+    protected String getFrom(ConnectionLoadBalanceConcept concept) {
+        ConnectionServer local = getLocal(concept);
         return local == null ? useUnknownIfNull(null) : useUnknownIfNull(local.getInstanceId());
     }
 
-    protected String getTopic(ConnectionServer local) {
+    protected String getTopic(ConnectionLoadBalanceConcept concept) {
+        ConnectionServer local = getLocal(concept);
         return PREFIX + DELIMITER + getExtension() + DELIMITER +
                 (local == null ? useUnknownIfNull(null) : useUnknownIfNull(local.getServiceId()));
+    }
+
+    protected ConnectionServer getLocal(ConnectionLoadBalanceConcept concept) {
+        return concept.getConnectionServerManager().getLocal();
     }
 
     protected String useUnknownIfNull(String s) {

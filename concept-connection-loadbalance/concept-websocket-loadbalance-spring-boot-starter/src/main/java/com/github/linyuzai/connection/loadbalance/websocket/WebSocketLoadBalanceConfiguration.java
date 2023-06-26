@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
@@ -20,6 +21,9 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -86,6 +90,21 @@ public class WebSocketLoadBalanceConfiguration {
                 ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
             ReactiveRedisTopicConnectionSubscriberFactory factory = new ReactiveRedisTopicConnectionSubscriberFactory();
             factory.setReactiveRedisTemplate(reactiveRedisTemplate);
+            factory.addScopes(WebSocketScoped.NAME);
+            return factory;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "RABBIT_FANOUT")
+    public static class RabbitFanoutConfiguration {
+
+        @Bean
+        public RabbitFanoutConnectionSubscriberFactory rabbitFanoutConnectionSubscriberFactory(RabbitTemplate rabbitTemplate,
+                                                                                               RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory) {
+            RabbitFanoutConnectionSubscriberFactory factory = new RabbitFanoutConnectionSubscriberFactory();
+            factory.setRabbitTemplate(rabbitTemplate);
+            factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }

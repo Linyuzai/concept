@@ -27,7 +27,6 @@ public class RedissonTopicConnectionSubscriber extends AbstractConnectionSubscri
         connection.setId(topic);
         connection.setTopic(rTopic);
         int listener = rTopic.addListener(Object.class, (channel, object) -> {
-            System.out.println("onMessage:" + channel + "," + object);
             onMessage(connection, object);
         });
         connection.setCloseCallback(reason -> rTopic.removeListenerAsync(listener));
