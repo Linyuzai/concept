@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 
 /**
  * 消息转发处理器
@@ -15,12 +16,12 @@ public class MessageForwardHandler implements MessageReceiveEventListener {
     }
 
     @Override
-    public void onMessage(Message message, Connection connection) {
+    public void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept) {
         try {
-            connection.getConcept().send(message);
-            connection.getConcept().getEventPublisher().publish(new MessageForwardEvent(connection, message));
+            concept.send(message);
+            concept.getEventPublisher().publish(new MessageForwardEvent(connection, message));
         } catch (Throwable e) {
-            connection.getConcept().getEventPublisher().publish(new MessageForwardErrorEvent(connection, message, e));
+            concept.getEventPublisher().publish(new MessageForwardErrorEvent(connection, message, e));
         }
     }
 

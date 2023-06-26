@@ -1,5 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.heartbeat;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,8 +37,8 @@ public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
      * 初始化添加定时任务
      */
     @Override
-    public void onInitialize() {
-        executor.scheduleAtFixedRate(this::schedule, period, period, TimeUnit.MILLISECONDS);
+    public void onInitialize(ConnectionLoadBalanceConcept concept) {
+        executor.scheduleAtFixedRate(() -> schedule(concept), period, period, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -44,16 +46,16 @@ public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
      * <p>
      * 发送 ping
      */
-    public void schedule() {
-        closeTimeout();
-        sendPing();
+    public void schedule(ConnectionLoadBalanceConcept concept) {
+        closeTimeout(concept);
+        sendPing(concept);
     }
 
     /**
      * 关闭线程池调度器
      */
     @Override
-    public void onDestroy() {
+    public void onDestroy(ConnectionLoadBalanceConcept concept) {
         if (executor != null && !executor.isShutdown()) {
             executor.shutdown();
         }

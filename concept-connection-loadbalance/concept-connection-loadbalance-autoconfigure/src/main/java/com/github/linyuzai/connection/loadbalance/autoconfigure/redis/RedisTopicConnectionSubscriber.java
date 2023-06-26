@@ -25,18 +25,18 @@ public class RedisTopicConnectionSubscriber extends AbstractConnectionSubscriber
         connection.setId(topic);
         connection.setTopic(topic);
         connection.setRedisTemplate(redisTemplate);
-        RedisMessageListenerContainer messageListenerContainer = newRedisMessageListenerContainer();
+        RedisMessageListenerContainer container = newRedisMessageListenerContainer();
         MessageListener listener = (message, pattern) ->
                 RedisTopicConnectionSubscriber.super.onMessage(connection, message);
         connection.setCloseCallback(o -> {
             //messageListenerContainer.removeMessageListener(listener);
-            if (messageListenerContainer.isRunning()) {
-                messageListenerContainer.stop();
+            if (container.isRunning()) {
+                container.stop();
             }
         });
-        messageListenerContainer.addMessageListener(listener, new ChannelTopic(topic));
-        messageListenerContainer.afterPropertiesSet();
-        messageListenerContainer.start();
+        container.addMessageListener(listener, new ChannelTopic(topic));
+        container.afterPropertiesSet();
+        container.start();
         return connection;
     }
 

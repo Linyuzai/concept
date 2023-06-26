@@ -10,16 +10,16 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventList
 public interface LifecycleListener extends ConnectionEventListener {
 
     @Override
-    default void onEvent(Object event) {
+    default void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ConnectionEstablishEvent) {
             Connection connection = ((ConnectionEstablishEvent) event).getConnection();
             if (Connection.Type.CLIENT.equals(connection.getType())) {
-                onEstablish(connection);
+                onEstablish(connection, concept);
             }
         } else if (event instanceof ConnectionCloseEvent) {
             Connection connection = ((ConnectionCloseEvent) event).getConnection();
             if (Connection.Type.CLIENT.equals(connection.getType())) {
-                onClose(connection, ((ConnectionCloseEvent) event).getReason());
+                onClose(connection, ((ConnectionCloseEvent) event).getReason(), concept);
             }
         }
     }
@@ -29,7 +29,7 @@ public interface LifecycleListener extends ConnectionEventListener {
      *
      * @param connection 连接
      */
-    void onEstablish(Connection connection);
+    void onEstablish(Connection connection, ConnectionLoadBalanceConcept concept);
 
     /**
      * 连接关闭
@@ -37,5 +37,5 @@ public interface LifecycleListener extends ConnectionEventListener {
      * @param connection 连接
      * @param reason     原因
      */
-    void onClose(Connection connection, Object reason);
+    void onClose(Connection connection, Object reason, ConnectionLoadBalanceConcept concept);
 }

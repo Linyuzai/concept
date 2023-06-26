@@ -12,15 +12,15 @@ public interface ErrorHandler extends ConnectionEventListener {
      * 异常回调
      *
      * @param e 异常
-     * @param o 事件
+     * @param event 事件
      */
-    void onError(Throwable e, Object o);
+    void onError(Throwable e, Object event, ConnectionLoadBalanceConcept concept);
 
     @Override
-    default void onEvent(Object event) {
+    default void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ErrorEvent) {
             Throwable error = ((ErrorEvent) event).getError();
-            onError(error, event);
+            onError(error, event, concept);
         }
     }
 }

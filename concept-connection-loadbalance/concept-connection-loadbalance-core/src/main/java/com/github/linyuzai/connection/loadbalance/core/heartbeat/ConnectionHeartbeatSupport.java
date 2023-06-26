@@ -20,8 +20,6 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public abstract class ConnectionHeartbeatSupport extends AbstractScoped implements ConnectionEventListener {
 
-    private ConnectionLoadBalanceConcept concept;
-
     /**
      * 连接类型
      */
@@ -33,12 +31,11 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
     private final long timeout;
 
     @Override
-    public void onEvent(Object event) {
+    public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ConnectionLoadBalanceConceptInitializeEvent) {
-            concept = ((ConnectionLoadBalanceConceptInitializeEvent) event).getConcept();
-            onInitialize();
+            onInitialize(concept);
         } else if (event instanceof ConnectionLoadBalanceConceptDestroyEvent) {
-            onDestroy();
+            onDestroy(concept);
         } else if (event instanceof MessageReceiveEvent) {
             Connection connection = ((MessageReceiveEvent) event).getConnection();
             Message message = ((MessageReceiveEvent) event).getMessage();
@@ -71,17 +68,17 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
     /**
      * 初始化
      */
-    public abstract void onInitialize();
+    public abstract void onInitialize(ConnectionLoadBalanceConcept concept);
 
     /**
      * 销毁
      */
-    public abstract void onDestroy();
+    public abstract void onDestroy(ConnectionLoadBalanceConcept concept);
 
     /**
      * 发送 ping
      */
-    public void sendPing() {
+    public void sendPing(ConnectionLoadBalanceConcept concept) {
         for (String connectionType : connectionTypes) {
             Collection<Connection> connections = concept.getConnectionRepository()
                     .select(connectionType);
@@ -100,7 +97,7 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
     /**
      * 关闭心跳超时的连接
      */
-    public void closeTimeout() {
+    public void closeTimeout(ConnectionLoadBalanceConcept concept) {
         long now = System.currentTimeMillis();
         for (String connectionType : connectionTypes) {
             Collection<Connection> connections = concept.getConnectionRepository().select(connectionType);

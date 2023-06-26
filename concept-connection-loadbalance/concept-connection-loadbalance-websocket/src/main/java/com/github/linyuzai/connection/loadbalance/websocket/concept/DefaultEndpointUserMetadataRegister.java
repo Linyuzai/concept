@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.extension.UserMessage;
 import com.github.linyuzai.connection.loadbalance.core.extension.UserSelector;
 
@@ -14,7 +15,7 @@ public class DefaultEndpointUserMetadataRegister implements WebSocketLifecycleLi
     public static final String NAME = "userId";
 
     @Override
-    public void onEstablish(Connection connection) {
+    public void onEstablish(Connection connection, ConnectionLoadBalanceConcept concept) {
         if (connection instanceof WebSocketConnection) {
             String userId = ((WebSocketConnection) connection).getQueryParameter(NAME);
             connection.getMetadata().put(UserSelector.KEY, userId);
@@ -22,7 +23,7 @@ public class DefaultEndpointUserMetadataRegister implements WebSocketLifecycleLi
     }
 
     @Override
-    public void onClose(Connection connection, Object reason) {
+    public void onClose(Connection connection, Object reason, ConnectionLoadBalanceConcept concept) {
 
     }
 }

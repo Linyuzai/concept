@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.monitor;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoadBalanceLogger;
 
@@ -16,7 +17,7 @@ public class LoadBalanceMonitorLogger extends ConnectionLoadBalanceLogger implem
     }
 
     @Override
-    public void onEvent(Object event) {
+    public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof LoadBalanceMonitorEvent) {
             info("Start running monitor for load balance");
         }

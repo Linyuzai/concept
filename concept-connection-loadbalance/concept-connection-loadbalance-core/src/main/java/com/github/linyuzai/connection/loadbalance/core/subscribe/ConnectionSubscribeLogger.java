@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionCloseEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEstablishEvent;
@@ -22,7 +23,7 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
     }
 
     @Override
-    public void onEvent(Object event) {
+    public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ConnectionEstablishEvent) {
             Connection connection = ((ConnectionEstablishEvent) event).getConnection();
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {

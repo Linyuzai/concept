@@ -29,16 +29,21 @@ public class RabbitFanoutConnectionSubscriber extends AbstractConnectionSubscrib
         RabbitAdmin admin = new RabbitAdmin(rabbitTemplate);
         admin.declareBinding(BindingBuilder.bind(new Queue(topic + "." + getFrom(concept)))
                 .to(new FanoutExchange(topic)));
-        MessageListenerContainer listenerContainer = rabbitListenerContainerFactory.createListenerContainer();
-        listenerContainer.setQueueNames(topic);
-        listenerContainer.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
+        MessageListenerContainer container = rabbitListenerContainerFactory.createListenerContainer();
+        container.setQueueNames(topic);
+        container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
             RabbitFanoutConnectionSubscriber.super.onMessage(connection, message);
             if (channel != null) {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             }
         });
-        listenerContainer.afterPropertiesSet();
-        listenerContainer.start();
+        connection.setCloseCallback(reason -> {
+            if (container.isRunning()) {
+                container.stop();
+            }
+        });
+        container.afterPropertiesSet();
+        container.start();
         return connection;
     }
 

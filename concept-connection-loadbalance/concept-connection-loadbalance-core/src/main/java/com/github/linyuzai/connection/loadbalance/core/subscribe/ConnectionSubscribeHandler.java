@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEventListener;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
@@ -21,12 +22,12 @@ public class ConnectionSubscribeHandler extends AbstractScoped implements Messag
     }
 
     @Override
-    public void onMessage(Message message, Connection connection) {
-        ConnectionSubscriber subscriber = connection.getConcept().getConnectionSubscriber();
+    public void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept) {
+        ConnectionSubscriber subscriber = concept.getConnectionSubscriber();
         if (message.isType(ConnectionServer.class) && subscriber instanceof ServerConnectionSubscriber) {
             ConnectionServer server = message.getPayload();
             connection.getMetadata().put(ConnectionServer.class, server);
-            ((ServerConnectionSubscriber<?>) subscriber).subscribe(server, connection.getConcept());
+            ((ServerConnectionSubscriber<?>) subscriber).subscribe(server, concept);
         }
     }
 }

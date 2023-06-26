@@ -25,30 +25,27 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
 
     private final long period;
 
-    private ConnectionLoadBalanceConcept concept;
-
-    public void start() {
-        executor.scheduleAtFixedRate(this::subscribe, period, period, TimeUnit.MILLISECONDS);
+    public void start(ConnectionLoadBalanceConcept concept) {
+        executor.scheduleAtFixedRate(() -> subscribe(concept), period, period, TimeUnit.MILLISECONDS);
     }
 
-    public void subscribe() {
+    public void subscribe(ConnectionLoadBalanceConcept concept) {
         concept.getEventPublisher().publish(new LoadBalanceMonitorEvent());
         concept.getConnectionSubscriber().subscribe();
     }
 
-    public void stop() {
+    public void stop(ConnectionLoadBalanceConcept concept) {
         if (!executor.isShutdown()) {
             executor.shutdown();
         }
     }
 
     @Override
-    public void onEvent(Object event) {
+    public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ConnectionLoadBalanceConceptInitializeEvent) {
-            concept = ((ConnectionLoadBalanceConceptInitializeEvent) event).getConcept();
-            start();
+            start(concept);
         } else if (event instanceof ConnectionLoadBalanceConceptDestroyEvent) {
-            stop();
+            stop(concept);
         }
     }
 }

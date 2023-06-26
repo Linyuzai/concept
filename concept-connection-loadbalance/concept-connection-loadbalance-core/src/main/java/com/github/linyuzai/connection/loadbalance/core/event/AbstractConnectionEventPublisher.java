@@ -30,7 +30,7 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
     public void publish(Object event, ConnectionLoadBalanceConcept concept) {
         for (ConnectionEventListener listener : listeners) {
             try {
-                listener.onEvent(event);
+                listener.onEvent(event, concept);
             } catch (Throwable e) {
                 handlePublishError(event, e);
             }

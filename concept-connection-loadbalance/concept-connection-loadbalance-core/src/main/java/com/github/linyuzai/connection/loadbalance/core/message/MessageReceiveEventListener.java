@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 
 /**
@@ -9,7 +10,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventList
 public interface MessageReceiveEventListener extends ConnectionEventListener {
 
     @Override
-    default void onEvent(Object event) {
+    default void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof MessageReceiveEvent) {
             Message message = ((MessageReceiveEvent) event).getMessage();
             if (message instanceof PingMessage || message instanceof PongMessage) {
@@ -17,12 +18,12 @@ public interface MessageReceiveEventListener extends ConnectionEventListener {
             }
             Connection connection = ((MessageReceiveEvent) event).getConnection();
             if (connection.getType().equals(getConnectionType())) {
-                onMessage(message, connection);
+                onMessage(message, connection, concept);
             }
         }
     }
 
     String getConnectionType();
 
-    void onMessage(Message message, Connection connection);
+    void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept);
 }

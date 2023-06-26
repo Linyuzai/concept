@@ -551,8 +551,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     withScope(MessageIdempotentVerifier.class, messageIdempotentVerifierFactories)));
             ConnectionEventPublisher publisher = ConnectionEventPublisher.Delegate.delegate(concept,
                     withScope(ConnectionEventPublisher.class, eventPublisherFactories));
-            publisher.register(ConnectionEventListener.Delegate.delegate(concept,
-                    withScope(eventListeners)));
+            publisher.register(withScope(eventListeners));
             concept.setEventPublisher(publisher);
 
             return concept;
