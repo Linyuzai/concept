@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractConnectionSu
             }
         });
         return connection;
+    }
+
+    @Override
+    protected MessageIdempotentVerifier getMessageIdempotentVerifier(ConnectionLoadBalanceConcept concept) {
+        return MessageIdempotentVerifier.VERIFIED;
     }
 
     @Override

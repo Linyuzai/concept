@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPubl
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
@@ -150,6 +151,8 @@ public interface ConnectionLoadBalanceConcept {
     List<MessageFactory> getMessageFactories();
 
     MessageCodecAdapter getMessageCodecAdapter();
+
+    MessageIdempotentVerifier getMessageIdempotentVerifier();
 
     ConnectionEventPublisher getEventPublisher();
 }

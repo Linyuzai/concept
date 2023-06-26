@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,12 @@ public class RedisTopicConnectionSubscriber extends AbstractConnectionSubscriber
         RedisMessageListenerContainer messageListenerContainer = newRedisMessageListenerContainer();
         MessageListener listener = (message, pattern) ->
                 RedisTopicConnectionSubscriber.super.onMessage(connection, message);
-        connection.setCloseCallback(o -> messageListenerContainer.removeMessageListener(listener));
+        connection.setCloseCallback(o -> {
+            //messageListenerContainer.removeMessageListener(listener);
+            if (messageListenerContainer.isRunning()) {
+                messageListenerContainer.stop();
+            }
+        });
         messageListenerContainer.addMessageListener(listener, new ChannelTopic(topic));
         messageListenerContainer.afterPropertiesSet();
         messageListenerContainer.start();
@@ -38,6 +44,11 @@ public class RedisTopicConnectionSubscriber extends AbstractConnectionSubscriber
         RedisMessageListenerContainer messageListenerContainer = new RedisMessageListenerContainer();
         messageListenerContainer.setConnectionFactory(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         return messageListenerContainer;
+    }
+
+    @Override
+    protected MessageIdempotentVerifier getMessageIdempotentVerifier(ConnectionLoadBalanceConcept concept) {
+        return MessageIdempotentVerifier.VERIFIED;
     }
 
     @Override

@@ -2,7 +2,10 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+
+import java.util.UUID;
 
 public abstract class AbstractConnectionSubscriber implements ConnectionSubscriber {
 
@@ -16,6 +19,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         String from = getFrom(concept);
         Connection connection = create(topic, concept);
         connection.getMessageSendInterceptors().add((message, con) -> {
+            message.setId(getMessageId());
             message.setFrom(from);
             return true;
         });
@@ -27,8 +31,19 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     protected abstract String getExtension();
 
     protected void onMessage(Connection connection, Object message) {
-        connection.getConcept().onMessage(connection, message, msg ->
-                !getFrom(connection.getConcept()).equals(msg.getFrom()));
+        connection.getConcept().onMessage(connection, message, msg -> {
+            ConnectionLoadBalanceConcept concept = connection.getConcept();
+            return !getFrom(concept).equals(msg.getFrom()) &&
+                    getMessageIdempotentVerifier(concept).verify(msg);
+        });
+    }
+
+    protected MessageIdempotentVerifier getMessageIdempotentVerifier(ConnectionLoadBalanceConcept concept) {
+        return concept.getMessageIdempotentVerifier();
+    }
+
+    protected String getMessageId() {
+        return UUID.randomUUID().toString();
     }
 
     protected String getFrom(ConnectionLoadBalanceConcept concept) {

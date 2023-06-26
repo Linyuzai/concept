@@ -13,6 +13,7 @@ import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecut
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapterFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifierFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
@@ -140,6 +141,7 @@ public class WebSocketLoadBalanceConfiguration {
             List<ConnectionSelector> connectionSelectors,
             List<MessageFactory> messageFactories,
             List<MessageCodecAdapterFactory> messageCodecAdapterFactories,
+            List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories,
             List<ConnectionEventPublisherFactory> eventPublisherFactories,
             List<ConnectionEventListener> eventListeners) {
         return new WebSocketLoadBalanceConcept.Builder()
@@ -150,6 +152,7 @@ public class WebSocketLoadBalanceConfiguration {
                 .addConnectionSelectors(connectionSelectors)
                 .addMessageFactories(messageFactories)
                 .addMessageCodecAdapterFactories(messageCodecAdapterFactories)
+                .addMessageIdempotentVerifierFactories(messageIdempotentVerifierFactories)
                 .addEventPublisherFactories(eventPublisherFactories)
                 .addEventListeners(eventListeners)
                 .build();

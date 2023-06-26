@@ -18,6 +18,11 @@ public interface Message {
     String FORWARD = "_forward";
 
     /**
+     * 消息ID
+     */
+    String ID = "_id";
+
+    /**
      * 标记该消息由哪个实例发送
      */
     String FROM = "_from";
@@ -51,6 +56,10 @@ public interface Message {
     boolean isForward();
 
     void setForward(boolean forward);
+
+    String getId();
+
+    void setId(String id);
 
     String getFrom();
 

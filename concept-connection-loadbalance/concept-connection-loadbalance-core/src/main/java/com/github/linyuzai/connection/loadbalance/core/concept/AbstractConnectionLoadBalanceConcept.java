@@ -71,6 +71,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected MessageCodecAdapter messageCodecAdapter;
 
     /**
+     * 消息幂等校验器
+     */
+    protected MessageIdempotentVerifier messageIdempotentVerifier;
+
+    /**
      * 事件发布者
      */
     protected ConnectionEventPublisher eventPublisher;
@@ -412,9 +417,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
 
+        protected List<MessageFactory> messageFactories = new ArrayList<>();
+
         protected List<MessageCodecAdapterFactory> messageCodecAdapterFactories = new ArrayList<>();
 
-        protected List<MessageFactory> messageFactories = new ArrayList<>();
+        protected List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories = new ArrayList<>();
 
         protected List<ConnectionEventPublisherFactory> eventPublisherFactories = new ArrayList<>();
 
@@ -461,6 +468,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
+         * 添加消息工厂
+         */
+        public T addMessageFactories(Collection<? extends MessageFactory> factories) {
+            this.messageFactories.addAll(factories);
+            return (T) this;
+        }
+
+        /**
          * 添加消息编解码适配器工厂
          */
         public T addMessageCodecAdapterFactories(Collection<? extends MessageCodecAdapterFactory> factories) {
@@ -469,10 +484,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加消息工厂
+         * 添加消息幂等校验器工厂
          */
-        public T addMessageFactories(Collection<? extends MessageFactory> factories) {
-            this.messageFactories.addAll(factories);
+        public T addMessageIdempotentVerifierFactories(Collection<? extends MessageIdempotentVerifierFactory> factories) {
+            this.messageIdempotentVerifierFactories.addAll(factories);
             return (T) this;
         }
 

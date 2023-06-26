@@ -21,36 +21,46 @@ public abstract class AbstractMessage<T> implements Message {
 
     @Override
     public boolean isBroadcast() {
-        String broadcast = getHeaders().getOrDefault(Message.BROADCAST, Boolean.TRUE.toString());
+        String broadcast = getHeaders().getOrDefault(BROADCAST, Boolean.TRUE.toString());
         return Boolean.parseBoolean(broadcast);
     }
 
     @Override
     public void setBroadcast(boolean broadcast) {
-        getHeaders().put(Message.BROADCAST, Boolean.valueOf(broadcast).toString());
+        getHeaders().put(BROADCAST, Boolean.valueOf(broadcast).toString());
     }
 
     @Override
     public boolean isForward() {
-        return getHeaders().containsKey(Message.FORWARD);
+        return getHeaders().containsKey(FORWARD);
     }
 
     @Override
     public void setForward(boolean forward) {
         if (forward) {
-            getHeaders().put(Message.FORWARD, Boolean.TRUE.toString());
+            getHeaders().put(FORWARD, Boolean.TRUE.toString());
         } else {
-            getHeaders().remove(Message.FORWARD);
+            getHeaders().remove(FORWARD);
         }
     }
 
     @Override
+    public String getId() {
+        return getHeaders().get(ID);
+    }
+
+    @Override
+    public void setId(String id) {
+        getHeaders().put(ID, id);
+    }
+
+    @Override
     public String getFrom() {
-        return getHeaders().get(Message.FROM);
+        return getHeaders().get(FROM);
     }
 
     @Override
     public void setFrom(String from) {
-        getHeaders().put(Message.FORWARD, from);
+        getHeaders().put(FORWARD, from);
     }
 }

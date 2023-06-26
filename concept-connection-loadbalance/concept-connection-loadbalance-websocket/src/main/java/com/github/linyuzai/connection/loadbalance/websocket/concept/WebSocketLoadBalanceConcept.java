@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.websocket.concept;
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
@@ -58,6 +59,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
             concept.setConnectionSelectors(withFilterChain(withScope(connectionSelectors)));
             concept.setMessageFactories(withScope(messageFactories));
             concept.setMessageCodecAdapter(withScope(MessageCodecAdapter.class, messageCodecAdapterFactories));
+            concept.setMessageIdempotentVerifier(withScope(MessageIdempotentVerifier.class, messageIdempotentVerifierFactories));
             concept.setEventPublisher(withScope(ConnectionEventPublisher.class, eventPublisherFactories, publisher ->
                     publisher.register(eventListeners)));
             return concept;
