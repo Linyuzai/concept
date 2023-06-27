@@ -1,8 +1,11 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.function.Consumer;
 
 /**
  * 连接订阅者
@@ -13,10 +16,25 @@ import lombok.RequiredArgsConstructor;
  */
 public interface ConnectionSubscriber {
 
-    void subscribe(ConnectionLoadBalanceConcept concept);
+    void subscribe(Consumer<Connection> consumer, ConnectionLoadBalanceConcept concept);
 
-    default void subscribe() {
-        subscribe(null);
+    default void subscribe(Consumer<Connection> consumer) {
+        subscribe(consumer, null);
+    }
+
+    class MasterSlave {
+
+        public static int getMasterIndex() {
+            return 0;
+        }
+
+        public static int getSlaveIndex(int index) {
+            return getMasterIndex() + index;
+        }
+
+        public static boolean isMaster(int index) {
+            return index == 0;
+        }
     }
 
     @Getter
@@ -28,18 +46,18 @@ public interface ConnectionSubscriber {
         private final ConnectionSubscriber delegate;
 
         public static ConnectionSubscriber delegate(ConnectionLoadBalanceConcept concept,
-                                        ConnectionSubscriber delegate) {
+                                                    ConnectionSubscriber delegate) {
             return new Delegate(concept, delegate);
         }
 
         @Override
-        public void subscribe(ConnectionLoadBalanceConcept concept) {
-            delegate.subscribe(concept);
+        public void subscribe(Consumer<Connection> consumer, ConnectionLoadBalanceConcept concept) {
+            delegate.subscribe(consumer, concept);
         }
 
         @Override
-        public void subscribe() {
-            delegate.subscribe(concept);
+        public void subscribe(Consumer<Connection> consumer) {
+            delegate.subscribe(consumer, concept);
         }
     }
 }

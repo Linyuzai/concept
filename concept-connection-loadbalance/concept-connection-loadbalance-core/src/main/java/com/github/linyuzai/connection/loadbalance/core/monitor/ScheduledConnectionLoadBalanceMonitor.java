@@ -27,7 +27,7 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
 
     public void subscribe(ConnectionLoadBalanceConcept concept) {
         concept.getEventPublisher().publish(new LoadBalanceMonitorEvent());
-        concept.getConnectionSubscriber().subscribe();
+        concept.getConnectionSubscriber().subscribe(concept::onEstablish);
     }
 
     public void stop(ConnectionLoadBalanceConcept concept) {

@@ -107,7 +107,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void initialize() {
-        connectionSubscriber.subscribe();
+        connectionSubscriber.subscribe(this::onEstablish);
         eventPublisher.publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 

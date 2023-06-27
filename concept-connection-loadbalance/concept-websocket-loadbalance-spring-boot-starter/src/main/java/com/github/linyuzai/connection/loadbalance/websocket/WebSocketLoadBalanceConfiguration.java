@@ -1,9 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
-import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRedisTopicConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
@@ -20,17 +16,11 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerMa
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
-import org.redisson.api.RedissonClient;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 
@@ -38,75 +28,77 @@ import java.util.List;
 public class WebSocketLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDISSON_TOPIC")
-    public static class RedissonTopicConfiguration {
-
-        @Bean
-        public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
-            RedissonTopicConnectionSubscriberFactory factory = new RedissonTopicConnectionSubscriberFactory();
-            factory.setRedissonClient(redissonClient);
-            factory.setShared(false);
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
-        }
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDISSON_TOPIC")
+    public static class RedissonTopicSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.RedissonTopicConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDISSON_SHARED_TOPIC")
-    public static class RedissonSharedTopicConfiguration {
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDISSON_TOPIC")
+    public static class RedissonTopicSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.RedissonTopicConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+    }
 
-        @Bean
-        public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
-            RedissonTopicConnectionSubscriberFactory factory = new RedissonTopicConnectionSubscriberFactory();
-            factory.setRedissonClient(redissonClient);
-            factory.setShared(true);
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
-        }
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDISSON_SHARED_TOPIC")
+    public static class RedissonSharedTopicSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.RedissonSharedTopicConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDISSON_SHARED_TOPIC")
+    public static class RedissonSharedTopicSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.RedissonSharedTopicConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDIS_TOPIC")
-    public static class RedisTopicConfiguration {
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDIS_TOPIC")
+    public static class RedisTopicSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.RedisTopicConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+    }
 
-        @Bean
-        public RedisTopicConnectionSubscriberFactory wsRedisTopicConnectionSubscriberFactory(RedisTemplate<?, ?> redisTemplate) {
-            RedisTopicConnectionSubscriberFactory factory = new RedisTopicConnectionSubscriberFactory();
-            factory.setRedisTemplate(redisTemplate);
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
-        }
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDIS_TOPIC")
+    public static class RedisTopicSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.RedisTopicConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "REDIS_TOPIC")
-    public static class ReactiveRedisTopicConfiguration {
-
-        @Bean
-        public ReactiveRedisTopicConnectionSubscriberFactory wsReactiveRedisTopicConnectionSubscriberFactory(
-                ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
-            ReactiveRedisTopicConnectionSubscriberFactory factory = new ReactiveRedisTopicConnectionSubscriberFactory();
-            factory.setReactiveRedisTemplate(reactiveRedisTemplate);
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
-        }
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDIS_TOPIC")
+    public static class ReactiveRedisTopicSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.ReactiveRedisTopicConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "RABBIT_FANOUT")
-    public static class RabbitFanoutConfiguration {
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDIS_TOPIC")
+    public static class ReactiveRedisTopicSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.ReactiveRedisTopicConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+    }
 
-        @Bean
-        public RabbitFanoutConnectionSubscriberFactory wsRabbitFanoutConnectionSubscriberFactory(RabbitTemplate rabbitTemplate,
-                                                                                                 RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory) {
-            RabbitFanoutConnectionSubscriberFactory factory = new RabbitFanoutConnectionSubscriberFactory();
-            factory.setRabbitTemplate(rabbitTemplate);
-            factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
-        }
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "RABBIT_FANOUT")
+    public static class RabbitFanoutSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.RabbitFanoutConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "RABBIT_FANOUT")
+    public static class RabbitFanoutSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.RabbitFanoutConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
     }
 
     @Bean

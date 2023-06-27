@@ -1,8 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceMonitorConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
+import com.github.linyuzai.connection.loadbalance.websocket.WebSocketSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,44 +29,45 @@ public class ServletWebSocketLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET", matchIfMissing = true)
-    public static class WebSocketProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
-
-        @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
-            ServletWebSocketConnectionSubscriberFactory factory = new ServletWebSocketConnectionSubscriberFactory();
-            factory.setProtocol("ws");
-            return factory;
-        }
-
-        @Bean
-        public ServletWebSocketLoadBalanceConfigurer servletWebSocketLoadBalanceConfigurer(WebSocketLoadBalanceConcept concept) {
-            return new ServletWebSocketLoadBalanceConfigurer(concept);
-        }
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master",
+            havingValue = "WEBSOCKET", matchIfMissing = true)
+    public static class WebSocketSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.ServletWebSocketConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.protocol", havingValue = "WEBSOCKET_SSL")
-    public static class WebSocketSSLProtocolConfiguration extends WebSocketLoadBalanceMonitorConfiguration {
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1",
+            havingValue = "WEBSOCKET")
+    public static class WebSocketSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.ServletWebSocketConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+    }
 
-        @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
-            ServletWebSocketConnectionSubscriberFactory factory = new ServletWebSocketConnectionSubscriberFactory();
-            factory.setProtocol("wss");
-            return factory;
-        }
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master",
+            havingValue = "WEBSOCKET_SSL")
+    public static class WebSocketSSLSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.ServletWebSocketSSLConfiguration
+            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+    }
 
-        @Bean
-        public ServletWebSocketLoadBalanceConfigurer servletWebSocketLoadBalanceConfigurer(WebSocketLoadBalanceConcept concept) {
-            return new ServletWebSocketLoadBalanceConfigurer(concept);
-        }
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1",
+            havingValue = "WEBSOCKET_SSL")
+    public static class WebSocketSSLSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.ServletWebSocketSSLConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
     }
 
     @EnableWebSocket
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.server.default-endpoint.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(value = "concept.websocket.server.default-endpoint.enabled",
+            havingValue = "true", matchIfMissing = true)
     public static class DefaultEndpointConfiguration extends WebSocketDefaultEndpointConfiguration {
 
         @Bean

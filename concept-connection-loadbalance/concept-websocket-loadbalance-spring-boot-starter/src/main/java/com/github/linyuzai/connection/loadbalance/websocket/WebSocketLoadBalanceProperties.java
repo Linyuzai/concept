@@ -91,9 +91,14 @@ public class WebSocketLoadBalanceProperties {
     public static class LoadBalanceProperties {
 
         /**
-         * 订阅协议，默认 WEBSOCKET
+         * 主订阅类型，默认 WEBSOCKET
          */
-        private Protocol protocol = Protocol.WEBSOCKET;
+        private Subscriber subscriberMaster = Subscriber.WEBSOCKET;
+
+        /**
+         * 从订阅类型，默认 NONE
+         */
+        private Subscriber subscriberSlave1 = Subscriber.NONE;
 
         /**
          * 消息配置
@@ -115,7 +120,9 @@ public class WebSocketLoadBalanceProperties {
          */
         private HeartbeatProperties heartbeat = new HeartbeatProperties();
 
-        public enum Protocol {
+        public enum Subscriber {
+
+            NONE,
 
             WEBSOCKET,
             WEBSOCKET_SSL,

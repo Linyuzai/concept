@@ -17,11 +17,11 @@ import java.util.function.Consumer;
 public abstract class ServerConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 
     @Override
-    public synchronized void subscribe(ConnectionLoadBalanceConcept concept) {
+    public synchronized void subscribe(Consumer<Connection> consumer, ConnectionLoadBalanceConcept concept) {
         List<ConnectionServer> servers = concept.getConnectionServerManager()
                 .getConnectionServers();
         for (ConnectionServer server : servers) {
-            subscribe(server, concept);
+            subscribe(consumer, server, concept);
         }
     }
 
@@ -40,7 +40,8 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
      *
      * @param server 需要订阅的服务实例
      */
-    public void subscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
+    public void subscribe(Consumer<Connection> consumer, ConnectionServer server,
+                          ConnectionLoadBalanceConcept concept) {
         //需要判断是否已经订阅对应的服务
         Connection exist = getSubscriberConnection(server, concept);
         if (exist != null) {
@@ -54,7 +55,7 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
         }
         try {
             doSubscribe(server, concept, connection -> {
-                concept.onEstablish(connection);
+                consumer.accept(connection);
                 ConnectionServer local = concept.getConnectionServerManager().getLocal();
                 if (local != null) {
                     connection.send(concept.createMessage(local));

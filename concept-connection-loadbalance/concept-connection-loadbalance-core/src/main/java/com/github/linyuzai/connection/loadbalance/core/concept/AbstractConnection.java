@@ -68,9 +68,6 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void send(@NonNull Message message) {
-        if (!isAlive()) {
-            throw new IllegalStateException("Connection not alive");
-        }
         if (message instanceof PingMessage) {
             Runnable ping = () -> ping((PingMessage) message);
             try {

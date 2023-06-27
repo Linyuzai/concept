@@ -27,7 +27,7 @@ public class ConnectionSubscribeHandler extends AbstractScoped implements Messag
         if (message.isType(ConnectionServer.class) && subscriber instanceof ServerConnectionSubscriber) {
             ConnectionServer server = message.getPayload();
             connection.getMetadata().put(ConnectionServer.class, server);
-            ((ServerConnectionSubscriber<?>) subscriber).subscribe(server, concept);
+            ((ServerConnectionSubscriber<?>) subscriber).subscribe(concept::onEstablish, server, concept);
         }
     }
 }

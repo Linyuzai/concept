@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotent
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class AbstractConnectionSubscriber implements ConnectionSubscriber {
 
@@ -14,7 +15,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     public static final String PREFIX = "ConceptConnectionLB";
 
     @Override
-    public synchronized void subscribe(ConnectionLoadBalanceConcept concept) {
+    public synchronized void subscribe(Consumer<Connection> consumer,ConnectionLoadBalanceConcept concept) {
         String topic = getTopic(concept);
         //需要判断是否已经订阅对应的服务
         Connection exist = getExist(topic, concept);
@@ -33,7 +34,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
             message.setFrom(from);
             return true;
         });
-        concept.onEstablish(connection);
+        consumer.accept(connection);
     }
 
     protected Connection getExist(String topic, ConnectionLoadBalanceConcept concept) {
