@@ -1,13 +1,15 @@
 package com.github.linyuzai.connection.loadbalance.core.event;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 连接建立事件
  */
-public class ConnectionEstablishEvent extends AbstractConnectionEvent {
+@Getter
+@RequiredArgsConstructor
+public class ConnectionEstablishEvent implements ConnectionEvent {
 
-    public ConnectionEstablishEvent(Connection connection) {
-        super(connection);
-    }
+    private final Connection connection;
 }

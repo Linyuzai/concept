@@ -9,6 +9,8 @@ import java.util.Collection;
  * 消息发送事件
  * <p>
  * 在消息发送之后发布
+ * <p>
+ * 无论成功或失败都会发布
  */
 @Getter
 public class MessageSendEvent implements MessageEvent {

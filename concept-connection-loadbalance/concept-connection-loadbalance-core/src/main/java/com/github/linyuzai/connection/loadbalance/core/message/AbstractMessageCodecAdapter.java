@@ -1,44 +1,44 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.JacksonTextMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.SampleMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTextMessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 
 /**
  * 消息编解码适配器的抽象类
  */
-public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter {
+public abstract class AbstractMessageCodecAdapter extends AbstractScoped implements MessageCodecAdapter {
 
     @Override
-    public MessageEncoder getMessageEncoder(String type, ConnectionLoadBalanceConcept concept) {
+    public MessageEncoder getMessageEncoder(String type) {
         switch (type) {
             case Connection.Type.CLIENT:
-                return getClientMessageEncoder(concept);
+                return getClientMessageEncoder();
             case Connection.Type.SUBSCRIBER:
-                return getSubscribeMessageEncoder(concept);
+                return getSubscribeMessageEncoder();
             case Connection.Type.OBSERVABLE:
-                return getForwardMessageEncoder(concept);
+                return getForwardMessageEncoder();
             default:
-                return getUndefinedTypeMessageEncoder(type, concept);
+                return getUndefinedTypeMessageEncoder(type);
         }
     }
 
     @Override
-    public MessageDecoder getMessageDecoder(String type, ConnectionLoadBalanceConcept concept) {
+    public MessageDecoder getMessageDecoder(String type) {
         switch (type) {
             case Connection.Type.CLIENT:
-                return getClientMessageDecoder(concept);
+                return getClientMessageDecoder();
             case Connection.Type.SUBSCRIBER:
-                return getForwardMessageDecoder(concept);
+                return getForwardMessageDecoder();
             case Connection.Type.OBSERVABLE:
-                return getSubscribeMessageDecoder(concept);
+                return getSubscribeMessageDecoder();
             default:
-                return getUndefinedTypeMessageDecoder(type, concept);
+                return getUndefinedTypeMessageDecoder(type);
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息编码器
      */
-    public MessageEncoder getClientMessageEncoder(ConnectionLoadBalanceConcept concept) {
+    public MessageEncoder getClientMessageEncoder() {
         return new JacksonTextMessageEncoder();
     }
 
@@ -56,7 +56,7 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息解码器
      */
-    public MessageDecoder getClientMessageDecoder(ConnectionLoadBalanceConcept concept) {
+    public MessageDecoder getClientMessageDecoder() {
         return new SampleMessageDecoder();
     }
 
@@ -65,7 +65,7 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息编码器
      */
-    public MessageEncoder getSubscribeMessageEncoder(ConnectionLoadBalanceConcept concept) {
+    public MessageEncoder getSubscribeMessageEncoder() {
         return new JacksonTextMessageEncoder();
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息解码器
      */
-    public MessageDecoder getSubscribeMessageDecoder(ConnectionLoadBalanceConcept concept) {
+    public MessageDecoder getSubscribeMessageDecoder() {
         return new JacksonSubscribeMessageDecoder();
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息编码器
      */
-    public MessageEncoder getForwardMessageEncoder(ConnectionLoadBalanceConcept concept) {
+    public MessageEncoder getForwardMessageEncoder() {
         return new JacksonTextMessageEncoder(true);
     }
 
@@ -92,15 +92,15 @@ public abstract class AbstractMessageCodecAdapter implements MessageCodecAdapter
      *
      * @return 消息解码器
      */
-    public MessageDecoder getForwardMessageDecoder(ConnectionLoadBalanceConcept concept) {
+    public MessageDecoder getForwardMessageDecoder() {
         return new JacksonTextMessageDecoder();
     }
 
-    public MessageEncoder getUndefinedTypeMessageEncoder(String type, ConnectionLoadBalanceConcept concept) {
+    public MessageEncoder getUndefinedTypeMessageEncoder(String type) {
         throw new UnsupportedOperationException();
     }
 
-    public MessageDecoder getUndefinedTypeMessageDecoder(String type, ConnectionLoadBalanceConcept concept) {
+    public MessageDecoder getUndefinedTypeMessageDecoder(String type) {
         throw new UnsupportedOperationException();
     }
 }

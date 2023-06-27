@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.extension;
+package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;

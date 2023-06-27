@@ -1,18 +1,15 @@
 package com.github.linyuzai.connection.loadbalance.core.heartbeat;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.event.ErrorEvent;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageSendErrorEvent;
 
 /**
  * 心跳发送异常事件
  */
-@Getter
-@AllArgsConstructor
-public class HeartbeatSendErrorEvent implements HeartbeatEvent, ErrorEvent {
+public class HeartbeatSendErrorEvent extends MessageSendErrorEvent implements HeartbeatEvent {
 
-    private Connection connection;
-
-    private Throwable error;
+    public HeartbeatSendErrorEvent(Connection connection, Message message, Throwable error) {
+        super(connection, message, error);
+    }
 }

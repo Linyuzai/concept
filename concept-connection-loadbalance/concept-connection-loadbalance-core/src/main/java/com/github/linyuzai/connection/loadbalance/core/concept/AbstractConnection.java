@@ -1,12 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionCloseErrorEvent;
-import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
-import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
-import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
+import com.github.linyuzai.connection.loadbalance.core.heartbeat.HeartbeatSendErrorEvent;
+import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncodeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -30,6 +30,9 @@ public abstract class AbstractConnection implements Connection {
 
     @NonNull
     protected String type;
+
+    @NonNull
+    protected MessageRetryStrategy messageRetryStrategy;
 
     @NonNull
     protected MessageEncoder messageEncoder;
@@ -66,21 +69,46 @@ public abstract class AbstractConnection implements Connection {
     @Override
     public void send(@NonNull Message message) {
         if (!isAlive()) {
-            return;
+            throw new IllegalStateException("Connection not alive");
         }
         if (message instanceof PingMessage) {
-            ping((PingMessage) message);
+            Runnable ping = () -> ping((PingMessage) message);
+            try {
+                ping.run();
+            } catch (Throwable e) {
+                messageRetryStrategy.retry(ping,
+                        new HeartbeatSendErrorEvent(this, message, e));
+            }
         } else if (message instanceof PongMessage) {
-            pong((PongMessage) message);
+            Runnable pong = () -> pong((PongMessage) message);
+            try {
+                pong.run();
+            } catch (Throwable e) {
+                messageRetryStrategy.retry(pong,
+                        new HeartbeatSendErrorEvent(this, message, e));
+            }
         } else {
             for (MessageSendInterceptor interceptor : messageSendInterceptors) {
                 if (!interceptor.intercept(message, this)) {
                     return;
                 }
             }
-            MessageEncoder encoder = getMessageEncoder();
-            Object encode = encoder.encode(message);
-            doSend(encode);
+            Object encode;
+            try {
+                MessageEncoder encoder = getMessageEncoder();
+                encode = encoder.encode(message);
+            } catch (Throwable e) {
+                concept.getEventPublisher().publish(new MessageEncodeErrorEvent(this, e));
+                return;
+            }
+
+            Runnable send = () -> doSend(encode);
+            try {
+                send.run();
+            } catch (Throwable e) {
+                messageRetryStrategy.retry(send,
+                        new MessageSendErrorEvent(this, message, e));
+            }
         }
     }
 

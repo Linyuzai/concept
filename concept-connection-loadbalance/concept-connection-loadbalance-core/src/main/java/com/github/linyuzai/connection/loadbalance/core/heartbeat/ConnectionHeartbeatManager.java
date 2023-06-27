@@ -1,44 +1,30 @@
 package com.github.linyuzai.connection.loadbalance.core.heartbeat;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 心跳管理器
  */
+@Setter
+@Getter
 public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
-
-    private final ScheduledExecutorService executor;
 
     /**
      * 心跳间隔时间
      */
-    private final long period;
-
-    public ConnectionHeartbeatManager(String connectionType,
-                                      long timeout, long period,
-                                      ScheduledExecutorService executor) {
-        this(Collections.singletonList(connectionType), timeout, period, executor);
-    }
-
-    public ConnectionHeartbeatManager(Collection<String> connectionTypes,
-                                      long timeout, long period,
-                                      ScheduledExecutorService executor) {
-        super(connectionTypes, timeout);
-        this.executor = executor;
-        this.period = period;
-    }
+    private long period;
 
     /**
      * 初始化添加定时任务
      */
     @Override
     public void onInitialize(ConnectionLoadBalanceConcept concept) {
-        executor.scheduleAtFixedRate(() -> schedule(concept), period, period, TimeUnit.MILLISECONDS);
+        concept.getScheduledExecutor().scheduleAtFixedRate(() -> schedule(concept),
+                period, period, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -51,13 +37,8 @@ public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
         sendPing(concept);
     }
 
-    /**
-     * 关闭线程池调度器
-     */
     @Override
     public void onDestroy(ConnectionLoadBalanceConcept concept) {
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown();
-        }
+
     }
 }

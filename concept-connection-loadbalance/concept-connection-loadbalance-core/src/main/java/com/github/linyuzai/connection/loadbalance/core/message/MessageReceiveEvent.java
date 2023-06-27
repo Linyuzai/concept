@@ -1,19 +1,18 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.event.AbstractConnectionEvent;
+import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEvent;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 消息接收事件
  */
 @Getter
-public class MessageReceiveEvent extends AbstractConnectionEvent implements MessageEvent {
+@RequiredArgsConstructor
+public class MessageReceiveEvent implements ConnectionEvent, MessageEvent {
+
+    private final Connection connection;
 
     private final Message message;
-
-    public MessageReceiveEvent(Connection connection, Message message) {
-        super(connection);
-        this.message = message;
-    }
 }

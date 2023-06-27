@@ -7,4 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCo
  */
 public class NettyMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
+    public NettyMessageCodecAdapter() {
+        addScopes(NettyScoped.NAME);
+    }
 }

@@ -6,27 +6,23 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalan
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 通过定时任务周期性的触发监控
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
         implements ConnectionLoadBalanceMonitor, ConnectionEventListener {
 
-    @NonNull
-    private final ScheduledExecutorService executor;
-
-    private final long period;
+    private long period;
 
     public void start(ConnectionLoadBalanceConcept concept) {
-        executor.scheduleAtFixedRate(() -> subscribe(concept), period, period, TimeUnit.MILLISECONDS);
+        concept.getScheduledExecutor().scheduleAtFixedRate(() -> subscribe(concept),
+                period, period, TimeUnit.MILLISECONDS);
     }
 
     public void subscribe(ConnectionLoadBalanceConcept concept) {
@@ -35,9 +31,7 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
     }
 
     public void stop(ConnectionLoadBalanceConcept concept) {
-        if (!executor.isShutdown()) {
-            executor.shutdown();
-        }
+
     }
 
     @Override

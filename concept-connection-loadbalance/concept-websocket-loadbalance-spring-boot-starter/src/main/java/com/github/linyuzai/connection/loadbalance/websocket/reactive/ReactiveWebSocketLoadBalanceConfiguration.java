@@ -23,8 +23,8 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    public ReactiveWebSocketMessageCodecAdapterFactory reactiveWebSocketMessageCodecAdapterFactory() {
-        return new ReactiveWebSocketMessageCodecAdapterFactory();
+    public ReactiveWebSocketMessageCodecAdapter reactiveWebSocketMessageCodecAdapter() {
+        return new ReactiveWebSocketMessageCodecAdapter();
     }
 
     @Configuration(proxyBeanMethods = false)

@@ -8,15 +8,13 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
-import com.github.linyuzai.connection.loadbalance.core.extension.SingleThreadScheduledExecutorServiceFactory;
-import com.github.linyuzai.connection.loadbalance.core.extension.ScheduledExecutorServiceFactory;
+import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
+import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapterFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifierFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifierFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.message.*;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapterImpl;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
-import com.github.linyuzai.connection.loadbalance.core.scope.ScopedFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
@@ -35,7 +33,6 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
@@ -45,7 +42,7 @@ public class WebSocketLoadBalanceConfiguration {
     public static class RedissonTopicConfiguration {
 
         @Bean
-        public RedissonTopicConnectionSubscriberFactory redissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
+        public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
             RedissonTopicConnectionSubscriberFactory factory = new RedissonTopicConnectionSubscriberFactory();
             factory.setRedissonClient(redissonClient);
             factory.setShared(false);
@@ -59,7 +56,7 @@ public class WebSocketLoadBalanceConfiguration {
     public static class RedissonSharedTopicConfiguration {
 
         @Bean
-        public RedissonTopicConnectionSubscriberFactory redissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
+        public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(RedissonClient redissonClient) {
             RedissonTopicConnectionSubscriberFactory factory = new RedissonTopicConnectionSubscriberFactory();
             factory.setRedissonClient(redissonClient);
             factory.setShared(true);
@@ -74,7 +71,7 @@ public class WebSocketLoadBalanceConfiguration {
     public static class RedisTopicConfiguration {
 
         @Bean
-        public RedisTopicConnectionSubscriberFactory redisTopicConnectionSubscriberFactory(RedisTemplate<?, ?> redisTemplate) {
+        public RedisTopicConnectionSubscriberFactory wsRedisTopicConnectionSubscriberFactory(RedisTemplate<?, ?> redisTemplate) {
             RedisTopicConnectionSubscriberFactory factory = new RedisTopicConnectionSubscriberFactory();
             factory.setRedisTemplate(redisTemplate);
             factory.addScopes(WebSocketScoped.NAME);
@@ -88,7 +85,7 @@ public class WebSocketLoadBalanceConfiguration {
     public static class ReactiveRedisTopicConfiguration {
 
         @Bean
-        public ReactiveRedisTopicConnectionSubscriberFactory reactiveRedisTopicConnectionSubscriberFactory(
+        public ReactiveRedisTopicConnectionSubscriberFactory wsReactiveRedisTopicConnectionSubscriberFactory(
                 ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
             ReactiveRedisTopicConnectionSubscriberFactory factory = new ReactiveRedisTopicConnectionSubscriberFactory();
             factory.setReactiveRedisTemplate(reactiveRedisTemplate);
@@ -102,8 +99,8 @@ public class WebSocketLoadBalanceConfiguration {
     public static class RabbitFanoutConfiguration {
 
         @Bean
-        public RabbitFanoutConnectionSubscriberFactory rabbitFanoutConnectionSubscriberFactory(RabbitTemplate rabbitTemplate,
-                                                                                               RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory) {
+        public RabbitFanoutConnectionSubscriberFactory wsRabbitFanoutConnectionSubscriberFactory(RabbitTemplate rabbitTemplate,
+                                                                                                 RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory) {
             RabbitFanoutConnectionSubscriberFactory factory = new RabbitFanoutConnectionSubscriberFactory();
             factory.setRabbitTemplate(rabbitTemplate);
             factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
@@ -113,29 +110,47 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    public MessageIdempotentVerifierFactory messageIdempotentVerifierFactory() {
+    public MessageRetryStrategyAdapter wsMessageRetryStrategyAdapter(WebSocketLoadBalanceProperties properties) {
+        MessageRetryStrategyAdapterImpl adapter = new MessageRetryStrategyAdapterImpl();
+        int clientTimes = properties.getServer().getMessage().getRetry().getTimes();
+        int clientPeriod = properties.getServer().getMessage().getRetry().getPeriod();
+        int lbTimes = properties.getLoadBalance().getMessage().getRetry().getTimes();
+        int lbPeriod = properties.getLoadBalance().getMessage().getRetry().getPeriod();
+        adapter.setClientMessageRetryTimes(clientTimes);
+        adapter.setClientMessageRetryPeriod(clientPeriod);
+        adapter.setSubscribeMessageRetryTimes(lbTimes);
+        adapter.setSubscribeMessageRetryPeriod(lbPeriod);
+        adapter.setForwardMessageRetryTimes(lbTimes);
+        adapter.setForwardMessageRetryPeriod(lbPeriod);
+        adapter.addScopes(WebSocketScoped.NAME);
+        return adapter;
+    }
+
+    @Bean
+    public MessageIdempotentVerifierFactory wsMessageIdempotentVerifierFactory() {
         return new MessageIdempotentVerifierFactoryImpl()
                 .addScopes(WebSocketScoped.NAME);
     }
 
     @Bean
-    public SingleThreadScheduledExecutorServiceFactory wsSingleThreadScheduledExecutorServiceFactory() {
-        return new SingleThreadScheduledExecutorServiceFactory()
+    public ScheduledExecutorFactory wsScheduledExecutorFactory() {
+        return new ScheduledExecutorFactoryImpl()
                 .addScopes(WebSocketScoped.NAME);
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ConnectionHeartbeatManager clientConnectionHeartbeatManager(
-            WebSocketLoadBalanceProperties properties,
-            List<ScheduledExecutorServiceFactory> factories) {
+    public ConnectionHeartbeatManager wsClientConnectionHeartbeatManager(
+            WebSocketLoadBalanceProperties properties) {
         long timeout = properties.getServer().getHeartbeat().getTimeout();
         long period = properties.getServer().getHeartbeat().getPeriod();
-        ScheduledExecutorService service = ScopedFactory
-                .create(WebSocketScoped.NAME, ScheduledExecutorService.class, factories);
-        return new ConnectionHeartbeatManager(Connection.Type.CLIENT,
-                timeout, period, service).addScopes(WebSocketScoped.NAME);
+        ConnectionHeartbeatManager manager = new ConnectionHeartbeatManager();
+        manager.getConnectionTypes().add(Connection.Type.CLIENT);
+        manager.setTimeout(timeout);
+        manager.setPeriod(period);
+        manager.addScopes(WebSocketScoped.NAME);
+        return manager;
     }
 
     @Bean(destroyMethod = "destroy")
@@ -147,8 +162,10 @@ public class WebSocketLoadBalanceConfiguration {
             List<ConnectionFactory> connectionFactories,
             List<ConnectionSelector> connectionSelectors,
             List<MessageFactory> messageFactories,
-            List<MessageCodecAdapterFactory> messageCodecAdapterFactories,
+            List<MessageCodecAdapter> messageCodecAdapters,
+            List<MessageRetryStrategyAdapter> messageRetryStrategyAdapters,
             List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories,
+            List<ScheduledExecutorFactory> scheduledExecutorFactories,
             List<ConnectionEventPublisherFactory> eventPublisherFactories,
             List<ConnectionEventListener> eventListeners) {
         return new WebSocketLoadBalanceConcept.Builder()
@@ -158,10 +175,12 @@ public class WebSocketLoadBalanceConfiguration {
                 .addConnectionFactories(connectionFactories)
                 .addConnectionSelectors(connectionSelectors)
                 .addMessageFactories(messageFactories)
-                .addMessageCodecAdapterFactories(messageCodecAdapterFactories)
+                .addMessageCodecAdapters(messageCodecAdapters)
+                .addMessageRetryStrategyAdapters(messageRetryStrategyAdapters)
                 .addMessageIdempotentVerifierFactories(messageIdempotentVerifierFactories)
                 .addEventPublisherFactories(eventPublisherFactories)
                 .addEventListeners(eventListeners)
+                .addScheduledExecutorFactories(scheduledExecutorFactories)
                 .build();
     }
 }

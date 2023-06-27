@@ -2,7 +2,6 @@ package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceMonitorConfiguration;
-import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,8 +20,8 @@ public class JavaxWebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    public JavaxWebSocketMessageCodecAdapterFactory javaxWebSocketMessageCodecAdapterFactory() {
-        return new JavaxWebSocketMessageCodecAdapterFactory();
+    public JavaxWebSocketMessageCodecAdapter javaxWebSocketMessageCodecAdapter() {
+        return new JavaxWebSocketMessageCodecAdapter();
     }
 
     @Configuration(proxyBeanMethods = false)

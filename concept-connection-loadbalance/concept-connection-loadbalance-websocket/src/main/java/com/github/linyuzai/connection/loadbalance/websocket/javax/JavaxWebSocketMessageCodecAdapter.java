@@ -13,18 +13,18 @@ import lombok.AllArgsConstructor;
 public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override
-    public MessageDecoder getClientMessageDecoder(ConnectionLoadBalanceConcept concept) {
-        return new JavaxMessageDecoder(super.getClientMessageDecoder(concept));
+    public MessageDecoder getClientMessageDecoder() {
+        return new JavaxMessageDecoder(super.getClientMessageDecoder());
     }
 
     @Override
-    public MessageDecoder getSubscribeMessageDecoder(ConnectionLoadBalanceConcept concept) {
-        return new JavaxMessageDecoder(super.getSubscribeMessageDecoder(concept));
+    public MessageDecoder getSubscribeMessageDecoder() {
+        return new JavaxMessageDecoder(super.getSubscribeMessageDecoder());
     }
 
     @Override
-    public MessageDecoder getForwardMessageDecoder(ConnectionLoadBalanceConcept concept) {
-        return new JavaxMessageDecoder(super.getForwardMessageDecoder(concept));
+    public MessageDecoder getForwardMessageDecoder() {
+        return new JavaxMessageDecoder(super.getForwardMessageDecoder());
     }
 
     @AllArgsConstructor

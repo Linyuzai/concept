@@ -8,6 +8,6 @@ import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadB
 public class MessageDecodeException extends ConnectionLoadBalanceException {
 
     public MessageDecodeException(Object message) {
-        super("Message can not decode " + message);
+        super("Can not decode message: " + message);
     }
 }

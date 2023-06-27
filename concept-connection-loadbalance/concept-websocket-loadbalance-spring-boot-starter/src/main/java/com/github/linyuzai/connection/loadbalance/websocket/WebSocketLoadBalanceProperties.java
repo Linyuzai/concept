@@ -35,6 +35,11 @@ public class WebSocketLoadBalanceProperties {
         private DefaultEndpointProperties defaultEndpoint = new DefaultEndpointProperties();
 
         /**
+         * 消息配置
+         */
+        private MessageProperties message = new MessageProperties();
+
+        /**
          * 心跳配置
          */
         private HeartbeatProperties heartbeat = new HeartbeatProperties();
@@ -91,6 +96,11 @@ public class WebSocketLoadBalanceProperties {
         private Protocol protocol = Protocol.WEBSOCKET;
 
         /**
+         * 消息配置
+         */
+        private MessageProperties message = new MessageProperties();
+
+        /**
          * 订阅日志
          */
         private boolean logger = true;
@@ -135,6 +145,29 @@ public class WebSocketLoadBalanceProperties {
              * 订阅监控周期，毫秒
              */
             private long period = 30000;
+        }
+    }
+
+    @Data
+    public static class MessageProperties {
+
+        /**
+         * 重试配置
+         */
+        private RetryProperties retry = new RetryProperties();
+
+        @Data
+        public static class RetryProperties {
+
+            /**
+             * 重试次数
+             */
+            private int times;
+
+            /**
+             * 重试间隔，毫秒
+             */
+            private int period;
         }
     }
 

@@ -10,25 +10,28 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 心跳管理支持类
  */
-@RequiredArgsConstructor
+@Setter
+@Getter
 public abstract class ConnectionHeartbeatSupport extends AbstractScoped implements ConnectionEventListener {
 
     /**
      * 连接类型
      */
-    private final Collection<String> connectionTypes;
+    private final Collection<String> connectionTypes = new CopyOnWriteArrayList<>();
 
     /**
      * 心跳超时时间
      */
-    private final long timeout;
+    private long timeout;
 
     @Override
     public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
@@ -87,10 +90,10 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
                 try {
                     connection.send(message);
                 } catch (Throwable e) {
-                    concept.getEventPublisher().publish(new HeartbeatSendErrorEvent(connection, e));
+                    concept.getEventPublisher().publish(new HeartbeatSendErrorEvent(connection, message, e));
                 }
             }
-            concept.getEventPublisher().publish(new HeartbeatSendEvent(connections, connectionType));
+            concept.getEventPublisher().publish(new HeartbeatSendEvent(connections, message, connectionType));
         }
     }
 
@@ -103,7 +106,7 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
             Collection<Connection> connections = concept.getConnectionRepository().select(connectionType);
             for (Connection connection : connections) {
                 long lastHeartbeat = connection.getLastHeartbeat();
-                if (now - lastHeartbeat > timeout) {
+                if (timeout > 0 && now - lastHeartbeat > timeout) {
                     connection.setAlive(false);
                     connection.close("HeartbeatTimeout");
                     concept.getEventPublisher().publish(new HeartbeatTimeoutEvent(connection));

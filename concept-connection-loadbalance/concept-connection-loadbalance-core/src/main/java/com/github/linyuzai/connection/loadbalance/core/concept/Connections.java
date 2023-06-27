@@ -1,19 +1,19 @@
-package com.github.linyuzai.connection.loadbalance.core.extension;
+package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
- * 多连接组合连接
+ * 组合连接
  */
 @Getter
 @AllArgsConstructor
@@ -22,17 +22,9 @@ public class Connections implements Connection {
     @NonNull
     private final Collection<? extends Connection> connections;
 
-    public Connection get() {
-        if (connections.size() == 1) {
-            return connections.iterator().next();
-        }
-        return null;
-    }
-
     @Override
     public Object getId() {
-        Connection connection = get();
-        return connection == null ? null : connection.getId();
+        return get(Connection::getId, null);
     }
 
     @Override
@@ -44,20 +36,29 @@ public class Connections implements Connection {
 
     @Override
     public String getType() {
-        Connection connection = get();
-        return connection == null ? null : connection.getType();
+        return get(Connection::getType, null);
     }
 
     @Override
     public Map<Object, Object> getMetadata() {
-        Connection connection = get();
-        return connection == null ? Collections.emptyMap() : connection.getMetadata();
+        return get(Connection::getMetadata, null);
+    }
+
+    @Override
+    public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
+        for (Connection connection : connections) {
+            connection.setMessageRetryStrategy(strategy);
+        }
+    }
+
+    @Override
+    public MessageRetryStrategy getMessageRetryStrategy() {
+        return get(Connection::getMessageRetryStrategy, null);
     }
 
     @Override
     public List<MessageSendInterceptor> getMessageSendInterceptors() {
-        Connection connection = get();
-        return connection == null ? Collections.emptyList() : connection.getMessageSendInterceptors();
+        return get(Connection::getMessageSendInterceptors, null);
     }
 
     @Override
@@ -69,8 +70,7 @@ public class Connections implements Connection {
 
     @Override
     public MessageEncoder getMessageEncoder() {
-        Connection connection = get();
-        return connection == null ? null : connection.getMessageEncoder();
+        return get(Connection::getMessageEncoder, null);
     }
 
     @Override
@@ -82,8 +82,7 @@ public class Connections implements Connection {
 
     @Override
     public MessageDecoder getMessageDecoder() {
-        Connection connection = get();
-        return connection == null ? null : connection.getMessageDecoder();
+        return get(Connection::getMessageDecoder, null);
     }
 
     @Override
@@ -95,17 +94,7 @@ public class Connections implements Connection {
 
     @Override
     public ConnectionLoadBalanceConcept getConcept() {
-        ConnectionLoadBalanceConcept concept = null;
-        for (Connection connection : connections) {
-            if (concept == null) {
-                concept = connection.getConcept();
-            } else {
-                if (concept != connection.getConcept()) {
-                    return null;
-                }
-            }
-        }
-        return concept;
+        return get(Connection::getConcept, null);
     }
 
     @Override
@@ -136,17 +125,7 @@ public class Connections implements Connection {
 
     @Override
     public boolean isAlive() {
-        Set<Boolean> set = new HashSet<>();
-        for (Connection connection : connections) {
-            set.add(connection.isAlive());
-            if (set.size() > 1) {
-                throw new UnsupportedOperationException();
-            }
-        }
-        if (set.isEmpty()) {
-            return false;
-        }
-        return set.iterator().next();
+        return get(Connection::isAlive, null);
     }
 
     @Override
@@ -158,7 +137,7 @@ public class Connections implements Connection {
 
     @Override
     public long getLastHeartbeat() {
-        return -1;
+        return get(Connection::getLastHeartbeat, null);
     }
 
     @Override
@@ -166,6 +145,20 @@ public class Connections implements Connection {
         for (Connection connection : connections) {
             connection.setLastHeartbeat(lastHeartbeat);
         }
+    }
+
+    protected <T> T get(Function<Connection, T> function, T empty) {
+        Set<T> set = new HashSet<>();
+        for (Connection connection : connections) {
+            set.add(function.apply(connection));
+            if (set.size() > 1) {
+                throw new UnsupportedOperationException();
+            }
+        }
+        if (set.isEmpty()) {
+            return empty;
+        }
+        return set.iterator().next();
     }
 
     @SafeVarargs

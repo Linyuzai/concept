@@ -7,4 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCo
  */
 public abstract class WebSocketMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
+    public WebSocketMessageCodecAdapter() {
+        addScopes(WebSocketScoped.NAME);
+    }
 }

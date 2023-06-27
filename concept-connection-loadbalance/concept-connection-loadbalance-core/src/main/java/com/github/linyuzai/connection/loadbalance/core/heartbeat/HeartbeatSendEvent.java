@@ -1,8 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.core.heartbeat;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageEvent;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 
@@ -10,10 +12,12 @@ import java.util.Collection;
  * 心跳发送事件
  */
 @Getter
-@AllArgsConstructor
-public class HeartbeatSendEvent implements HeartbeatEvent {
+@RequiredArgsConstructor
+public class HeartbeatSendEvent implements HeartbeatEvent, MessageEvent {
 
-    private Collection<Connection> connections;
+    private final Collection<Connection> connections;
 
-    private String connectionType;
+    private final Message message;
+
+    private final String connectionType;
 }

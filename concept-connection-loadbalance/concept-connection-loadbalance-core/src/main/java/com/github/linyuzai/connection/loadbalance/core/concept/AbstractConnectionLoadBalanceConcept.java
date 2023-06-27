@@ -2,10 +2,14 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
+import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutor;
+import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.scope.Scoped;
@@ -36,6 +40,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected final Map<String, MessageEncoder> messageEncoderMap = new ConcurrentHashMap<>();
 
     protected final Map<String, MessageDecoder> messageDecoderMap = new ConcurrentHashMap<>();
+
+    protected final Map<String, MessageRetryStrategy> messageRetryStrategyMap = new ConcurrentHashMap<>();
 
     /**
      * 连接仓库
@@ -73,9 +79,19 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected MessageCodecAdapter messageCodecAdapter;
 
     /**
+     * 消息重试策略适配器
+     */
+    protected MessageRetryStrategyAdapter messageRetryStrategyAdapter;
+
+    /**
      * 消息幂等校验器
      */
     protected MessageIdempotentVerifier messageIdempotentVerifier;
+
+    /**
+     * 定时执行器
+     */
+    protected ScheduledExecutor scheduledExecutor;
 
     /**
      * 事件发布者
@@ -106,6 +122,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     public void destroy() {
         //Spring会帮忙调用close方法
         //connectionRepository.stream().forEach(connection -> connection.close("ServerStop"));
+        scheduledExecutor.shutdown();
         eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
     }
 
@@ -175,8 +192,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         MessageDecoder decoder = messageDecoderMap.computeIfAbsent(type, key ->
                 MessageDecoder.Delegate.delegate(this,
                         messageCodecAdapter.getMessageDecoder(key)));
+        MessageRetryStrategy retryStrategy = messageRetryStrategyMap.computeIfAbsent(type, key ->
+                MessageRetryStrategy.Delegate.delegate(this,
+                        messageRetryStrategyAdapter.getMessageRetryStrategy(key)));
         connection.setMessageEncoder(encoder);
         connection.setMessageDecoder(decoder);
+        connection.setMessageRetryStrategy(retryStrategy);
         connectionRepository.add(connection);
         eventPublisher.publish(new ConnectionEstablishEvent(connection));
     }
@@ -262,14 +283,20 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         try {
             MessageDecoder decoder = connection.getMessageDecoder();
             decode = decoder.decode(message);
-            if (!predicate.test(decode)) {
-                return;
-            }
         } catch (Throwable e) {
             eventPublisher.publish(new MessageDecodeErrorEvent(connection, e));
             return;
         }
-        eventPublisher.publish(new MessageReceiveEvent(connection, decode));
+        boolean test;
+        try {
+            test = predicate.test(decode);
+        } catch (Throwable e) {
+            eventPublisher.publish(new MessageReceivePredicateErrorEvent(connection, decode, e));
+            return;
+        }
+        if (test) {
+            eventPublisher.publish(new MessageReceiveEvent(connection, decode));
+        }
     }
 
     /**
@@ -351,6 +378,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void send(Object msg) {
         Message message = createMessage(msg);
+        String messageId = messageIdempotentVerifier.generateMessageId(message);
+        message.setId(messageId);
         ConnectionSelector selector = getConnectionSelector(message);
         Collection<Connection> connections = selector.select(message);
         if (connections == null || connections.isEmpty()) {
@@ -424,9 +453,13 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected List<MessageFactory> messageFactories = new ArrayList<>();
 
-        protected List<MessageCodecAdapterFactory> messageCodecAdapterFactories = new ArrayList<>();
+        protected List<MessageCodecAdapter> messageCodecAdapters = new ArrayList<>();
+
+        protected List<MessageRetryStrategyAdapter> messageRetryStrategyAdapters = new ArrayList<>();
 
         protected List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories = new ArrayList<>();
+
+        protected List<ScheduledExecutorFactory> scheduledExecutorFactories = new ArrayList<>();
 
         protected List<ConnectionEventPublisherFactory> eventPublisherFactories = new ArrayList<>();
 
@@ -481,10 +514,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加消息编解码适配器工厂
+         * 添加消息编解码适配器
          */
-        public B addMessageCodecAdapterFactories(Collection<? extends MessageCodecAdapterFactory> factories) {
-            this.messageCodecAdapterFactories.addAll(factories);
+        public B addMessageCodecAdapters(Collection<? extends MessageCodecAdapter> adapters) {
+            this.messageCodecAdapters.addAll(adapters);
+            return (B) this;
+        }
+
+        public B addMessageRetryStrategyAdapters(Collection<? extends MessageRetryStrategyAdapter> adapters) {
+            this.messageRetryStrategyAdapters.addAll(adapters);
             return (B) this;
         }
 
@@ -493,6 +531,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
          */
         public B addMessageIdempotentVerifierFactories(Collection<? extends MessageIdempotentVerifierFactory> factories) {
             this.messageIdempotentVerifierFactories.addAll(factories);
+            return (B) this;
+        }
+
+        /**
+         * 添加线程池工厂
+         */
+        public B addScheduledExecutorFactories(Collection<ScheduledExecutorFactory> factories) {
+            this.scheduledExecutorFactories.addAll(factories);
             return (B) this;
         }
 
@@ -534,26 +580,29 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             T concept = create();
 
             concept.setConnectionRepository(ConnectionRepository.Delegate.delegate(concept,
-                    withScope(ConnectionRepository.class, connectionRepositoryFactories)));
+                    withScopeFactory(ConnectionRepository.class, connectionRepositoryFactories)));
             concept.setConnectionServerManager(ConnectionServerManager.Delegate.delegate(concept,
-                    withScope(ConnectionServerManager.class, connectionServerManagerFactories)));
+                    withScopeFactory(ConnectionServerManager.class, connectionServerManagerFactories)));
             concept.setConnectionSubscriber(ConnectionSubscriber.Delegate.delegate(concept,
-                    withScope(ConnectionSubscriber.class, connectionSubscriberFactories)));
+                    withScopeFactory(ConnectionSubscriber.class, connectionSubscriberFactories)));
             concept.setConnectionFactories(ConnectionFactory.Delegate.delegate(concept,
                     withScope(connectionFactories)));
             concept.setConnectionSelectors(ConnectionSelector.Delegate.delegate(concept,
                     withFilterChain(withScope(connectionSelectors))));
             concept.setMessageFactories(MessageFactory.Delegate.delegate(concept,
                     withScope(messageFactories)));
-            concept.setMessageCodecAdapter(MessageCodecAdapter.Delegate.delegate(concept,
-                    withScope(MessageCodecAdapter.class, messageCodecAdapterFactories)));
+            concept.setMessageCodecAdapter(
+                    withScope(MessageCodecAdapter.class, messageCodecAdapters));
+            concept.setMessageRetryStrategyAdapter(
+                    withScope(MessageRetryStrategyAdapter.class, messageRetryStrategyAdapters));
             concept.setMessageIdempotentVerifier(MessageIdempotentVerifier.Delegate.delegate(concept,
-                    withScope(MessageIdempotentVerifier.class, messageIdempotentVerifierFactories)));
+                    withScopeFactory(MessageIdempotentVerifier.class, messageIdempotentVerifierFactories)));
+            concept.setScheduledExecutor(ScheduledExecutor.Delegate.delegate(concept,
+                    withScopeFactory(ScheduledExecutor.class, scheduledExecutorFactories)));
             ConnectionEventPublisher publisher = ConnectionEventPublisher.Delegate.delegate(concept,
-                    withScope(ConnectionEventPublisher.class, eventPublisherFactories));
+                    withScopeFactory(ConnectionEventPublisher.class, eventPublisherFactories));
             publisher.register(withScope(eventListeners));
             concept.setEventPublisher(publisher);
-
             return concept;
         }
 
@@ -565,7 +614,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return Scoped.filter(getScope(), collection);
         }
 
-        protected <C, F extends ScopedFactory<C>> C withScope(Class<C> type, Collection<F> factories) {
+        protected <S extends Scoped> S withScope(Class<S> type, Collection<S> collection) {
+            return Scoped.filter(getScope(), type, collection);
+        }
+
+        protected <C, F extends ScopedFactory<C>> C withScopeFactory(Class<C> type, Collection<F> factories) {
             return ScopedFactory.create(getScope(), type, factories);
         }
 

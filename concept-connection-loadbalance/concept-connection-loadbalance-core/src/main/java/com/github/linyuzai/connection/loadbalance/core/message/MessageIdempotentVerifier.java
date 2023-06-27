@@ -4,9 +4,19 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 public interface MessageIdempotentVerifier {
 
     MessageIdempotentVerifier VERIFIED = (message, concept) -> true;
+
+    default String generateMessageId(Message message, ConnectionLoadBalanceConcept concept) {
+        return UUID.randomUUID().toString();
+    }
+
+    default String generateMessageId(Message message) {
+        return generateMessageId(message, null);
+    }
 
     boolean verify(Message message, ConnectionLoadBalanceConcept concept);
 
@@ -25,6 +35,16 @@ public interface MessageIdempotentVerifier {
         public static MessageIdempotentVerifier delegate(ConnectionLoadBalanceConcept concept,
                                                          MessageIdempotentVerifier delegate) {
             return new Delegate(concept, delegate);
+        }
+
+        @Override
+        public String generateMessageId(Message message, ConnectionLoadBalanceConcept concept) {
+            return delegate.generateMessageId(message, concept);
+        }
+
+        @Override
+        public String generateMessageId(Message message) {
+            return delegate.generateMessageId(message, concept);
         }
 
         @Override

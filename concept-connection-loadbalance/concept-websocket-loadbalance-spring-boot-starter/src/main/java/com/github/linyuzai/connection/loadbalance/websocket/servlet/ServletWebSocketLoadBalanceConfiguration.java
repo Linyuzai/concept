@@ -23,8 +23,8 @@ public class ServletWebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    public ServletWebSocketMessageCodecAdapterFactory servletWebSocketMessageCodecAdapterFactory() {
-        return new ServletWebSocketMessageCodecAdapterFactory();
+    public ServletWebSocketMessageCodecAdapter servletWebSocketMessageCodecAdapter() {
+        return new ServletWebSocketMessageCodecAdapter();
     }
 
     @Configuration(proxyBeanMethods = false)

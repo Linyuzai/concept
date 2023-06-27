@@ -1,16 +1,17 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
+import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutor;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -152,7 +153,11 @@ public interface ConnectionLoadBalanceConcept {
 
     MessageCodecAdapter getMessageCodecAdapter();
 
+    MessageRetryStrategyAdapter getMessageRetryStrategyAdapter();
+
     MessageIdempotentVerifier getMessageIdempotentVerifier();
+
+    ScheduledExecutor getScheduledExecutor();
 
     ConnectionEventPublisher getEventPublisher();
 }

@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
@@ -43,6 +44,10 @@ public interface Connection {
      * @return 连接的元数据
      */
     Map<Object, Object> getMetadata();
+
+    void setMessageRetryStrategy(MessageRetryStrategy strategy);
+
+    MessageRetryStrategy getMessageRetryStrategy();
 
     /**
      * 获得消息发送拦截器列表
