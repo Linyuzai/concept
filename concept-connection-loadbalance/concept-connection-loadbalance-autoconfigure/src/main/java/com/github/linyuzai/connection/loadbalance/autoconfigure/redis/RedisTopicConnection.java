@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -34,12 +36,7 @@ public class RedisTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doSend(Object message) {
-        redisTemplate.convertAndSend(topic, message);
-    }
-
-    @Override
-    public void ping(PingMessage ping) {
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
         RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
         if (factory == null) {
             return;
@@ -54,6 +51,16 @@ public class RedisTopicConnection extends AliveForeverConnection {
             //TODO
         } finally {
             RedisConnectionUtils.releaseConnection(connection, factory);
+        }
+    }
+
+    @Override
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+        try {
+            redisTemplate.convertAndSend(topic, message);
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
         }
     }
 }

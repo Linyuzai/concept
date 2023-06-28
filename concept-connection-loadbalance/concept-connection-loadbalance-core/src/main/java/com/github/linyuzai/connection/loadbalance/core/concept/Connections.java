@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -101,6 +102,13 @@ public class Connections implements Connection {
     public void send(@NonNull Message message) {
         for (Connection connection : connections) {
             connection.send(message);
+        }
+    }
+
+    @Override
+    public void send(@NonNull Message message, Runnable success, Consumer<Throwable> error) {
+        for (Connection connection : connections) {
+            connection.send(message, success, error);
         }
     }
 

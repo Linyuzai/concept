@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
+import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
@@ -12,6 +13,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 基于 {@link Session} 的 {@link WebSocketConnection} 实现
@@ -45,28 +47,41 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
 
     @SneakyThrows
     @Override
-    public void doSend(Object message) {
-        if (message instanceof String) {
-            session.getBasicRemote().sendText((String) message);
-        } else if (message instanceof ByteBuffer) {
-            session.getBasicRemote().sendBinary((ByteBuffer) message);
-        } else if (message instanceof byte[]) {
-            session.getBasicRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
-        } else {
-            session.getBasicRemote().sendObject(message);
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+        try {
+            if (message instanceof String) {
+                session.getBasicRemote().sendText((String) message);
+            } else if (message instanceof ByteBuffer) {
+                session.getBasicRemote().sendBinary((ByteBuffer) message);
+            } else if (message instanceof byte[]) {
+                session.getBasicRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
+            } else {
+                session.getBasicRemote().sendObject(message);
+            }
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
         }
     }
 
-    @SneakyThrows
     @Override
-    public void ping(PingMessage ping) {
-        session.getBasicRemote().sendPing(ping.getPayload());
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+        try {
+            session.getBasicRemote().sendPing(message.getPayload());
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
+        }
     }
 
-    @SneakyThrows
     @Override
-    public void pong(PongMessage pong) {
-        session.getBasicRemote().sendPong(pong.getPayload());
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+        try {
+            session.getBasicRemote().sendPong(message.getPayload());
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
+        }
     }
 
     @SneakyThrows

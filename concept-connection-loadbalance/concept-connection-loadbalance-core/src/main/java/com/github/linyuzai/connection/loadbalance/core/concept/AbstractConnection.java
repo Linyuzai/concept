@@ -1,10 +1,9 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionCloseErrorEvent;
-import com.github.linyuzai.connection.loadbalance.core.heartbeat.HeartbeatSendErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncodeErrorEvent;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncodeException;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
 import lombok.Getter;
@@ -16,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * 连接抽象类
@@ -68,22 +68,19 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void send(@NonNull Message message) {
+        send(message, () -> {
+
+        }, e ->
+                concept.getEventPublisher()
+                        .publish(new MessageSendErrorEvent(this, message, e)));
+    }
+
+    @Override
+    public void send(@NonNull Message message, Runnable success, Consumer<Throwable> error) {
         if (message instanceof PingMessage) {
-            Runnable ping = () -> ping((PingMessage) message);
-            try {
-                ping.run();
-            } catch (Throwable e) {
-                messageRetryStrategy.retry(ping,
-                        new HeartbeatSendErrorEvent(this, message, e));
-            }
+            ping((PingMessage) message, success, error);
         } else if (message instanceof PongMessage) {
-            Runnable pong = () -> pong((PongMessage) message);
-            try {
-                pong.run();
-            } catch (Throwable e) {
-                messageRetryStrategy.retry(pong,
-                        new HeartbeatSendErrorEvent(this, message, e));
-            }
+            pong((PongMessage) message, success, error);
         } else {
             for (MessageSendInterceptor interceptor : messageSendInterceptors) {
                 if (!interceptor.intercept(message, this)) {
@@ -95,23 +92,37 @@ public abstract class AbstractConnection implements Connection {
                 MessageEncoder encoder = getMessageEncoder();
                 encode = encoder.encode(message);
             } catch (Throwable e) {
-                concept.getEventPublisher().publish(new MessageEncodeErrorEvent(this, e));
-                return;
+                throw new MessageEncodeException(message, e);
             }
 
-            Runnable send = () -> doSend(encode);
-            try {
-                send.run();
-            } catch (Throwable e) {
-                messageRetryStrategy.retry(send,
-                        new MessageSendErrorEvent(this, message, e));
-            }
+            Consumer<Consumer<Throwable>> send = consumer -> doSend(encode, success, consumer);
+            send.accept(e -> messageRetryStrategy.retry(e, send, error));
         }
     }
 
-    public abstract void ping(PingMessage ping);
+    public void ping(PingMessage message) {
+        ping(message, () -> concept.getEventPublisher()
+                        .publish(new MessageSendSuccessEvent(this, message)),
+                e -> concept.getEventPublisher()
+                        .publish(new MessageSendErrorEvent(this, message, e)));
+    }
 
-    public abstract void pong(PongMessage pong);
+    public void ping(PingMessage message, Runnable success, Consumer<Throwable> error) {
+        Consumer<Consumer<Throwable>> ping = consumer -> doPing(message, success, consumer);
+        ping.accept(e -> messageRetryStrategy.retry(e, ping, error));
+    }
+
+    public void pong(PongMessage message) {
+        pong(message, () -> concept.getEventPublisher()
+                        .publish(new MessageSendSuccessEvent(this, message)),
+                e -> concept.getEventPublisher()
+                        .publish(new MessageSendErrorEvent(this, message, e)));
+    }
+
+    public void pong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+        Consumer<Consumer<Throwable>> pong = consumer -> doPong(message, success, consumer);
+        pong.accept(e -> messageRetryStrategy.retry(e, pong, error));
+    }
 
     @Override
     public void close() {
@@ -133,5 +144,9 @@ public abstract class AbstractConnection implements Connection {
 
     public abstract Object getCloseReason(int code, String reason);
 
-    public abstract void doSend(Object message);
+    public abstract void doSend(Object message, Runnable success, Consumer<Throwable> error);
+
+    public abstract void doPing(PingMessage message, Runnable success, Consumer<Throwable> error);
+
+    public abstract void doPong(PongMessage message, Runnable success, Consumer<Throwable> error);
 }

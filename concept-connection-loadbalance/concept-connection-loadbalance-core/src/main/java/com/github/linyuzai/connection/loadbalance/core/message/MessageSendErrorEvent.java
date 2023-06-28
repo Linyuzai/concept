@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.message;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.event.ErrorEvent;
+import com.github.linyuzai.connection.loadbalance.core.event.TimestampEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class MessageSendErrorEvent implements MessageEvent, ErrorEvent {
+public class MessageSendErrorEvent extends TimestampEvent implements MessageEvent, ErrorEvent {
 
     private final Connection connection;
 

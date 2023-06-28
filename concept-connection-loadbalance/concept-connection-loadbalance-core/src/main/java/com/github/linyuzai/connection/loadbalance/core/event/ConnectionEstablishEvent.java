@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class ConnectionEstablishEvent implements ConnectionEvent {
+public class ConnectionEstablishEvent extends TimestampEvent implements ConnectionEvent {
 
     private final Connection connection;
 }

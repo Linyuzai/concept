@@ -1,19 +1,19 @@
-package com.github.linyuzai.connection.loadbalance.core.event;
+package com.github.linyuzai.connection.loadbalance.core.message.retry;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * 连接关闭事件
- */
 @Getter
 @RequiredArgsConstructor
-public class ConnectionCloseErrorEvent extends TimestampEvent implements ConnectionEvent, ErrorEvent {
+public class RetryContext {
 
     private final Connection connection;
 
-    private final Object reason;
+    private final Message message;
 
     private final Throwable error;
+
+
 }

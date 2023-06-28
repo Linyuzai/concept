@@ -9,6 +9,7 @@ import lombok.NonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 表示一个连接
@@ -104,6 +105,13 @@ public interface Connection {
      * @param message 消息
      */
     void send(@NonNull Message message);
+
+    /**
+     * 发送消息
+     *
+     * @param message 消息
+     */
+    void send(@NonNull Message message, Runnable success, Consumer<Throwable> error);
 
     /**
      * 关闭连接

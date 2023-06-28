@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
+import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.*;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现
@@ -37,32 +39,51 @@ public class ServletWebSocketConnection extends WebSocketConnection {
         return session.getUri();
     }
 
-    @SneakyThrows
     @Override
-    public void doSend(Object message) {
-        if (message instanceof WebSocketMessage) {
-            session.sendMessage((WebSocketMessage<?>) message);
-        } else if (message instanceof String) {
-            session.sendMessage(new TextMessage((CharSequence) message));
-        } else if (message instanceof ByteBuffer) {
-            session.sendMessage(new BinaryMessage((ByteBuffer) message));
-        } else if (message instanceof byte[]) {
-            session.sendMessage(new BinaryMessage(ByteBuffer.wrap((byte[]) message)));
-        } else {
-            throw new IllegalArgumentException(message.toString());
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+        try {
+            if (message instanceof WebSocketMessage) {
+                session.sendMessage((WebSocketMessage<?>) message);
+                success.run();
+                return;
+            } else if (message instanceof String) {
+                session.sendMessage(new TextMessage((CharSequence) message));
+                success.run();
+                return;
+            } else if (message instanceof ByteBuffer) {
+                session.sendMessage(new BinaryMessage((ByteBuffer) message));
+                success.run();
+                return;
+            } else if (message instanceof byte[]) {
+                session.sendMessage(new BinaryMessage(ByteBuffer.wrap((byte[]) message)));
+                success.run();
+                return;
+            }
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
+            return;
+        }
+        throw new IllegalArgumentException(message.toString());
+    }
+
+    @Override
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+        try {
+            session.sendMessage(new org.springframework.web.socket.PingMessage(message.getPayload()));
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
         }
     }
 
-    @SneakyThrows
     @Override
-    public void ping(PingMessage ping) {
-        session.sendMessage(new org.springframework.web.socket.PingMessage(ping.getPayload()));
-    }
-
-    @SneakyThrows
-    @Override
-    public void pong(PongMessage pong) {
-        session.sendMessage(new org.springframework.web.socket.PongMessage(pong.getPayload()));
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+        try {
+            session.sendMessage(new org.springframework.web.socket.PongMessage(message.getPayload()));
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
+        }
     }
 
     @SneakyThrows

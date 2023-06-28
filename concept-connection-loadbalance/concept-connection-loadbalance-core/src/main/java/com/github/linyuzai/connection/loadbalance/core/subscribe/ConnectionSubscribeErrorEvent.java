@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ErrorEvent;
+import com.github.linyuzai.connection.loadbalance.core.event.TimestampEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ConnectionSubscribeErrorEvent implements ErrorEvent {
+public class ConnectionSubscribeErrorEvent extends TimestampEvent implements ErrorEvent {
 
     private final Throwable error;
 }

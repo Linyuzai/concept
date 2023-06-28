@@ -9,7 +9,7 @@ import lombok.Getter;
  * 未知连接异常事件
  */
 @Getter
-public class UnknownErrorEvent implements ConnectionEvent, ErrorEvent {
+public class UnknownErrorEvent extends TimestampEvent implements ConnectionEvent, ErrorEvent {
 
     private final Connection connection;
 

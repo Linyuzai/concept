@@ -1,10 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.core.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
-import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import lombok.Getter;
+
+import java.util.function.Consumer;
 
 /**
  * 未知连接
@@ -23,17 +23,17 @@ public class UnknownConnection extends AbstractConnection {
     }
 
     @Override
-    public void ping(PingMessage ping) {
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
 
     }
 
     @Override
-    public void pong(PongMessage pong) {
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
 
     }
 
     @Override
-    public void doSend(Object message) {
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
 
     }
 

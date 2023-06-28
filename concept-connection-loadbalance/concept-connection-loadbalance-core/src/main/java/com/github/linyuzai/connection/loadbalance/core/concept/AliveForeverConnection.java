@@ -24,12 +24,12 @@ public abstract class AliveForeverConnection extends AbstractConnection {
     }
 
     @Override
-    public void ping(PingMessage ping) {
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
 
     }
 
     @Override
-    public void pong(PongMessage pong) {
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
 
     }
 

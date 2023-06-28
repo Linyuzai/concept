@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
+import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
@@ -12,6 +13,7 @@ import reactor.core.publisher.FluxSink;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现
@@ -45,31 +47,36 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void doSend(Object message) {
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
         //session.send(Flux.just(createMessage(bytes))).subscribe();
-        if (message instanceof WebSocketMessage) {
-            sender.next((WebSocketMessage) message);
-        } else if (message instanceof String) {
-            sender.next(session.textMessage((String) message));
-        } else if (message instanceof DataBuffer) {
-            sender.next(session.binaryMessage(factory -> (DataBuffer) message));
-        } else if (message instanceof ByteBuffer) {
-            sender.next(session.binaryMessage(factory -> factory.wrap((ByteBuffer) message)));
-        } else if (message instanceof byte[]) {
-            sender.next(session.binaryMessage(factory -> factory.wrap((byte[]) message)));
-        } else {
-            throw new IllegalArgumentException(message.toString());
+        try {
+            if (message instanceof WebSocketMessage) {
+                sender.next((WebSocketMessage) message);
+            } else if (message instanceof String) {
+                sender.next(session.textMessage((String) message));
+            } else if (message instanceof DataBuffer) {
+                sender.next(session.binaryMessage(factory -> (DataBuffer) message));
+            } else if (message instanceof ByteBuffer) {
+                sender.next(session.binaryMessage(factory -> factory.wrap((ByteBuffer) message)));
+            } else if (message instanceof byte[]) {
+                sender.next(session.binaryMessage(factory -> factory.wrap((byte[]) message)));
+            } else {
+                throw new IllegalArgumentException(message.toString());
+            }
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
         }
     }
 
     @Override
-    public void ping(PingMessage ping) {
-        sender.next(session.pingMessage(factory -> factory.wrap(ping.getPayload())));
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+        sender.next(session.pingMessage(factory -> factory.wrap(message.getPayload())));
     }
 
     @Override
-    public void pong(PongMessage pong) {
-        sender.next(session.pongMessage(factory -> factory.wrap(pong.getPayload())));
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+        sender.next(session.pongMessage(factory -> factory.wrap(message.getPayload())));
     }
 
     @Override

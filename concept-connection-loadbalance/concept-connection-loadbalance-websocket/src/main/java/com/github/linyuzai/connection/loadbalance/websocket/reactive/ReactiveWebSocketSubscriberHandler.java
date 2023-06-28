@@ -29,8 +29,8 @@ public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {
     @NonNull
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        Mono<Void> send = session.send(Flux.create(sink -> sessionConsumer.accept(session, sink)))
-                .doOnError(it -> concept.onError(session.getId(), Connection.Type.SUBSCRIBER, it));
+        Mono<Void> send = session.send(Flux.<WebSocketMessage>create(sink -> sessionConsumer.accept(session, sink))
+                .doOnError(it -> concept.onError(session.getId(), Connection.Type.SUBSCRIBER, it)));
 
         Mono<Void> receive = session.receive()
                 .doOnNext(it -> concept.onMessage(session.getId(), Connection.Type.SUBSCRIBER, it))

@@ -1,16 +1,17 @@
 package com.github.linyuzai.connection.loadbalance.core.message.retry;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageSendErrorEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.function.Consumer;
+
 public interface MessageRetryStrategy {
 
-    void retry(Runnable retryable, MessageSendErrorEvent event, ConnectionLoadBalanceConcept concept);
+    void retry(Throwable e, Consumer<Consumer<Throwable>> retryable, Consumer<Throwable> error, ConnectionLoadBalanceConcept concept);
 
-    default void retry(Runnable retryable, MessageSendErrorEvent event) {
-        retry(retryable, event, null);
+    default void retry(Throwable e, Consumer<Consumer<Throwable>> retryable, Consumer<Throwable> error) {
+        retry(e, retryable, error, null);
     }
 
     @Getter
@@ -27,13 +28,13 @@ public interface MessageRetryStrategy {
         }
 
         @Override
-        public void retry(Runnable retryable, MessageSendErrorEvent event, ConnectionLoadBalanceConcept concept) {
-            delegate.retry(retryable, event, concept);
+        public void retry(Throwable e, Consumer<Consumer<Throwable>> retryable, Consumer<Throwable> error, ConnectionLoadBalanceConcept concept) {
+            delegate.retry(e, retryable, error, concept);
         }
 
         @Override
-        public void retry(Runnable retryable, MessageSendErrorEvent event) {
-            delegate.retry(retryable, event, concept);
+        public void retry(Throwable e, Consumer<Consumer<Throwable>> retryable, Consumer<Throwable> error) {
+            delegate.retry(e, retryable, error, concept);
         }
     }
 }

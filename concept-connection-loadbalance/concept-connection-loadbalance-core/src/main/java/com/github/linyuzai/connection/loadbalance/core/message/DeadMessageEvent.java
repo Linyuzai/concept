@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
+import com.github.linyuzai.connection.loadbalance.core.event.TimestampEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class DeadMessageEvent implements MessageEvent {
+public class DeadMessageEvent extends TimestampEvent implements MessageEvent {
 
     private Message message;
 }

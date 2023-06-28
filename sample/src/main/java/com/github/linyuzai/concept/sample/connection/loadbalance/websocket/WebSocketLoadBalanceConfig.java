@@ -26,7 +26,7 @@ public class WebSocketLoadBalanceConfig {
     public MessageHandler messageHandler() {
         return new WebSocketMessageHandler() {
             @Override
-            public void onMessage(Message message, Connection connection) {
+            public void onMessage(Message message, Connection connection,  ConnectionLoadBalanceConcept concept) {
                 System.out.println("Message " + message.getPayload());
             }
         };
@@ -36,7 +36,7 @@ public class WebSocketLoadBalanceConfig {
     public ConnectionEventListener connectionEventListener() {
         return new WebSocketEventListener() {
             @Override
-            public void onEvent(Object event) {
+            public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
                 if (event instanceof ConnectionEvent) {
                     Connection connection = ((ConnectionEvent) event).getConnection();
                     if (Connection.Type.CLIENT.equals(connection.getType())) {

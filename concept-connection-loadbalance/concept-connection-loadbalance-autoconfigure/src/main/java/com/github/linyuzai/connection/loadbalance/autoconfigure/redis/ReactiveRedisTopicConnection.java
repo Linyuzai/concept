@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -27,9 +28,7 @@ public class ReactiveRedisTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doSend(Object message) {
-        reactiveRedisTemplate.convertAndSend(topic, message).subscribe(l -> {
-
-        });
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+        reactiveRedisTemplate.convertAndSend(topic, message).subscribe(l -> success.run(), error);
     }
 }

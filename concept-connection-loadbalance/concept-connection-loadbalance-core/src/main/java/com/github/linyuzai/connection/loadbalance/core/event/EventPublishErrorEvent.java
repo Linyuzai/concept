@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class EventPublishErrorEvent implements ErrorEvent {
+public class EventPublishErrorEvent extends TimestampEvent implements ErrorEvent {
 
     private final Object event;
 

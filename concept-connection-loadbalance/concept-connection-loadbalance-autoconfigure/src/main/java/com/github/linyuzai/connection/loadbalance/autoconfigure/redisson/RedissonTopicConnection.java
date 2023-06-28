@@ -2,11 +2,13 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.redisson;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 
+import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RTopic;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
@@ -25,7 +27,12 @@ public class RedissonTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doSend(Object message) {
-        topic.publish(message);
+    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+        try {
+            topic.publish(message);
+            success.run();
+        } catch (Throwable e) {
+            error.accept(new MessageTransportException(e));
+        }
     }
 }

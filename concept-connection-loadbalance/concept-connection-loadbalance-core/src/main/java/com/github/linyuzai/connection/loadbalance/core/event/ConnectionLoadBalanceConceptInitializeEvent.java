@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ConnectionLoadBalanceConceptInitializeEvent {
+public class ConnectionLoadBalanceConceptInitializeEvent extends TimestampEvent {
 
     private ConnectionLoadBalanceConcept concept;
 }
