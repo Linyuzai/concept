@@ -22,15 +22,17 @@ public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnectio
     private String protocol = "ws";
 
     @Override
-    public void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept, Consumer<T> consumer) {
+    public void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
+                            Consumer<T> connectionConsumer, Consumer<Throwable> errorConsumer) {
         URI uri = getUri(server);
         doSubscribe(uri, concept, connection -> {
             connection.getMetadata().put(ConnectionServer.class, server);
-            consumer.accept(connection);
-        });
+            connectionConsumer.accept(connection);
+        }, errorConsumer);
     }
 
-    public abstract void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept, Consumer<T> consumer);
+    public abstract void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
+                                     Consumer<T> connectionConsumer, Consumer<Throwable> errorConsumer);
 
     @Override
     public String getEndpoint() {
@@ -38,4 +40,9 @@ public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnectio
     }
 
     public abstract String getType();
+
+    @Override
+    public MasterSlave getMasterSlave() {
+        return MasterSlave.UNSUPPORTED;
+    }
 }

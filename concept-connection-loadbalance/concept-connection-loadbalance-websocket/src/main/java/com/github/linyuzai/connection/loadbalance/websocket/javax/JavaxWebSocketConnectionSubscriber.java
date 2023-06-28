@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import javax.websocket.DeploymentException;
 import javax.websocket.Session;
+import java.io.IOException;
 import java.net.URI;
 import java.util.function.Consumer;
 
@@ -20,11 +22,16 @@ public class JavaxWebSocketConnectionSubscriber extends
 
     private final Class<?> clientClass;
 
-    @SneakyThrows
     @Override
-    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept, Consumer<JavaxWebSocketConnection> consumer) {
-        Session session = getContainer().connectToServer(clientClass, uri);
-        consumer.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
+    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
+                            Consumer<JavaxWebSocketConnection> connectionConsumer,
+                            Consumer<Throwable> errorConsumer) {
+        try {
+            Session session = getContainer().connectToServer(clientClass, uri);
+            connectionConsumer.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
+        } catch (Throwable e) {
+            errorConsumer.accept(e);
+        }
     }
 
     @Override

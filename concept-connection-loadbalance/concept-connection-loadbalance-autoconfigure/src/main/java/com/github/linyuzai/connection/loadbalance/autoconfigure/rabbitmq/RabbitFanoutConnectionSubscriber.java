@@ -2,7 +2,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
@@ -14,7 +14,7 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 
 @Getter
 @RequiredArgsConstructor
-public class RabbitFanoutConnectionSubscriber extends AbstractConnectionSubscriber {
+public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
 
     private final RabbitTemplate rabbitTemplate;
 

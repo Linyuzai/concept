@@ -33,9 +33,11 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
 
             }
         } else if (event instanceof ConnectionSubscribeErrorEvent) {
-            ConnectionServer server = ((ConnectionSubscribeErrorEvent) event).getConnectionServer();
             Throwable e = ((ConnectionSubscribeErrorEvent) event).getError();
-            error("Error subscribe " + getServer(server), e);
+            if (e instanceof ConnectionServerSubscribeException) {
+                ConnectionServer server = ((ConnectionServerSubscribeException) e).getConnectionServer();
+                error("Error subscribe " + getServer(server), e);
+            }
         } else if (event instanceof MessageReceiveEvent) {
             Connection connection = ((MessageReceiveEvent) event).getConnection();
             if (Connection.Type.OBSERVABLE.equals(connection.getType())) {

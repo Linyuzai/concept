@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventList
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptDestroyEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +28,8 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
 
     public void subscribe(ConnectionLoadBalanceConcept concept) {
         concept.getEventPublisher().publish(new LoadBalanceMonitorEvent());
-        concept.getConnectionSubscriber().subscribe(concept::onEstablish);
+        concept.getConnectionSubscriber().subscribe(concept::onEstablish, e ->
+                concept.getEventPublisher().publish(new ConnectionSubscribeErrorEvent(e)));
     }
 
     public void stop(ConnectionLoadBalanceConcept concept) {

@@ -15,26 +15,32 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     public static final String PREFIX = "ConceptConnectionLB";
 
     @Override
-    public synchronized void subscribe(Consumer<Connection> consumer,ConnectionLoadBalanceConcept concept) {
-        String topic = getTopic(concept);
-        //需要判断是否已经订阅对应的服务
-        Connection exist = getExist(topic, concept);
-        if (exist != null) {
-            if (exist.isAlive()) {
-                //如果连接还存活则直接返回
-                return;
-            } else {
-                //否则关闭连接
-                exist.close("NotAlive");
+    public synchronized void subscribe(Consumer<Connection> connectionConsumer,
+                                       Consumer<Throwable> errorConsumer,
+                                       ConnectionLoadBalanceConcept concept) {
+        try {
+            String topic = getTopic(concept);
+            //需要判断是否已经订阅对应的服务
+            Connection exist = getExist(topic, concept);
+            if (exist != null) {
+                if (exist.isAlive()) {
+                    //如果连接还存活则直接返回
+                    return;
+                } else {
+                    //否则关闭连接
+                    exist.close("NotAlive");
+                }
             }
+            String from = getFrom(concept);
+            Connection connection = create(topic, concept);
+            connection.getMessageSendInterceptors().add((message, con) -> {
+                message.setFrom(from);
+                return true;
+            });
+            connectionConsumer.accept(connection);
+        } catch (Throwable e) {
+            errorConsumer.accept(e);
         }
-        String from = getFrom(concept);
-        Connection connection = create(topic, concept);
-        connection.getMessageSendInterceptors().add((message, con) -> {
-            message.setFrom(from);
-            return true;
-        });
-        consumer.accept(connection);
     }
 
     protected Connection getExist(String topic, ConnectionLoadBalanceConcept concept) {

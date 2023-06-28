@@ -20,6 +20,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelectorChain;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import lombok.Getter;
@@ -28,6 +29,7 @@ import lombok.Setter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -107,7 +109,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     @Override
     public void initialize() {
-        connectionSubscriber.subscribe(this::onEstablish);
+        connectionSubscriber.subscribe(this::onEstablish, e ->
+                eventPublisher.publish(new ConnectionSubscribeErrorEvent(e)));
         eventPublisher.publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
     }
 

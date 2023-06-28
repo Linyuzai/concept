@@ -29,16 +29,7 @@ public class JavaxWebSocketLoadBalanceConfiguration {
             havingValue = "WEBSOCKET", matchIfMissing = true)
     public static class WebSocketSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.JavaxWebSocketConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1",
-            havingValue = "WEBSOCKET")
-    public static class WebSocketSubscriberSlave1Configuration
-            extends WebSocketSubscriberConfiguration.JavaxWebSocketConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -47,16 +38,7 @@ public class JavaxWebSocketLoadBalanceConfiguration {
             havingValue = "WEBSOCKET_SSL")
     public static class WebSocketSSLSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.JavaxWebSocketSSLConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1",
-            havingValue = "WEBSOCKET_SSL")
-    public static class WebSocketSSLSubscriberSlave1Configuration
-            extends WebSocketSubscriberConfiguration.JavaxWebSocketSSLConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)

@@ -33,28 +33,28 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 public class WebSocketSubscriberConfiguration {
 
-    public interface MasterSlaveIndexProvider {
+    public interface MasterSlaveProvider {
 
-        int getIndex();
+        ConnectionSubscriber.MasterSlave getMasterSlave();
     }
 
-    public interface MasterIndexProvider extends MasterSlaveIndexProvider {
+    public interface MasterProvider extends MasterSlaveProvider {
 
         @Override
-        default int getIndex() {
-            return ConnectionSubscriber.MasterSlave.getMasterIndex();
+        default ConnectionSubscriber.MasterSlave getMasterSlave() {
+            return ConnectionSubscriber.MasterSlave.MASTER;
         }
     }
 
-    public interface Slave1IndexProvider extends MasterSlaveIndexProvider {
+    public interface Slave1Provider extends MasterSlaveProvider {
 
         @Override
-        default int getIndex() {
-            return ConnectionSubscriber.MasterSlave.getSlaveIndex(1);
+        default ConnectionSubscriber.MasterSlave getMasterSlave() {
+            return ConnectionSubscriber.MasterSlave.SLAVE1;
         }
     }
 
-    public abstract static class RedissonTopicConfiguration implements MasterSlaveIndexProvider {
+    public abstract static class RedissonTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
         @ConditionalOnMissingBean
@@ -64,13 +64,13 @@ public class WebSocketSubscriberConfiguration {
                     new RedissonTopicConnectionSubscriberFactory();
             factory.setRedissonClient(redissonClient);
             factory.setShared(false);
-            factory.setIndex(getIndex());
+            factory.setMasterSlave(getMasterSlave());
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
     }
 
-    public abstract static class RedissonSharedTopicConfiguration implements MasterSlaveIndexProvider {
+    public abstract static class RedissonSharedTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
         @ConditionalOnMissingBean
@@ -80,13 +80,13 @@ public class WebSocketSubscriberConfiguration {
                     new RedissonTopicConnectionSubscriberFactory();
             factory.setRedissonClient(redissonClient);
             factory.setShared(true);
-            factory.setIndex(getIndex());
+            factory.setMasterSlave(getMasterSlave());
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
     }
 
-    public abstract static class RedisTopicConfiguration implements MasterSlaveIndexProvider {
+    public abstract static class RedisTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
         @ConditionalOnMissingBean
@@ -95,13 +95,13 @@ public class WebSocketSubscriberConfiguration {
             RedisTopicConnectionSubscriberFactory factory =
                     new RedisTopicConnectionSubscriberFactory();
             factory.setRedisTemplate(redisTemplate);
-            factory.setIndex(getIndex());
+            factory.setMasterSlave(getMasterSlave());
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
     }
 
-    public abstract static class ReactiveRedisTopicConfiguration implements MasterSlaveIndexProvider {
+    public abstract static class ReactiveRedisTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
         @ConditionalOnMissingBean
@@ -110,13 +110,13 @@ public class WebSocketSubscriberConfiguration {
             ReactiveRedisTopicConnectionSubscriberFactory factory =
                     new ReactiveRedisTopicConnectionSubscriberFactory();
             factory.setReactiveRedisTemplate(reactiveRedisTemplate);
-            factory.setIndex(getIndex());
+            factory.setMasterSlave(getMasterSlave());
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
     }
 
-    public abstract static class RabbitFanoutConfiguration implements MasterSlaveIndexProvider {
+    public abstract static class RabbitFanoutConfiguration implements MasterSlaveProvider {
 
         @Bean
         @ConditionalOnMissingBean
@@ -128,14 +128,13 @@ public class WebSocketSubscriberConfiguration {
                     new RabbitFanoutConnectionSubscriberFactory();
             factory.setRabbitTemplate(rabbitTemplate);
             factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
-            factory.setIndex(getIndex());
+            factory.setMasterSlave(getMasterSlave());
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
     }
 
-    public abstract static class JavaxWebSocketConfiguration extends JavaxWebSocketBaseConfiguration
-            implements MasterSlaveIndexProvider {
+    public abstract static class JavaxWebSocketConfiguration extends JavaxWebSocketBaseConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
@@ -143,13 +142,11 @@ public class WebSocketSubscriberConfiguration {
             JavaxWebSocketConnectionSubscriberFactory factory =
                     new JavaxWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
-            factory.setIndex(getIndex());
             return factory;
         }
     }
 
-    public abstract static class JavaxWebSocketSSLConfiguration extends JavaxWebSocketBaseConfiguration
-            implements MasterSlaveIndexProvider {
+    public abstract static class JavaxWebSocketSSLConfiguration extends JavaxWebSocketBaseConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
@@ -157,13 +154,11 @@ public class WebSocketSubscriberConfiguration {
             JavaxWebSocketConnectionSubscriberFactory factory =
                     new JavaxWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
-            factory.setIndex(getIndex());
             return factory;
         }
     }
 
-    public abstract static class ReactiveWebSocketConfiguration extends ReactiveWebSocketBaseConfiguration
-            implements MasterSlaveIndexProvider {
+    public abstract static class ReactiveWebSocketConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
@@ -171,13 +166,11 @@ public class WebSocketSubscriberConfiguration {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
-            factory.setIndex(getIndex());
             return factory;
         }
     }
 
-    public abstract static class ReactiveWebSocketSSLConfiguration extends ReactiveWebSocketBaseConfiguration
-            implements MasterSlaveIndexProvider {
+    public abstract static class ReactiveWebSocketSSLConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
@@ -185,33 +178,28 @@ public class WebSocketSubscriberConfiguration {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
-            factory.setIndex(getIndex());
             return factory;
         }
     }
 
-    public abstract static class ServletWebSocketConfiguration extends ServletWebSocketBaseConfiguration
-            implements MasterSlaveIndexProvider {
+    public abstract static class ServletWebSocketConfiguration extends ServletWebSocketBaseConfiguration {
 
         @Bean
         public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
             ServletWebSocketConnectionSubscriberFactory factory =
                     new ServletWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
-            factory.setIndex(getIndex());
             return factory;
         }
     }
 
-    public abstract static class ServletWebSocketSSLConfiguration extends ServletWebSocketBaseConfiguration
-            implements MasterSlaveIndexProvider {
+    public abstract static class ServletWebSocketSSLConfiguration extends ServletWebSocketBaseConfiguration {
 
         @Bean
         public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
             ServletWebSocketConnectionSubscriberFactory factory =
                     new ServletWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
-            factory.setIndex(getIndex());
             return factory;
         }
     }

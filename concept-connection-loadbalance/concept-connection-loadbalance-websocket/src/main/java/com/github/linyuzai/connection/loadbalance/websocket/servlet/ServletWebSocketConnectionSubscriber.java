@@ -29,12 +29,18 @@ public class ServletWebSocketConnectionSubscriber extends
     }
 
     @Override
-    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept, Consumer<ServletWebSocketConnection> consumer) {
-        WebSocketClient client = newWebSocketClient();
-        ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
-                consumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
-        WebSocketConnectionManager manager = new WebSocketConnectionManager(client, handler, uri.toString());
-        manager.start();
+    public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
+                            Consumer<ServletWebSocketConnection> connectionConsumer,
+                            Consumer<Throwable> errorConsumer) {
+        try {
+            WebSocketClient client = newWebSocketClient();
+            ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
+                    connectionConsumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
+            WebSocketConnectionManager manager = new WebSocketConnectionManager(client, handler, uri.toString());
+            manager.start();
+        } catch (Throwable e) {
+            errorConsumer.accept(e);
+        }
     }
 
     public WebSocketClient newWebSocketClient() {

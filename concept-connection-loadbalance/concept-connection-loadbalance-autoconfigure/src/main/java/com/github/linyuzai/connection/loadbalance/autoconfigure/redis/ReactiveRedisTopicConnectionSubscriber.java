@@ -3,7 +3,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -12,7 +12,7 @@ import reactor.core.Disposable;
 
 @Getter
 @RequiredArgsConstructor
-public class ReactiveRedisTopicConnectionSubscriber extends AbstractConnectionSubscriber {
+public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
 
     private final ReactiveRedisTemplate<?, Object> reactiveRedisTemplate;
 

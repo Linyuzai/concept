@@ -16,25 +16,20 @@ import java.util.function.Consumer;
  */
 public interface ConnectionSubscriber {
 
-    void subscribe(Consumer<Connection> consumer, ConnectionLoadBalanceConcept concept);
+    void subscribe(Consumer<Connection> connectionConsumer,
+                   Consumer<Throwable> errorConsumer,
+                   ConnectionLoadBalanceConcept concept);
 
-    default void subscribe(Consumer<Connection> consumer) {
-        subscribe(consumer, null);
+    default void subscribe(Consumer<Connection> connectionConsumer,
+                           Consumer<Throwable> errorConsumer) {
+        subscribe(connectionConsumer, errorConsumer, null);
     }
 
-    class MasterSlave {
+    MasterSlave getMasterSlave();
 
-        public static int getMasterIndex() {
-            return 0;
-        }
+    enum MasterSlave {
 
-        public static int getSlaveIndex(int index) {
-            return getMasterIndex() + index;
-        }
-
-        public static boolean isMaster(int index) {
-            return index == 0;
-        }
+        UNSUPPORTED, MASTER, SLAVE1
     }
 
     @Getter
@@ -51,13 +46,21 @@ public interface ConnectionSubscriber {
         }
 
         @Override
-        public void subscribe(Consumer<Connection> consumer, ConnectionLoadBalanceConcept concept) {
-            delegate.subscribe(consumer, concept);
+        public void subscribe(Consumer<Connection> connectionConsumer,
+                              Consumer<Throwable> errorConsumer,
+                              ConnectionLoadBalanceConcept concept) {
+            delegate.subscribe(connectionConsumer, errorConsumer, concept);
         }
 
         @Override
-        public void subscribe(Consumer<Connection> consumer) {
-            delegate.subscribe(consumer, concept);
+        public void subscribe(Consumer<Connection> connectionConsumer,
+                              Consumer<Throwable> errorConsumer) {
+            delegate.subscribe(connectionConsumer, errorConsumer, concept);
+        }
+
+        @Override
+        public MasterSlave getMasterSlave() {
+            return delegate.getMasterSlave();
         }
     }
 }

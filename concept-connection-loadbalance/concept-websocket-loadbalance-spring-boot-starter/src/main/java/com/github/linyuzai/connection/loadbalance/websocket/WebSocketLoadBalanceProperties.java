@@ -93,12 +93,12 @@ public class WebSocketLoadBalanceProperties {
         /**
          * 主订阅类型，默认 WEBSOCKET
          */
-        private Subscriber subscriberMaster = Subscriber.WEBSOCKET;
+        private MasterSubscriber subscriberMaster = MasterSubscriber.WEBSOCKET;
 
         /**
          * 从订阅类型，默认 NONE
          */
-        private Subscriber subscriberSlave1 = Subscriber.NONE;
+        private SlaveSubscriber subscriberSlave1 = SlaveSubscriber.NONE;
 
         /**
          * 消息配置
@@ -120,12 +120,24 @@ public class WebSocketLoadBalanceProperties {
          */
         private HeartbeatProperties heartbeat = new HeartbeatProperties();
 
-        public enum Subscriber {
+        public enum MasterSubscriber {
 
             NONE,
 
             WEBSOCKET,
             WEBSOCKET_SSL,
+
+            REDISSON_TOPIC,
+            REDISSON_SHARED_TOPIC,
+
+            REDIS_TOPIC,
+
+            RABBIT_FANOUT
+        }
+
+        public enum SlaveSubscriber {
+
+            NONE,
 
             REDISSON_TOPIC,
             REDISSON_SHARED_TOPIC,

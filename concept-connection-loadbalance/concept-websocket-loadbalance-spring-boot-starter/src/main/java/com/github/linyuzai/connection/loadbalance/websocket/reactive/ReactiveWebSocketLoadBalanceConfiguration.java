@@ -33,16 +33,7 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
             havingValue = "WEBSOCKET", matchIfMissing = true)
     public static class WebSocketSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.ReactiveWebSocketConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1",
-            havingValue = "WEBSOCKET")
-    public static class WebSocketSubscriberSlave1Configuration
-            extends WebSocketSubscriberConfiguration.ReactiveWebSocketConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -51,16 +42,7 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
             havingValue = "WEBSOCKET_SSL")
     public static class WebSocketSSLSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.ReactiveWebSocketSSLConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1",
-            havingValue = "WEBSOCKET_SSL")
-    public static class WebSocketSSLSubscriberSlave1Configuration
-            extends WebSocketSubscriberConfiguration.ReactiveWebSocketSSLConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)

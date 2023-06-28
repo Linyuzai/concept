@@ -31,28 +31,28 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDISSON_TOPIC")
     public static class RedissonTopicSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.RedissonTopicConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDISSON_TOPIC")
     public static class RedissonTopicSubscriberSlave1Configuration
             extends WebSocketSubscriberConfiguration.RedissonTopicConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.Slave1Provider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDISSON_SHARED_TOPIC")
     public static class RedissonSharedTopicSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.RedissonSharedTopicConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDISSON_SHARED_TOPIC")
     public static class RedissonSharedTopicSubscriberSlave1Configuration
             extends WebSocketSubscriberConfiguration.RedissonSharedTopicConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.Slave1Provider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -60,7 +60,7 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.RedisTopicConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -68,7 +68,7 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberSlave1Configuration
             extends WebSocketSubscriberConfiguration.RedisTopicConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.Slave1Provider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -76,7 +76,7 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDIS_TOPIC")
     public static class ReactiveRedisTopicSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.ReactiveRedisTopicConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -84,21 +84,21 @@ public class WebSocketLoadBalanceConfiguration {
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "REDIS_TOPIC")
     public static class ReactiveRedisTopicSubscriberSlave1Configuration
             extends WebSocketSubscriberConfiguration.ReactiveRedisTopicConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.Slave1Provider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "RABBIT_FANOUT")
     public static class RabbitFanoutSubscriberMasterConfiguration
             extends WebSocketSubscriberConfiguration.RabbitFanoutConfiguration
-            implements WebSocketSubscriberConfiguration.MasterIndexProvider {
+            implements WebSocketSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "RABBIT_FANOUT")
     public static class RabbitFanoutSubscriberSlave1Configuration
             extends WebSocketSubscriberConfiguration.RabbitFanoutConfiguration
-            implements WebSocketSubscriberConfiguration.Slave1IndexProvider {
+            implements WebSocketSubscriberConfiguration.Slave1Provider {
     }
 
     @Bean

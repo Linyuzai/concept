@@ -2,7 +2,6 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageSendErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.*;
 
@@ -17,11 +16,13 @@ import java.util.function.Consumer;
 public abstract class ServerConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 
     @Override
-    public synchronized void subscribe(Consumer<Connection> consumer, ConnectionLoadBalanceConcept concept) {
+    public synchronized void subscribe(Consumer<Connection> connectionConsumer,
+                                       Consumer<Throwable> errorConsumer,
+                                       ConnectionLoadBalanceConcept concept) {
         List<ConnectionServer> servers = concept.getConnectionServerManager()
                 .getConnectionServers();
         for (ConnectionServer server : servers) {
-            subscribe(consumer, server, concept);
+            subscribe(connectionConsumer, errorConsumer, server, concept);
         }
     }
 
@@ -40,7 +41,9 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
      *
      * @param server 需要订阅的服务实例
      */
-    public void subscribe(Consumer<Connection> consumer, ConnectionServer server,
+    public void subscribe(Consumer<Connection> connectionConsumer,
+                          Consumer<Throwable> errorConsumer,
+                          ConnectionServer server,
                           ConnectionLoadBalanceConcept concept) {
         //需要判断是否已经订阅对应的服务
         Connection exist = getSubscriberConnection(server, concept);
@@ -53,17 +56,13 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
                 exist.close("NotAlive");
             }
         }
-        try {
-            doSubscribe(server, concept, connection -> {
-                consumer.accept(connection);
-                ConnectionServer local = concept.getConnectionServerManager().getLocal();
-                if (local != null) {
-                    connection.send(concept.createMessage(local));
-                }
-            });
-        } catch (Throwable e) {
-            concept.getEventPublisher().publish(new ConnectionSubscribeErrorEvent(server, e));
-        }
+        doSubscribe(server, concept, connection -> {
+            connectionConsumer.accept(connection);
+            ConnectionServer local = concept.getConnectionServerManager().getLocal();
+            if (local != null) {
+                connection.send(concept.createMessage(local));
+            }
+        }, e -> errorConsumer.accept(new ConnectionServerSubscribeException(server, e.getMessage(), e)));
     }
 
     /**
@@ -89,7 +88,9 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
         return null;
     }
 
-    public abstract void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept, Consumer<T> consumer);
+    public abstract void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
+                                     Consumer<T> connectionConsumer,
+                                     Consumer<Throwable> errorConsumer);
 
     /**
      * 获得对应服务的连接 host
