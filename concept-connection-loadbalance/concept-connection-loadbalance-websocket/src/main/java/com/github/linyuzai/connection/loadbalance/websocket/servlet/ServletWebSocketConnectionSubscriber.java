@@ -2,7 +2,6 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.ContainerWebSocketConnectionSubscriber;
 import lombok.NoArgsConstructor;
 import org.springframework.util.ClassUtils;
@@ -30,16 +29,19 @@ public class ServletWebSocketConnectionSubscriber extends
 
     @Override
     public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
-                            Consumer<ServletWebSocketConnection> connectionConsumer,
-                            Consumer<Throwable> errorConsumer) {
+                            Consumer<ServletWebSocketConnection> onSuccess,
+                            Consumer<Throwable> onError,
+                            Runnable onComplete) {
         try {
             WebSocketClient client = newWebSocketClient();
             ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
-                    connectionConsumer.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
+                    onSuccess.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
             WebSocketConnectionManager manager = new WebSocketConnectionManager(client, handler, uri.toString());
             manager.start();
         } catch (Throwable e) {
-            errorConsumer.accept(e);
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 

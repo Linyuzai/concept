@@ -5,9 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportE
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -33,37 +35,41 @@ public class NettyConnection extends AbstractConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
-        try {
-            channel.writeAndFlush(message);
-            success.run();
-        } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
-        }
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        channel.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                onSuccess.run();
+            } else {
+                Throwable cause = future.cause();
+                if (cause instanceof IOException) {
+                    onError.accept(new MessageTransportException(cause));
+                } else {
+                    onError.accept(cause);
+                }
+            }
+            onComplete.run();
+        });
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
 
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
 
     }
 
     @Override
-    public Object getCloseReason(int code, String reason) {
-        return reason;
-    }
-
-    @Override
-    public void close(String reason) {
-        channel.close();
-    }
-
-    @Override
-    public void doClose(Object reason) {
-        channel.close();
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        channel.close().addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                onSuccess.run();
+            } else {
+                onError.accept(future.cause());
+            }
+            onComplete.run();
+        });
     }
 }

@@ -106,9 +106,9 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void send(@NonNull Message message, Runnable success, Consumer<Throwable> error) {
+    public void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         for (Connection connection : connections) {
-            connection.send(message, success, error);
+            connection.send(message, onSuccess, onError, onComplete);
         }
     }
 
@@ -118,16 +118,23 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void close(String reason) {
+    public void close(Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        for (Connection connection : connections) {
+            connection.close(onSuccess, onError, onComplete);
+        }
+    }
+
+    @Override
+    public void close(Object reason) {
         for (Connection connection : connections) {
             connection.close(reason);
         }
     }
 
     @Override
-    public void close(int code, String reason) {
+    public void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         for (Connection connection : connections) {
-            connection.close(code, reason);
+            connection.close(reason, onSuccess, onError, onComplete);
         }
     }
 

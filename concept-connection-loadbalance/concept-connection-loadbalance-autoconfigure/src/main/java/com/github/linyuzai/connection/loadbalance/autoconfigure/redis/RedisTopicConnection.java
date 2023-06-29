@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.ClusterInfo;
 import org.springframework.data.redis.connection.RedisClusterConnection;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -36,7 +37,21 @@ public class RedisTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        try {
+            redisTemplate.convertAndSend(topic, message);
+            onSuccess.run();
+        } catch (DataAccessException e) {
+            onError.accept(new MessageTransportException(e));
+        } catch (Throwable e) {
+            onError.accept(e);
+        } finally {
+            onComplete.run();
+        }
+    }
+
+    @Override
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
         RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
         if (factory == null) {
             return;
@@ -51,16 +66,6 @@ public class RedisTopicConnection extends AliveForeverConnection {
             //TODO
         } finally {
             RedisConnectionUtils.releaseConnection(connection, factory);
-        }
-    }
-
-    @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
-        try {
-            redisTemplate.convertAndSend(topic, message);
-            success.run();
-        } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
         }
     }
 }

@@ -111,7 +111,7 @@ public interface Connection {
      *
      * @param message 消息
      */
-    void send(@NonNull Message message, Runnable success, Consumer<Throwable> error);
+    void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 
     /**
      * 关闭连接
@@ -120,22 +120,26 @@ public interface Connection {
 
     /**
      * 关闭连接
-     * <p>
-     * 这里可以借鉴ws通过先发送一个约定的数据来关闭
-     *
-     * @param reason 原因
      */
-    void close(String reason);
+    void close(Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 
     /**
      * 关闭连接
      * <p>
      * 这里可以借鉴ws通过先发送一个约定的数据来关闭
      *
-     * @param code   关闭码
      * @param reason 原因
      */
-    void close(int code, String reason);
+    void close(Object reason);
+
+    /**
+     * 关闭连接
+     * <p>
+     * 这里可以借鉴ws通过先发送一个约定的数据来关闭
+     *
+     * @param reason 原因
+     */
+    void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 
     /**
      * 连接是否存活

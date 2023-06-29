@@ -30,9 +30,15 @@ public abstract class WebSocketConnection extends AbstractConnection {
 
     public abstract boolean isOpen();
 
+    public abstract Object getCloseReason(int code, String reason);
+
+    public void close(int code, String reason) {
+        close(getCloseReason(code, reason));
+    }
+
     @Override
-    public void close(String reason) {
-        close(1000, reason);
+    public void close() {
+        close(getCloseReason(1000, null));
     }
 
     public String getQueryParameter(String name) {

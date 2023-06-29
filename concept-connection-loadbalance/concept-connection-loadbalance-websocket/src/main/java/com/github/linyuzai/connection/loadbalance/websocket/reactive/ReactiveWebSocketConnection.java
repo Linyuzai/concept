@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -47,8 +48,12 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
-        //session.send(Flux.just(createMessage(bytes))).subscribe();
+    public boolean isOpen() {
+        return session.isOpen();
+    }
+
+    @Override
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             if (message instanceof WebSocketMessage) {
                 sender.next((WebSocketMessage) message);
@@ -61,37 +66,50 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
             } else if (message instanceof byte[]) {
                 sender.next(session.binaryMessage(factory -> factory.wrap((byte[]) message)));
             } else {
-                throw new IllegalArgumentException(message.toString());
+                sender.next(session.textMessage(message.toString()));
             }
-            success.run();
+            onSuccess.run();
+        } catch (WebClientException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
-        sender.next(session.pingMessage(factory -> factory.wrap(message.getPayload())));
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        try {
+            sender.next(session.pingMessage(factory -> factory.wrap(message.getPayload())));
+            onSuccess.run();
+        } catch (Throwable e) {
+            onError.accept(e);
+        } finally {
+            onComplete.run();
+        }
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
-        sender.next(session.pongMessage(factory -> factory.wrap(message.getPayload())));
+    public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        try {
+            sender.next(session.pongMessage(factory -> factory.wrap(message.getPayload())));
+            onSuccess.run();
+        } catch (Throwable e) {
+            onError.accept(e);
+        } finally {
+            onComplete.run();
+        }
     }
 
     @Override
-    public void doClose(Object reason) {
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         sender.complete();
-        session.close((CloseStatus) reason).subscribe();
+        session.close((CloseStatus) reason).subscribe(v -> onSuccess.run(), onError, onComplete);
     }
 
     @Override
     public Object getCloseReason(int code, String reason) {
         return new CloseStatus(code, reason);
-    }
-
-    @Override
-    public boolean isOpen() {
-        return session.isOpen();
     }
 }

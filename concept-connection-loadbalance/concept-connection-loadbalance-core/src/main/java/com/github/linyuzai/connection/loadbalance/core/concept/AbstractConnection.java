@@ -51,7 +51,7 @@ public abstract class AbstractConnection implements Connection {
     /**
      * 最后一次心跳时间
      */
-    protected long lastHeartbeat;
+    protected volatile long lastHeartbeat;
 
     public AbstractConnection(@NonNull String type) {
         this(type, null);
@@ -72,81 +72,104 @@ public abstract class AbstractConnection implements Connection {
 
         }, e ->
                 concept.getEventPublisher()
-                        .publish(new MessageSendErrorEvent(this, message, e)));
+                        .publish(new MessageSendErrorEvent(this, message, e)), () -> {
+        });
     }
 
     @Override
-    public void send(@NonNull Message message, Runnable success, Consumer<Throwable> error) {
+    public void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         if (message instanceof PingMessage) {
-            ping((PingMessage) message, success, error);
+            ping((PingMessage) message, onSuccess, onError, onComplete);
         } else if (message instanceof PongMessage) {
-            pong((PongMessage) message, success, error);
+            pong((PongMessage) message, onSuccess, onError, onComplete);
         } else {
-            for (MessageSendInterceptor interceptor : messageSendInterceptors) {
-                if (!interceptor.intercept(message, this)) {
-                    return;
+            try {
+                for (MessageSendInterceptor interceptor : messageSendInterceptors) {
+                    if (!interceptor.intercept(message, this)) {
+                        return;
+                    }
                 }
+            } catch (Throwable e) {
+                onError.accept(e);
+                onComplete.run();
+                return;
             }
             Object encode;
             try {
                 MessageEncoder encoder = getMessageEncoder();
                 encode = encoder.encode(message);
             } catch (Throwable e) {
-                throw new MessageEncodeException(message, e);
+                onError.accept(new MessageEncodeException(message, e));
+                onComplete.run();
+                return;
             }
 
-            Consumer<Consumer<Throwable>> send = consumer -> doSend(encode, success, consumer);
-            send.accept(e -> messageRetryStrategy.retry(e, send, error));
+            Consumer<Consumer<Throwable>> send = consumer ->
+                    doSend(encode, onSuccess, consumer, onComplete);
+            send.accept(e -> messageRetryStrategy.retry(e, send, onError));
         }
     }
 
     public void ping(PingMessage message) {
-        ping(message, () -> concept.getEventPublisher()
-                        .publish(new MessageSendSuccessEvent(this, message)),
-                e -> concept.getEventPublisher()
-                        .publish(new MessageSendErrorEvent(this, message, e)));
+        ping(message, onMessageSuccess(message), onMessageError(message), onMessageComplete());
     }
 
-    public void ping(PingMessage message, Runnable success, Consumer<Throwable> error) {
-        Consumer<Consumer<Throwable>> ping = consumer -> doPing(message, success, consumer);
-        ping.accept(e -> messageRetryStrategy.retry(e, ping, error));
+    public void ping(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        doPing(message, onSuccess, onError, onComplete);
     }
 
     public void pong(PongMessage message) {
-        pong(message, () -> concept.getEventPublisher()
-                        .publish(new MessageSendSuccessEvent(this, message)),
-                e -> concept.getEventPublisher()
-                        .publish(new MessageSendErrorEvent(this, message, e)));
+        pong(message, onMessageSuccess(message), onMessageError(message), onMessageComplete());
     }
 
-    public void pong(PongMessage message, Runnable success, Consumer<Throwable> error) {
-        Consumer<Consumer<Throwable>> pong = consumer -> doPong(message, success, consumer);
-        pong.accept(e -> messageRetryStrategy.retry(e, pong, error));
+    public void pong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        doPong(message, onSuccess, onError, onComplete);
+    }
+
+    protected Runnable onMessageSuccess(Message message) {
+        return () -> concept.getEventPublisher()
+                .publish(new MessageSendSuccessEvent(this, message));
+    }
+
+    protected Consumer<Throwable> onMessageError(Message message) {
+        return e -> concept.getEventPublisher()
+                .publish(new MessageSendErrorEvent(this, message, e));
+    }
+
+    protected Runnable onMessageComplete() {
+        return () -> {
+        };
     }
 
     @Override
     public void close() {
-        close("");
+        close(null);
     }
 
     @Override
-    public void close(int code, String reason) {
-        Object cr = getCloseReason(code, reason);
-        try {
-            doClose(cr);
-        } catch (Throwable e) {
-            concept.onClose(this, cr);
-            concept.getEventPublisher().publish(new ConnectionCloseErrorEvent(this, cr, e));
-        }
+    public void close(Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        close(null, onSuccess, onError, onComplete);
     }
 
-    public abstract void doClose(Object reason);
+    @Override
+    public void close(Object reason) {
 
-    public abstract Object getCloseReason(int code, String reason);
+    }
 
-    public abstract void doSend(Object message, Runnable success, Consumer<Throwable> error);
+    @Override
+    public void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        concept.onClose(this, reason);
+        doClose(reason, onSuccess, e -> {
+            concept.getEventPublisher().publish(new ConnectionCloseErrorEvent(this, reason, e));
+            onError.accept(e);
+        }, onComplete);
+    }
 
-    public abstract void doPing(PingMessage message, Runnable success, Consumer<Throwable> error);
+    public abstract void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 
-    public abstract void doPong(PongMessage message, Runnable success, Consumer<Throwable> error);
+    public abstract void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
+
+    public abstract void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
+
+    public abstract void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 }

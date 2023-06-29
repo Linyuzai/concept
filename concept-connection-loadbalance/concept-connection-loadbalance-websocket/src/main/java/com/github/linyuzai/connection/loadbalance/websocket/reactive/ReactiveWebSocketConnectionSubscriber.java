@@ -41,15 +41,16 @@ public class ReactiveWebSocketConnectionSubscriber extends
 
     @Override
     public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
-                            Consumer<ReactiveWebSocketConnection> connectionConsumer,
-                            Consumer<Throwable> errorConsumer) {
+                            Consumer<ReactiveWebSocketConnection> onSuccess,
+                            Consumer<Throwable> onError,
+                            Runnable onComplete) {
         WebSocketClient client = newWebSocketClient();
         ReactiveWebSocketSubscriberHandler handler =
                 new ReactiveWebSocketSubscriberHandler(concept, (session, sink) ->
-                        connectionConsumer.accept(new ReactiveWebSocketConnection(session, sink,
+                        onSuccess.accept(new ReactiveWebSocketConnection(session, sink,
                                 Connection.Type.SUBSCRIBER)));
         client.execute(uri, handler).subscribe(unused -> {
-        }, errorConsumer);
+        }, onError, onComplete);
     }
 
     @SneakyThrows

@@ -24,13 +24,16 @@ public class JavaxWebSocketConnectionSubscriber extends
 
     @Override
     public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
-                            Consumer<JavaxWebSocketConnection> connectionConsumer,
-                            Consumer<Throwable> errorConsumer) {
+                            Consumer<JavaxWebSocketConnection> onSuccess,
+                            Consumer<Throwable> onError,
+                            Runnable onComplete) {
         try {
             Session session = getContainer().connectToServer(clientClass, uri);
-            connectionConsumer.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
+            onSuccess.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
         } catch (Throwable e) {
-            errorConsumer.accept(e);
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 

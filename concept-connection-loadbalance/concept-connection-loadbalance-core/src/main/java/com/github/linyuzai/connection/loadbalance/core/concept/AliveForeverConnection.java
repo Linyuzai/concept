@@ -24,30 +24,26 @@ public abstract class AliveForeverConnection extends AbstractConnection {
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
 
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
 
     }
 
     @Override
-    public void doClose(Object reason) {
+    public void doClose(Object reason, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
         if (closeCallback != null) {
-            closeCallback.accept(reason);
+            try {
+                closeCallback.accept(reason);
+                success.run();
+            } catch (Throwable e) {
+                error.accept(e);
+            }
         }
-    }
-
-    @Override
-    public Object getCloseReason(int code, String reason) {
-        return reason;
-    }
-
-    @Override
-    public void close(String reason) {
-        doClose(reason);
+        onComplete.run();
     }
 
     @Override

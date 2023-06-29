@@ -4,9 +4,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportE
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
-import lombok.SneakyThrows;
 import org.springframework.web.socket.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -40,65 +40,76 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+    public boolean isOpen() {
+        return session.isOpen();
+    }
+
+    @Override
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             if (message instanceof WebSocketMessage) {
                 session.sendMessage((WebSocketMessage<?>) message);
-                success.run();
-                return;
             } else if (message instanceof String) {
                 session.sendMessage(new TextMessage((CharSequence) message));
-                success.run();
-                return;
             } else if (message instanceof ByteBuffer) {
                 session.sendMessage(new BinaryMessage((ByteBuffer) message));
-                success.run();
-                return;
             } else if (message instanceof byte[]) {
                 session.sendMessage(new BinaryMessage(ByteBuffer.wrap((byte[]) message)));
-                success.run();
-                return;
+            } else {
+                session.sendMessage(new TextMessage(message.toString()));
             }
+            onSuccess.run();
+        } catch (IOException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
-            return;
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
-        throw new IllegalArgumentException(message.toString());
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             session.sendMessage(new org.springframework.web.socket.PingMessage(message.getPayload()));
-            success.run();
+            onSuccess.run();
+        } catch (IOException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             session.sendMessage(new org.springframework.web.socket.PongMessage(message.getPayload()));
-            success.run();
+            onSuccess.run();
+        } catch (IOException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 
-    @SneakyThrows
     @Override
-    public void doClose(Object reason) {
-        session.close((CloseStatus) reason);
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        try {
+            session.close((CloseStatus) reason);
+            onSuccess.run();
+        } catch (Throwable e) {
+            onError.accept(e);
+        } finally {
+            onComplete.run();
+        }
     }
 
     @Override
     public Object getCloseReason(int code, String reason) {
         return new CloseStatus(code, reason);
-    }
-
-    @Override
-    public boolean isOpen() {
-        return session.isOpen();
     }
 }

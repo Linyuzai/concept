@@ -1,9 +1,11 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 
 import java.util.Map;
@@ -28,7 +30,14 @@ public class ReactiveRedisTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
-        reactiveRedisTemplate.convertAndSend(topic, message).subscribe(l -> success.run(), error);
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        reactiveRedisTemplate.convertAndSend(topic, message)
+                .subscribe(l -> onSuccess.run(), e -> {
+                    if (e instanceof DataAccessException) {
+                        onError.accept(new MessageTransportException(e));
+                    } else {
+                        onError.accept(e);
+                    }
+                }, onComplete);
     }
 }

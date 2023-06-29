@@ -23,32 +23,22 @@ public class UnknownConnection extends AbstractConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
 
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
 
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
 
     }
 
     @Override
-    public void close(String reason) {
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
 
-    }
-
-    @Override
-    public void doClose(Object reason) {
-
-    }
-
-    @Override
-    public Object getCloseReason(int code, String reason) {
-        return null;
     }
 }

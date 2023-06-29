@@ -16,14 +16,22 @@ import java.util.function.Consumer;
 public abstract class ServerConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 
     @Override
-    public synchronized void subscribe(Consumer<Connection> connectionConsumer,
-                                       Consumer<Throwable> errorConsumer,
+    public synchronized void subscribe(Consumer<Connection> onSuccess,
+                                       Consumer<Throwable> onError,
+                                       Runnable onComplete,
                                        ConnectionLoadBalanceConcept concept) {
         List<ConnectionServer> servers = concept.getConnectionServerManager()
                 .getConnectionServers();
         for (ConnectionServer server : servers) {
-            subscribe(connectionConsumer, errorConsumer, server, concept);
+            subscribe(onSuccess, onError, onComplete, server, concept);
         }
+    }
+
+    public void subscribe(ConnectionServer server,
+                          ConnectionLoadBalanceConcept concept) {
+        subscribe(ConnectionSubscriber.onSubscribeSuccess(concept),
+                ConnectionSubscriber.onSubscribeError(concept), () -> {
+                }, server, concept);
     }
 
     /**
@@ -41,8 +49,9 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
      *
      * @param server 需要订阅的服务实例
      */
-    public void subscribe(Consumer<Connection> connectionConsumer,
-                          Consumer<Throwable> errorConsumer,
+    public void subscribe(Consumer<Connection> onSuccess,
+                          Consumer<Throwable> onError,
+                          Runnable onComplete,
                           ConnectionServer server,
                           ConnectionLoadBalanceConcept concept) {
         //需要判断是否已经订阅对应的服务
@@ -50,6 +59,7 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
         if (exist != null) {
             if (exist.isAlive()) {
                 //如果连接还存活则直接返回
+                onComplete.run();
                 return;
             } else {
                 //否则关闭连接
@@ -57,12 +67,12 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
             }
         }
         doSubscribe(server, concept, connection -> {
-            connectionConsumer.accept(connection);
+            onSuccess.accept(connection);
             ConnectionServer local = concept.getConnectionServerManager().getLocal();
             if (local != null) {
                 connection.send(concept.createMessage(local));
             }
-        }, e -> errorConsumer.accept(new ConnectionServerSubscribeException(server, e.getMessage(), e)));
+        }, e -> onError.accept(new ConnectionServerSubscribeException(server, e.getMessage(), e)), onComplete);
     }
 
     /**
@@ -89,8 +99,9 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
     }
 
     public abstract void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
-                                     Consumer<T> connectionConsumer,
-                                     Consumer<Throwable> errorConsumer);
+                                     Consumer<T> onSuccess,
+                                     Consumer<Throwable> onError,
+                                     Runnable onComplete);
 
     /**
      * 获得对应服务的连接 host

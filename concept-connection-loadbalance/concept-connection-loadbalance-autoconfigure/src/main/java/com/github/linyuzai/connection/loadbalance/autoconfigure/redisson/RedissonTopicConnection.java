@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportE
 import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RTopic;
+import org.redisson.client.RedisException;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -27,12 +28,16 @@ public class RedissonTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             topic.publish(message);
-            success.run();
+            onSuccess.run();
+        } catch (RedisException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 }

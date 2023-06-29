@@ -30,15 +30,18 @@ public class MasterSlaveSwitchableConnectionSubscriber
     private final long period;
 
     @Override
-    public void subscribe(Consumer<Connection> connectionConsumer, Consumer<Throwable> errorConsumer, ConnectionLoadBalanceConcept concept) {
+    public void subscribe(Consumer<Connection> onSuccess,
+                          Consumer<Throwable> onError,
+                          Runnable onComplete,
+                          ConnectionLoadBalanceConcept concept) {
         ConnectionImpl connection = new ConnectionImpl();
         masterConnectionSubscriber.subscribe(master ->
-                connection.master = master, errorConsumer, concept);
+                connection.master = master, onError, onComplete, concept);
 
         slaveConnectionSubscriber.subscribe(slave ->
-                connection.slave = slave, errorConsumer, concept);
+                connection.slave = slave, onError, onComplete, concept);
 
-        connectionConsumer.accept(connection);
+        onSuccess.accept(connection);
     }
 
     @Override
@@ -241,8 +244,8 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
-        public void send(@NonNull Message message, Runnable success, Consumer<Throwable> error) {
-            getCurrent().send(message, success, error);
+        public void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+            getCurrent().send(message, onSuccess, onError, onComplete);
         }
 
         @Override
@@ -253,17 +256,24 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
-        public void close(String reason) {
+        public void close(Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+            getConcept().onClose(this, null);
+            master.close(onSuccess, onError, () ->
+                    slave.close(onSuccess, onError, onComplete));
+        }
+
+        @Override
+        public void close(Object reason) {
             getConcept().onClose(this, reason);
             master.close(reason);
             slave.close(reason);
         }
 
         @Override
-        public void close(int code, String reason) {
+        public void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
             getConcept().onClose(this, reason);
-            master.close(code, reason);
-            slave.close(code, reason);
+            master.close(reason, onSuccess, onError, () ->
+                    slave.close(reason, onSuccess, onError, onComplete));
         }
 
         @Override

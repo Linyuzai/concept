@@ -23,16 +23,19 @@ public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnectio
 
     @Override
     public void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
-                            Consumer<T> connectionConsumer, Consumer<Throwable> errorConsumer) {
+                            Consumer<T> onSuccess, Consumer<Throwable> onError,
+                            Runnable onComplete) {
         URI uri = getUri(server);
         doSubscribe(uri, concept, connection -> {
             connection.getMetadata().put(ConnectionServer.class, server);
-            connectionConsumer.accept(connection);
-        }, errorConsumer);
+            onSuccess.accept(connection);
+        }, onError, onComplete);
     }
 
     public abstract void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
-                                     Consumer<T> connectionConsumer, Consumer<Throwable> errorConsumer);
+                                     Consumer<T> onSuccess,
+                                     Consumer<Throwable> onError,
+                                     Runnable onComplete);
 
     @Override
     public String getEndpoint() {

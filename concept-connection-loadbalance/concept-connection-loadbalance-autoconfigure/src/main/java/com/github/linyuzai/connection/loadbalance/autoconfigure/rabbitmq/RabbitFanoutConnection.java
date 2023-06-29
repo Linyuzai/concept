@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportE
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.amqp.AmqpIOException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.Map;
@@ -29,12 +30,16 @@ public class RabbitFanoutConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             rabbitTemplate.convertAndSend(exchange, "", message);
-            success.run();
+            onSuccess.run();
+        } catch (AmqpIOException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 }

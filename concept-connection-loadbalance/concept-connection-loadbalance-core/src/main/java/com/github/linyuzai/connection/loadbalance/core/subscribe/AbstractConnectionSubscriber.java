@@ -15,8 +15,9 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     public static final String PREFIX = "ConceptConnectionLB";
 
     @Override
-    public synchronized void subscribe(Consumer<Connection> connectionConsumer,
-                                       Consumer<Throwable> errorConsumer,
+    public synchronized void subscribe(Consumer<Connection> onSuccess,
+                                       Consumer<Throwable> onError,
+                                       Runnable onComplete,
                                        ConnectionLoadBalanceConcept concept) {
         try {
             String topic = getTopic(concept);
@@ -37,9 +38,11 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                 message.setFrom(from);
                 return true;
             });
-            connectionConsumer.accept(connection);
+            onSuccess.accept(connection);
         } catch (Throwable e) {
-            errorConsumer.accept(e);
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 

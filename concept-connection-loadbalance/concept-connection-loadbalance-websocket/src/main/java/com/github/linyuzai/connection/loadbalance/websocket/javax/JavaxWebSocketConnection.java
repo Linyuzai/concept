@@ -5,10 +5,10 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -45,9 +45,13 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
         return session.getRequestURI();
     }
 
-    @SneakyThrows
     @Override
-    public void doSend(Object message, Runnable success, Consumer<Throwable> error) {
+    public boolean isOpen() {
+        return session.isOpen();
+    }
+
+    @Override
+    public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             if (message instanceof String) {
                 session.getBasicRemote().sendText((String) message);
@@ -58,46 +62,55 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
             } else {
                 session.getBasicRemote().sendObject(message);
             }
-            success.run();
+            onSuccess.run();
+        } catch (IOException e) {
+            onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             session.getBasicRemote().sendPing(message.getPayload());
-            success.run();
+            onSuccess.run();
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error) {
+    public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
             session.getBasicRemote().sendPong(message.getPayload());
-            success.run();
+            onSuccess.run();
         } catch (Throwable e) {
-            error.accept(new MessageTransportException(e));
+            onError.accept(e);
+        } finally {
+            onComplete.run();
         }
     }
 
-    @SneakyThrows
     @Override
-    public void doClose(Object reason) {
-        session.close((CloseReason) reason);
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        try {
+            session.close((CloseReason) reason);
+            onSuccess.run();
+        } catch (Throwable e) {
+            onError.accept(e);
+        } finally {
+            onComplete.run();
+        }
     }
 
     @Override
     public CloseReason getCloseReason(int code, String reason) {
         return new CloseReason(CloseReason.CloseCodes.getCloseCode(code), reason);
-    }
-
-    @Override
-    public boolean isOpen() {
-        return session.isOpen();
     }
 
     @Override

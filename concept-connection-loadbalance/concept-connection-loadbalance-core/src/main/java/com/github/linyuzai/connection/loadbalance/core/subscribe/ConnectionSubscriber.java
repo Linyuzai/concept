@@ -16,13 +16,32 @@ import java.util.function.Consumer;
  */
 public interface ConnectionSubscriber {
 
-    void subscribe(Consumer<Connection> connectionConsumer,
-                   Consumer<Throwable> errorConsumer,
+    static Consumer<Connection> onSubscribeSuccess(ConnectionLoadBalanceConcept concept) {
+        return concept::onEstablish;
+    }
+
+    static Consumer<Throwable> onSubscribeError(ConnectionLoadBalanceConcept concept) {
+        return e -> concept.getEventPublisher().publish(new ConnectionSubscribeErrorEvent(e));
+    }
+
+    default void subscribe(ConnectionLoadBalanceConcept concept) {
+        subscribe(onSubscribeSuccess(concept), onSubscribeError(concept), () -> {
+        }, concept);
+    }
+
+    default void subscribe() {
+        subscribe(null);
+    }
+
+    void subscribe(Consumer<Connection> onSuccess,
+                   Consumer<Throwable> onError,
+                   Runnable onComplete,
                    ConnectionLoadBalanceConcept concept);
 
-    default void subscribe(Consumer<Connection> connectionConsumer,
-                           Consumer<Throwable> errorConsumer) {
-        subscribe(connectionConsumer, errorConsumer, null);
+    default void subscribe(Consumer<Connection> onSuccess,
+                           Consumer<Throwable> onError,
+                           Runnable onComplete) {
+        subscribe(onSuccess, onError, onComplete, null);
     }
 
     MasterSlave getMasterSlave();
@@ -46,16 +65,28 @@ public interface ConnectionSubscriber {
         }
 
         @Override
-        public void subscribe(Consumer<Connection> connectionConsumer,
-                              Consumer<Throwable> errorConsumer,
-                              ConnectionLoadBalanceConcept concept) {
-            delegate.subscribe(connectionConsumer, errorConsumer, concept);
+        public void subscribe(ConnectionLoadBalanceConcept concept) {
+            delegate.subscribe(concept);
         }
 
         @Override
-        public void subscribe(Consumer<Connection> connectionConsumer,
-                              Consumer<Throwable> errorConsumer) {
-            delegate.subscribe(connectionConsumer, errorConsumer, concept);
+        public void subscribe() {
+            delegate.subscribe(concept);
+        }
+
+        @Override
+        public void subscribe(Consumer<Connection> onSuccess,
+                              Consumer<Throwable> onError,
+                              Runnable onComplete,
+                              ConnectionLoadBalanceConcept concept) {
+            delegate.subscribe(onSuccess, onError, onComplete, concept);
+        }
+
+        @Override
+        public void subscribe(Consumer<Connection> onSuccess,
+                              Consumer<Throwable> onError,
+                              Runnable onComplete) {
+            delegate.subscribe(onSuccess, onError, onComplete, concept);
         }
 
         @Override
