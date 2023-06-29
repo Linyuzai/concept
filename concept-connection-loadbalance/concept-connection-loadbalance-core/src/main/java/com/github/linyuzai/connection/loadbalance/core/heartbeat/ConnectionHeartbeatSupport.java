@@ -5,10 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptDestroyEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
-import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage;
-import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageReceiveEvent;
-import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.Getter;
 import lombok.Setter;
@@ -90,10 +87,10 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
                 try {
                     connection.send(message);
                 } catch (Throwable e) {
-                    concept.getEventPublisher().publish(new HeartbeatSendErrorEvent(connection, message, e));
+                    concept.getEventPublisher().publish(new MessageSendErrorEvent(connection, message, e));
                 }
             }
-            concept.getEventPublisher().publish(new HeartbeatSendEvent(connections, message, connectionType));
+            concept.getEventPublisher().publish(new MessageSendEvent(message, connections));
         }
     }
 

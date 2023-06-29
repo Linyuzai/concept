@@ -17,7 +17,7 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
     private final boolean shared;
 
     @Override
-    protected Connection create(String topic, ConnectionLoadBalanceConcept concept) {
+    protected Connection create(String topic, String name, ConnectionLoadBalanceConcept concept) {
         RTopic rTopic;
         if (shared) {
             rTopic = client.getShardedTopic(topic);
@@ -27,9 +27,8 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
         RedissonTopicConnection connection = new RedissonTopicConnection(Connection.Type.OBSERVABLE);
         connection.setId(topic);
         connection.setTopic(rTopic);
-        int listener = rTopic.addListener(Object.class, (channel, object) -> {
-            onMessage(connection, object);
-        });
+        int listener = rTopic.addListener(Object.class, (channel, object) ->
+                onMessage(connection, object));
         connection.setCloseCallback(reason -> rTopic.removeListenerAsync(listener));
         return connection;
     }

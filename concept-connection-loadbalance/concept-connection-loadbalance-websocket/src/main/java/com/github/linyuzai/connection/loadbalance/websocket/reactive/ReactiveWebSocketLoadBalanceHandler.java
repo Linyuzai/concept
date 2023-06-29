@@ -26,8 +26,6 @@ public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
             ReactiveWebSocketConnection connection =
                     new ReactiveWebSocketConnection(session, sink, Connection.Type.OBSERVABLE);
             concept.onEstablish(connection);
-        }).doOnError(e -> {
-            //TODO
         }));
 
         Mono<Void> receive = session.receive()

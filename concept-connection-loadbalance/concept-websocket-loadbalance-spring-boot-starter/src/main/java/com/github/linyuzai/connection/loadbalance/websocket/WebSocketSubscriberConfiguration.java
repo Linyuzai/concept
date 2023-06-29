@@ -1,11 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
@@ -23,13 +22,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.MessageListenerContainer;
 
 public class WebSocketSubscriberConfiguration {
 
@@ -122,12 +123,30 @@ public class WebSocketSubscriberConfiguration {
         @ConditionalOnMissingBean
         public RabbitFanoutConnectionSubscriberFactory wsRabbitFanoutConnectionSubscriberFactory(
                 RabbitTemplate rabbitTemplate,
-                RabbitListenerContainerFactory<? extends MessageListenerContainer>
+                RabbitListenerContainerFactory<? extends org.springframework.amqp.rabbit.listener.MessageListenerContainer>
                         rabbitListenerContainerFactory) {
             RabbitFanoutConnectionSubscriberFactory factory =
                     new RabbitFanoutConnectionSubscriberFactory();
             factory.setRabbitTemplate(rabbitTemplate);
             factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
+            factory.setMasterSlave(getMasterSlave());
+            factory.addScopes(WebSocketScoped.NAME);
+            return factory;
+        }
+    }
+
+    public abstract static class KafkaTopicConfiguration implements MasterSlaveProvider {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public KafkaTopicConnectionSubscriberFactory wsKafkaTopicConnectionSubscriberFactory(
+                KafkaTemplate<?, Object> kafkaTemplate,
+                KafkaListenerContainerFactory<? extends MessageListenerContainer>
+                        kafkaListenerContainerFactory) {
+            KafkaTopicConnectionSubscriberFactory factory =
+                    new KafkaTopicConnectionSubscriberFactory();
+            factory.setKafkaTemplate(kafkaTemplate);
+            factory.setKafkaListenerContainerFactory(kafkaListenerContainerFactory);
             factory.setMasterSlave(getMasterSlave());
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
@@ -265,21 +284,5 @@ public class WebSocketSubscriberConfiguration {
             monitor.addScopes(WebSocketScoped.NAME);
             return monitor;
         }
-
-        @Bean
-        @ConditionalOnProperty(value = "concept.websocket.load-balance.heartbeat.enabled", havingValue = "true", matchIfMissing = true)
-        public ConnectionHeartbeatManager loadBalanceConnectionHeartbeatManager(
-                WebSocketLoadBalanceProperties properties) {
-            long timeout = properties.getLoadBalance().getHeartbeat().getTimeout();
-            long period = properties.getLoadBalance().getHeartbeat().getPeriod();
-            ConnectionHeartbeatManager manager = new ConnectionHeartbeatManager();
-            manager.getConnectionTypes().add(Connection.Type.SUBSCRIBER);
-            manager.getConnectionTypes().add(Connection.Type.OBSERVABLE);
-            manager.setTimeout(timeout);
-            manager.setPeriod(period);
-            manager.addScopes(WebSocketScoped.NAME);
-            return manager;
-        }
     }
-
 }

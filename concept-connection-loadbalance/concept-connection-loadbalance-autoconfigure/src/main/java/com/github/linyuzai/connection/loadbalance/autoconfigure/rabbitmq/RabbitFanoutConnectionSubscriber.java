@@ -21,18 +21,18 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
     private final RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory;
 
     @Override
-    protected Connection create(String topic, ConnectionLoadBalanceConcept concept) {
+    protected Connection create(String topic, String name, ConnectionLoadBalanceConcept concept) {
         RabbitFanoutConnection connection = new RabbitFanoutConnection(Connection.Type.OBSERVABLE);
         connection.setId(topic);
         connection.setExchange(topic);
         connection.setRabbitTemplate(rabbitTemplate);
         RabbitAdmin admin = new RabbitAdmin(rabbitTemplate);
-        admin.declareBinding(BindingBuilder.bind(new Queue(topic + "." + getFrom(concept)))
+        admin.declareBinding(BindingBuilder.bind(new Queue(name))
                 .to(new FanoutExchange(topic)));
         MessageListenerContainer container = rabbitListenerContainerFactory.createListenerContainer();
         container.setQueueNames(topic);
         container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
-            RabbitFanoutConnectionSubscriber.super.onMessage(connection, message);
+            onMessage(connection, getPayload(message));
             if (channel != null) {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             }
@@ -45,6 +45,10 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         container.afterPropertiesSet();
         container.start();
         return connection;
+    }
+
+    protected Object getPayload(Message message) {
+        return message.getBody();
     }
 
     @Override

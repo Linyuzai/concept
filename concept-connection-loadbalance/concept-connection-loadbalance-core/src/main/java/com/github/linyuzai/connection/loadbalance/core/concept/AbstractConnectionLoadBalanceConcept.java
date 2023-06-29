@@ -20,9 +20,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelectorChain;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -189,10 +187,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         connection.setConcept(this);
         MessageEncoder encoder = messageEncoderMap.computeIfAbsent(type, key ->
                 MessageEncoder.Delegate.delegate(this,
-                        messageCodecAdapter.getMessageEncoder(key)));
+                        messageCodecAdapter.getMessageEncoder(key, null)));
         MessageDecoder decoder = messageDecoderMap.computeIfAbsent(type, key ->
                 MessageDecoder.Delegate.delegate(this,
-                        messageCodecAdapter.getMessageDecoder(key)));
+                        messageCodecAdapter.getMessageDecoder(key, null)));
         MessageRetryStrategy retryStrategy = messageRetryStrategyMap.computeIfAbsent(type, key ->
                 MessageRetryStrategy.Delegate.delegate(this,
                         messageRetryStrategyAdapter.getMessageRetryStrategy(key)));
@@ -575,6 +573,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             //添加一个任意对象的消息工厂
             messageFactories.add(new ObjectMessageFactory());
 
+            messageCodecAdapters.add(0, new AnyMessageCodecAdapter());
+
             //添加消息转发处理器
             eventListeners.add(0, new MessageForwardHandler());
 
@@ -585,15 +585,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             concept.setConnectionServerManager(ConnectionServerManager.Delegate.delegate(concept,
                     withScopeFactory(ConnectionServerManager.class, connectionServerManagerFactories)));
             concept.setConnectionSubscriber(ConnectionSubscriber.Delegate.delegate(concept,
-                    withScopeFactory(ConnectionSubscriber.class, connectionSubscriberFactories)));
+                    withConnectionSubscriberMasterSlave(withScope(connectionSubscriberFactories))));
             concept.setConnectionFactories(ConnectionFactory.Delegate.delegate(concept,
                     withScope(connectionFactories)));
             concept.setConnectionSelectors(ConnectionSelector.Delegate.delegate(concept,
-                    withFilterChain(withScope(connectionSelectors))));
+                    withConnectionSelectorFilterChain(withScope(connectionSelectors))));
             concept.setMessageFactories(MessageFactory.Delegate.delegate(concept,
                     withScope(messageFactories)));
             concept.setMessageCodecAdapter(
-                    withScope(MessageCodecAdapter.class, messageCodecAdapters));
+                    withMessageCodecAdapterChain(withScope(messageCodecAdapters)));
             concept.setMessageRetryStrategyAdapter(
                     withScope(MessageRetryStrategyAdapter.class, messageRetryStrategyAdapters));
             concept.setMessageIdempotentVerifier(MessageIdempotentVerifier.Delegate.delegate(concept,
@@ -623,7 +623,41 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return ScopedFactory.create(getScope(), type, factories);
         }
 
-        protected List<ConnectionSelector> withFilterChain(Collection<ConnectionSelector> connectionSelectors) {
+        protected ConnectionSubscriber withConnectionSubscriberMasterSlave(List<ConnectionSubscriberFactory> factories) {
+            List<ConnectionSubscriberFactory> masters = new ArrayList<>();
+            List<ConnectionSubscriberFactory> slaves = new ArrayList<>();
+            for (ConnectionSubscriberFactory factory : factories) {
+                if (factory instanceof MasterSlaveConnectionSubscriberFactory) {
+                    ConnectionSubscriber.MasterSlave masterSlave =
+                            ((MasterSlaveConnectionSubscriberFactory) factory).getMasterSlave();
+                    if (ConnectionSubscriber.MasterSlave.MASTER == masterSlave) {
+                        masters.add(factory);
+                    } else if (ConnectionSubscriber.MasterSlave.SLAVE1 == masterSlave) {
+                        slaves.add(factory);
+                    }
+                }
+            }
+            if (masters.isEmpty()) {
+                return withScopeFactory(ConnectionSubscriber.class, factories);
+            } else if (masters.size() == 1) {
+                ConnectionSubscriber master = withScopeFactory(ConnectionSubscriber.class, masters);
+                if (slaves.isEmpty()) {
+                    return master;
+                } else {
+                    ConnectionSubscriber slave = withScopeFactory(ConnectionSubscriber.class, slaves);
+                    eventListeners.add(0, new MasterSlaveAutoSwitcher());
+                    return new MasterSlaveSwitchableConnectionSubscriber(master, slave);
+                }
+            } else {
+                throw new IllegalArgumentException("Master more than one");
+            }
+        }
+
+        protected MessageCodecAdapter withMessageCodecAdapterChain(List<MessageCodecAdapter> messageCodecAdapters) {
+            return new MessageCodecAdapterChain(messageCodecAdapters);
+        }
+
+        protected List<ConnectionSelector> withConnectionSelectorFilterChain(List<ConnectionSelector> connectionSelectors) {
             List<ConnectionSelector> selectors = new ArrayList<>();
             List<FilterConnectionSelector> filterSelectors = new ArrayList<>();
             for (ConnectionSelector selector : connectionSelectors) {

@@ -13,6 +13,7 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
     compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
     compileOnly 'org.springframework.boot:spring-boot-starter-data-redis'
+    compileOnly 'org.springframework.kafka:spring-kafka'
     compileOnly "org.redisson:redisson:${RedissonVersion}"
 
     //api "com.github.linyuzai:concept-connection-loadbalance-core:${ConceptConnectionLoadbalanceVersion}"

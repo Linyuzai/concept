@@ -43,6 +43,8 @@ public abstract class AbstractConnection implements Connection {
     @NonNull
     protected ConnectionLoadBalanceConcept concept;
 
+    protected volatile boolean closed;
+
     /**
      * 是否还存活
      */
@@ -69,7 +71,6 @@ public abstract class AbstractConnection implements Connection {
     @Override
     public void send(@NonNull Message message) {
         send(message, () -> {
-
         }, e ->
                 concept.getEventPublisher()
                         .publish(new MessageSendErrorEvent(this, message, e)), () -> {
@@ -78,6 +79,11 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        if (isClosed()) {
+            onError.accept(new IllegalStateException("Connection is closed"));
+            onComplete.run();
+            return;
+        }
         if (message instanceof PingMessage) {
             ping((PingMessage) message, onSuccess, onError, onComplete);
         } else if (message instanceof PongMessage) {
@@ -153,16 +159,17 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void close(Object reason) {
-
+        close(reason, () -> {
+        }, e -> concept.getEventPublisher()
+                .publish(new ConnectionCloseErrorEvent(this, reason, e)), () -> {
+        });
     }
 
     @Override
     public void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        closed = true;
+        doClose(reason, onSuccess, onError, onComplete);
         concept.onClose(this, reason);
-        doClose(reason, onSuccess, e -> {
-            concept.getEventPublisher().publish(new ConnectionCloseErrorEvent(this, reason, e));
-            onError.accept(e);
-        }, onComplete);
     }
 
     public abstract void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);

@@ -33,7 +33,8 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                 }
             }
             String from = getFrom(concept);
-            Connection connection = create(topic, concept);
+            String name = getName(topic, from);
+            Connection connection = create(topic, name, concept);
             connection.getMessageSendInterceptors().add((message, con) -> {
                 message.setFrom(from);
                 return true;
@@ -50,7 +51,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         return concept.getConnectionRepository().get(topic, Connection.Type.OBSERVABLE);
     }
 
-    protected abstract Connection create(String topic, ConnectionLoadBalanceConcept concept);
+    protected abstract Connection create(String topic, String name, ConnectionLoadBalanceConcept concept);
 
     protected abstract String getExtension();
 
@@ -64,6 +65,10 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
 
     protected MessageIdempotentVerifier getMessageIdempotentVerifier(ConnectionLoadBalanceConcept concept) {
         return concept.getMessageIdempotentVerifier();
+    }
+
+    protected String getName(String topic, String from) {
+        return topic + DELIMITER + from;
     }
 
     protected String getFrom(ConnectionLoadBalanceConcept concept) {

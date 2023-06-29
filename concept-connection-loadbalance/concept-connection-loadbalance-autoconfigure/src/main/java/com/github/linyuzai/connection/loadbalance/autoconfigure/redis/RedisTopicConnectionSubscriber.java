@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotent
 import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -20,14 +21,13 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
     private final RedisTemplate<?, ?> redisTemplate;
 
     @Override
-    protected Connection create(String topic, ConnectionLoadBalanceConcept concept) {
+    protected Connection create(String topic, String name, ConnectionLoadBalanceConcept concept) {
         RedisTopicConnection connection = new RedisTopicConnection(Connection.Type.OBSERVABLE);
         connection.setId(topic);
         connection.setTopic(topic);
         connection.setRedisTemplate(redisTemplate);
         RedisMessageListenerContainer container = newRedisMessageListenerContainer();
-        MessageListener listener = (message, pattern) ->
-                RedisTopicConnectionSubscriber.super.onMessage(connection, message);
+        MessageListener listener = (message, pattern) -> onMessage(connection, getPayload(message));
         connection.setCloseCallback(o -> {
             //messageListenerContainer.removeMessageListener(listener);
             if (container.isRunning()) {
@@ -44,6 +44,10 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         RedisMessageListenerContainer messageListenerContainer = new RedisMessageListenerContainer();
         messageListenerContainer.setConnectionFactory(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         return messageListenerContainer;
+    }
+
+    protected Object getPayload(Message message) {
+        return message.getBody();
     }
 
     @Override

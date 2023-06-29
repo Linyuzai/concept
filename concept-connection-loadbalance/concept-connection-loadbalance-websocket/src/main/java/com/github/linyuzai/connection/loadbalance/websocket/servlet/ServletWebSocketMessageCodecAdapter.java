@@ -15,18 +15,18 @@ import org.springframework.web.socket.WebSocketMessage;
 public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override
-    public MessageDecoder getClientMessageDecoder() {
-        return new ServletMessageDecoder(super.getClientMessageDecoder());
+    public MessageDecoder getClientMessageDecoder(MessageDecoder decoder) {
+        return new ServletMessageDecoder(decoder);
     }
 
     @Override
-    public MessageDecoder getSubscribeMessageDecoder() {
-        return new ServletMessageDecoder(super.getSubscribeMessageDecoder());
+    public MessageDecoder getSubscribeMessageDecoder(MessageDecoder decoder) {
+        return new ServletMessageDecoder(decoder);
     }
 
     @Override
-    public MessageDecoder getForwardMessageDecoder() {
-        return new ServletMessageDecoder(super.getForwardMessageDecoder());
+    public MessageDecoder getForwardMessageDecoder(MessageDecoder decoder) {
+        return new ServletMessageDecoder(decoder);
     }
 
     @AllArgsConstructor

@@ -56,14 +56,11 @@ public class NettyMain {
                         }
                     });
             ChannelFuture channelFuture = bootstrap.bind(1234).sync();
-            channelFuture.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess()) {
-                        System.out.println("服务端启动");
-                    } else {
-                        System.out.println("服务端启动失败");
-                    }
+            channelFuture.addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    System.out.println("服务端启动");
+                } else {
+                    System.out.println("服务端启动失败");
                 }
             });
             channelFuture.channel().closeFuture().sync();

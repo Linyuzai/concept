@@ -1,7 +1,5 @@
 package com.github.linyuzai.connection.loadbalance.core.scope;
 
-import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
-
 import java.util.Collection;
 
 public interface ScopedFactory<T> extends Scoped {
@@ -14,6 +12,6 @@ public interface ScopedFactory<T> extends Scoped {
                 return factory.create(scope);
             }
         }
-        throw new ConnectionLoadBalanceException(type.getName() + " not found");
+        throw new IllegalArgumentException("No " + type.getName() + " supported");
     }
 }

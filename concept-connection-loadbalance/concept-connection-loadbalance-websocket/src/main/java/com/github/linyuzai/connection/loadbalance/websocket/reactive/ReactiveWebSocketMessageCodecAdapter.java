@@ -15,18 +15,18 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override
-    public MessageDecoder getClientMessageDecoder() {
-        return new ReactiveMessageDecoder(super.getClientMessageDecoder());
+    public MessageDecoder getClientMessageDecoder(MessageDecoder decoder) {
+        return new ReactiveMessageDecoder(decoder);
     }
 
     @Override
-    public MessageDecoder getSubscribeMessageDecoder() {
-        return new ReactiveMessageDecoder(super.getSubscribeMessageDecoder());
+    public MessageDecoder getSubscribeMessageDecoder(MessageDecoder decoder) {
+        return new ReactiveMessageDecoder(decoder);
     }
 
     @Override
-    public MessageDecoder getForwardMessageDecoder() {
-        return new ReactiveMessageDecoder(super.getForwardMessageDecoder());
+    public MessageDecoder getForwardMessageDecoder(MessageDecoder decoder) {
+        return new ReactiveMessageDecoder(decoder);
     }
 
     @AllArgsConstructor

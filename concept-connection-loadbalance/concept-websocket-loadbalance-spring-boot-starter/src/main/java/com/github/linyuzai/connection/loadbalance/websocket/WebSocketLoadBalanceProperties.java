@@ -132,7 +132,9 @@ public class WebSocketLoadBalanceProperties {
 
             REDIS_TOPIC,
 
-            RABBIT_FANOUT
+            RABBIT_FANOUT,
+
+            KAFKA_TOPIC
         }
 
         public enum SlaveSubscriber {
@@ -144,7 +146,9 @@ public class WebSocketLoadBalanceProperties {
 
             REDIS_TOPIC,
 
-            RABBIT_FANOUT
+            RABBIT_FANOUT,
+
+            KAFKA_TOPIC
         }
 
         @Data

@@ -30,6 +30,11 @@ public abstract class WebSocketConnection extends AbstractConnection {
 
     public abstract boolean isOpen();
 
+    @Override
+    public boolean isClosed() {
+        return super.isClosed() || !isOpen();
+    }
+
     public abstract Object getCloseReason(int code, String reason);
 
     public void close(int code, String reason) {

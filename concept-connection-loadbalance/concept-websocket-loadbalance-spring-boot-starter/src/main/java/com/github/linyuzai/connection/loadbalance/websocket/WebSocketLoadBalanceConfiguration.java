@@ -101,6 +101,20 @@ public class WebSocketLoadBalanceConfiguration {
             implements WebSocketSubscriberConfiguration.Slave1Provider {
     }
 
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "KAFKA_TOPIC")
+    public static class KafkaTopicSubscriberMasterConfiguration
+            extends WebSocketSubscriberConfiguration.KafkaTopicConfiguration
+            implements WebSocketSubscriberConfiguration.MasterProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave1", havingValue = "KAFKA_TOPIC")
+    public static class KafkaTopicSubscriberSlave1Configuration
+            extends WebSocketSubscriberConfiguration.KafkaTopicConfiguration
+            implements WebSocketSubscriberConfiguration.Slave1Provider {
+    }
+
     @Bean
     public MessageRetryStrategyAdapter wsMessageRetryStrategyAdapter(WebSocketLoadBalanceProperties properties) {
         MessageRetryStrategyAdapterImpl adapter = new MessageRetryStrategyAdapterImpl();
@@ -139,6 +153,22 @@ public class WebSocketLoadBalanceConfiguration {
         long period = properties.getServer().getHeartbeat().getPeriod();
         ConnectionHeartbeatManager manager = new ConnectionHeartbeatManager();
         manager.getConnectionTypes().add(Connection.Type.CLIENT);
+        manager.setTimeout(timeout);
+        manager.setPeriod(period);
+        manager.addScopes(WebSocketScoped.NAME);
+        return manager;
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.heartbeat.enabled",
+            havingValue = "true", matchIfMissing = true)
+    public ConnectionHeartbeatManager wsLoadBalanceConnectionHeartbeatManager(
+            WebSocketLoadBalanceProperties properties) {
+        long timeout = properties.getLoadBalance().getHeartbeat().getTimeout();
+        long period = properties.getLoadBalance().getHeartbeat().getPeriod();
+        ConnectionHeartbeatManager manager = new ConnectionHeartbeatManager();
+        manager.getConnectionTypes().add(Connection.Type.SUBSCRIBER);
+        manager.getConnectionTypes().add(Connection.Type.OBSERVABLE);
         manager.setTimeout(timeout);
         manager.setPeriod(period);
         manager.addScopes(WebSocketScoped.NAME);

@@ -21,13 +21,11 @@ import java.util.function.Consumer;
 @Getter
 @RequiredArgsConstructor
 public class MasterSlaveSwitchableConnectionSubscriber
-        implements ConnectionSubscriber, ConnectionEventListener {
+        implements ConnectionSubscriber {
 
     private final ConnectionSubscriber masterConnectionSubscriber;
 
     private final ConnectionSubscriber slaveConnectionSubscriber;
-
-    private final long period;
 
     @Override
     public void subscribe(Consumer<Connection> onSuccess,
@@ -47,61 +45,6 @@ public class MasterSlaveSwitchableConnectionSubscriber
     @Override
     public MasterSlave getMasterSlave() {
         return MasterSlave.MASTER;
-    }
-
-    @Override
-    public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
-        if (event instanceof MessageSendErrorEvent) {
-            Throwable error = ((MessageSendErrorEvent) event).getError();
-            if (!isTransportError(error)) {
-                return;
-            }
-            Connection connection = ((MessageSendErrorEvent) event).getConnection();
-            if (connection instanceof MasterSlaveConnection) {
-                MasterSlaveConnection msConnection = (MasterSlaveConnection) connection;
-                long timestamp = ((MessageSendErrorEvent) event).getTimestamp();
-                if (validateMasterSlaveAndTimestamp(msConnection, timestamp)) {
-                    if (msConnection.getLock().tryLock()) {
-                        try {
-                            if (validateMasterSlaveAndTimestamp(msConnection, timestamp)) {
-                                msConnection.switchSlave(null);
-                                Message message = ((MessageSendErrorEvent) event).getMessage();
-                                try {
-                                    //正常情况下，MessageTransportException不会直接抛出异常
-                                    connection.send(message);
-                                } catch (Throwable e) {
-                                    concept.getEventPublisher()
-                                            .publish(new MessageSendErrorEvent(connection, message, e));
-                                }
-                            }
-                        } finally {
-                            msConnection.getLock().unlock();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public boolean validateMasterSlaveAndTimestamp(MasterSlaveConnection connection, long timestamp) {
-        return timestamp >= connection.getSwitchTimestamp() &&
-                connection.isMaster(connection.getCurrent());
-    }
-
-    public boolean isTransportError(Throwable e) {
-        if (e instanceof MessageTransportException) {
-            return true;
-        }
-        Throwable cause = e.getCause();
-        if (cause != null) {
-            return isTransportError(cause);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean support(String scope) {
-        return true;
     }
 
     @Getter

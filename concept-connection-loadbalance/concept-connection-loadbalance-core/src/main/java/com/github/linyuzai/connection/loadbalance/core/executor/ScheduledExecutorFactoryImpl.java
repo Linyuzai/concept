@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ScheduledExecutorFactoryImpl extends AbstractScopedFactory<ScheduledExecutor>
         implements ScheduledExecutorFactory {
 
+    //TODO yaml set
     private int size = 1;
 
     @Override

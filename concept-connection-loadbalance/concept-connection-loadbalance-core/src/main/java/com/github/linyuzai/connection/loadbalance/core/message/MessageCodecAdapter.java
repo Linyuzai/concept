@@ -17,7 +17,7 @@ public interface MessageCodecAdapter extends Scoped {
      * @param type 连接类型
      * @return 消息编码器
      */
-    MessageEncoder getMessageEncoder(String type);
+    MessageEncoder getMessageEncoder(String type, MessageEncoder encoder);
 
     /**
      * 通过连接类型获得消息解码器
@@ -25,5 +25,5 @@ public interface MessageCodecAdapter extends Scoped {
      * @param type 连接类型
      * @return 消息解码器
      */
-    MessageDecoder getMessageDecoder(String type);
+    MessageDecoder getMessageDecoder(String type, MessageDecoder decoder);
 }
