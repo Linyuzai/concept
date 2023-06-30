@@ -6,7 +6,6 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotent
 import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.connection.ReactiveSubscription;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import reactor.core.Disposable;
@@ -24,7 +23,7 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
         connection.setTopic(topic);
         connection.setReactiveRedisTemplate(reactiveRedisTemplate);
         Disposable disposable = reactiveRedisTemplate.listenTo(new ChannelTopic(topic)).subscribe(
-                message -> onMessage(connection, getPayload(message)),
+                message -> onMessageReceived(connection, message),
                 e -> concept.onError(connection, e));
         connection.setCloseCallback(reason -> {
             if (!disposable.isDisposed()) {
@@ -32,10 +31,6 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
             }
         });
         return connection;
-    }
-
-    protected Object getPayload(ReactiveSubscription.Message<String, Object> message) {
-        return message.getMessage();
     }
 
     @Override

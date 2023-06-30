@@ -27,7 +27,7 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         connection.setTopic(topic);
         connection.setRedisTemplate(redisTemplate);
         RedisMessageListenerContainer container = newRedisMessageListenerContainer();
-        MessageListener listener = (message, pattern) -> onMessage(connection, getPayload(message));
+        MessageListener listener = (message, pattern) -> onMessageReceived(connection, message);
         connection.setCloseCallback(o -> {
             //messageListenerContainer.removeMessageListener(listener);
             if (container.isRunning()) {
@@ -44,10 +44,6 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         RedisMessageListenerContainer messageListenerContainer = new RedisMessageListenerContainer();
         messageListenerContainer.setConnectionFactory(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         return messageListenerContainer;
-    }
-
-    protected Object getPayload(Message message) {
-        return message.getBody();
     }
 
     @Override

@@ -55,7 +55,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
 
     protected abstract String getExtension();
 
-    protected void onMessage(Connection connection, Object message) {
+    protected void onMessageReceived(Connection connection, Object message) {
         connection.getConcept().onMessage(connection, message, msg -> {
             ConnectionLoadBalanceConcept concept = connection.getConcept();
             return !Objects.equals(getFrom(concept), msg.getFrom()) &&

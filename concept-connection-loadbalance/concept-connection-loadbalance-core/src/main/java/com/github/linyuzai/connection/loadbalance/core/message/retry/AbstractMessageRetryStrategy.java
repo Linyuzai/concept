@@ -7,18 +7,19 @@ import lombok.RequiredArgsConstructor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+//TODO 包装异常
 public abstract class AbstractMessageRetryStrategy implements MessageRetryStrategy {
 
     @Override
     public void retry(Throwable e, Consumer<Consumer<Throwable>> retryable,
-                      Consumer<Throwable> error, ConnectionLoadBalanceConcept concept) {
+                      Consumer<Throwable> onError, ConnectionLoadBalanceConcept concept) {
         int times = getTimes();
         if (times <= 0) {
-            error.accept(e);
+            onError.accept(e);
             return;
         }
         int period = getPeriod(1);
-        RetryRunnable retry = new RetryRunnable(1, e, retryable, error, concept);
+        RetryRunnable retry = new RetryRunnable(1, e, retryable, onError, concept);
         concept.getScheduledExecutor().schedule(retry, period, TimeUnit.MILLISECONDS);
     }
 
@@ -32,11 +33,11 @@ public abstract class AbstractMessageRetryStrategy implements MessageRetryStrate
 
         private final int current;
 
-        private final Throwable e;
+        private final Throwable error;
 
         private final Consumer<Consumer<Throwable>> retryable;
 
-        private final Consumer<Throwable> error;
+        private final Consumer<Throwable> onError;
 
         private final ConnectionLoadBalanceConcept concept;
 
@@ -47,11 +48,11 @@ public abstract class AbstractMessageRetryStrategy implements MessageRetryStrate
                 int newCurrent = current + 1;
                 int period = getPeriod(newCurrent);
                 if (current < times) {
-                    RetryRunnable retry = new RetryRunnable(newCurrent, e, retryable, error, concept);
+                    RetryRunnable retry = new RetryRunnable(newCurrent, e, retryable, onError, concept);
                     concept.getScheduledExecutor().schedule(retry, period, TimeUnit.MILLISECONDS);
                 } else {
                     String retryErrorMessage = "Retry failed " + current + "/" + times;
-                    error.accept(new MessageRetryException(retryErrorMessage, e));
+                    onError.accept(new MessageRetryException(retryErrorMessage, e));
                 }
             });
         }

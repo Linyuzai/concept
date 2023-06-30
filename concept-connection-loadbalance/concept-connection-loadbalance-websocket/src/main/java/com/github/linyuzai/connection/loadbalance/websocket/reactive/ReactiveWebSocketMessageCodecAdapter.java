@@ -6,7 +6,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageCodecAdapter;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 
 /**
@@ -29,7 +30,8 @@ public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecA
         return new ReactiveMessageDecoder(decoder);
     }
 
-    @AllArgsConstructor
+    @Getter
+    @RequiredArgsConstructor
     public static class ReactiveMessageDecoder implements MessageDecoder {
 
         private final MessageDecoder decoder;
@@ -39,16 +41,16 @@ public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecA
             if (message instanceof WebSocketMessage) {
                 WebSocketMessage.Type type = ((WebSocketMessage) message).getType();
                 if (type == WebSocketMessage.Type.TEXT) {
-                    return decoder.decode(((WebSocketMessage) message).getPayloadAsText());
+                    return decoder.decode(((WebSocketMessage) message).getPayloadAsText(), concept);
                 } else if (type == WebSocketMessage.Type.PING) {
                     return new BinaryPingMessage(((WebSocketMessage) message).getPayload().asByteBuffer());
                 } else if (type == WebSocketMessage.Type.PONG) {
                     return new BinaryPongMessage(((WebSocketMessage) message).getPayload().asByteBuffer());
                 } else if (type == WebSocketMessage.Type.BINARY) {
-                    return decoder.decode(((WebSocketMessage) message).getPayload().asByteBuffer());
+                    return decoder.decode(((WebSocketMessage) message).getPayload().asByteBuffer(), concept);
                 }
             }
-            return decoder.decode(message);
+            return decoder.decode(message, concept);
         }
     }
 }

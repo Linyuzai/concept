@@ -7,7 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTex
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 
-public class AnyMessageCodecAdapter extends AbstractMessageCodecAdapter {
+public class BaseMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override
     public MessageEncoder getClientMessageEncoder(MessageEncoder encoder) {

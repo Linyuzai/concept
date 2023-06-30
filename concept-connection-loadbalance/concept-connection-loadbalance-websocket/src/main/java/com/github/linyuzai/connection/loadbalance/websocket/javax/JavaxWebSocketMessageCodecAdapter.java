@@ -5,7 +5,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageCodecAdapter;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 用于 {@link JavaxWebSocketConnection} 的消息编解码适配器
@@ -27,7 +28,8 @@ public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdap
         return new JavaxMessageDecoder(decoder);
     }
 
-    @AllArgsConstructor
+    @Getter
+    @RequiredArgsConstructor
     public static class JavaxMessageDecoder implements MessageDecoder {
 
         private final MessageDecoder decoder;
@@ -37,7 +39,7 @@ public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdap
             if (message instanceof javax.websocket.PongMessage) {
                 return new BinaryPongMessage(((javax.websocket.PongMessage) message).getApplicationData());
             }
-            return decoder.decode(message);
+            return decoder.decode(message, concept);
         }
     }
 }

@@ -5,7 +5,6 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerEndpoint;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -34,14 +33,14 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         Object listener;
         if (mode == ContainerProperties.AckMode.MANUAL || mode == ContainerProperties.AckMode.MANUAL_IMMEDIATE) {
             listener = (AcknowledgingMessageListener<Object, Object>) (data, acknowledgment) -> {
-                onMessage(connection, getPayload(data));
+                onMessageReceived(connection, data);
                 if (acknowledgment != null) {
                     acknowledgment.acknowledge();
                 }
             };
         } else {
             listener = (MessageListener<Object, Object>) data ->
-                    concept.onMessage(connection, getPayload(data));
+                    onMessageReceived(connection, data);
         }
         connection.setCloseCallback(reason -> {
             if (container.isRunning()) {
@@ -51,10 +50,6 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         container.setupMessageListener(listener);
         container.start();
         return connection;
-    }
-
-    protected Object getPayload(ConsumerRecord<Object, Object> record) {
-        return record.value();
     }
 
     @Override

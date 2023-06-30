@@ -1,8 +1,12 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitMessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRedisTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
@@ -58,7 +62,7 @@ public class WebSocketSubscriberConfiguration {
     public abstract static class RedissonTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "wsRedissonTopicConnectionSubscriberFactory")
         public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
             RedissonTopicConnectionSubscriberFactory factory =
@@ -74,8 +78,8 @@ public class WebSocketSubscriberConfiguration {
     public abstract static class RedissonSharedTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
-        @ConditionalOnMissingBean
-        public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(
+        @ConditionalOnMissingBean(name = "wsRedissonSharedTopicConnectionSubscriberFactory")
+        public RedissonTopicConnectionSubscriberFactory wsRedissonSharedTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
             RedissonTopicConnectionSubscriberFactory factory =
                     new RedissonTopicConnectionSubscriberFactory();
@@ -90,7 +94,7 @@ public class WebSocketSubscriberConfiguration {
     public abstract static class RedisTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "wsRedisTopicConnectionSubscriberFactory")
         public RedisTopicConnectionSubscriberFactory wsRedisTopicConnectionSubscriberFactory(
                 RedisTemplate<?, ?> redisTemplate) {
             RedisTopicConnectionSubscriberFactory factory =
@@ -100,12 +104,18 @@ public class WebSocketSubscriberConfiguration {
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsRedisMessageCodecAdapter")
+        public RedisMessageCodecAdapter wsRedisMessageCodecAdapter() {
+            return new RedisMessageCodecAdapter();
+        }
     }
 
     public abstract static class ReactiveRedisTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "wsReactiveRedisTopicConnectionSubscriberFactory")
         public ReactiveRedisTopicConnectionSubscriberFactory wsReactiveRedisTopicConnectionSubscriberFactory(
                 ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
             ReactiveRedisTopicConnectionSubscriberFactory factory =
@@ -115,12 +125,18 @@ public class WebSocketSubscriberConfiguration {
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsReactiveRedisMessageCodecAdapter")
+        public ReactiveRedisMessageCodecAdapter wsReactiveRedisMessageCodecAdapter() {
+            return new ReactiveRedisMessageCodecAdapter();
+        }
     }
 
     public abstract static class RabbitFanoutConfiguration implements MasterSlaveProvider {
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "wsRabbitFanoutConnectionSubscriberFactory")
         public RabbitFanoutConnectionSubscriberFactory wsRabbitFanoutConnectionSubscriberFactory(
                 RabbitTemplate rabbitTemplate,
                 RabbitListenerContainerFactory<? extends org.springframework.amqp.rabbit.listener.MessageListenerContainer>
@@ -133,12 +149,18 @@ public class WebSocketSubscriberConfiguration {
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsRabbitMessageCodecAdapter")
+        public RabbitMessageCodecAdapter wsRabbitMessageCodecAdapter() {
+            return new RabbitMessageCodecAdapter();
+        }
     }
 
     public abstract static class KafkaTopicConfiguration implements MasterSlaveProvider {
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "wsKafkaTopicConnectionSubscriberFactory")
         public KafkaTopicConnectionSubscriberFactory wsKafkaTopicConnectionSubscriberFactory(
                 KafkaTemplate<?, Object> kafkaTemplate,
                 KafkaListenerContainerFactory<? extends MessageListenerContainer>
@@ -151,12 +173,17 @@ public class WebSocketSubscriberConfiguration {
             factory.addScopes(WebSocketScoped.NAME);
             return factory;
         }
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsKafkaMessageCodecAdapter")
+        public KafkaMessageCodecAdapter wsKafkaMessageCodecAdapter() {
+            return new KafkaMessageCodecAdapter();
+        }
     }
 
     public abstract static class JavaxWebSocketConfiguration extends JavaxWebSocketBaseConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
         public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory() {
             JavaxWebSocketConnectionSubscriberFactory factory =
                     new JavaxWebSocketConnectionSubscriberFactory();
@@ -168,7 +195,6 @@ public class WebSocketSubscriberConfiguration {
     public abstract static class JavaxWebSocketSSLConfiguration extends JavaxWebSocketBaseConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
         public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory() {
             JavaxWebSocketConnectionSubscriberFactory factory =
                     new JavaxWebSocketConnectionSubscriberFactory();
@@ -180,7 +206,6 @@ public class WebSocketSubscriberConfiguration {
     public abstract static class ReactiveWebSocketConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
         public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory() {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
@@ -192,7 +217,6 @@ public class WebSocketSubscriberConfiguration {
     public abstract static class ReactiveWebSocketSSLConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
         public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory() {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();

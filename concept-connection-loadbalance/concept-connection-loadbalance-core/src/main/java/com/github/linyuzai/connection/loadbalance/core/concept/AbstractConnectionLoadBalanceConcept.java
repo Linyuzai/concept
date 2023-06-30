@@ -186,11 +186,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         String type = connection.getType();
         connection.setConcept(this);
         MessageEncoder encoder = messageEncoderMap.computeIfAbsent(type, key ->
-                MessageEncoder.Delegate.delegate(this,
-                        messageCodecAdapter.getMessageEncoder(key, null)));
+                messageCodecAdapter.getMessageEncoder(key, null));
         MessageDecoder decoder = messageDecoderMap.computeIfAbsent(type, key ->
-                MessageDecoder.Delegate.delegate(this,
-                        messageCodecAdapter.getMessageDecoder(key, null)));
+                messageCodecAdapter.getMessageDecoder(key, null));
         MessageRetryStrategy retryStrategy = messageRetryStrategyMap.computeIfAbsent(type, key ->
                 MessageRetryStrategy.Delegate.delegate(this,
                         messageRetryStrategyAdapter.getMessageRetryStrategy(key)));
@@ -573,7 +571,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             //添加一个任意对象的消息工厂
             messageFactories.add(new ObjectMessageFactory());
 
-            messageCodecAdapters.add(0, new AnyMessageCodecAdapter());
+            messageCodecAdapters.add(new BaseMessageCodecAdapter());
 
             //添加消息转发处理器
             eventListeners.add(0, new MessageForwardHandler());
@@ -593,7 +591,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             concept.setMessageFactories(MessageFactory.Delegate.delegate(concept,
                     withScope(messageFactories)));
             concept.setMessageCodecAdapter(
-                    withMessageCodecAdapterChain(withScope(messageCodecAdapters)));
+                    withMessageCodecAdapterChain(concept, withScope(messageCodecAdapters)));
             concept.setMessageRetryStrategyAdapter(
                     withScope(MessageRetryStrategyAdapter.class, messageRetryStrategyAdapters));
             concept.setMessageIdempotentVerifier(MessageIdempotentVerifier.Delegate.delegate(concept,
@@ -653,8 +651,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
         }
 
-        protected MessageCodecAdapter withMessageCodecAdapterChain(List<MessageCodecAdapter> messageCodecAdapters) {
-            return new MessageCodecAdapterChain(messageCodecAdapters);
+        protected MessageCodecAdapter withMessageCodecAdapterChain(ConnectionLoadBalanceConcept concept,
+                                                                   List<MessageCodecAdapter> messageCodecAdapters) {
+            Collections.reverse(messageCodecAdapters);
+            return new MessageCodecAdapterChain(concept, messageCodecAdapters);
         }
 
         protected List<ConnectionSelector> withConnectionSelectorFilterChain(List<ConnectionSelector> connectionSelectors) {

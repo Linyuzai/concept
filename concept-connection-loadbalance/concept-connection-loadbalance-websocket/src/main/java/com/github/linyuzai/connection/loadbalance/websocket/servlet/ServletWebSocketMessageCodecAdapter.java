@@ -6,7 +6,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageCodecAdapter;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.WebSocketMessage;
 
 /**
@@ -29,7 +30,8 @@ public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAd
         return new ServletMessageDecoder(decoder);
     }
 
-    @AllArgsConstructor
+    @Getter
+    @RequiredArgsConstructor
     public static class ServletMessageDecoder implements MessageDecoder {
 
         private final MessageDecoder decoder;
@@ -38,16 +40,16 @@ public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAd
         public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
             if (message instanceof WebSocketMessage) {
                 if (message instanceof org.springframework.web.socket.TextMessage) {
-                    return decoder.decode(((org.springframework.web.socket.TextMessage) message).getPayload());
+                    return decoder.decode(((org.springframework.web.socket.TextMessage) message).getPayload(), concept);
                 } else if (message instanceof org.springframework.web.socket.PingMessage) {
                     return new BinaryPingMessage(((org.springframework.web.socket.PingMessage) message).getPayload());
                 } else if (message instanceof org.springframework.web.socket.PongMessage) {
                     return new BinaryPongMessage(((org.springframework.web.socket.PongMessage) message).getPayload());
                 } else if (message instanceof org.springframework.web.socket.BinaryMessage) {
-                    return decoder.decode(((org.springframework.web.socket.BinaryMessage) message).getPayload());
+                    return decoder.decode(((org.springframework.web.socket.BinaryMessage) message).getPayload(), concept);
                 }
             }
-            return decoder.decode(message);
+            return decoder.decode(message, concept);
         }
     }
 }

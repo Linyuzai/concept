@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import lombok.Getter;
@@ -10,6 +11,8 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class MessageCodecAdapterChain implements MessageCodecAdapter {
+
+    private final ConnectionLoadBalanceConcept concept;
 
     private final List<MessageCodecAdapter> messageCodecAdapters;
 
@@ -22,7 +25,8 @@ public class MessageCodecAdapterChain implements MessageCodecAdapter {
         if (index < messageCodecAdapters.size()) {
             MessageEncoder adapter =
                     messageCodecAdapters.get(index).getMessageEncoder(type, encoder);
-            return adaptMessageEncoder(index + 1, type, adapter);
+            MessageEncoder delegate = MessageEncoder.Delegate.delegate(concept, adapter);
+            return adaptMessageEncoder(index + 1, type, delegate);
         } else {
             return encoder;
         }

@@ -32,7 +32,7 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         MessageListenerContainer container = rabbitListenerContainerFactory.createListenerContainer();
         container.setQueueNames(topic);
         container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
-            onMessage(connection, getPayload(message));
+            onMessageReceived(connection, message);
             if (channel != null) {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             }
@@ -45,10 +45,6 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         container.afterPropertiesSet();
         container.start();
         return connection;
-    }
-
-    protected Object getPayload(Message message) {
-        return message.getBody();
     }
 
     @Override

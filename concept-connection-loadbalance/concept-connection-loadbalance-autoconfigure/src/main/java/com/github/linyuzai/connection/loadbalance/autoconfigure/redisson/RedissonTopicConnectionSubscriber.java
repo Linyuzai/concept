@@ -28,7 +28,7 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
         connection.setId(topic);
         connection.setTopic(rTopic);
         int listener = rTopic.addListener(Object.class, (channel, object) ->
-                onMessage(connection, object));
+                onMessageReceived(connection, object));
         connection.setCloseCallback(reason -> rTopic.removeListenerAsync(listener));
         return connection;
     }
