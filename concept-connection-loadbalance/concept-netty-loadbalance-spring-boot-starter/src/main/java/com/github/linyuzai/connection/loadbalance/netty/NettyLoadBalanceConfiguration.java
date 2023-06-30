@@ -190,6 +190,7 @@ public class NettyLoadBalanceConfiguration {
                 .addEventPublisherFactories(eventPublisherFactories)
                 .addEventListeners(eventListeners)
                 .addScheduledExecutorFactories(scheduledExecutorFactories)
+                .snapshot()
                 .build();
     }
 }
