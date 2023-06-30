@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.netty.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
@@ -12,6 +13,15 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
 
     public Builder toBuilder() {
         return builder.copy();
+    }
+
+    @Override
+    protected void onDestroy() {
+        for (String type : connectionRepository.types()) {
+            for (Connection connection : connectionRepository.select(type)) {
+                connection.close();
+            }
+        }
     }
 
     public static class Builder extends AbstractBuilder<Builder, NettyLoadBalanceConcept> {

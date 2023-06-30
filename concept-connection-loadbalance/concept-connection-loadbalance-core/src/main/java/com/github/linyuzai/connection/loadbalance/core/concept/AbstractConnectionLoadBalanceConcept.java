@@ -97,6 +97,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      */
     protected ConnectionEventPublisher eventPublisher;
 
+    private boolean initialized;
+
+    private boolean destroyed;
+
     /**
      * 初始化
      * <p>
@@ -105,9 +109,17 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      * 发布 {@link ConnectionLoadBalanceConceptInitializeEvent} 事件
      */
     @Override
-    public void initialize() {
-        connectionSubscriber.subscribe();
-        eventPublisher.publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
+    public synchronized void initialize() {
+        if (!initialized) {
+            initialized = true;
+            onInitialize();
+            connectionSubscriber.subscribe();
+            eventPublisher.publish(new ConnectionLoadBalanceConceptInitializeEvent(this));
+        }
+    }
+
+    protected void onInitialize() {
+
     }
 
     /**
@@ -118,11 +130,17 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      * 发布 {@link ConnectionLoadBalanceConceptDestroyEvent} 事件
      */
     @Override
-    public void destroy() {
-        //Spring会帮忙调用close方法
-        //connectionRepository.stream().forEach(connection -> connection.close("ServerStop"));
-        scheduledExecutor.shutdown();
-        eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
+    public synchronized void destroy() {
+        if (!destroyed) {
+            destroyed = true;
+            onDestroy();
+            scheduledExecutor.shutdown();
+            eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
+        }
+    }
+
+    protected void onDestroy() {
+
     }
 
     /**
