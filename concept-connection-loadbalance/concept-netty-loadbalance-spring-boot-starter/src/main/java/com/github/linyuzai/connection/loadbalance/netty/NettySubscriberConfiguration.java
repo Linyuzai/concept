@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.ConnectionSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
@@ -9,7 +10,6 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRe
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,104 +22,79 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-public class NettySubscriberConfiguration {
+public class NettySubscriberConfiguration extends ConnectionSubscriberConfiguration {
 
-    public interface MasterSlaveProvider {
-
-        ConnectionSubscriber.MasterSlave getMasterSlave();
-    }
-
-    public interface MasterProvider extends MasterSlaveProvider {
+    public interface NettyScopedProvider extends ConnectionSubscriberConfiguration.ScopedProvider {
 
         @Override
-        default ConnectionSubscriber.MasterSlave getMasterSlave() {
-            return ConnectionSubscriber.MasterSlave.MASTER;
+        default String getScoped() {
+            return NettyScoped.NAME;
         }
     }
 
-    public interface Slave1Provider extends MasterSlaveProvider {
-
-        @Override
-        default ConnectionSubscriber.MasterSlave getMasterSlave() {
-            return ConnectionSubscriber.MasterSlave.SLAVE1;
-        }
-    }
-
-    public abstract static class RedissonTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class RedissonTopicConfiguration
+            extends ConnectionSubscriberConfiguration.RedissonTopicConfiguration
+            implements NettyScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyRedissonTopicConnectionSubscriberFactory")
         public RedissonTopicConnectionSubscriberFactory nettyRedissonTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
-            RedissonTopicConnectionSubscriberFactory factory =
-                    new RedissonTopicConnectionSubscriberFactory();
-            factory.setRedissonClient(redissonClient);
-            factory.setShared(false);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(NettyScoped.NAME);
-            return factory;
+            return redissonTopicConnectionSubscriberFactory(redissonClient);
         }
     }
 
-    public abstract static class RedissonSharedTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class RedissonSharedTopicConfiguration
+            extends ConnectionSubscriberConfiguration.RedissonSharedTopicConfiguration
+            implements NettyScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyRedissonSharedTopicConnectionSubscriberFactory")
         public RedissonTopicConnectionSubscriberFactory nettyRedissonSharedTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
-            RedissonTopicConnectionSubscriberFactory factory =
-                    new RedissonTopicConnectionSubscriberFactory();
-            factory.setRedissonClient(redissonClient);
-            factory.setShared(true);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(NettyScoped.NAME);
-            return factory;
+            return redissonSharedTopicConnectionSubscriberFactory(redissonClient);
         }
     }
 
-    public abstract static class RedisTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class RedisTopicConfiguration
+            extends ConnectionSubscriberConfiguration.RedisTopicConfiguration
+            implements NettyScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyRedisTopicConnectionSubscriberFactory")
         public RedisTopicConnectionSubscriberFactory nettyRedisTopicConnectionSubscriberFactory(
                 RedisTemplate<?, ?> redisTemplate) {
-            RedisTopicConnectionSubscriberFactory factory =
-                    new RedisTopicConnectionSubscriberFactory();
-            factory.setRedisTemplate(redisTemplate);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(NettyScoped.NAME);
-            return factory;
+            return redisTopicConnectionSubscriberFactory(redisTemplate);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyRedisMessageCodecAdapter")
         public RedisMessageCodecAdapter nettyRedisMessageCodecAdapter() {
-            return new RedisMessageCodecAdapter().addScopes(NettyScoped.NAME);
+            return redisMessageCodecAdapter();
         }
     }
 
-    public abstract static class ReactiveRedisTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class ReactiveRedisTopicConfiguration
+            extends ConnectionSubscriberConfiguration.ReactiveRedisTopicConfiguration
+            implements NettyScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyReactiveRedisTopicConnectionSubscriberFactory")
         public ReactiveRedisTopicConnectionSubscriberFactory nettyReactiveRedisTopicConnectionSubscriberFactory(
                 ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
-            ReactiveRedisTopicConnectionSubscriberFactory factory =
-                    new ReactiveRedisTopicConnectionSubscriberFactory();
-            factory.setReactiveRedisTemplate(reactiveRedisTemplate);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(NettyScoped.NAME);
-            return factory;
+            return reactiveRedisTopicConnectionSubscriberFactory(reactiveRedisTemplate);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyReactiveRedisMessageCodecAdapter")
         public ReactiveRedisMessageCodecAdapter nettyReactiveRedisMessageCodecAdapter() {
-            return new ReactiveRedisMessageCodecAdapter().addScopes(NettyScoped.NAME);
+            return reactiveRedisMessageCodecAdapter();
         }
     }
 
-    public abstract static class RabbitFanoutConfiguration implements MasterSlaveProvider {
+    public abstract static class RabbitFanoutConfiguration
+            extends ConnectionSubscriberConfiguration.RabbitFanoutConfiguration
+            implements NettyScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyRabbitFanoutConnectionSubscriberFactory")
@@ -127,23 +102,19 @@ public class NettySubscriberConfiguration {
                 RabbitTemplate rabbitTemplate,
                 RabbitListenerContainerFactory<? extends org.springframework.amqp.rabbit.listener.MessageListenerContainer>
                         rabbitListenerContainerFactory) {
-            RabbitFanoutConnectionSubscriberFactory factory =
-                    new RabbitFanoutConnectionSubscriberFactory();
-            factory.setRabbitTemplate(rabbitTemplate);
-            factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(NettyScoped.NAME);
-            return factory;
+            return rabbitFanoutConnectionSubscriberFactory(rabbitTemplate, rabbitListenerContainerFactory);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyRabbitMessageCodecAdapter")
         public RabbitMessageCodecAdapter nettyRabbitMessageCodecAdapter() {
-            return new RabbitMessageCodecAdapter().addScopes(NettyScoped.NAME);
+            return rabbitMessageCodecAdapter();
         }
     }
 
-    public abstract static class KafkaTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class KafkaTopicConfiguration
+            extends ConnectionSubscriberConfiguration.KafkaTopicConfiguration
+            implements NettyScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyKafkaTopicConnectionSubscriberFactory")
@@ -151,19 +122,13 @@ public class NettySubscriberConfiguration {
                 KafkaTemplate<?, Object> kafkaTemplate,
                 KafkaListenerContainerFactory<? extends MessageListenerContainer>
                         kafkaListenerContainerFactory) {
-            KafkaTopicConnectionSubscriberFactory factory =
-                    new KafkaTopicConnectionSubscriberFactory();
-            factory.setKafkaTemplate(kafkaTemplate);
-            factory.setKafkaListenerContainerFactory(kafkaListenerContainerFactory);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(NettyScoped.NAME);
-            return factory;
+            return kafkaTopicConnectionSubscriberFactory(kafkaTemplate, kafkaListenerContainerFactory);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "nettyKafkaMessageCodecAdapter")
         public KafkaMessageCodecAdapter nettyKafkaMessageCodecAdapter() {
-            return new KafkaMessageCodecAdapter().addScopes(NettyScoped.NAME);
+            return kafkaMessageCodecAdapter();
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.ConnectionSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
@@ -13,7 +14,6 @@ import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonito
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionSubscriberFactory;
@@ -36,104 +36,79 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-public class WebSocketSubscriberConfiguration {
+public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfiguration {
 
-    public interface MasterSlaveProvider {
-
-        ConnectionSubscriber.MasterSlave getMasterSlave();
-    }
-
-    public interface MasterProvider extends MasterSlaveProvider {
+    public interface WebSocketScopedProvider extends ConnectionSubscriberConfiguration.ScopedProvider {
 
         @Override
-        default ConnectionSubscriber.MasterSlave getMasterSlave() {
-            return ConnectionSubscriber.MasterSlave.MASTER;
+        default String getScoped() {
+            return WebSocketScoped.NAME;
         }
     }
 
-    public interface Slave1Provider extends MasterSlaveProvider {
-
-        @Override
-        default ConnectionSubscriber.MasterSlave getMasterSlave() {
-            return ConnectionSubscriber.MasterSlave.SLAVE1;
-        }
-    }
-
-    public abstract static class RedissonTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class RedissonTopicConfiguration
+            extends ConnectionSubscriberConfiguration.RedissonTopicConfiguration
+            implements WebSocketScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "wsRedissonTopicConnectionSubscriberFactory")
         public RedissonTopicConnectionSubscriberFactory wsRedissonTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
-            RedissonTopicConnectionSubscriberFactory factory =
-                    new RedissonTopicConnectionSubscriberFactory();
-            factory.setRedissonClient(redissonClient);
-            factory.setShared(false);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
+            return redissonTopicConnectionSubscriberFactory(redissonClient);
         }
     }
 
-    public abstract static class RedissonSharedTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class RedissonSharedTopicConfiguration
+            extends ConnectionSubscriberConfiguration.RedissonSharedTopicConfiguration
+            implements WebSocketScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "wsRedissonSharedTopicConnectionSubscriberFactory")
         public RedissonTopicConnectionSubscriberFactory wsRedissonSharedTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
-            RedissonTopicConnectionSubscriberFactory factory =
-                    new RedissonTopicConnectionSubscriberFactory();
-            factory.setRedissonClient(redissonClient);
-            factory.setShared(true);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
+            return redissonSharedTopicConnectionSubscriberFactory(redissonClient);
         }
     }
 
-    public abstract static class RedisTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class RedisTopicConfiguration
+            extends ConnectionSubscriberConfiguration.RedisTopicConfiguration
+            implements WebSocketScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "wsRedisTopicConnectionSubscriberFactory")
         public RedisTopicConnectionSubscriberFactory wsRedisTopicConnectionSubscriberFactory(
                 RedisTemplate<?, ?> redisTemplate) {
-            RedisTopicConnectionSubscriberFactory factory =
-                    new RedisTopicConnectionSubscriberFactory();
-            factory.setRedisTemplate(redisTemplate);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
+            return redisTopicConnectionSubscriberFactory(redisTemplate);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "wsRedisMessageCodecAdapter")
         public RedisMessageCodecAdapter wsRedisMessageCodecAdapter() {
-            return new RedisMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
+            return redisMessageCodecAdapter();
         }
     }
 
-    public abstract static class ReactiveRedisTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class ReactiveRedisTopicConfiguration
+            extends ConnectionSubscriberConfiguration.ReactiveRedisTopicConfiguration
+            implements WebSocketScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "wsReactiveRedisTopicConnectionSubscriberFactory")
         public ReactiveRedisTopicConnectionSubscriberFactory wsReactiveRedisTopicConnectionSubscriberFactory(
                 ReactiveRedisTemplate<?, Object> reactiveRedisTemplate) {
-            ReactiveRedisTopicConnectionSubscriberFactory factory =
-                    new ReactiveRedisTopicConnectionSubscriberFactory();
-            factory.setReactiveRedisTemplate(reactiveRedisTemplate);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
+            return reactiveRedisTopicConnectionSubscriberFactory(reactiveRedisTemplate);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "wsReactiveRedisMessageCodecAdapter")
         public ReactiveRedisMessageCodecAdapter wsReactiveRedisMessageCodecAdapter() {
-            return new ReactiveRedisMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
+            return reactiveRedisMessageCodecAdapter();
         }
     }
 
-    public abstract static class RabbitFanoutConfiguration implements MasterSlaveProvider {
+    public abstract static class RabbitFanoutConfiguration
+            extends ConnectionSubscriberConfiguration.RabbitFanoutConfiguration
+            implements WebSocketScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "wsRabbitFanoutConnectionSubscriberFactory")
@@ -141,23 +116,19 @@ public class WebSocketSubscriberConfiguration {
                 RabbitTemplate rabbitTemplate,
                 RabbitListenerContainerFactory<? extends org.springframework.amqp.rabbit.listener.MessageListenerContainer>
                         rabbitListenerContainerFactory) {
-            RabbitFanoutConnectionSubscriberFactory factory =
-                    new RabbitFanoutConnectionSubscriberFactory();
-            factory.setRabbitTemplate(rabbitTemplate);
-            factory.setRabbitListenerContainerFactory(rabbitListenerContainerFactory);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
+            return rabbitFanoutConnectionSubscriberFactory(rabbitTemplate, rabbitListenerContainerFactory);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "wsRabbitMessageCodecAdapter")
         public RabbitMessageCodecAdapter wsRabbitMessageCodecAdapter() {
-            return new RabbitMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
+            return rabbitMessageCodecAdapter();
         }
     }
 
-    public abstract static class KafkaTopicConfiguration implements MasterSlaveProvider {
+    public abstract static class KafkaTopicConfiguration
+            extends ConnectionSubscriberConfiguration.KafkaTopicConfiguration
+            implements WebSocketScopedProvider {
 
         @Bean
         @ConditionalOnMissingBean(name = "wsKafkaTopicConnectionSubscriberFactory")
@@ -165,19 +136,13 @@ public class WebSocketSubscriberConfiguration {
                 KafkaTemplate<?, Object> kafkaTemplate,
                 KafkaListenerContainerFactory<? extends MessageListenerContainer>
                         kafkaListenerContainerFactory) {
-            KafkaTopicConnectionSubscriberFactory factory =
-                    new KafkaTopicConnectionSubscriberFactory();
-            factory.setKafkaTemplate(kafkaTemplate);
-            factory.setKafkaListenerContainerFactory(kafkaListenerContainerFactory);
-            factory.setMasterSlave(getMasterSlave());
-            factory.addScopes(WebSocketScoped.NAME);
-            return factory;
+            return kafkaTopicConnectionSubscriberFactory(kafkaTemplate, kafkaListenerContainerFactory);
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "wsKafkaMessageCodecAdapter")
         public KafkaMessageCodecAdapter wsKafkaMessageCodecAdapter() {
-            return new KafkaMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
+            return kafkaMessageCodecAdapter();
         }
     }
 

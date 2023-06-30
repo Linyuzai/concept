@@ -35,7 +35,7 @@ public class ConnectionLoadBalanceConfiguration {
 
         @Bean
         public ConnectionServerManagerFactory connectionServerManagerFactory(DiscoveryClient client,
-                                                                                      Registration registration) {
+                                                                             Registration registration) {
             return new DiscoveryConnectionServerManagerFactory(client, registration);
         }
     }
