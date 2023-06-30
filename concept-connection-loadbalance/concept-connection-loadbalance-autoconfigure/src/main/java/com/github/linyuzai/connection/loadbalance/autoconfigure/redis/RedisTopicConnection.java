@@ -7,15 +7,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.ClusterInfo;
-import org.springframework.data.redis.connection.RedisClusterConnection;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.function.Consumer;
 
 @Getter
@@ -51,21 +46,27 @@ public class RedisTopicConnection extends AliveForeverConnection {
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
-        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
-        if (factory == null) {
-            return;
-        }
-        RedisConnection connection = RedisConnectionUtils.getConnection(factory);
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            if (connection instanceof RedisClusterConnection) {
-                ClusterInfo info = ((RedisClusterConnection) connection).clusterGetClusterInfo();
+            String pong = getConnection().ping();
+            if ("PONG".equalsIgnoreCase(pong)) {
+                onSuccess.run();
             } else {
-                Properties info = connection.info("server");
+                onError.accept(new IllegalStateException("Redis ping: " + pong));
             }
-            //TODO
+        } catch (Throwable e) {
+            onError.accept(e);
         } finally {
-            RedisConnectionUtils.releaseConnection(connection, factory);
+            try {
+                getConnection().close();
+            } catch (Throwable ignore) {
+            } finally {
+                onComplete.run();
+            }
         }
+    }
+
+    protected RedisConnection getConnection() {
+        return redisTemplate.getRequiredConnectionFactory().getConnection();
     }
 }

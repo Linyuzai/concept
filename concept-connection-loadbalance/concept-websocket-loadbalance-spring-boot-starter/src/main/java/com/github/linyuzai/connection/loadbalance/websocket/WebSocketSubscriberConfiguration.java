@@ -108,7 +108,7 @@ public class WebSocketSubscriberConfiguration {
         @Bean
         @ConditionalOnMissingBean(name = "wsRedisMessageCodecAdapter")
         public RedisMessageCodecAdapter wsRedisMessageCodecAdapter() {
-            return new RedisMessageCodecAdapter();
+            return new RedisMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
         }
     }
 
@@ -129,7 +129,7 @@ public class WebSocketSubscriberConfiguration {
         @Bean
         @ConditionalOnMissingBean(name = "wsReactiveRedisMessageCodecAdapter")
         public ReactiveRedisMessageCodecAdapter wsReactiveRedisMessageCodecAdapter() {
-            return new ReactiveRedisMessageCodecAdapter();
+            return new ReactiveRedisMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
         }
     }
 
@@ -153,7 +153,7 @@ public class WebSocketSubscriberConfiguration {
         @Bean
         @ConditionalOnMissingBean(name = "wsRabbitMessageCodecAdapter")
         public RabbitMessageCodecAdapter wsRabbitMessageCodecAdapter() {
-            return new RabbitMessageCodecAdapter();
+            return new RabbitMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
         }
     }
 
@@ -177,7 +177,7 @@ public class WebSocketSubscriberConfiguration {
         @Bean
         @ConditionalOnMissingBean(name = "wsKafkaMessageCodecAdapter")
         public KafkaMessageCodecAdapter wsKafkaMessageCodecAdapter() {
-            return new KafkaMessageCodecAdapter();
+            return new KafkaMessageCodecAdapter().addScopes(WebSocketScoped.NAME);
         }
     }
 

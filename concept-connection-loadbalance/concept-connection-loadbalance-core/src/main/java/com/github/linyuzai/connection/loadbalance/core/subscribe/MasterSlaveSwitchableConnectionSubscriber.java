@@ -2,7 +2,6 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
@@ -10,10 +9,10 @@ import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetr
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
@@ -32,7 +31,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
                           Consumer<Throwable> onError,
                           Runnable onComplete,
                           ConnectionLoadBalanceConcept concept) {
-        ConnectionImpl connection = new ConnectionImpl();
+        LockableConnection connection = new LockableConnection();
         masterConnectionSubscriber.subscribe(master ->
                 connection.master = master, onError, onComplete, concept);
 
@@ -48,22 +47,17 @@ public class MasterSlaveSwitchableConnectionSubscriber
     }
 
     @Getter
-    public static class ConnectionImpl implements MasterSlaveConnection {
+    public static class LockableConnection implements MasterSlaveConnection {
 
         private final ReadWriteLock lock = new ReentrantReadWriteLock();
-
-        private Connection current;
 
         private Connection master;
 
         private Connection slave;
 
-        private long switchTimestamp;
+        private Connection current;
 
-        @Override
-        public Lock getLock() {
-            return lock.writeLock();
-        }
+        private long switchTimestamp;
 
         @Override
         public Connection getCurrent() {
@@ -85,16 +79,6 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
-        public boolean isMaster(Connection connection) {
-            return connection == master;
-        }
-
-        @Override
-        public boolean isSlave(Connection connection) {
-            return connection == slave;
-        }
-
-        @Override
         public void switchMaster() {
             lock.writeLock().lock();
             try {
@@ -106,7 +90,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
-        public void switchSlave(Object key) {
+        public void switchSlave() {
             lock.writeLock().lock();
             try {
                 current = slave;
@@ -114,6 +98,27 @@ public class MasterSlaveSwitchableConnectionSubscriber
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        @SneakyThrows
+        @Override
+        public void lock() {
+            lock.writeLock().lockInterruptibly();
+        }
+
+        @Override
+        public void unlock() {
+            lock.writeLock().unlock();
+        }
+
+        @Override
+        public boolean isMaster(Connection connection) {
+            return connection == master;
+        }
+
+        @Override
+        public boolean isSlave(Connection connection) {
+            return connection == slave;
         }
 
         @Override

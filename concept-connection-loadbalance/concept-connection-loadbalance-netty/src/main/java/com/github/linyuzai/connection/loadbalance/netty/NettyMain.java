@@ -25,7 +25,8 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * @since JDK 1.8
  */
 public class NettyMain {
-    public static void main(String[] args) {
+
+    public  void main() {
         NioEventLoopGroup boss = new NioEventLoopGroup(1);
         NioEventLoopGroup worker = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();

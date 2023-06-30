@@ -1,10 +1,10 @@
 apply from: '../../allprojects.gradle'
 
 apply from: '../version.gradle'
-version ConceptWebSocketLoadbalanceVersion
+version ConceptNettyLoadbalanceVersion
 ext {
-    set('publishName', 'WebSocket Load Balance Spring Boot Starter')
-    set('publishDescription', 'Load Balance 4 WebSocket')
+    set('publishName', 'Netty Load Balance Spring Boot Starter')
+    set('publishDescription', 'Load Balance 4 Netty')
 }
 
 dependencies {
@@ -17,11 +17,11 @@ dependencies {
     compileOnly "org.redisson:redisson:${RedissonVersion}"
 
     //api "com.github.linyuzai:concept-connection-loadbalance-core:${ConceptConnectionLoadbalanceVersion}"
-    //api "com.github.linyuzai:concept-connection-loadbalance-websocket:${ConceptConnectionLoadbalanceVersion}"
+    //api "com.github.linyuzai:concept-connection-loadbalance-netty:${ConceptConnectionLoadbalanceVersion}"
     //api "com.github.linyuzai:concept-connection-loadbalance-autoconfigure:${ConceptConnectionLoadbalanceVersion}"
 
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
-    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-websocket')
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-netty')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure')
 }
 

@@ -1,10 +1,10 @@
 apply from: '../../allprojects.gradle'
 
 apply from: '../version.gradle'
-version ConceptConnectionLoadbalanceVersion
+version ConceptWebSocketLoadbalanceVersion
 ext {
     set('publishName', 'Connection Load Balance Web Socket')
-    set('publishDescription', 'Load Balance 4 Connection')
+    set('publishDescription', 'Load Balance 4 WebSocket')
 }
 
 dependencies {

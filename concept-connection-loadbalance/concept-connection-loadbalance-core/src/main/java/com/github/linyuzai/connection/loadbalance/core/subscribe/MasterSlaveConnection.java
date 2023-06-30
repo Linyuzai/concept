@@ -2,21 +2,25 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 
-import java.util.concurrent.locks.Lock;
-
 public interface MasterSlaveConnection extends Connection {
 
-    Lock getLock();
+    Connection getMaster();
+
+    Connection getSlave();
 
     Connection getCurrent();
+
+    long getSwitchTimestamp();
+
+    void switchMaster();
+
+    void switchSlave();
 
     boolean isMaster(Connection connection);
 
     boolean isSlave(Connection connection);
 
-    void switchMaster();
+    void lock();
 
-    void switchSlave(Object key);
-
-    long getSwitchTimestamp();
+    void unlock();
 }

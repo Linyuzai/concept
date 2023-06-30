@@ -42,14 +42,13 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
             }
             long timestamp = ((MessageSendSuccessEvent) event).getTimestamp();
             if (validateSlaveAndTimestamp(connection, timestamp)) {
-                if (connection.getLock().tryLock()) {
-                    try {
-                        if (validateSlaveAndTimestamp(connection, timestamp)) {
-                            connection.switchMaster();
-                        }
-                    } finally {
-                        connection.getLock().unlock();
+                connection.lock();
+                try {
+                    if (validateSlaveAndTimestamp(connection, timestamp)) {
+                        connection.switchMaster();
                     }
+                } finally {
+                    connection.unlock();
                 }
             }
         }
@@ -68,22 +67,21 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
             }
             long timestamp = ((MessageSendErrorEvent) event).getTimestamp();
             if (validateMasterAndTimestamp(connection, timestamp)) {
-                if (connection.getLock().tryLock()) {
-                    try {
-                        if (validateMasterAndTimestamp(connection, timestamp)) {
-                            connection.switchSlave(null);
-                            Message message = ((MessageSendErrorEvent) event).getMessage();
-                            try {
-                                //正常情况下，MessageTransportException不会直接抛出异常
-                                connection.send(message);
-                            } catch (Throwable e) {
-                                concept.getEventPublisher()
-                                        .publish(new MessageSendErrorEvent(connection, message, e));
-                            }
+                connection.lock();
+                try {
+                    if (validateMasterAndTimestamp(connection, timestamp)) {
+                        connection.switchSlave();
+                        Message message = ((MessageSendErrorEvent) event).getMessage();
+                        try {
+                            //正常情况下，MessageTransportException不会直接抛出异常
+                            connection.send(message);
+                        } catch (Throwable e) {
+                            concept.getEventPublisher()
+                                    .publish(new MessageSendErrorEvent(connection, message, e));
                         }
-                    } finally {
-                        connection.getLock().unlock();
                     }
+                } finally {
+                    connection.unlock();
                 }
             }
         }

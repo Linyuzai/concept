@@ -2,9 +2,12 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.kafka;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
+import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.kafka.common.Metric;
+import org.apache.kafka.common.MetricName;
 import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -51,5 +54,17 @@ public class KafkaTopicConnection extends AliveForeverConnection {
                 onComplete.run();
             }
         });
+    }
+
+    @Override
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        try {
+            Map<MetricName, ? extends Metric> metrics = kafkaTemplate.metrics();
+            onSuccess.run();
+        } catch (Throwable e) {
+            onError.accept(e);
+        } finally {
+            onComplete.run();
+        }
     }
 }

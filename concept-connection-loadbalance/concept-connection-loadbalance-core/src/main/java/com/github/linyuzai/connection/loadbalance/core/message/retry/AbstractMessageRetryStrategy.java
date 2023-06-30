@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-//TODO 包装异常
 public abstract class AbstractMessageRetryStrategy implements MessageRetryStrategy {
 
     @Override
@@ -18,8 +17,9 @@ public abstract class AbstractMessageRetryStrategy implements MessageRetryStrate
             onError.accept(e);
             return;
         }
-        int period = getPeriod(1);
-        RetryRunnable retry = new RetryRunnable(1, e, retryable, onError, concept);
+        int current = 1;
+        int period = getPeriod(current);
+        RetryRunnable retry = new RetryRunnable(current, e, retryable, onError, concept);
         concept.getScheduledExecutor().schedule(retry, period, TimeUnit.MILLISECONDS);
     }
 
@@ -47,12 +47,14 @@ public abstract class AbstractMessageRetryStrategy implements MessageRetryStrate
                 int times = getTimes();
                 int newCurrent = current + 1;
                 int period = getPeriod(newCurrent);
+                String retryErrorMessage = "Retry failed " + current + "/" + times;
+                MessageRetryException retryException =
+                        new MessageRetryException(retryErrorMessage, e, error);
                 if (current < times) {
-                    RetryRunnable retry = new RetryRunnable(newCurrent, e, retryable, onError, concept);
+                    RetryRunnable retry = new RetryRunnable(newCurrent, retryException, retryable, onError, concept);
                     concept.getScheduledExecutor().schedule(retry, period, TimeUnit.MILLISECONDS);
                 } else {
-                    String retryErrorMessage = "Retry failed " + current + "/" + times;
-                    onError.accept(new MessageRetryException(retryErrorMessage, e));
+                    onError.accept(retryException);
                 }
             });
         }

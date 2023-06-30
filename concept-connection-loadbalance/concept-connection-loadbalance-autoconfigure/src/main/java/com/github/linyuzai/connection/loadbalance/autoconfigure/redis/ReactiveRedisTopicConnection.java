@@ -2,10 +2,12 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
+import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 
 import java.util.Map;
@@ -39,5 +41,22 @@ public class ReactiveRedisTopicConnection extends AliveForeverConnection {
                         onError.accept(e);
                     }
                 }, onComplete);
+    }
+
+    @Override
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        getConnection().ping().subscribe(pong -> {
+            if ("PONG".equalsIgnoreCase(pong)) {
+                onSuccess.run();
+            } else {
+                onError.accept(new IllegalStateException("Redis ping: " + pong));
+            }
+        }, onError, () -> getConnection().closeLater().subscribe(v -> {
+        }, e -> {
+        }, onComplete));
+    }
+
+    protected ReactiveRedisConnection getConnection() {
+        return reactiveRedisTemplate.getConnectionFactory().getReactiveConnection();
     }
 }
