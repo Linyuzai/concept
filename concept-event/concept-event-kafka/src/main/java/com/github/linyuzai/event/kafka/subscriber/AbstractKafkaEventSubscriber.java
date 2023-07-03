@@ -19,12 +19,7 @@ public abstract class AbstractKafkaEventSubscriber extends KafkaEventSubscriber 
     @Override
     public Subscription doSubscribe(EventListener listener, KafkaEventEndpoint endpoint, EventContext context) {
         MessageListenerContainer container = createMessageListenerContainer(endpoint, context);
-        Object messageListener = container.getContainerProperties().getMessageListener();
-        //如果没有设置监听器则生成一个监听器并设置
-        if (messageListener == null) {
-            container.getContainerProperties()
-                    .setMessageListener(createMessageListener(listener, endpoint, context));
-        }
+        container.setupMessageListener(createMessageListener(listener, endpoint, context));
         container.start();
         return new KafkaSubscription(container);
     }

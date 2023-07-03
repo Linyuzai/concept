@@ -36,6 +36,7 @@ public abstract class AbstractRabbitEventSubscriber extends RabbitEventSubscribe
         if (container.getMessageListener() == null) {
             container.setupMessageListener(messageListener);
         }
+        container.afterPropertiesSet();
         container.start();
         return new RabbitSubscription(container);
     }
