@@ -6,15 +6,23 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @Getter
 @RequiredArgsConstructor
 public class NettyLoadBalanceHandler extends ChannelInboundHandlerAdapter {
 
     private final NettyLoadBalanceConcept concept;
 
+    private final Map<Object, Object> metadata;
+
+    public NettyLoadBalanceHandler(NettyLoadBalanceConcept concept) {
+        this(concept, null);
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        concept.onEstablish(ctx, null);
+        concept.onEstablish(ctx, metadata);
         ctx.fireChannelActive();
     }
 
