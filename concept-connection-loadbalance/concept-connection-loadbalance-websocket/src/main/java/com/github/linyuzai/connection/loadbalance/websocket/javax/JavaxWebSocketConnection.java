@@ -53,14 +53,16 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     @Override
     public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            if (message instanceof String) {
-                session.getBasicRemote().sendText((String) message);
-            } else if (message instanceof ByteBuffer) {
-                session.getBasicRemote().sendBinary((ByteBuffer) message);
-            } else if (message instanceof byte[]) {
-                session.getBasicRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
-            } else {
-                session.getBasicRemote().sendObject(message);
+            synchronized (session) {
+                if (message instanceof String) {
+                    session.getBasicRemote().sendText((String) message);
+                } else if (message instanceof ByteBuffer) {
+                    session.getBasicRemote().sendBinary((ByteBuffer) message);
+                } else if (message instanceof byte[]) {
+                    session.getBasicRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
+                } else {
+                    session.getBasicRemote().sendObject(message);
+                }
             }
             onSuccess.run();
         } catch (IOException e) {
