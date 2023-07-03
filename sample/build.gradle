@@ -77,6 +77,8 @@ dependencies {
 
     compileOnly 'org.springframework.kafka:spring-kafka'
 
+    compileOnly 'mysql:mysql-connector-java'
+
     compileOnly 'org.jboss.xnio:xnio-api:3.8.6.Final'
     compileOnly 'io.netty:netty-all:4.1.85.Final'
 

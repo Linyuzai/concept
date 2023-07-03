@@ -1,5 +1,10 @@
 server:
   port: 18080
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/concept?serverTimezone=GMT%2b8
+    username: root
+    password: 123456
 management:
   health:
     rabbit:
