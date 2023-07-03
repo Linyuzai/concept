@@ -40,16 +40,18 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     @SneakyThrows
     @Override
     public void doSend(Object message) {
-        if (message instanceof WebSocketMessage) {
-            session.sendMessage((WebSocketMessage<?>) message);
-        } else if (message instanceof String) {
-            session.sendMessage(new TextMessage((CharSequence) message));
-        } else if (message instanceof ByteBuffer) {
-            session.sendMessage(new BinaryMessage((ByteBuffer) message));
-        } else if (message instanceof byte[]) {
-            session.sendMessage(new BinaryMessage(ByteBuffer.wrap((byte[]) message)));
-        } else {
-            throw new IllegalArgumentException(message.toString());
+        synchronized (session) {
+            if (message instanceof WebSocketMessage) {
+                session.sendMessage((WebSocketMessage<?>) message);
+            } else if (message instanceof String) {
+                session.sendMessage(new TextMessage((CharSequence) message));
+            } else if (message instanceof ByteBuffer) {
+                session.sendMessage(new BinaryMessage((ByteBuffer) message));
+            } else if (message instanceof byte[]) {
+                session.sendMessage(new BinaryMessage(ByteBuffer.wrap((byte[]) message)));
+            } else {
+                throw new IllegalArgumentException(message.toString());
+            }
         }
     }
 

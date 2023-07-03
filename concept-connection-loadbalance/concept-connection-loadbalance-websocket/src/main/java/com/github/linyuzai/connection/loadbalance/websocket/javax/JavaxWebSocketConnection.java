@@ -43,29 +43,32 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
         return session.getRequestURI();
     }
 
+    @SneakyThrows
     @Override
     public void doSend(Object message) {
-        if (message instanceof String) {
-            session.getAsyncRemote().sendText((String) message);
-        } else if (message instanceof ByteBuffer) {
-            session.getAsyncRemote().sendBinary((ByteBuffer) message);
-        } else if (message instanceof byte[]) {
-            session.getAsyncRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
-        } else {
-            session.getAsyncRemote().sendObject(message);
+        synchronized (session) {
+            if (message instanceof String) {
+                session.getBasicRemote().sendText((String) message);
+            } else if (message instanceof ByteBuffer) {
+                session.getBasicRemote().sendBinary((ByteBuffer) message);
+            } else if (message instanceof byte[]) {
+                session.getBasicRemote().sendBinary(ByteBuffer.wrap((byte[]) message));
+            } else {
+                session.getBasicRemote().sendObject(message);
+            }
         }
     }
 
     @SneakyThrows
     @Override
     public void ping(PingMessage ping) {
-        session.getAsyncRemote().sendPing(ping.getPayload());
+        session.getBasicRemote().sendPing(ping.getPayload());
     }
 
     @SneakyThrows
     @Override
     public void pong(PongMessage pong) {
-        session.getAsyncRemote().sendPong(pong.getPayload());
+        session.getBasicRemote().sendPong(pong.getPayload());
     }
 
     @SneakyThrows
