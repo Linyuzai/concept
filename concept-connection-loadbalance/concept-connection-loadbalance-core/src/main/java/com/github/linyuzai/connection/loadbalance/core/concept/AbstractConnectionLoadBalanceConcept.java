@@ -681,7 +681,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         protected MessageCodecAdapter withMessageCodecAdapterChain(ConnectionLoadBalanceConcept concept,
                                                                    List<MessageCodecAdapter> messageCodecAdapters) {
             Collections.reverse(messageCodecAdapters);
-            return new MessageCodecAdapterChain(concept, messageCodecAdapters);
+            return new MessageCodecAdapterChain(concept, messageCodecAdapters)
+                    .addScopes(getScope());
         }
 
         protected List<ConnectionSelector> withConnectionSelectorFilterChain(List<ConnectionSelector> connectionSelectors) {

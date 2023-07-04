@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.core.message;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class MessageCodecAdapterChain implements MessageCodecAdapter {
+public class MessageCodecAdapterChain extends AbstractScoped implements MessageCodecAdapter {
 
     private final ConnectionLoadBalanceConcept concept;
 
@@ -45,10 +46,5 @@ public class MessageCodecAdapterChain implements MessageCodecAdapter {
         } else {
             return decoder;
         }
-    }
-
-    @Override
-    public boolean support(String scope) {
-        return true;
     }
 }
