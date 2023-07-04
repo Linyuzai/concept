@@ -106,11 +106,6 @@ public class WebSocketLoadBalanceProperties {
         private MessageProperties message = new MessageProperties();
 
         /**
-         * 订阅日志
-         */
-        private boolean logger = true;
-
-        /**
          * 监控配置
          */
         private MonitorProperties monitor = new MonitorProperties();

@@ -29,8 +29,6 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
                 info("Subscribe on " + getServer(server));
-            } else if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
-
             }
         } else if (event instanceof ConnectionSubscribeErrorEvent) {
             Throwable e = ((ConnectionSubscribeErrorEvent) event).getError();
@@ -41,7 +39,7 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
         } else if (event instanceof MessageReceiveEvent) {
             Connection connection = ((MessageReceiveEvent) event).getConnection();
             if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
-
+                //
             }
         } else if (event instanceof ConnectionCloseEvent) {
             Connection connection = ((ConnectionCloseEvent) event).getConnection();
@@ -56,8 +54,6 @@ public class ConnectionSubscribeLogger extends ConnectionLoadBalanceLogger imple
             if (Connection.Type.SUBSCRIBER.equals(connection.getType())) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
                 error("Error subscribe " + getServer(server), e);
-            } else if (Connection.Type.OBSERVABLE.equals(connection.getType())) {
-                error("Error observed", e);
             }
         }
     }

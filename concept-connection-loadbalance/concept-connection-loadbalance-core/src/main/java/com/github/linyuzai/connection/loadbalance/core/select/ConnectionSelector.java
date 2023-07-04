@@ -19,11 +19,6 @@ import java.util.stream.Collectors;
  */
 public interface ConnectionSelector extends Scoped {
 
-    @Override
-    default boolean support(String scope) {
-        return true;
-    }
-
     /**
      * 是否支持该消息
      *

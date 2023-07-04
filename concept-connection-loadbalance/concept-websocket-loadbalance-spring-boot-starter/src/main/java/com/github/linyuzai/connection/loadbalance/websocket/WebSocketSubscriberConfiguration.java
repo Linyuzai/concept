@@ -243,12 +243,13 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public static class WebSocketBaseConfiguration {
 
         @Bean
+        @ConditionalOnMissingBean
         public ConnectionSubscribeHandler connectionSubscribeHandler() {
             return new ConnectionSubscribeHandler().addScopes(WebSocketScoped.NAME);
         }
 
         @Bean
-        @ConditionalOnProperty(value = "concept.websocket.load-balance.logger", havingValue = "true", matchIfMissing = true)
+        @ConditionalOnMissingBean
         public ConnectionSubscribeLogger connectionSubscribeLogger() {
             Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
             return new ConnectionSubscribeLogger(log::info, log::error)
@@ -256,6 +257,7 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         }
 
         @Bean
+        @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.logger", havingValue = "true", matchIfMissing = true)
         public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
             Log log = LogFactory.getLog(LoadBalanceMonitorLogger.class);
@@ -264,6 +266,7 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         }
 
         @Bean
+        @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.enabled", havingValue = "true", matchIfMissing = true)
         public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
                 WebSocketLoadBalanceProperties properties) {

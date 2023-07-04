@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.List;
  * 连接选择器的抽象类
  */
 @Getter
-public abstract class AbstractConnectionSelector implements ConnectionSelector {
+public abstract class AbstractConnectionSelector extends AbstractScoped implements ConnectionSelector {
 
     @Override
     public Collection<Connection> select(Message message, ConnectionLoadBalanceConcept concept) {

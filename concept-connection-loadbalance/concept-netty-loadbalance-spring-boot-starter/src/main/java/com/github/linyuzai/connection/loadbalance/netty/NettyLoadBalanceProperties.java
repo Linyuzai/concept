@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * ws 配置
+ * netty 配置
  */
 @Data
 @ConfigurationProperties(prefix = "concept.netty")
@@ -33,7 +33,7 @@ public class NettyLoadBalanceProperties {
     public static class LoadBalanceProperties {
 
         /**
-         * 主订阅类型，默认 WEBSOCKET
+         * 主订阅类型，默认 NONE
          */
         private Subscriber subscriberMaster = Subscriber.NONE;
 
@@ -46,16 +46,6 @@ public class NettyLoadBalanceProperties {
          * 消息配置
          */
         private MessageProperties message = new MessageProperties();
-
-        /**
-         * 订阅日志
-         */
-        private boolean logger = true;
-
-        /**
-         * 监控配置
-         */
-        private MonitorProperties monitor = new MonitorProperties();
 
         /**
          * 心跳配置
@@ -74,25 +64,6 @@ public class NettyLoadBalanceProperties {
             RABBIT_FANOUT,
 
             KAFKA_TOPIC
-        }
-
-        @Data
-        public static class MonitorProperties {
-
-            /**
-             * 是否启用订阅监控
-             */
-            private boolean enabled = true;
-
-            /**
-             * 是否打印订阅监控日志
-             */
-            private boolean logger = false;
-
-            /**
-             * 订阅监控周期，毫秒
-             */
-            private long period = 30000;
         }
     }
 

@@ -585,12 +585,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         public T build() {
 
             //添加一个全选器在最后
-            connectionSelectors.add(new AllSelector());
+            connectionSelectors.add(new AllSelector()
+                    .addScopes(getScope()));
 
             //添加一个任意对象的消息工厂
             messageFactories.add(new ObjectMessageFactory());
 
-            messageCodecAdapters.add(new BaseMessageCodecAdapter());
+            messageCodecAdapters.add(new BaseMessageCodecAdapter()
+                    .addScopes(getScope()));
 
             //添加消息转发处理器
             eventListeners.add(0, new MessageForwardHandler());
@@ -693,7 +695,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     selectors.add(selector);
                 }
             }
-            selectors.add(new FilterConnectionSelectorChain(filterSelectors));
+            selectors.add(new FilterConnectionSelectorChain(filterSelectors)
+                    .addScopes(getScope()));
             return selectors;
         }
     }

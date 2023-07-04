@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.core.select;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class FilterConnectionSelectorChain implements ConnectionSelector {
+public class FilterConnectionSelectorChain extends AbstractScoped implements ConnectionSelector {
 
     private final List<FilterConnectionSelector> selectors;
 
