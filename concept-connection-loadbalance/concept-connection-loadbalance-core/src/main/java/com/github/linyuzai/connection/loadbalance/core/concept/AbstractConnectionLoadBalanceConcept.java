@@ -21,6 +21,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -640,32 +641,38 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         protected ConnectionSubscriber withConnectionSubscriberMasterSlave(List<ConnectionSubscriberFactory> factories) {
+            List<ConnectionSubscriberFactory> unsupported = new ArrayList<>();
             List<ConnectionSubscriberFactory> masters = new ArrayList<>();
             List<ConnectionSubscriberFactory> slaves = new ArrayList<>();
             for (ConnectionSubscriberFactory factory : factories) {
                 if (factory instanceof MasterSlaveConnectionSubscriberFactory) {
-                    ConnectionSubscriber.MasterSlave masterSlave =
+                    MasterSlave masterSlave =
                             ((MasterSlaveConnectionSubscriberFactory) factory).getMasterSlave();
-                    if (ConnectionSubscriber.MasterSlave.MASTER == masterSlave) {
-                        masters.add(factory);
-                    } else if (ConnectionSubscriber.MasterSlave.SLAVE1 == masterSlave) {
-                        slaves.add(factory);
+                    switch (masterSlave) {
+                        case MASTER:
+                            masters.add(factory);
+                            break;
+                        case SLAVE1:
+                            slaves.add(factory);
+                            break;
                     }
+                } else {
+                    unsupported.add(factory);
                 }
             }
             if (masters.isEmpty()) {
-                return withScopeFactory(ConnectionSubscriber.class, factories);
+                return withScopeFactory(ConnectionSubscriber.class, unsupported);
             } else if (masters.size() == 1) {
                 ConnectionSubscriber master = withScopeFactory(ConnectionSubscriber.class, masters);
                 if (slaves.isEmpty()) {
-                    return master;
+                    return new MasterFixedConnectionSubscriber(master);
                 } else {
                     ConnectionSubscriber slave = withScopeFactory(ConnectionSubscriber.class, slaves);
                     eventListeners.add(0, new MasterSlaveAutoSwitcher());
                     return new MasterSlaveSwitchableConnectionSubscriber(master, slave);
                 }
             } else {
-                throw new IllegalArgumentException("Master more than one");
+                throw new IllegalArgumentException("Master can only be one");
             }
         }
 

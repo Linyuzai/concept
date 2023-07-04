@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.core.subscribe;
+package com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -32,22 +33,27 @@ public class MasterSlaveSwitchableConnectionSubscriber
                           Runnable onComplete,
                           ConnectionLoadBalanceConcept concept) {
         LockableConnection connection = new LockableConnection();
-        masterConnectionSubscriber.subscribe(master ->
-                connection.master = master, onError, onComplete, concept);
+        masterConnectionSubscriber.subscribe(master -> {
+            connection.master = master;
+            onSuccess(connection, onSuccess);
+        }, onError, onComplete, concept);
 
-        slaveConnectionSubscriber.subscribe(slave ->
-                connection.slave = slave, onError, onComplete, concept);
-
-        onSuccess.accept(connection);
+        slaveConnectionSubscriber.subscribe(slave -> {
+            connection.slave = slave;
+            onSuccess(connection, onSuccess);
+        }, onError, onComplete, concept);
     }
 
-    @Override
-    public MasterSlave getMasterSlave() {
-        return MasterSlave.MASTER;
+    private void onSuccess(LockableConnection connection, Consumer<Connection> onSuccess) {
+        if (connection.master != null && connection.slave != null) {
+            connection.current = connection.master;
+            onSuccess.accept(connection);
+        }
     }
 
     @Getter
-    public static class LockableConnection implements MasterSlaveConnection {
+    public static class LockableConnection implements MasterSlaveConnection,
+            MasterSlaveConnection.MasterSlaveSwitcher {
 
         private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -79,36 +85,28 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
-        public void switchMaster() {
-            lock.writeLock().lock();
-            try {
-                current = master;
-                switchTimestamp = System.currentTimeMillis();
-            } finally {
-                lock.writeLock().unlock();
-            }
+        public boolean switchMaster() {
+            current = master;
+            switchTimestamp = System.currentTimeMillis();
+            return true;
         }
 
         @Override
-        public void switchSlave() {
-            lock.writeLock().lock();
-            try {
-                current = slave;
-                switchTimestamp = System.currentTimeMillis();
-            } finally {
-                lock.writeLock().unlock();
-            }
+        public boolean switchSlave() {
+            current = slave;
+            switchTimestamp = System.currentTimeMillis();
+            return true;
         }
 
         @SneakyThrows
         @Override
-        public void lock() {
+        public void switchBy(Consumer<MasterSlaveSwitcher> consumer) {
             lock.writeLock().lockInterruptibly();
-        }
-
-        @Override
-        public void unlock() {
-            lock.writeLock().unlock();
+            try {
+                consumer.accept(this);
+            } finally {
+                lock.writeLock().unlock();
+            }
         }
 
         @Override
@@ -188,12 +186,24 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @Override
         public void send(@NonNull Message message) {
-            getCurrent().send(message);
+            if (message instanceof PingMessage) {
+                if (isSlave(getCurrent())) {
+                    slave.send(message);
+                }
+            } else {
+                getCurrent().send(message);
+            }
         }
 
         @Override
         public void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-            getCurrent().send(message, onSuccess, onError, onComplete);
+            if (message instanceof PingMessage) {
+                if (isSlave(getCurrent())) {
+                    slave.send(message, onSuccess, onError, onComplete);
+                }
+            } else {
+                getCurrent().send(message, onSuccess, onError, onComplete);
+            }
         }
 
         @Override

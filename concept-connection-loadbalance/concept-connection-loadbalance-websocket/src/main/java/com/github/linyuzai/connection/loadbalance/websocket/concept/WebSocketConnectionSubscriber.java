@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlave;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ServerConnectionSubscriber;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,9 +44,4 @@ public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnectio
     }
 
     public abstract String getType();
-
-    @Override
-    public MasterSlave getMasterSlave() {
-        return MasterSlave.UNSUPPORTED;
-    }
 }

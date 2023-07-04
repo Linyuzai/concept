@@ -9,7 +9,7 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.ReactiveRe
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.RedissonTopicConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlave;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
@@ -23,22 +23,22 @@ public class ConnectionSubscriberConfiguration {
 
     public interface MasterSlaveProvider {
 
-        ConnectionSubscriber.MasterSlave getMasterSlave();
+        MasterSlave getMasterSlave();
     }
 
     public interface MasterProvider extends MasterSlaveProvider {
 
         @Override
-        default ConnectionSubscriber.MasterSlave getMasterSlave() {
-            return ConnectionSubscriber.MasterSlave.MASTER;
+        default MasterSlave getMasterSlave() {
+            return MasterSlave.MASTER;
         }
     }
 
     public interface Slave1Provider extends MasterSlaveProvider {
 
         @Override
-        default ConnectionSubscriber.MasterSlave getMasterSlave() {
-            return ConnectionSubscriber.MasterSlave.SLAVE1;
+        default MasterSlave getMasterSlave() {
+            return MasterSlave.SLAVE1;
         }
     }
 

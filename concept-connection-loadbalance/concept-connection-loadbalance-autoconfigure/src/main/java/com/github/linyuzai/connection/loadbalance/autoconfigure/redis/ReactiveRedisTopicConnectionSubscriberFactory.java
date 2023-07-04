@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
 
-import com.github.linyuzai.connection.loadbalance.core.subscribe.MasterSlaveConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.MasterSlaveConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriberFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;

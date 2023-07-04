@@ -3,7 +3,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.redisson;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractMasterSlaveConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.*;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;

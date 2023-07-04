@@ -1,5 +1,7 @@
-package com.github.linyuzai.connection.loadbalance.core.subscribe;
+package com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave;
 
+import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,7 +9,7 @@ import lombok.Setter;
 @Setter
 public abstract class MasterSlaveConnectionSubscriberFactory extends AbstractConnectionSubscriberFactory {
 
-    private ConnectionSubscriber.MasterSlave masterSlave;
+    private MasterSlave masterSlave;
 
     @Override
     public ConnectionSubscriber create(String scope) {

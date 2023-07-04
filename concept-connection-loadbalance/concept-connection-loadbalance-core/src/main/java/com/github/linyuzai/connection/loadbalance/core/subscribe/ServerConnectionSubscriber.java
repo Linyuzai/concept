@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -16,14 +17,28 @@ import java.util.function.Consumer;
 public abstract class ServerConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 
     @Override
-    public synchronized void subscribe(Consumer<Connection> onSuccess,
-                                       Consumer<Throwable> onError,
-                                       Runnable onComplete,
-                                       ConnectionLoadBalanceConcept concept) {
+    public void subscribe(Consumer<Connection> onSuccess,
+                          Consumer<Throwable> onError,
+                          Runnable onComplete,
+                          ConnectionLoadBalanceConcept concept) {
         List<ConnectionServer> servers = concept.getConnectionServerManager()
                 .getConnectionServers();
-        for (ConnectionServer server : servers) {
-            subscribe(onSuccess, onError, onComplete, server, concept);
+        subscribe(0, servers, onSuccess, onError, onComplete, concept);
+    }
+
+    protected void subscribe(int index,
+                             List<ConnectionServer> servers,
+                             Consumer<Connection> onSuccess,
+                             Consumer<Throwable> onError,
+                             Runnable onComplete,
+                             ConnectionLoadBalanceConcept concept) {
+        if (index < servers.size()) {
+            ConnectionServer server = servers.get(index);
+            subscribe(onSuccess, onError, () ->
+                            subscribe(index + 1, servers, onSuccess, onError, onComplete, concept),
+                    server, concept);
+        } else {
+            onComplete.run();
         }
     }
 

@@ -44,13 +44,6 @@ public interface ConnectionSubscriber {
         subscribe(onSuccess, onError, onComplete, null);
     }
 
-    MasterSlave getMasterSlave();
-
-    enum MasterSlave {
-
-        UNSUPPORTED, MASTER, SLAVE1
-    }
-
     @Getter
     @RequiredArgsConstructor
     class Delegate implements ConnectionSubscriber {
@@ -87,11 +80,6 @@ public interface ConnectionSubscriber {
                               Consumer<Throwable> onError,
                               Runnable onComplete) {
             delegate.subscribe(onSuccess, onError, onComplete, concept);
-        }
-
-        @Override
-        public MasterSlave getMasterSlave() {
-            return delegate.getMasterSlave();
         }
     }
 }

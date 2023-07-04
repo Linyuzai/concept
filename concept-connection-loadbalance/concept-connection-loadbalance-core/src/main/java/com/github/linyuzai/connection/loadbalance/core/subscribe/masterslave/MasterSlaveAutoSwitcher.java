@@ -1,34 +1,26 @@
-package com.github.linyuzai.connection.loadbalance.core.subscribe;
+package com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEstablishEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 public class MasterSlaveAutoSwitcher extends AbstractScoped implements ConnectionEventListener {
 
     @Override
     public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
-        recoverMasterIfNecessary(event, concept);
-        switchSlaveIfNecessary(event, concept);
-    }
-
-    @Deprecated
-    public void onMasterEstablished(Object event, ConnectionLoadBalanceConcept concept) {
-        if (event instanceof ConnectionEstablishEvent) {
-            MasterSlaveConnection connection =
-                    getMasterSlaveConnection(((ConnectionEstablishEvent) event).getConnection(), concept);
-            if (connection == null) {
-                return;
-            }
-            concept.getScheduledExecutor().scheduleAtFixedRate(() ->
-                            connection.send(new BinaryPingMessage()), 0, 0,
-                    TimeUnit.MILLISECONDS);
+        try {
+            recoverMasterIfNecessary(event, concept);
+        } catch (Throwable e) {
+            concept.getEventPublisher().publish(new MasterRecoverErrorEvent(e));
+        }
+        try {
+            switchSlaveIfNecessary(event, concept);
+        } catch (Throwable e) {
+            concept.getEventPublisher().publish(new SlaveSwitchErrorEvent(e));
         }
     }
 
@@ -36,20 +28,19 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
         if (event instanceof MessageSendSuccessEvent &&
                 ((MessageSendSuccessEvent) event).getMessage() instanceof PingMessage) {
             MasterSlaveConnection connection =
-                    getMasterSlaveConnection(((MessageSendSuccessEvent) event).getConnection(), concept);
+                    getMasterConnection(((MessageSendSuccessEvent) event).getConnection(), concept);
             if (connection == null) {
                 return;
             }
             long timestamp = ((MessageSendSuccessEvent) event).getTimestamp();
             if (validateSlaveAndTimestamp(connection, timestamp)) {
-                connection.lock();
-                try {
+                connection.switchBy(switcher -> {
                     if (validateSlaveAndTimestamp(connection, timestamp)) {
-                        connection.switchMaster();
+                        if (switcher.switchMaster()) {
+                            concept.getEventPublisher().publish(new MasterRecoverEvent(connection));
+                        }
                     }
-                } finally {
-                    connection.unlock();
-                }
+                });
             }
         }
     }
@@ -60,35 +51,37 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
             if (!isTransportError(error)) {
                 return;
             }
+            Message message = ((MessageSendErrorEvent) event).getMessage();
+            if (message instanceof PingMessage || message instanceof PongMessage) {
+                //默认情况下，消息发送失败之后开启 master 的 ping
+                return;
+            }
             MasterSlaveConnection connection =
-                    getMasterSlaveConnection(((MessageSendErrorEvent) event).getConnection(), concept);
+                    getMasterConnection(((MessageSendErrorEvent) event).getConnection(), concept);
             if (connection == null) {
                 return;
             }
             long timestamp = ((MessageSendErrorEvent) event).getTimestamp();
             if (validateMasterAndTimestamp(connection, timestamp)) {
-                connection.lock();
-                try {
+                connection.switchBy(switcher -> {
                     if (validateMasterAndTimestamp(connection, timestamp)) {
-                        connection.switchSlave();
-                        Message message = ((MessageSendErrorEvent) event).getMessage();
-                        try {
-                            //正常情况下，MessageTransportException不会直接抛出异常
-                            connection.send(message);
-                        } catch (Throwable e) {
-                            concept.getEventPublisher()
-                                    .publish(new MessageSendErrorEvent(connection, message, e));
+                        if (switcher.switchSlave()) {
+                            try {
+                                //正常情况下，MessageTransportException不会直接抛出异常
+                                connection.send(message);
+                            } catch (Throwable e) {
+                                concept.getEventPublisher()
+                                        .publish(new MessageSendErrorEvent(connection, message, e));
+                            }
                         }
                     }
-                } finally {
-                    connection.unlock();
-                }
+                });
             }
         }
     }
 
-    public MasterSlaveConnection getMasterSlaveConnection(Connection connection,
-                                                          ConnectionLoadBalanceConcept concept) {
+    public MasterSlaveConnection getMasterConnection(Connection connection,
+                                                     ConnectionLoadBalanceConcept concept) {
         if (!Connection.Type.OBSERVABLE.equals(connection.getType())) {
             return null;
         }
