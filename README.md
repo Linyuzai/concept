@@ -13,11 +13,13 @@
 - [一个注解实现下载接口](../../wiki/Concept-Download)
 - [异步回调转为同步返回](../../wiki/Concept-Sync-Waiting)
 - [动态加载外部 jar 中的 Class](../../wiki/Concept-Plugin)
-- [一个配置注解实现 WebSocket 集群方案](../../wiki/Concept-WebSocket-LoadBalance)
 - [协同开发之动态路由](../../wiki/Concept-Router)
 - [基于多个 Kafka & Rabbitmq 构建的事件模型](../../wiki/Concept-Event)
 - [属性继承插件（伪 Java 多继承）](../../wiki/Concept-Inherit)
 - [MapQueue：支持元素更新的 Queue](../../wiki/Concept-MapQueue)
+- 长连接在服务集群场景的解决方案
+  - [一个配置注解实现 WebSocket 集群方案（1.x.x）](../../wiki/Concept-WebSocket-LoadBalance)
+  - 2.x.x（新增 Netty 支持，新增 Redis/RabbitMQ/Kafka 转发支持，测试中。。。）
 - Spring Cloud & Spring Boot 基建
   - [模块化项目生成插件（IDEA）](../../wiki/Concept-Cloud-Plugin-Intellij)
   - [全局请求响应拦截](../../wiki/Concept-Cloud-Web)
