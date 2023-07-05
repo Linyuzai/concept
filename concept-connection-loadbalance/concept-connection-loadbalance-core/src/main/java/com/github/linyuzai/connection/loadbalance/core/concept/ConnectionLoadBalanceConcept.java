@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutor;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLogger;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
@@ -158,6 +159,8 @@ public interface ConnectionLoadBalanceConcept {
     MessageIdempotentVerifier getMessageIdempotentVerifier();
 
     ScheduledExecutor getScheduledExecutor();
+
+    ConnectionLogger getLogger();
 
     ConnectionEventPublisher getEventPublisher();
 }

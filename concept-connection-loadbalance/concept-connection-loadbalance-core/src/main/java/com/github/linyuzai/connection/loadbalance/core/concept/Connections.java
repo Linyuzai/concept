@@ -29,13 +29,6 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void setType(@NonNull String type) {
-        for (Connection connection : connections) {
-            connection.setType(type);
-        }
-    }
-
-    @Override
     public String getType() {
         return get(Connection::getType, null);
     }

@@ -34,13 +34,21 @@ public class MasterSlaveSwitchableConnectionSubscriber
                           ConnectionLoadBalanceConcept concept) {
         LockableConnection connection = new LockableConnection();
         masterConnectionSubscriber.subscribe(master -> {
-            connection.master = master;
-            onSuccess(connection, onSuccess);
+            if (master.isObservable()) {
+                connection.master = master;
+                onSuccess(connection, onSuccess);
+            } else {
+                onSuccess.accept(master);
+            }
         }, onError, onComplete, concept);
 
         slaveConnectionSubscriber.subscribe(slave -> {
-            connection.slave = slave;
-            onSuccess(connection, onSuccess);
+            if (slave.isObservable()) {
+                connection.slave = slave;
+                onSuccess(connection, onSuccess);
+            } else {
+                onSuccess.accept(slave);
+            }
         }, onError, onComplete, concept);
     }
 
@@ -122,11 +130,6 @@ public class MasterSlaveSwitchableConnectionSubscriber
         @Override
         public Object getId() {
             return getCurrent().getId();
-        }
-
-        @Override
-        public void setType(@NonNull String type) {
-            getCurrent().setType(type);
         }
 
         @Override

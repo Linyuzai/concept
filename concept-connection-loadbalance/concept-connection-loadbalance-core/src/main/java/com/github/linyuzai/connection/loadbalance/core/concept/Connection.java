@@ -5,10 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetr
 import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -24,20 +25,24 @@ public interface Connection {
     Object getId();
 
     /**
-     * 设置连接类型
-     *
-     * @param type 连接类型
-     * @see Type
-     */
-    void setType(@NonNull String type);
-
-    /**
      * 获得该连接的类型
      *
      * @return 连接类型
      * @see Type
      */
     String getType();
+
+    default boolean isClientType() {
+       return Type.isClient(getType());
+    }
+
+    default boolean isSubscriber() {
+        return Type.isSubscriber(getType());
+    }
+
+    default boolean isObservable() {
+        return Type.isObservable(getType());
+    }
 
     /**
      * 获得连接的元数据
@@ -178,35 +183,37 @@ public interface Connection {
     /**
      * 连接类型
      */
-    class Type {
+    interface Type {
 
         /**
          * 普通的客户端连接
          */
-        public static final String CLIENT = "Connection@client";
+        String CLIENT = "Connection@client";
 
         /**
          * 用于监听其他服务的连接
          * <p>
          * 接收转发的消息
          */
-        public static final String SUBSCRIBER = "Connection@subscriber";
+        String SUBSCRIBER = "Connection@subscriber";
 
         /**
          * 用于被其他服务监听的连接
          * <p>
          * 转发消息
          */
-        public static final String OBSERVABLE = "Connection@observable";
+        String OBSERVABLE = "Connection@observable";
 
-        /**
-         * 未定义的类型
-         * <p>
-         * 用于无法区分的连接类型
-         * <p>
-         * 暂未用到
-         */
-        @Deprecated
-        public static final String UNDEFINED = "Connection@undefined";
+        static boolean isClient(String type) {
+            return CLIENT.equals(type);
+        }
+
+        static boolean isSubscriber(String type) {
+            return SUBSCRIBER.equals(type);
+        }
+
+        static boolean isObservable(String type) {
+            return OBSERVABLE.equals(type);
+        }
     }
 }

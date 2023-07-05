@@ -39,7 +39,7 @@ public class WebSocketLoadBalanceConfig {
             public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
                 if (event instanceof ConnectionEvent) {
                     Connection connection = ((ConnectionEvent) event).getConnection();
-                    if (Connection.Type.CLIENT.equals(connection.getType())) {
+                    if (connection.isClientType()) {
                         if (event instanceof ConnectionEstablishEvent) {
                             System.out.println("Open " + connection.getMetadata());
                         } else if (event instanceof ConnectionCloseEvent) {

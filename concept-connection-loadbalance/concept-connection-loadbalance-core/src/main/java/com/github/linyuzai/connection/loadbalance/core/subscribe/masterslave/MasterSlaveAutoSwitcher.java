@@ -82,7 +82,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
 
     public MasterSlaveConnection getMasterConnection(Connection connection,
                                                      ConnectionLoadBalanceConcept concept) {
-        if (!Connection.Type.OBSERVABLE.equals(connection.getType())) {
+        if (!connection.isObservable()) {
             return null;
         }
         Collection<Connection> select = concept.getConnectionRepository()

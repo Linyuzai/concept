@@ -13,12 +13,12 @@ public interface LifecycleListener extends ConnectionEventListener {
     default void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ConnectionEstablishEvent) {
             Connection connection = ((ConnectionEstablishEvent) event).getConnection();
-            if (Connection.Type.CLIENT.equals(connection.getType())) {
+            if (connection.isClientType()) {
                 onEstablish(connection, concept);
             }
         } else if (event instanceof ConnectionCloseEvent) {
             Connection connection = ((ConnectionCloseEvent) event).getConnection();
-            if (Connection.Type.CLIENT.equals(connection.getType())) {
+            if (connection.isClientType()) {
                 onClose(connection, ((ConnectionCloseEvent) event).getReason(), concept);
             }
         }

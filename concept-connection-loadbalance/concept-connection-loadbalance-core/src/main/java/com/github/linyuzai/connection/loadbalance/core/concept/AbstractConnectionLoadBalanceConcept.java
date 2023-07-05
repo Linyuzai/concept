@@ -4,6 +4,8 @@ import com.github.linyuzai.connection.loadbalance.core.event.*;
 import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadBalanceException;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutor;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLogger;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeErrorEvent;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -92,6 +94,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
      * 定时执行器
      */
     protected ScheduledExecutor scheduledExecutor;
+
+    /**
+     * 日志
+     */
+    protected ConnectionLogger logger;
 
     /**
      * 事件发布者
@@ -479,6 +486,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
         protected List<ScheduledExecutorFactory> scheduledExecutorFactories = new ArrayList<>();
 
+        protected List<ConnectionLoggerFactory> loggerFactories = new ArrayList<>();
+
         protected List<ConnectionEventPublisherFactory> eventPublisherFactories = new ArrayList<>();
 
         protected List<ConnectionEventListener> eventListeners = new ArrayList<>();
@@ -539,6 +548,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return (B) this;
         }
 
+        /**
+         * 添加消息重试策略适配器
+         */
         public B addMessageRetryStrategyAdapters(Collection<? extends MessageRetryStrategyAdapter> adapters) {
             this.messageRetryStrategyAdapters.addAll(adapters);
             return (B) this;
@@ -557,6 +569,14 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
          */
         public B addScheduledExecutorFactories(Collection<ScheduledExecutorFactory> factories) {
             this.scheduledExecutorFactories.addAll(factories);
+            return (B) this;
+        }
+
+        /**
+         * 添加日志工厂
+         */
+        public B addLoggerFactories(Collection<ConnectionLoggerFactory> factories) {
+            this.loggerFactories.addAll(factories);
             return (B) this;
         }
 
@@ -621,6 +641,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     withScopeFactory(MessageIdempotentVerifier.class, messageIdempotentVerifierFactories)));
             concept.setScheduledExecutor(ScheduledExecutor.Delegate.delegate(concept,
                     withScopeFactory(ScheduledExecutor.class, scheduledExecutorFactories)));
+            concept.setLogger(ConnectionLogger.Delegate.delegate(concept,
+                    withScopeFactory(ConnectionLogger.class, loggerFactories)));
             ConnectionEventPublisher publisher = ConnectionEventPublisher.Delegate.delegate(concept,
                     withScopeFactory(ConnectionEventPublisher.class, eventPublisherFactories));
             publisher.register(withScope(eventListeners));

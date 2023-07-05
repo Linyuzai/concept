@@ -10,8 +10,6 @@ import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepo
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactoryImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -60,8 +58,7 @@ public class ConnectionLoadBalanceConfiguration {
 
     @Bean
     public ErrorHandler errorHandler() {
-        Log log = LogFactory.getLog(ErrorLogger.class);
-        return new ErrorLogger(log::info, log::error);
+        return new ErrorLogger();
     }
 
     @Bean

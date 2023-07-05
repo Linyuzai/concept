@@ -13,7 +13,6 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.redisson.Redisso
 import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionSubscriberFactory;
@@ -22,8 +21,6 @@ import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWeb
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketLoadBalanceHandlerMapping;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketLoadBalanceConfigurer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
@@ -250,19 +247,9 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
 
         @Bean
         @ConditionalOnMissingBean
-        public ConnectionSubscribeLogger connectionSubscribeLogger() {
-            Log log = LogFactory.getLog(ConnectionSubscribeLogger.class);
-            return new ConnectionSubscribeLogger(log::info, log::error)
-                    .addScopes(WebSocketScoped.NAME);
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.logger", havingValue = "true")
         public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
-            Log log = LogFactory.getLog(LoadBalanceMonitorLogger.class);
-            return new LoadBalanceMonitorLogger(log::info, log::error)
-                    .addScopes(WebSocketScoped.NAME);
+            return new LoadBalanceMonitorLogger().addScopes(WebSocketScoped.NAME);
         }
 
         @Bean

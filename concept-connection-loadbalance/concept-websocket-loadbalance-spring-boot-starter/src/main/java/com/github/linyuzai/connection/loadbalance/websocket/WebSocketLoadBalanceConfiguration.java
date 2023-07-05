@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.logger.ConnectionLoggerFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
@@ -7,12 +8,14 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPubl
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapterImpl;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
@@ -116,6 +119,11 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
+    public ConnectionSubscribeLogger connectionSubscribeLogger() {
+        return new ConnectionSubscribeLogger().addScopes(WebSocketScoped.NAME);
+    }
+
+    @Bean
     public MessageRetryStrategyAdapter wsMessageRetryStrategyAdapter(WebSocketLoadBalanceProperties properties) {
         MessageRetryStrategyAdapterImpl adapter = new MessageRetryStrategyAdapterImpl();
         int clientTimes = properties.getServer().getMessage().getRetry().getTimes();
@@ -142,6 +150,14 @@ public class WebSocketLoadBalanceConfiguration {
     public ScheduledExecutorFactory wsScheduledExecutorFactory() {
         return new ScheduledExecutorFactoryImpl()
                 .addScopes(WebSocketScoped.NAME);
+    }
+
+    @Bean
+    public ConnectionLoggerFactory nettyConnectionLoggerFactory() {
+        ConnectionLoggerFactoryImpl factory = new ConnectionLoggerFactoryImpl();
+        factory.setTag("LBWebSocket >> ");
+        factory.addScopes(WebSocketScoped.NAME);
+        return factory;
     }
 
     @Bean
@@ -188,6 +204,7 @@ public class WebSocketLoadBalanceConfiguration {
             List<MessageRetryStrategyAdapter> messageRetryStrategyAdapters,
             List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories,
             List<ScheduledExecutorFactory> scheduledExecutorFactories,
+            List<ConnectionLoggerFactory> loggerFactories,
             List<ConnectionEventPublisherFactory> eventPublisherFactories,
             List<ConnectionEventListener> eventListeners) {
         return new WebSocketLoadBalanceConcept.Builder()
@@ -200,9 +217,10 @@ public class WebSocketLoadBalanceConfiguration {
                 .addMessageCodecAdapters(messageCodecAdapters)
                 .addMessageRetryStrategyAdapters(messageRetryStrategyAdapters)
                 .addMessageIdempotentVerifierFactories(messageIdempotentVerifierFactories)
+                .addScheduledExecutorFactories(scheduledExecutorFactories)
+                .addLoggerFactories(loggerFactories)
                 .addEventPublisherFactories(eventPublisherFactories)
                 .addEventListeners(eventListeners)
-                .addScheduledExecutorFactories(scheduledExecutorFactories)
                 .build();
     }
 }

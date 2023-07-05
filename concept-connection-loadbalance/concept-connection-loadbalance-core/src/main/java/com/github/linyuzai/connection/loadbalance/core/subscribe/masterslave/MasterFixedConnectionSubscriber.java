@@ -25,7 +25,13 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
 
     @Override
     public void subscribe(Consumer<Connection> onSuccess, Consumer<Throwable> onError, Runnable onComplete, ConnectionLoadBalanceConcept concept) {
-        masterConnectionSubscriber.subscribe(MasterConnection::new, onError, onComplete, concept);
+        masterConnectionSubscriber.subscribe(master -> {
+            if (master.isObservable()) {
+                onSuccess.accept(new MasterConnection(master));
+            } else {
+                onSuccess.accept(master);
+            }
+        }, onError, onComplete, concept);
     }
 
     @Getter
@@ -78,11 +84,6 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
         @Override
         public Object getId() {
             return master.getId();
-        }
-
-        @Override
-        public void setType(@NonNull String type) {
-            master.setType(type);
         }
 
         @Override

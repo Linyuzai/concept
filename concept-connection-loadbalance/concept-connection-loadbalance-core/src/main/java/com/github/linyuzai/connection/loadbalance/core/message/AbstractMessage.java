@@ -58,6 +58,6 @@ public abstract class AbstractMessage<T> implements Message {
 
     @Override
     public void setFrom(String from) {
-        getHeaders().put(FORWARD, from);
+        getHeaders().put(FROM, from);
     }
 }

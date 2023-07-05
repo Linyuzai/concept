@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.logger.ConnectionLoggerFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
@@ -7,6 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPubl
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
+import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifierFactory;
@@ -16,6 +18,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetr
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
@@ -119,6 +122,11 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Bean
+    public ConnectionSubscribeLogger connectionSubscribeLogger() {
+        return new ConnectionSubscribeLogger().addScopes(NettyScoped.NAME);
+    }
+
+    @Bean
     public MessageRetryStrategyAdapter nettyMessageRetryStrategyAdapter(NettyLoadBalanceProperties properties) {
         MessageRetryStrategyAdapterImpl adapter = new MessageRetryStrategyAdapterImpl();
         int clientTimes = properties.getServer().getMessage().getRetry().getTimes();
@@ -145,6 +153,14 @@ public class NettyLoadBalanceConfiguration {
     public ScheduledExecutorFactory nettyScheduledExecutorFactory() {
         return new ScheduledExecutorFactoryImpl()
                 .addScopes(NettyScoped.NAME);
+    }
+
+    @Bean
+    public ConnectionLoggerFactory nettyConnectionLoggerFactory() {
+        ConnectionLoggerFactoryImpl factory = new ConnectionLoggerFactoryImpl();
+        factory.setTag("LBNetty >> ");
+        factory.addScopes(NettyScoped.NAME);
+        return factory;
     }
 
     @Bean
@@ -175,6 +191,7 @@ public class NettyLoadBalanceConfiguration {
             List<MessageRetryStrategyAdapter> messageRetryStrategyAdapters,
             List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories,
             List<ScheduledExecutorFactory> scheduledExecutorFactories,
+            List<ConnectionLoggerFactory> loggerFactories,
             List<ConnectionEventPublisherFactory> eventPublisherFactories,
             List<ConnectionEventListener> eventListeners) {
         return new NettyLoadBalanceConcept.Builder()
@@ -187,9 +204,10 @@ public class NettyLoadBalanceConfiguration {
                 .addMessageCodecAdapters(messageCodecAdapters)
                 .addMessageRetryStrategyAdapters(messageRetryStrategyAdapters)
                 .addMessageIdempotentVerifierFactories(messageIdempotentVerifierFactories)
+                .addScheduledExecutorFactories(scheduledExecutorFactories)
+                .addLoggerFactories(loggerFactories)
                 .addEventPublisherFactories(eventPublisherFactories)
                 .addEventListeners(eventListeners)
-                .addScheduledExecutorFactories(scheduledExecutorFactories)
                 .snapshot()
                 .build();
     }
