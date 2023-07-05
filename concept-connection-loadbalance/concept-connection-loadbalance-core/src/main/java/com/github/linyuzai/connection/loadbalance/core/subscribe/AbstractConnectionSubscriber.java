@@ -12,7 +12,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
 
     public static final String DELIMITER = "@";
 
-    public static final String PREFIX = "ConceptConnectionLB";
+    public static final String PREFIX = "LBConnection";
 
     @Override
     public synchronized void subscribe(Consumer<Connection> onSuccess,

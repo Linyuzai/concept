@@ -42,7 +42,8 @@ public class MessageCodecAdapterChain extends AbstractScoped implements MessageC
         if (index < messageCodecAdapters.size()) {
             MessageDecoder adapter =
                     messageCodecAdapters.get(index).getMessageDecoder(type, decoder);
-            return adaptMessageDecoder(index + 1, type, adapter);
+            MessageDecoder delegate = MessageDecoder.Delegate.delegate(concept, adapter);
+            return adaptMessageDecoder(index + 1, type, delegate);
         } else {
             return decoder;
         }

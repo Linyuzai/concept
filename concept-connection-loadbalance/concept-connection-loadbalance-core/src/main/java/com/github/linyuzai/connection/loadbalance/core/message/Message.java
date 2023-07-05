@@ -8,24 +8,24 @@ import java.util.Map;
 public interface Message {
 
     /**
-     * 标记该消息进行广播
+     * 标记该消息是否进行广播
      */
-    String BROADCAST = "_broadcast";
+    String BROADCAST = "_lb:broadcast";
 
     /**
-     * 标记该消息已经经过转发
+     * 标记该消息是否需要转发
      */
-    String FORWARD = "_forward";
+    String FORWARD = "_lb:forward";
 
     /**
      * 消息ID
      */
-    String ID = "_id";
+    String ID = "_lb:id";
 
     /**
      * 标记该消息由哪个实例发送
      */
-    String FROM = "_from";
+    String FROM = "_lb:from";
 
     /**
      * 获得消息头
@@ -49,11 +49,11 @@ public interface Message {
         return type.isInstance(getPayload());
     }
 
-    boolean isBroadcast();
+    boolean needBroadcast();
 
     void setBroadcast(boolean broadcast);
 
-    boolean isForward();
+    boolean needForward();
 
     void setForward(boolean forward);
 

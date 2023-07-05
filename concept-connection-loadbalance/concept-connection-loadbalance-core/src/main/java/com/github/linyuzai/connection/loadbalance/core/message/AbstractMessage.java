@@ -20,7 +20,7 @@ public abstract class AbstractMessage<T> implements Message {
     private T payload;
 
     @Override
-    public boolean isBroadcast() {
+    public boolean needBroadcast() {
         String broadcast = getHeaders().getOrDefault(BROADCAST, Boolean.TRUE.toString());
         return Boolean.parseBoolean(broadcast);
     }
@@ -31,17 +31,14 @@ public abstract class AbstractMessage<T> implements Message {
     }
 
     @Override
-    public boolean isForward() {
-        return getHeaders().containsKey(FORWARD);
+    public boolean needForward() {
+        String forward = getHeaders().getOrDefault(FORWARD, Boolean.TRUE.toString());
+        return Boolean.parseBoolean(forward);
     }
 
     @Override
     public void setForward(boolean forward) {
-        if (forward) {
-            getHeaders().put(FORWARD, Boolean.TRUE.toString());
-        } else {
-            getHeaders().remove(FORWARD);
-        }
+        getHeaders().put(FORWARD, Boolean.valueOf(forward).toString());
     }
 
     @Override

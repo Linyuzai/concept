@@ -398,6 +398,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         message.setId(messageId);
         ConnectionSelector selector = getConnectionSelector(message);
         Collection<Connection> connections = selector.select(message);
+        //设置不再转发，防止其他服务再次转发
+        message.setForward(false);
         if (connections == null || connections.isEmpty()) {
             eventPublisher.publish(new DeadMessageEvent(message));
             return;

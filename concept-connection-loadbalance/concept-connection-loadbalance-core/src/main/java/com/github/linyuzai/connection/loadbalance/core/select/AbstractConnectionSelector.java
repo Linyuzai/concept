@@ -36,12 +36,10 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
             return select;
         }
 
-        if (message.isForward()) {
+        if (!message.needForward()) {
             //已经被其他服务转发的就不再转发
             return select;
         }
-        //添加转发标记，防止其他服务再次转发
-        message.setForward(true);
 
         Collection<Connection> observables = repository.select(Connection.Type.OBSERVABLE);
 
@@ -50,7 +48,7 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
             return observables;
         }
 
-        if (message.isBroadcast()) {
+        if (message.needBroadcast()) {
             //广播
             List<Connection> combine = new ArrayList<>(select.size() + observables.size());
             combine.addAll(select);

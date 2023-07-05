@@ -258,7 +258,7 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
 
         @Bean
         @ConditionalOnMissingBean
-        @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.logger", havingValue = "true", matchIfMissing = true)
+        @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.logger", havingValue = "true")
         public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
             Log log = LogFactory.getLog(LoadBalanceMonitorLogger.class);
             return new LoadBalanceMonitorLogger(log::info, log::error)

@@ -2,17 +2,37 @@ package com.github.linyuzai.connection.loadbalance.netty.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
 
-    private Builder builder;
+    @Getter
+    private final Map<Object, NettyLoadBalanceConcept> concepts;
 
-    public Builder toBuilder() {
-        return builder.copy();
+    private final Builder builder;
+
+    public NettyLoadBalanceConcept createConcept(Object key) {
+        return createConcept(key, unused -> {
+        });
+    }
+
+    public NettyLoadBalanceConcept createConcept(Object key,
+                                                 Consumer<Builder> consumer) {
+        if (concepts.containsKey(key)) {
+            throw new IllegalArgumentException("Key exist: " + key);
+        }
+        Builder duplicate = builder.duplicate();
+        consumer.accept(duplicate);
+        NettyLoadBalanceConcept concept = duplicate.build();
+        concepts.put(key, concept);
+        return concept;
     }
 
     @Override
@@ -26,6 +46,8 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
 
     public static class Builder extends AbstractBuilder<Builder, NettyLoadBalanceConcept> {
 
+        protected Map<Object, NettyLoadBalanceConcept> conceptMap;
+
         protected Builder snapshot;
 
         @Override
@@ -35,15 +57,15 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
 
         @Override
         protected NettyLoadBalanceConcept create() {
-            return new NettyLoadBalanceConcept(this.snapshot);
+            return new NettyLoadBalanceConcept(this.conceptMap, this.snapshot);
         }
 
         public Builder snapshot() {
-            this.snapshot = copy();
+            this.snapshot = duplicate();
             return this;
         }
 
-        protected Builder copy() {
+        protected Builder duplicate() {
             Builder builder = new Builder();
             builder.connectionRepositoryFactories = new ArrayList<>(connectionRepositoryFactories);
             builder.connectionServerManagerFactories = new ArrayList<>(connectionServerManagerFactories);
@@ -57,6 +79,10 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
             builder.scheduledExecutorFactories = new ArrayList<>(scheduledExecutorFactories);
             builder.eventPublisherFactories = new ArrayList<>(eventPublisherFactories);
             builder.eventListeners = new ArrayList<>(eventListeners);
+            if (conceptMap == null) {
+                conceptMap = new ConcurrentHashMap<>();
+            }
+            builder.conceptMap = conceptMap;
             builder.snapshot = builder;
             return builder;
         }
