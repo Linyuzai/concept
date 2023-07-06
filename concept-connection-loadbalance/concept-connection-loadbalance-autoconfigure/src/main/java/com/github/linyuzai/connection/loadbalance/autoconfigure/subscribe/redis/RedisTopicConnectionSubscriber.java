@@ -8,6 +8,9 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.Abs
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -78,12 +81,26 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
 
         @Override
         public String getHost() {
-            return null;
+            RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+            if (factory instanceof LettuceConnectionFactory) {
+                return ((LettuceConnectionFactory) factory).getHostName();
+            } else if (factory instanceof JedisConnectionFactory) {
+                return ((JedisConnectionFactory) factory).getHostName();
+            } else {
+                return null;
+            }
         }
 
         @Override
         public int getPort() {
-            return 0;
+            RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+            if (factory instanceof LettuceConnectionFactory) {
+                return ((LettuceConnectionFactory) factory).getPort();
+            } else if (factory instanceof JedisConnectionFactory) {
+                return ((JedisConnectionFactory) factory).getPort();
+            } else {
+                return 0;
+            }
         }
 
         @Override

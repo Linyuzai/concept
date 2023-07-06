@@ -15,12 +15,16 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
         try {
             recoverMasterIfNecessary(event, concept);
         } catch (Throwable e) {
-            concept.getEventPublisher().publish(new MasterRecoverErrorEvent(e));
+            concept.getEventPublisher()
+                    .publish(new MasterSlaveSwitchErrorEvent(
+                            new MasterSlaveSwitchException("Master recover failure", e), MasterSlave.MASTER));
         }
         try {
             switchSlaveIfNecessary(event, concept);
         } catch (Throwable e) {
-            concept.getEventPublisher().publish(new SlaveSwitchErrorEvent(e));
+            concept.getEventPublisher()
+                    .publish(new MasterSlaveSwitchErrorEvent(
+                            new MasterSlaveSwitchException("Slave switch failure", e), MasterSlave.SLAVE1));
         }
     }
 
@@ -37,7 +41,9 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                 connection.switchover(switcher -> {
                     if (validateSlaveAndTimestamp(connection, timestamp)) {
                         if (switcher.switchMaster()) {
-                            concept.getEventPublisher().publish(new MasterRecoverEvent(connection));
+                            concept.getEventPublisher()
+                                    .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.MASTER));
+                            concept.getLogger().info("Switch to master");
                         }
                     }
                 });
@@ -66,12 +72,15 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                 connection.switchover(switcher -> {
                     if (validateMasterAndTimestamp(connection, timestamp)) {
                         if (switcher.switchSlave()) {
+                            concept.getEventPublisher()
+                                    .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.SLAVE1));
                             try {
                                 //正常情况下，MessageTransportException不会直接抛出异常
                                 connection.send(message);
                             } catch (Throwable e) {
                                 concept.getEventPublisher()
                                         .publish(new MessageSendErrorEvent(connection, message, e));
+                                concept.getLogger().info("Switch to slave");
                             }
                         }
                     }

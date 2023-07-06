@@ -30,10 +30,14 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         RabbitFanoutSubscriberConnection connection = new RabbitFanoutSubscriberConnection();
         connection.setId(id);
         RabbitAdmin admin = new RabbitAdmin(rabbitTemplate);
-        admin.declareBinding(BindingBuilder.bind(new Queue(id))
-                .to(new FanoutExchange(topic)));
+        FanoutExchange exchange = new FanoutExchange(topic);
+        Queue queue = new Queue(id);
+        Binding binding = BindingBuilder.bind(queue).to(exchange);
+        admin.declareExchange(exchange);
+        admin.declareQueue(queue);
+        admin.declareBinding(binding);
         MessageListenerContainer container = createMessageListenerContainer();
-        container.setQueueNames(topic);
+        container.setQueueNames(id);
         container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
             onMessageReceived(connection, message);
             if (channel != null) {
@@ -47,7 +51,9 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
     }
 
     protected MessageListenerContainer createMessageListenerContainer() {
-        return rabbitListenerContainerFactory.createListenerContainer();
+        AcknowledgeRabbitListenerEndpoint endpoint =
+                new AcknowledgeRabbitListenerEndpoint(AcknowledgeMode.MANUAL);
+        return rabbitListenerContainerFactory.createListenerContainer(endpoint);
     }
 
     @Override

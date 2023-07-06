@@ -78,6 +78,7 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
 
         @Override
         public String getHost() {
+            //get方法用protect，不给读就算了，哼！
             return null;
         }
 
