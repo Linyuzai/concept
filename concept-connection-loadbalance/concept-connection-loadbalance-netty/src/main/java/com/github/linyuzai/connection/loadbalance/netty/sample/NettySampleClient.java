@@ -9,13 +9,23 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.function.Consumer;
 
+@Getter
 public class NettySampleClient {
 
-    public static void connect(String host, int port, Consumer<String> consumer) {
+    private Channel channel;
+
+    @Setter
+    private Consumer<String> consumer;
+
+    public void send(String msg) {
+        channel.writeAndFlush(msg);
+    }
+
+    public void connect(String host, int port) {
         EventLoopGroup worker = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -29,7 +39,7 @@ public class NettySampleClient {
                             pipeline.addLast(new LineBasedFrameDecoder(1024));
                             pipeline.addLast(new StringEncoder());
                             pipeline.addLast(new StringDecoder());
-                            pipeline.addLast(new ClientHandler(consumer));
+                            pipeline.addLast(new ClientHandler());
                         }
                     });
             ChannelFuture future = bootstrap.connect(host, port).sync();
@@ -41,15 +51,18 @@ public class NettySampleClient {
         }
     }
 
-    @Getter
-    @RequiredArgsConstructor
-    public static class ClientHandler extends ChannelInboundHandlerAdapter {
+    public class ClientHandler extends ChannelInboundHandlerAdapter {
 
-        private final Consumer<String> consumer;
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            channel = ctx.channel();
+        }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            consumer.accept(String.valueOf(msg));
+            if (consumer != null) {
+                consumer.accept(String.valueOf(msg));
+            }
         }
     }
 }

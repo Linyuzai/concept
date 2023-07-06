@@ -10,10 +10,20 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
 public class NettySampleServer {
 
-    public static void start(NettyLoadBalanceConcept concept, int port) {
+    private final NettyLoadBalanceConcept concept;
+
+    public void send(String msg) {
+        concept.send(msg);
+    }
+
+    public void start(int port) {
         EventLoopGroup boss = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
         try {
