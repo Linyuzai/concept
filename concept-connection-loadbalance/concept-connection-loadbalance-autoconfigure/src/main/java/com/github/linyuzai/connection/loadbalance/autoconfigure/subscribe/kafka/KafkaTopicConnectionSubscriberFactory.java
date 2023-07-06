@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.kafka;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka;
 
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriberFactory;

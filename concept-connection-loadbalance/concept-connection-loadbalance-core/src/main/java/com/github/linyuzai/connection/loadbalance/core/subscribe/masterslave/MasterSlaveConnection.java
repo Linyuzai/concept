@@ -18,7 +18,7 @@ public interface MasterSlaveConnection extends Connection {
 
     boolean isSlave(Connection connection);
 
-    void switchBy(Consumer<MasterSlaveSwitcher> consumer);
+    void switchover(Consumer<MasterSlaveSwitcher> consumer);
 
     interface MasterSlaveSwitcher {
 

@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -8,7 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.Abs
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
@@ -20,29 +20,31 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
 
-    private final RedisTemplate<?, ?> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
-    protected Connection create(String topic, String name, Connection subscriber, ConnectionLoadBalanceConcept concept) {
-        RedisTopicConnection connection = new RedisTopicConnection(Connection.Type.OBSERVABLE);
-        connection.setId(name);
-        connection.setTopic(topic);
-        connection.setRedisTemplate(redisTemplate);
-        RedisMessageListenerContainer container = newRedisMessageListenerContainer();
-        MessageListener listener = (message, pattern) -> onMessageReceived(subscriber, message);
-        connection.setCloseCallback(o -> {
-            //messageListenerContainer.removeMessageListener(listener);
-            if (container.isRunning()) {
-                container.stop();
-            }
-        });
+    protected Connection createSubscriber(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
+        RedisTopicSubscriberConnection connection = new RedisTopicSubscriberConnection();
+        connection.setId(id);
+        RedisMessageListenerContainer container = createRedisMessageListenerContainer();
+        MessageListener listener = (message, pattern) -> onMessageReceived(connection, message);
         container.addMessageListener(listener, new ChannelTopic(topic));
         container.afterPropertiesSet();
         container.start();
+        connection.setContainer(container);
         return connection;
     }
 
-    protected RedisMessageListenerContainer newRedisMessageListenerContainer() {
+    @Override
+    protected Connection createObservable(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
+        RedisTopicObservableConnection connection = new RedisTopicObservableConnection();
+        connection.setId(id);
+        connection.setTopic(topic);
+        connection.setRedisTemplate(redisTemplate);
+        return connection;
+    }
+
+    protected RedisMessageListenerContainer createRedisMessageListenerContainer() {
         RedisMessageListenerContainer messageListenerContainer = new RedisMessageListenerContainer();
         messageListenerContainer.setConnectionFactory(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         return messageListenerContainer;
@@ -54,7 +56,7 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
     }
 
     @Override
-    protected ConnectionServer getSubscriberServer() {
+    protected ConnectionServer getSubscribeServer() {
         return new RedisConnectionServer(redisTemplate);
     }
 
@@ -62,7 +64,7 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
     @RequiredArgsConstructor
     public static class RedisConnectionServer implements ConnectionServer {
 
-        private final RedisTemplate<?, ?> redisTemplate;
+        private final StringRedisTemplate redisTemplate;
 
         @Override
         public String getInstanceId() {

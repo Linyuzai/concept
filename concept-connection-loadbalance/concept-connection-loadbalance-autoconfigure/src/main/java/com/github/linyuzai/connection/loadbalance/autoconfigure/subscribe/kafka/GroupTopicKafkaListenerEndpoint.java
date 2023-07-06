@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.kafka;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

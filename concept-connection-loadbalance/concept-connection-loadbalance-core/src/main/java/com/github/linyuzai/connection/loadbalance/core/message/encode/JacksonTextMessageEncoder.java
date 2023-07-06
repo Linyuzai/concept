@@ -39,10 +39,10 @@ public class JacksonTextMessageEncoder implements MessageEncoder {
 
     @SneakyThrows
     @Override
-    public String encode(Message message, ConnectionLoadBalanceConcept concept) {
+    public Object encode(Message message, ConnectionLoadBalanceConcept concept) {
         Object payload = getPayload(message);
-        if (payload instanceof String) {
-            return (String) payload;
+        if (payload instanceof String || payload instanceof byte[]) {
+            return payload;
         }
         return objectMapper.writeValueAsString(payload);
     }

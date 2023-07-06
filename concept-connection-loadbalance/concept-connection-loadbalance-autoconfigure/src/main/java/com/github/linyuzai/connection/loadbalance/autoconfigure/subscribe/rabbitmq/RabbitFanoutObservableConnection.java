@@ -1,11 +1,10 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.rabbitmq.client.ShutdownNotifier;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.amqp.AmqpIOException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,7 +14,7 @@ import java.util.function.Consumer;
 
 @Setter
 @Getter
-public class RabbitFanoutConnection extends AliveForeverConnection {
+public class RabbitFanoutObservableConnection extends AliveForeverConnection {
 
     private String id;
 
@@ -23,12 +22,12 @@ public class RabbitFanoutConnection extends AliveForeverConnection {
 
     private RabbitTemplate rabbitTemplate;
 
-    public RabbitFanoutConnection(@NonNull String type) {
-        super(type);
+    public RabbitFanoutObservableConnection() {
+        super(Type.OBSERVABLE);
     }
 
-    public RabbitFanoutConnection(@NonNull String type, Map<Object, Object> metadata) {
-        super(type, metadata);
+    public RabbitFanoutObservableConnection(Map<Object, Object> metadata) {
+        super(Type.OBSERVABLE, metadata);
     }
 
     @Override
@@ -59,5 +58,10 @@ public class RabbitFanoutConnection extends AliveForeverConnection {
         } finally {
             onComplete.run();
         }
+    }
+
+    @Override
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        onComplete.run();
     }
 }

@@ -1,10 +1,9 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.kafka;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
@@ -18,7 +17,7 @@ import java.util.function.Consumer;
 
 @Setter
 @Getter
-public class KafkaTopicConnection extends AliveForeverConnection {
+public class KafkaTopicObservableConnection extends AliveForeverConnection {
 
     private String id;
 
@@ -26,12 +25,12 @@ public class KafkaTopicConnection extends AliveForeverConnection {
 
     private KafkaTemplate<?, Object> kafkaTemplate;
 
-    public KafkaTopicConnection(@NonNull String type) {
-        super(type);
+    public KafkaTopicObservableConnection() {
+        super(Type.OBSERVABLE);
     }
 
-    public KafkaTopicConnection(@NonNull String type, Map<Object, Object> metadata) {
-        super(type, metadata);
+    public KafkaTopicObservableConnection(Map<Object, Object> metadata) {
+        super(Type.OBSERVABLE, metadata);
     }
 
     @Override
@@ -66,5 +65,10 @@ public class KafkaTopicConnection extends AliveForeverConnection {
         } finally {
             onComplete.run();
         }
+    }
+
+    @Override
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        onComplete.run();
     }
 }

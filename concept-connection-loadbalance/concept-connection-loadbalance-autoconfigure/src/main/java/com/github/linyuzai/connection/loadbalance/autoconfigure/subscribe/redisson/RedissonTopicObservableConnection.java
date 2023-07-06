@@ -1,7 +1,6 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.redisson;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
-
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
@@ -19,20 +18,20 @@ import java.util.function.Consumer;
 
 @Getter
 @Setter
-public class RedissonTopicConnection extends AliveForeverConnection {
+public class RedissonTopicObservableConnection extends AliveForeverConnection {
 
     private Object id;
 
-    private RedissonClient redissonClient;
+    private RedissonClient client;
 
     private RTopic topic;
 
-    public RedissonTopicConnection(String type) {
-        super(type);
+    public RedissonTopicObservableConnection() {
+        super(Type.OBSERVABLE);
     }
 
-    public RedissonTopicConnection(String type, Map<Object, Object> metadata) {
-        super(type, metadata);
+    public RedissonTopicObservableConnection(Map<Object, Object> metadata) {
+        super(Type.OBSERVABLE, metadata);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class RedissonTopicConnection extends AliveForeverConnection {
     @Override
     public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            Redisson redisson = (Redisson) redissonClient;
+            Redisson redisson = (Redisson) client;
             RFuture<String> future = redisson.getCommandExecutor()
                     .readAsync((byte[]) null, StringCodec.INSTANCE, RedisCommands.PING);
             String pong = redisson.getCommandExecutor().get(future);
@@ -66,5 +65,10 @@ public class RedissonTopicConnection extends AliveForeverConnection {
         } finally {
             onComplete.run();
         }
+    }
+
+    @Override
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        onComplete.run();
     }
 }

@@ -171,6 +171,7 @@ public class NettyLoadBalanceConfiguration {
         long timeout = properties.getLoadBalance().getHeartbeat().getTimeout();
         long period = properties.getLoadBalance().getHeartbeat().getPeriod();
         ConnectionHeartbeatManager manager = new ConnectionHeartbeatManager();
+        manager.getConnectionTypes().add(Connection.Type.SUBSCRIBER);
         manager.getConnectionTypes().add(Connection.Type.OBSERVABLE);
         manager.setTimeout(timeout);
         manager.setPeriod(period);

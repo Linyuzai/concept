@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCodecAdapter;

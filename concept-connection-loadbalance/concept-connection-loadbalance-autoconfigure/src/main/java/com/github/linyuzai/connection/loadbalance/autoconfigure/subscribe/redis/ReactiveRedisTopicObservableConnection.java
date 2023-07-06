@@ -1,10 +1,9 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.ReactiveRedisConnection;
@@ -15,7 +14,7 @@ import java.util.function.Consumer;
 
 @Getter
 @Setter
-public class ReactiveRedisTopicConnection extends AliveForeverConnection {
+public class ReactiveRedisTopicObservableConnection extends AliveForeverConnection {
 
     private Object id;
 
@@ -23,12 +22,12 @@ public class ReactiveRedisTopicConnection extends AliveForeverConnection {
 
     private ReactiveRedisTemplate<?, Object> reactiveRedisTemplate;
 
-    public ReactiveRedisTopicConnection(@NonNull String type) {
-        super(type);
+    public ReactiveRedisTopicObservableConnection() {
+        super(Type.OBSERVABLE);
     }
 
-    public ReactiveRedisTopicConnection(@NonNull String type, Map<Object, Object> metadata) {
-        super(type, metadata);
+    public ReactiveRedisTopicObservableConnection(Map<Object, Object> metadata) {
+        super(Type.OBSERVABLE, metadata);
     }
 
     @Override
@@ -45,15 +44,26 @@ public class ReactiveRedisTopicConnection extends AliveForeverConnection {
 
     @Override
     public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-        getConnection().ping().subscribe(pong -> {
-            if ("PONG".equalsIgnoreCase(pong)) {
-                onSuccess.run();
-            } else {
-                onError.accept(new IllegalStateException("Redis ping: " + pong));
-            }
-        }, onError, () -> getConnection().closeLater().subscribe(v -> {
-        }, e -> {
-        }, onComplete));
+        try {
+            ReactiveRedisConnection connection = getConnection();
+
+            connection.ping().subscribe(pong -> {
+                if ("PONG".equalsIgnoreCase(pong)) {
+                    onSuccess.run();
+                } else {
+                    onError.accept(new IllegalStateException("Redis ping: " + pong));
+                }
+            }, onError, () -> connection.closeLater().subscribe(v -> {
+            }, e -> {
+            }, onComplete));
+        } catch (Throwable ignore) {
+            onComplete.run();
+        }
+    }
+
+    @Override
+    public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        onComplete.run();
     }
 
     protected ReactiveRedisConnection getConnection() {

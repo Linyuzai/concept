@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.kafka;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -26,38 +26,47 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
     private final KafkaListenerContainerFactory<? extends MessageListenerContainer> kafkaListenerContainerFactory;
 
     @Override
-    protected Connection create(String topic, String name, Connection subscriber, ConnectionLoadBalanceConcept concept) {
-        KafkaTopicConnection connection = new KafkaTopicConnection(Connection.Type.OBSERVABLE);
-        connection.setId(name);
-        connection.setTopic(topic);
-        connection.setKafkaTemplate(kafkaTemplate);
-        KafkaListenerEndpoint endpoint = new GroupTopicKafkaListenerEndpoint(name, topic);
-        MessageListenerContainer container = kafkaListenerContainerFactory.createListenerContainer(endpoint);
+    protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
+                                          ConnectionLoadBalanceConcept concept) {
+        KafkaTopicSubscriberConnection connection = new KafkaTopicSubscriberConnection();
+        connection.setId(id);
+        KafkaListenerEndpoint endpoint = new GroupTopicKafkaListenerEndpoint(id, topic);
+        MessageListenerContainer container = createMessageListenerContainer(endpoint);
         ContainerProperties.AckMode mode = container.getContainerProperties().getAckMode();
         Object listener;
         if (mode == ContainerProperties.AckMode.MANUAL || mode == ContainerProperties.AckMode.MANUAL_IMMEDIATE) {
             listener = (AcknowledgingMessageListener<Object, Object>) (data, acknowledgment) -> {
-                onMessageReceived(subscriber, data);
+                onMessageReceived(connection, data);
                 if (acknowledgment != null) {
                     acknowledgment.acknowledge();
                 }
             };
         } else {
             listener = (MessageListener<Object, Object>) data ->
-                    onMessageReceived(subscriber, data);
+                    onMessageReceived(connection, data);
         }
-        connection.setCloseCallback(reason -> {
-            if (container.isRunning()) {
-                container.stop();
-            }
-        });
         container.setupMessageListener(listener);
         container.start();
+        connection.setContainer(container);
+        return connection;
+    }
+
+    protected MessageListenerContainer createMessageListenerContainer(KafkaListenerEndpoint endpoint) {
+        return kafkaListenerContainerFactory.createListenerContainer(endpoint);
+    }
+
+    @Override
+    protected Connection createObservable(String id, String topic, Map<Object, Object> context,
+                                          ConnectionLoadBalanceConcept concept) {
+        KafkaTopicObservableConnection connection = new KafkaTopicObservableConnection();
+        connection.setId(id);
+        connection.setTopic(topic);
+        connection.setKafkaTemplate(kafkaTemplate);
         return connection;
     }
 
     @Override
-    protected ConnectionServer getSubscriberServer() {
+    protected ConnectionServer getSubscribeServer() {
         return new KafkaConnectionServer(kafkaTemplate);
     }
 

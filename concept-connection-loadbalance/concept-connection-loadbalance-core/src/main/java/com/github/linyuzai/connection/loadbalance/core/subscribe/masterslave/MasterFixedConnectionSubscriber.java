@@ -67,7 +67,7 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
         }
 
         @Override
-        public void switchBy(Consumer<MasterSlaveSwitcher> consumer) {
+        public void switchover(Consumer<MasterSlaveSwitcher> consumer) {
             consumer.accept(this);
         }
 

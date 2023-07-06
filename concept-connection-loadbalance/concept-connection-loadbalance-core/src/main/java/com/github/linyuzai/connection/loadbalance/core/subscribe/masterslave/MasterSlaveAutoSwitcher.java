@@ -34,7 +34,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
             }
             long timestamp = ((MessageSendSuccessEvent) event).getTimestamp();
             if (validateSlaveAndTimestamp(connection, timestamp)) {
-                connection.switchBy(switcher -> {
+                connection.switchover(switcher -> {
                     if (validateSlaveAndTimestamp(connection, timestamp)) {
                         if (switcher.switchMaster()) {
                             concept.getEventPublisher().publish(new MasterRecoverEvent(connection));
@@ -63,7 +63,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
             }
             long timestamp = ((MessageSendErrorEvent) event).getTimestamp();
             if (validateMasterAndTimestamp(connection, timestamp)) {
-                connection.switchBy(switcher -> {
+                connection.switchover(switcher -> {
                     if (validateMasterAndTimestamp(connection, timestamp)) {
                         if (switcher.switchSlave()) {
                             try {

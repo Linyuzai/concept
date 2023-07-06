@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.redisson;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -21,19 +21,32 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
     private final boolean shared;
 
     @Override
-    protected Connection create(String topic, String name, Connection subscriber, ConnectionLoadBalanceConcept concept) {
+    protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
+                                          ConnectionLoadBalanceConcept concept) {
         RTopic rTopic;
         if (shared) {
             rTopic = client.getShardedTopic(topic);
         } else {
             rTopic = client.getTopic(topic);
         }
-        RedissonTopicConnection connection = new RedissonTopicConnection(Connection.Type.OBSERVABLE);
-        connection.setId(name);
+        context.put(RTopic.class, rTopic);
+        RedissonTopicSubscriberConnection connection = new RedissonTopicSubscriberConnection();
+        connection.setId(id);
         connection.setTopic(rTopic);
         int listener = rTopic.addListener(Object.class, (channel, object) ->
-                onMessageReceived(subscriber, object));
-        connection.setCloseCallback(reason -> rTopic.removeListenerAsync(listener));
+                onMessageReceived(connection, object));
+        connection.setListener(listener);
+        return connection;
+    }
+
+    @Override
+    protected Connection createObservable(String id, String topic, Map<Object, Object> context,
+                                          ConnectionLoadBalanceConcept concept) {
+        RTopic rTopic = (RTopic) context.get(RTopic.class);
+        RedissonTopicObservableConnection connection = new RedissonTopicObservableConnection();
+        connection.setId(id);
+        connection.setClient(client);
+        connection.setTopic(rTopic);
         return connection;
     }
 
@@ -43,7 +56,7 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
     }
 
     @Override
-    protected ConnectionServer getSubscriberServer() {
+    protected ConnectionServer getSubscribeServer() {
         return new RedissonConnectionServer(client);
     }
 

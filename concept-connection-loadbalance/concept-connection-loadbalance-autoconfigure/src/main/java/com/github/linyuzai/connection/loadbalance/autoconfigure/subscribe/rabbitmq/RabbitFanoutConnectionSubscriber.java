@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.rabbitmq;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -25,34 +25,43 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
     private final RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory;
 
     @Override
-    protected Connection create(String topic, String name, Connection subscriber, ConnectionLoadBalanceConcept concept) {
-        RabbitFanoutConnection connection = new RabbitFanoutConnection(Connection.Type.OBSERVABLE);
-        connection.setId(name);
-        connection.setExchange(topic);
-        connection.setRabbitTemplate(rabbitTemplate);
+    protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
+                                          ConnectionLoadBalanceConcept concept) {
+        RabbitFanoutSubscriberConnection connection = new RabbitFanoutSubscriberConnection();
+        connection.setId(id);
         RabbitAdmin admin = new RabbitAdmin(rabbitTemplate);
-        admin.declareBinding(BindingBuilder.bind(new Queue(name))
+        admin.declareBinding(BindingBuilder.bind(new Queue(id))
                 .to(new FanoutExchange(topic)));
-        MessageListenerContainer container = rabbitListenerContainerFactory.createListenerContainer();
+        MessageListenerContainer container = createMessageListenerContainer();
         container.setQueueNames(topic);
         container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
-            onMessageReceived(subscriber, message);
+            onMessageReceived(connection, message);
             if (channel != null) {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             }
         });
-        connection.setCloseCallback(reason -> {
-            if (container.isRunning()) {
-                container.stop();
-            }
-        });
         container.afterPropertiesSet();
         container.start();
+        connection.setContainer(container);
+        return connection;
+    }
+
+    protected MessageListenerContainer createMessageListenerContainer() {
+        return rabbitListenerContainerFactory.createListenerContainer();
+    }
+
+    @Override
+    protected Connection createObservable(String id, String topic, Map<Object, Object> context,
+                                          ConnectionLoadBalanceConcept concept) {
+        RabbitFanoutObservableConnection connection = new RabbitFanoutObservableConnection();
+        connection.setId(id);
+        connection.setExchange(topic);
+        connection.setRabbitTemplate(rabbitTemplate);
         return connection;
     }
 
     @Override
-    protected ConnectionServer getSubscriberServer() {
+    protected ConnectionServer getSubscribeServer() {
         return new RabbitConnectionServer(rabbitTemplate);
     }
 

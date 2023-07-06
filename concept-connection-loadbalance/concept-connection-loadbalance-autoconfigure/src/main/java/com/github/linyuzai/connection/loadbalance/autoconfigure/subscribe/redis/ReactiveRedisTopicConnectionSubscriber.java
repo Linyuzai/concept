@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -21,19 +21,22 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
     private final ReactiveRedisTemplate<?, Object> reactiveRedisTemplate;
 
     @Override
-    protected Connection create(String topic, String name, Connection subscriber, ConnectionLoadBalanceConcept concept) {
-        ReactiveRedisTopicConnection connection = new ReactiveRedisTopicConnection(Connection.Type.OBSERVABLE);
-        connection.setId(name);
+    protected Connection createSubscriber(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
+        ReactiveRedisTopicSubscriberConnection connection = new ReactiveRedisTopicSubscriberConnection();
+        connection.setId(id);
+        Disposable disposable = reactiveRedisTemplate.listenTo(new ChannelTopic(topic)).subscribe(
+                message -> onMessageReceived(connection, message),
+                e -> concept.onError(connection, e));
+        connection.setDisposable(disposable);
+        return connection;
+    }
+
+    @Override
+    protected Connection createObservable(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
+        ReactiveRedisTopicObservableConnection connection = new ReactiveRedisTopicObservableConnection();
+        connection.setId(id);
         connection.setTopic(topic);
         connection.setReactiveRedisTemplate(reactiveRedisTemplate);
-        Disposable disposable = reactiveRedisTemplate.listenTo(new ChannelTopic(topic)).subscribe(
-                message -> onMessageReceived(subscriber, message),
-                e -> concept.onError(subscriber, e));
-        connection.setCloseCallback(reason -> {
-            if (!disposable.isDisposed()) {
-                disposable.dispose();
-            }
-        });
         return connection;
     }
 
@@ -43,7 +46,7 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
     }
 
     @Override
-    protected ConnectionServer getSubscriberServer() {
+    protected ConnectionServer getSubscribeServer() {
         return new ReactiveRedisConnectionServer(reactiveRedisTemplate);
     }
 

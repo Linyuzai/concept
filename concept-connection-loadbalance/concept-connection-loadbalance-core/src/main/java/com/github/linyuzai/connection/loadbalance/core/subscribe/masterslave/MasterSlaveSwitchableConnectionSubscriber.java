@@ -108,7 +108,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @SneakyThrows
         @Override
-        public void switchBy(Consumer<MasterSlaveSwitcher> consumer) {
+        public void switchover(Consumer<MasterSlaveSwitcher> consumer) {
             lock.writeLock().lockInterruptibly();
             try {
                 consumer.accept(this);
