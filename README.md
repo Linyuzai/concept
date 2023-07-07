@@ -19,7 +19,7 @@
 - [MapQueue：支持元素更新的 Queue](../../wiki/Concept-MapQueue)
 - 长连接在服务集群场景下的解决方案
   - [一个配置注解实现 WebSocket 集群方案（1.x.x）](../../wiki/Concept-WebSocket-LoadBalance)
-  - 2.x.x（新增 Netty 支持，新增 Redis/RabbitMQ/Kafka 转发支持，测试中。。。）
+  - 2.x.x（新增 Netty 支持，新增 Redis/RabbitMQ/Kafka 转发支持，支持主从切换，测试中。。。）
 - Spring Cloud & Spring Boot 基建
   - [模块化项目生成插件（IDEA）](../../wiki/Concept-Cloud-Plugin-Intellij)
   - [全局请求响应拦截](../../wiki/Concept-Cloud-Web)
