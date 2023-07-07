@@ -437,10 +437,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         String messageId = messageIdempotentVerifier.generateMessageId(message);
         message.setId(messageId);
         ConnectionServer local = connectionServerManager.getLocal();
-        if (local != null) {
-            String from = local.getHost() + ":" + local.getPort();
-            message.setFrom(from);
-        }
+        message.setFrom(ConnectionServer.url(local));
     }
 
     /**

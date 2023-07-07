@@ -76,8 +76,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     }
 
     protected String getFrom(ConnectionLoadBalanceConcept concept) {
-        ConnectionServer local = getLocal(concept);
-        return local == null ? null : local.getHost() + ":" + local.getPort();
+        return ConnectionServer.url(getLocal(concept));
     }
 
     protected String getTopic(ConnectionServer server) {

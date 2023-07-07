@@ -10,6 +10,13 @@ import java.util.Map;
  */
 public interface ConnectionServer {
 
+    static String url(ConnectionServer server) {
+        if (server == null) {
+            return null;
+        }
+        return server.getHost() + ":" + server.getPort();
+    }
+
     /**
      * 获得服务实例 id
      *
