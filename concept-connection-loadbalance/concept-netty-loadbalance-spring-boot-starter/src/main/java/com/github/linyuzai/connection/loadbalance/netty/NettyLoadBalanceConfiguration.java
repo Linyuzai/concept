@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.ConnectionSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.logger.ConnectionLoggerFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
@@ -41,10 +42,10 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave1", havingValue = "REDISSON_TOPIC")
-    public static class RedissonTopicSubscriberSlave1Configuration
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDISSON_TOPIC")
+    public static class RedissonTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RedissonTopicConfiguration
-            implements NettySubscriberConfiguration.Slave1Provider {
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -55,10 +56,10 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave1", havingValue = "REDISSON_SHARED_TOPIC")
-    public static class RedissonSharedTopicSubscriberSlave1Configuration
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDISSON_SHARED_TOPIC")
+    public static class RedissonSharedTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RedissonSharedTopicConfiguration
-            implements NettySubscriberConfiguration.Slave1Provider {
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -71,10 +72,10 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave1", havingValue = "REDIS_TOPIC")
-    public static class RedisTopicSubscriberSlave1Configuration
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDIS_TOPIC")
+    public static class RedisTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RedisTopicConfiguration
-            implements NettySubscriberConfiguration.Slave1Provider {
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -87,10 +88,10 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave1", havingValue = "REDIS_TOPIC")
-    public static class ReactiveRedisTopicSubscriberSlave1Configuration
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDIS_TOPIC")
+    public static class ReactiveRedisTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.ReactiveRedisTopicConfiguration
-            implements NettySubscriberConfiguration.Slave1Provider {
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -101,10 +102,10 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave1", havingValue = "RABBIT_FANOUT")
-    public static class RabbitFanoutSubscriberSlave1Configuration
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "RABBIT_FANOUT")
+    public static class RabbitFanoutSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RabbitFanoutConfiguration
-            implements NettySubscriberConfiguration.Slave1Provider {
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -115,10 +116,10 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave1", havingValue = "KAFKA_TOPIC")
-    public static class KafkaTopicSubscriberSlave1Configuration
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "KAFKA_TOPIC")
+    public static class KafkaTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.KafkaTopicConfiguration
-            implements NettySubscriberConfiguration.Slave1Provider {
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Bean

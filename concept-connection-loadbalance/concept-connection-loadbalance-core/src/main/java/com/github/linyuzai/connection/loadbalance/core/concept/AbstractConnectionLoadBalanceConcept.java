@@ -678,7 +678,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                         case MASTER:
                             masters.add(factory);
                             break;
-                        case SLAVE1:
+                        case SLAVE:
                             slaves.add(factory);
                             break;
                     }
@@ -694,7 +694,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     return new MasterFixedConnectionSubscriber(master);
                 } else {
                     ConnectionSubscriber slave = withScopeFactory(ConnectionSubscriber.class, slaves);
-                    eventListeners.add(0, new MasterSlaveAutoSwitcher());
+                    eventListeners.add(0, new MasterSlaveAutoSwitcher().addScopes(getScope()));
                     return new MasterSlaveSwitchableConnectionSubscriber(master, slave);
                 }
             } else {

@@ -24,7 +24,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
         } catch (Throwable e) {
             concept.getEventPublisher()
                     .publish(new MasterSlaveSwitchErrorEvent(
-                            new MasterSlaveSwitchException("Slave switch failure", e), MasterSlave.SLAVE1));
+                            new MasterSlaveSwitchException("Slave switch failure", e), MasterSlave.SLAVE));
         }
     }
 
@@ -73,7 +73,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                     if (validateMasterAndTimestamp(connection, timestamp)) {
                         if (switcher.switchSlave()) {
                             concept.getEventPublisher()
-                                    .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.SLAVE1));
+                                    .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.SLAVE));
                             try {
                                 //正常情况下，MessageTransportException不会直接抛出异常
                                 connection.send(message);

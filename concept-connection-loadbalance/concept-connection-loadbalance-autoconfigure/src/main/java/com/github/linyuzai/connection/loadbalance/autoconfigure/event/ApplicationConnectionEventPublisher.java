@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.event;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherImpl;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,12 @@ public class ApplicationConnectionEventPublisher extends ConnectionEventPublishe
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public void publish(Object event) {
-        super.publish(event);
+    public void publish(Object event, ConnectionLoadBalanceConcept concept) {
+        super.publish(event, concept);
         try {
             publisher.publishEvent(event);
         } catch (Throwable e) {
-            handlePublishError(event, e);
+            handlePublishError(event, e, concept);
         }
     }
 }

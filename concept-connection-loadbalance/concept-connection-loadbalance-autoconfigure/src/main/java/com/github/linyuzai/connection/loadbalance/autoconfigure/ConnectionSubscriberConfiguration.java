@@ -34,11 +34,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
-    public interface Slave1Provider extends MasterSlaveProvider {
+    public interface SlaveProvider extends MasterSlaveProvider {
 
         @Override
         default MasterSlave getMasterSlave() {
-            return MasterSlave.SLAVE1;
+            return MasterSlave.SLAVE;
         }
     }
 

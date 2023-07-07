@@ -39,7 +39,7 @@ public class KafkaTopicObservableConnection extends AliveForeverConnection {
 
             @Override
             public void onFailure(Throwable e) {
-                if (e instanceof KafkaException) {
+                if (e instanceof KafkaException || e instanceof org.apache.kafka.common.KafkaException) {
                     onError.accept(new MessageTransportException(e));
                 } else {
                     onError.accept(e);

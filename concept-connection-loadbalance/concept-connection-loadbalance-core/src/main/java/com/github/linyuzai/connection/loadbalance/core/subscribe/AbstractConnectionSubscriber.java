@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public abstract class AbstractConnectionSubscriber implements ConnectionSubscriber {
 
-    public static final String DELIMITER = "@";
+    public static final String DELIMITER = "_";
 
     public static final String PREFIX = "LBConnection";
 

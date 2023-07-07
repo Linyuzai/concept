@@ -32,18 +32,18 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
             try {
                 listener.onEvent(event, concept);
             } catch (Throwable e) {
-                handlePublishError(event, e);
+                handlePublishError(event, e, concept);
             }
         }
     }
 
     @SneakyThrows
-    public void handlePublishError(Object event, Throwable e) {
+    public void handlePublishError(Object event, Throwable e, ConnectionLoadBalanceConcept concept) {
         if (event instanceof EventPublishErrorEvent) {
             throw ((EventPublishErrorEvent) event).getError();
         }
         //业务异常会关闭连接
-        publish(new EventPublishErrorEvent(event, e));
+        publish(new EventPublishErrorEvent(event, e), concept);
     }
 
     @Override

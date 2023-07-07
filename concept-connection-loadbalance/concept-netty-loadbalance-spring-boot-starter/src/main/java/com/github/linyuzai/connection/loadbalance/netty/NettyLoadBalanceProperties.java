@@ -40,7 +40,7 @@ public class NettyLoadBalanceProperties {
         /**
          * 从订阅类型，默认 NONE
          */
-        private Subscriber subscriberSlave1 = Subscriber.NONE;
+        private Subscriber subscriberSlave = Subscriber.NONE;
 
         /**
          * 消息配置

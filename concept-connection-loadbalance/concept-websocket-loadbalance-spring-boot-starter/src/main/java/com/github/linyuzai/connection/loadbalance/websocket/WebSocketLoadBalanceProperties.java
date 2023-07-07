@@ -98,7 +98,7 @@ public class WebSocketLoadBalanceProperties {
         /**
          * 从订阅类型，默认 NONE
          */
-        private SlaveSubscriber subscriberSlave1 = SlaveSubscriber.NONE;
+        private SlaveSubscriber subscriberSlave = SlaveSubscriber.NONE;
 
         /**
          * 消息配置
