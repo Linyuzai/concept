@@ -26,7 +26,7 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
     @Override
     public void subscribe(Consumer<Connection> onSuccess, Consumer<Throwable> onError, Runnable onComplete, ConnectionLoadBalanceConcept concept) {
         masterConnectionSubscriber.subscribe(master -> {
-            if (master.isObservable()) {
+            if (master.isObservableType()) {
                 onSuccess.accept(new MasterConnection(master));
             } else {
                 onSuccess.accept(master);

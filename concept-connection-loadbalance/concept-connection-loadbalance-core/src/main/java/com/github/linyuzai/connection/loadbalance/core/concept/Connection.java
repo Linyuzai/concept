@@ -5,9 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetr
 import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -36,11 +34,11 @@ public interface Connection {
        return Type.isClient(getType());
     }
 
-    default boolean isSubscriber() {
+    default boolean isSubscriberType() {
         return Type.isSubscriber(getType());
     }
 
-    default boolean isObservable() {
+    default boolean isObservableType() {
         return Type.isObservable(getType());
     }
 

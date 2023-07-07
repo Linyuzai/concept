@@ -17,7 +17,7 @@ public class ConnectionSubscribeLogger extends AbstractScoped implements Connect
     public void onEvent(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof ConnectionEstablishEvent) {
             Connection connection = ((ConnectionEstablishEvent) event).getConnection();
-            if (connection.isSubscriber()) {
+            if (connection.isSubscriberType()) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
                 concept.getLogger().info("Subscribe on " + getServer(server));
             }
@@ -30,7 +30,7 @@ public class ConnectionSubscribeLogger extends AbstractScoped implements Connect
         } else if (event instanceof ConnectionCloseEvent) {
             Connection connection = ((ConnectionCloseEvent) event).getConnection();
             Object reason = ((ConnectionCloseEvent) event).getReason();
-            if (connection.isSubscriber()) {
+            if (connection.isSubscriberType()) {
                 ConnectionServer server = (ConnectionServer) connection.getMetadata().get(ConnectionServer.class);
                 concept.getLogger().info("Unsubscribe on " + getServer(server) + getReason(reason));
             }

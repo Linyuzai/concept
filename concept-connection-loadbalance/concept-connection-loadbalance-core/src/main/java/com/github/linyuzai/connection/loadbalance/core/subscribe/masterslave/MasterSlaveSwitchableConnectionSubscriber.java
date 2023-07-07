@@ -34,7 +34,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
                           ConnectionLoadBalanceConcept concept) {
         LockableConnection connection = new LockableConnection();
         masterConnectionSubscriber.subscribe(master -> {
-            if (master.isObservable()) {
+            if (master.isObservableType()) {
                 connection.master = master;
                 onSuccess(connection, onSuccess);
             } else {
@@ -43,7 +43,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }, onError, onComplete, concept);
 
         slaveConnectionSubscriber.subscribe(slave -> {
-            if (slave.isObservable()) {
+            if (slave.isObservableType()) {
                 connection.slave = slave;
                 onSuccess(connection, onSuccess);
             } else {
