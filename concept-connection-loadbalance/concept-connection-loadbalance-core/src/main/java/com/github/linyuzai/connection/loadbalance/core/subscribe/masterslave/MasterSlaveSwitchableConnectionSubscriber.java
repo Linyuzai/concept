@@ -144,7 +144,8 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @Override
         public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
-            getCurrent().setMessageRetryStrategy(strategy);
+            master.setMessageRetryStrategy(strategy);
+            slave.setMessageRetryStrategy(strategy);
         }
 
         @Override
@@ -159,7 +160,8 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @Override
         public void setMessageEncoder(MessageEncoder encoder) {
-            getCurrent().setMessageEncoder(encoder);
+            master.setMessageEncoder(encoder);
+            slave.setMessageEncoder(encoder);
         }
 
         @Override
@@ -169,7 +171,8 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @Override
         public void setMessageDecoder(MessageDecoder decoder) {
-            getCurrent().setMessageDecoder(decoder);
+            master.setMessageDecoder(decoder);
+            slave.setMessageDecoder(decoder);
         }
 
         @Override
@@ -179,7 +182,8 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @Override
         public void setConcept(@NonNull ConnectionLoadBalanceConcept concept) {
-            getCurrent().setConcept(concept);
+            master.setConcept(concept);
+            slave.setConcept(concept);
         }
 
         @Override
@@ -189,23 +193,25 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         @Override
         public void send(@NonNull Message message) {
+            Connection curr = getCurrent();
             if (message instanceof PingMessage) {
-                if (isSlave(getCurrent())) {
-                    slave.send(message);
+                if (isSlave(curr)) {
+                    master.send(message);
                 }
             } else {
-                getCurrent().send(message);
+                curr.send(message);
             }
         }
 
         @Override
         public void send(@NonNull Message message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+            Connection curr = getCurrent();
             if (message instanceof PingMessage) {
-                if (isSlave(getCurrent())) {
-                    slave.send(message, onSuccess, onError, onComplete);
+                if (isSlave(curr)) {
+                    master.send(message, onSuccess, onError, onComplete);
                 }
             } else {
-                getCurrent().send(message, onSuccess, onError, onComplete);
+                curr.send(message, onSuccess, onError, onComplete);
             }
         }
 

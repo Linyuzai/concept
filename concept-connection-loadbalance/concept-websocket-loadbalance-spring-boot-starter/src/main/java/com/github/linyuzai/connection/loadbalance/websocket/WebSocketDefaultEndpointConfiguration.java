@@ -7,6 +7,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 
 public class WebSocketDefaultEndpointConfiguration {
 
@@ -27,6 +28,7 @@ public class WebSocketDefaultEndpointConfiguration {
     }
 
     @Bean
+    @Order(1000)
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.user-selector",
             name = "enabled", havingValue = "true")
     public DefaultEndpointUserMetadataRegister defaultEndpointUserMetadataRegister() {

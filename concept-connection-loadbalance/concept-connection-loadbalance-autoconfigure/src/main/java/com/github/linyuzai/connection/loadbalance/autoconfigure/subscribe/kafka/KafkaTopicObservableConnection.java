@@ -10,6 +10,7 @@ import org.apache.kafka.common.MetricName;
 import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.Map;
@@ -35,7 +36,19 @@ public class KafkaTopicObservableConnection extends AliveForeverConnection {
 
     @Override
     public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-        kafkaTemplate.send(topic, message).addCallback(new ListenableFutureCallback<SendResult<?, Object>>() {
+        ListenableFuture<? extends SendResult<?, Object>> send;
+        try {
+            send = kafkaTemplate.send(topic, message);
+        } catch (KafkaException | org.apache.kafka.common.KafkaException e) {
+            onError.accept(new MessageTransportException(e));
+            onComplete.run();
+            return;
+        } catch (Throwable e) {
+            onError.accept(e);
+            onComplete.run();
+            return;
+        }
+        send.addCallback(new ListenableFutureCallback<SendResult<?, Object>>() {
 
             @Override
             public void onFailure(Throwable e) {

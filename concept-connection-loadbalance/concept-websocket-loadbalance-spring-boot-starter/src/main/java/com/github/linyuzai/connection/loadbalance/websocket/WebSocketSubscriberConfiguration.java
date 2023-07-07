@@ -27,6 +27,7 @@ import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -240,12 +241,14 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public static class WebSocketBaseConfiguration {
 
         @Bean
+        @Order(100)
         @ConditionalOnMissingBean
         public ConnectionSubscribeHandler connectionSubscribeHandler() {
             return new ConnectionSubscribeHandler().addScopes(WebSocketScoped.NAME);
         }
 
         @Bean
+        @Order(300)
         @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.logger", havingValue = "true")
         public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
@@ -253,6 +256,7 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         }
 
         @Bean
+        @Order(300)
         @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.enabled", havingValue = "true", matchIfMissing = true)
         public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(

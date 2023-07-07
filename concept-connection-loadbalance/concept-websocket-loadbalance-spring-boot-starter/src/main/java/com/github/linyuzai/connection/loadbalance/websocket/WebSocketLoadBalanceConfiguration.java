@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
@@ -120,6 +121,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
+    @Order(100)
     public ConnectionSubscribeLogger connectionSubscribeLogger() {
         return new ConnectionSubscribeLogger().addScopes(WebSocketScoped.NAME);
     }
@@ -162,6 +164,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
+    @Order(200)
     @ConditionalOnProperty(prefix = "concept.websocket.server.heartbeat",
             name = "enabled", havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatManager wsClientConnectionHeartbeatManager(
@@ -177,6 +180,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
+    @Order(200)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.heartbeat.enabled",
             havingValue = "true", matchIfMissing = true)
     public ConnectionHeartbeatManager wsLoadBalanceConnectionHeartbeatManager(

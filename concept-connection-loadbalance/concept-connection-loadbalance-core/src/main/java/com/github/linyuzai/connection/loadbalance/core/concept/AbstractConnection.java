@@ -70,8 +70,8 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void send(@NonNull Message message) {
-        send(message, () -> {
-        }, e ->
+        send(message, () -> concept.getEventPublisher()
+                .publish(new MessageSendSuccessEvent(this, message)), e ->
                 concept.getEventPublisher()
                         .publish(new MessageSendErrorEvent(this, message, e)), () -> {
         });

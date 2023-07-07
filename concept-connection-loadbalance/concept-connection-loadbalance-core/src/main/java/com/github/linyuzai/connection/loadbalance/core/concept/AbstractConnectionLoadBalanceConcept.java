@@ -20,6 +20,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.AllSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSelectorChain;
+import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
@@ -401,8 +402,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     @Override
     public void send(Object msg) {
         Message message = createMessage(msg);
-        String messageId = messageIdempotentVerifier.generateMessageId(message);
-        message.setId(messageId);
+        initMessage(message);
         ConnectionSelector selector = getConnectionSelector(message);
         Collection<Connection> connections = selector.select(message);
         //设置不再转发，防止其他服务再次转发
@@ -431,6 +431,16 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Message message = createMessage(msg);
         message.getHeaders().putAll(headers);
         send(message);
+    }
+
+    protected void initMessage(Message message) {
+        String messageId = messageIdempotentVerifier.generateMessageId(message);
+        message.setId(messageId);
+        ConnectionServer local = connectionServerManager.getLocal();
+        if (local != null) {
+            String from = local.getHost() + ":" + local.getPort();
+            message.setFrom(from);
+        }
     }
 
     /**
@@ -617,7 +627,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     .addScopes(getScope()));
 
             //添加消息转发处理器
-            eventListeners.add(0, new MessageForwardHandler());
+            eventListeners.add(1, new MessageForwardHandler());
 
             T concept = create();
 
@@ -694,7 +704,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     return new MasterFixedConnectionSubscriber(master);
                 } else {
                     ConnectionSubscriber slave = withScopeFactory(ConnectionSubscriber.class, slaves);
-                    eventListeners.add(0, new MasterSlaveAutoSwitcher().addScopes(getScope()));
+                    eventListeners.add(1, new MasterSlaveAutoSwitcher().addScopes(getScope()));
                     return new MasterSlaveSwitchableConnectionSubscriber(master, slave);
                 }
             } else {

@@ -62,10 +62,6 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
             }
             Connection observable = createObservable(id, topic, context, concept);
             if (observable != null) {
-                observable.getMessageSendInterceptors().add((message, con) -> {
-                    message.setFrom(from);
-                    return true;
-                });
                 onSuccess.accept(observable);
             }
         } catch (Throwable e) {
