@@ -6,7 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.rabbitmq.client.ShutdownNotifier;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.amqp.AmqpIOException;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public class RabbitFanoutObservableConnection extends AliveForeverConnection {
         try {
             rabbitTemplate.convertAndSend(exchange, "", message);
             onSuccess.run();
-        } catch (AmqpIOException e) {
+        } catch (AmqpException e) {
             onError.accept(new MessageTransportException(e));
         } catch (Throwable e) {
             onError.accept(e);
