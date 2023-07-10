@@ -23,7 +23,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                           ConnectionLoadBalanceConcept concept) {
         ConnectionServer server = getSubscribeServer();
         try {
-            String topic = getTopic(server);
+            String topic = getTopic(concept, server);
             String from = getFrom(concept);
             String id = getId(topic, from);
 
@@ -79,8 +79,8 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         return ConnectionServer.url(getLocal(concept));
     }
 
-    protected String getTopic(ConnectionServer server) {
-        return PREFIX + DELIMITER + server.getServiceId();
+    protected String getTopic(ConnectionLoadBalanceConcept concept, ConnectionServer server) {
+        return PREFIX + DELIMITER + concept.getId() + DELIMITER + server.getServiceId();
     }
 
     protected ConnectionServer getLocal(ConnectionLoadBalanceConcept concept) {

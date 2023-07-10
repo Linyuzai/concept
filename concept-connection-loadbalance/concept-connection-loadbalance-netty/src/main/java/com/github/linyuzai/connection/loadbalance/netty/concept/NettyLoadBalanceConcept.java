@@ -18,6 +18,11 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
 
     private final Builder builder;
 
+    @Override
+    public String getId() {
+        return "netty";
+    }
+
     public NettyLoadBalanceConcept createConcept(Object key) {
         return createConcept(key, unused -> {
         });

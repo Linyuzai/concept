@@ -37,6 +37,11 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
         instance = this;
     }
 
+    @Override
+    public String getId() {
+        return "websocket";
+    }
+
     public static class Builder extends AbstractBuilder<Builder, WebSocketLoadBalanceConcept> {
 
         @Override

@@ -32,6 +32,8 @@ public interface ConnectionLoadBalanceConcept {
      */
     void destroy();
 
+    String getId();
+
     /**
      * 创建连接
      *

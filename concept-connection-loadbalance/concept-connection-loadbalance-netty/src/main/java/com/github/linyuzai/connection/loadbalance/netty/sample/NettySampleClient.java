@@ -22,7 +22,11 @@ public class NettySampleClient {
     private Consumer<String> consumer;
 
     public void send(String msg) {
-        channel.writeAndFlush(msg);
+        if (msg.endsWith("\n")) {
+            channel.writeAndFlush(msg);
+        } else {
+            channel.writeAndFlush(msg + "\n");
+        }
     }
 
     public void connect(String host, int port) {

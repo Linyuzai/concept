@@ -21,6 +21,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.netty.concept.NettyConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -124,8 +125,13 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Bean
+    public NettyConnectionFactory nettyConnectionFactory() {
+        return new NettyConnectionFactory();
+    }
+
+    @Bean
     @Order(100)
-    public ConnectionSubscribeLogger connectionSubscribeLogger() {
+    public ConnectionSubscribeLogger nettyConnectionSubscribeLogger() {
         return new ConnectionSubscribeLogger().addScopes(NettyScoped.NAME);
     }
 

@@ -122,7 +122,7 @@ public class WebSocketLoadBalanceConfiguration {
 
     @Bean
     @Order(100)
-    public ConnectionSubscribeLogger connectionSubscribeLogger() {
+    public ConnectionSubscribeLogger wsConnectionSubscribeLogger() {
         return new ConnectionSubscribeLogger().addScopes(WebSocketScoped.NAME);
     }
 
@@ -156,7 +156,7 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    public ConnectionLoggerFactory nettyConnectionLoggerFactory() {
+    public ConnectionLoggerFactory wsConnectionLoggerFactory() {
         ConnectionLoggerFactoryImpl factory = new ConnectionLoggerFactoryImpl();
         factory.setTag("LBWebSocket >> ");
         factory.addScopes(WebSocketScoped.NAME);
