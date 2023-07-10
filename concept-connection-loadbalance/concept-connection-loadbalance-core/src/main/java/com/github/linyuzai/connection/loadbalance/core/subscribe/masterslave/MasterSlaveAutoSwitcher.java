@@ -41,9 +41,9 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                 connection.switchover(switcher -> {
                     if (validateSlaveAndTimestamp(connection, timestamp)) {
                         if (switcher.switchMaster()) {
+                            concept.getLogger().info("Switch to master subscriber");
                             concept.getEventPublisher()
                                     .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.MASTER));
-                            concept.getLogger().info("Switch to master subscriber");
                         }
                     }
                 });
@@ -72,6 +72,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                 connection.switchover(switcher -> {
                     if (validateMasterAndTimestamp(connection, timestamp)) {
                         if (switcher.switchSlave()) {
+                            concept.getLogger().info("Switch to slave subscriber");
                             concept.getEventPublisher()
                                     .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.SLAVE));
                             try {
@@ -80,7 +81,6 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                             } catch (Throwable e) {
                                 concept.getEventPublisher()
                                         .publish(new MessageSendErrorEvent(connection, message, e));
-                                concept.getLogger().info("Switch to slave subscriber");
                             }
                         }
                     }
