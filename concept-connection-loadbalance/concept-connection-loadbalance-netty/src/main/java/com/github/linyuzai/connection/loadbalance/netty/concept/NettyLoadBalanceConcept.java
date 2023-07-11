@@ -18,7 +18,7 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
     protected void onDestroy() {
         for (String type : connectionRepository.types()) {
             for (Connection connection : connectionRepository.select(type)) {
-                connection.close();
+                connection.close("ServerStop");
             }
         }
     }

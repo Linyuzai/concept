@@ -22,6 +22,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.EmptyConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
@@ -38,28 +39,44 @@ import java.util.List;
 public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master", havingValue = "REDISSON_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "NONE", matchIfMissing = true)
+    public static class NoneSubscriberConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "nettyEmptyConnectionSubscriberFactory")
+        public EmptyConnectionSubscriberFactory nettyEmptyConnectionSubscriberFactory() {
+            return new EmptyConnectionSubscriberFactory().addScopes(NettyScoped.NAME);
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "REDISSON_TOPIC")
     public static class RedissonTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.RedissonTopicConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDISSON_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "REDISSON_TOPIC")
     public static class RedissonTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RedissonTopicConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master", havingValue = "REDISSON_SHARED_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "REDISSON_SHARED_TOPIC")
     public static class RedissonSharedTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.RedissonSharedTopicConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDISSON_SHARED_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "REDISSON_SHARED_TOPIC")
     public static class RedissonSharedTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RedissonSharedTopicConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {
@@ -67,7 +84,8 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master", havingValue = "REDIS_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.RedisTopicConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
@@ -75,7 +93,8 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDIS_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RedisTopicConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {
@@ -83,7 +102,8 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master", havingValue = "REDIS_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "REDIS_TOPIC")
     public static class ReactiveRedisTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.ReactiveRedisTopicConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
@@ -91,35 +111,40 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "REDIS_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "REDIS_TOPIC")
     public static class ReactiveRedisTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.ReactiveRedisTopicConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master", havingValue = "RABBIT_FANOUT")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "RABBIT_FANOUT")
     public static class RabbitFanoutSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.RabbitFanoutConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "RABBIT_FANOUT")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "RABBIT_FANOUT")
     public static class RabbitFanoutSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.RabbitFanoutConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master", havingValue = "KAFKA_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "KAFKA_TOPIC")
     public static class KafkaTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.KafkaTopicConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave", havingValue = "KAFKA_TOPIC")
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "KAFKA_TOPIC")
     public static class KafkaTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.KafkaTopicConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {
@@ -142,7 +167,8 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Bean
-    public MessageRetryStrategyAdapter nettyMessageRetryStrategyAdapter(NettyLoadBalanceProperties properties) {
+    public MessageRetryStrategyAdapter nettyMessageRetryStrategyAdapter(
+            NettyLoadBalanceProperties properties) {
         MessageRetryStrategyAdapterImpl adapter = new MessageRetryStrategyAdapterImpl();
         int clientTimes = properties.getServer().getMessage().getRetry().getTimes();
         int clientPeriod = properties.getServer().getMessage().getRetry().getPeriod();
@@ -165,7 +191,8 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Bean
-    public ScheduledExecutorFactory nettyScheduledExecutorFactory(NettyLoadBalanceProperties properties) {
+    public ScheduledExecutorFactory nettyScheduledExecutorFactory(
+            NettyLoadBalanceProperties properties) {
         ScheduledExecutorFactoryImpl factory = new ScheduledExecutorFactoryImpl();
         factory.setSize(properties.getExecutor().getSize());
         factory.addScopes(NettyScoped.NAME);
