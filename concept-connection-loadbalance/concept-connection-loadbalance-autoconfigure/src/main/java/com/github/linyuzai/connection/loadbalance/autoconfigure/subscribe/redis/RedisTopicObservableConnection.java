@@ -12,6 +12,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Redis 转发连接。
+ * <p>
+ * The connection to forward message by Redis.
+ */
 @Getter
 @Setter
 public class RedisTopicObservableConnection extends AliveForeverConnection {

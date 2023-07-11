@@ -16,6 +16,11 @@ import org.redisson.client.protocol.RedisCommands;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Redisson 转发连接。
+ * <p>
+ * The connection to forward message by Redisson.
+ */
 @Getter
 @Setter
 public class RedissonTopicObservableConnection extends AliveForeverConnection {

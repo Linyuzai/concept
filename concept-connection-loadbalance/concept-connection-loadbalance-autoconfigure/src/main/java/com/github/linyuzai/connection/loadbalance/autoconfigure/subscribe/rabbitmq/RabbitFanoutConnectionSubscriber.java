@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbi
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,13 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * RabbitMQ 连接订阅器。
+ * 使用 fanout 交换机，通过 {@link RabbitTemplate} 转发消息，通过 {@link RabbitListenerContainerFactory} 订阅消息
+ * <p>
+ * {@link ConnectionSubscriber} impl by RabbitMQ.
+ * Use fanout exchange, forward message by {@link RabbitTemplate}, listen message by {@link RabbitListenerContainerFactory}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
@@ -24,11 +32,18 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
 
     private final RabbitListenerContainerFactory<? extends MessageListenerContainer> rabbitListenerContainerFactory;
 
+    /**
+     * 创建 RabbitMQ 的监听连接。
+     * <p>
+     * Create the connection to listen message from RabbitMQ.
+     */
     @Override
     protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
                                           ConnectionLoadBalanceConcept concept) {
         RabbitFanoutSubscriberConnection connection = new RabbitFanoutSubscriberConnection();
         connection.setId(id);
+
+        //需要手动创建 交换机，队列，绑定关系
         RabbitAdmin admin = new RabbitAdmin(rabbitTemplate);
         FanoutExchange exchange = new FanoutExchange(topic);
         Queue queue = new Queue(id);
@@ -36,6 +51,7 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         admin.declareExchange(exchange);
         admin.declareQueue(queue);
         admin.declareBinding(binding);
+
         MessageListenerContainer container = createMessageListenerContainer();
         container.setQueueNames(id);
         container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
@@ -56,6 +72,11 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         return rabbitListenerContainerFactory.createListenerContainer(endpoint);
     }
 
+    /**
+     * 创建 RabbitMQ 的转发连接。
+     * <p>
+     * Create the connection to forward message by RabbitMQ.
+     */
     @Override
     protected Connection createObservable(String id, String topic, Map<Object, Object> context,
                                           ConnectionLoadBalanceConcept concept) {

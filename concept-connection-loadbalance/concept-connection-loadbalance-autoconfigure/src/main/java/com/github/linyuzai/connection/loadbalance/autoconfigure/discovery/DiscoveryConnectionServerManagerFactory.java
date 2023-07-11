@@ -3,17 +3,22 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.discovery;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.Registration;
 
+/**
+ * {@link DiscoveryConnectionServerManager} 工厂。
+ * <p>
+ * Factory of {@link DiscoveryConnectionServerManager}.
+ */
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class DiscoveryConnectionServerManagerFactory implements ConnectionServerManagerFactory {
 
-    private final DiscoveryClient discoveryClient;
+    private DiscoveryClient discoveryClient;
 
-    private final Registration registration;
+    private Registration registration;
 
     @Override
     public ConnectionServerManager create(String scope) {

@@ -19,13 +19,28 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
+/**
+ * 连接订阅器配置复用。
+ * <p>
+ * Configuration of connection subscriber to reuse.
+ */
 public class ConnectionSubscriberConfiguration {
 
+    /**
+     * 主从提供器。
+     * <p>
+     * Provider of master slave config.
+     */
     public interface MasterSlaveProvider {
 
         MasterSlave getMasterSlave();
     }
 
+    /**
+     * 主连接订阅器。
+     * <p>
+     * Provider of master config.
+     */
     public interface MasterProvider extends MasterSlaveProvider {
 
         @Override
@@ -34,6 +49,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * 从连接订阅器。
+     * <p>
+     * Provider of slave config.
+     */
     public interface SlaveProvider extends MasterSlaveProvider {
 
         @Override
@@ -42,11 +62,21 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * 连接域提供器。
+     * <p>
+     * Provider of connection's scope.
+     */
     public interface ScopedProvider {
 
         String getScoped();
     }
 
+    /**
+     * Redisson Topic 复用配置。
+     * <p>
+     * Configuration of redisson's topic subscriber to reuse.
+     */
     public abstract static class RedissonTopicConfiguration
             implements ScopedProvider, MasterSlaveProvider {
 
@@ -62,6 +92,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * Redisson Shared Topic 复用配置。
+     * <p>
+     * Configuration of redisson's shared topic subscriber to reuse.
+     */
     public abstract static class RedissonSharedTopicConfiguration
             implements ScopedProvider, MasterSlaveProvider {
 
@@ -77,6 +112,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * Redis Topic 复用配置。
+     * <p>
+     * Configuration of redis's topic subscriber to reuse.
+     */
     public abstract static class RedisTopicConfiguration
             implements ScopedProvider, MasterSlaveProvider {
 
@@ -95,6 +135,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * Reactive Redis Topic 复用配置。
+     * <p>
+     * Configuration of reactive redis's subscriber to reuse.
+     */
     public abstract static class ReactiveRedisTopicConfiguration
             implements ScopedProvider, MasterSlaveProvider {
 
@@ -113,6 +158,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * Rabbit Fanout Exchange 复用配置。
+     * <p>
+     * Configuration of rabbitmq's subscriber to reuse.
+     */
     public abstract static class RabbitFanoutConfiguration
             implements ScopedProvider, MasterSlaveProvider {
 
@@ -134,6 +184,11 @@ public class ConnectionSubscriberConfiguration {
         }
     }
 
+    /**
+     * Kafka Topic 复用配置。
+     * <p>
+     * Configuration of kafka's subscriber to reuse.
+     */
     public abstract static class KafkaTopicConfiguration
             implements ScopedProvider, MasterSlaveProvider {
 

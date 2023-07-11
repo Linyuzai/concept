@@ -6,6 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScopedFacto
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 日志工厂。
+ * <p>
+ * Factory of {@link ConnectionLoggerImpl}.
+ */
 @Getter
 @Setter
 public class ConnectionLoggerFactoryImpl extends AbstractScopedFactory<ConnectionLogger>

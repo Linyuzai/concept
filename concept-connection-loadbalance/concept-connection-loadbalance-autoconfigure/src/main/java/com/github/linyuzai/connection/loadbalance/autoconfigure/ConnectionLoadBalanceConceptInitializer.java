@@ -10,7 +10,9 @@ import org.springframework.core.Ordered;
 import java.util.List;
 
 /**
- * {@link ConnectionLoadBalanceConcept} 初始化器
+ * {@link ConnectionLoadBalanceConcept} 初始化器。
+ * <p>
+ * Initializer of {@link ConnectionLoadBalanceConcept}.
  */
 @Getter
 @RequiredArgsConstructor

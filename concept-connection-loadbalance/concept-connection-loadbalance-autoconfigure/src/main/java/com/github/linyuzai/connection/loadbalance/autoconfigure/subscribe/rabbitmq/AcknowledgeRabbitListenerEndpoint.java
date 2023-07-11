@@ -6,6 +6,11 @@ import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint;
 
+/**
+ * 指定确认模式的监听端点。
+ * <p>
+ * {@link RabbitListenerEndpoint} specified {@link AcknowledgeMode}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class AcknowledgeRabbitListenerEndpoint implements RabbitListenerEndpoint {

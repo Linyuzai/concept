@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+/**
+ * Redis Topic 连接订阅器工厂。
+ * <p>
+ * Factory of {@link RedisTopicConnectionSubscriber}.
+ */
 @Getter
 @Setter
 public class RedisTopicConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {

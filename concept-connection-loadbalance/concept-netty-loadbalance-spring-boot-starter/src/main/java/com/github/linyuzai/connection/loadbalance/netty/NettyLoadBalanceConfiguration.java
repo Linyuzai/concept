@@ -26,12 +26,13 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.EmptyConnection
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnMissingBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
             havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberMasterConfiguration
@@ -92,7 +93,7 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnMissingBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
             havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberSlaveConfiguration
@@ -101,7 +102,7 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @ConditionalOnBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
             havingValue = "REDIS_TOPIC")
     public static class ReactiveRedisTopicSubscriberMasterConfiguration
@@ -110,7 +111,7 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @ConditionalOnBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
             havingValue = "REDIS_TOPIC")
     public static class ReactiveRedisTopicSubscriberSlaveConfiguration

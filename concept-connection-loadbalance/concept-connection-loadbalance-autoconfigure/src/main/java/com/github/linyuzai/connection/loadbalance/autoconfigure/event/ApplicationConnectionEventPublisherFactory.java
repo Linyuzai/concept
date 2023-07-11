@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 
+/**
+ * 事件发布器工厂。
+ * <p>
+ * Factory of {@link ApplicationConnectionEventPublisher}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class ApplicationConnectionEventPublisherFactory implements ConnectionEventPublisherFactory {

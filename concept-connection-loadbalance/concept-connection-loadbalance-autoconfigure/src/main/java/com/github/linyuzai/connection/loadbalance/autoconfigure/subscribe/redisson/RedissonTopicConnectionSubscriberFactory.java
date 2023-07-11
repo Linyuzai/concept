@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RedissonClient;
 
+/**
+ * Redisson (Shared) Topic 连接订阅器工厂。
+ * <p>
+ * Factory of {@link RedissonTopicConnectionSubscriber}.
+ */
 @Getter
 @Setter
 public class RedissonTopicConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {

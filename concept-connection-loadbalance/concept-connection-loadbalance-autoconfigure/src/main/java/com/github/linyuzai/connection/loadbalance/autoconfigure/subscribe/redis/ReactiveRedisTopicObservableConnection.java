@@ -12,6 +12,11 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Reactive Redis 转发连接。
+ * <p>
+ * The connection to forward message by Reactive Redis.
+ */
 @Getter
 @Setter
 public class ReactiveRedisTopicObservableConnection extends AliveForeverConnection {

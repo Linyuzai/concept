@@ -7,12 +7,22 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * 日志实现。
+ * <p>
+ * Impl of {@link ConnectionLogger}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class ConnectionLoggerImpl implements ConnectionLogger {
 
     private final Log log = LogFactory.getLog(ConnectionLogger.class);
 
+    /**
+     * 前缀标签
+     * <p>
+     * Prefix label
+     */
     private final String tag;
 
     @Override

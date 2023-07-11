@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,24 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Redis Topic 连接订阅器。
+ * 通过 {@link StringRedisTemplate} 转发消息，通过 {@link RedisMessageListenerContainer} 订阅消息
+ * <p>
+ * {@link ConnectionSubscriber} impl by Redis Topic.
+ * forward message by {@link StringRedisTemplate}, listen message by {@link RedisMessageListenerContainer}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
 
     private final StringRedisTemplate redisTemplate;
 
+    /**
+     * 创建 Redis 的监听连接。
+     * <p>
+     * Create the connection to listen message from Redis.
+     */
     @Override
     protected Connection createSubscriber(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
         RedisTopicSubscriberConnection connection = new RedisTopicSubscriberConnection();
@@ -38,6 +51,11 @@ public class RedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         return connection;
     }
 
+    /**
+     * 创建 Redis 的转发连接。
+     * <p>
+     * Create the connection to forward message by Redis.
+     */
     @Override
     protected Connection createObservable(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
         RedisTopicObservableConnection connection = new RedisTopicObservableConnection();

@@ -24,6 +24,8 @@ import java.util.List;
 
 /**
  * 连接负载均衡配置
+ * <p>
+ * Configuration of connection's load-balance
  */
 @Configuration(proxyBeanMethods = false)
 public class ConnectionLoadBalanceConfiguration {
@@ -35,7 +37,10 @@ public class ConnectionLoadBalanceConfiguration {
         @Bean
         public ConnectionServerManagerFactory connectionServerManagerFactory(DiscoveryClient client,
                                                                              Registration registration) {
-            return new DiscoveryConnectionServerManagerFactory(client, registration);
+            DiscoveryConnectionServerManagerFactory factory = new DiscoveryConnectionServerManagerFactory();
+            factory.setDiscoveryClient(client);
+            factory.setRegistration(registration);
+            return factory;
         }
     }
 

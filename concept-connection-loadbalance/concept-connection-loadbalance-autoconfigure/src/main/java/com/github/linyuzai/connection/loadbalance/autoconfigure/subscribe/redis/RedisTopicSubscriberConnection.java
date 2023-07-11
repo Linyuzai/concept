@@ -8,6 +8,11 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Redis 监听连接。
+ * <p>
+ * The connection to listen message form Redis.
+ */
 @Getter
 @Setter
 public class RedisTopicSubscriberConnection extends AliveForeverConnection {
@@ -29,6 +34,11 @@ public class RedisTopicSubscriberConnection extends AliveForeverConnection {
         onComplete.run();
     }
 
+    /**
+     * 在连接关闭的时候停止监听。
+     * <p>
+     * Stop listen when closing.
+     */
     @Override
     public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {

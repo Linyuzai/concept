@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.*;
 import org.redisson.api.RTopic;
@@ -12,6 +13,13 @@ import org.redisson.api.RedissonClient;
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * Redisson (Shared) Topic 连接订阅器。
+ * 通过 {@link RTopic} 转发消息，通过 {@link RTopic} 订阅消息
+ * <p>
+ * {@link ConnectionSubscriber} impl by Redisson (Shared) Topic.
+ * forward message by {@link RTopic}, listen message by {@link RTopic}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
@@ -20,6 +28,11 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
 
     private final boolean shared;
 
+    /**
+     * 创建 Redisson 的监听连接。
+     * <p>
+     * Create the connection to listen message from Redisson.
+     */
     @Override
     protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
                                           ConnectionLoadBalanceConcept concept) {
@@ -39,6 +52,11 @@ public class RedissonTopicConnectionSubscriber extends AbstractMasterSlaveConnec
         return connection;
     }
 
+    /**
+     * 创建 Redisson 的转发连接。
+     * <p>
+     * Create the connection to forward message by Redisson.
+     */
     @Override
     protected Connection createObservable(String id, String topic, Map<Object, Object> context,
                                           ConnectionLoadBalanceConcept concept) {

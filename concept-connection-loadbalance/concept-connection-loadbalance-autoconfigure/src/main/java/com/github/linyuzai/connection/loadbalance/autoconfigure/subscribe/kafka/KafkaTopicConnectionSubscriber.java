@@ -3,6 +3,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,13 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * Kafka Topic 连接订阅器。
+ * 通过 {@link KafkaTemplate} 转发消息，通过 {@link KafkaListenerContainerFactory} 订阅消息。
+ * <p>
+ * {@link ConnectionSubscriber} impl by Kafka.
+ * Forward message by {@link KafkaTemplate}, listen message by {@link KafkaListenerContainerFactory}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
@@ -25,6 +33,11 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
 
     private final KafkaListenerContainerFactory<? extends MessageListenerContainer> kafkaListenerContainerFactory;
 
+    /**
+     * 创建 Kafka Topic 的监听连接。
+     * <p>
+     * Create the connection to listen message from Kafka.
+     */
     @Override
     protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
                                           ConnectionLoadBalanceConcept concept) {
@@ -34,6 +47,7 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         MessageListenerContainer container = createMessageListenerContainer(endpoint);
         ContainerProperties.AckMode mode = container.getContainerProperties().getAckMode();
         Object listener;
+        //手动确认
         if (mode == ContainerProperties.AckMode.MANUAL || mode == ContainerProperties.AckMode.MANUAL_IMMEDIATE) {
             listener = (AcknowledgingMessageListener<Object, Object>) (data, acknowledgment) -> {
                 onMessageReceived(connection, data);
@@ -55,6 +69,11 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
         return kafkaListenerContainerFactory.createListenerContainer(endpoint);
     }
 
+    /**
+     * 创建 Kafka Topic 的转发连接。
+     * <p>
+     * Create the connection to forward message by Kafka.
+     */
     @Override
     protected Connection createObservable(String id, String topic, Map<Object, Object> context,
                                           ConnectionLoadBalanceConcept concept) {

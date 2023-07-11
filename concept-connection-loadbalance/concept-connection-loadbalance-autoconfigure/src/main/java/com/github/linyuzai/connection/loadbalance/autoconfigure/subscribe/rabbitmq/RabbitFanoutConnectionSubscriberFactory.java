@@ -8,6 +8,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 
+/**
+ * RabbitMQ 连接订阅器工厂。
+ * <p>
+ * Factory of {@link RabbitFanoutConnectionSubscriber}.
+ */
 @Getter
 @Setter
 public class RabbitFanoutConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {

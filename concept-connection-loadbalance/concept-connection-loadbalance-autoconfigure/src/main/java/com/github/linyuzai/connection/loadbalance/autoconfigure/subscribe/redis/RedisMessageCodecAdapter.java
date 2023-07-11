@@ -3,10 +3,16 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Redis 消息编解码适配器。
+ * <p>
+ * {@link MessageCodecAdapter} for Redis.
+ */
 public class RedisMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override

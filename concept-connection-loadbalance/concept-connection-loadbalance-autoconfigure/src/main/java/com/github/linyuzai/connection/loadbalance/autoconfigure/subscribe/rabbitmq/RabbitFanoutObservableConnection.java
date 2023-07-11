@@ -12,6 +12,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * RabbitMQ 转发连接。
+ * <p>
+ * The connection to forward message by RabbitMQ.
+ */
 @Setter
 @Getter
 public class RabbitFanoutObservableConnection extends AliveForeverConnection {

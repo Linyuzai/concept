@@ -4,6 +4,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +15,24 @@ import reactor.core.Disposable;
 import java.net.URI;
 import java.util.Map;
 
+/**
+ * Reactive Redis Topic 连接订阅器。
+ * 通过 {@link ReactiveRedisTemplate} 转发消息，通过 {@link ReactiveRedisTemplate} 订阅消息
+ * <p>
+ * {@link ConnectionSubscriber} impl by Reactive Redis Topic.
+ * forward message by {@link ReactiveRedisTemplate}, listen message by {@link ReactiveRedisTemplate}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveConnectionSubscriber {
 
     private final ReactiveRedisTemplate<?, Object> reactiveRedisTemplate;
 
+    /**
+     * 创建 Reactive Redis 的监听连接。
+     * <p>
+     * Create the connection to listen message from Reactive Redis.
+     */
     @Override
     protected Connection createSubscriber(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
         ReactiveRedisTopicSubscriberConnection connection = new ReactiveRedisTopicSubscriberConnection();
@@ -31,6 +44,11 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
         return connection;
     }
 
+    /**
+     * 创建 Reactive Redis 的转发连接。
+     * <p>
+     * Create the connection to forward message by Reactive Redis.
+     */
     @Override
     protected Connection createObservable(String id, String topic, Map<Object, Object> context, ConnectionLoadBalanceConcept concept) {
         ReactiveRedisTopicObservableConnection connection = new ReactiveRedisTopicObservableConnection();

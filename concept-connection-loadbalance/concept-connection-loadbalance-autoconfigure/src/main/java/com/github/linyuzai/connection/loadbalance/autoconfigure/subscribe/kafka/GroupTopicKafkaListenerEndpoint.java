@@ -11,6 +11,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
+/**
+ * 指定了 topic 和 groupId 的监听端点。
+ * <p>
+ * {@link KafkaListenerEndpoint} specified 'topic' and 'groupId'.
+ */
 @Getter
 @RequiredArgsConstructor
 public class GroupTopicKafkaListenerEndpoint implements KafkaListenerEndpoint {

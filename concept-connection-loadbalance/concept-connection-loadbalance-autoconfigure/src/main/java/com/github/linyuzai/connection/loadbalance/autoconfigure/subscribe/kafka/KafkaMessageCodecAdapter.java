@@ -3,11 +3,17 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
+import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+/**
+ * Kafka 消息编解码适配器。
+ * <p>
+ * {@link MessageCodecAdapter} for Kafka.
+ */
 public class KafkaMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override

@@ -16,6 +16,11 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Kafka Topic 转发连接。
+ * <p>
+ * The connection to forward message by Kafka.
+ */
 @Setter
 @Getter
 public class KafkaTopicObservableConnection extends AliveForeverConnection {

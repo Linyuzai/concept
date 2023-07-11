@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 
+/**
+ * Reactive Redis Topic 连接订阅器工厂。
+ * <p>
+ * Factory of {@link ReactiveRedisTopicConnectionSubscriber}.
+ */
 @Getter
 @Setter
 public class ReactiveRedisTopicConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {
