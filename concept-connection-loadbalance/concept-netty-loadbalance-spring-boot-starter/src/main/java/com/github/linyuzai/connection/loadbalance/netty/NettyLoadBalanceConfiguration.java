@@ -165,9 +165,11 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Bean
-    public ScheduledExecutorFactory nettyScheduledExecutorFactory() {
-        return new ScheduledExecutorFactoryImpl()
-                .addScopes(NettyScoped.NAME);
+    public ScheduledExecutorFactory nettyScheduledExecutorFactory(NettyLoadBalanceProperties properties) {
+        ScheduledExecutorFactoryImpl factory = new ScheduledExecutorFactoryImpl();
+        factory.setSize(properties.getExecutor().getSize());
+        factory.addScopes(NettyScoped.NAME);
+        return factory;
     }
 
     @Bean

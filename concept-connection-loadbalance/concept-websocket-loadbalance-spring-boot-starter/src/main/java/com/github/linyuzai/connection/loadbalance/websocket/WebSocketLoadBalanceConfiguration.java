@@ -150,9 +150,12 @@ public class WebSocketLoadBalanceConfiguration {
     }
 
     @Bean
-    public ScheduledExecutorFactory wsScheduledExecutorFactory() {
-        return new ScheduledExecutorFactoryImpl()
-                .addScopes(WebSocketScoped.NAME);
+    public ScheduledExecutorFactory wsScheduledExecutorFactory(WebSocketLoadBalanceProperties properties) {
+        ScheduledExecutorFactoryImpl factory = new ScheduledExecutorFactoryImpl();
+        factory.setSize(properties.getExecutor().getSize());
+        factory.addScopes(WebSocketScoped.NAME);
+        return factory;
+
     }
 
     @Bean

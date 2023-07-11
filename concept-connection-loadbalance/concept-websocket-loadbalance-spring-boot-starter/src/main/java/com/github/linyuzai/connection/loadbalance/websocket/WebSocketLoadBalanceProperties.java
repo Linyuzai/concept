@@ -26,6 +26,8 @@ public class WebSocketLoadBalanceProperties {
      */
     private LoadBalanceProperties loadBalance = new LoadBalanceProperties();
 
+    private ExecutorProperties executor = new ExecutorProperties();
+
     @Data
     public static class ServerProperties {
 
@@ -164,6 +166,12 @@ public class WebSocketLoadBalanceProperties {
              */
             private long period = 30000;
         }
+    }
+
+    @Data
+    public static class ExecutorProperties {
+
+        private int size = 1;
     }
 
     @Data

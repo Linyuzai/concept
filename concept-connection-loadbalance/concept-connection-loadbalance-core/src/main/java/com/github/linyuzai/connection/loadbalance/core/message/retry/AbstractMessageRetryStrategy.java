@@ -43,11 +43,13 @@ public abstract class AbstractMessageRetryStrategy implements MessageRetryStrate
 
         @Override
         public void run() {
+            int times = getTimes();
+            String currentTimes = current + "/" + times;
+            concept.getLogger().info("Start retry and current is " + currentTimes);
             retryable.accept(e -> {
-                int times = getTimes();
+                String retryErrorMessage = "Retry failed " + currentTimes;
                 int newCurrent = current + 1;
                 int period = getPeriod(newCurrent);
-                String retryErrorMessage = "Retry failed " + current + "/" + times;
                 MessageRetryException retryException =
                         new MessageRetryException(retryErrorMessage, e, error);
                 if (current < times) {
