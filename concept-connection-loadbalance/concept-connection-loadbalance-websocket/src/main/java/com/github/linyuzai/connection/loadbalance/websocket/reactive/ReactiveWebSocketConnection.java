@@ -4,6 +4,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportE
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.socket.CloseStatus;
@@ -13,29 +15,18 @@ import reactor.core.publisher.FluxSink;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
  * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现
  */
+@Getter
+@RequiredArgsConstructor
 public class ReactiveWebSocketConnection extends WebSocketConnection {
 
     private final WebSocketSession session;
 
     private final FluxSink<WebSocketMessage> sender;
-
-    public ReactiveWebSocketConnection(WebSocketSession session, FluxSink<WebSocketMessage> sender, String type) {
-        super(type);
-        this.session = session;
-        this.sender = sender;
-    }
-
-    public ReactiveWebSocketConnection(WebSocketSession session, FluxSink<WebSocketMessage> sender, String type, Map<Object, Object> metadata) {
-        super(type, metadata);
-        this.session = session;
-        this.sender = sender;
-    }
 
     @Override
     public Object getId() {

@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionFactory;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -23,10 +23,10 @@ public class ReactiveWebSocketConnectionFactory extends WebSocketConnectionFacto
     }
 
     @Override
-    public ReactiveWebSocketConnection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
+    protected AbstractConnection doCreate(Object o, ConnectionLoadBalanceConcept concept) {
         WebSocketSession session = (WebSocketSession) ((Object[]) o)[0];
         @SuppressWarnings("unchecked")
         FluxSink<WebSocketMessage> sender = (FluxSink<WebSocketMessage>) ((Object[]) o)[1];
-        return new ReactiveWebSocketConnection(session, sender, Connection.Type.CLIENT, metadata);
+        return new ReactiveWebSocketConnection(session, sender);
     }
 }

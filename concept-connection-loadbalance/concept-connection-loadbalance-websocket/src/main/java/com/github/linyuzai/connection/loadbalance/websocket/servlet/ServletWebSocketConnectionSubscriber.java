@@ -34,8 +34,11 @@ public class ServletWebSocketConnectionSubscriber extends
                             Runnable onComplete) {
         try {
             WebSocketClient client = newWebSocketClient();
-            ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session ->
-                    onSuccess.accept(new ServletWebSocketConnection(session, Connection.Type.SUBSCRIBER)));
+            ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session -> {
+                ServletWebSocketConnection connection = new ServletWebSocketConnection(session);
+                connection.setType(Connection.Type.SUBSCRIBER);
+                onSuccess.accept(connection);
+            });
             WebSocketConnectionManager manager = new WebSocketConnectionManager(client, handler, uri.toString());
             manager.start();
         } catch (Throwable e) {

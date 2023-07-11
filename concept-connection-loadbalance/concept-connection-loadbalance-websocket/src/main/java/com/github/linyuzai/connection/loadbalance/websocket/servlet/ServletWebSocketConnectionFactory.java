@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionFactory;
 import org.springframework.web.socket.WebSocketSession;
@@ -18,8 +18,7 @@ public class ServletWebSocketConnectionFactory extends WebSocketConnectionFactor
     }
 
     @Override
-    public ServletWebSocketConnection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
-        WebSocketSession session = (WebSocketSession) o;
-        return new ServletWebSocketConnection(session, Connection.Type.CLIENT, metadata);
+    protected AbstractConnection doCreate(Object o, ConnectionLoadBalanceConcept concept) {
+        return new ServletWebSocketConnection((WebSocketSession) o);
     }
 }

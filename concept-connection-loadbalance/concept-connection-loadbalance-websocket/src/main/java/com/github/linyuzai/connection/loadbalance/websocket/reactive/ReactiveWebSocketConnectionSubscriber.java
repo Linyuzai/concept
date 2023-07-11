@@ -45,9 +45,11 @@ public class ReactiveWebSocketConnectionSubscriber extends
                             Runnable onComplete) {
         WebSocketClient client = newWebSocketClient();
         ReactiveWebSocketSubscriberHandler handler =
-                new ReactiveWebSocketSubscriberHandler(concept, (session, sink) ->
-                        onSuccess.accept(new ReactiveWebSocketConnection(session, sink,
-                                Connection.Type.SUBSCRIBER)));
+                new ReactiveWebSocketSubscriberHandler(concept, (session, sink) -> {
+                    ReactiveWebSocketConnection connection = new ReactiveWebSocketConnection(session, sink);
+                    connection.setType(Connection.Type.SUBSCRIBER);
+                    onSuccess.accept(connection);
+                });
         client.execute(uri, handler).subscribe(unused -> {
         }, onError, onComplete);
     }

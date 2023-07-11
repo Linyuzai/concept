@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -22,11 +21,7 @@ public class RabbitFanoutSubscriberConnection extends AliveForeverConnection {
     private MessageListenerContainer container;
 
     public RabbitFanoutSubscriberConnection() {
-        super(Type.SUBSCRIBER);
-    }
-
-    public RabbitFanoutSubscriberConnection(Map<Object, Object> metadata) {
-        super(Type.SUBSCRIBER, metadata);
+        setType(Type.SUBSCRIBER);
     }
 
     @Override

@@ -4,30 +4,23 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportE
 import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
  * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现
  */
+@Getter
+@RequiredArgsConstructor
 public class ServletWebSocketConnection extends WebSocketConnection {
 
     private final WebSocketSession session;
-
-    public ServletWebSocketConnection(WebSocketSession session, String type) {
-        super(type);
-        this.session = session;
-    }
-
-    public ServletWebSocketConnection(WebSocketSession session, String type, Map<Object, Object> metadata) {
-        super(type, metadata);
-        this.session = session;
-    }
 
     @Override
     public Object getId() {

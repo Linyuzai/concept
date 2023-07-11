@@ -29,7 +29,9 @@ public class JavaxWebSocketConnectionSubscriber extends
                             Runnable onComplete) {
         try {
             Session session = getContainer().connectToServer(clientClass, uri);
-            onSuccess.accept(new JavaxWebSocketConnection(session, Connection.Type.SUBSCRIBER));
+            JavaxWebSocketConnection connection = new JavaxWebSocketConnection(session);
+            connection.setType(Connection.Type.SUBSCRIBER);
+            onSuccess.accept(connection);
         } catch (Throwable e) {
             onError.accept(e);
         } finally {

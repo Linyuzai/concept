@@ -32,11 +32,7 @@ public class KafkaTopicObservableConnection extends AliveForeverConnection {
     private KafkaTemplate<?, Object> kafkaTemplate;
 
     public KafkaTopicObservableConnection() {
-        super(Type.OBSERVABLE);
-    }
-
-    public KafkaTopicObservableConnection(Map<Object, Object> metadata) {
-        super(Type.OBSERVABLE, metadata);
+        setType(Type.OBSERVABLE);
     }
 
     @Override

@@ -18,14 +18,6 @@ public abstract class WebSocketConnection extends AbstractConnection {
 
     private final Object parseQueryParameterMapLock = new Object();
 
-    public WebSocketConnection(String type) {
-        super(type);
-    }
-
-    public WebSocketConnection(String type, Map<Object, Object> metadata) {
-        super(type, metadata);
-    }
-
     public abstract URI getUri();
 
     public abstract boolean isOpen();

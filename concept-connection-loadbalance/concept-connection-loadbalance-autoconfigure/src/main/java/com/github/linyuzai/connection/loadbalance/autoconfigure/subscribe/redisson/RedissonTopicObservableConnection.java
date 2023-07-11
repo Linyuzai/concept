@@ -13,7 +13,6 @@ import org.redisson.client.RedisException;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.client.protocol.RedisCommands;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -32,11 +31,7 @@ public class RedissonTopicObservableConnection extends AliveForeverConnection {
     private RTopic topic;
 
     public RedissonTopicObservableConnection() {
-        super(Type.OBSERVABLE);
-    }
-
-    public RedissonTopicObservableConnection(Map<Object, Object> metadata) {
-        super(Type.OBSERVABLE, metadata);
+        setType(Type.OBSERVABLE);
     }
 
     @Override

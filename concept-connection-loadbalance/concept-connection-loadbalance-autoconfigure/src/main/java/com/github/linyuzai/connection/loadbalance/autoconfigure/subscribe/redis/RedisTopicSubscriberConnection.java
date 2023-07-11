@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -22,11 +21,7 @@ public class RedisTopicSubscriberConnection extends AliveForeverConnection {
     private RedisMessageListenerContainer container;
 
     public RedisTopicSubscriberConnection() {
-        super(Type.SUBSCRIBER);
-    }
-
-    public RedisTopicSubscriberConnection(Map<Object, Object> metadata) {
-        super(Type.SUBSCRIBER, metadata);
+        setType(Type.SUBSCRIBER);
     }
 
     @Override

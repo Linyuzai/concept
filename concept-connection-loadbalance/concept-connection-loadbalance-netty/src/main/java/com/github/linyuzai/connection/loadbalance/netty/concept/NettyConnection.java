@@ -7,27 +7,16 @@ import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.function.Consumer;
 
 @Getter
+@RequiredArgsConstructor
 public class NettyConnection extends AbstractConnection {
 
     private final Channel channel;
-
-    public NettyConnection(Channel channel, @NonNull String type) {
-        super(type);
-        this.channel = channel;
-    }
-
-    public NettyConnection(Channel channel, @NonNull String type, Map<Object, Object> metadata) {
-        super(type, metadata);
-        this.channel = channel;
-    }
-
 
     @Override
     public Object getId() {

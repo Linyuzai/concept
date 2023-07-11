@@ -15,7 +15,8 @@ public class JavaxWebSocketLoadBalanceEndpoint {
 
     @OnOpen
     public void onOpen(Session session) {
-        JavaxWebSocketConnection connection = new JavaxWebSocketConnection(session, Connection.Type.OBSERVABLE);
+        JavaxWebSocketConnection connection = new JavaxWebSocketConnection(session);
+        connection.setType(Connection.Type.OBSERVABLE);
         WebSocketLoadBalanceConcept.getInstance().onEstablish(connection);
     }
 

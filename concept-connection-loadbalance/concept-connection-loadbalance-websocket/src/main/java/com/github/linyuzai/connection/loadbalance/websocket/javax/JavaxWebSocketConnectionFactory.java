@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionFactory;
 
@@ -18,8 +18,7 @@ public class JavaxWebSocketConnectionFactory extends WebSocketConnectionFactory<
     }
 
     @Override
-    public JavaxWebSocketConnection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
-        Session session = (Session) o;
-        return new JavaxWebSocketConnection(session, Connection.Type.CLIENT, metadata);
+    protected AbstractConnection doCreate(Object o, ConnectionLoadBalanceConcept concept) {
+        return new JavaxWebSocketConnection((Session) o);
     }
 }

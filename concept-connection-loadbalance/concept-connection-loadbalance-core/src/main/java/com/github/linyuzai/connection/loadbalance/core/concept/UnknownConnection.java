@@ -17,7 +17,7 @@ public class UnknownConnection extends AbstractConnection {
     private final Object id;
 
     public UnknownConnection(Object id, String type, ConnectionLoadBalanceConcept concept) {
-        super(type);
+        setType(type);
         setConcept(concept);
         this.id = id;
     }

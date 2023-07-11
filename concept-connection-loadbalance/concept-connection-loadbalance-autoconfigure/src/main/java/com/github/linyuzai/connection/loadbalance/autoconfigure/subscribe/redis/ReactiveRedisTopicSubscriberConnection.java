@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import reactor.core.Disposable;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -22,11 +21,7 @@ public class ReactiveRedisTopicSubscriberConnection extends AliveForeverConnecti
     private Disposable disposable;
 
     public ReactiveRedisTopicSubscriberConnection() {
-        super(Type.SUBSCRIBER);
-    }
-
-    public ReactiveRedisTopicSubscriberConnection(Map<Object, Object> metadata) {
-        super(Type.SUBSCRIBER, metadata);
+        setType(Type.SUBSCRIBER);
     }
 
     @Override

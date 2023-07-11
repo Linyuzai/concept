@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.netty.concept;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnection;
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionFactory;
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,8 +20,8 @@ public class NettyConnectionFactory extends AbstractConnectionFactory<NettyConne
     }
 
     @Override
-    public Connection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
-        return new NettyConnection(getChannel(o), Connection.Type.CLIENT, metadata);
+    protected AbstractConnection doCreate(Object o, ConnectionLoadBalanceConcept concept) {
+        return new NettyConnection(getChannel(o));
     }
 
     protected Channel getChannel(Object o) {

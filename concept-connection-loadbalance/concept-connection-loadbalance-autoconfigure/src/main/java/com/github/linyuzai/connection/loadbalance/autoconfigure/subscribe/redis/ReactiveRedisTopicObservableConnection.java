@@ -9,7 +9,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -28,11 +27,7 @@ public class ReactiveRedisTopicObservableConnection extends AliveForeverConnecti
     private ReactiveRedisTemplate<?, Object> reactiveRedisTemplate;
 
     public ReactiveRedisTopicObservableConnection() {
-        super(Type.OBSERVABLE);
-    }
-
-    public ReactiveRedisTopicObservableConnection(Map<Object, Object> metadata) {
-        super(Type.OBSERVABLE, metadata);
+        setType(Type.OBSERVABLE);
     }
 
     @Override

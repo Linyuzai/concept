@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -22,11 +21,7 @@ public class KafkaTopicSubscriberConnection extends AliveForeverConnection {
     private MessageListenerContainer container;
 
     public KafkaTopicSubscriberConnection() {
-        super(Type.SUBSCRIBER);
-    }
-
-    public KafkaTopicSubscriberConnection(Map<Object, Object> metadata) {
-        super(Type.SUBSCRIBER, metadata);
+        setType(Type.SUBSCRIBER);
     }
 
     @Override

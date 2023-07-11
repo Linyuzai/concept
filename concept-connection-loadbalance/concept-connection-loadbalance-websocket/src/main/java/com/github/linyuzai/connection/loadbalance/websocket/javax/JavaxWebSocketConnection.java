@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.PingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
@@ -19,21 +20,10 @@ import java.util.function.Consumer;
  * 基于 {@link Session} 的 {@link WebSocketConnection} 实现
  */
 @Getter
+@RequiredArgsConstructor
 public class JavaxWebSocketConnection extends WebSocketConnection {
 
     private final Session session;
-
-    public JavaxWebSocketConnection(Session session, String type) {
-        super(type);
-        this.session = session;
-    }
-
-    public JavaxWebSocketConnection(Session session,
-                                    String type,
-                                    Map<Object, Object> metadata) {
-        super(type, metadata);
-        this.session = session;
-    }
 
     @Override
     public Object getId() {

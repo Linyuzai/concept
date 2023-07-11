@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RTopic;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -25,11 +24,7 @@ public class RedissonTopicSubscriberConnection extends AliveForeverConnection {
     private Integer listener;
 
     public RedissonTopicSubscriberConnection() {
-        super(Type.SUBSCRIBER);
-    }
-
-    public RedissonTopicSubscriberConnection(Map<Object, Object> metadata) {
-        super(Type.SUBSCRIBER, metadata);
+        setType(Type.SUBSCRIBER);
     }
 
     @Override

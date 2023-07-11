@@ -9,7 +9,6 @@ import lombok.Setter;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -28,11 +27,7 @@ public class RabbitFanoutObservableConnection extends AliveForeverConnection {
     private RabbitTemplate rabbitTemplate;
 
     public RabbitFanoutObservableConnection() {
-        super(Type.OBSERVABLE);
-    }
-
-    public RabbitFanoutObservableConnection(Map<Object, Object> metadata) {
-        super(Type.OBSERVABLE, metadata);
+        setType(Type.OBSERVABLE);
     }
 
     @Override

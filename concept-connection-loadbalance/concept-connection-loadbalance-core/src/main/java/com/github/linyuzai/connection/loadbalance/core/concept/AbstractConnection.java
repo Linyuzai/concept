@@ -48,24 +48,18 @@ public abstract class AbstractConnection implements Connection {
     /**
      * 是否还存活
      */
-    protected volatile boolean alive;
+    protected volatile boolean alive = true;
 
     /**
      * 最后一次心跳时间
      */
-    protected volatile long lastHeartbeat;
+    protected volatile long lastHeartbeat = System.currentTimeMillis();
 
-    public AbstractConnection(@NonNull String type) {
-        this(type, null);
-    }
-
-    public AbstractConnection(@NonNull String type, Map<Object, Object> metadata) {
-        this.type = type;
-        if (metadata != null) {
-            this.metadata.putAll(metadata);
+    public void addMetadata(Map<?, ?> metadata) {
+        if (metadata == null) {
+            return;
         }
-        this.alive = true;
-        this.lastHeartbeat = System.currentTimeMillis();
+        this.metadata.putAll(metadata);
     }
 
     @Override
