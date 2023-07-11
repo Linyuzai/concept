@@ -1,11 +1,13 @@
 package com.github.linyuzai.connection.loadbalance.netty.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.extension.GroupSelector;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -17,7 +19,17 @@ public class NettyLoadBalanceHandler extends ChannelInboundHandlerAdapter {
     private final Map<Object, Object> metadata;
 
     public NettyLoadBalanceHandler(NettyLoadBalanceConcept concept) {
-        this(concept, null);
+        this(concept, (Map<Object, Object>) null);
+    }
+
+    public NettyLoadBalanceHandler(NettyLoadBalanceConcept concept, String group) {
+        this(concept, getGroupMetadata(group));
+    }
+
+    private static Map<Object, Object> getGroupMetadata(String group) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put(GroupSelector.KEY, group);
+        return map;
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * 基于用户的消息
  * <p>
- * 可以给某个用于发送消息
+ * 可以给某个用户发送消息
  * <p>
  * 配合 {@link UserSelector} 使用
  */

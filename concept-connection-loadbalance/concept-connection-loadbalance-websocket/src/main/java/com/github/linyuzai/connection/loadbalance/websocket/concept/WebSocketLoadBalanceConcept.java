@@ -6,10 +6,14 @@ import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectio
  * ws 负载均衡概念
  */
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
+
+    public static final String ID = "websocket";
+
     /**
      * 服务间订阅端点
      */
     public static final String SUBSCRIBER_ENDPOINT = "/concept-websocket-subscriber";
+
     /**
      * 默认服务端点的前缀
      */
@@ -39,7 +43,7 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
 
     @Override
     public String getId() {
-        return "websocket";
+        return ID;
     }
 
     public static class Builder extends AbstractBuilder<Builder, WebSocketLoadBalanceConcept> {

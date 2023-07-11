@@ -8,6 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventList
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.extension.GroupSelector;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
@@ -130,6 +131,11 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Bean
+    public GroupSelector groupSelector() {
+        return new GroupSelector().addScopes(NettyScoped.NAME);
+    }
+
+    @Bean
     @Order(100)
     public ConnectionSubscribeLogger nettyConnectionSubscribeLogger() {
         return new ConnectionSubscribeLogger().addScopes(NettyScoped.NAME);
@@ -219,7 +225,6 @@ public class NettyLoadBalanceConfiguration {
                 .addLoggerFactories(loggerFactories)
                 .addEventPublisherFactories(eventPublisherFactories)
                 .addEventListeners(eventListeners)
-                .snapshot()
                 .build();
     }
 }

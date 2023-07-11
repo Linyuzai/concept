@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class PathSelector extends MessageHeaderSelector {
 
-    public static final String KEY = "path";
+    public static final String KEY = "_selector_path";
 
     private final String prefix;
 

@@ -4,15 +4,15 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 import com.github.linyuzai.connection.loadbalance.core.select.MetadataSelector;
 
 /**
- * 用户连接选择器
+ * 分组连接选择器
  * <p>
- * 配合 {@link UserMessage} 使用
+ * 配合 {@link GroupMessage} 使用
  */
-public class UserSelector extends MetadataSelector implements FilterConnectionSelector {
+public class GroupSelector extends MetadataSelector implements FilterConnectionSelector {
 
-    public static final String KEY = "_selector_user_id";
+    public static final String KEY = "_selector_group";
 
-    public UserSelector() {
+    public GroupSelector() {
         super(KEY);
     }
 }
