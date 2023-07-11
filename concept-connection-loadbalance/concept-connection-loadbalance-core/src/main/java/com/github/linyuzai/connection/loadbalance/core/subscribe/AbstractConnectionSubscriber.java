@@ -21,6 +21,12 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                           Consumer<Throwable> onError,
                           Runnable onComplete,
                           ConnectionLoadBalanceConcept concept) {
+        ConnectionServer local = concept.getConnectionServerManager().getLocal();
+        //单体应用不需要转发
+        if (local == null) {
+            onComplete.run();
+            return;
+        }
         ConnectionServer server = getSubscribeServer();
         try {
             String topic = getTopic(concept, server);
@@ -76,15 +82,11 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     }
 
     protected String getFrom(ConnectionLoadBalanceConcept concept) {
-        return ConnectionServer.url(getLocal(concept));
+        return ConnectionServer.url(concept.getConnectionServerManager().getLocal());
     }
 
     protected String getTopic(ConnectionLoadBalanceConcept concept, ConnectionServer server) {
         return PREFIX + DELIMITER + concept.getId() + DELIMITER + server.getServiceId();
-    }
-
-    protected ConnectionServer getLocal(ConnectionLoadBalanceConcept concept) {
-        return concept.getConnectionServerManager().getLocal();
     }
 
     protected void onMessageReceived(Connection connection, Object message) {
