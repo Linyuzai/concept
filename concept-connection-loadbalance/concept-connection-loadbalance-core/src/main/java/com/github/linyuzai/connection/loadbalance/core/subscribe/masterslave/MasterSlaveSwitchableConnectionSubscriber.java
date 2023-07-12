@@ -36,7 +36,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
         masterConnectionSubscriber.subscribe(master -> {
             if (master.isObservableType()) {
                 connection.master = master;
-                onSuccess(connection, onSuccess);
+                onSuccess(connection, onSuccess, concept);
             } else {
                 onSuccess.accept(master);
             }
@@ -45,16 +45,18 @@ public class MasterSlaveSwitchableConnectionSubscriber
         slaveConnectionSubscriber.subscribe(slave -> {
             if (slave.isObservableType()) {
                 connection.slave = slave;
-                onSuccess(connection, onSuccess);
+                onSuccess(connection, onSuccess, concept);
             } else {
                 onSuccess.accept(slave);
             }
         }, onError, onComplete, concept);
     }
 
-    private void onSuccess(LockableConnection connection, Consumer<Connection> onSuccess) {
+    private void onSuccess(LockableConnection connection, Consumer<Connection> onSuccess,
+                           ConnectionLoadBalanceConcept concept) {
         if (connection.master != null && connection.slave != null) {
             connection.current = connection.master;
+            concept.getLogger().info("Master-slave subscriber activated");
             onSuccess.accept(connection);
         }
     }

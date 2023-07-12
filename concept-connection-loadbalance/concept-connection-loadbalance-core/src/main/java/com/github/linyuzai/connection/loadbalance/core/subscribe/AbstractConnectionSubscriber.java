@@ -29,9 +29,9 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         }
         ConnectionServer server = getSubscribeServer();
         try {
-            String topic = getTopic(concept, server);
+            String topic = getTopic(concept);
             String from = getFrom(concept);
-            String id = getId(topic, from);
+            String id = getId(topic, from, server);
 
             //subscriber
             Connection existSubscriber = concept.getConnectionRepository()
@@ -77,16 +77,23 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         }
     }
 
-    protected String getId(String topic, String from) {
-        return topic + DELIMITER + from;
+    /**
+     * LBConnection_[websocket/netty]_${serviceId}_${host:port}_[redisson/redis/rabbit/kakfa]
+     */
+    protected String getId(String topic, String from, ConnectionServer subscribe) {
+        return topic + DELIMITER + from + DELIMITER + subscribe.getServiceId();
     }
 
     protected String getFrom(ConnectionLoadBalanceConcept concept) {
         return ConnectionServer.url(concept.getConnectionServerManager().getLocal());
     }
 
-    protected String getTopic(ConnectionLoadBalanceConcept concept, ConnectionServer server) {
-        return PREFIX + DELIMITER + concept.getId() + DELIMITER + server.getServiceId();
+    /**
+     * LBConnection_[websocket/netty]_${serviceId}
+     */
+    protected String getTopic(ConnectionLoadBalanceConcept concept) {
+        ConnectionServer local = concept.getConnectionServerManager().getLocal();
+        return PREFIX + DELIMITER + concept.getId() + DELIMITER + local.getServiceId();
     }
 
     protected void onMessageReceived(Connection connection, Object message) {

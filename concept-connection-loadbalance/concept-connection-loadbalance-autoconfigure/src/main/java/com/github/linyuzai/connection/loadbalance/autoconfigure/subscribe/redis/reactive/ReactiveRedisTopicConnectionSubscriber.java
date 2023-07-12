@@ -8,6 +8,10 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import reactor.core.Disposable;
@@ -81,17 +85,27 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
 
         @Override
         public String getServiceId() {
-            return "redis-reactive";
+            return "redis.reactive";
         }
 
         @Override
         public String getHost() {
-            return null;
+            ReactiveRedisConnectionFactory factory = reactiveRedisTemplate.getConnectionFactory();
+            if (factory instanceof LettuceConnectionFactory) {
+                return ((LettuceConnectionFactory) factory).getHostName();
+            } else {
+                return null;
+            }
         }
 
         @Override
         public int getPort() {
-            return 0;
+            ReactiveRedisConnectionFactory factory = reactiveRedisTemplate.getConnectionFactory();
+            if (factory instanceof LettuceConnectionFactory) {
+                return ((LettuceConnectionFactory) factory).getPort();
+            } else {
+                return 0;
+            }
         }
 
         @Override

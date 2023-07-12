@@ -96,7 +96,7 @@ public class ReactiveRedissonTopicConnectionSubscriber extends AbstractMasterSla
 
         @Override
         public String getServiceId() {
-            return "redisson-reactive";
+            return "redisson.reactive";
         }
 
         @Override
