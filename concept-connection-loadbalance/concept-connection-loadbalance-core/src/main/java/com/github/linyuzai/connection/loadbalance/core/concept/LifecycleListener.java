@@ -5,7 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEstablish
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 
 /**
- * 生命周期监听器
+ * 生命周期监听器。
+ * <p>
+ * Listener of connection's lifecycle.
  */
 public interface LifecycleListener extends ConnectionEventListener {
 
@@ -25,17 +27,16 @@ public interface LifecycleListener extends ConnectionEventListener {
     }
 
     /**
-     * 连接建立
-     *
-     * @param connection 连接
+     * 连接建立。
+     * <p>
+     * Callback when established.
      */
     void onEstablish(Connection connection, ConnectionLoadBalanceConcept concept);
 
     /**
-     * 连接关闭
-     *
-     * @param connection 连接
-     * @param reason     原因
+     * 连接关闭。
+     * <p>
+     * Callback when closed.
      */
     void onClose(Connection connection, Object reason, ConnectionLoadBalanceConcept concept);
 }

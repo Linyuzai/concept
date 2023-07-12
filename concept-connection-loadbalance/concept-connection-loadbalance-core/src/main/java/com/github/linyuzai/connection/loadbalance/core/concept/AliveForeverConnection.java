@@ -5,6 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.PongMessage;
 
 import java.util.function.Consumer;
 
+/**
+ * 永远在线的连接。
+ * <p>
+ * Connection alive forever.
+ */
 public abstract class AliveForeverConnection extends AbstractConnection {
 
     @Override

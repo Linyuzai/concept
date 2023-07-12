@@ -7,9 +7,10 @@ import lombok.Getter;
 import java.util.function.Consumer;
 
 /**
- * 未知连接
+ * 未知连接。
+ * 表示在连接仓库中未找到的连接。
  * <p>
- * 用于表示在连接仓库中未找到的连接
+ * Connection which absent in connection repository.
  */
 @Getter
 public class UnknownConnection extends AbstractConnection {
@@ -24,21 +25,21 @@ public class UnknownConnection extends AbstractConnection {
 
     @Override
     public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-
+        onComplete.run();
     }
 
     @Override
     public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-
+        onComplete.run();
     }
 
     @Override
     public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-
+        onComplete.run();
     }
 
     @Override
     public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-
+        onComplete.run();
     }
 }

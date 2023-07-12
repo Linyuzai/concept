@@ -34,7 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 /**
- * {@link ConnectionLoadBalanceConcept} 抽象类
+ * Concept 抽象类。
+ * <p>
+ * Abstract concept.
  */
 @Getter
 @Setter
@@ -46,64 +48,28 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
 
     protected final Map<String, MessageRetryStrategy> messageRetryStrategyMap = new ConcurrentHashMap<>();
 
-    /**
-     * 连接仓库
-     */
     protected ConnectionRepository connectionRepository;
 
-    /**
-     * 服务实例提供者
-     */
     protected ConnectionServerManager connectionServerManager;
 
-    /**
-     * 连接订阅者
-     */
     protected ConnectionSubscriber connectionSubscriber;
 
-    /**
-     * 连接工厂
-     */
     protected List<ConnectionFactory> connectionFactories;
 
-    /**
-     * 连接选择器
-     */
     protected List<ConnectionSelector> connectionSelectors;
 
-    /**
-     * 消息工厂
-     */
     protected List<MessageFactory> messageFactories;
 
-    /**
-     * 消息编解码适配器
-     */
     protected MessageCodecAdapter messageCodecAdapter;
 
-    /**
-     * 消息重试策略适配器
-     */
     protected MessageRetryStrategyAdapter messageRetryStrategyAdapter;
 
-    /**
-     * 消息幂等校验器
-     */
     protected MessageIdempotentVerifier messageIdempotentVerifier;
 
-    /**
-     * 定时执行器
-     */
     protected ScheduledExecutor scheduledExecutor;
 
-    /**
-     * 日志
-     */
     protected ConnectionLogger logger;
 
-    /**
-     * 事件发布者
-     */
     protected ConnectionEventPublisher eventPublisher;
 
     private boolean initialized;
@@ -111,11 +77,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     private boolean destroyed;
 
     /**
-     * 初始化
+     * 初始化。
+     * 执行订阅流程。
+     * 发布 {@link ConnectionLoadBalanceConceptInitializeEvent} 事件。
      * <p>
-     * 尝试对所有服务实例发起订阅
-     * <p>
-     * 发布 {@link ConnectionLoadBalanceConceptInitializeEvent} 事件
+     * Initialize.
+     * Subscribe and publish {@link ConnectionLoadBalanceConceptInitializeEvent}.
      */
     @Override
     public synchronized void initialize() {
@@ -127,16 +94,22 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    /**
+     * 同步执行额外的初始化操作。
+     * <p>
+     * Additional initialization operations in sync.
+     */
     protected void onInitialize() {
 
     }
 
     /**
-     * 销毁
+     * 销毁。
+     * 关闭线程池。
+     * 发布 {@link ConnectionLoadBalanceConceptDestroyEvent} 事件。
      * <p>
-     * 关闭所有连接
-     * <p>
-     * 发布 {@link ConnectionLoadBalanceConceptDestroyEvent} 事件
+     * Destroy.
+     * Shutdown executor and publish {@link ConnectionLoadBalanceConceptDestroyEvent}.
      */
     @Override
     public synchronized void destroy() {
@@ -148,18 +121,20 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
     }
 
+    /**
+     * 同步执行额外的销毁操作。
+     * <p>
+     * Additional destruction operations in sync.
+     */
     protected void onDestroy() {
 
     }
 
     /**
-     * 创建连接
+     * 创建连接。
+     * 通过适配连接工厂进行创建。
      * <p>
-     * 通过适配连接工厂创建连接
-     *
-     * @param o        底层连接
-     * @param metadata 元数据
-     * @return 连接
+     * Create connection by factories.
      */
     @Override
     public Connection createConnection(Object o, Map<Object, Object> metadata) {
@@ -175,11 +150,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 适配连接工厂
-     *
-     * @param o        底层连接
-     * @param metadata 元数据
-     * @return 连接工厂或 null
+     * 适配连接工厂。
+     * <p>
+     * Adapt connection factory.
      */
     public ConnectionFactory getConnectionFactory(Object o, Map<Object, Object> metadata) {
         for (ConnectionFactory connectionFactory : connectionFactories) {
@@ -190,6 +163,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         return null;
     }
 
+    /**
+     * 当连接建立时调用。
+     * <p>
+     * Called when connection established.
+     */
     @Override
     public Connection onEstablish(Object o, Map<Object, Object> metadata) {
         Connection connection = createConnection(o, metadata);
@@ -198,15 +176,17 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 当连接建立时调用
+     * 当连接建立时调用。
+     * 设置 Concept 和设置编解码器。
+     * 设置消息重试策略。
+     * 将连接添加到连接仓库 {@link ConnectionRepository}。
+     * 发布 {@link ConnectionEstablishEvent} 事件。
      * <p>
-     * 设置 {@link ConnectionLoadBalanceConcept} 和设置编解码器
-     * <p>
-     * 将连接添加到连接仓库 {@link ConnectionRepository}
-     * <p>
-     * 发布 {@link ConnectionEstablishEvent} 事件
-     *
-     * @param connection 连接
+     * Called when connection established.
+     * Set concept and encoder/decoder.
+     * Set message retry strategy.
+     * Add connection to {@link ConnectionRepository}.
+     * Publish {@link ConnectionEstablishEvent}.
      */
     @Override
     public void onEstablish(Connection connection) {
@@ -227,15 +207,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 当连接关闭时调用
+     * 当连接关闭时调用。
      * <p>
-     * 当连接仓库 {@link ConnectionRepository} 中不存在对应的连接
-     * <p>
-     * 将会发布 {@link UnknownCloseEvent} 事件
-     *
-     * @param id     连接 id
-     * @param type   连接类型
-     * @param reason 关闭原因
+     * Called when connection closed.
      */
     @Override
     public void onClose(Object id, String type, Object reason) {
@@ -248,12 +222,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 当连接关闭时调用
+     * 当连接关闭时调用。
+     * 将连接从 {@link ConnectionRepository} 中删除。
      * <p>
-     * 发布 {@link ConnectionCloseEvent} 事件
-     *
-     * @param connection 连接
-     * @param reason     关闭原因
+     * Called when connection closed.
+     * Remove connection from {@link ConnectionRepository}.
      */
     @Override
     public void onClose(@NonNull Connection connection, Object reason) {
@@ -264,15 +237,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 当连接接收消息时调用
+     * 当连接接收消息时调用。
      * <p>
-     * 当连接仓库 {@link ConnectionRepository} 中不存在对应的连接
-     * <p>
-     * 将会发布 {@link UnknownMessageEvent} 事件
-     *
-     * @param id      连接 id
-     * @param type    连接类型
-     * @param message 消息数据
+     * Called when message received.
      */
     @Override
     public void onMessage(Object id, String type, Object message) {
@@ -285,24 +252,24 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 当连接接收消息时调用
+     * 当连接接收消息时调用。
      * <p>
-     * 发布 {@link MessageReceiveEvent} 事件
-     * <p>
-     * 当消息解码失败时
-     * <p>
-     * 发布 {@link MessageDecodeErrorEvent} 事件
-     *
-     * @param connection 连接
-     * @param message    消息数据
+     * Called when message received.
      */
     @Override
     public void onMessage(@NonNull Connection connection, Object message) {
         onMessage(connection, message, msg -> true);
     }
 
+    /**
+     * 当连接接收消息时调用。
+     * <p>
+     * Called when message received.
+     */
     @Override
     public void onMessage(Connection connection, Object message, Predicate<Message> predicate) {
+        //解码
+        //Decode message
         Message decode;
         try {
             MessageDecoder decoder = connection.getMessageDecoder();
@@ -311,6 +278,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             eventPublisher.publish(new MessageDecodeErrorEvent(connection, e));
             return;
         }
+        //断言
+        //predicate
         boolean test;
         try {
             test = predicate.test(decode);
@@ -319,19 +288,20 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return;
         }
         if (test) {
+            //接收
+            //Receive
             eventPublisher.publish(new MessageReceiveEvent(connection, decode));
+        } else {
+            //丢弃
+            //Discard
+            eventPublisher.publish(new MessageDiscardEvent(connection, decode));
         }
     }
 
     /**
-     * 当连接异常时调用
-     * 当连接仓库 {@link ConnectionRepository} 中不存在对应的连接
+     * 当连接异常时调用。
      * <p>
-     * 将会发布 {@link UnknownErrorEvent} 事件
-     *
-     * @param id   连接 id
-     * @param type 连接类型
-     * @param e    异常
+     * Called when has error.
      */
     @Override
     public void onError(Object id, String type, Throwable e) {
@@ -344,12 +314,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 当连接异常时调用
+     * 当连接异常时调用。
      * <p>
-     * 发布 {@link ConnectionErrorEvent} 事件
-     *
-     * @param connection 连接
-     * @param e          异常
+     * Called when has error.
      */
     @Override
     public void onError(@NonNull Connection connection, Throwable e) {
@@ -357,14 +324,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 创建消息
+     * 创建消息。
      * <p>
-     * 如果已经是 {@link Message} 则直接返回
-     * <p>
-     * 通过适配消息工厂 {@link MessageFactory} 创建消息
-     *
-     * @param o 消息数据
-     * @return {@link Message} 实例
+     * Create message.
      */
     @Override
     public Message createMessage(Object o) {
@@ -383,35 +345,38 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 将消息包装成 {@link Message}
+     * 发送消息。
      * <p>
-     * 适配对应的连接选择器 {@link ConnectionSelector}
-     * <p>
-     * 选择连接并标记消息被转发 {@link Message#FORWARD}
-     * <p>
-     * 发布 {@link MessagePrepareEvent} 事件
-     * <p>
-     * 执行发送消息
-     * <p>
-     * 发布 {@link MessageSendEvent} 事件
-     * <p>
-     * 如果连接选择器为选择任何连接则发布 {@link DeadMessageEvent} 事件
-     *
-     * @param msg 消息
+     * Send message.
      */
     @Override
     public void send(Object msg) {
+        //创建消息
+        //Create message
         Message message = createMessage(msg);
+        //初始化消息
+        //Init message
         initMessage(message);
+        //连接选择器
+        //Get connection selector
         ConnectionSelector selector = getConnectionSelector(message);
+        //选择连接
+        //Select connections
         Collection<Connection> connections = selector.select(message);
         //设置不再转发，防止其他服务再次转发
+        //Set forward flag to forbid other instances forward again
         message.setForward(false);
         if (connections == null || connections.isEmpty()) {
+            //消息不会发送给任何连接
+            //No connection to send message
             eventPublisher.publish(new DeadMessageEvent(message));
             return;
         }
+        //消息准备
+        //Message prepare
         eventPublisher.publish(new MessagePrepareEvent(message, connections));
+        //遍历发送
+        //Foreach send
         for (Connection connection : connections) {
             try {
                 connection.send(message);
@@ -422,6 +387,12 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         eventPublisher.publish(new MessageSendEvent(message, connections));
     }
 
+    /**
+     * 发送消息。
+     * 同时添加额外的消息头。
+     * <p>
+     * Send message with additional headers.
+     */
     @Override
     public void send(Object msg, Map<String, String> headers) {
         if (headers == null) {
@@ -433,6 +404,15 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         send(message);
     }
 
+    /**
+     * 初始化消息。
+     * 设置消息ID。
+     * 设置消息来源。
+     * <p>
+     * Init message.
+     * Set message id.
+     * Set message from.
+     */
     protected void initMessage(Message message) {
         String messageId = messageIdempotentVerifier.generateMessageId(message);
         message.setId(messageId);
@@ -441,10 +421,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 适配消息工厂 {@link MessageFactory}
-     *
-     * @param msg 消息数据
-     * @return 消息工厂
+     * 获得适配的消息工厂。
+     * <p>
+     * Get adaptive message factory .
      */
     public MessageFactory getMessageFactory(Object msg) {
         for (MessageFactory messageFactory : messageFactories) {
@@ -456,10 +435,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
-     * 适配连接选择器 {@link ConnectionSelector}
-     *
-     * @param message 消息
-     * @return 连接选择器
+     * 获得适配连接选择器。
+     * <p>
+     * Get adaptive connection selector.
      */
     public ConnectionSelector getConnectionSelector(Message message) {
         for (ConnectionSelector connectionSelector : connectionSelectors) {
@@ -470,6 +448,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         return null;
     }
 
+    /**
+     * Builder 抽象类。
+     * <p>
+     * Abstract builder for concept.
+     */
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends AbstractConnectionLoadBalanceConcept> {
 
@@ -500,7 +483,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         protected List<ConnectionEventListener> eventListeners = new ArrayList<>();
 
         /**
-         * 添加连接仓库工厂
+         * 添加连接仓库工厂。
+         * <p>
+         * Add factory of connection repository.
          */
         public B addConnectionRepositoryFactories(Collection<? extends ConnectionRepositoryFactory> factories) {
             this.connectionRepositoryFactories.addAll(factories);
@@ -508,7 +493,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加服务实例管理器工厂
+         * 添加服务实例管理器工厂。
+         * <p>
+         * Add factory of connection server manager.
          */
         public B addConnectionServerManagerFactories(Collection<? extends ConnectionServerManagerFactory> factories) {
             this.connectionServerManagerFactories.addAll(factories);
@@ -516,7 +503,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加连接订阅者工厂
+         * 添加连接订阅者工厂。
+         * <p>
+         * Add factory of connection subscriber.
          */
         public B addConnectionSubscriberFactories(Collection<? extends ConnectionSubscriberFactory> factories) {
             this.connectionSubscriberFactories.addAll(factories);
@@ -524,7 +513,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加连接工厂
+         * 添加连接工厂。
+         * <p>
+         * Add factory of connection.
          */
         public B addConnectionFactories(Collection<? extends ConnectionFactory> factories) {
             this.connectionFactories.addAll(factories);
@@ -532,7 +523,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加连接选择器
+         * 添加连接选择器。
+         * <p>
+         * Add connection selector.
          */
         public B addConnectionSelectors(Collection<? extends ConnectionSelector> selectors) {
             this.connectionSelectors.addAll(selectors);
@@ -540,7 +533,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加消息工厂
+         * 添加消息工厂。
+         * <p>
+         * Add factory of message.
          */
         public B addMessageFactories(Collection<? extends MessageFactory> factories) {
             this.messageFactories.addAll(factories);
@@ -548,7 +543,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加消息编解码适配器
+         * 添加消息编解码适配器。
+         * <p>
+         * Add adapter of message codec.
          */
         public B addMessageCodecAdapters(Collection<? extends MessageCodecAdapter> adapters) {
             this.messageCodecAdapters.addAll(adapters);
@@ -556,7 +553,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加消息重试策略适配器
+         * 添加消息重试策略适配器。
+         * <p>
+         * Add adapter of message retry strategy.
          */
         public B addMessageRetryStrategyAdapters(Collection<? extends MessageRetryStrategyAdapter> adapters) {
             this.messageRetryStrategyAdapters.addAll(adapters);
@@ -564,7 +563,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加消息幂等校验器工厂
+         * 添加消息幂等校验器工厂。
+         * <p>
+         * Add factory of message idempotent verifier.
          */
         public B addMessageIdempotentVerifierFactories(Collection<? extends MessageIdempotentVerifierFactory> factories) {
             this.messageIdempotentVerifierFactories.addAll(factories);
@@ -572,7 +573,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加线程池工厂
+         * 添加线程池工厂。
+         * <p>
+         * Add factory of executor.
          */
         public B addScheduledExecutorFactories(Collection<ScheduledExecutorFactory> factories) {
             this.scheduledExecutorFactories.addAll(factories);
@@ -580,7 +583,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加日志工厂
+         * 添加日志工厂。
+         * <p>
+         * Add factory of logger.
          */
         public B addLoggerFactories(Collection<ConnectionLoggerFactory> factories) {
             this.loggerFactories.addAll(factories);
@@ -588,7 +593,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加事件发布者工厂
+         * 添加事件发布者工厂。
+         * <p>
+         * Add factory of event publisher.
          */
         public B addEventPublisherFactories(Collection<? extends ConnectionEventPublisherFactory> factories) {
             this.eventPublisherFactories.addAll(factories);
@@ -596,7 +603,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加事件监听器
+         * 添加事件监听器。
+         * <p>
+         * Add event listener.
          */
         public B addEventListener(ConnectionEventListener listener) {
             this.eventListeners.add(listener);
@@ -604,7 +613,9 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         }
 
         /**
-         * 添加事件监听器
+         * 添加事件监听器。
+         * <p>
+         * Add event listener.
          */
         public B addEventListeners(Collection<ConnectionEventListener> listeners) {
             this.eventListeners.addAll(listeners);
@@ -614,16 +625,21 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         public T build() {
 
             //添加一个全选器在最后
+            //Add an all connection selector.
             connectionSelectors.add(new AllSelector()
                     .addScopes(getScope()));
 
             //添加一个任意对象的消息工厂
+            //Add a message factory support any object
             messageFactories.add(new ObjectMessageFactory());
 
+            //添加一个基础消息编解码适配器
+            //Add a basic message codec adapter
             messageCodecAdapters.add(new BaseMessageCodecAdapter()
                     .addScopes(getScope()));
 
             //添加消息转发处理器
+            //Add the message forward handler
             eventListeners.add(1, new MessageForwardHandler());
 
             T concept = create();
@@ -657,22 +673,52 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             return concept;
         }
 
+        /**
+         * 创建 concept 实例。
+         * <p>
+         * Create an instance of concept.
+         */
         protected abstract T create();
 
+        /**
+         * 获得连接域。
+         * <p>
+         * Get the scope.
+         */
         protected abstract String getScope();
 
+        /**
+         * 根据连接域筛选。
+         * <p>
+         * Filter by scope.
+         */
         protected <S extends Scoped> List<S> withScope(Collection<S> collection) {
             return Scoped.filter(getScope(), collection);
         }
 
+        /**
+         * 根据连接域筛选。
+         * <p>
+         * Filter by scope.
+         */
         protected <S extends Scoped> S withScope(Class<S> type, Collection<S> collection) {
             return Scoped.filter(getScope(), type, collection);
         }
 
+        /**
+         * 根据连接域筛选并创建实例。
+         * <p>
+         * Filter by scope and create instance.
+         */
         protected <C, F extends ScopedFactory<C>> C withScopeFactory(Class<C> type, Collection<F> factories) {
             return ScopedFactory.create(getScope(), type, factories);
         }
 
+        /**
+         * 处理主从订阅器。
+         * <p>
+         * Handle master-slave subscriber.
+         */
         protected ConnectionSubscriber withConnectionSubscriberMasterSlave(List<ConnectionSubscriberFactory> factories) {
             List<ConnectionSubscriberFactory> unsupported = new ArrayList<>();
             List<ConnectionSubscriberFactory> masters = new ArrayList<>();
@@ -709,6 +755,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
         }
 
+        /**
+         * 消息编解码链。
+         * <p>
+         * Apply chain of message codec adapter.
+         */
         protected MessageCodecAdapter withMessageCodecAdapterChain(ConnectionLoadBalanceConcept concept,
                                                                    List<MessageCodecAdapter> messageCodecAdapters) {
             Collections.reverse(messageCodecAdapters);
@@ -716,6 +767,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     .addScopes(getScope());
         }
 
+        /**
+         * 连接选择器过滤链。
+         * <p>
+         * Apply filter chain of connection selector.
+         */
         protected List<ConnectionSelector> withConnectionSelectorFilterChain(List<ConnectionSelector> connectionSelectors) {
             List<ConnectionSelector> selectors = new ArrayList<>();
             List<FilterConnectionSelector> filterSelectors = new ArrayList<>();

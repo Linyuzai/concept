@@ -9,39 +9,49 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 连接工厂
+ * 连接工厂。
  * <p>
- * 用于将底层连接包装成 {@link Connection} 实例
+ * Factory of connection.
  */
 public interface ConnectionFactory extends Scoped {
 
     /**
-     * 是否支持
-     *
-     * @param o        底层连接
-     * @param metadata 元数据
-     * @return 是否支持
+     * 是否支持。
+     * <p>
+     * If supported.
      */
     boolean support(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 是否支持。
+     * <p>
+     * If supported.
+     */
     default boolean support(Object o, Map<Object, Object> metadata) {
         return support(o, metadata, null);
     }
 
     /**
-     * 创建 {@link Connection} 对象
-     *
-     * @param o        底层连接
-     * @param metadata 元数据
-     * @param concept  {@link ConnectionLoadBalanceConcept}
-     * @return {@link Connection} 实例
+     * 创建连接。
+     * <p>
+     * Create connection.
      */
     Connection create(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 创建连接。
+     * <p>
+     * Create connection.
+     */
     default Connection create(Object o, Map<Object, Object> metadata) {
         return create(o, metadata, null);
     }
 
+    /**
+     * 连接工厂代理。
+     * <p>
+     * Delegate of connection factory.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements ConnectionFactory {

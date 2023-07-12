@@ -18,28 +18,22 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * 连接负载均衡概念
+ * 连接负载均衡概念。
+ * <p>
+ * Concept of connection's load-balance.
  */
 public interface ConnectionLoadBalanceConcept {
 
-    /**
-     * 初始化
-     */
     void initialize();
 
-    /**
-     * 销毁
-     */
     void destroy();
 
     String getId();
 
     /**
-     * 创建连接
-     *
-     * @param o        底层连接
-     * @param metadata 元数据
-     * @return 连接
+     * 创建连接。
+     * <p>
+     * Create connection.
      */
     Connection createConnection(Object o, Map<Object, Object> metadata);
 
@@ -53,92 +47,82 @@ public interface ConnectionLoadBalanceConcept {
     Connection onEstablish(Object o, Map<Object, Object> metadata);
 
     /**
-     * 当连接建立时调用
-     *
-     * @param connection 连接
+     * 当连接建立时调用。
+     * <p>
+     * Called when connection established.
      */
     void onEstablish(Connection connection);
 
     /**
-     * 当连接关闭时调用
-     *
-     * @param id     连接 id
-     * @param type   连接类型
-     * @param reason 关闭原因
+     * 当连接关闭时调用。
+     * <p>
+     * Called when connection closed.
      */
     void onClose(Object id, String type, Object reason);
 
     /**
-     * 当连接关闭时调用
-     *
-     * @param connection 连接
-     * @param reason     关闭原因
+     * 当连接关闭时调用。
+     * <p>
+     * Called when connection closed for additional reason.
      */
     void onClose(Connection connection, Object reason);
 
     /**
-     * 当连接接收消息时调用
-     *
-     * @param id      连接 id
-     * @param type    连接类型
-     * @param message 消息数据
+     * 当连接接收消息时调用。
+     * <p>
+     * Called when message received.
      */
     void onMessage(Object id, String type, Object message);
 
     /**
-     * 当连接接收消息时调用
-     *
-     * @param connection 连接
-     * @param message    消息数据
+     * 当连接接收消息时调用。
+     * <p>
+     * Called when message received.
      */
     void onMessage(Connection connection, Object message);
 
     /**
-     * 当连接接收消息时调用
-     *
-     * @param connection 连接
-     * @param message    消息数据
-     * @param predicate  过滤条件
+     * 当连接接收消息时调用。
+     * 可通过断言确定是否丢弃消息。
+     * <p>
+     * Called when message received.
+     * Discard messages by predicate.
      */
     void onMessage(Connection connection, Object message, Predicate<Message> predicate);
 
     /**
-     * 当连接异常时调用
-     *
-     * @param id   连接 id
-     * @param type 连接类型
-     * @param e    异常
+     * 当连接异常时调用。
+     * <p>
+     * Called when has error.
      */
     void onError(Object id, String type, Throwable e);
 
     /**
-     * 当连接异常时调用
-     *
-     * @param connection 连接
-     * @param e          异常
+     * 当连接异常时调用。
+     * <p>
+     * Called when has error.
      */
     void onError(Connection connection, Throwable e);
 
     /**
-     * 创建消息
-     *
-     * @param o 消息数据
-     * @return {@link Message} 实例
+     * 创建消息。
+     * <p>
+     * Create message.
      */
     Message createMessage(Object o);
 
     /**
-     * 发送消息
-     *
-     * @param msg 消息
+     * 发送消息。
+     * <p>
+     * Send message.
      */
     void send(Object msg);
 
     /**
-     * 发送消息
-     *
-     * @param msg     消息
-     * @param headers 消息头
+     * 发送消息。
+     * 同时添加额外的消息头。
+     * <p>
+     * Send message with additional headers.
      */
     void send(Object msg, Map<String, String> headers);
 

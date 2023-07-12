@@ -5,9 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageSendInterc
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -15,9 +15,11 @@ import java.util.function.Function;
 
 /**
  * 组合连接
+ * <p>
+ * Connection impl of connection's list.
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class Connections implements Connection {
 
     @NonNull

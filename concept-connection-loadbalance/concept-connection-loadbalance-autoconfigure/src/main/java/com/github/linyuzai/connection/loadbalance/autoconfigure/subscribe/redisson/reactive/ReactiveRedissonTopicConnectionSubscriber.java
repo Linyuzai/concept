@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Redisson (Shared) Topic 连接订阅器。
- * 通过 {@link RTopic} 转发消息，通过 {@link RTopic} 订阅消息
+ * Reactive Redisson (Shared) Topic 连接订阅器。
+ * 通过 {@link RTopicReactive} 转发消息，通过 {@link RTopicReactive} 订阅消息
  * <p>
- * {@link ConnectionSubscriber} impl by Redisson (Shared) Topic.
- * forward message by {@link RTopic}, listen message by {@link RTopic}.
+ * {@link ConnectionSubscriber} impl by Reactive Redisson (Shared) Topic.
+ * forward message by {@link RTopicReactive}, listen message by {@link RTopicReactive}.
  */
 @Getter
 @RequiredArgsConstructor
@@ -35,9 +35,9 @@ public class ReactiveRedissonTopicConnectionSubscriber extends AbstractMasterSla
     private final boolean shared;
 
     /**
-     * 创建 Redisson 的监听连接。
+     * 创建 Reactive Redisson 的监听连接。
      * <p>
-     * Create the connection to listen message from Redisson.
+     * Create the connection to listen message from Reactive Redisson.
      */
     @Override
     protected Connection createSubscriber(String id, String topic, Map<Object, Object> context,
@@ -58,9 +58,9 @@ public class ReactiveRedissonTopicConnectionSubscriber extends AbstractMasterSla
     }
 
     /**
-     * 创建 Redisson 的转发连接。
+     * 创建 Reactive Redisson 的转发连接。
      * <p>
-     * Create the connection to forward message by Redisson.
+     * Create the connection to forward message by Reactive Redisson.
      */
     @Override
     protected Connection createObservable(String id, String topic, Map<Object, Object> context,
