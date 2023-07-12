@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageTransportException;

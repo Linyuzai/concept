@@ -5,11 +5,12 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq.RabbitMessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.ReactiveRedisMessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.ReactiveRedisTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisMessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -44,6 +45,18 @@ public class NettySubscriberConfiguration extends ConnectionSubscriberConfigurat
         }
     }
 
+    public abstract static class ReactiveRedissonTopicConfiguration
+            extends ConnectionSubscriberConfiguration.ReactiveRedissonTopicConfiguration
+            implements NettyScopedProvider {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "nettyReactiveRedissonTopicConnectionSubscriberFactory")
+        public ReactiveRedissonTopicConnectionSubscriberFactory nettyReactiveRedissonTopicConnectionSubscriberFactory(
+                RedissonClient redissonClient) {
+            return reactiveRedissonTopicConnectionSubscriberFactory(redissonClient);
+        }
+    }
+
     public abstract static class RedissonSharedTopicConfiguration
             extends ConnectionSubscriberConfiguration.RedissonSharedTopicConfiguration
             implements NettyScopedProvider {
@@ -53,6 +66,18 @@ public class NettySubscriberConfiguration extends ConnectionSubscriberConfigurat
         public RedissonTopicConnectionSubscriberFactory nettyRedissonSharedTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
             return redissonSharedTopicConnectionSubscriberFactory(redissonClient);
+        }
+    }
+
+    public abstract static class ReactiveRedissonSharedTopicConfiguration
+            extends ConnectionSubscriberConfiguration.ReactiveRedissonSharedTopicConfiguration
+            implements NettyScopedProvider {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "nettyReactiveRedissonSharedTopicConnectionSubscriberFactory")
+        public ReactiveRedissonTopicConnectionSubscriberFactory nettyReactiveRedissonSharedTopicConnectionSubscriberFactory(
+                RedissonClient redissonClient) {
+            return reactiveRedissonTopicConnectionSubscriberFactory(redissonClient);
         }
     }
 

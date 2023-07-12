@@ -4,11 +4,12 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq.RabbitMessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.ReactiveRedisMessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.ReactiveRedisTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisMessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlave;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -93,6 +94,26 @@ public class ConnectionSubscriberConfiguration {
     }
 
     /**
+     * Reactive Redisson Topic 复用配置。
+     * <p>
+     * Configuration of reactive-redisson's topic subscriber to reuse.
+     */
+    public abstract static class ReactiveRedissonTopicConfiguration
+            implements ScopedProvider, MasterSlaveProvider {
+
+        public ReactiveRedissonTopicConnectionSubscriberFactory reactiveRedissonTopicConnectionSubscriberFactory(
+                RedissonClient redissonClient) {
+            ReactiveRedissonTopicConnectionSubscriberFactory factory =
+                    new ReactiveRedissonTopicConnectionSubscriberFactory();
+            factory.setRedissonReactiveClient(redissonClient.reactive());
+            factory.setShared(false);
+            factory.setMasterSlave(getMasterSlave());
+            factory.addScopes(getScoped());
+            return factory;
+        }
+    }
+
+    /**
      * Redisson Shared Topic 复用配置。
      * <p>
      * Configuration of redisson's shared topic subscriber to reuse.
@@ -105,6 +126,26 @@ public class ConnectionSubscriberConfiguration {
             RedissonTopicConnectionSubscriberFactory factory =
                     new RedissonTopicConnectionSubscriberFactory();
             factory.setRedissonClient(redissonClient);
+            factory.setShared(true);
+            factory.setMasterSlave(getMasterSlave());
+            factory.addScopes(getScoped());
+            return factory;
+        }
+    }
+
+    /**
+     * Reactive Redisson Shared Topic 复用配置。
+     * <p>
+     * Configuration of reactive-redisson's shared topic subscriber to reuse.
+     */
+    public abstract static class ReactiveRedissonSharedTopicConfiguration
+            implements ScopedProvider, MasterSlaveProvider {
+
+        public ReactiveRedissonTopicConnectionSubscriberFactory reactiveRedissonTopicConnectionSubscriberFactory(
+                RedissonClient redissonClient) {
+            ReactiveRedissonTopicConnectionSubscriberFactory factory =
+                    new ReactiveRedissonTopicConnectionSubscriberFactory();
+            factory.setRedissonReactiveClient(redissonClient.reactive());
             factory.setShared(true);
             factory.setMasterSlave(getMasterSlave());
             factory.addScopes(getScoped());

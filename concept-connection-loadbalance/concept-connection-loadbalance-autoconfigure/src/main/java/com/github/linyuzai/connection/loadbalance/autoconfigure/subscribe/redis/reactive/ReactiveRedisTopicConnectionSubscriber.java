@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -81,7 +81,7 @@ public class ReactiveRedisTopicConnectionSubscriber extends AbstractMasterSlaveC
 
         @Override
         public String getServiceId() {
-            return "reactive-redis";
+            return "redis-reactive";
         }
 
         @Override

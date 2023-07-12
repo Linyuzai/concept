@@ -26,13 +26,11 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.EmptyConnection
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 
 import java.util.List;
 
@@ -69,6 +67,22 @@ public class NettyLoadBalanceConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "REDISSON_TOPIC_REACTIVE")
+    public static class ReactiveRedissonTopicSubscriberMasterConfiguration
+            extends NettySubscriberConfiguration.ReactiveRedissonTopicConfiguration
+            implements NettySubscriberConfiguration.MasterProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "REDISSON_TOPIC_REACTIVE")
+    public static class ReactiveRedissonTopicSubscriberSlaveConfiguration
+            extends NettySubscriberConfiguration.ReactiveRedissonTopicConfiguration
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
             havingValue = "REDISSON_SHARED_TOPIC")
     public static class RedissonSharedTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.RedissonSharedTopicConfiguration
@@ -84,7 +98,22 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnMissingBean(ReactiveRedisConnectionFactory.class)
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
+            havingValue = "REDISSON_SHARED_TOPIC_REACTIVE")
+    public static class ReactiveRedissonSharedTopicSubscriberMasterConfiguration
+            extends NettySubscriberConfiguration.ReactiveRedissonSharedTopicConfiguration
+            implements NettySubscriberConfiguration.MasterProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
+            havingValue = "REDISSON_SHARED_TOPIC_REACTIVE")
+    public static class ReactiveRedissonSharedTopicSubscriberSlaveConfiguration
+            extends NettySubscriberConfiguration.ReactiveRedissonSharedTopicConfiguration
+            implements ConnectionSubscriberConfiguration.SlaveProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
             havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberMasterConfiguration
@@ -93,7 +122,6 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnMissingBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
             havingValue = "REDIS_TOPIC")
     public static class RedisTopicSubscriberSlaveConfiguration
@@ -102,18 +130,16 @@ public class NettyLoadBalanceConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-master",
-            havingValue = "REDIS_TOPIC")
+            havingValue = "REDIS_TOPIC_REACTIVE")
     public static class ReactiveRedisTopicSubscriberMasterConfiguration
             extends NettySubscriberConfiguration.ReactiveRedisTopicConfiguration
             implements NettySubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnBean(ReactiveRedisConnectionFactory.class)
     @ConditionalOnProperty(value = "concept.netty.load-balance.subscriber-slave",
-            havingValue = "REDIS_TOPIC")
+            havingValue = "REDIS_TOPIC_REACTIVE")
     public static class ReactiveRedisTopicSubscriberSlaveConfiguration
             extends NettySubscriberConfiguration.ReactiveRedisTopicConfiguration
             implements ConnectionSubscriberConfiguration.SlaveProvider {

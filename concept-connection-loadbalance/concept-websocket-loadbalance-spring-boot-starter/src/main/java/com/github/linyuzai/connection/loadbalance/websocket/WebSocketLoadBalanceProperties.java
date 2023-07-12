@@ -125,9 +125,13 @@ public class WebSocketLoadBalanceProperties {
             WEBSOCKET_SSL,
 
             REDISSON_TOPIC,
+            REDISSON_TOPIC_REACTIVE,
+
             REDISSON_SHARED_TOPIC,
+            REDISSON_SHARED_TOPIC_REACTIVE,
 
             REDIS_TOPIC,
+            REDIS_TOPIC_REACTIVE,
 
             RABBIT_FANOUT,
 
@@ -139,9 +143,13 @@ public class WebSocketLoadBalanceProperties {
             NONE,
 
             REDISSON_TOPIC,
+            REDISSON_TOPIC_REACTIVE,
+
             REDISSON_SHARED_TOPIC,
+            REDISSON_SHARED_TOPIC_REACTIVE,
 
             REDIS_TOPIC,
+            REDIS_TOPIC_REACTIVE,
 
             RABBIT_FANOUT,
 

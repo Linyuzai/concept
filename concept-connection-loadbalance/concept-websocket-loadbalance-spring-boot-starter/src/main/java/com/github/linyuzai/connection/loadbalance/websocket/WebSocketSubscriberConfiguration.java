@@ -5,11 +5,12 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka.KafkaTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq.RabbitFanoutConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.rabbitmq.RabbitMessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.ReactiveRedisMessageCodecAdapter;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.ReactiveRedisTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisMessageCodecAdapter;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
@@ -56,6 +57,18 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         }
     }
 
+    public abstract static class ReactiveRedissonTopicConfiguration
+            extends ConnectionSubscriberConfiguration.ReactiveRedissonTopicConfiguration
+            implements WebSocketScopedProvider {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsReactiveRedissonTopicConnectionSubscriberFactory")
+        public ReactiveRedissonTopicConnectionSubscriberFactory wsReactiveRedissonTopicConnectionSubscriberFactory(
+                RedissonClient redissonClient) {
+            return reactiveRedissonTopicConnectionSubscriberFactory(redissonClient);
+        }
+    }
+
     public abstract static class RedissonSharedTopicConfiguration
             extends ConnectionSubscriberConfiguration.RedissonSharedTopicConfiguration
             implements WebSocketScopedProvider {
@@ -65,6 +78,18 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         public RedissonTopicConnectionSubscriberFactory wsRedissonSharedTopicConnectionSubscriberFactory(
                 RedissonClient redissonClient) {
             return redissonSharedTopicConnectionSubscriberFactory(redissonClient);
+        }
+    }
+
+    public abstract static class ReactiveRedissonSharedTopicConfiguration
+            extends ConnectionSubscriberConfiguration.ReactiveRedissonSharedTopicConfiguration
+            implements WebSocketScopedProvider {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsReactiveRedissonSharedTopicConnectionSubscriberFactory")
+        public ReactiveRedissonTopicConnectionSubscriberFactory wsReactiveRedissonSharedTopicConnectionSubscriberFactory(
+                RedissonClient redissonClient) {
+            return reactiveRedissonTopicConnectionSubscriberFactory(redissonClient);
         }
     }
 

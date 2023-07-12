@@ -59,9 +59,13 @@ public class NettyLoadBalanceProperties {
             NONE,
 
             REDISSON_TOPIC,
+            REDISSON_TOPIC_REACTIVE,
+
             REDISSON_SHARED_TOPIC,
+            REDISSON_SHARED_TOPIC_REACTIVE,
 
             REDIS_TOPIC,
+            REDIS_TOPIC_REACTIVE,
 
             RABBIT_FANOUT,
 

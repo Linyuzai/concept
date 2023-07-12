@@ -1,4 +1,4 @@
-package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
+package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
 import lombok.Getter;
@@ -8,19 +8,19 @@ import reactor.core.Disposable;
 import java.util.function.Consumer;
 
 /**
- * Reactive Redis 监听连接。
+ * Redisson 监听连接。
  * <p>
- * The connection to listen message form Reactive Redis.
+ * The connection to listen message form Redisson.
  */
 @Getter
 @Setter
-public class ReactiveRedisTopicSubscriberConnection extends AliveForeverConnection {
+public class ReactiveRedissonTopicSubscriberConnection extends AliveForeverConnection {
 
     private Object id;
 
     private Disposable disposable;
 
-    public ReactiveRedisTopicSubscriberConnection() {
+    public ReactiveRedissonTopicSubscriberConnection() {
         setType(Type.SUBSCRIBER);
     }
 
