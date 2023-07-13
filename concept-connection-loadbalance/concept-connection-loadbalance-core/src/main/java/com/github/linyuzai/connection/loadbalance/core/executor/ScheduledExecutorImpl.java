@@ -7,6 +7,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 定时任务执行器实现。
+ * 基于 {@link ScheduledExecutorService}。
+ * <p>
+ * Scheduled executor impl by {@link ScheduledExecutorService}.
+ */
 @Getter
 @RequiredArgsConstructor
 public class ScheduledExecutorImpl implements ScheduledExecutor {

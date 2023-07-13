@@ -6,7 +6,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.UnknownConnection
 import lombok.Getter;
 
 /**
- * 未知连接关闭事件
+ * 未知连接关闭事件。
+ * <p>
+ * Event will be published when unknown connection closed.
  */
 @Getter
 public class UnknownCloseEvent extends TimestampEvent implements ConnectionEvent {

@@ -8,9 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * 可以将消息发送给指定路径的连接
+ * 基于路径的消息。
+ * 可以将消息发送给指定路径的连接。
+ * 配合 {@link PathSelector} 使用。
  * <p>
- * 配合 {@link PathSelector} 使用
+ * Messages based on paths.
+ * Message will be send to paths with {@link PathSelector}.
  */
 public class PathMessage extends ObjectMessage implements MessageCondition {
 

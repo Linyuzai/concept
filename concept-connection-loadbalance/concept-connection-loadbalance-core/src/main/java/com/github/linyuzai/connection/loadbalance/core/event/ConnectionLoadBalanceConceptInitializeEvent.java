@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * {@link ConnectionLoadBalanceConcept} 初始化事件
+ * Concept 初始化事件。
+ * <p>
+ * Event will be published when concept init.
  */
 @Getter
 @AllArgsConstructor

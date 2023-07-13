@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 事件发布异常事件
+ * 事件发布异常事件。
+ * <p>
+ * Event will be published when event publish error.
  */
 @Getter
 @AllArgsConstructor

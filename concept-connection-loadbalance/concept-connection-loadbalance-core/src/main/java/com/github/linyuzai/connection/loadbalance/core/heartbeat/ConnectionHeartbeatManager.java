@@ -7,19 +7,25 @@ import lombok.Setter;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 心跳管理器
+ * 心跳管理器。
+ * <p>
+ * Management of heartbeat.
  */
 @Setter
 @Getter
 public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
 
     /**
-     * 心跳间隔时间
+     * 心跳发送间隔时间。
+     * <p>
+     * Period of heartbeat sending.
      */
     private long period;
 
     /**
-     * 初始化添加定时任务
+     * 初始化添加定时任务。
+     * <p>
+     * Add heartbeat jab.
      */
     @Override
     public void onInitialize(ConnectionLoadBalanceConcept concept) {
@@ -28,13 +34,13 @@ public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
     }
 
     /**
-     * 关闭心跳超时的连接
+     * 关闭心跳超时的连接并发送心跳。
      * <p>
-     * 发送 ping
+     * Close connections on heartbeat timeout and send heartbeat.
      */
     public void schedule(ConnectionLoadBalanceConcept concept) {
         closeTimeout(concept);
-        sendPing(concept);
+        sendHeartbeat(concept);
     }
 
     @Override

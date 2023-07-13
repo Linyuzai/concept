@@ -4,6 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 连接日志。
+ * <p>
+ * Logger of connections.
+ */
 public interface ConnectionLogger {
 
     void info(String msg, ConnectionLoadBalanceConcept concept);
@@ -18,6 +23,11 @@ public interface ConnectionLogger {
         error(msg, e, null);
     }
 
+    /**
+     * 连接日志代理。
+     * <p>
+     * Delegate of logger.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements ConnectionLogger {

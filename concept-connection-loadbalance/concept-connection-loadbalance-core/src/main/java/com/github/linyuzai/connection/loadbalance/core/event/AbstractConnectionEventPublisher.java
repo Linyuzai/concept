@@ -1,30 +1,37 @@
 package com.github.linyuzai.connection.loadbalance.core.event;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 事件发布者抽象类
+ * 事件发布者抽象类。
+ * <p>
+ * Abstract event publisher.
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AbstractConnectionEventPublisher implements ConnectionEventPublisher {
 
     private final List<ConnectionEventListener> listeners;
 
+    public AbstractConnectionEventPublisher() {
+        this(new CopyOnWriteArrayList<>());
+    }
+
     /**
-     * 发布事件
+     * 发布事件。
+     * 发布异常会被重新发布 {@link EventPublishErrorEvent} 事件。
+     * 再次异常将会直接抛出异常。
      * <p>
-     * 发布异常会被重新发布 {@link EventPublishErrorEvent} 事件
-     * <p>
-     * 再次异常将会直接抛出异常
-     *
-     * @param event 事件
+     * Publish event.
+     * Publish {@link EventPublishErrorEvent} when publish error.
+     * Throw if error again.
      */
     @Override
     public void publish(Object event, ConnectionLoadBalanceConcept concept) {

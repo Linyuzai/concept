@@ -8,11 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * 基于用户的消息
+ * 基于用户的消息。
+ * 可以给某个用户发送消息。
+ * 配合 {@link UserSelector} 使用。
  * <p>
- * 可以给某个用户发送消息
- * <p>
- * 配合 {@link UserSelector} 使用
+ * Messages based on users.
+ * Message will be send to users with {@link UserSelector}.
  */
 public class UserMessage extends ObjectMessage implements MessageCondition {
 

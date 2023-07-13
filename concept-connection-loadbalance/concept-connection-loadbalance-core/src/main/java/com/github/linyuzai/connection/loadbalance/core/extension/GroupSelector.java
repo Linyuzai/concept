@@ -4,9 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 import com.github.linyuzai.connection.loadbalance.core.select.MetadataSelector;
 
 /**
- * 分组连接选择器
+ * 分组连接选择器。
+ * 配合 {@link GroupMessage} 使用。
  * <p>
- * 配合 {@link GroupMessage} 使用
+ * Group connection selector.
+ * Used with {@link GroupMessage}.
  */
 public class GroupSelector extends MetadataSelector implements FilterConnectionSelector {
 

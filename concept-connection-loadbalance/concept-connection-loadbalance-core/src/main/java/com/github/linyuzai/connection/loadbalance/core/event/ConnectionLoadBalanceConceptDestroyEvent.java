@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * {@link ConnectionLoadBalanceConcept} 销毁事件
+ * Concept 销毁事件。
+ * <p>
+ * Event will be published when concept destroyed.
  */
 @Getter
 @AllArgsConstructor

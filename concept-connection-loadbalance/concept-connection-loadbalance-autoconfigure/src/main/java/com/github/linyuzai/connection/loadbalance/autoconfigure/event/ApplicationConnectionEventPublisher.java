@@ -1,8 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.event;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.event.AbstractConnectionEventPublisher;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherImpl;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,7 +15,7 @@ import org.springframework.context.event.EventListener;
  */
 @Getter
 @RequiredArgsConstructor
-public class ApplicationConnectionEventPublisher extends ConnectionEventPublisherImpl {
+public class ApplicationConnectionEventPublisher extends AbstractConnectionEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 

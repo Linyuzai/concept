@@ -6,9 +6,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 基于路径的连接选择器
+ * 路径连接选择器。
+ * 配合 {@link PathMessage} 使用。
  * <p>
- * 配合 {@link PathMessage} 使用
+ * Path connection selector.
+ * Used with {@link PathMessage}.
  */
 @Getter
 @RequiredArgsConstructor

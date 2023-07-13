@@ -5,7 +5,7 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.event.Applicatio
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
-import com.github.linyuzai.connection.loadbalance.core.logger.ErrorLogger;
+import com.github.linyuzai.connection.loadbalance.core.logger.LoggedErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactoryImpl;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
@@ -65,7 +65,7 @@ public class ConnectionLoadBalanceConfiguration {
     @Bean
     @Order(0)
     public ErrorHandler errorHandler() {
-        return new ErrorLogger();
+        return new LoggedErrorHandler();
     }
 
     @Bean

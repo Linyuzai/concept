@@ -4,9 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.select.FilterConnectionSe
 import com.github.linyuzai.connection.loadbalance.core.select.MetadataSelector;
 
 /**
- * 用户连接选择器
+ * 用户连接选择器。
+ * 配合 {@link UserMessage} 使用。
  * <p>
- * 配合 {@link UserMessage} 使用
+ * User connection selector.
+ * Used with {@link UserMessage}.
  */
 public class UserSelector extends MetadataSelector implements FilterConnectionSelector {
 

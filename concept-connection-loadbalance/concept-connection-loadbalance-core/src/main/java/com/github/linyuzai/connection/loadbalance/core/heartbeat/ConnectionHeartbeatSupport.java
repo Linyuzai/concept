@@ -14,19 +14,25 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 心跳管理支持类
+ * 心跳管理支持类。
+ * <p>
+ * To support heartbeat management.
  */
 @Setter
 @Getter
 public abstract class ConnectionHeartbeatSupport extends AbstractScoped implements ConnectionEventListener {
 
     /**
-     * 连接类型
+     * 连接类型。
+     * <p>
+     * Connection's type to support.
      */
     private final Collection<String> connectionTypes = new CopyOnWriteArrayList<>();
 
     /**
-     * 心跳超时时间
+     * 心跳超时时间。
+     * <p>
+     * Milliseconds of timeout.
      */
     private long timeout;
 
@@ -40,7 +46,7 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
             Connection connection = ((MessageReceiveEvent) event).getConnection();
             Message message = ((MessageReceiveEvent) event).getMessage();
             //如果是 pong 则更新最后心跳时间
-            if (isTypeMatched(connection.getType()) && isPongMessage(message)) {
+            if (isTypeMatched(connection.getType()) && isHeartbeatReply(message)) {
                 connection.setLastHeartbeat(System.currentTimeMillis());
                 connection.setAlive(true);
             }
@@ -48,10 +54,9 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
     }
 
     /**
-     * 连接类型是否匹配
-     *
-     * @param type 连接类型
-     * @return 连接类型是否匹配
+     * 连接类型是否匹配。
+     * <p>
+     * Match connection's type.
      */
     public boolean isTypeMatched(String type) {
         if (type == null) {
@@ -65,24 +70,20 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
         return false;
     }
 
-    /**
-     * 初始化
-     */
     public abstract void onInitialize(ConnectionLoadBalanceConcept concept);
 
-    /**
-     * 销毁
-     */
     public abstract void onDestroy(ConnectionLoadBalanceConcept concept);
 
     /**
-     * 发送 ping
+     * 发送心跳。
+     * <p>
+     * Send ping as heartbeat.
      */
-    public void sendPing(ConnectionLoadBalanceConcept concept) {
+    public void sendHeartbeat(ConnectionLoadBalanceConcept concept) {
         for (String connectionType : connectionTypes) {
             Collection<Connection> connections = concept.getConnectionRepository()
                     .select(connectionType);
-            Message message = createPingMessage();
+            Message message = createHeartbeatMessage();
             for (Connection connection : connections) {
                 try {
                     connection.send(message);
@@ -95,7 +96,9 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
     }
 
     /**
-     * 关闭心跳超时的连接
+     * 关闭心跳超时的连接。
+     * <p>
+     * Close connections if heartbeat timeout.
      */
     public void closeTimeout(ConnectionLoadBalanceConcept concept) {
         long now = System.currentTimeMillis();
@@ -113,21 +116,20 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
     }
 
     /**
-     * 是否是 pong
-     *
-     * @param message 消息
-     * @return 是否是 pong
+     * 是否是心跳回复。
+     * <p>
+     * If is heartbeat reply.
      */
-    public boolean isPongMessage(Message message) {
+    public boolean isHeartbeatReply(Message message) {
         return message instanceof PongMessage;
     }
 
     /**
-     * 创建 ping 消息
-     *
-     * @return ping 消息
+     * 创建心跳消息。
+     * <p>
+     * Create heartbeat message.
      */
-    public Message createPingMessage() {
+    public Message createHeartbeatMessage() {
         return new BinaryPingMessage();
     }
 }

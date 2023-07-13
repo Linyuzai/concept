@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 连接建立事件
+ * 连接建立事件。
+ * <p>
+ * Event will be published when connection established.
  */
 @Getter
 @RequiredArgsConstructor

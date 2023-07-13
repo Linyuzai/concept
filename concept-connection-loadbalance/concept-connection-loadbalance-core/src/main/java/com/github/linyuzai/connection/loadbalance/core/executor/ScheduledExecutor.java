@@ -6,6 +6,11 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 定时任务执行器。
+ * <p>
+ * Executor of scheduled job.
+ */
 public interface ScheduledExecutor {
 
     void schedule(Runnable runnable, long delay, TimeUnit unit, ConnectionLoadBalanceConcept concept);
@@ -46,6 +51,11 @@ public interface ScheduledExecutor {
         shutdown(null);
     }
 
+    /**
+     * 定时任务执行器代理。
+     * <p>
+     * Delegate of scheduled executor.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements ScheduledExecutor {

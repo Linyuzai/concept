@@ -1,7 +1,9 @@
 package com.github.linyuzai.connection.loadbalance.core.exception;
 
 /**
- * 异常类
+ * 异常基础类。
+ * <p>
+ * Basic exception.
  */
 public class ConnectionLoadBalanceException extends RuntimeException {
 

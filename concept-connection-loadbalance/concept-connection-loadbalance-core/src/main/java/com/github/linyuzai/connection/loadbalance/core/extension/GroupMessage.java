@@ -8,11 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * 基于分组的消息
+ * 基于分组的消息。
+ * 可以给某几个分组发送消息。
+ * 配合 {@link GroupSelector} 使用。
  * <p>
- * 可以给某个分组发送消息
- * <p>
- * 配合 {@link GroupSelector} 使用
+ * Messages based on groups.
+ * Message will be send to groups with {@link GroupSelector}.
  */
 public class GroupMessage extends ObjectMessage implements MessageCondition {
 

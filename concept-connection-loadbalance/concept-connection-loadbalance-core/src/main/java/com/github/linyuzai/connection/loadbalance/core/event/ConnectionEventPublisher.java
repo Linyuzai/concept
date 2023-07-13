@@ -8,14 +8,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * 事件发布者
+ * 事件发布者。
+ * <p>
+ * Event publisher.
  */
 public interface ConnectionEventPublisher {
 
     /**
-     * 发布事件
-     *
-     * @param event 事件
+     * 发布事件。
+     * <p>
+     * Publish event.
      */
     void publish(Object event, ConnectionLoadBalanceConcept concept);
 
@@ -24,9 +26,9 @@ public interface ConnectionEventPublisher {
     }
 
     /**
-     * 注册事件监听器
-     *
-     * @param listener 事件监听器
+     * 注册事件监听器。
+     * <p>
+     * Register event listener.
      */
     void register(ConnectionEventListener listener, ConnectionLoadBalanceConcept concept);
 
@@ -35,9 +37,9 @@ public interface ConnectionEventPublisher {
     }
 
     /**
-     * 注册事件监听器
-     *
-     * @param listeners 事件监听器
+     * 注册事件监听器。
+     * <p>
+     * Register event listeners.
      */
     void register(Collection<? extends ConnectionEventListener> listeners, ConnectionLoadBalanceConcept concept);
 
@@ -45,6 +47,11 @@ public interface ConnectionEventPublisher {
         register(listeners, null);
     }
 
+    /**
+     * 事件发布者代理。
+     * <p>
+     * Delegate of event publisher.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements ConnectionEventPublisher {
@@ -54,7 +61,7 @@ public interface ConnectionEventPublisher {
         private final ConnectionEventPublisher delegate;
 
         public static ConnectionEventPublisher delegate(ConnectionLoadBalanceConcept concept,
-                                                 ConnectionEventPublisher delegate) {
+                                                        ConnectionEventPublisher delegate) {
             return new Delegate(concept, delegate);
         }
 

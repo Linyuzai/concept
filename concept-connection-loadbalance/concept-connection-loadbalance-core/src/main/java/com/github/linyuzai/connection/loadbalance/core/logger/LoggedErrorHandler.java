@@ -4,9 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
 
 /**
- * 异常日志
+ * 异常日志打印。
+ * <p>
+ * Handler to log error.
  */
-public class ErrorLogger implements ErrorHandler {
+public class LoggedErrorHandler implements ErrorHandler {
 
     @Override
     public void onError(Throwable e, Object event, ConnectionLoadBalanceConcept concept) {
