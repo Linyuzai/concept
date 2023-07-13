@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 默认的连接仓库
  */
-public class ConnectionRepositoryImpl implements ConnectionRepository {
+public class GroupedConnectionRepository implements ConnectionRepository {
 
     protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();
 

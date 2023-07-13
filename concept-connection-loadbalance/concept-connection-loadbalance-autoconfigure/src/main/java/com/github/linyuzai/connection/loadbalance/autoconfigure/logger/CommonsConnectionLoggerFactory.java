@@ -9,17 +9,17 @@ import lombok.Setter;
 /**
  * 日志工厂。
  * <p>
- * Factory of {@link ConnectionLoggerImpl}.
+ * Factory of {@link CommonsConnectionLogger}.
  */
 @Getter
 @Setter
-public class ConnectionLoggerFactoryImpl extends AbstractScopedFactory<ConnectionLogger>
+public class CommonsConnectionLoggerFactory extends AbstractScopedFactory<ConnectionLogger>
         implements ConnectionLoggerFactory {
 
     private String tag;
 
     @Override
     public ConnectionLogger create(String scope) {
-        return new ConnectionLoggerImpl(tag);
+        return new CommonsConnectionLogger(tag);
     }
 }

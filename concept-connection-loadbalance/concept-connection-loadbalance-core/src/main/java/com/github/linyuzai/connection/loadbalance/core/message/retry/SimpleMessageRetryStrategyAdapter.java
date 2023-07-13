@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MessageRetryStrategyAdapterImpl extends AbstractMessageRetryStrategyAdapter {
+public class SimpleMessageRetryStrategyAdapter extends AbstractMessageRetryStrategyAdapter {
 
     private int clientMessageRetryTimes;
 
@@ -21,16 +21,16 @@ public class MessageRetryStrategyAdapterImpl extends AbstractMessageRetryStrateg
 
     @Override
     public MessageRetryStrategy getClientMessageRetryStrategy() {
-        return new MessageRetryStrategyImpl(clientMessageRetryTimes, clientMessageRetryPeriod);
+        return new SimpleMessageRetryStrategy(clientMessageRetryTimes, clientMessageRetryPeriod);
     }
 
     @Override
     public MessageRetryStrategy getSubscribeMessageRetryStrategy() {
-        return new MessageRetryStrategyImpl(subscribeMessageRetryTimes, subscribeMessageRetryPeriod);
+        return new SimpleMessageRetryStrategy(subscribeMessageRetryTimes, subscribeMessageRetryPeriod);
     }
 
     @Override
     public MessageRetryStrategy getForwardMessageRetryStrategy() {
-        return new MessageRetryStrategyImpl(forwardMessageRetryTimes, forwardMessageRetryPeriod);
+        return new SimpleMessageRetryStrategy(forwardMessageRetryTimes, forwardMessageRetryPeriod);
     }
 }

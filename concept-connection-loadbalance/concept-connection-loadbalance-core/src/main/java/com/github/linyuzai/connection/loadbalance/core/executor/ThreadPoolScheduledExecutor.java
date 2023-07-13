@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 @RequiredArgsConstructor
-public class ScheduledExecutorImpl implements ScheduledExecutor {
+public class ThreadPoolScheduledExecutor implements ScheduledExecutor {
 
     private final ScheduledExecutorService service;
 

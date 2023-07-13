@@ -2,20 +2,21 @@ package com.github.linyuzai.connection.loadbalance.core.message.decode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.message.BinaryMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.TextMessage;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.nio.ByteBuffer;
 
 /**
- * 将字符串转为 {@link TextMessage} 的解码器
+ * 通过 jackson 来解析 json。
  * <p>
- * 用于消息转发
+ * Parse json by jackson.
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class JacksonTextMessageDecoder implements MessageDecoder {
 
     private final ObjectMapper objectMapper;

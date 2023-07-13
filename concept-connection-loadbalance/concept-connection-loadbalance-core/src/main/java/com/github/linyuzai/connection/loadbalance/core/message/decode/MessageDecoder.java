@@ -6,16 +6,33 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 消息解码器
+ * 消息解码器。
+ * <p>
+ * Message decoder.
  */
 public interface MessageDecoder {
 
+    /**
+     * 解码。
+     * <p>
+     * Decode.
+     */
     Message decode(Object message, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 解码。
+     * <p>
+     * Decode.
+     */
     default Message decode(Object message) {
         return decode(message, null);
     }
 
+    /**
+     * 消息解码器代理。
+     * <p>
+     * Delegate of message decoder.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements MessageDecoder {

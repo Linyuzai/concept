@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class MessageRetryStrategyImpl extends AbstractMessageRetryStrategy {
+public class SimpleMessageRetryStrategy extends AbstractMessageRetryStrategy {
 
     private final int times;
 

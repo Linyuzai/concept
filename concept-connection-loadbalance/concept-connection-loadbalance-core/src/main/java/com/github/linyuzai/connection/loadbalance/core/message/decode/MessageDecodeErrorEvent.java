@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 消息解码异常事件
+ * 消息解码异常事件。
+ * <p>
+ * Event will be published when message decode error.
  */
 @Getter
 @RequiredArgsConstructor

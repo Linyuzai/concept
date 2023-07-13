@@ -1,22 +1,22 @@
 package com.github.linyuzai.connection.loadbalance.netty;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.ConnectionSubscriberConfiguration;
-import com.github.linyuzai.connection.loadbalance.autoconfigure.logger.ConnectionLoggerFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.autoconfigure.logger.CommonsConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
-import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.executor.ThreadPoolScheduledExecutorFactory;
 import com.github.linyuzai.connection.loadbalance.core.extension.GroupSelector;
 import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifierFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifierFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.message.idempotent.InMemoryMessageIdempotentVerifierFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
-import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapterImpl;
+import com.github.linyuzai.connection.loadbalance.core.message.retry.SimpleMessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
@@ -196,7 +196,7 @@ public class NettyLoadBalanceConfiguration {
     @Bean
     public MessageRetryStrategyAdapter nettyMessageRetryStrategyAdapter(
             NettyLoadBalanceProperties properties) {
-        MessageRetryStrategyAdapterImpl adapter = new MessageRetryStrategyAdapterImpl();
+        SimpleMessageRetryStrategyAdapter adapter = new SimpleMessageRetryStrategyAdapter();
         int clientTimes = properties.getServer().getMessage().getRetry().getTimes();
         int clientPeriod = properties.getServer().getMessage().getRetry().getPeriod();
         int lbTimes = properties.getLoadBalance().getMessage().getRetry().getTimes();
@@ -213,22 +213,22 @@ public class NettyLoadBalanceConfiguration {
 
     @Bean
     public MessageIdempotentVerifierFactory nettyMessageIdempotentVerifierFactory() {
-        return new MessageIdempotentVerifierFactoryImpl()
+        return new InMemoryMessageIdempotentVerifierFactory()
                 .addScopes(NettyScoped.NAME);
     }
 
     @Bean
     public ScheduledExecutorFactory nettyScheduledExecutorFactory(
             NettyLoadBalanceProperties properties) {
-        ScheduledExecutorFactoryImpl factory = new ScheduledExecutorFactoryImpl();
-        factory.setSize(properties.getExecutor().getSize());
+        ThreadPoolScheduledExecutorFactory factory = new ThreadPoolScheduledExecutorFactory();
+        factory.setThreadPoolSize(properties.getExecutor().getThreadPoolSize());
         factory.addScopes(NettyScoped.NAME);
         return factory;
     }
 
     @Bean
     public ConnectionLoggerFactory nettyConnectionLoggerFactory() {
-        ConnectionLoggerFactoryImpl factory = new ConnectionLoggerFactoryImpl();
+        CommonsConnectionLoggerFactory factory = new CommonsConnectionLoggerFactory();
         factory.setTag("LBNetty >> ");
         factory.addScopes(NettyScoped.NAME);
         return factory;

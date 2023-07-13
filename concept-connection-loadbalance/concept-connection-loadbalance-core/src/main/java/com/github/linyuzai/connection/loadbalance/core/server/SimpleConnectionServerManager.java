@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * {@link ConnectionServer} 提供者默认实现
  */
-public class ConnectionServerManagerImpl implements ConnectionServerManager {
+public class SimpleConnectionServerManager implements ConnectionServerManager {
 
     private final List<ConnectionServer> connectionServers = new CopyOnWriteArrayList<>();
 

@@ -76,7 +76,7 @@ public class NettyLoadBalanceProperties {
     @Data
     public static class ExecutorProperties {
 
-        private int size = 1;
+        private int threadPoolSize = 1;
     }
 
     @Data

@@ -8,11 +8,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.TextMessage;
 import java.nio.ByteBuffer;
 
 /**
- * 简单的消息解码器
+ * 简单的消息解码器。
  * <p>
- * 用于客户端消息接收
+ * Sample decoder for messages.
  */
-public class SampleMessageDecoder implements MessageDecoder {
+public class SimpleMessageDecoder implements MessageDecoder {
 
     @Override
     public Message decode(Object message, ConnectionLoadBalanceConcept concept) {

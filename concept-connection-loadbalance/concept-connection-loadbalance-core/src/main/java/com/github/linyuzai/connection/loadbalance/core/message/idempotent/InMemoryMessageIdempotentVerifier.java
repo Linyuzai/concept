@@ -6,7 +6,12 @@ import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MessageIdempotentVerifierImpl implements MessageIdempotentVerifier {
+/**
+ * 消息幂等校验器实现。
+ * <p>
+ * Verify idempotent of message in memory.
+ */
+public class InMemoryMessageIdempotentVerifier implements MessageIdempotentVerifier {
 
     private final Map<String, Boolean> ids = new ConcurrentHashMap<>();
 

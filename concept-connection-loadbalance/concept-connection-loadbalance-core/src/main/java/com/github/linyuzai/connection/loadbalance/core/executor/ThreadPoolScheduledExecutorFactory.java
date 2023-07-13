@@ -16,14 +16,14 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @Getter
 @Setter
-public class ScheduledExecutorFactoryImpl extends AbstractScopedFactory<ScheduledExecutor>
+public class ThreadPoolScheduledExecutorFactory extends AbstractScopedFactory<ScheduledExecutor>
         implements ScheduledExecutorFactory {
 
-    private int size = 1;
+    private int threadPoolSize;
 
     @Override
     public ScheduledExecutor create(String scope) {
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(size);
-        return new ScheduledExecutorImpl(service);
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(threadPoolSize);
+        return new ThreadPoolScheduledExecutor(service);
     }
 }

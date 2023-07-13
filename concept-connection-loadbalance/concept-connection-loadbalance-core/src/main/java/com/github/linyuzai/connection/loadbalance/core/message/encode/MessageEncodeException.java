@@ -4,7 +4,9 @@ import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadB
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 
 /**
- * 消息编码异常
+ * 消息编码异常。
+ * <p>
+ * Exception for message encode error.
  */
 public class MessageEncodeException extends ConnectionLoadBalanceException {
 

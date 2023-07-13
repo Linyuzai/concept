@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @Getter
 @RequiredArgsConstructor
-public class ConnectionLoggerImpl implements ConnectionLogger {
+public class CommonsConnectionLogger implements ConnectionLogger {
 
     private final Log log = LogFactory.getLog(ConnectionLogger.class);
 

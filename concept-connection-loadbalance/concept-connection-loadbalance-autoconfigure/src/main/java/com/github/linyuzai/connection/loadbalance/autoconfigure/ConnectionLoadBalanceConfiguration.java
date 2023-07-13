@@ -7,9 +7,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
 import com.github.linyuzai.connection.loadbalance.core.logger.LoggedErrorHandler;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
-import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.repository.GroupedConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactoryImpl;
+import com.github.linyuzai.connection.loadbalance.core.server.SimpleConnectionServerManagerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -53,13 +53,13 @@ public class ConnectionLoadBalanceConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public ConnectionServerManagerFactory connectionServerManagerFactory() {
-            return new ConnectionServerManagerFactoryImpl();
+            return new SimpleConnectionServerManagerFactory();
         }
     }
 
     @Bean
     public ConnectionRepositoryFactory connectionRepositoryFactory() {
-        return new ConnectionRepositoryFactoryImpl();
+        return new GroupedConnectionRepositoryFactory();
     }
 
     @Bean
