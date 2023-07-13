@@ -41,23 +41,6 @@ public class Connections implements Connection {
     }
 
     @Override
-    public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
-        for (Connection connection : connections) {
-            connection.setMessageRetryStrategy(strategy);
-        }
-    }
-
-    @Override
-    public MessageRetryStrategy getMessageRetryStrategy() {
-        return get(Connection::getMessageRetryStrategy, null);
-    }
-
-    @Override
-    public List<MessageSendInterceptor> getMessageSendInterceptors() {
-        return get(Connection::getMessageSendInterceptors, null);
-    }
-
-    @Override
     public void setMessageEncoder(MessageEncoder encoder) {
         for (Connection connection : connections) {
             connection.setMessageEncoder(encoder);
@@ -79,6 +62,23 @@ public class Connections implements Connection {
     @Override
     public MessageDecoder getMessageDecoder() {
         return get(Connection::getMessageDecoder, null);
+    }
+
+    @Override
+    public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
+        for (Connection connection : connections) {
+            connection.setMessageRetryStrategy(strategy);
+        }
+    }
+
+    @Override
+    public MessageRetryStrategy getMessageRetryStrategy() {
+        return get(Connection::getMessageRetryStrategy, null);
+    }
+
+    @Override
+    public List<MessageSendInterceptor> getMessageSendInterceptors() {
+        return get(Connection::getMessageSendInterceptors, null);
     }
 
     @Override

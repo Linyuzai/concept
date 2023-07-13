@@ -68,27 +68,6 @@ public interface Connection {
     Map<Object, Object> getMetadata();
 
     /**
-     * 设置消息重试策略。
-     * <p>
-     * Set retry strategy for message sending.
-     */
-    void setMessageRetryStrategy(MessageRetryStrategy strategy);
-
-    /**
-     * 获得消息重试策略。
-     * <p>
-     * Get retry strategy for message sending.
-     */
-    MessageRetryStrategy getMessageRetryStrategy();
-
-    /**
-     * 获得消息发送拦截器。
-     * <p>
-     * Get interceptors for message sending.
-     */
-    List<MessageSendInterceptor> getMessageSendInterceptors();
-
-    /**
      * 设置消息编码器。
      * <p>
      * Set encoder for message.
@@ -115,6 +94,27 @@ public interface Connection {
      * Get decoder for message.
      */
     MessageDecoder getMessageDecoder();
+
+    /**
+     * 设置消息重试策略。
+     * <p>
+     * Set retry strategy for message sending.
+     */
+    void setMessageRetryStrategy(MessageRetryStrategy strategy);
+
+    /**
+     * 获得消息重试策略。
+     * <p>
+     * Get retry strategy for message sending.
+     */
+    MessageRetryStrategy getMessageRetryStrategy();
+
+    /**
+     * 获得消息发送拦截器。
+     * <p>
+     * Get interceptors for message sending.
+     */
+    List<MessageSendInterceptor> getMessageSendInterceptors();
 
     /**
      * 设置 {@link ConnectionLoadBalanceConcept}。

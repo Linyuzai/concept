@@ -9,5 +9,10 @@ import com.github.linyuzai.connection.loadbalance.core.scope.Scoped;
  */
 public interface MessageRetryStrategyAdapter extends Scoped {
 
+    /**
+     * 根据连接类型获得消息重试策略。
+     * <p>
+     * Get retry strategy for message sending by connection's type.
+     */
     MessageRetryStrategy getMessageRetryStrategy(String type);
 }

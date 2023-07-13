@@ -29,10 +29,25 @@ public abstract class AbstractMessageRetryStrategyAdapter extends AbstractScoped
         }
     }
 
+    /**
+     * 获得客户端连接的消息重试策略。
+     * <p>
+     * Get retry strategy for message sending of client connection.
+     */
     public abstract MessageRetryStrategy getClientMessageRetryStrategy();
 
+    /**
+     * 获得订阅连接的消息重试策略。
+     * <p>
+     * Get retry strategy for message sending of subscription.
+     */
     public abstract MessageRetryStrategy getSubscribeMessageRetryStrategy();
 
+    /**
+     * 获得转发连接的消息重试策略。
+     * <p>
+     * Get retry strategy for message sending of forward.
+     */
     public abstract MessageRetryStrategy getForwardMessageRetryStrategy();
 
     public MessageRetryStrategy getUndefinedTypeMessageEncoder(String type) {

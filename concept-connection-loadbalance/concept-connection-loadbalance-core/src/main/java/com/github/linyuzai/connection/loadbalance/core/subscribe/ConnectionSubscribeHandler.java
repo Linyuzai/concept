@@ -24,7 +24,7 @@ public class ConnectionSubscribeHandler extends AbstractScoped implements Messag
     @Override
     public void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept) {
         ConnectionSubscriber subscriber = unwrap(concept.getConnectionSubscriber());
-        if (message.isType(ConnectionServer.class) &&
+        if (message.getPayload() instanceof ConnectionServer &&
                 subscriber instanceof ServerConnectionSubscriber) {
             ConnectionServer server = message.getPayload();
             connection.getMetadata().put(ConnectionServer.class, server);

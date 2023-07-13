@@ -7,9 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 消息抽象类
- *
- * @param <T> 消息体类型
+ * 消息抽象类。
+ * <p>
+ * Abstract message.
  */
 @Getter
 @Setter

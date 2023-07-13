@@ -10,10 +10,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -26,21 +25,23 @@ import java.util.function.Consumer;
 @Setter
 public abstract class AbstractConnection implements Connection {
 
-    protected final Map<Object, Object> metadata = Collections.synchronizedMap(new LinkedHashMap<>());
-
-    protected final List<MessageSendInterceptor> messageSendInterceptors = new CopyOnWriteArrayList<>();
-
     @NonNull
     protected String type;
 
     @NonNull
-    protected MessageRetryStrategy messageRetryStrategy;
+    protected Map<Object, Object> metadata = new ConcurrentHashMap<>();
 
     @NonNull
     protected MessageEncoder messageEncoder;
 
     @NonNull
     protected MessageDecoder messageDecoder;
+
+    @NonNull
+    protected MessageRetryStrategy messageRetryStrategy;
+
+    @NonNull
+    protected List<MessageSendInterceptor> messageSendInterceptors = new CopyOnWriteArrayList<>();
 
     @NonNull
     protected ConnectionLoadBalanceConcept concept;

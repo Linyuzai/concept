@@ -97,21 +97,6 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
         }
 
         @Override
-        public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
-            master.setMessageRetryStrategy(strategy);
-        }
-
-        @Override
-        public MessageRetryStrategy getMessageRetryStrategy() {
-            return master.getMessageRetryStrategy();
-        }
-
-        @Override
-        public List<MessageSendInterceptor> getMessageSendInterceptors() {
-            return master.getMessageSendInterceptors();
-        }
-
-        @Override
         public void setMessageEncoder(MessageEncoder encoder) {
             master.setMessageEncoder(encoder);
         }
@@ -129,6 +114,21 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
         @Override
         public MessageDecoder getMessageDecoder() {
             return master.getMessageDecoder();
+        }
+
+        @Override
+        public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
+            master.setMessageRetryStrategy(strategy);
+        }
+
+        @Override
+        public MessageRetryStrategy getMessageRetryStrategy() {
+            return master.getMessageRetryStrategy();
+        }
+
+        @Override
+        public List<MessageSendInterceptor> getMessageSendInterceptors() {
+            return master.getMessageSendInterceptors();
         }
 
         @Override

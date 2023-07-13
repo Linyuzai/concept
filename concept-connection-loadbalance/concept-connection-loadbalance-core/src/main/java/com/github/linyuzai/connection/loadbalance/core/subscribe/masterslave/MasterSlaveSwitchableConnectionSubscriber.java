@@ -145,22 +145,6 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
-        public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
-            master.setMessageRetryStrategy(strategy);
-            slave.setMessageRetryStrategy(strategy);
-        }
-
-        @Override
-        public MessageRetryStrategy getMessageRetryStrategy() {
-            return getCurrent().getMessageRetryStrategy();
-        }
-
-        @Override
-        public List<MessageSendInterceptor> getMessageSendInterceptors() {
-            return getCurrent().getMessageSendInterceptors();
-        }
-
-        @Override
         public void setMessageEncoder(MessageEncoder encoder) {
             master.setMessageEncoder(encoder);
             slave.setMessageEncoder(encoder);
@@ -180,6 +164,22 @@ public class MasterSlaveSwitchableConnectionSubscriber
         @Override
         public MessageDecoder getMessageDecoder() {
             return getCurrent().getMessageDecoder();
+        }
+
+        @Override
+        public void setMessageRetryStrategy(MessageRetryStrategy strategy) {
+            master.setMessageRetryStrategy(strategy);
+            slave.setMessageRetryStrategy(strategy);
+        }
+
+        @Override
+        public MessageRetryStrategy getMessageRetryStrategy() {
+            return getCurrent().getMessageRetryStrategy();
+        }
+
+        @Override
+        public List<MessageSendInterceptor> getMessageSendInterceptors() {
+            return getCurrent().getMessageSendInterceptors();
         }
 
         @Override
