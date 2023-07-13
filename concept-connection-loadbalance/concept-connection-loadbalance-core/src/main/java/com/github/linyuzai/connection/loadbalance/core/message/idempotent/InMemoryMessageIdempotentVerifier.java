@@ -23,6 +23,8 @@ public class InMemoryMessageIdempotentVerifier implements MessageIdempotentVerif
         }
         Holder holder = new Holder();
         ids.computeIfAbsent(id, k -> {
+            //如果不存在则会回调进入，说明消息没有消费过，并添加这个消息ID（同步的）
+            //If message id is not duplicate and put this message id in sync
             holder.verified = true;
             return Boolean.TRUE;
         });

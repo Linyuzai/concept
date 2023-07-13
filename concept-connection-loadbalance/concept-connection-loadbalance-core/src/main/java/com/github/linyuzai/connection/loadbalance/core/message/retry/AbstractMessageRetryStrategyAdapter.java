@@ -5,9 +5,15 @@ import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 消息重试策略适配器的抽象类。
+ * <p>
+ * Abstract adapter of retry strategy for message sending.
+ */
 @Getter
 @Setter
-public abstract class AbstractMessageRetryStrategyAdapter extends AbstractScoped implements MessageRetryStrategyAdapter {
+public abstract class AbstractMessageRetryStrategyAdapter extends AbstractScoped
+        implements MessageRetryStrategyAdapter {
 
     @Override
     public MessageRetryStrategy getMessageRetryStrategy(String type) {
