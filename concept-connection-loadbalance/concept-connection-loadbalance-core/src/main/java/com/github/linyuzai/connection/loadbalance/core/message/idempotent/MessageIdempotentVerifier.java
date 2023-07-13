@@ -1,6 +1,7 @@
-package com.github.linyuzai.connection.loadbalance.core.message;
+package com.github.linyuzai.connection.loadbalance.core.message.idempotent;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

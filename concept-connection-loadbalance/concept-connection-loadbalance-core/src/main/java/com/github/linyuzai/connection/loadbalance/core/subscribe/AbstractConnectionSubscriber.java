@@ -2,7 +2,7 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.message.*;
+import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 import java.util.LinkedHashMap;
@@ -42,7 +42,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                     return;
                 } else {
                     //否则关闭连接
-                    existSubscriber.close("NotAlive");
+                    existSubscriber.close(Connection.Close.NOT_ALIVE);
                 }
             }
 
@@ -63,7 +63,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                     return;
                 } else {
                     //否则关闭连接
-                    existObservable.close("NotAlive");
+                    existObservable.close(Connection.Close.NOT_ALIVE);
                 }
             }
             Connection observable = createObservable(id, topic, context, concept);

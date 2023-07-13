@@ -21,16 +21,23 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
 
     private long period;
 
+    private boolean loggerEnabled;
+
+    @Override
     public void start(ConnectionLoadBalanceConcept concept) {
         concept.getScheduledExecutor().scheduleAtFixedRate(() -> subscribe(concept),
                 period, period, TimeUnit.MILLISECONDS);
     }
 
     public void subscribe(ConnectionLoadBalanceConcept concept) {
+        if (loggerEnabled) {
+            concept.getLogger().info("Start running monitor for load balance");
+        }
         concept.getEventPublisher().publish(new LoadBalanceMonitorEvent());
         concept.getConnectionSubscriber().subscribe();
     }
 
+    @Override
     public void stop(ConnectionLoadBalanceConcept concept) {
 
     }

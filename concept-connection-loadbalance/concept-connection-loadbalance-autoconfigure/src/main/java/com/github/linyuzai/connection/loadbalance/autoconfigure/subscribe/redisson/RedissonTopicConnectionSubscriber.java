@@ -2,7 +2,7 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
+import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;

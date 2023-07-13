@@ -11,7 +11,6 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.RedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.core.monitor.LoadBalanceMonitorLogger;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
@@ -275,20 +274,14 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         @Bean
         @Order(300)
         @ConditionalOnMissingBean
-        @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.logger", havingValue = "true")
-        public LoadBalanceMonitorLogger loadBalanceMonitorLogger() {
-            return new LoadBalanceMonitorLogger().addScopes(WebSocketScoped.NAME);
-        }
-
-        @Bean
-        @Order(300)
-        @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.enabled", havingValue = "true", matchIfMissing = true)
         public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
                 WebSocketLoadBalanceProperties properties) {
             long period = properties.getLoadBalance().getMonitor().getPeriod();
+            boolean logger = properties.getLoadBalance().getMonitor().isLogger();
             ScheduledConnectionLoadBalanceMonitor monitor = new ScheduledConnectionLoadBalanceMonitor();
             monitor.setPeriod(period);
+            monitor.setLoggerEnabled(logger);
             monitor.addScopes(WebSocketScoped.NAME);
             return monitor;
         }

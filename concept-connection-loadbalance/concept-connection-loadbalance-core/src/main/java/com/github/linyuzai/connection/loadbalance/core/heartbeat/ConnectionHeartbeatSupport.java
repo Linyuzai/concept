@@ -108,7 +108,7 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
                 long lastHeartbeat = connection.getLastHeartbeat();
                 if (timeout > 0 && now - lastHeartbeat > timeout) {
                     connection.setAlive(false);
-                    connection.close("HeartbeatTimeout");
+                    connection.close(Connection.Close.HEARTBEAT_TIMEOUT);
                     concept.getEventPublisher().publish(new HeartbeatTimeoutEvent(connection));
                 }
             }

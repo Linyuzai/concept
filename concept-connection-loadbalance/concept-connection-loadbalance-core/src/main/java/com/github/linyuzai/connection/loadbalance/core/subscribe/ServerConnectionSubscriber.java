@@ -77,7 +77,7 @@ public abstract class ServerConnectionSubscriber<T extends Connection> implement
                 return;
             } else {
                 //否则关闭连接
-                exist.close("NotAlive");
+                exist.close(Connection.Close.NOT_ALIVE);
             }
         }
         doSubscribe(server, concept, connection -> {

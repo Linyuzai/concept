@@ -6,7 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLogger;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.MessageIdempotentVerifier;
+import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;

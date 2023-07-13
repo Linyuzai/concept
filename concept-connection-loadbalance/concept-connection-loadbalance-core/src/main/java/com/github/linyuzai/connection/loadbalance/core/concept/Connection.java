@@ -251,4 +251,13 @@ public interface Connection {
             return OBSERVABLE.equals(type);
         }
     }
+
+    interface Close {
+
+        String HEARTBEAT_TIMEOUT = "HeartbeatTimeout";
+
+        String NOT_ALIVE = "NotAlive";
+
+        String SERVER_STOP = "ServerStop";
+    }
 }

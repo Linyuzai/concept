@@ -1,9 +1,10 @@
-package com.github.linyuzai.connection.loadbalance.core.select;
+package com.github.linyuzai.connection.loadbalance.core.select.filter;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
+import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
