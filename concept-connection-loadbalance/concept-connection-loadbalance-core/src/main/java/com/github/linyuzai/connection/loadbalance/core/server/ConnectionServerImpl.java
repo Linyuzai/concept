@@ -6,7 +6,9 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * {@link ConnectionServer} 的默认实现
+ * {@link ConnectionServer} 的默认实现。
+ * <p>
+ * Default impl of {@link ConnectionServer}.
  */
 @Data
 public class ConnectionServerImpl implements ConnectionServer {

@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * {@link ConnectionServer} 提供者默认实现
+ * 连接服务管理器简单实现。
+ * <p>
+ * Simple impl of server manager.
  */
 public class SimpleConnectionServerManager implements ConnectionServerManager {
 
