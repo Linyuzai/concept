@@ -2,6 +2,11 @@ package com.github.linyuzai.connection.loadbalance.core.scope;
 
 import java.util.Collection;
 
+/**
+ * 支持定义连接域的工厂。
+ * <p>
+ * Factory which supports set scope.
+ */
 public interface ScopedFactory<T> extends Scoped {
 
     T create(String scope);

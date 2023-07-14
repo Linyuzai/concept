@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 默认的连接仓库
+ * 基于连接类型分组的连接仓库。
+ * <p>
+ * Repository of connections cached by type grouped.
  */
-public class GroupedConnectionRepository implements ConnectionRepository {
+public class TypeGroupedConnectionRepository implements ConnectionRepository {
 
     protected final Map<String, Map<Object, Connection>> connections = new ConcurrentHashMap<>();
 

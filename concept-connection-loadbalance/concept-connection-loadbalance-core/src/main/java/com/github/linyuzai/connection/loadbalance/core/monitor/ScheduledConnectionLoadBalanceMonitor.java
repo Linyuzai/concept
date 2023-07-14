@@ -12,7 +12,9 @@ import lombok.Setter;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 通过定时任务周期性的触发监控
+ * 通过定时任务周期性的触发监控。
+ * <p>
+ * The monitor to resubscribe by scheduled task when disconnect.
  */
 @Getter
 @Setter

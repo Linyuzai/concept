@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * 来接订阅者的抽象类
  */
-public abstract class ServerConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
+public abstract class ServerInstanceConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 
     @Override
     public void subscribe(Consumer<Connection> onSuccess,

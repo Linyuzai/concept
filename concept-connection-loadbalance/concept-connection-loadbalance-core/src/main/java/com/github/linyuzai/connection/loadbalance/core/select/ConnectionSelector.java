@@ -13,37 +13,50 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 连接选择器
+ * 连接选择器。
+ * 通过消息来筛选需要发送该消息的连接。
  * <p>
- * 通过消息来筛选需要发送该消息的连接
+ * Selector to select connection by message.
  */
 public interface ConnectionSelector extends Scoped {
 
     /**
-     * 是否支持该消息
-     *
-     * @param message 消息
-     * @return 是否支持
+     * 是否支持该消息。
+     * <p>
+     * If the selector is supported by the message.
      */
     boolean support(Message message, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 是否支持该消息。
+     * <p>
+     * If the selector is supported by the message.
+     */
     default boolean support(Message message) {
         return support(message, null);
     }
 
     /**
-     * 选择连接
-     *
-     * @param message 消息
-     * @param concept {@link ConnectionLoadBalanceConcept}
-     * @return 需要发送该消息的连接
+     * 选择连接。
+     * <p>
+     * Select connections.
      */
     Collection<Connection> select(Message message, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 选择连接。
+     * <p>
+     * Select connections.
+     */
     default Collection<Connection> select(Message message) {
         return select(message, null);
     }
 
+    /**
+     * 连接选择器代理。
+     * <p>
+     * Delegate of connection's selector.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements ConnectionSelector {

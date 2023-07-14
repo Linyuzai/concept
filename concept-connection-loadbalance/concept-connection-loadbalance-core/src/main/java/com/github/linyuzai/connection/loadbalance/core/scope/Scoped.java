@@ -6,8 +6,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 连接域。
+ * <p>
+ * Scope of connection.
+ */
 public interface Scoped {
 
+    /**
+     * 是否支持该连接域。
+     * <p>
+     * If support the scope.
+     */
     boolean support(String scope);
 
     static <S extends Scoped> S filter(String scope, Class<S> type, Collection<S> collection) {

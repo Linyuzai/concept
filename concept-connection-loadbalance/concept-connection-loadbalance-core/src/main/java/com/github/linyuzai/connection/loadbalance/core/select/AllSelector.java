@@ -8,7 +8,9 @@ import com.github.linyuzai.connection.loadbalance.core.select.filter.FilterConne
 import java.util.Collection;
 
 /**
- * 不进行过滤的选择器
+ * 不进行过滤的选择器。
+ * <p>
+ * Selector that not filter.
  */
 public class AllSelector extends AbstractConnectionSelector implements FilterConnectionSelector {
 
@@ -18,7 +20,9 @@ public class AllSelector extends AbstractConnectionSelector implements FilterCon
     }
 
     @Override
-    public Collection<Connection> doSelect(Message message, Collection<Connection> connections) {
+    public Collection<Connection> doSelect(Message message,
+                                           Collection<Connection> connections,
+                                           ConnectionLoadBalanceConcept concept) {
         return connections;
     }
 }

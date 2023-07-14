@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.extension.PathMessage;
 import com.github.linyuzai.connection.loadbalance.core.extension.PathSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.filter.FilterConnectionSelector;
@@ -18,7 +19,7 @@ public class DefaultEndpointPathSelector extends PathSelector
     }
 
     @Override
-    public String getPath(Connection connection) {
+    public String getPath(Connection connection, ConnectionLoadBalanceConcept concept) {
         if (connection instanceof WebSocketConnection) {
             return ((WebSocketConnection) connection).getUri().getPath();
         }

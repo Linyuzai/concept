@@ -14,8 +14,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-/***
- * 连接选择器的抽象类
+/**
+ * 连接选择器的抽象类。
+ * <p>
+ * Abstract selector of connections.
  */
 @Getter
 public abstract class AbstractConnectionSelector extends AbstractScoped implements ConnectionSelector {
@@ -28,16 +30,18 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
         if (clients.isEmpty()) {
             select = Collections.emptyList();
         } else {
-            select = doSelect(message, clients);
+            select = doSelect(message, clients, concept);
         }
 
         if (message instanceof PingMessage || message instanceof PongMessage) {
             //ping pong 不转发
+            //Not forward ping and pong
             return select;
         }
 
         if (!message.needForward()) {
             //已经被其他服务转发的就不再转发
+            //Not forward if it is forwarded and has the flag in headers
             return select;
         }
 
@@ -45,20 +49,30 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
 
         if (select == null || select.isEmpty()) {
             //没有对应的连接，直接进行转发
+            //Forward if not found any client connections
             return observables;
         }
 
         if (message.needBroadcast()) {
             //广播
+            //Forward if need broadcast
             List<Connection> combine = new ArrayList<>(select.size() + observables.size());
             combine.addAll(select);
             combine.addAll(observables);
             return combine;
         } else {
             //单播
+            //If set broadcast is true and client connections is not empty
             return select;
         }
     }
 
-    public abstract Collection<Connection> doSelect(Message message, Collection<Connection> connections);
+    /**
+     * 选择普通的客户端连接。
+     * <p>
+     * Select connections from the client type.
+     */
+    public abstract Collection<Connection> doSelect(Message message,
+                                                    Collection<Connection> connections,
+                                                    ConnectionLoadBalanceConcept concept);
 }

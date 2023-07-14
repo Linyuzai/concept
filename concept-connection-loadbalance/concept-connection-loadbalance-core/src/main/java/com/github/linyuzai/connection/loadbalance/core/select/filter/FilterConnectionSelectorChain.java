@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 组合多了选择器并进行并集。
+ * <p>
+ * Combine multiple selectors and perform union.
+ */
 @Getter
 @RequiredArgsConstructor
 public class FilterConnectionSelectorChain extends AbstractScoped implements ConnectionSelector {

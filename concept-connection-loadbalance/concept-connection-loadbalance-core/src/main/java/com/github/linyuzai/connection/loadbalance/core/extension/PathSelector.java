@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.extension;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.select.MessageHeaderSelector;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,18 +31,14 @@ public abstract class PathSelector extends MessageHeaderSelector {
     }
 
     @Override
-    public boolean match(Connection connection, String header) {
-        if (header == null) {
-            return false;
-        }
-        String[] split = header.split(",");
-        for (String s : split) {
-            if ((prefix + s).equals(getPath(connection))) {
-                return true;
-            }
-        }
-        return false;
+    public String prepareMatchingValue(String value) {
+        return prefix + value;
     }
 
-    public abstract String getPath(Connection connection);
+    @Override
+    public Object getMatchableValue(Connection connection, ConnectionLoadBalanceConcept concept) {
+        return getPath(connection, concept);
+    }
+
+    public abstract String getPath(Connection connection, ConnectionLoadBalanceConcept concept);
 }
