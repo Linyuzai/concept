@@ -117,16 +117,16 @@ public interface Connection {
     List<MessageSendInterceptor> getMessageSendInterceptors();
 
     /**
-     * 设置 {@link ConnectionLoadBalanceConcept}。
+     * 设置 Concept。
      * <p>
-     * Set {@link ConnectionLoadBalanceConcept}.
+     * Set Concept.
      */
     void setConcept(@NonNull ConnectionLoadBalanceConcept concept);
 
     /**
-     * 获得 {@link ConnectionLoadBalanceConcept}。
+     * 获得 Concept。
      * <p>
-     * Get {@link ConnectionLoadBalanceConcept}.
+     * Get Concept.
      */
     ConnectionLoadBalanceConcept getConcept();
 

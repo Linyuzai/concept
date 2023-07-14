@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 消息接收断言异常事件
+ * 消息接收断言异常事件。
+ * <p>
+ * Event will be published when predicate error after message received.
  */
 @Getter
 @RequiredArgsConstructor

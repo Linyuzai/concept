@@ -7,9 +7,9 @@ import com.github.linyuzai.connection.loadbalance.core.event.TimestampEvent;
 import lombok.Getter;
 
 /**
- * 未知消息
+ * 未知消息事件。
  * <p>
- * 当对应的连接不存在连接仓库中时发布
+ * Event will be published when message received from unknown connection.
  */
 @Getter
 public class UnknownMessageEvent extends TimestampEvent implements MessageEvent {

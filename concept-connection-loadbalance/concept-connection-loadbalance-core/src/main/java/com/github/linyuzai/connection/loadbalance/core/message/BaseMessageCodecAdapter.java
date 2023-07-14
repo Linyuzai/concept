@@ -7,6 +7,12 @@ import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTex
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 
+/**
+ * 基础编解码适配器。
+ * 提供最基础的编解码器。
+ * <p>
+ * Adapter for message codec to provider basic encoder and decoder.
+ */
 public class BaseMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override

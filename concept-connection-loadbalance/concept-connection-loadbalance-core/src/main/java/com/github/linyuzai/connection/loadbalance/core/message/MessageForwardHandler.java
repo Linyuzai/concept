@@ -4,9 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 
 /**
- * 消息转发处理器
+ * 消息转发处理器。
+ * 当服务实例收到转发的消息后发送给自己的客户端连接。
  * <p>
- * 当服务实例的客户端收到转发的消息后发送给自己真实的客户端连接
+ * Forward messages to clients which connected by this server instance
+ * when received message from other service instance.
  */
 public class MessageForwardHandler implements MessageReceiveEventListener {
 

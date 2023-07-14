@@ -5,8 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 
+
 /**
- * 消息编解码适配器的抽象类
+ * 消息编解码适配器的抽象类。
+ * <p>
+ * Abstract adapter of codec for message.
  */
 public abstract class AbstractMessageCodecAdapter extends AbstractScoped implements MessageCodecAdapter {
 
@@ -39,54 +42,54 @@ public abstract class AbstractMessageCodecAdapter extends AbstractScoped impleme
     }
 
     /**
-     * 发消息给客户端时的消息编码器
-     *
-     * @return 消息编码器
+     * 获得客户端连接的消息编码器。
+     * <p>
+     * Get encoder for message of client connection.
      */
     public MessageEncoder getClientMessageEncoder(MessageEncoder encoder) {
         return encoder;
     }
 
     /**
-     * 接收客户端消息的消息解码器
-     *
-     * @return 消息解码器
+     * 获得客户端连接的消息解码器。
+     * <p>
+     * Get decoder for message of client connection.
      */
     public MessageDecoder getClientMessageDecoder(MessageDecoder decoder) {
         return decoder;
     }
 
     /**
-     * 订阅时发送服务信息的消息编码器
-     *
-     * @return 消息编码器
+     * 获得订阅连接的消息编码器。
+     * <p>
+     * Get encoder for message of subscription.
      */
     public MessageEncoder getSubscribeMessageEncoder(MessageEncoder encoder) {
         return encoder;
     }
 
     /**
-     * 订阅时接收服务信息的消息解码器
-     *
-     * @return 消息解码器
+     * 获得订阅连接的消息解码器。
+     * <p>
+     * Get decoder for message of subscription.
      */
     public MessageDecoder getSubscribeMessageDecoder(MessageDecoder decoder) {
         return decoder;
     }
 
     /**
-     * 转发消息的消息编码器
-     *
-     * @return 消息编码器
+     * 获得转发连接的消息编码器。
+     * <p>
+     * Get encoder for message of forward.
      */
     public MessageEncoder getForwardMessageEncoder(MessageEncoder encoder) {
         return encoder;
     }
 
     /**
-     * 接收消息转发的消息解码器
-     *
-     * @return 消息解码器
+     * 获得转发连接的消息解码器。
+     * <p>
+     * Get decoder for message of forward.
      */
     public MessageDecoder getForwardMessageDecoder(MessageDecoder decoder) {
         return decoder;

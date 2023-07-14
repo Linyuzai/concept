@@ -7,9 +7,9 @@ import lombok.Getter;
 import java.util.Collection;
 
 /**
- * 消息准备事件
+ * 消息准备事件。
  * <p>
- * 在消息还未发送时发布
+ * Event will be published when message preparing.
  */
 @Getter
 public class MessagePrepareEvent extends TimestampEvent implements MessageEvent {

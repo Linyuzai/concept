@@ -9,6 +9,11 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 消息编解码适配链。
+ * <p>
+ * A chain to adapt message codec.
+ */
 @Getter
 @RequiredArgsConstructor
 public class MessageCodecAdapterChain extends AbstractScoped implements MessageCodecAdapter {

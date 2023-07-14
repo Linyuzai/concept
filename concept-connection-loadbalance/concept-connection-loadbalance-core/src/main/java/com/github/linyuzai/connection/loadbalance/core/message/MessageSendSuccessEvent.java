@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 消息发送成功事件
+ * 消息发送成功事件。
+ * <p>
+ * Event will be published when message sending is successful.
  */
 @Getter
 @RequiredArgsConstructor

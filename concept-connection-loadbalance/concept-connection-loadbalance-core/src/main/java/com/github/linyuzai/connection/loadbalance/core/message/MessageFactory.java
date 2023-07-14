@@ -9,22 +9,49 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 消息工厂
+ * 消息工厂。
+ * <p>
+ * Factory of message.
  */
 public interface MessageFactory extends Scoped {
 
+    /**
+     * 是否支持。
+     * <p>
+     * Use this factory to create message if return true.
+     */
     boolean support(Object message, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 是否支持。
+     * <p>
+     * Use this factory to create message if return true.
+     */
     default boolean support(Object message) {
         return support(message, null);
     }
 
+    /**
+     * 创建消息。
+     * <p>
+     * Create the message with input.
+     */
     Message create(Object message, ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 创建消息。
+     * <p>
+     * Create the message with input.
+     */
     default Message create(Object message) {
         return create(message, null);
     }
 
+    /**
+     * 消息工厂代理。
+     * <p>
+     * Delegate of factory for message.
+     */
     @Getter
     @RequiredArgsConstructor
     class Delegate implements MessageFactory {

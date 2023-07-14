@@ -145,7 +145,13 @@ public abstract class AbstractConnection implements Connection {
             //Send and retry if failure
             Consumer<Consumer<Throwable>> send = consumer ->
                     doSend(encode, onSuccess, consumer, onComplete);
-            send.accept(e -> messageRetryStrategy.retry(e, send, onError));
+            send.accept(e -> {
+                if (e instanceof MessageTransportException) {
+                    messageRetryStrategy.retry(e, send, onError);
+                } else {
+                    onError.accept(e);
+                }
+            });
         }
     }
 

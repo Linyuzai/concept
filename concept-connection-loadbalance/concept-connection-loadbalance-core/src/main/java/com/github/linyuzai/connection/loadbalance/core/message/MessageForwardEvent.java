@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 消息转发事件
+ * 消息转发事件。
+ * <p>
+ * Event will be published when message forwarded.
  */
 @Getter
 @RequiredArgsConstructor

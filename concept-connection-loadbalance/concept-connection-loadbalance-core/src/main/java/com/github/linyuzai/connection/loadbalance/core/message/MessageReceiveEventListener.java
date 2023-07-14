@@ -5,7 +5,9 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 
 /**
- * 消息接收事件监听器
+ * 消息接收事件监听器。
+ * <p>
+ * To listen message receive event.
  */
 public interface MessageReceiveEventListener extends ConnectionEventListener {
 

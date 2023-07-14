@@ -7,11 +7,10 @@ import lombok.Getter;
 import java.util.Collection;
 
 /**
- * 消息发送事件
+ * 消息发送事件。
+ * 在消息发送之后发布，无论成功或失败都会发布。
  * <p>
- * 在消息发送之后发布
- * <p>
- * 无论成功或失败都会发布
+ * Event will be published after message sending whether success or failure.
  */
 @Getter
 public class MessageSendEvent extends TimestampEvent implements MessageEvent {
