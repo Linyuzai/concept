@@ -1,27 +1,18 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave;
 
-import com.github.linyuzai.connection.loadbalance.core.subscribe.AbstractConnectionSubscriberFactory;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
-import lombok.Getter;
-import lombok.Setter;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 
 /**
  * 主从连接订阅者工厂。
  * <p>
  * Factory of {@link MasterSlaveConnectionSubscriber}.
  */
-@Getter
-@Setter
-public abstract class MasterSlaveConnectionSubscriberFactory extends AbstractConnectionSubscriberFactory {
-
-    private MasterSlave masterSlave;
+public interface MasterSlaveConnectionSubscriberFactory extends ConnectionSubscriberFactory {
 
     @Override
-    public ConnectionSubscriber create(String scope) {
-        MasterSlaveConnectionSubscriber subscriber = doCreate(scope);
-        subscriber.setMasterSlave(masterSlave);
-        return subscriber;
-    }
+    MasterSlaveConnectionSubscriber create(String scope);
 
-    public abstract MasterSlaveConnectionSubscriber doCreate(String scope);
+    MasterSlave getMasterSlave();
+
+    void setMasterSlave(MasterSlave masterSlave);
 }

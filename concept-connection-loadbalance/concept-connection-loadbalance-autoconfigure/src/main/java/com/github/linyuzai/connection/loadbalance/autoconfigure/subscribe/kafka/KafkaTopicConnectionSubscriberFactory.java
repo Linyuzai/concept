@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.kafka;
 
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriberFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -15,7 +15,8 @@ import org.springframework.kafka.listener.MessageListenerContainer;
  */
 @Setter
 @Getter
-public class KafkaTopicConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {
+public class KafkaTopicConnectionSubscriberFactory
+        extends AbstractMasterSlaveConnectionSubscriberFactory {
 
     private KafkaTemplate<?, Object> kafkaTemplate;
 

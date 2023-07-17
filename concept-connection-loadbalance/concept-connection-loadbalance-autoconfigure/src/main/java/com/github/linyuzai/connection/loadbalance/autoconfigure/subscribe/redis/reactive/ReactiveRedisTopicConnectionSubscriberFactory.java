@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive;
 
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriberFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -13,7 +13,8 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
  */
 @Getter
 @Setter
-public class ReactiveRedisTopicConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {
+public class ReactiveRedisTopicConnectionSubscriberFactory
+        extends AbstractMasterSlaveConnectionSubscriberFactory {
 
     private ReactiveRedisTemplate<?, Object> reactiveRedisTemplate;
 

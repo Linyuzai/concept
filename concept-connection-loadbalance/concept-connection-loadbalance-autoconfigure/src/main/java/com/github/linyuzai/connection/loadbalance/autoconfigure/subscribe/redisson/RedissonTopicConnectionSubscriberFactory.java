@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson;
 
+import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.MasterSlaveConnectionSubscriberFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RedissonClient;
@@ -13,7 +13,8 @@ import org.redisson.api.RedissonClient;
  */
 @Getter
 @Setter
-public class RedissonTopicConnectionSubscriberFactory extends MasterSlaveConnectionSubscriberFactory {
+public class RedissonTopicConnectionSubscriberFactory
+        extends AbstractMasterSlaveConnectionSubscriberFactory {
 
     private RedissonClient redissonClient;
 
