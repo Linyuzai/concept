@@ -12,7 +12,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * 基于 {@link ReactiveWebSocketConnection} 的服务间负载均衡的 {@link WebSocketHandler}
+ * 基于 {@link ReactiveWebSocketConnection} 的服务间负载均衡的 {@link WebSocketHandler}。
+ * <p>
+ * {@link WebSocketHandler} based on {@link ReactiveWebSocketConnection} for service load balancing.
  */
 @AllArgsConstructor
 public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {

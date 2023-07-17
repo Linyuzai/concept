@@ -12,6 +12,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 
+/**
+ * ws 负载均衡的导入选择器。
+ * <p>
+ * Import selector for ws load balancing.
+ */
 public class WebSocketLoadBalanceImportSelector implements ImportSelector, EnvironmentAware {
 
     private Environment environment;

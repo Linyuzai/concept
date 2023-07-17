@@ -10,9 +10,9 @@ import java.net.URI;
 import java.util.function.Consumer;
 
 /**
- * ws 连接订阅者
- *
- * @param <T> 连接类
+ * ws 连接订阅者。
+ * <p>
+ * ws connection subscriber.
  */
 @Getter
 @Setter

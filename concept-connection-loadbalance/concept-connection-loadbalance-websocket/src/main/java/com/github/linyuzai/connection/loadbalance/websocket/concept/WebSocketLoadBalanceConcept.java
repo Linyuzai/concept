@@ -3,7 +3,9 @@ package com.github.linyuzai.connection.loadbalance.websocket.concept;
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
 
 /**
- * ws 负载均衡概念
+ * ws 负载均衡概念。
+ * <p>
+ * ws load balance concept.
  */
 public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
 

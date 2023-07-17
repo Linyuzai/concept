@@ -8,7 +8,9 @@ import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
 
 /**
- * 基于 {@link JavaxWebSocketConnection} 的服务间负载均衡的端点配置
+ * 基于 {@link JavaxWebSocketConnection} 的服务间负载均衡的端点配置。
+ * <p>
+ * Endpoint configuration based on {@link JavaxWebSocketConnection} for inter-service load balancing.
  */
 @ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
 public class JavaxWebSocketLoadBalanceEndpoint {

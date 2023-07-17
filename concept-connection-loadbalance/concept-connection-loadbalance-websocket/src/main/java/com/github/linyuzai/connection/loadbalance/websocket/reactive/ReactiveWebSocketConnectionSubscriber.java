@@ -16,7 +16,9 @@ import java.net.URI;
 import java.util.function.Consumer;
 
 /**
- * {@link ReactiveWebSocketConnection} 的连接订阅者
+ * {@link ReactiveWebSocketConnection} 的连接订阅者。
+ * <p>
+ * {@link ReactiveWebSocketConnection} connection subscriber.
  */
 @NoArgsConstructor
 public class ReactiveWebSocketConnectionSubscriber extends

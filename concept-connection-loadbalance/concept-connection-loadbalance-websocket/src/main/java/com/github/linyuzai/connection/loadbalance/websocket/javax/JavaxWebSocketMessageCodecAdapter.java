@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 用于 {@link JavaxWebSocketConnection} 的消息编解码适配器
+ * 用于 {@link JavaxWebSocketConnection} 的消息编解码适配器。
+ * <p>
+ * Message codec adapter for {@link JavaxWebSocketConnection}.
  */
 public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 

@@ -4,6 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectio
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Netty 负载均衡概念。
+ * <p>
+ * Netty load balance concept.
+ */
 @RequiredArgsConstructor
 public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept {
 

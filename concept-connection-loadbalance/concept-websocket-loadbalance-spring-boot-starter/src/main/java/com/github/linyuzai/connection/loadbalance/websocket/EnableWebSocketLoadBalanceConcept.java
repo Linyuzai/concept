@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * ws 负载均衡的启用注解
+ * ws 负载均衡的启用注解。
+ * <p>
+ * Enable annotation for ws load balancing.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

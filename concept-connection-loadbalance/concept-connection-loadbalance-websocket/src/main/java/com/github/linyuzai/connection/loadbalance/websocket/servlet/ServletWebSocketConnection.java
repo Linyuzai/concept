@@ -14,7 +14,9 @@ import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
 /**
- * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现
+ * 基于 {@link WebSocketSession} 的 {@link WebSocketConnection} 实现。
+ * <p>
+ * {@link WebSocketConnection} implementation based on {@link WebSocketSession}.
  */
 @Getter
 @RequiredArgsConstructor

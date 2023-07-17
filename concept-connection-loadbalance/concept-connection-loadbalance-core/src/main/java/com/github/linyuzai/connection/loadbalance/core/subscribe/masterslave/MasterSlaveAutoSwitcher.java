@@ -75,6 +75,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
             Message message = ((MessageSendErrorEvent) event).getMessage();
             if (message instanceof PingMessage || message instanceof PongMessage) {
                 //默认情况下，消息发送失败之后开启 master 的 ping
+                //By default, open master ping after message sending fails
                 return;
             }
             MasterSlaveConnection connection =
@@ -92,6 +93,7 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
                                     .publish(new MasterSlaveSwitchEvent(connection, MasterSlave.SLAVE));
                             try {
                                 //正常情况下，MessageTransportException不会直接抛出异常
+                                //Normally, MessageTransportException will not throw an exception directly
                                 connection.send(message);
                             } catch (Throwable e) {
                                 concept.getEventPublisher()

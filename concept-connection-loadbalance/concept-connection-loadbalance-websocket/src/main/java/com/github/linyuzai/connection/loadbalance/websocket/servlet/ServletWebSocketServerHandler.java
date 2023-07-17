@@ -10,7 +10,9 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
- * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketHandler}
+ * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketHandler}。
+ * <p>
+ * {@link WebSocketHandler} for default service based on {@link ServletWebSocketConnection}.
  */
 @AllArgsConstructor
 public class ServletWebSocketServerHandler implements WebSocketHandler {

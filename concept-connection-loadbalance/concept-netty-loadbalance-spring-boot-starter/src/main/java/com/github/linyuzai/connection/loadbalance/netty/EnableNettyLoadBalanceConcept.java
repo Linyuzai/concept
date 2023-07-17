@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * Netty 负载均衡的启用注解
+ * Netty 负载均衡的启用注解。
+ * <p>
+ * Enable annotation for Netty load balancing.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -14,7 +14,9 @@ import java.net.URI;
 import java.util.function.Consumer;
 
 /**
- * {@link ServletWebSocketConnection} 的连接订阅者
+ * {@link ServletWebSocketConnection} 的连接订阅者。
+ * <p>
+ * {@link ServletWebSocketConnection} connection subscriber.
  */
 @NoArgsConstructor
 public class ServletWebSocketConnectionSubscriber extends

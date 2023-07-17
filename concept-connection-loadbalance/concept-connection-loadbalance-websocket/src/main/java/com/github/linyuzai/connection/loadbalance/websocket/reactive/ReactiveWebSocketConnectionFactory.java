@@ -10,7 +10,9 @@ import reactor.core.publisher.FluxSink;
 import java.util.Map;
 
 /**
- * {@link ReactiveWebSocketConnection} 连接工厂
+ * {@link ReactiveWebSocketConnection} 连接工厂。
+ * <p>
+ * {@link ReactiveWebSocketConnection} connection factory.
  */
 public class ReactiveWebSocketConnectionFactory extends WebSocketConnectionFactory<ReactiveWebSocketConnection> {
 

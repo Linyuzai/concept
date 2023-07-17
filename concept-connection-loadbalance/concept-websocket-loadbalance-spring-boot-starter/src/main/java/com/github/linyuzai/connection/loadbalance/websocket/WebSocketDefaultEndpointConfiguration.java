@@ -9,6 +9,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 
+/**
+ * ws 默认端点配置。
+ * <p>
+ * ws default endpoint configuration.
+ */
 public class WebSocketDefaultEndpointConfiguration {
 
     @Bean

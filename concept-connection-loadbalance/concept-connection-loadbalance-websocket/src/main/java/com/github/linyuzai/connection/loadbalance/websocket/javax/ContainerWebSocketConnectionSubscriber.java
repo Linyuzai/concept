@@ -11,7 +11,9 @@ import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
 
 /**
- * 基于 {@link WebSocketContainer} 的连接订阅者
+ * 基于 {@link WebSocketContainer} 的连接订阅者。
+ * <p>
+ * Connection subscriber based on {@link WebSocketContainer}.
  */
 @NoArgsConstructor
 public abstract class ContainerWebSocketConnectionSubscriber<T extends WebSocketConnection>

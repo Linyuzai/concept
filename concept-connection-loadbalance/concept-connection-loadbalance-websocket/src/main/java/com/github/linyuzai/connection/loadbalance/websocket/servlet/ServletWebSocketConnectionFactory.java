@@ -8,7 +8,9 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.Map;
 
 /**
- * {@link ServletWebSocketConnection} 连接工厂
+ * {@link ServletWebSocketConnection} 连接工厂。
+ * <p>
+ * {@link ServletWebSocketConnection} connection factory.
  */
 public class ServletWebSocketConnectionFactory extends WebSocketConnectionFactory<ServletWebSocketConnection> {
 

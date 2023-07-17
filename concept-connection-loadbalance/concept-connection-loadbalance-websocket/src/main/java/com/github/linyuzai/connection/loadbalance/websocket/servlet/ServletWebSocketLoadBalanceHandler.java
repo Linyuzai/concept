@@ -10,7 +10,9 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
- * 基于 {@link ServletWebSocketConnection} 的服务间负载均衡的 {@link WebSocketHandler}
+ * 基于 {@link ServletWebSocketConnection} 的服务间负载均衡的 {@link WebSocketHandler}。
+ * <p>
+ * {@link WebSocketHandler} for service load balancing based on {@link ServletWebSocketConnection}.
  */
 @AllArgsConstructor
 public class ServletWebSocketLoadBalanceHandler implements WebSocketHandler {

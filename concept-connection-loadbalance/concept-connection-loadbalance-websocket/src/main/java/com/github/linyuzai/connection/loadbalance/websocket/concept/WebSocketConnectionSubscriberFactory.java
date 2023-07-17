@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
+/**
+ * ws 连接订阅者工厂抽象类。
+ * <p>
+ * Abstract class of ws connection subscriber factory.
+ */
 @Getter
 @Setter
 public abstract class WebSocketConnectionSubscriberFactory<T extends WebSocketConnection>

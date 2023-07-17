@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基于 {@link ReactiveWebSocketConnection} 的默认服务的 {@link HandlerMapping}
+ * 基于 {@link ReactiveWebSocketConnection} 的默认服务的 {@link HandlerMapping}。
+ * <p>
+ * {@link HandlerMapping} for default service based on {@link ReactiveWebSocketConnection}.
  */
 public class ReactiveWebSocketServerHandlerMapping extends SimpleUrlHandlerMapping {
 

@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
+/**
+ * Javax WebSocket 负载均衡配置。
+ * <p>
+ * Javax WebSocket load balancing configuration.
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class JavaxWebSocketLoadBalanceConfiguration {

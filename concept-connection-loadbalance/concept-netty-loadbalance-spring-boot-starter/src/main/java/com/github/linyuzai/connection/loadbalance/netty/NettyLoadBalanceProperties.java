@@ -4,29 +4,42 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * netty 配置
+ * netty 配置。
+ * <p>
+ * Netty properties.
  */
 @Data
 @ConfigurationProperties(prefix = "concept.netty")
 public class NettyLoadBalanceProperties {
 
     /**
-     * 服务配置
+     * 服务配置。
+     * <p>
+     * Server properties.
      */
     private ServerProperties server = new ServerProperties();
 
     /**
-     * 订阅配置
+     * 订阅配置。
+     * <p>
+     * Subscriber properties.
      */
     private LoadBalanceProperties loadBalance = new LoadBalanceProperties();
 
+    /**
+     * 执行器配置。
+     * <p>
+     * Executor properties.
+     */
     private ExecutorProperties executor = new ExecutorProperties();
 
     @Data
     public static class ServerProperties {
 
         /**
-         * 消息配置
+         * 消息配置。
+         * <p>
+         * Message properties.
          */
         private MessageProperties message = new MessageProperties();
     }
@@ -35,22 +48,30 @@ public class NettyLoadBalanceProperties {
     public static class LoadBalanceProperties {
 
         /**
-         * 主订阅类型，默认 NONE
+         * 主订阅类型，默认 NONE。
+         * <p>
+         * Subscriber type of master, default NONE.
          */
         private Subscriber subscriberMaster = Subscriber.NONE;
 
         /**
-         * 从订阅类型，默认 NONE
+         * 从订阅类型，默认 NONE。
+         * <p>
+         * Subscriber type of slave, default NONE.
          */
         private Subscriber subscriberSlave = Subscriber.NONE;
 
         /**
-         * 消息配置
+         * 消息配置。
+         * <p>
+         * Message properties.
          */
         private MessageProperties message = new MessageProperties();
 
         /**
-         * 心跳配置
+         * 心跳配置。
+         * <p>
+         * Heartbeat properties.
          */
         private HeartbeatProperties heartbeat = new HeartbeatProperties();
 
@@ -76,6 +97,11 @@ public class NettyLoadBalanceProperties {
     @Data
     public static class ExecutorProperties {
 
+        /**
+         * 线程池大小，默认 1。
+         * <p>
+         * Thread pool size, default 1.
+         */
         private int threadPoolSize = 1;
     }
 
@@ -83,7 +109,9 @@ public class NettyLoadBalanceProperties {
     public static class MessageProperties {
 
         /**
-         * 重试配置
+         * 重试配置。
+         * <p>
+         * Retry properties.
          */
         private RetryProperties retry = new RetryProperties();
 
@@ -91,12 +119,16 @@ public class NettyLoadBalanceProperties {
         public static class RetryProperties {
 
             /**
-             * 重试次数
+             * 重试次数。
+             * <p>
+             * Retry times.
              */
             private int times;
 
             /**
-             * 重试间隔，毫秒
+             * 重试间隔，毫秒。
+             * <p>
+             * Retry interval, milliseconds.
              */
             private int period;
         }
@@ -106,17 +138,23 @@ public class NettyLoadBalanceProperties {
     public static class HeartbeatProperties {
 
         /**
-         * 是否启用心跳
+         * 是否启用心跳。
+         * <p>
+         * Whether to enable heartbeat.
          */
         private boolean enabled = true;
 
         /**
-         * 心跳超时时间，毫秒
+         * 心跳超时时间，毫秒。
+         * <p>
+         * Heartbeat timeout, milliseconds.
          */
         private long timeout = 210000;
 
         /**
-         * 心跳周期，毫秒
+         * 心跳周期，毫秒。
+         * <p>
+         * Heartbeat period, milliseconds.
          */
         private long period = 60000;
     }

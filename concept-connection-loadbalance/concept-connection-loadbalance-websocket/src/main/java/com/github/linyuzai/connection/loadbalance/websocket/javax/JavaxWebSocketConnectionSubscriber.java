@@ -13,7 +13,9 @@ import java.net.URI;
 import java.util.function.Consumer;
 
 /**
- * {@link JavaxWebSocketConnection} 的连接订阅者
+ * {@link JavaxWebSocketConnection} 的连接订阅者。
+ * <p>
+ * {@link JavaxWebSocketConnection} connection subscriber.
  */
 @Getter
 @RequiredArgsConstructor

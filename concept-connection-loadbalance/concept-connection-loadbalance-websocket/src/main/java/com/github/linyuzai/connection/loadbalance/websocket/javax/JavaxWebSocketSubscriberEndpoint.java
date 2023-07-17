@@ -7,7 +7,9 @@ import javax.websocket.*;
 import java.nio.ByteBuffer;
 
 /**
- * 基于 {@link JavaxWebSocketConnection} 转发消息客户端的端点配置
+ * 基于 {@link JavaxWebSocketConnection} 转发消息客户端的端点配置。
+ * <p>
+ * Endpoint configuration based on {@link JavaxWebSocketConnection} forwarding message client.
  */
 @ClientEndpoint
 public class JavaxWebSocketSubscriberEndpoint {

@@ -11,7 +11,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * 基于 {@link ReactiveWebSocketConnection} 默认服务的 {@link WebSocketHandler}
+ * 基于 {@link ReactiveWebSocketConnection} 默认服务的 {@link WebSocketHandler}。
+ * <p>
+ * {@link WebSocketHandler} based on {@link ReactiveWebSocketConnection} for default service.
  */
 @AllArgsConstructor
 public class ReactiveWebSocketServerHandler implements WebSocketHandler {

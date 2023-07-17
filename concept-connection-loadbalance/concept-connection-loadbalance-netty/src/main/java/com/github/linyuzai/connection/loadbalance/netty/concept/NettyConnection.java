@@ -12,6 +12,11 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+/**
+ * Netty 连接。
+ * <p>
+ * Netty connection.
+ */
 @Getter
 @RequiredArgsConstructor
 public class NettyConnection extends AbstractConnection {

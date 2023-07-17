@@ -12,7 +12,9 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.function.Consumer;
 
 /**
- * 基于 {@link ServletWebSocketConnection} 转发消息客户端的 {@link WebSocketHandler}
+ * 基于 {@link ServletWebSocketConnection} 转发消息客户端的 {@link WebSocketHandler}。
+ * <p>
+ * {@link WebSocketHandler} for forwarding message client based on {@link ServletWebSocketConnection}.
  */
 @AllArgsConstructor
 public class ServletWebSocketSubscriberHandler implements WebSocketHandler {

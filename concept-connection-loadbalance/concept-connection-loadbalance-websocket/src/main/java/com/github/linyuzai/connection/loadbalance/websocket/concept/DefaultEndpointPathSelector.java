@@ -7,9 +7,11 @@ import com.github.linyuzai.connection.loadbalance.core.extension.PathSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.filter.FilterConnectionSelector;
 
 /**
- * 默认的路径选择器
+ * 默认的路径选择器。
+ * 配合 {@link PathMessage} 使用。
  * <p>
- * 配合 {@link PathMessage} 使用
+ * Default path selector.
+ * Work with {@link PathMessage}.
  */
 public class DefaultEndpointPathSelector extends PathSelector
         implements FilterConnectionSelector {

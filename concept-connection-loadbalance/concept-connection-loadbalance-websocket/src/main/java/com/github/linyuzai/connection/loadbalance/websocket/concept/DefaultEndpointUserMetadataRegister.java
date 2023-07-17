@@ -6,9 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.extension.UserMessage;
 import com.github.linyuzai.connection.loadbalance.core.extension.UserSelector;
 
 /**
- * userId 注册器
+ * userId 注册器。
+ * 配合 {@link UserMessage} {@link UserSelector} 使用。
  * <p>
- * 配合 {@link UserMessage} {@link UserSelector} 使用
+ * userId register.
+ * Work with {@link UserMessage} {@link UserSelector}.
  */
 public class DefaultEndpointUserMetadataRegister implements WebSocketLifecycleListener {
 

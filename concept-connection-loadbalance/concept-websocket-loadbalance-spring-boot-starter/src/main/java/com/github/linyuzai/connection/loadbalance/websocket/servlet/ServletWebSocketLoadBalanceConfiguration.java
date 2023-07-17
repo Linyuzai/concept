@@ -13,6 +13,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
+/**
+ * Servlet WebSocket 负载均衡配置。
+ * <p>
+ * Servlet WebSocket load balancing configuration.
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class ServletWebSocketLoadBalanceConfiguration {

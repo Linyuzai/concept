@@ -8,7 +8,9 @@ import javax.websocket.Session;
 import java.util.Map;
 
 /**
- * {@link JavaxWebSocketConnection} 连接工厂
+ * {@link JavaxWebSocketConnection} 连接工厂。
+ * <p>
+ * {@link JavaxWebSocketConnection} connection factory.
  */
 public class JavaxWebSocketConnectionFactory extends WebSocketConnectionFactory<JavaxWebSocketConnection> {
 

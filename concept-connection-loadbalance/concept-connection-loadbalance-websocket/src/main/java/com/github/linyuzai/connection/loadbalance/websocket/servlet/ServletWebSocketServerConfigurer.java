@@ -10,7 +10,9 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistra
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 /**
- * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketConfigurer}
+ * 基于 {@link ServletWebSocketConnection} 默认服务的 {@link WebSocketConfigurer}。
+ * <p>
+ * {@link WebSocketConfigurer} for default service based on {@link ServletWebSocketConnection}.
  */
 @RequiredArgsConstructor
 public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {

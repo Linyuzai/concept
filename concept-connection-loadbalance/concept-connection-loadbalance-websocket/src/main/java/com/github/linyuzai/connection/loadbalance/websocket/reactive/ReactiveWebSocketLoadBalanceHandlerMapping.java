@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基于 {@link ReactiveWebSocketConnection} 的服务间负载均衡的 {@link HandlerMapping}
+ * 基于 {@link ReactiveWebSocketConnection} 的服务间负载均衡的 {@link HandlerMapping}。
+ * <p>
+ * {@link HandlerMapping} for service load balancing based on {@link ReactiveWebSocketConnection}.
  */
 public class ReactiveWebSocketLoadBalanceHandlerMapping extends SimpleUrlHandlerMapping {
 

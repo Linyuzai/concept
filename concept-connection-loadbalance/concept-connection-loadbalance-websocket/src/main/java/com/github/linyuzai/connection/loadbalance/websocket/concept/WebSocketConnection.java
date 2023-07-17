@@ -7,12 +7,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * ws 连接
+ * ws 连接。
+ * <p>
+ * ws connection.
  */
 public abstract class WebSocketConnection extends AbstractConnection {
 
     /**
-     * 连接参数
+     * 连接参数。
+     * <p>
+     * Connection parameters.
      */
     private volatile Map<String, String> queryParameterMap;
 

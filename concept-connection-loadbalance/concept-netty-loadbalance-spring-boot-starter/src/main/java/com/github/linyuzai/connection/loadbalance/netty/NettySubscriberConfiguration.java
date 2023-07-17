@@ -23,6 +23,11 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
+/**
+ * Netty 订阅配置类。
+ * <p>
+ * Netty subscription configuration.
+ */
 public class NettySubscriberConfiguration extends ConnectionSubscriberConfiguration {
 
     public interface NettyScopedProvider extends ConnectionSubscriberConfiguration.ScopedProvider {

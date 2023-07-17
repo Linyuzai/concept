@@ -6,7 +6,9 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 /**
- * 基于 {@link ServletWebSocketConnection} 的服务间负载均衡的 {@link WebSocketConfigurer}
+ * 基于 {@link ServletWebSocketConnection} 的服务间负载均衡的 {@link WebSocketConfigurer}。
+ * <p>
+ * {@link WebSocketConfigurer} for service load balancing based on {@link ServletWebSocketConnection}.
  */
 @AllArgsConstructor
 public class ServletWebSocketLoadBalanceConfigurer implements WebSocketConfigurer {

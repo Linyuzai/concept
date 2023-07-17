@@ -34,6 +34,11 @@ import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
+/**
+ * Netty 负载均衡的配置类。
+ * <p>
+ * Configuration class for Netty load balancing.
+ */
 @Configuration(proxyBeanMethods = false)
 public class NettyLoadBalanceConfiguration {
 

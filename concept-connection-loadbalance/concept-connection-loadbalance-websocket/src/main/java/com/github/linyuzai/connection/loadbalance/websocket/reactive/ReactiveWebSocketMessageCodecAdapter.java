@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 
 /**
- * 用于 {@link ReactiveWebSocketConnection} 的消息编解码适配器
+ * 用于 {@link ReactiveWebSocketConnection} 的消息编解码适配器。
+ * <p>
+ * Message codec adapter for {@link ReactiveWebSocketConnection}.
  */
 public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 

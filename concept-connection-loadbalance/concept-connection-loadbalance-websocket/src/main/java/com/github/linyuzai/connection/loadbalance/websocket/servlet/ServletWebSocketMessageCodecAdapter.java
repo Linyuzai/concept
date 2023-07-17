@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.WebSocketMessage;
 
 /**
- * 用于 {@link ServletWebSocketConnection} 的消息编解码适配器
+ * 用于 {@link ServletWebSocketConnection} 的消息编解码适配器。
+ * <p>
+ * Message codec adapter for {@link ServletWebSocketConnection}.
  */
 public class ServletWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 

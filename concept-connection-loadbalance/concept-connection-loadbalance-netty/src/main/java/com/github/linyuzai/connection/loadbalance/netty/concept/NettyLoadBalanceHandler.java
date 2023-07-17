@@ -10,6 +10,11 @@ import lombok.RequiredArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Netty 负载均衡处理器。
+ * <p>
+ * Netty load balance handler.
+ */
 @Getter
 @RequiredArgsConstructor
 public class NettyLoadBalanceHandler extends ChannelInboundHandlerAdapter {

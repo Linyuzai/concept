@@ -30,6 +30,11 @@ import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
+/**
+ * ws 负载均衡配置。
+ * <p>
+ * ws load balance configuration.
+ */
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
 

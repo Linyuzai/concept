@@ -34,6 +34,11 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
+/**
+ * WebSocket 订阅者配置。
+ * <p>
+ * WebSocket subscription configuration.
+ */
 public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfiguration {
 
     public interface WebSocketScopedProvider extends ConnectionSubscriberConfiguration.ScopedProvider {

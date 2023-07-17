@@ -8,6 +8,11 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Map;
 
+/**
+ * Netty 连接工厂。
+ * <p>
+ * Netty connection factory.
+ */
 public class NettyConnectionFactory extends AbstractConnectionFactory<NettyConnection> {
 
     public NettyConnectionFactory() {

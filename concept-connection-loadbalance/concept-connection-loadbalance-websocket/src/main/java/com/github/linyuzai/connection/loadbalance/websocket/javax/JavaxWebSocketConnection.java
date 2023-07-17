@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * 基于 {@link Session} 的 {@link WebSocketConnection} 实现
+ * 基于 {@link Session} 的 {@link WebSocketConnection} 实现。
+ * <p>
+ * {@link WebSocketConnection} implementation based on {@link Session}.
  */
 @Getter
 @RequiredArgsConstructor

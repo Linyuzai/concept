@@ -9,7 +9,9 @@ import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
 
 /**
- * 基于 {@link JavaxWebSocketConnection} 默认服务的端点配置
+ * 基于 {@link JavaxWebSocketConnection} 默认服务的端点配置。
+ * <p>
+ * Endpoint configuration based on {@link JavaxWebSocketConnection} default service.
  */
 @ServerEndpoint(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "{type}")
 public class JavaxWebSocketServerEndpoint {
