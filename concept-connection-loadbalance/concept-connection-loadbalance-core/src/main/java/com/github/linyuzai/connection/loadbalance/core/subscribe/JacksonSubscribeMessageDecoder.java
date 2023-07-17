@@ -14,7 +14,9 @@ import lombok.SneakyThrows;
 import java.nio.ByteBuffer;
 
 /**
- * 连接订阅消息解码器
+ * 连接订阅消息解码器。
+ * <p>
+ * Connection subscribe message decoder.
  */
 @Getter
 @AllArgsConstructor

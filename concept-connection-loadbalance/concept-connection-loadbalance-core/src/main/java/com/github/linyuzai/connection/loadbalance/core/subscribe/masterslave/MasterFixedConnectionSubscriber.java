@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * 主固定连接订阅者。
+ * <p>
+ * Master fixed connection subscriber.
+ */
 @Getter
 @RequiredArgsConstructor
 public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {

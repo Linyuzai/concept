@@ -4,6 +4,11 @@ import com.github.linyuzai.connection.loadbalance.core.exception.ConnectionLoadB
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.Getter;
 
+/**
+ * 连接订阅异常。
+ * <p>
+ * Connection subscribe exception.
+ */
 @Getter
 public class ConnectionServerSubscribeException extends ConnectionLoadBalanceException {
 

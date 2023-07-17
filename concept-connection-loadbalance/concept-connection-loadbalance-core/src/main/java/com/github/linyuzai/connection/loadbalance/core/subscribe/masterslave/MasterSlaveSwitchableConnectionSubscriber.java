@@ -18,6 +18,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
+/**
+ * 主从可切换连接订阅者。
+ * <p>
+ * Master slave switchable connection subscriber.
+ */
 @Getter
 @RequiredArgsConstructor
 public class MasterSlaveSwitchableConnectionSubscriber

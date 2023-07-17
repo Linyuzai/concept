@@ -10,6 +10,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * 连接订阅者抽象类。
+ * <p>
+ * Abstract class of {@link ConnectionSubscriber}.
+ */
 public abstract class AbstractConnectionSubscriber implements ConnectionSubscriber {
 
     public static final String DELIMITER = "_";
@@ -23,6 +28,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
                           ConnectionLoadBalanceConcept concept) {
         ConnectionServer local = concept.getConnectionServerManager().getLocal();
         //单体应用不需要转发
+        //Single application does not need to forward
         if (local == null) {
             onComplete.run();
             return;
@@ -39,9 +45,11 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
             if (existSubscriber != null) {
                 if (existSubscriber.isAlive()) {
                     //如果连接还存活则直接返回
+                    //If the connection is still alive, just return
                     return;
                 } else {
                     //否则关闭连接
+                    //Otherwise, close the connection
                     existSubscriber.close(Connection.Close.NOT_ALIVE);
                 }
             }
@@ -60,9 +68,11 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
             if (existObservable != null) {
                 if (existObservable.isAlive()) {
                     //如果连接还存活则直接返回
+                    //If the connection is still alive, just return
                     return;
                 } else {
                     //否则关闭连接
+                    //Otherwise, close the connection
                     existObservable.close(Connection.Close.NOT_ALIVE);
                 }
             }
@@ -78,7 +88,7 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
     }
 
     /**
-     * LBConnection_[websocket/netty]_${serviceId}_${host:port}_[redisson/redis/rabbit/kakfa]
+     * LBConnection_[websocket/netty]_${serviceId}_${host:port}_[redisson/redis/rabbit/kafka]
      */
     protected String getId(String topic, String from, ConnectionServer subscribe) {
         return topic + DELIMITER + from + DELIMITER + subscribe.getServiceId();
@@ -108,15 +118,30 @@ public abstract class AbstractConnectionSubscriber implements ConnectionSubscrib
         return concept.getMessageIdempotentVerifier();
     }
 
+    /**
+     * 创建订阅者连接。
+     * <p>
+     * Create subscriber connection.
+     */
     protected abstract Connection createSubscriber(String id,
                                                    String topic,
                                                    Map<Object, Object> context,
                                                    ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 创建可观察者连接。
+     * <p>
+     * Create observable connection.
+     */
     protected abstract Connection createObservable(String id,
                                                    String topic,
                                                    Map<Object, Object> context,
                                                    ConnectionLoadBalanceConcept concept);
 
+    /**
+     * 获取订阅者连接服务。
+     * <p>
+     * Get subscriber connection server.
+     */
     protected abstract ConnectionServer getSubscribeServer();
 }

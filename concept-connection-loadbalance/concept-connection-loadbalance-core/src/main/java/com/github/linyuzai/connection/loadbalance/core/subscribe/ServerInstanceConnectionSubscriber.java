@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 来接订阅者的抽象类
+ * 服务实例连接订阅者。
+ * <p>
+ * Subscriber of connection of service instance.
  */
 public abstract class ServerInstanceConnectionSubscriber<T extends Connection> implements ConnectionSubscriber {
 

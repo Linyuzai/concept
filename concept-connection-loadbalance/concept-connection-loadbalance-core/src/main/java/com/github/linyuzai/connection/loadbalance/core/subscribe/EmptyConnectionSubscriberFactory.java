@@ -6,6 +6,11 @@ import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScopedFacto
 
 import java.util.function.Consumer;
 
+/**
+ * 空连接订阅者工厂。
+ * <p>
+ * Factory of {@link EmptyConnectionSubscriber}.
+ */
 public class EmptyConnectionSubscriberFactory extends AbstractScopedFactory<ConnectionSubscriber>
         implements ConnectionSubscriberFactory {
 

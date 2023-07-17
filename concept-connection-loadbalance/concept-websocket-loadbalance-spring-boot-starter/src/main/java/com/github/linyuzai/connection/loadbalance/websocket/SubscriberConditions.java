@@ -13,10 +13,12 @@ public class SubscriberConditions {
             super(ConfigurationPhase.PARSE_CONFIGURATION);
         }
 
+        @Deprecated
         @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master", havingValue = "REDISSON_TOPIC")
         static class Master {
         }
 
+        @Deprecated
         @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-slave", havingValue = "REDISSON_TOPIC")
         static class Slave {
         }

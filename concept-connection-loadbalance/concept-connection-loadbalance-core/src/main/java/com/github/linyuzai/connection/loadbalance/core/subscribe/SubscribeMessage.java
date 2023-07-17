@@ -5,9 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import lombok.NoArgsConstructor;
 
 /**
- * 订阅消息
+ * 订阅消息。
+ * 用于发送服务信息和反向连接。
  * <p>
- * 用于发送服务信息和反向连接
+ * Message of subscribe.
+ * Used to send server info and reverse connection.
  */
 @NoArgsConstructor
 public class SubscribeMessage extends AbstractMessage<ConnectionServer> {

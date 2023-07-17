@@ -8,6 +8,11 @@ import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 
 import java.util.Collection;
 
+/**
+ * 主从自动切换器。
+ * <p>
+ * Master slave auto switcher.
+ */
 public class MasterSlaveAutoSwitcher extends AbstractScoped implements ConnectionEventListener {
 
     @Override
@@ -28,6 +33,11 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
         }
     }
 
+    /**
+     * 如果必要，恢复 master。
+     * <p>
+     * If necessary, recover master.
+     */
     public void recoverMasterIfNecessary(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof MessageSendSuccessEvent &&
                 ((MessageSendSuccessEvent) event).getMessage() instanceof PingMessage) {
@@ -51,6 +61,11 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
         }
     }
 
+    /**
+     * 如果必要，切换 slave。
+     * <p>
+     * If necessary, switch slave.
+     */
     public void switchSlaveIfNecessary(Object event, ConnectionLoadBalanceConcept concept) {
         if (event instanceof MessageSendErrorEvent) {
             Throwable error = ((MessageSendErrorEvent) event).getError();
@@ -105,16 +120,31 @@ public class MasterSlaveAutoSwitcher extends AbstractScoped implements Connectio
         return null;
     }
 
+    /**
+     * 验证 slave 和 timestamp。
+     * <p>
+     * Validate slave and timestamp.
+     */
     public boolean validateSlaveAndTimestamp(MasterSlaveConnection connection, long timestamp) {
         return timestamp >= connection.getSwitchTimestamp() &&
                 connection.isSlave(connection.getCurrent());
     }
 
+    /**
+     * 验证 master 和 timestamp。
+     * <p>
+     * Validate master and timestamp.
+     */
     public boolean validateMasterAndTimestamp(MasterSlaveConnection connection, long timestamp) {
         return timestamp >= connection.getSwitchTimestamp() &&
                 connection.isMaster(connection.getCurrent());
     }
 
+    /**
+     * 是否为传输异常。
+     * <p>
+     * Is it a transport exception.
+     */
     public boolean isTransportError(Throwable e) {
         if (e instanceof MessageTransportException) {
             return true;

@@ -9,7 +9,9 @@ import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 
 /**
- * 连接订阅日志
+ * 连接订阅日志。
+ * <p>
+ * Connection subscribe logger.
  */
 public class ConnectionSubscribeLogger extends AbstractScoped implements ConnectionEventListener {
 

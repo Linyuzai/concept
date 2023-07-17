@@ -5,6 +5,11 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubsc
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 主从连接订阅者工厂。
+ * <p>
+ * Factory of {@link MasterSlaveConnectionSubscriber}.
+ */
 @Getter
 @Setter
 public abstract class MasterSlaveConnectionSubscriberFactory extends AbstractConnectionSubscriberFactory {
