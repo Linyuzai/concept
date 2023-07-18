@@ -206,6 +206,9 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        if (closed) {
+            return;
+        }
         closed = true;
         doClose(reason, onSuccess, onError, onComplete);
         concept.onClose(this, reason);

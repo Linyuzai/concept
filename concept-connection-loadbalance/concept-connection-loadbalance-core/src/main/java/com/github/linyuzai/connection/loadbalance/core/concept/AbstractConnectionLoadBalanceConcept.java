@@ -119,6 +119,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             destroyed = true;
             onDestroy();
             scheduledExecutor.shutdown();
+            for (String type : connectionRepository.types()) {
+                for (Connection connection : connectionRepository.select(type)) {
+                    connection.close(Connection.Close.SERVER_STOP);
+                }
+            }
             eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
         }
     }

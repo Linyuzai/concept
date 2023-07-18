@@ -23,6 +23,13 @@ public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
     private long period;
 
     /**
+     * 是否已销毁。
+     * <p>
+     * Whether it has been destroyed.
+     */
+    private volatile boolean destroyed;
+
+    /**
      * 初始化添加定时任务。
      * <p>
      * Add heartbeat jab.
@@ -39,12 +46,15 @@ public class ConnectionHeartbeatManager extends ConnectionHeartbeatSupport {
      * Close connections on heartbeat timeout and send heartbeat.
      */
     public void schedule(ConnectionLoadBalanceConcept concept) {
+        if (destroyed) {
+            return;
+        }
         closeTimeout(concept);
         sendHeartbeat(concept);
     }
 
     @Override
     public void onDestroy(ConnectionLoadBalanceConcept concept) {
-
+        destroyed = true;
     }
 }

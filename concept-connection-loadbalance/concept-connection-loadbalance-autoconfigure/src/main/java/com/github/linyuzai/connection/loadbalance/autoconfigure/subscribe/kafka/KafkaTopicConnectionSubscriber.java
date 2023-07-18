@@ -16,7 +16,9 @@ import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Kafka Topic 连接订阅器。
@@ -107,6 +109,13 @@ public class KafkaTopicConnectionSubscriber extends AbstractMasterSlaveConnectio
 
         @Override
         public String getHost() {
+            Object o = kafkaTemplate.getProducerFactory().getConfigurationProperties()
+                    .get("bootstrap.servers");
+            if (o instanceof List) {
+                return ((List<?>) o).stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining("&"));
+            }
             return null;
         }
 

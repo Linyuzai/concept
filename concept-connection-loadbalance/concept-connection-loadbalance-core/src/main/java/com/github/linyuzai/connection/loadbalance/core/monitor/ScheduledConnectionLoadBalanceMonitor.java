@@ -21,9 +21,26 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
         implements ConnectionLoadBalanceMonitor, ConnectionEventListener {
 
+    /**
+     * 监控周期。
+     * <p>
+     * The period of monitor.
+     */
     private long period;
 
+    /**
+     * 是否启用日志。
+     * <p>
+     * Whether enable logger.
+     */
     private boolean loggerEnabled;
+
+    /**
+     * 是否已停止。
+     * <p>
+     * Whether it has been stopped.
+     */
+    private volatile boolean stopped;
 
     @Override
     public void start(ConnectionLoadBalanceConcept concept) {
@@ -32,6 +49,9 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
     }
 
     public void subscribe(ConnectionLoadBalanceConcept concept) {
+        if (stopped) {
+            return;
+        }
         if (loggerEnabled) {
             concept.getLogger().info("Start running monitor for load balance");
         }
@@ -41,7 +61,7 @@ public class ScheduledConnectionLoadBalanceMonitor extends AbstractScoped
 
     @Override
     public void stop(ConnectionLoadBalanceConcept concept) {
-
+        stopped = true;
     }
 
     @Override

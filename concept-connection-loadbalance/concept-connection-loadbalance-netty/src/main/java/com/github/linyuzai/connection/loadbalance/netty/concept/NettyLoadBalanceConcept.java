@@ -19,15 +19,6 @@ public class NettyLoadBalanceConcept extends AbstractConnectionLoadBalanceConcep
         return ID;
     }
 
-    @Override
-    protected void onDestroy() {
-        for (String type : connectionRepository.types()) {
-            for (Connection connection : connectionRepository.select(type)) {
-                connection.close(Connection.Close.SERVER_STOP);
-            }
-        }
-    }
-
     public static class Builder extends AbstractBuilder<Builder, NettyLoadBalanceConcept> {
 
         @Override
