@@ -17,12 +17,12 @@ dependencies {
     compileOnly "org.redisson:redisson:${RedissonVersion}"
 
     //api "com.github.linyuzai:concept-connection-loadbalance-core:${ConceptConnectionLoadbalanceVersion}"
-    //api "com.github.linyuzai:concept-connection-loadbalance-netty:${ConceptConnectionLoadbalanceVersion}"
     //api "com.github.linyuzai:concept-connection-loadbalance-autoconfigure:${ConceptConnectionLoadbalanceVersion}"
+    //api "com.github.linyuzai:concept-connection-loadbalance-netty:${ConceptNettyLoadbalanceVersion}"
 
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
-    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-netty')
     compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure')
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-netty')
 }
 
 apply from: '../../publish.gradle'
