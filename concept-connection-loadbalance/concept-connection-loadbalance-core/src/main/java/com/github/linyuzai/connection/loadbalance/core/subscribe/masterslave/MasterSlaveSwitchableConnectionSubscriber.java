@@ -40,6 +40,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
         LockableConnection connection = new LockableConnection();
         masterConnectionSubscriber.subscribe(master -> {
             if (master.isObservableType()) {
+                master.getMetadata().put(MasterSlave.class, MasterSlave.MASTER);
                 connection.master = master;
                 onSuccess(connection, onSuccess, concept);
             } else {
@@ -49,6 +50,7 @@ public class MasterSlaveSwitchableConnectionSubscriber
 
         slaveConnectionSubscriber.subscribe(slave -> {
             if (slave.isObservableType()) {
+                slave.getMetadata().put(MasterSlave.class, MasterSlave.SLAVE);
                 connection.slave = slave;
                 onSuccess(connection, onSuccess, concept);
             } else {

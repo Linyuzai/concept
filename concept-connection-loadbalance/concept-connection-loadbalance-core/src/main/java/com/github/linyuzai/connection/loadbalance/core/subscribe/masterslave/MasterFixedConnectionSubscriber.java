@@ -32,6 +32,7 @@ public class MasterFixedConnectionSubscriber implements ConnectionSubscriber {
     public void subscribe(Consumer<Connection> onSuccess, Consumer<Throwable> onError, Runnable onComplete, ConnectionLoadBalanceConcept concept) {
         masterConnectionSubscriber.subscribe(master -> {
             if (master.isObservableType()) {
+                master.getMetadata().put(MasterSlave.class, MasterSlave.MASTER);
                 onSuccess.accept(new MasterConnection(master));
             } else {
                 onSuccess.accept(master);

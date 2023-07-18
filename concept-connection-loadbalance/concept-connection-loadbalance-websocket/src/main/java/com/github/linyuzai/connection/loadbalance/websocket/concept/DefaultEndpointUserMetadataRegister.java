@@ -20,7 +20,9 @@ public class DefaultEndpointUserMetadataRegister implements WebSocketLifecycleLi
     public void onEstablish(Connection connection, ConnectionLoadBalanceConcept concept) {
         if (connection instanceof WebSocketConnection) {
             String userId = ((WebSocketConnection) connection).getQueryParameter(NAME);
-            connection.getMetadata().put(UserSelector.KEY, userId);
+            if (userId != null) {
+                connection.getMetadata().put(UserSelector.KEY, userId);
+            }
         }
     }
 
