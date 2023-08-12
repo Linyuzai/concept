@@ -38,11 +38,9 @@ public interface ConnectionLoadBalanceConcept {
     Connection createConnection(Object o, Map<Object, Object> metadata);
 
     /**
-     * 当连接建立时调用
-     *
-     * @param o        底层连接
-     * @param metadata 元数据
-     * @return 连接
+     * 当连接建立时调用。
+     * <p>
+     * Called when connection established.
      */
     Connection onEstablish(Object o, Map<Object, Object> metadata);
 

@@ -23,8 +23,11 @@
       },
       "dependencies": {
         "websocket-loadbalance": [
-          "implementation 'com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:1.1.0'",
+          "implementation 'com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:2.0.0'",
           "implementation 'org.springframework.boot:spring-boot-starter-websocket'"
+        ],
+        "netty-loadbalance": [
+          "implementation 'com.github.linyuzai:concept-netty-loadbalance-spring-boot-starter:2.0.0'"
         ],
         "download": [
           "implementation 'com.github.linyuzai:concept-download-spring-boot-starter:1.2.2'"
@@ -58,7 +61,21 @@
           "links": [
             {
               "type": "WEBSITE",
-              "url": "https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance-2",
+              "title": "Github Wiki"
+            }
+          ],
+          "default": false,
+          "required": false
+        },
+        {
+          "id": "netty-loadbalance",
+          "title": "Concept Netty LoadBalance",
+          "description": "多实例服务场景下的 Netty 无感知应用",
+          "links": [
+            {
+              "type": "WEBSITE",
+              "url": "https://github.com/Linyuzai/concept/wiki/Concept-Netty-LoadBalance",
               "title": "Github Wiki"
             }
           ],
