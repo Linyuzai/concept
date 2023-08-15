@@ -132,7 +132,7 @@ interface ConceptCellBuilder<out T : JComponent> {
      */
     fun sizeGroup(name: String): ConceptCellBuilder<T>
     fun growPolicy(growPolicy: ConceptGrowPolicy): ConceptCellBuilder<T>
-    fun constraints(vararg constraints: CCFlags): ConceptCellBuilder<T>
+    fun constraints(vararg constraints: ConceptCCFlags): ConceptCellBuilder<T>
 
     /**
      * If this method is called, the value of the component will be stored to the backing property only if the component is enabled.
@@ -266,23 +266,23 @@ abstract class ConceptCell : ConceptBaseBuilder {
      * If this constraint is not set the grow weight is set to 0 and the component will not grow (unless some automatic rule is not applied (see [com.intellij.ui.layout.panel])).
      * Grow weight will only be compared against the weights for the same cell.
      */
-    val growX = CCFlags.growX
+    val growX = ConceptCCFlags.growX
 
     @Suppress("unused")
-    val growY = CCFlags.growY
-    val grow = CCFlags.grow
+    val growY = ConceptCCFlags.growY
+    val grow = ConceptCCFlags.grow
 
     /**
      * Makes the column that the component is residing in grow with `weight`.
      */
-    val pushX = CCFlags.pushX
+    val pushX = ConceptCCFlags.pushX
 
     /**
      * Makes the row that the component is residing in grow with `weight`.
      */
     @Suppress("unused")
-    val pushY = CCFlags.pushY
-    val push = CCFlags.push
+    val pushY = ConceptCCFlags.pushY
+    val push = ConceptCCFlags.push
 
     fun label(
         text: String,
@@ -1024,7 +1024,7 @@ abstract class ConceptCell : ConceptBaseBuilder {
     abstract fun <T : JComponent> component(component: T, viewComponent: JComponent): ConceptCellBuilder<T>
 
     operator fun <T : JComponent> T.invoke(
-        vararg constraints: CCFlags,
+        vararg constraints: ConceptCCFlags,
         growPolicy: ConceptGrowPolicy? = null,
         comment: String? = null
     ): ConceptCellBuilder<T> = component(this).apply {

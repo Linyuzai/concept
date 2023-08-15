@@ -16,7 +16,7 @@ interface ConceptLayoutBuilderImpl {
     val rootRow: ConceptRow
     fun withButtonGroup(buttonGroup: ButtonGroup, body: () -> Unit)
 
-    fun build(container: Container, layoutConstraints: Array<out LCFlags>)
+    fun build(container: Container, layoutConstraints: Array<out ConceptLCFlags>)
 
     val preferredFocusedComponent: JComponent?
 

@@ -16,7 +16,6 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.*
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.layout.*
 import com.intellij.util.ModalityUiUtil
 import com.intellij.util.concurrency.EdtExecutorService
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
@@ -271,7 +270,7 @@ open class ConceptWebStarterLibrariesStep(contextProvider: ConceptWebStarterCont
         selectedLibrariesPanel.emptyText.text = messages?.noDependenciesSelectedLabel
             ?: "No dependencies added"
 
-        return panel(LCFlags.fillX, LCFlags.fillY) {
+        return panel(ConceptLCFlags.fillX, ConceptLCFlags.fillY) {
             val frameworkVersions = getAvailableFrameworkVersions()
             if (frameworkVersions.isNotEmpty()) {
                 row {

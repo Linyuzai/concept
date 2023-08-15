@@ -7,7 +7,7 @@ import com.intellij.util.ui.JBUI
 import javax.swing.border.Border
 
 inline fun panel(
-    vararg constraints: LCFlags,
+    vararg constraints: ConceptLCFlags,
     title: String? = null,
     border: Border = JBUI.Borders.empty(10, 20, 5, 20),
     init: ConceptLayoutBuilder.() -> Unit

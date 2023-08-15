@@ -77,7 +77,7 @@ class ConceptButtonSelectorToolbar @JvmOverloads constructor(
     actionGroup: ActionGroup,
     horizontal: Boolean,
     private val forceFieldHeight: Boolean = false
-) : ActionToolbarImpl(place, actionGroup, horizontal, true) {
+) : ActionToolbarImpl(place, actionGroup, horizontal) {
 
     init {
         setForceMinimumSize(true)

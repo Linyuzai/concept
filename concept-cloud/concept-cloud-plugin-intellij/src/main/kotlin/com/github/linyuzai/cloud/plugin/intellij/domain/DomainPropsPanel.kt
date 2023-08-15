@@ -1,5 +1,6 @@
 package com.github.linyuzai.cloud.plugin.intellij.domain
 
+import com.github.linyuzai.cloud.plugin.intellij.ConceptLCFlags
 import com.github.linyuzai.cloud.plugin.intellij.builder.toSampleName
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.intellij.icons.AllIcons.Actions
@@ -47,7 +48,7 @@ class DomainPropsPanel(private val project: Project) : ScrollablePanel(VerticalL
         propPanel.background = UIUtil.getListBackground()
 
         propPanel.addToRight(removeButton)
-        propPanel.addToCenter(panel(LCFlags.fillX, LCFlags.fillY) {
+        propPanel.addToCenter(panel(ConceptLCFlags.fillX, ConceptLCFlags.fillY) {
 
             row("Prop Class:") {
                 classesComboBox(project, DomainModel.RECENTS_KEY_DOMAIN_PROP_CLASS, prop.propClass) {

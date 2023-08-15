@@ -1,6 +1,7 @@
 package com.github.linyuzai.cloud.plugin.intellij.module
 
 import com.github.linyuzai.cloud.plugin.intellij.CHECK_NOT_EMPTY
+import com.github.linyuzai.cloud.plugin.intellij.ConceptLCFlags
 import com.github.linyuzai.cloud.plugin.intellij.GenerateCodeAction
 import com.github.linyuzai.cloud.plugin.intellij.panel
 import com.github.linyuzai.cloud.plugin.intellij.util.ConceptDialog
@@ -30,7 +31,7 @@ object ModuleComponents {
     @JvmStatic
     fun createGenerateModulePanel(project: Project, model: ModuleModel, dialog: ConceptDialog): DialogPanel {
 
-        return panel(LCFlags.fillX, LCFlags.fillY) {
+        return panel(ConceptLCFlags.fillX, ConceptLCFlags.fillY) {
 
             row("User Domain Class:") {
                 classesComboBox(

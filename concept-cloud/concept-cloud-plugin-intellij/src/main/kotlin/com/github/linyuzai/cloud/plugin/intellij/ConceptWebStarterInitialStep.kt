@@ -223,33 +223,33 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
 
             addFieldsBefore(this)
 
-            if (starterSettings.languages.size > 1) {
+            /*if (starterSettings.languages.size > 1) {
                 row("Language:") {
                     languagesSelector = buttonSelector(starterSettings.languages, languageProperty) { it.title }
                 }.largeGapAfter()
-            }
+            }*/
 
             row("Language:") {
                 label("Java")
             }.largeGapAfter()
 
-            if (starterSettings.projectTypes.size > 1) {
+            /*if (starterSettings.projectTypes.size > 1) {
                 val messages = starterSettings.customizedMessages
                 row(messages?.projectTypeLabel ?: "Type:") {
                     projectTypesSelector =
                         buttonSelector(starterSettings.projectTypes, projectTypeProperty) { it?.title ?: "" }
                 }.largeGapAfter()
-            }
+            }*/
 
             row("Type:") {
                 label("Gradle")
             }.largeGapAfter()
 
-            if (starterSettings.testFrameworks.isNotEmpty()) {
+            /*if (starterSettings.testFrameworks.isNotEmpty()) {
                 row("Test framework:") {
                     buttonSelector(starterSettings.testFrameworks, testFrameworkProperty) { it?.title ?: "" }
                 }.largeGapAfter()
-            }
+            }*/
 
             row("Group:") {
                 textField(groupIdProperty)
@@ -312,12 +312,12 @@ open class ConceptWebStarterInitialStep(contextProvider: ConceptWebStarterContex
                 }.largeGapAfter()
             }
 
-            if (starterSettings.packagingTypes.isNotEmpty()) {
+            /*if (starterSettings.packagingTypes.isNotEmpty()) {
                 row("Packaging:") {
                     packagingTypesSelector =
                         buttonSelector(starterSettings.packagingTypes, packagingProperty) { it?.title ?: "" }
                 }.largeGapAfter()
-            }
+            }*/
 
             if (starterSettings.isExampleCodeProvided) {
                 row {

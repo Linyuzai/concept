@@ -16,6 +16,7 @@ import java.awt.*
 import javax.swing.JPanel
 import javax.swing.JTextArea
 import javax.swing.SwingUtilities
+import javax.swing.UIManager
 import kotlin.math.max
 
 class ConceptLibraryDescriptionPanel : ScrollablePanel(VerticalLayout(DEFAULT_VGAP)) {
@@ -36,7 +37,7 @@ class ConceptLibraryDescriptionPanel : ScrollablePanel(VerticalLayout(DEFAULT_VG
         this.border = JBUI.Borders.empty(DEFAULT_VGAP)
 
         val headerPanel = JPanel(BorderLayout())
-        descriptionHeader.font = StartupUiUtil.getLabelFont().deriveFont(Font.BOLD)
+        descriptionHeader.font = UIManager.getFont("Label.font").deriveFont(Font.BOLD)
         descriptionHeader.border = JBUI.Borders.empty(DEFAULT_VGAP, 0)
 
         descriptionVersion.icon = AllIcons.General.BalloonWarning

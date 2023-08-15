@@ -42,7 +42,7 @@ object DomainComponents {
         dialog: ConceptDialog
     ): DialogPanel {
 
-        return panel(LCFlags.fillX, LCFlags.fillY) {
+        return panel(ConceptLCFlags.fillX, ConceptLCFlags.fillY) {
 
             row("User Domain Class:") {
                 classesComboBox(
@@ -156,7 +156,7 @@ object DomainComponents {
     }
 
     fun createPreviewDomainPanel(model: DomainModel): DialogPanel {
-        return panel(LCFlags.fillX, LCFlags.fillY) {
+        return panel(ConceptLCFlags.fillX, ConceptLCFlags.fillY) {
             row("Preview (pseudo code):") {
 
             }

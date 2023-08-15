@@ -111,7 +111,7 @@ internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration)
         component.constraints.callback()
     }
 
-    override fun build(container: Container, layoutConstraints: Array<out LCFlags>) {
+    override fun build(container: Container, layoutConstraints: Array<out ConceptLCFlags>) {
         val lc = createLayoutConstraints()
         lc.gridGapY = gapToBoundSize(spacing.verticalGap, false)
         if (layoutConstraints.isEmpty()) {
@@ -142,7 +142,7 @@ internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration)
             false
         )
         var isLayoutInsetsAdjusted = false
-        container.layout = object : MigLayout(lc, columnConstraints, rowConstraints) {
+        container.layout = object : ConceptMigLayout(lc, columnConstraints, rowConstraints) {
             override fun layoutContainer(parent: Container) {
                 if (!isLayoutInsetsAdjusted) {
                     isLayoutInsetsAdjusted = true
@@ -163,7 +163,7 @@ internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration)
 
         configureGapsBetweenRows(physicalRows)
 
-        val isNoGrid = layoutConstraints.contains(LCFlags.noGrid)
+        val isNoGrid = layoutConstraints.contains(ConceptLCFlags.noGrid)
         if (isNoGrid) {
             physicalRows.flatMap { it.components }.forEach { component ->
                 container.add(component, component.constraints)
@@ -303,19 +303,18 @@ internal class ConceptMigLayoutBuilder(val spacing: ConceptSpacingConfiguration)
     }
 }
 
-private fun LC.apply(flags: Array<out LCFlags>): LC {
+private fun LC.apply(flags: Array<out ConceptLCFlags>): LC {
     for (flag in flags) {
-        @Suppress("NON_EXHAUSTIVE_WHEN")
         when (flag) {
-            LCFlags.noGrid -> isNoGrid = true
+            ConceptLCFlags.noGrid -> isNoGrid = true
 
-            LCFlags.flowY -> isFlowX = false
+            ConceptLCFlags.flowY -> isFlowX = false
 
-            LCFlags.fill -> fill()
-            LCFlags.fillX -> isFillX = true
-            LCFlags.fillY -> isFillY = true
+            ConceptLCFlags.fill -> fill()
+            ConceptLCFlags.fillX -> isFillX = true
+            ConceptLCFlags.fillY -> isFillY = true
 
-            LCFlags.debug -> debug()
+            ConceptLCFlags.debug -> debug()
         }
     }
     return this

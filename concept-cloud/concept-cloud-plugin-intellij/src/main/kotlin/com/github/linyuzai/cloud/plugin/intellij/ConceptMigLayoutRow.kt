@@ -311,7 +311,7 @@ internal class ConceptMigLayoutRow(private val parent: ConceptMigLayoutRow?,
 
         lateinit var panelBuilder: ConceptCellBuilder<DialogPanel>
         row {
-            panelBuilder = panel(CCFlags.growX)
+            panelBuilder = panel(ConceptCCFlags.growX)
         }
         return panelBuilder
     }
@@ -661,7 +661,7 @@ private class ConceptCellBuilderImpl<T : JComponent> internal constructor(
         return this
     }
 
-    override fun constraints(vararg constraints: CCFlags): ConceptCellBuilder<T> {
+    override fun constraints(vararg constraints: ConceptCCFlags): ConceptCellBuilder<T> {
         builder.updateComponentConstraints(viewComponent) {
             overrideFlags(this, constraints)
         }

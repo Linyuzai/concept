@@ -12,15 +12,15 @@ import java.awt.Component
 import javax.swing.*
 import javax.swing.text.JTextComponent
 
-internal fun overrideFlags(cc: CC, flags: Array<out CCFlags>) {
+internal fun overrideFlags(cc: CC, flags: Array<out ConceptCCFlags>) {
     for (flag in flags) {
         when (flag) {
-            CCFlags.grow -> cc.grow()
-            CCFlags.growX -> {
+            ConceptCCFlags.grow -> cc.grow()
+            ConceptCCFlags.growX -> {
                 cc.growX(1000f)
             }
 
-            CCFlags.growY -> cc.growY(1000f)
+            ConceptCCFlags.growY -> cc.growY(1000f)
 
             // If you have more than one component in a cell the alignment keywords will not work since the behavior would be indeterministic.
             // You can however accomplish the same thing by setting a gap before and/or after the components.
@@ -28,9 +28,9 @@ internal fun overrideFlags(cc: CC, flags: Array<out CCFlags>) {
             // There is even a keyword for this: "push". So "gapleft push" will be the same as "align right" and work for multi-component cells as well.
             //CCFlags.right -> horizontal.gapBefore = BoundSize(null, null, null, true, null)
 
-            CCFlags.push -> cc.push()
-            CCFlags.pushX -> cc.pushX()
-            CCFlags.pushY -> cc.pushY()
+            ConceptCCFlags.push -> cc.push()
+            ConceptCCFlags.pushX -> cc.pushX()
+            ConceptCCFlags.pushY -> cc.pushY()
         }
     }
 }
