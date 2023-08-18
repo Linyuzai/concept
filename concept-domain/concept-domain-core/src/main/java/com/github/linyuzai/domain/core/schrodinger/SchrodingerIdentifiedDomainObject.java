@@ -8,17 +8,11 @@ import lombok.*;
  * 薛定谔模型代理
  */
 @Getter
+@Setter
 public class SchrodingerIdentifiedDomainObject<T extends DomainObject>
         extends AbstractSchrodingerDomainObject<T> implements DomainObject {
 
-    @NonNull
-    protected final String id;
-
-    public SchrodingerIdentifiedDomainObject(@NonNull DomainContext context,
-                                             @NonNull String id) {
-        super(context);
-        this.id = id;
-    }
+    protected String id;
 
     /**
      * 获得被代理的对象
@@ -29,5 +23,10 @@ public class SchrodingerIdentifiedDomainObject<T extends DomainObject>
             throw new DomainNotFoundException(getDomainObjectType(), id);
         }
         return domain;
+    }
+
+    @Override
+    protected void onRelease() {
+        id = null;
     }
 }

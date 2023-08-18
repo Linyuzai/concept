@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -18,23 +17,9 @@ public class ProxyListableDomainCollection<T extends DomainObject> extends Lista
         DomainContext.Aware {
 
     @NonNull
-    protected final Class<? extends DomainCollection<?>> type;
+    protected Class<? extends DomainCollection<?>> type;
 
     protected DomainContext context;
-
-    public ProxyListableDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                         @NonNull List<T> list) {
-        super(list);
-        this.type = type;
-    }
-
-    public ProxyListableDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                         DomainContext context,
-                                         @NonNull List<T> list) {
-        super(list);
-        this.type = type;
-        this.context = context;
-    }
 
     @Override
     public Conditions getConditions() {

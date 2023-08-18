@@ -3,12 +3,9 @@ package com.github.linyuzai.domain.core.schrodinger;
 import com.github.linyuzai.domain.core.AbstractDomainProperties;
 import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.exception.DomainMultipleFoundException;
-import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -20,15 +17,13 @@ import static com.github.linyuzai.domain.core.schrodinger.AbstractSchrodingerDom
  * 薛定谔模型代理
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class SchrodingerPredicatedDomainObject<T extends DomainObject>
         extends AbstractDomainProperties implements DomainObject {
 
-    @NonNull
-    protected final DomainCollection<T> collection;
+    protected DomainCollection<T> collection;
 
-    @NonNull
-    protected final Predicate<T> predicate;
+    protected Predicate<T> predicate;
 
     /**
      * 被代理的领域模型
@@ -66,8 +61,21 @@ public class SchrodingerPredicatedDomainObject<T extends DomainObject>
     }
 
     @Override
-    public synchronized void release() {
+    public synchronized void unload() {
         this.target = null;
+    }
+
+    @Override
+    public void release() {
+        collection = null;
+        predicate = null;
+        target = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 
     protected Class<? extends T> getDomainObjectType() {

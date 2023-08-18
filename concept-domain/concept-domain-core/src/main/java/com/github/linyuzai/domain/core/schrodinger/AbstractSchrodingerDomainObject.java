@@ -9,7 +9,7 @@ import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -17,12 +17,12 @@ import java.util.List;
  * 薛定谔模型代理
  */
 @Getter
-@RequiredArgsConstructor
 public abstract class AbstractSchrodingerDomainObject<T extends DomainObject>
         extends AbstractDomainProperties implements DomainObject {
 
+    @Setter
     @NonNull
-    protected final DomainContext context;
+    protected DomainContext context;
 
     protected DomainRepository<T, ?> repository;
 
@@ -56,8 +56,19 @@ public abstract class AbstractSchrodingerDomainObject<T extends DomainObject>
     }
 
     @Override
-    public synchronized void release() {
+    public synchronized void unload() {
         this.target = null;
+    }
+
+    @Override
+    public void release() {
+        target = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 
     public DomainRepository<T, ?> getRepository() {

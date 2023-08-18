@@ -16,6 +16,10 @@ public interface DomainProperties {
         return false;
     }
 
+    default void clearProperties() {
+
+    }
+
     default <V> V withPropertyKey(Object key, Supplier<V> supplier) {
         if (hasProperty(key)) {
             return getProperty(key);

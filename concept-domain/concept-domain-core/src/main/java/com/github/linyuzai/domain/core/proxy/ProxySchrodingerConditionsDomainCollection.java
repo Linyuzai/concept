@@ -1,14 +1,13 @@
 package com.github.linyuzai.domain.core.proxy;
 
 import com.github.linyuzai.domain.core.DomainCollection;
-import com.github.linyuzai.domain.core.DomainContext;
 import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainObject;
-import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerConditionsDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.function.Function;
 
@@ -16,6 +15,7 @@ import java.util.function.Function;
  * 薛定谔的集合模型
  */
 @Getter
+@Setter
 public class ProxySchrodingerConditionsDomainCollection<T extends DomainObject>
         extends SchrodingerConditionsDomainCollection<T>
         implements DomainCollection<T>, Function<T, T>,
@@ -23,19 +23,10 @@ public class ProxySchrodingerConditionsDomainCollection<T extends DomainObject>
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull
-    protected final Class<? extends DomainCollection<?>> type;
+    protected Class<? extends DomainCollection<?>> type;
 
     @NonNull
-    protected final DomainFactory factory;
-
-    public ProxySchrodingerConditionsDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                                      @NonNull DomainContext context,
-                                                      @NonNull DomainFactory factory,
-                                                      @NonNull Conditions conditions) {
-        super(context, conditions);
-        this.type = type;
-        this.factory = factory;
-    }
+    protected DomainFactory factory;
 
     @Override
     protected Class<T> getDomainObjectType() {

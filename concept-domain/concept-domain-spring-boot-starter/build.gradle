@@ -9,7 +9,7 @@ ext {
 }
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
     //api "com.github.linyuzai:concept-domain-core:${ConceptDomainVersion}"
     compileOnly project(':concept-domain:concept-domain-core')
 }

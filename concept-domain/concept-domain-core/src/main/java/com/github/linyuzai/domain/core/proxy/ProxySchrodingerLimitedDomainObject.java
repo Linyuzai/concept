@@ -1,29 +1,23 @@
 package com.github.linyuzai.domain.core.proxy;
 
-import com.github.linyuzai.domain.core.DomainCollection;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerLimitedDomainObject;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * 薛定谔模型代理
  */
 @Getter
+@Setter
 public class ProxySchrodingerLimitedDomainObject<T extends DomainObject>
         extends SchrodingerLimitedDomainObject<T>
         implements DomainObject, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
     @NonNull
-    protected final Class<T> type;
-
-    public ProxySchrodingerLimitedDomainObject(@NonNull Class<T> type,
-                                               @NonNull DomainCollection<T> collection,
-                                               @NonNull String id) {
-        super(collection, id);
-        this.type = type;
-    }
+    protected Class<T> type;
 
     @Override
     public Object getProxied() {

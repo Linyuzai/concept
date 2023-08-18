@@ -6,16 +6,16 @@ import com.github.linyuzai.domain.core.link.DomainLink;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerDeferredDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
-import java.util.Collection;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * 薛定谔的集合模型
  */
 @Getter
+@Setter
 public class ProxySchrodingerDeferredDomainCollection<T extends DomainObject>
         extends SchrodingerDeferredDomainCollection<T>
         implements DomainCollection<T>, Function<T, T>,
@@ -23,19 +23,10 @@ public class ProxySchrodingerDeferredDomainCollection<T extends DomainObject>
         DomainProxy.RepositoryAccess<T>, DomainProxy.ExtraAccess<Object> {
 
     @NonNull
-    protected final Class<? extends DomainCollection<?>> type;
+    protected Class<? extends DomainCollection<?>> type;
 
     @NonNull
-    protected final DomainFactory factory;
-
-    public ProxySchrodingerDeferredDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                                    @NonNull DomainContext context,
-                                                    @NonNull DomainFactory factory,
-                                                    @NonNull Supplier<Collection<T>> supplier) {
-        super(context, supplier);
-        this.type = type;
-        this.factory = factory;
-    }
+    protected DomainFactory factory;
 
     @Override
     protected Class<T> getDomainObjectType() {

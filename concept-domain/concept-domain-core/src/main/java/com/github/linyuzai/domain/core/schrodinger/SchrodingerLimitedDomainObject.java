@@ -6,25 +6,22 @@ import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.exception.DomainNotFoundException;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  * 薛定谔模型代理
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class SchrodingerLimitedDomainObject<T extends DomainObject>
         extends AbstractDomainProperties implements DomainObject {
 
-    @NonNull
-    protected final DomainCollection<T> collection;
+    protected DomainCollection<T> collection;
 
     /**
      * 领域模型 id
      */
-    @NonNull
-    protected final String id;
+    protected String id;
 
     /**
      * 被代理的领域模型
@@ -57,8 +54,21 @@ public class SchrodingerLimitedDomainObject<T extends DomainObject>
     }
 
     @Override
-    public synchronized void release() {
+    public synchronized void unload() {
         this.target = null;
+    }
+
+    @Override
+    public void release() {
+        collection = null;
+        id = null;
+        target = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 
     protected Class<? extends T> getDomainObjectType() {

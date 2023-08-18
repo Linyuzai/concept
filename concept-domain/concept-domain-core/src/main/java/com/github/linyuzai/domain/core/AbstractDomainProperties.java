@@ -22,4 +22,9 @@ public abstract class AbstractDomainProperties implements DomainProperties {
     public boolean hasProperty(Object key) {
         return properties.containsKey(key);
     }
+
+    @Override
+    public void clearProperties() {
+        properties.clear();
+    }
 }

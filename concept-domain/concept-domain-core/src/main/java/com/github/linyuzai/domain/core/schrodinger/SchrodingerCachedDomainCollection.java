@@ -182,7 +182,7 @@ public class SchrodingerCachedDomainCollection<T extends DomainObject> implement
     }
 
     @Override
-    public void release() {
+    public void unload() {
         targetMap.clear();
         targetList = null;
         targetCount = null;

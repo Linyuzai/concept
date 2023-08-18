@@ -11,7 +11,6 @@ import java.lang.reflect.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 
 /**
  * 领域代理
@@ -20,8 +19,10 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
 
     Map<Method, MethodHandle> DEFAULT_METHOD_HANDLES = new ConcurrentHashMap<>();
 
+    @Deprecated
     Map<Method, Field> PROXY_FIELDS = new ConcurrentHashMap<>();
 
+    @Deprecated
     Map<Method, Method> PROXY_METHODS = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -100,6 +101,7 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         return constructor.newInstance(declaringClass, MethodHandles.Lookup.PUBLIC | MethodHandles.Lookup.PRIVATE).unreflectSpecial(method, declaringClass);
     }
 
+    @Deprecated
     @SneakyThrows
     static Field getProxyField(String name, Object o) {
         String fieldName = new LambdaFunction.Name(name).convertGetMethodToField().lowercaseFirst().getValue();
@@ -111,6 +113,7 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         return field;
     }
 
+    @Deprecated
     @SneakyThrows
     static Method getProxyMethod(String name, Class<?>[] parameterTypes, Object o) {
         Method method = getMethod(o.getClass(), name, parameterTypes);
@@ -121,6 +124,7 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         return method;
     }
 
+    @Deprecated
     @SneakyThrows
     static Field getField(Class<?> clazz, String name) {
         if (clazz == null) {
@@ -133,6 +137,7 @@ public interface DomainProxy extends DomainProperties, InvocationHandler {
         }
     }
 
+    @Deprecated
     @SneakyThrows
     static Method getMethod(Class<?> clazz, String name, Class<?>[] parameterTypes) {
         if (clazz == null) {

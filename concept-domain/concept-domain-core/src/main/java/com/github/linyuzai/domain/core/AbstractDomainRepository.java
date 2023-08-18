@@ -228,8 +228,16 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
 
     protected C wrap(Collection<T> objects) {
         Class<C> genericType = getGenericType();
-        return new ProxyListableDomainCollection<>(genericType, getContext(), new ArrayList<>(objects))
-                .create(genericType);
+        DomainFactory factory = getFactory();
+        if (factory == null) {
+            ProxyListableDomainCollection<T> creator = new ProxyListableDomainCollection<>();
+            creator.setType(genericType);
+            creator.setContext(getContext());
+            creator.setList(new ArrayList<>(objects));
+            return creator.create(genericType);
+        } else {
+            return factory.wrapCollection(genericType, objects);
+        }
     }
 
     protected Class<C> getGenericType() {
@@ -237,6 +245,10 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
     }
 
     protected DomainContext getContext() {
+        return null;
+    }
+
+    protected DomainFactory getFactory() {
         return null;
     }
 }

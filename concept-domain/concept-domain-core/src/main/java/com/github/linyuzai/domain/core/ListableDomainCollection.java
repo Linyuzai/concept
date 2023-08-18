@@ -1,8 +1,7 @@
 package com.github.linyuzai.domain.core;
 
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
@@ -11,12 +10,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class ListableDomainCollection<T extends DomainObject> extends AbstractDomainProperties
         implements DomainCollection<T> {
 
-    @NonNull
-    protected final List<T> list;
+    protected List<T> list;
 
     protected Map<String, T> map;
 
@@ -50,5 +48,17 @@ public class ListableDomainCollection<T extends DomainObject> extends AbstractDo
             map = list.stream().collect(Collectors.toMap(Identifiable::getId, Function.identity()));
         }
         return map;
+    }
+
+    @Override
+    public void release() {
+        list = null;
+        map = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 }

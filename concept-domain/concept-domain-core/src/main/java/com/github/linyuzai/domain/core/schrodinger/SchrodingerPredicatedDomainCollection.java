@@ -2,8 +2,7 @@ package com.github.linyuzai.domain.core.schrodinger;
 
 import com.github.linyuzai.domain.core.*;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,15 +17,13 @@ import java.util.stream.Stream;
  * 薛定谔的集合模型
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class SchrodingerPredicatedDomainCollection<T extends DomainObject>
         extends AbstractDomainProperties implements DomainCollection<T> {
 
-    @NonNull
-    protected final DomainCollection<T> collection;
+    protected DomainCollection<T> collection;
 
-    @NonNull
-    protected final Predicate<T> predicate;
+    protected Predicate<T> predicate;
 
     protected Map<String, T> target;
 
@@ -84,7 +81,20 @@ public class SchrodingerPredicatedDomainCollection<T extends DomainObject>
     }
 
     @Override
-    public synchronized void release() {
+    public synchronized void unload() {
         target = null;
+    }
+
+    @Override
+    public void release() {
+        collection = null;
+        predicate = null;
+        target = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 }

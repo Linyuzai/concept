@@ -7,27 +7,21 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.schrodinger.SchrodingerPredicatedDomainCollection;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * 薛定谔的集合模型
  */
 @Getter
+@Setter
 public class ProxySchrodingerPredicatedDomainCollection<T extends DomainObject>
         extends SchrodingerPredicatedDomainCollection<T>
         implements DomainCollection<T>, DomainProxy, DomainProxy.AccessAdapter<T, Object> {
 
     @NonNull
-    protected final Class<? extends DomainCollection<?>> type;
-
-    public ProxySchrodingerPredicatedDomainCollection(@NonNull Class<? extends DomainCollection<?>> type,
-                                                      @NonNull DomainCollection<T> collection,
-                                                      @NonNull Predicate<T> predicate) {
-        super(collection, predicate);
-        this.type = type;
-    }
+    protected Class<? extends DomainCollection<?>> type;
 
     @Override
     public Conditions getConditions() {

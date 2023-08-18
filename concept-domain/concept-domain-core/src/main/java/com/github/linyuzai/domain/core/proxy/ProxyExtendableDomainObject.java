@@ -16,20 +16,11 @@ public class ProxyExtendableDomainObject<T extends DomainObject> extends Abstrac
         DomainContext.Aware {
 
     @NonNull
-    protected final T object;
+    protected Class<? extends DomainObject> type;
 
-    @NonNull
-    protected final Class<? extends DomainObject> type;
+    protected T object;
 
     protected DomainContext context;
-
-    public ProxyExtendableDomainObject(@NonNull Class<? extends DomainObject> type,
-                                       DomainContext context,
-                                       @NonNull T object) {
-        this.type = type;
-        this.context = context;
-        this.object = object;
-    }
 
     @Override
     public String getId() {
@@ -56,5 +47,16 @@ public class ProxyExtendableDomainObject<T extends DomainObject> extends Abstrac
                     DomainLink.repository(type);
             return context.get(clazz);
         });
+    }
+
+    @Override
+    public void release() {
+        object = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 }

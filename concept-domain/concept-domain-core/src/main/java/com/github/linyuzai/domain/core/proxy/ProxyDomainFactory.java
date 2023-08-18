@@ -6,45 +6,101 @@ import com.github.linyuzai.domain.core.DomainFactory;
 import com.github.linyuzai.domain.core.DomainObject;
 import com.github.linyuzai.domain.core.condition.Conditions;
 import com.github.linyuzai.domain.core.link.DomainLink;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.domain.core.recycler.DomainRecycler;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.lang.reflect.Proxy;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProxyDomainFactory implements DomainFactory {
 
-    private DomainContext context;
+    private final DomainContext context;
 
-    @Override
-    public <T extends DomainObject> T createObject(Class<T> cls, String id) {
-        return new ProxySchrodingerIdentifiedDomainObject<>(cls, context, id).create(cls);
+    private final DomainRecycler recycler;
+
+    protected <T extends DomainObject, P extends DomainProxy> T obtain(
+            Class<P> proxyType, Supplier<P> supplier, Class<T> cls,
+            Consumer<P> onCreate, Consumer<P> onInit) {
+        T reuseOrCreate = recycler.reuse(proxyType, cls, () -> {
+            P creator = supplier.get();
+            onCreate.accept(creator);
+            return creator.create(cls);
+        });
+        P creator = (P) Proxy.getInvocationHandler(reuseOrCreate);
+        onInit.accept(creator);
+        return reuseOrCreate;
     }
 
     @Override
-    public <T extends DomainObject> T createObject(Class<T> cls, Conditions conditions) {
-        return new ProxySchrodingerConditionsDomainObject<>(cls, context, conditions).create(cls);
+    public <T extends DomainObject> T createObject(Class<T> cls, @NonNull String id) {
+        return obtain(ProxySchrodingerIdentifiedDomainObject.class,
+                ProxySchrodingerIdentifiedDomainObject::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setType(cls);
+                }, init -> {
+                    init.setId(id);
+                });
     }
 
     @Override
-    public <T extends DomainObject> T createObject(Class<T> cls, Supplier<T> supplier) {
-        return new ProxySchrodingerDeferredDomainObject<>(cls, context, supplier).create(cls);
+    public <T extends DomainObject> T createObject(Class<T> cls, @NonNull Conditions conditions) {
+        return obtain(ProxySchrodingerConditionsDomainObject.class,
+                ProxySchrodingerConditionsDomainObject::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setType(cls);
+                }, init -> {
+                    init.setConditions(conditions);
+                });
     }
 
     @Override
-    public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, String id) {
-        return new ProxySchrodingerLimitedDomainObject<>(cls, collection, id).create(cls);
+    public <T extends DomainObject> T createObject(Class<T> cls, @NonNull Supplier<T> supplier) {
+        return obtain(ProxySchrodingerDeferredDomainObject.class,
+                ProxySchrodingerDeferredDomainObject::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setType(cls);
+                }, init -> {
+                    init.setSupplier(supplier);
+                });
+    }
+
+    @Override
+    public <T extends DomainObject> T createObject(Class<T> cls,
+                                                   @NonNull DomainCollection<T> collection,
+                                                   @NonNull String id) {
+        return obtain(ProxySchrodingerLimitedDomainObject.class,
+                ProxySchrodingerLimitedDomainObject::new, cls,
+                create -> {
+                    create.setType(cls);
+                }, init -> {
+                    init.setCollection(collection);
+                    init.setId(id);
+                });
     }
 
     @Override
     public <T extends DomainObject> T createObject(Class<T> cls, DomainCollection<T> collection, Predicate<T> predicate) {
-        return new ProxySchrodingerPredicatedDomainObject<>(cls, collection, predicate).create(cls);
+        return obtain(ProxySchrodingerPredicatedDomainObject.class,
+                ProxySchrodingerPredicatedDomainObject::new, cls,
+                create -> {
+                    create.setType(cls);
+                }, init -> {
+                    init.setCollection(collection);
+                    init.setPredicate(predicate);
+                });
     }
 
     @Override
@@ -83,27 +139,65 @@ public class ProxyDomainFactory implements DomainFactory {
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Conditions conditions) {
-        return new ProxySchrodingerConditionsDomainCollection<C>(cls, context, this, conditions).create(cls);
+        return obtain(ProxySchrodingerConditionsDomainCollection.class,
+                ProxySchrodingerConditionsDomainCollection::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setFactory(this);
+                    create.setType(cls);
+                }, init -> {
+                    init.setConditions(conditions);
+                });
     }
 
     @Override
     public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, Supplier<Collection<T>> supplier) {
-        return new ProxySchrodingerDeferredDomainCollection<>(cls, context, this, supplier).create(cls);
+        return obtain(ProxySchrodingerDeferredDomainCollection.class,
+                ProxySchrodingerDeferredDomainCollection::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setFactory(this);
+                    create.setType(cls);
+                }, init -> {
+                    init.setSupplier(supplier);
+                });
     }
 
     @Override
     public <C extends DomainCollection<?>> C createCollection(Class<C> cls, Collection<String> ids) {
-        return new ProxySchrodingerIdentifiedDomainCollection<>(cls, context, this, ids).create(cls);
+        return obtain(ProxySchrodingerIdentifiedDomainCollection.class,
+                ProxySchrodingerIdentifiedDomainCollection::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setFactory(this);
+                    create.setType(cls);
+                }, init -> {
+                    init.setIds(ids);
+                });
     }
 
     @Override
     public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Collection<String> ids) {
-        return new ProxySchrodingerLimitedDomainCollection<>(cls, collection, ids).create(cls);
+        return obtain(ProxySchrodingerLimitedDomainCollection.class,
+                ProxySchrodingerLimitedDomainCollection::new, cls,
+                create -> {
+                    create.setType(cls);
+                }, init -> {
+                    init.setCollection(collection);
+                    init.setIds(ids);
+                });
     }
 
     @Override
     public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, C collection, Predicate<T> predicate) {
-        return new ProxySchrodingerPredicatedDomainCollection<T>(cls, collection, predicate).create(cls);
+        return obtain(ProxySchrodingerPredicatedDomainCollection.class,
+                ProxySchrodingerPredicatedDomainCollection::new, cls,
+                create -> {
+                    create.setType(cls);
+                }, init -> {
+                    init.setCollection(collection);
+                    init.setPredicate(predicate);
+                });
     }
 
     @Override
@@ -143,12 +237,26 @@ public class ProxyDomainFactory implements DomainFactory {
 
     @Override
     public <T extends DomainObject> T wrapObject(Class<T> cls, T object) {
-        return new ProxyExtendableDomainObject<>(cls, context, object).create(cls);
+        return obtain(ProxyExtendableDomainObject.class,
+                ProxyExtendableDomainObject::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setType(cls);
+                }, init -> {
+                    init.setObject(object);
+                });
     }
 
     @Override
     public <C extends DomainCollection<?>> C wrapCollection(Class<C> cls, Collection<? extends DomainObject> objects) {
-        return new ProxyListableDomainCollection<>(cls, context, new ArrayList<>(objects)).create(cls);
+        return obtain(ProxyListableDomainCollection.class,
+                ProxyListableDomainCollection::new, cls,
+                create -> {
+                    create.setContext(context);
+                    create.setType(cls);
+                }, init -> {
+                    init.setList(new ArrayList<>(objects));
+                });
     }
 
     @Override

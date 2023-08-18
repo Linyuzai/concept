@@ -5,7 +5,7 @@ import com.github.linyuzai.domain.core.exception.DomainIdRequiredException;
 import com.github.linyuzai.domain.core.link.DomainLink;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,12 +19,12 @@ import java.util.stream.Stream;
  * 薛定谔的集合模型
  */
 @Getter
-@RequiredArgsConstructor
 public abstract class AbstractSchrodingerDomainCollection<T extends DomainObject>
         extends AbstractDomainProperties implements DomainCollection<T> {
 
+    @Setter
     @NonNull
-    protected final DomainContext context;
+    protected DomainContext context;
 
     protected DomainRepository<T, ?> repository;
 
@@ -92,8 +92,19 @@ public abstract class AbstractSchrodingerDomainCollection<T extends DomainObject
     }
 
     @Override
-    public synchronized void release() {
+    public synchronized void unload() {
         target = null;
+    }
+
+    @Override
+    public void release() {
+        target = null;
+        clearProperties();
+        onRelease();
+    }
+
+    protected void onRelease() {
+
     }
 
     public DomainRepository<T, ?> getRepository() {
