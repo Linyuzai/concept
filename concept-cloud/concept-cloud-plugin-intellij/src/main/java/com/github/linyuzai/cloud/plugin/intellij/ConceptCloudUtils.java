@@ -31,7 +31,11 @@ public class ConceptCloudUtils {
             return false;
         }*/
         PsiElement psiElement = e.getData(LangDataKeys.PSI_ELEMENT);
-        return psiElement instanceof PsiDirectory;
+        if (psiElement instanceof PsiDirectory psiDirectory) {
+            PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(psiDirectory);
+            return psiPackage != null && psiPackage.getName() != null;
+        }
+        return false;
     }
 
     public static String uppercaseFirst(String str) {

@@ -126,9 +126,9 @@ public abstract class GenerateCodeAction extends AnAction {
                     Messages.showErrorDialog(error.getMessage(), getDialogTitle());
                 }
             }, getProgressTitle(), true, context.project);
+            LocalFileSystem.getInstance().refresh(false);
+            new ReformatCodeProcessor(context.project, context.selectModule, false).run();
         }
-        LocalFileSystem.getInstance().refresh(false);
-        new ReformatCodeProcessor(context.project, context.selectModule, false).run();
     }
 
     protected void suggestModule(Context context) {
