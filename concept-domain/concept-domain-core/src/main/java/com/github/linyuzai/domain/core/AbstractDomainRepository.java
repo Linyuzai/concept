@@ -24,6 +24,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      */
     public abstract P do2po(T object);
 
+    /**
+     * 领域模型转数据模型
+     */
     public Collection<P> dos2pos(Collection<? extends T> objects) {
         return objects.stream().map(this::do2po).collect(Collectors.toList());
     }
@@ -33,6 +36,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      */
     public abstract T po2do(P po);
 
+    /**
+     * 数据模型转领域模型
+     */
     public Collection<T> pos2dos(Collection<? extends P> pos) {
         return pos.stream().map(this::po2do).collect(Collectors.toList());
     }
@@ -102,11 +108,17 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
      */
     protected abstract void doDelete(P po);
 
+    /**
+     * 删除多个领域模型
+     */
     @Override
     public void delete(C collection) {
         doDelete(dos2pos(collection.list()));
     }
 
+    /**
+     * 删除多条记录
+     */
     protected abstract void doDelete(Collection<? extends P> pos);
 
     /**
@@ -156,7 +168,7 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
     protected abstract void doDelete(Conditions conditions);
 
     /**
-     * 条件查询
+     * 条件查询一个领域模型
      */
     @Override
     public T get(Conditions conditions) {
@@ -171,10 +183,13 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
     }
 
     /**
-     * 条件查询
+     * 条件查询一条数据
      */
     protected abstract P doGet(Conditions conditions);
 
+    /**
+     * 条件查询多个领域模型
+     */
     @Override
     public C select(Conditions conditions) {
         if (intercept(conditions)) {
@@ -183,6 +198,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
         return wrap(pos2dos(doSelect(conditions)));
     }
 
+    /**
+     * 条件查询多条数据
+     */
     protected abstract Collection<P> doSelect(Conditions conditions);
 
     /**
@@ -226,6 +244,9 @@ public abstract class AbstractDomainRepository<T extends DomainObject, C extends
         return false;
     }
 
+    /**
+     * 将多条数据包装成领域集合
+     */
     protected C wrap(Collection<T> objects) {
         Class<C> genericType = getGenericType();
         DomainFactory factory = getFactory();

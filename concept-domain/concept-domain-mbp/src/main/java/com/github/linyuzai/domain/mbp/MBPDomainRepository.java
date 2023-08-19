@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -87,7 +88,10 @@ public abstract class MBPDomainRepository<T extends DomainObject, C extends Doma
         if (pos.isEmpty()) {
             return;
         }
-        getBaseMapper().deleteBatchIds(pos.stream().map(Identifiable::getId).collect(Collectors.toSet()));
+        Set<String> ids = pos.stream()
+                .map(Identifiable::getId)
+                .collect(Collectors.toSet());
+        getBaseMapper().deleteBatchIds(ids);
     }
 
     /**

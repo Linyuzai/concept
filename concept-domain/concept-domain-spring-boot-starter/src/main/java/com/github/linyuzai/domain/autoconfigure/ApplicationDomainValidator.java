@@ -1,7 +1,8 @@
 package com.github.linyuzai.domain.autoconfigure;
 
 import com.github.linyuzai.domain.core.DomainValidator;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.FieldError;
@@ -12,13 +13,14 @@ import java.util.Objects;
 /**
  * 基于 Spring 的校验器
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ApplicationDomainValidator implements DomainValidator {
 
     /**
      * org.springframework.validation.Validator
      */
-    private Validator validator;
+    private final Validator validator;
 
     @Override
     public void validate(Object target) {

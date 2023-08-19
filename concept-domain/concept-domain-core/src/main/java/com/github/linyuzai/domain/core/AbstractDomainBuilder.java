@@ -28,6 +28,9 @@ public abstract class AbstractDomainBuilder<T extends DomainObject> implements D
         validator.validate(this);
     }
 
+    /**
+     * 初始化一些默认值
+     */
     protected void init() {
 
     }
