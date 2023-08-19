@@ -5,27 +5,23 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 @Getter
 @RequiredArgsConstructor
 public class ThreadLocalDomainRecycler implements DomainRecycler {
 
-    private final ThreadLocal<Map<Object, Map<Class<? extends DomainObject>, List<DomainObject>>>> TL =
-            ThreadLocal.withInitial(HashMap::new);
+    private final ThreadLocal<List<RecycleHolder>> TL = ThreadLocal.withInitial(ArrayList::new);
 
     private final DomainRecycler recycler;
 
     @SuppressWarnings("unchecked")
     public void recycle() {
-        Map<Object, Map<Class<? extends DomainObject>, List<DomainObject>>> map = TL.get();
-        map.forEach((recycleType, listMap) ->
-                listMap.forEach((domainType, list) ->
-                        list.forEach(recyclable ->
-                                recycle(recycleType, (Class<DomainObject>) domainType, recyclable))));
+        List<RecycleHolder> holders = TL.get();
+        for (RecycleHolder holder : holders) {
+            recycle(holder.recycleType, (Class<DomainObject>) holder.domainType, holder.recyclable);
+        }
         TL.remove();
     }
 
@@ -37,9 +33,20 @@ public class ThreadLocalDomainRecycler implements DomainRecycler {
     @Override
     public <T extends DomainObject> T reuse(Object recycleType, Class<T> domainType, Supplier<T> supplier) {
         T reused = recycler.reuse(recycleType, domainType, supplier);
-        TL.get().computeIfAbsent(recycleType, rt -> new HashMap<>())
-                .computeIfAbsent(domainType, dt -> new ArrayList<>())
-                .add(reused);
+        RecycleHolder holder = new RecycleHolder();
+        holder.recycleType = recycleType;
+        holder.domainType = domainType;
+        holder.recyclable = reused;
+        TL.get().add(holder);
         return reused;
+    }
+
+    static class RecycleHolder {
+
+        Object recycleType;
+
+        Class<? extends DomainObject> domainType;
+
+        DomainObject recyclable;
     }
 }
