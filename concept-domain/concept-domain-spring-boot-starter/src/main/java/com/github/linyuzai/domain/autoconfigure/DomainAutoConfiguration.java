@@ -61,7 +61,11 @@ public class DomainAutoConfiguration {
         public DomainRecycler domainRecycler() {
             DomainProperties.RecyclerProperties recycler = properties.getRecycler();
             if (recycler.isEnabled()) {
-                return new LinkedDomainRecycler();
+                if (recycler.isThreadLocalAutoRecycle()) {
+                    return new ThreadLocalDomainRecycler(new LinkedDomainRecycler());
+                } else {
+                    return new LinkedDomainRecycler();
+                }
             } else {
                 return new NotRecycledDomainRecycler();
             }
@@ -69,10 +73,9 @@ public class DomainAutoConfiguration {
 
         @Override
         public void addInterceptors(InterceptorRegistry registry) {
-            DomainProperties.RecyclerProperties recycler = properties.getRecycler();
-            if (recycler.isEnabled() && recycler.isThreadLocalAutoRecycle()) {
-                registry.addInterceptor(new AutoRecycleHandler(
-                        new ThreadLocalDomainRecycler(domainRecycler())));
+            DomainRecycler recycler = domainRecycler();
+            if (recycler instanceof ThreadLocalDomainRecycler) {
+                registry.addInterceptor(new AutoRecycleHandler((ThreadLocalDomainRecycler) recycler));
             }
         }
 
