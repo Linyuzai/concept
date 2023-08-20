@@ -8,6 +8,10 @@ import com.github.linyuzai.domain.core.proxy.ProxyDomainFactory;
 import com.github.linyuzai.domain.core.recycler.DomainRecycler;
 import com.github.linyuzai.domain.core.recycler.LinkedDomainRecycler;
 import com.github.linyuzai.domain.core.recycler.NotRecycledDomainRecycler;
+import com.github.linyuzai.domain.core.recycler.ThreadLocalDomainRecycler;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,6 +20,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Validator;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableConfigurationProperties(DomainProperties.class)
@@ -39,27 +49,55 @@ public class DomainAutoConfiguration {
         return new ApplicationDomainValidator(validator);
     }
 
-    @Bean
-    @ConditionalOnMissingBean
+    @Configuration
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    public DomainRecycler domainRecycler(DomainProperties properties) {
-        DomainProperties.RecyclerProperties recycler = properties.getRecycler();
-        if (recycler.isEnabled()) {
-            if (recycler.isThreadLocalAutoRecycle()) {
-                return new ThreadLocalAutoRecycledDomainRecycler(new LinkedDomainRecycler());
-            } else {
+    public static class DomainRecyclerConfiguration implements WebMvcConfigurer {
+
+        @Autowired
+        private DomainProperties properties;
+
+        @Bean
+        @ConditionalOnMissingBean
+        public DomainRecycler domainRecycler() {
+            DomainProperties.RecyclerProperties recycler = properties.getRecycler();
+            if (recycler.isEnabled()) {
                 return new LinkedDomainRecycler();
+            } else {
+                return new NotRecycledDomainRecycler();
             }
-        } else {
-            return new NotRecycledDomainRecycler();
+        }
+
+        @Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            DomainProperties.RecyclerProperties recycler = properties.getRecycler();
+            if (recycler.isEnabled() && recycler.isThreadLocalAutoRecycle()) {
+                registry.addInterceptor(new AutoRecycleHandler(
+                        new ThreadLocalDomainRecycler(domainRecycler())));
+            }
+        }
+
+        @Getter
+        @RequiredArgsConstructor
+        public static class AutoRecycleHandler implements HandlerInterceptor {
+
+            private final ThreadLocalDomainRecycler recycler;
+
+            @Override
+            public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+                recycler.recycle();
+            }
         }
     }
 
-    @Bean
-    @ConditionalOnMissingBean
+    @Configuration
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-    public DomainRecycler notRecycledDomainRecycler() {
-        return new NotRecycledDomainRecycler();
+    public static class ReactiveDomainRecyclerConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public DomainRecycler notRecycledDomainRecycler() {
+            return new NotRecycledDomainRecycler();
+        }
     }
 
     /**
