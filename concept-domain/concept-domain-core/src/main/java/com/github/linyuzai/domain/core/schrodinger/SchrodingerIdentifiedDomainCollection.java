@@ -17,8 +17,8 @@ public class SchrodingerIdentifiedDomainCollection<T extends DomainObject>
     protected Collection<String> ids;
 
     @Override
-    protected Collection<T> doGetTarget() {
-        return getRepository().select(ids).list();
+    protected DomainCollection<T> doGetTarget() {
+        return getRepository().select(ids);
     }
 
     @Override

@@ -61,7 +61,7 @@ public interface DomainFactory {
     /**
      * 创建延迟调用的领域集合
      */
-    <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, Supplier<Collection<T>> supplier);
+    <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, Supplier<C> supplier);
 
     /**
      * 创建在指定集合中指定 ids 的领域集合

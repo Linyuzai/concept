@@ -5,8 +5,6 @@ import com.github.linyuzai.domain.core.condition.Conditions;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
-
 /**
  * 薛定谔的集合模型
  */
@@ -18,8 +16,8 @@ public class SchrodingerConditionsDomainCollection<T extends DomainObject>
     protected Conditions conditions;
 
     @Override
-    protected Collection<T> doGetTarget() {
-        return getRepository().select(conditions).list();
+    protected DomainCollection<T> doGetTarget() {
+        return getRepository().select(conditions);
     }
 
     @Override

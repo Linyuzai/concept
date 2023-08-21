@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -37,7 +36,7 @@ public abstract class AbstractSchrodingerDomainCollection<T extends DomainObject
         return this.target;
     }
 
-    protected abstract Collection<T> doGetTarget();
+    protected abstract DomainCollection<T> doGetTarget();
 
     /**
      * 根据 id 获得领域模型

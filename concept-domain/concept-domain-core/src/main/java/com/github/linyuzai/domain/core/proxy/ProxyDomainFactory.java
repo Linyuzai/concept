@@ -119,9 +119,10 @@ public class ProxyDomainFactory implements DomainFactory {
         C collection = createCollection(cCls, () -> {
             Set<String> ids = new HashSet<>(function.apply(ownerIds).values());
             C c = createCollection(cCls, ids);
-            return ids.stream()
+            List<T> list = ids.stream()
                     .map(it -> createObject(dCls, c, it))
                     .collect(Collectors.toList());
+            return wrapCollection(cCls, list);
         });
 
         Map<String, T> map = new LinkedHashMap<>();
@@ -151,7 +152,7 @@ public class ProxyDomainFactory implements DomainFactory {
     }
 
     @Override
-    public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, Supplier<Collection<T>> supplier) {
+    public <T extends DomainObject, C extends DomainCollection<T>> C createCollection(Class<C> cls, Supplier<C> supplier) {
         return obtain(ProxySchrodingerDeferredDomainCollection.class,
                 ProxySchrodingerDeferredDomainCollection::new, cls,
                 create -> {
@@ -216,9 +217,10 @@ public class ProxyDomainFactory implements DomainFactory {
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
             C c = createCollection(cCls, ids);
-            return ids.stream()
+            List<T> list = ids.stream()
                     .map(it -> createObject(dCls, c, it))
                     .collect(Collectors.toList());
+            return wrapCollection(cCls, list);
         });
 
         Map<String, C> map = new LinkedHashMap<>();
@@ -226,9 +228,10 @@ public class ProxyDomainFactory implements DomainFactory {
             C c = createCollection(cCls, () -> {
                 Map<String, ? extends Collection<String>> apply = function.apply(ownerIds);
                 Collection<String> ids = apply.get(ownerId);
-                return ids.stream()
+                List<T> list = ids.stream()
                         .map(collection::get)
                         .collect(Collectors.toList());
+                return wrapCollection(cCls, list);
             });
             map.put(ownerId, c);
         }
