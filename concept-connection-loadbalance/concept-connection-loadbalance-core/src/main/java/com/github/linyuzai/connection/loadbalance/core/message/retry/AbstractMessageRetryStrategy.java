@@ -74,7 +74,7 @@ public abstract class AbstractMessageRetryStrategy implements MessageRetryStrate
         private final Throwable error;
 
         /**
-         * 能够被重试的操锁。
+         * 能够被重试的操作。
          * <p>
          * Operation can be retry.
          */

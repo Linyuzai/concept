@@ -5,6 +5,7 @@ import com.github.linyuzai.concept.sample.inherit.bug6.Bug6Sample;
 import com.github.linyuzai.concept.sample.mapqueue.MapQueueBugSample;
 import com.github.linyuzai.concept.sample.mapqueue.MapQueueSample;
 import com.github.linyuzai.concept.sample.throwsdemo.ThrowsDemo;
+import com.github.linyuzai.connection.loadbalance.netty.sample.NettySampleServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,12 +15,13 @@ import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
+import java.nio.channels.Selector;
 import java.util.*;
 //import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 //@EnableSwagger2
 @Slf4j
-@SpringBootApplication(scanBasePackages = "com.github.linyuzai.concept.sample.cloud.web"
+@SpringBootApplication(scanBasePackages = "com.github.linyuzai.concept.sample.connection.loadbalance"
         , exclude = DataSourceAutoConfiguration.class)
 public class ConceptSampleApplication {
 
@@ -30,5 +32,7 @@ public class ConceptSampleApplication {
         //new Bug6Sample().bug(null);
         //new MapQueueBugSample().start();
         //new DomainTest().test();
+        //Selector.open();
+        //new NettySampleServer().start();
     }
 }

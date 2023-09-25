@@ -117,6 +117,13 @@ public interface Connection {
     List<MessageSendInterceptor> getMessageSendInterceptors();
 
     /**
+     * 获得连接关闭拦截器。
+     * <p>
+     * Get interceptors for connection closing.
+     */
+    List<ConnectionCloseInterceptor> getConnectionCloseInterceptors();
+
+    /**
      * 设置 Concept。
      * <p>
      * Set Concept.
@@ -179,6 +186,8 @@ public interface Connection {
      * Result returned by callback.
      */
     void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
+
+    boolean isClosed();
 
     /**
      * 连接是否存活。
@@ -253,6 +262,8 @@ public interface Connection {
     }
 
     interface Close {
+
+        int CODE = 4096;
 
         String HEARTBEAT_TIMEOUT = "HeartbeatTimeout";
 

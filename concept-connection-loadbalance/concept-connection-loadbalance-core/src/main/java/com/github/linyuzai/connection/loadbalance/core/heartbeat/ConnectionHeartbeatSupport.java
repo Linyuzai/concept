@@ -85,6 +85,9 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
                     .select(connectionType);
             Message message = createHeartbeatMessage();
             for (Connection connection : connections) {
+                if (connection.isClosed()) {
+                    continue;
+                }
                 try {
                     connection.send(message);
                 } catch (Throwable e) {
@@ -105,6 +108,9 @@ public abstract class ConnectionHeartbeatSupport extends AbstractScoped implemen
         for (String connectionType : connectionTypes) {
             Collection<Connection> connections = concept.getConnectionRepository().select(connectionType);
             for (Connection connection : connections) {
+                if (connection.isClosed()) {
+                    continue;
+                }
                 long lastHeartbeat = connection.getLastHeartbeat();
                 if (timeout > 0 && now - lastHeartbeat > timeout) {
                     connection.setAlive(false);

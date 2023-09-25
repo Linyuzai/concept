@@ -6,6 +6,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDec
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncodeException;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -41,7 +43,10 @@ public abstract class AbstractConnection implements Connection {
     protected MessageRetryStrategy messageRetryStrategy;
 
     @NonNull
-    protected List<MessageSendInterceptor> messageSendInterceptors = new CopyOnWriteArrayList<>();
+    protected final List<MessageSendInterceptor> messageSendInterceptors = new CopyOnWriteArrayList<>();
+
+    @NonNull
+    protected final List<ConnectionCloseInterceptor> connectionCloseInterceptors = new CopyOnWriteArrayList<>();
 
     @NonNull
     protected ConnectionLoadBalanceConcept concept;
@@ -51,7 +56,9 @@ public abstract class AbstractConnection implements Connection {
      * <p>
      * If closed.
      */
-    protected volatile boolean closed;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    protected AtomicBoolean closed = new AtomicBoolean(false);
 
     /**
      * 是否还存活。
@@ -102,6 +109,7 @@ public abstract class AbstractConnection implements Connection {
         //如果连接已经关闭则直接返回异常
         //Return error if connection has been closed
         if (isClosed()) {
+
             onError.accept(new IllegalStateException("Connection is closed"));
             onComplete.run();
             return;
@@ -206,12 +214,37 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public void close(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-        if (closed) {
+        if (closed.get()) {
             return;
         }
-        closed = true;
-        doClose(reason, onSuccess, onError, onComplete);
-        concept.onClose(this, reason);
+        if (closed.compareAndSet(false,true)) {
+            if (!connectionCloseInterceptors.isEmpty()) {
+                try {
+                    for (ConnectionCloseInterceptor interceptor : connectionCloseInterceptors) {
+                        if (interceptor.intercept(reason, this)) {
+                            return;
+                        }
+                    }
+                } catch (Throwable e) {
+                    onError.accept(e);
+                    onComplete.run();
+                    return;
+                }
+            }
+            doClose(adaptCloseReason(reason), onSuccess, onError, () -> {
+                concept.onClose(this, reason);
+                onComplete.run();
+            });
+        }
+    }
+
+    protected Object adaptCloseReason(Object reason) {
+        return reason;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return closed.get();
     }
 
     /**

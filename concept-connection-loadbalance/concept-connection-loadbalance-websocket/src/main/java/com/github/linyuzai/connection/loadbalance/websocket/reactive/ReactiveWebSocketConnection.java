@@ -98,7 +98,11 @@ public class ReactiveWebSocketConnection extends WebSocketConnection {
     @Override
     public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         sender.complete();
-        session.close((CloseStatus) reason).subscribe(v -> onSuccess.run(), onError, onComplete);
+        session.close((CloseStatus) reason)
+                .doOnSuccess(v -> onSuccess.run())
+                .doOnError(onError)
+                .doOnTerminate(onComplete)
+                .subscribe();
     }
 
     @Override

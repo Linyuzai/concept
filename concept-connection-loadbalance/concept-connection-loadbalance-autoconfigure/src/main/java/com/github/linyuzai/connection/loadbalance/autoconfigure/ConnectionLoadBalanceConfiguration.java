@@ -35,6 +35,7 @@ public class ConnectionLoadBalanceConfiguration {
     public static class DiscoveryConnectionServerManagerConfiguration {
 
         @Bean
+        @ConditionalOnMissingBean
         public ConnectionServerManagerFactory connectionServerManagerFactory(DiscoveryClient client,
                                                                              Registration registration) {
             DiscoveryConnectionServerManagerFactory factory = new DiscoveryConnectionServerManagerFactory();

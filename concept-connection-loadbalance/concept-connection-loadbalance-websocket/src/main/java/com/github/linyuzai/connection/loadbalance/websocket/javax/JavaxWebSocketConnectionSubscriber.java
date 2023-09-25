@@ -4,11 +4,8 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
-import javax.websocket.DeploymentException;
 import javax.websocket.Session;
-import java.io.IOException;
 import java.net.URI;
 import java.util.function.Consumer;
 

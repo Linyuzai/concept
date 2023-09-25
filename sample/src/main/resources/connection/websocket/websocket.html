@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+</body>
+<script>
+  const ws = new WebSocket("ws://localhost:18080/concept-websocket/sample");
+  ws.onopen = function(evt) {
+    console.log("Connection open ...");
+    ws.send("Hello WebSockets!");
+  };
+
+  ws.onmessage = function(evt) {
+    console.log("Received Message: " + evt.data);
+    ws.close();
+  };
+
+  ws.onclose = function(evt) {
+    console.log(evt);
+  };
+</script>
+</html>

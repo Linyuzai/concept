@@ -42,6 +42,19 @@ public abstract class WebSocketConnection extends AbstractConnection {
         close(getCloseReason(1000, null));
     }
 
+    @Override
+    protected Object adaptCloseReason(Object reason) {
+        if (Close.HEARTBEAT_TIMEOUT.equals(reason)) {
+            return getCloseReason(Close.CODE, Close.HEARTBEAT_TIMEOUT);
+        } else if (Close.NOT_ALIVE.equals(reason)) {
+            return getCloseReason(Close.CODE, Close.NOT_ALIVE);
+        } else if (Close.SERVER_STOP.equals(reason)) {
+            return getCloseReason(Close.CODE, Close.SERVER_STOP);
+        } else {
+            return getCloseReason(Close.CODE, reason == null ? null : reason.toString());
+        }
+    }
+
     public String getQueryParameter(String name) {
         checkQueryParameterMap();
         return queryParameterMap.get(name);
@@ -54,6 +67,8 @@ public abstract class WebSocketConnection extends AbstractConnection {
 
     protected void checkQueryParameterMap() {
         if (queryParameterMap == null) {
+            //单独使用一个对象作为锁
+            //不用连接本身是为了不影响其他业务使用连接本身作为锁
             synchronized (parseQueryParameterMapLock) {
                 if (queryParameterMap == null) {
                     queryParameterMap = new LinkedHashMap<>();

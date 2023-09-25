@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionCloseInterceptor;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.*;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
@@ -190,6 +191,11 @@ public class MasterSlaveSwitchableConnectionSubscriber
         }
 
         @Override
+        public List<ConnectionCloseInterceptor> getConnectionCloseInterceptors() {
+            return getCurrent().getConnectionCloseInterceptors();
+        }
+
+        @Override
         public void setConcept(@NonNull ConnectionLoadBalanceConcept concept) {
             master.setConcept(concept);
             slave.setConcept(concept);
@@ -250,6 +256,11 @@ public class MasterSlaveSwitchableConnectionSubscriber
             getConcept().onClose(this, reason);
             master.close(reason, onSuccess, onError, () ->
                     slave.close(reason, onSuccess, onError, onComplete));
+        }
+
+        @Override
+        public boolean isClosed() {
+            return master.isClosed();
         }
 
         @Override

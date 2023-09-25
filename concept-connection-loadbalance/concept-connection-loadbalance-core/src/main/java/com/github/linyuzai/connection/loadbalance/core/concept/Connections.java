@@ -82,6 +82,11 @@ public class Connections implements Connection {
     }
 
     @Override
+    public List<ConnectionCloseInterceptor> getConnectionCloseInterceptors() {
+        return get(Connection::getConnectionCloseInterceptors, null);
+    }
+
+    @Override
     public void setConcept(@NonNull ConnectionLoadBalanceConcept concept) {
         for (Connection connection : connections) {
             connection.setConcept(concept);
@@ -134,8 +139,13 @@ public class Connections implements Connection {
     }
 
     @Override
+    public boolean isClosed() {
+        return get(Connection::isClosed, true);
+    }
+
+    @Override
     public boolean isAlive() {
-        return get(Connection::isAlive, null);
+        return get(Connection::isAlive, false);
     }
 
     @Override
@@ -147,7 +157,7 @@ public class Connections implements Connection {
 
     @Override
     public long getLastHeartbeat() {
-        return get(Connection::getLastHeartbeat, null);
+        return get(Connection::getLastHeartbeat, -1L);
     }
 
     @Override
