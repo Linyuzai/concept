@@ -68,7 +68,7 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     @Override
     public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            session.sendMessage(new org.springframework.web.socket.PingMessage(message.getPayload()));
+            session.sendMessage(new org.springframework.web.socket.PingMessage(ByteBuffer.wrap(message.getPayload())));
             onSuccess.run();
         } catch (IOException e) {
             onError.accept(new MessageTransportException(e));
@@ -82,7 +82,7 @@ public class ServletWebSocketConnection extends WebSocketConnection {
     @Override
     public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            session.sendMessage(new org.springframework.web.socket.PongMessage(message.getPayload()));
+            session.sendMessage(new org.springframework.web.socket.PongMessage(ByteBuffer.wrap(message.getPayload())));
             onSuccess.run();
         } catch (IOException e) {
             onError.accept(new MessageTransportException(e));

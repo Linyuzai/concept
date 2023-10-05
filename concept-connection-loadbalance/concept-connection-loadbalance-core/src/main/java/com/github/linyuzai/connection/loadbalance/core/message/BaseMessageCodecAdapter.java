@@ -1,9 +1,10 @@
 package com.github.linyuzai.connection.loadbalance.core.message;
 
-import com.github.linyuzai.connection.loadbalance.core.message.decode.JacksonTextMessageDecoder;
+import com.github.linyuzai.connection.loadbalance.core.message.decode.JacksonForwardMessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.SimpleMessageDecoder;
-import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonTextMessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonForwardMessageEncoder;
+import com.github.linyuzai.connection.loadbalance.core.message.encode.JacksonMessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.JacksonSubscribeMessageDecoder;
 
@@ -17,7 +18,7 @@ public class BaseMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override
     public MessageEncoder getClientMessageEncoder(MessageEncoder encoder) {
-        return new JacksonTextMessageEncoder();
+        return new JacksonMessageEncoder();
     }
 
     @Override
@@ -27,7 +28,7 @@ public class BaseMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override
     public MessageEncoder getSubscribeMessageEncoder(MessageEncoder encoder) {
-        return new JacksonTextMessageEncoder();
+        return new JacksonMessageEncoder();
     }
 
     @Override
@@ -37,11 +38,11 @@ public class BaseMessageCodecAdapter extends AbstractMessageCodecAdapter {
 
     @Override
     public MessageEncoder getForwardMessageEncoder(MessageEncoder encoder) {
-        return new JacksonTextMessageEncoder(true);
+        return new JacksonForwardMessageEncoder();
     }
 
     @Override
     public MessageDecoder getForwardMessageDecoder(MessageDecoder decoder) {
-        return new JacksonTextMessageDecoder();
+        return new JacksonForwardMessageDecoder();
     }
 }

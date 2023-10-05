@@ -69,7 +69,7 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     @Override
     public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            session.getBasicRemote().sendPing(message.getPayload());
+            session.getBasicRemote().sendPing(ByteBuffer.wrap(message.getPayload()));
             onSuccess.run();
         } catch (Throwable e) {
             onError.accept(e);
@@ -81,7 +81,7 @@ public class JavaxWebSocketConnection extends WebSocketConnection {
     @Override
     public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            session.getBasicRemote().sendPong(message.getPayload());
+            session.getBasicRemote().sendPong(ByteBuffer.wrap(message.getPayload()));
             onSuccess.run();
         } catch (Throwable e) {
             onError.accept(e);

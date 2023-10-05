@@ -280,7 +280,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         Message decode;
         try {
             MessageDecoder decoder = connection.getMessageDecoder();
-            decode = decoder.decode(message);
+            decode = decoder.decode(message, connection);
         } catch (Throwable e) {
             eventPublisher.publish(new MessageDecodeErrorEvent(connection, e));
             return;

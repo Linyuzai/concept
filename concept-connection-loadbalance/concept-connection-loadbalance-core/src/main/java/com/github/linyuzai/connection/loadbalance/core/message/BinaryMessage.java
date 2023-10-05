@@ -10,9 +10,13 @@ import java.nio.ByteBuffer;
  * Message has binary payload.
  */
 @NoArgsConstructor
-public class BinaryMessage extends AbstractMessage<ByteBuffer> {
+public class BinaryMessage extends AbstractMessage<byte[]> {
+
+    public BinaryMessage(byte[] payload) {
+        setPayload(payload);
+    }
 
     public BinaryMessage(ByteBuffer payload) {
-        setPayload(payload);
+        setPayload(payload.array());
     }
 }

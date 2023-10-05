@@ -1,14 +1,15 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecodeException;
 import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerImpl;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.nio.ByteBuffer;
@@ -19,10 +20,10 @@ import java.nio.ByteBuffer;
  * Connection subscribe message decoder.
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JacksonSubscribeMessageDecoder implements MessageDecoder {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public JacksonSubscribeMessageDecoder() {
         /*this(new ObjectMapper()
@@ -32,7 +33,7 @@ public class JacksonSubscribeMessageDecoder implements MessageDecoder {
     }
 
     @Override
-    public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
+    public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
         return new SubscribeMessage(parse(message));
     }
 

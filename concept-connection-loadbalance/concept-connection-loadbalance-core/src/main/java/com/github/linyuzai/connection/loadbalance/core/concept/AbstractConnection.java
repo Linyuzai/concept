@@ -142,7 +142,7 @@ public abstract class AbstractConnection implements Connection {
             Object encode;
             try {
                 MessageEncoder encoder = getMessageEncoder();
-                encode = encoder.encode(message);
+                encode = encoder.encode(message, this);
             } catch (Throwable e) {
                 onError.accept(new MessageEncodeException(message, e));
                 onComplete.run();
@@ -217,7 +217,7 @@ public abstract class AbstractConnection implements Connection {
         if (closed.get()) {
             return;
         }
-        if (closed.compareAndSet(false,true)) {
+        if (closed.compareAndSet(false, true)) {
             if (!connectionCloseInterceptors.isEmpty()) {
                 try {
                     for (ConnectionCloseInterceptor interceptor : connectionCloseInterceptors) {

@@ -20,7 +20,13 @@ public class MessageForwardHandler implements MessageReceiveEventListener {
     @Override
     public void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept) {
         try {
-            concept.send(message);
+            String pooled = message.getHeaders()
+                    .getOrDefault(Message.POOLED, Boolean.FALSE.toString());
+            if (Boolean.parseBoolean(pooled)){
+                concept.send(PooledMessage.wrap(message));
+            } else {
+                concept.send(message);
+            }
             concept.getEventPublisher().publish(new MessageForwardEvent(connection, message));
         } catch (Throwable e) {
             concept.getEventPublisher().publish(new MessageForwardErrorEvent(connection, message, e));

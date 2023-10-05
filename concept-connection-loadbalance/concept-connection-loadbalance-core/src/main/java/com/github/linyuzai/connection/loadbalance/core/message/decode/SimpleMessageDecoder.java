@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.message.decode;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
@@ -15,7 +16,7 @@ import java.nio.ByteBuffer;
 public class SimpleMessageDecoder implements MessageDecoder {
 
     @Override
-    public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
+    public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
         if (message instanceof String) {
             return new TextMessage((String) message);
         } else if (message instanceof ByteBuffer) {

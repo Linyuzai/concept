@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
@@ -28,11 +29,11 @@ public class ReactiveRedisMessageCodecAdapter extends AbstractMessageCodecAdapte
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
+        public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
             if (message instanceof ReactiveSubscription.Message) {
-                return decoder.decode(((ReactiveSubscription.Message<?, ?>) message).getMessage(), concept);
+                return decoder.decode(((ReactiveSubscription.Message<?, ?>) message).getMessage(), connection, concept);
             }
-            return decoder.decode(message, concept);
+            return decoder.decode(message, connection, concept);
         }
     }
 }

@@ -46,12 +46,12 @@ public class NettyConnection extends AbstractConnection {
     }
 
     @Override
-    public void doPing(PingMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
+    public void doPing(PingMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
 
     }
 
     @Override
-    public void doPong(PongMessage message, Runnable success, Consumer<Throwable> error, Runnable onComplete) {
+    public void doPong(PongMessage message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
 
     }
 

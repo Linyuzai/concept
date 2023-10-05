@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPingMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage;
@@ -39,20 +40,20 @@ public class ReactiveWebSocketMessageCodecAdapter extends WebSocketMessageCodecA
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
+        public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
             if (message instanceof WebSocketMessage) {
                 WebSocketMessage.Type type = ((WebSocketMessage) message).getType();
                 if (type == WebSocketMessage.Type.TEXT) {
-                    return decoder.decode(((WebSocketMessage) message).getPayloadAsText(), concept);
+                    return decoder.decode(((WebSocketMessage) message).getPayloadAsText(), connection, concept);
                 } else if (type == WebSocketMessage.Type.PING) {
                     return new BinaryPingMessage(((WebSocketMessage) message).getPayload().asByteBuffer());
                 } else if (type == WebSocketMessage.Type.PONG) {
                     return new BinaryPongMessage(((WebSocketMessage) message).getPayload().asByteBuffer());
                 } else if (type == WebSocketMessage.Type.BINARY) {
-                    return decoder.decode(((WebSocketMessage) message).getPayload().asByteBuffer(), concept);
+                    return decoder.decode(((WebSocketMessage) message).getPayload().asByteBuffer(), connection, concept);
                 }
             }
-            return decoder.decode(message, concept);
+            return decoder.decode(message, connection, concept);
         }
     }
 }

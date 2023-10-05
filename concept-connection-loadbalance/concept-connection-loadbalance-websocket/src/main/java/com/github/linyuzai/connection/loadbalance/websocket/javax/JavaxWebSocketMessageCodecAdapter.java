@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryPongMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
@@ -37,11 +38,11 @@ public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdap
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
+        public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
             if (message instanceof javax.websocket.PongMessage) {
                 return new BinaryPongMessage(((javax.websocket.PongMessage) message).getApplicationData());
             }
-            return decoder.decode(message, concept);
+            return decoder.decode(message, connection, concept);
         }
     }
 }

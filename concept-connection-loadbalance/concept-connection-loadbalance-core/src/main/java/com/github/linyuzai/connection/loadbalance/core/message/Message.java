@@ -38,6 +38,20 @@ public interface Message {
     String FROM = "_lb:from";
 
     /**
+     * 标记该消息为二进制数据，转发解码需要依赖此属性。
+     * <p>
+     * Key of message header for message type.
+     */
+    String BINARY = "_lb:binary";
+
+    /**
+     * 标记该消息转发需要缓存。
+     * <p>
+     * Key of message header for message pooled.
+     */
+    String POOLED = "_lb:pooled";
+
+    /**
      * 获得消息头。
      * <p>
      * Get message headers.
@@ -56,54 +70,72 @@ public interface Message {
      * <p>
      * If the message need broadcast.
      */
-    boolean needBroadcast();
+    default boolean needBroadcast() {
+        String broadcast = getHeaders().getOrDefault(BROADCAST, Boolean.TRUE.toString());
+        return Boolean.parseBoolean(broadcast);
+    }
 
     /**
      * 设置消息是否需要广播。
      * <p>
      * Set the message need broadcast or not.
      */
-    void setBroadcast(boolean broadcast);
+    default void setBroadcast(boolean broadcast) {
+        getHeaders().put(BROADCAST, Boolean.valueOf(broadcast).toString());
+    }
 
     /**
      * 是否需要转发。
      * <p>
      * If the message need forward.
      */
-    boolean needForward();
+    default boolean needForward() {
+        String forward = getHeaders().getOrDefault(FORWARD, Boolean.TRUE.toString());
+        return Boolean.parseBoolean(forward);
+    }
 
     /**
      * 设置消息是否需要转发。
      * <p>
      * Set the message need forward or not.
      */
-    void setForward(boolean forward);
+    default void setForward(boolean forward) {
+        getHeaders().put(FORWARD, Boolean.valueOf(forward).toString());
+    }
 
     /**
      * 获得消息ID。
      * <p>
      * Get message id.
      */
-    String getId();
+    default String getId() {
+        return getHeaders().get(ID);
+    }
 
     /**
      * 设置消息ID。
      * <p>
      * Set message id.
      */
-    void setId(String id);
+    default void setId(String id) {
+        getHeaders().put(ID, id);
+    }
 
     /**
      * 获得消息来源。
      * <p>
      * Get message's from.
      */
-    String getFrom();
+    default String getFrom() {
+        return getHeaders().get(FROM);
+    }
 
     /**
      * 设置消息来源。
      * <p>
      * Set message's from.
      */
-    void setFrom(String from);
+    default void setFrom(String from) {
+        getHeaders().put(FROM, from);
+    }
 }

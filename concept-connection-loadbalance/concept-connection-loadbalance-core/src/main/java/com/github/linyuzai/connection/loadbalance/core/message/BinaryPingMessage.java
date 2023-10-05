@@ -10,7 +10,11 @@ import java.nio.ByteBuffer;
 public class BinaryPingMessage extends BinaryMessage implements PingMessage {
 
     public BinaryPingMessage() {
-        this(ByteBuffer.allocate(0));
+        super(new byte[0]);
+    }
+
+    public BinaryPingMessage(byte[] payload) {
+        super(payload);
     }
 
     public BinaryPingMessage(ByteBuffer payload) {

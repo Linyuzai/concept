@@ -45,6 +45,7 @@ dependencies {
     implementation project(path: ':concept-event:concept-event-rabbitmq', configuration: 'default')
     implementation project(path: ':concept-event:concept-event-spring-boot-starter', configuration: 'default')
 
+    //implementation "com.github.linyuzai:concept-websocket-loadbalance-spring-boot-starter:2.1.0"
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-websocket', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-netty', configuration: 'default')

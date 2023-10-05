@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.AbstractMessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
@@ -27,11 +28,11 @@ public class RedisMessageCodecAdapter extends AbstractMessageCodecAdapter {
         private final MessageDecoder decoder;
 
         @Override
-        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
+        public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
             if (message instanceof org.springframework.data.redis.connection.Message) {
-                return decoder.decode(((org.springframework.data.redis.connection.Message) message).getBody(), concept);
+                return decoder.decode(((org.springframework.data.redis.connection.Message) message).getBody(), connection, concept);
             }
-            return decoder.decode(message, concept);
+            return decoder.decode(message, connection, concept);
         }
     }
 }

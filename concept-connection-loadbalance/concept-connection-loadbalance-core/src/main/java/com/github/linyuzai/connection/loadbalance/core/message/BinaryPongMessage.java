@@ -10,7 +10,11 @@ import java.nio.ByteBuffer;
 public class BinaryPongMessage extends BinaryMessage implements PongMessage {
 
     public BinaryPongMessage() {
-        this(ByteBuffer.allocate(0));
+        super(new byte[0]);
+    }
+
+    public BinaryPongMessage(byte[] payload) {
+        super(payload);
     }
 
     public BinaryPongMessage(ByteBuffer payload) {

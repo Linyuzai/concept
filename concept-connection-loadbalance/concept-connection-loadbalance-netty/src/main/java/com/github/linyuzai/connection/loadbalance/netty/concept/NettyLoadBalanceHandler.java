@@ -37,9 +37,13 @@ public class NettyLoadBalanceHandler extends ChannelInboundHandlerAdapter {
         return map;
     }
 
+    protected Connection create(ChannelHandlerContext ctx, Map<Object, Object> metadata) {
+        return concept.createConnection(ctx, metadata);
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        concept.onEstablish(ctx, metadata);
+        concept.onEstablish(create(ctx, metadata));
         ctx.fireChannelActive();
     }
 
