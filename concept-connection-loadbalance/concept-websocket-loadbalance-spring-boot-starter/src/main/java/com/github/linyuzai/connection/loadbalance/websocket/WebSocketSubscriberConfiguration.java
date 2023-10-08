@@ -17,8 +17,12 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoa
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketLoadBalanceEndpoint;
+import com.github.linyuzai.connection.loadbalance.websocket.reactive.DefaultReactiveWebSocketClientFactory;
+import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketClientFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketLoadBalanceHandlerMapping;
+import com.github.linyuzai.connection.loadbalance.websocket.servlet.DefaultServletWebSocketClientFactory;
+import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketClientFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketLoadBalanceConfigurer;
 import org.redisson.api.RedissonClient;
@@ -198,10 +202,11 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ReactiveWebSocketConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
-        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory() {
+        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(ReactiveWebSocketClientFactory webSocketClientFactory) {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
+            factory.setWebSocketClientFactory(webSocketClientFactory);
             return factory;
         }
     }
@@ -209,10 +214,11 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ReactiveWebSocketSSLConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
-        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory() {
+        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(ReactiveWebSocketClientFactory webSocketClientFactory) {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
+            factory.setWebSocketClientFactory(webSocketClientFactory);
             return factory;
         }
     }
@@ -220,10 +226,11 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ServletWebSocketConfiguration extends ServletWebSocketBaseConfiguration {
 
         @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
+        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(ServletWebSocketClientFactory webSocketClientFactory) {
             ServletWebSocketConnectionSubscriberFactory factory =
                     new ServletWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
+            factory.setWebSocketClientFactory(webSocketClientFactory);
             return factory;
         }
     }
@@ -231,10 +238,11 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ServletWebSocketSSLConfiguration extends ServletWebSocketBaseConfiguration {
 
         @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory() {
+        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(ServletWebSocketClientFactory webSocketClientFactory) {
             ServletWebSocketConnectionSubscriberFactory factory =
                     new ServletWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
+            factory.setWebSocketClientFactory(webSocketClientFactory);
             return factory;
         }
     }
@@ -252,6 +260,12 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public static class ReactiveWebSocketBaseConfiguration extends WebSocketBaseConfiguration {
 
         @Bean
+        @ConditionalOnMissingBean
+        public ReactiveWebSocketClientFactory reactiveWebSocketClientFactory() {
+            return new DefaultReactiveWebSocketClientFactory();
+        }
+
+        @Bean
         public ReactiveWebSocketLoadBalanceHandlerMapping reactiveWebSocketLoadBalanceHandlerMapping(
                 WebSocketLoadBalanceConcept concept) {
             return new ReactiveWebSocketLoadBalanceHandlerMapping(concept);
@@ -259,6 +273,12 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     }
 
     public static class ServletWebSocketBaseConfiguration extends WebSocketBaseConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ServletWebSocketClientFactory servletWebSocketClientFactory() {
+            return new DefaultServletWebSocketClientFactory();
+        }
 
         @Bean
         public ServletWebSocketLoadBalanceConfigurer servletWebSocketLoadBalanceConfigurer(

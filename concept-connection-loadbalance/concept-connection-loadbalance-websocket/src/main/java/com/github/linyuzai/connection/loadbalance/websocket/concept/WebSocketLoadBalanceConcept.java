@@ -1,6 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.websocket.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
+import lombok.Getter;
 
 /**
  * ws 负载均衡概念。
@@ -33,11 +34,8 @@ public class WebSocketLoadBalanceConcept extends AbstractConnectionLoadBalanceCo
         return builder.toString();
     }
 
+    @Getter
     private static WebSocketLoadBalanceConcept instance;
-
-    public static WebSocketLoadBalanceConcept getInstance() {
-        return instance;
-    }
 
     public void holdInstance() {
         instance = this;

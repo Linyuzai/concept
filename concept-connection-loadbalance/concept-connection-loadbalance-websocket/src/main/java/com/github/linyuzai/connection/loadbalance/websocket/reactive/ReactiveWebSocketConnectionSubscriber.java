@@ -3,14 +3,8 @@ package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceException;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.util.ClassUtils;
+import lombok.*;
 import org.springframework.web.reactive.socket.client.*;
-import org.xnio.OptionMap;
-import org.xnio.Xnio;
-import org.xnio.XnioWorker;
 
 import java.net.URI;
 import java.util.function.Consumer;
@@ -20,56 +14,29 @@ import java.util.function.Consumer;
  * <p>
  * {@link ReactiveWebSocketConnection} connection subscriber.
  */
-@NoArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ReactiveWebSocketConnectionSubscriber extends
         WebSocketConnectionSubscriber<ReactiveWebSocketConnection> {
 
-    private static final boolean tomcatPresent;
-
-    private static final boolean jettyPresent;
-
-    private static final boolean undertowPresent;
-
-    private static final boolean reactorNettyPresent;
-
-    static {
-        ClassLoader loader = ReactiveWebSocketConnectionSubscriber.class.getClassLoader();
-        tomcatPresent = ClassUtils.isPresent("org.apache.tomcat.websocket.WsWebSocketContainer", loader);
-        jettyPresent = ClassUtils.isPresent("org.eclipse.jetty.websocket.client.WebSocketClient", loader);
-        undertowPresent = ClassUtils.isPresent("io.undertow.websockets.core.WebSocketChannel", loader);
-        reactorNettyPresent = ClassUtils.isPresent("reactor.netty.http.websocket.WebsocketInbound", loader);
-    }
+    private final ReactiveWebSocketClientFactory webSocketClientFactory;
 
     @Override
     public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
                             Consumer<ReactiveWebSocketConnection> onSuccess,
                             Consumer<Throwable> onError,
                             Runnable onComplete) {
-        WebSocketClient client = newWebSocketClient();
+        WebSocketClient client = webSocketClientFactory.create();
         ReactiveWebSocketSubscriberHandler handler =
                 new ReactiveWebSocketSubscriberHandler(concept, (session, sink) -> {
                     ReactiveWebSocketConnection connection = new ReactiveWebSocketConnection(session, sink);
                     connection.setType(Connection.Type.SUBSCRIBER);
                     onSuccess.accept(connection);
                 });
-        client.execute(uri, handler).subscribe(unused -> {
-        }, onError, onComplete);
-    }
-
-    @SneakyThrows
-    public WebSocketClient newWebSocketClient() {
-        if (reactorNettyPresent) {
-            return new ReactorNettyWebSocketClient();
-        } else if (undertowPresent) {
-            XnioWorker worker = Xnio.getInstance().createWorker(OptionMap.builder().getMap());
-            return new UndertowWebSocketClient(worker);
-        } else if (jettyPresent) {
-            return new JettyWebSocketClient();
-        } else if (tomcatPresent) {
-            return new TomcatWebSocketClient();
-        } else {
-            throw new WebSocketLoadBalanceException("No suitable client found");
-        }
+        client.execute(uri, handler)
+                .doOnError(onError)
+                .doOnTerminate(onComplete)
+                .subscribe();
     }
 
     @Override

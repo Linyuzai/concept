@@ -2,13 +2,11 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.websocket.javax.ContainerWebSocketConnectionSubscriber;
-import lombok.NoArgsConstructor;
-import org.springframework.util.ClassUtils;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
-import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.net.URI;
 import java.util.function.Consumer;
@@ -18,16 +16,12 @@ import java.util.function.Consumer;
  * <p>
  * {@link ServletWebSocketConnection} connection subscriber.
  */
-@NoArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ServletWebSocketConnectionSubscriber extends
-        ContainerWebSocketConnectionSubscriber<ServletWebSocketConnection> {
+        WebSocketConnectionSubscriber<ServletWebSocketConnection> {
 
-    private static final boolean jettyPresent;
-
-    static {
-        ClassLoader loader = ServletWebSocketConnectionSubscriber.class.getClassLoader();
-        jettyPresent = ClassUtils.isPresent("org.eclipse.jetty.websocket.client.WebSocketClient", loader);
-    }
+    private final ServletWebSocketClientFactory webSocketClientFactory;
 
     @Override
     public void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
@@ -35,7 +29,7 @@ public class ServletWebSocketConnectionSubscriber extends
                             Consumer<Throwable> onError,
                             Runnable onComplete) {
         try {
-            WebSocketClient client = newWebSocketClient();
+            WebSocketClient client = webSocketClientFactory.create();
             ServletWebSocketSubscriberHandler handler = new ServletWebSocketSubscriberHandler(concept, session -> {
                 ServletWebSocketConnection connection = new ServletWebSocketConnection(session);
                 connection.setType(Connection.Type.SUBSCRIBER);
@@ -47,14 +41,6 @@ public class ServletWebSocketConnectionSubscriber extends
             onError.accept(e);
         } finally {
             onComplete.run();
-        }
-    }
-
-    public WebSocketClient newWebSocketClient() {
-        if (jettyPresent) {
-            return new JettyWebSocketClient();
-        } else {
-            return new StandardWebSocketClient(getContainer());
         }
     }
 

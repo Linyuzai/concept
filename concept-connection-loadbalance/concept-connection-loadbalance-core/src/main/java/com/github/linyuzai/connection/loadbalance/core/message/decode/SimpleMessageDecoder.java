@@ -22,7 +22,7 @@ public class SimpleMessageDecoder implements MessageDecoder {
         } else if (message instanceof ByteBuffer) {
             return new BinaryMessage((ByteBuffer) message);
         } else if (message instanceof byte[]) {
-            return new BinaryMessage(ByteBuffer.wrap((byte[]) message));
+            return new BinaryMessage((byte[]) message);
         } else {
             throw new MessageDecodeException(message);
         }
