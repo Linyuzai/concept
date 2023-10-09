@@ -1,0 +1,15 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptReactiveVersion
+
+ext {
+    set('publishName', 'Reactive Core')
+    set('publishDescription', 'Reactive Core')
+}
+
+dependencies {
+
+}
+
+apply from: '../../publish.gradle'

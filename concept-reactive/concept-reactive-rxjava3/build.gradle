@@ -1,0 +1,16 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptReactiveVersion
+
+ext {
+    set('publishName', 'Reactive Rxjava3')
+    set('publishDescription', 'Reactive 4 Rxjava3')
+}
+
+dependencies {
+    compileOnly "io.reactivex.rxjava3:${Rxjava3Version}"
+    compileOnly project(':concept-reactive:concept-reactive-core')
+}
+
+apply from: '../../publish.gradle'

@@ -1,0 +1,16 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptReactiveVersion
+
+ext {
+    set('publishName', 'Reactive Reactor')
+    set('publishDescription', 'Reactive 4 Reactor')
+}
+
+dependencies {
+    compileOnly "io.projectreactor:reactor-core:${ReactorVersion}"
+    compileOnly project(':concept-reactive:concept-reactive-core')
+}
+
+apply from: '../../publish.gradle'
