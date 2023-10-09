@@ -27,6 +27,8 @@ public abstract class AbstractBlockingMapQueue<K, V> implements BlockingMapQueue
     /**
      * Current number of elements
      */
+    //size 方法没加锁，可以用 cas 优化
+    //或者 size 加锁
     private int count;
 
     /**

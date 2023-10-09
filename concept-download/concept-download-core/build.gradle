@@ -12,7 +12,7 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     api 'javax.activation:activation:1.1.1'
-    api 'io.projectreactor:reactor-core:3.4.22'
+    api "io.projectreactor:reactor-core:${ReactorVersion}"
 }
 
 apply from: '../../publish.gradle'

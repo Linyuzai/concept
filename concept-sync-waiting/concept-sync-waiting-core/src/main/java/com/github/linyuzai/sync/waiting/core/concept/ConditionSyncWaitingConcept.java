@@ -5,9 +5,7 @@ import com.github.linyuzai.sync.waiting.core.container.SyncWaiterContainer;
 import com.github.linyuzai.sync.waiting.core.exception.SyncWaitingTimeoutException;
 import com.github.linyuzai.sync.waiting.core.recycler.DisposableSyncWaiterRecycler;
 import com.github.linyuzai.sync.waiting.core.recycler.SyncWaiterRecycler;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -65,7 +63,8 @@ public class ConditionSyncWaitingConcept extends AbstractSyncWaitingConcept {
     /**
      * 基于 {@link Condition } 实现的 {@link SyncWaiter}。
      */
-    @AllArgsConstructor
+    @Getter
+    @RequiredArgsConstructor
     public static class ConditionSyncWaiter extends AbstractSyncWaiter {
 
         @NonNull

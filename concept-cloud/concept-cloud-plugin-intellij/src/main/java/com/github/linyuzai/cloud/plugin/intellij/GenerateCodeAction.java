@@ -92,6 +92,7 @@ public abstract class GenerateCodeAction extends AnAction {
 
         context.selectModule = e.getData(LangDataKeys.MODULE);
         context.psiElement = e.getData(LangDataKeys.PSI_ELEMENT);
+        //context.selectModule = ModuleUtil.findModuleForPsiElement(context.psiElement);
 
         context.psiPackage = ConceptCloudUtils.getPackage(context.psiElement);
 
@@ -134,6 +135,8 @@ public abstract class GenerateCodeAction extends AnAction {
     protected void suggestModule(Context context) {
         Collection<Module> modules = ModuleUtil.getModulesOfType(context.project, StdModuleTypes.JAVA);
         for (Module module : modules) {
+            //ModuleUtil.moduleContainsFile()
+            //ModuleUtil.isModuleDir(module, context.psiElement.getContainingFile().getVirtualFile());
             if (context.selectModule != null &&
                     context.selectModule.getName().endsWith(".main") &&
                     context.selectModule.getName().equals(module.getName() + ".main")) {
