@@ -1,8 +1,8 @@
 package com.github.linyuzai.reactive.reactor.concept;
 
 import com.github.linyuzai.reactive.core.concept.ReactiveObject;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.Callable;
@@ -10,10 +10,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReactorObject<T> implements ReactiveObject<T> {
 
-    private Mono<T> mono;
+    private final Mono<T> mono;
 
     public static class MonoFactory implements Factory {
 

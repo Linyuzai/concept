@@ -2,18 +2,18 @@ package com.github.linyuzai.reactive.rxjava3.concept;
 
 import com.github.linyuzai.reactive.core.concept.ReactiveObject;
 import io.reactivex.rxjava3.core.Maybe;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RxJava3Object<T> implements ReactiveObject<T> {
 
-    private Maybe<T> maybe;
+    private final Maybe<T> maybe;
 
     public static class MaybeFactory implements Factory {
 
