@@ -3,7 +3,6 @@ package com.github.linyuzai.reactive.reactor.concept;
 import com.github.linyuzai.reactive.core.concept.ReactiveCollection;
 import com.github.linyuzai.reactive.core.concept.ReactiveConcept;
 import com.github.linyuzai.reactive.core.concept.ReactiveObject;
-import reactor.core.publisher.Mono;
 
 public class ReactorConcept implements ReactiveConcept {
 
@@ -14,6 +13,6 @@ public class ReactorConcept implements ReactiveConcept {
 
     @Override
     public ReactiveCollection.Factory collectionFactory() {
-        return null;
+        return new ReactorCollection.FluxFactory();
     }
 }

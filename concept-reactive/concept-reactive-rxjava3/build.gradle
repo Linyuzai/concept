@@ -9,7 +9,7 @@ ext {
 }
 
 dependencies {
-    compileOnly "io.reactivex.rxjava3:${Rxjava3Version}"
+    compileOnly "io.reactivex.rxjava3:rxjava:${RxJava3Version}"
     compileOnly project(':concept-reactive:concept-reactive-core')
 }
 
