@@ -51,24 +51,31 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         admin.declareExchange(exchange);
         admin.declareQueue(queue);
         admin.declareBinding(binding);
-
-        MessageListenerContainer container = createMessageListenerContainer();
-        container.setQueueNames(id);
-        container.setupMessageListener((ChannelAwareMessageListener) (message, channel) -> {
-            onMessageReceived(connection, message);
-            if (channel != null) {
-                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-            }
-        });
+        MessageListenerContainer container = createMessageListenerContainer2(id,
+                (ChannelAwareMessageListener) (message, channel) -> {
+                    onMessageReceived(connection, message);
+                    if (channel != null) {
+                        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                    }
+                });
         container.afterPropertiesSet();
         container.start();
         connection.setContainer(container);
         return connection;
     }
 
-    protected MessageListenerContainer createMessageListenerContainer() {
+    protected MessageListenerContainer createMessageListenerContainer(String queue, MessageListener messageListener) {
         AcknowledgeRabbitListenerEndpoint endpoint =
                 new AcknowledgeRabbitListenerEndpoint(AcknowledgeMode.MANUAL);
+        MessageListenerContainer container = rabbitListenerContainerFactory.createListenerContainer(endpoint);
+        container.setQueueNames(queue);
+        container.setupMessageListener(messageListener);
+        return container;
+    }
+
+    protected MessageListenerContainer createMessageListenerContainer2(String queue, MessageListener messageListener) {
+        AcknowledgeRabbitListenerEndpoint2 endpoint =
+                new AcknowledgeRabbitListenerEndpoint2(queue, AcknowledgeMode.MANUAL, messageListener);
         return rabbitListenerContainerFactory.createListenerContainer(endpoint);
     }
 

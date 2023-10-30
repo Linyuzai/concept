@@ -42,6 +42,10 @@ public class AcknowledgeRabbitListenerEndpoint implements RabbitListenerEndpoint
         return null;
     }
 
+    public Boolean getBatchListener() {
+        return null;
+    }
+
     @Override
     public void setupListenerContainer(MessageListenerContainer listenerContainer) {
 
