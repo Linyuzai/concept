@@ -9,6 +9,7 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.function.Consumer;
@@ -29,7 +30,7 @@ public class NettySampleClient {
         }
     }
 
-    public void connect(String host, int port) {
+    public void connect(String host, int port) throws InterruptedException {
         EventLoopGroup worker = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -37,8 +38,9 @@ public class NettySampleClient {
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_KEEPALIVE, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
+
                         @Override
-                        protected void initChannel(SocketChannel channel) throws Exception {
+                        protected void initChannel(@NonNull SocketChannel channel) {
                             ChannelPipeline pipeline = channel.pipeline();
                             pipeline.addLast(new LineBasedFrameDecoder(1024));
                             pipeline.addLast(new StringEncoder());
@@ -48,8 +50,6 @@ public class NettySampleClient {
                     });
             ChannelFuture future = bootstrap.connect(host, port).sync();
             future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } finally {
             worker.shutdownGracefully();
         }
@@ -63,7 +63,7 @@ public class NettySampleClient {
         }
 
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        public void channelRead(@NonNull ChannelHandlerContext ctx, @NonNull Object msg) throws Exception {
             if (consumer != null) {
                 consumer.accept(String.valueOf(msg));
             }

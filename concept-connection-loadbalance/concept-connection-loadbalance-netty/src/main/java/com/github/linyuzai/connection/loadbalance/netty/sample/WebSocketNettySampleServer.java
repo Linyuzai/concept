@@ -1,15 +1,15 @@
 package com.github.linyuzai.connection.loadbalance.netty.sample;
 
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceHandler;
+import com.github.linyuzai.connection.loadbalance.netty.websocket.WebSocketNettyLoadBalanceHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.Setter;
 
 @Getter
 @RequiredArgsConstructor
-public class NettySampleServer {
+public class WebSocketNettySampleServer {
 
     private final NettyLoadBalanceConcept concept;
 
@@ -25,33 +25,29 @@ public class NettySampleServer {
     private String group;
 
     public void send(String msg) {
-        if (msg.endsWith("\n")) {
-            concept.send(msg);
-        } else {
-            concept.send(msg + "\n");
-        }
+        concept.send(msg);
     }
 
-    public void start(int port) throws InterruptedException {
+    public void start(String path, int port) throws InterruptedException {
         EventLoopGroup boss = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(boss, worker)
                     .channel(NioServerSocketChannel.class)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
 
                         @Override
                         protected void initChannel(@NonNull SocketChannel channel) {
                             ChannelPipeline pipeline = channel.pipeline();
-                            pipeline.addLast(new LineBasedFrameDecoder(1024));
-                            pipeline.addLast(new StringEncoder());
-                            pipeline.addLast(new StringDecoder());
+                            pipeline.addLast(new HttpServerCodec());
+                            pipeline.addLast(new HttpObjectAggregator(65536));
+                            //WebSocketServerCompressionHandler
+                            pipeline.addLast(new WebSocketServerProtocolHandler(path));
                             if (group == null) {
-                                pipeline.addLast(new NettyLoadBalanceHandler(concept));
+                                pipeline.addLast(new WebSocketNettyLoadBalanceHandler(concept));
                             } else {
-                                pipeline.addLast(new NettyLoadBalanceHandler(concept, group));
+                                pipeline.addLast(new WebSocketNettyLoadBalanceHandler(concept, group));
                             }
                         }
                     });
