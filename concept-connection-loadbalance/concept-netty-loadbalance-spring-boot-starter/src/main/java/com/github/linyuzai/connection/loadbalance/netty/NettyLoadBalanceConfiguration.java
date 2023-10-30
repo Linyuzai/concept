@@ -26,6 +26,7 @@ import com.github.linyuzai.connection.loadbalance.core.subscribe.EmptyConnection
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.netty.concept.NettyScoped;
+import com.github.linyuzai.connection.loadbalance.netty.websocket.WebSocketFrameNettyMessageCodecAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -185,6 +186,11 @@ public class NettyLoadBalanceConfiguration {
     @Bean
     public NettyConnectionFactory nettyConnectionFactory() {
         return new NettyConnectionFactory();
+    }
+
+    @Bean
+    public WebSocketFrameNettyMessageCodecAdapter webSocketFrameNettyMessageCodecAdapter() {
+        return new WebSocketFrameNettyMessageCodecAdapter();
     }
 
     @Bean

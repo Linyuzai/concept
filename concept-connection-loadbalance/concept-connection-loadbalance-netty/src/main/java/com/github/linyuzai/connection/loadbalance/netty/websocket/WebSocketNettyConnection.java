@@ -14,6 +14,14 @@ public class WebSocketNettyConnection extends NettyConnection {
 
     public WebSocketNettyConnection(NettyConnection connection) {
         super(connection.getChannel());
+        setType(connection.getType());
+        setMetadata(connection.getMetadata());
+        setMessageEncoder(connection.getMessageEncoder());
+        setMessageDecoder(connection.getMessageDecoder());
+        setMessageRetryStrategy(connection.getMessageRetryStrategy());
+        setAlive(connection.isAlive());
+        setLastHeartbeat(connection.getLastHeartbeat());
+        setConcept(connection.getConcept());
     }
 
     @Override

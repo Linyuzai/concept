@@ -27,28 +27,20 @@ import java.util.function.Consumer;
 @Setter
 public abstract class AbstractConnection implements Connection {
 
-    @NonNull
     protected String type;
 
-    @NonNull
     protected Map<Object, Object> metadata = new ConcurrentHashMap<>();
 
-    @NonNull
     protected MessageEncoder messageEncoder;
 
-    @NonNull
     protected MessageDecoder messageDecoder;
 
-    @NonNull
     protected MessageRetryStrategy messageRetryStrategy;
 
-    @NonNull
     protected final List<MessageSendInterceptor> messageSendInterceptors = new CopyOnWriteArrayList<>();
 
-    @NonNull
     protected final List<ConnectionCloseInterceptor> connectionCloseInterceptors = new CopyOnWriteArrayList<>();
 
-    @NonNull
     protected ConnectionLoadBalanceConcept concept;
 
     /**
