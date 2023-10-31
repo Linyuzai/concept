@@ -7,7 +7,7 @@ import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
-import com.github.linyuzai.download.core.concept.ChainDownloadConcept;
+import com.github.linyuzai.download.core.web.servlet.ServletDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
 import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
@@ -39,7 +39,6 @@ import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
 import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
-import com.github.linyuzai.download.core.source.reactive.PublisherSourceFactory;
 import com.github.linyuzai.download.core.source.reflect.ReflectionSourceFactory;
 import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
 import com.github.linyuzai.download.core.source.text.TextSourceFactory;
@@ -195,11 +194,11 @@ public class DownloadConceptCoreAutoConfiguration {
         return new HttpSourceFactory();
     }
 
-    @Bean
+    /*@Bean
     @ConditionalOnMissingBean
     public PublisherSourceFactory publisherSourceFactory() {
         return new PublisherSourceFactory();
-    }
+    }*/
 
     @Bean
     @ConditionalOnMissingBean
@@ -262,10 +261,8 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public WriteResponseHandler writeResponseHandler(DownloadWriterAdapter adapter,
-                                                     DownloadRequestProvider requestProvider,
-                                                     DownloadResponseProvider responseProvider) {
-        return new WriteResponseHandler(adapter, requestProvider, responseProvider);
+    public WriteResponseHandler writeResponseHandler(DownloadWriterAdapter adapter) {
+        return new WriteResponseHandler(adapter);
     }
 
     @Bean
@@ -277,8 +274,7 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     public DownloadConcept downloadConcept(DownloadContextFactory factory,
-                                           DownloadReturnInterceptor returnInterceptor,
                                            List<DownloadHandler> handlers) {
-        return new ChainDownloadConcept(factory, returnInterceptor, handlers);
+        return new ServletDownloadConcept(factory, handlers);
     }
 }

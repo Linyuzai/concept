@@ -8,8 +8,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
 import lombok.*;
 import org.springframework.util.StringUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -163,11 +161,10 @@ public class MultipleSource implements Source {
      * @param context {@link DownloadContext}
      */
     @Override
-    public Mono<Source> load(DownloadContext context) {
-        return Flux.fromIterable(sources)
-                .flatMap(it -> it.load(context))
-                .collectList()
-                .map(MultipleSource::new);
+    public void load(DownloadContext context) {
+        for (Source source : sources) {
+            source.load(context);
+        }
     }
 
     /**

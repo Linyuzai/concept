@@ -3,7 +3,6 @@ package com.github.linyuzai.download.core.source;
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.Loadable;
-import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.util.Collection;
@@ -16,14 +15,13 @@ import java.util.function.Predicate;
 public interface Source extends Resource, Loadable {
 
     /**
-     * 默认直接返回本身的 {@link Mono}。
+     * 默认直接返回本身。
      *
      * @param context {@link DownloadContext}
-     * @return {@link Mono#just(Object)}
      */
     @Override
-    default Mono<Source> load(DownloadContext context) {
-        return Mono.just(this);
+    default void load(DownloadContext context) {
+
     }
 
     /**

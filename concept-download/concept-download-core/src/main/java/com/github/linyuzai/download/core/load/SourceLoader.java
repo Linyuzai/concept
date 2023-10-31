@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
  * {@link Source} 加载器。
  *
  * @see DefaultSourceLoader
- * @see SchedulerSourceLoader
  */
 public interface SourceLoader {
 
@@ -17,7 +16,6 @@ public interface SourceLoader {
      *
      * @param source  {@link Source}
      * @param context {@link DownloadContext}
-     * @return 加载后的 {@link Source}
      */
-    Mono<Source> load(Source source, DownloadContext context);
+    void load(Source source, DownloadContext context);
 }

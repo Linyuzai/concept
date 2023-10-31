@@ -26,17 +26,15 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
      * @return 加载后的 {@link Source}
      */
     @Override
-    public Mono<Source> doLoad(OutputStream os, DownloadContext context) {
+    public void doLoad(OutputStream os, DownloadContext context) {
         DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-        DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+        DownloadWriter writer = writerAdapter.getWriter(this, context);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        return loadRemote(context).map(it -> {
-            Progress progress = new Progress(length);
-            writer.write(it, os, null, null, length, (current, increase) -> {
-                progress.update(increase);
-                publisher.publish(new SourceLoadingProgressEvent(context, this, progress.freeze()));
-            });
-            return this;
+        InputStream is = loadRemote(context);
+        Progress progress = new Progress(length);
+        writer.write(is, os, null, null, length, (current, increase) -> {
+            progress.update(increase);
+            publisher.publish(new SourceLoadingProgressEvent(context, this, progress.freeze()));
         });
     }
 
@@ -46,7 +44,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
      * @param context {@link DownloadContext}
      * @return 加载后的 {@link Source}
      */
-    public abstract Mono<InputStream> loadRemote(DownloadContext context);
+    public abstract InputStream loadRemote(DownloadContext context);
 
     public static abstract class Builder<T extends RemoteLoadableSource, B extends Builder<T, B>> extends AbstractLoadableSource.Builder<T, B> {
 

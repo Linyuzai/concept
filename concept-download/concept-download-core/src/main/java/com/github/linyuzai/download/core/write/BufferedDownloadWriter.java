@@ -29,12 +29,11 @@ public class BufferedDownloadWriter implements DownloadWriter {
      * 返回true / Return true
      *
      * @param resource 可下载的资源 / Resource can be downloaded
-     * @param range        写入的范围 / Range of writing
-     * @param context      下载上下文 / Context of download
+     * @param context  下载上下文 / Context of download
      * @return true
      */
     @Override
-    public boolean support(Resource resource, Range range, DownloadContext context) {
+    public boolean support(Resource resource, DownloadContext context) {
         return true;
     }
 

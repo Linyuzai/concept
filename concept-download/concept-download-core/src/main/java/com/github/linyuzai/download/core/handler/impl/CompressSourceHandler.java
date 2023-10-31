@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.handler.impl;
 
-import com.github.linyuzai.download.core.aop.annotation.Download;
+import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.compress.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
@@ -11,20 +11,21 @@ import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
-import reactor.core.publisher.Mono;
 
 /**
  * 对 {@link Source} 进行压缩。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     /**
      * {@link SourceCompressor} 适配器
      */
-    private SourceCompressorAdapter sourceCompressorAdapter;
+    private final SourceCompressorAdapter sourceCompressorAdapter;
 
     /**
      * 压缩 {@link Source}。
@@ -38,7 +39,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      * @param context {@link DownloadContext}
      */
     @Override
-    public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+    public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Source source = context.get(Source.class);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         Compression compression;
@@ -53,7 +54,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
             String formatToUse = StringUtils.hasText(compressFormat) ? compressFormat : CompressFormat.ZIP;
             SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(source, null, context);
+            DownloadWriter writer = writerAdapter.getWriter(source, context);
             compression = compressor.compress(source, writer, context);
         }
         publisher.publish(new AfterSourceCompressedEvent(context, source, compression));

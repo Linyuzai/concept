@@ -1,8 +1,8 @@
 package com.github.linyuzai.download.core.aop.advice;
 
-import com.github.linyuzai.download.core.aop.annotation.CompressCache;
-import com.github.linyuzai.download.core.aop.annotation.Download;
-import com.github.linyuzai.download.core.aop.annotation.SourceCache;
+import com.github.linyuzai.download.core.annotation.CompressCache;
+import com.github.linyuzai.download.core.annotation.Download;
+import com.github.linyuzai.download.core.annotation.SourceCache;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.concept.ValueContainer;

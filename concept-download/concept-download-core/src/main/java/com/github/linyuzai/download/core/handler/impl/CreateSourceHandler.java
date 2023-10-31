@@ -7,19 +7,20 @@ import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.source.*;
-import lombok.AllArgsConstructor;
-import reactor.core.publisher.Mono;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 将任意的对象解析成对应的 {@link Source}。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
 
     /**
      * {@link SourceFactory} 适配器
      */
-    private SourceFactoryAdapter sourceFactoryAdapter;
+    private final SourceFactoryAdapter sourceFactoryAdapter;
 
     /**
      * 创建 {@link Source}。
@@ -31,7 +32,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      * @param context {@link DownloadContext}
      */
     @Override
-    public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+    public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Object original = context.getOptions().getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);
         Source source = factory.create(original, context);

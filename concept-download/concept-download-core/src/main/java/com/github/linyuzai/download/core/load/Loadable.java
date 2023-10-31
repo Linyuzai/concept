@@ -15,7 +15,7 @@ public interface Loadable extends Resource {
      *
      * @param context {@link DownloadContext}
      */
-    Mono<Source> load(DownloadContext context);
+    void load(DownloadContext context);
 
     /**
      * 异步加载会通过多线程等方式处理。

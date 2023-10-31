@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.download.core.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -12,9 +13,11 @@ import reactor.core.publisher.Mono;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+*/
 /**
  * 支持 {@link Publisher} 的 {@link Source}。
- */
+ *//*
+
 @Getter
 @AllArgsConstructor
 public class PublisherSource implements Source {
@@ -61,14 +64,16 @@ public class PublisherSource implements Source {
         throw new UnsupportedOperationException();
     }
 
-    /**
+    */
+/**
      * 使用 {@link Flux#from(Publisher)} 来获得 {@link Source}。
      *
      * @param context {@link DownloadContext}
      * @return 加载后的 {@link Source}
-     */
+     *//*
+
     @Override
-    public Mono<Source> load(DownloadContext context) {
+    public void load(DownloadContext context) {
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
         return Flux.from(publisher)
                 .collectList()
@@ -76,3 +81,4 @@ public class PublisherSource implements Source {
                 .flatMap(it -> it.load(context));
     }
 }
+*/

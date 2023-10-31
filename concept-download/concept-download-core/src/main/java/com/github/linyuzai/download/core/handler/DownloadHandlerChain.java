@@ -13,5 +13,5 @@ public interface DownloadHandlerChain {
      *
      * @param context {@link DownloadContext}
      */
-    Mono<Void> next(DownloadContext context);
+    Object next(DownloadContext context);
 }

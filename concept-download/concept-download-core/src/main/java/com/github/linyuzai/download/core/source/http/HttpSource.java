@@ -75,7 +75,7 @@ public class HttpSource extends RemoteLoadableSource {
      */
     @SneakyThrows
     @Override
-    public Mono<InputStream> loadRemote(DownloadContext context) {
+    public InputStream loadRemote(DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         publisher.publish(new LoadHttpSourceEvent(context, this));
         URL u = new URL(url);
@@ -102,10 +102,10 @@ public class HttpSource extends RemoteLoadableSource {
             if (l != -1) {
                 length = l;
             }
-            return Mono.just(connection.getInputStream());
+            return connection.getInputStream();
         } else {
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(this, null, context);
+            DownloadWriter writer = writerAdapter.getWriter(this, context);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             writer.write(connection.getErrorStream(), os, null, null, null);
             throw new DownloadException("code: " + code + ", " + os.toString());

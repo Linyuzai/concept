@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.web.servlet;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class ServletDownloadResponse implements DownloadResponse {
 
     @SneakyThrows
     @Override
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream(DownloadContext context) {
         return response.getOutputStream();
     }
 

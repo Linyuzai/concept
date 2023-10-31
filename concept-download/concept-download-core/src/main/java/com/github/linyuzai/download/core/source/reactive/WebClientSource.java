@@ -9,10 +9,7 @@ import com.github.linyuzai.download.core.source.http.HttpSource;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.Progress;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.client.reactive.ClientHttpResponse;
 import org.springframework.web.reactive.function.BodyExtractor;
@@ -31,11 +28,12 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource {
 
+    @SneakyThrows
     @Override
-    public Mono<Source> doLoad(OutputStream os, DownloadContext context) {
+    public void doLoad(OutputStream os, DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         publisher.publish(new LoadWebClientSourceEvent(context, this));
-        return WebClient.create()
+        WebClient.create()
                 .get()
                 .uri(url)
                 .headers(httpHeaders -> {
@@ -54,7 +52,7 @@ public class WebClientSource extends HttpSource {
                         return clientResponse.bodyToMono(String.class)
                                 .flatMap(it -> Mono.error(new DownloadException("code: " + code + ", " + it)));
                     }
-                });
+                }).toFuture().get();
     }
 
     /**
@@ -64,8 +62,8 @@ public class WebClientSource extends HttpSource {
      * @return {@link Mono#empty()}
      */
     @Override
-    public Mono<InputStream> loadRemote(DownloadContext context) {
-        return Mono.empty();
+    public InputStream loadRemote(DownloadContext context) {
+        return null;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class WebClientSource extends HttpSource {
         @Override
         public Mono<Source> extract(ClientHttpResponse response, Context ctx) {
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
-            DownloadWriter writer = writerAdapter.getWriter(WebClientSource.this, null, context);
+            DownloadWriter writer = writerAdapter.getWriter(WebClientSource.this, context);
             DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
             Progress progress = new Progress(length);
             return Flux.from(response.getBody())

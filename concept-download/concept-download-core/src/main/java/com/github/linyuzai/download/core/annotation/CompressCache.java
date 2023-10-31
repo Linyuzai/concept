@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.aop.annotation;
+package com.github.linyuzai.download.core.annotation;
 
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.compress.Compression;

@@ -1,8 +1,8 @@
 package com.github.linyuzai.concept.sample.download;
 
-import com.github.linyuzai.download.core.aop.annotation.CompressCache;
-import com.github.linyuzai.download.core.aop.annotation.Download;
-import com.github.linyuzai.download.core.aop.annotation.SourceCache;
+import com.github.linyuzai.download.core.annotation.CompressCache;
+import com.github.linyuzai.download.core.annotation.Download;
+import com.github.linyuzai.download.core.annotation.SourceCache;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;

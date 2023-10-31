@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.web.reactive;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,24 +35,13 @@ public class ReactiveDownloadResponse implements DownloadResponse {
     }
 
     @Override
-    public Mono<Void> write(Consumer<OutputStream> consumer) {
+    public OutputStream getOutputStream(DownloadContext context) {
         if (os == null) {
             mono = response.writeWith(Flux.create(fluxSink -> {
-                try {
-                    os = new FluxSinkOutputStream(fluxSink, response);
-                    consumer.accept(os);
-                } catch (Throwable e) {
-                    fluxSink.error(e);
-                }
+                os = new FluxSinkOutputStream(fluxSink, response);
             }));
-        } else {
-            consumer.accept(os);
+            context.set(Mono.class, mono);
         }
-        return mono;
-    }
-
-    @Override
-    public OutputStream getOutputStream() {
         return os;
     }
 

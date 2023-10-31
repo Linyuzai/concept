@@ -17,7 +17,7 @@ public class DefaultSourceLoader implements SourceLoader {
      * @return 加载后的 {@link Source}
      */
     @Override
-    public Mono<Source> load(Source source, DownloadContext context) {
-        return source.load(context);
+    public void load(Source source, DownloadContext context) {
+        source.load(context);
     }
 }

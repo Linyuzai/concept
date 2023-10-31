@@ -7,19 +7,20 @@ import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.load.AfterSourceLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.source.Source;
-import lombok.AllArgsConstructor;
-import reactor.core.publisher.Mono;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 对所有的 {@link Source} 进行加载。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class LoadSourceHandler implements DownloadHandler {
 
     /**
      * 加载器
      */
-    private SourceLoader sourceLoader;
+    private final SourceLoader sourceLoader;
 
     /**
      * 加载 {@link Source}。
@@ -30,15 +31,13 @@ public class LoadSourceHandler implements DownloadHandler {
      * @param context {@link DownloadContext}
      */
     @Override
-    public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
+    public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Source source = context.get(Source.class);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        return sourceLoader.load(source, context)
-                .doOnSuccess(it -> publisher.publish(new AfterSourceLoadedEvent(context, it)))
-                .flatMap(it -> {
-                    context.set(Source.class, it);
-                    return chain.next(context);
-                });
+        sourceLoader.load(source, context);
+        publisher.publish(new AfterSourceLoadedEvent(context, source));
+        //context.set(Source.class, load);
+        return chain.next(context);
     }
 
     @Override

@@ -21,5 +21,5 @@ public interface DownloadHandler extends OrderProvider {
      * @param context {@link DownloadContext}
      * @param chain   {@link DownloadHandlerChain}
      */
-    Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain);
+    Object handle(DownloadContext context, DownloadHandlerChain chain);
 }

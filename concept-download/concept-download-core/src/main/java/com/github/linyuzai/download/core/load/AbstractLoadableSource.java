@@ -58,12 +58,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      */
     @SneakyThrows
     @Override
-    public Mono<Source> load(DownloadContext context) {
+    public void load(DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         if (inputStream != null) {
             //直接使用
             publisher.publish(new SourceAlreadyLoadedEvent(context, this));
-            return Mono.just(this);
+            return;
         }
         if (isCacheEnabled()) {
             String cachePath = getCachePath();
@@ -81,52 +81,52 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             }
 
             File cache = new File(dir, nameToUse);
-            Mono<Source> mono;
             //缓存存在
             if (cache.exists()) {
                 publisher.publish(new SourceLoadedCacheUsedEvent(context, this, cache.getAbsolutePath()));
-                mono = Mono.just(this);
             } else {
                 //写到缓存文件
                 FileOutputStream fos = new FileOutputStream(cache);
-                mono = doLoad(fos, context)
-                        .doOnSuccess(s -> closeStream(fos))
-                        .doOnError(e -> closeStream(fos));
+                try {
+                    doLoad(fos, context);
+                } finally {
+                    closeStream(fos);
+                }
             }
-            return mono.map(it -> {
-                //Content Type
-                String contentType = getContentType();
-                if (!StringUtils.hasText(contentType)) {
-                    setContentType(ContentType.file(cache));
-                }
-                //设置长度
-                long l = cache.length();
-                if (length == null) {
+
+            //Content Type
+            String contentType = getContentType();
+            if (!StringUtils.hasText(contentType)) {
+                setContentType(ContentType.file(cache));
+            }
+            //设置长度
+            long l = cache.length();
+            if (length == null) {
+                length = l;
+            } else {
+                if (length != l) {
                     length = l;
-                } else {
-                    if (length != l) {
-                        length = l;
-                    }
                 }
-                inputStream = getCacheInputStream(cache);
-                return it;
-            });
+            }
+            inputStream = getCacheInputStream(cache);
         } else {
             //内存加载
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            return doLoad(os, context).map(it -> {
-                byte[] bytes = os.toByteArray();
-                long l = bytes.length;
-                if (length == null) {
+            try {
+                doLoad(os, context);
+            } finally {
+                closeStream(os);
+            }
+            byte[] bytes = os.toByteArray();
+            long l = bytes.length;
+            if (length == null) {
+                length = l;
+            } else {
+                if (length != l) {
                     length = l;
-                } else {
-                    if (length != l) {
-                        length = l;
-                    }
                 }
-                inputStream = new ByteArrayInputStream(bytes);
-                return it;
-            });
+            }
+            inputStream = new ByteArrayInputStream(bytes);
         }
     }
 
@@ -180,9 +180,8 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * 加载到对应的输出流。
      *
      * @param context {@link DownloadContext}
-     * @return 加载后的 {@link Source}
      */
-    public abstract Mono<Source> doLoad(OutputStream os, DownloadContext context);
+    public abstract void doLoad(OutputStream os, DownloadContext context);
 
     public static abstract class Builder<T extends AbstractLoadableSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 

@@ -26,7 +26,7 @@ public class OkHttpSource extends HttpSource {
 
     @SneakyThrows
     @Override
-    public Mono<InputStream> loadRemote(DownloadContext context) {
+    public InputStream loadRemote(DownloadContext context) {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         publisher.publish(new LoadOkHttpSourceEvent(context, this));
         Request.Builder rb = new Request.Builder();
@@ -53,7 +53,7 @@ public class OkHttpSource extends HttpSource {
             if (l != -1) {
                 length = l;
             }
-            return Mono.just(body.byteStream());
+            return body.byteStream();
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append(response.code()).append(";");

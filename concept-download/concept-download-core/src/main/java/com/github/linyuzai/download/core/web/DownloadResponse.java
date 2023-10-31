@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.web;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
 import lombok.SneakyThrows;
 import reactor.core.publisher.Mono;
 
@@ -19,8 +20,9 @@ public interface DownloadResponse {
      * @param consumer 回调 {@link OutputStream}
      * @return {@link Void} 的 {@link Mono}
      */
+    @Deprecated
     default Mono<Void> write(Consumer<OutputStream> consumer) {
-        consumer.accept(getOutputStream());
+        //consumer.accept(getOutputStream());
         return Mono.empty();
     }
 
@@ -29,7 +31,7 @@ public interface DownloadResponse {
      *
      * @return {@link OutputStream}
      */
-    OutputStream getOutputStream();
+    OutputStream getOutputStream(DownloadContext context);
 
     /**
      * 设置状态码。

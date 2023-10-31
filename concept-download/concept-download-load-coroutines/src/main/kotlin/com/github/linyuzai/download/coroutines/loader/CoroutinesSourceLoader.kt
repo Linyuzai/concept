@@ -4,25 +4,23 @@ import com.github.linyuzai.download.core.context.DownloadContext
 import com.github.linyuzai.download.core.load.ConcurrentSourceLoader
 import com.github.linyuzai.download.core.load.SourceLoader
 import com.github.linyuzai.download.core.source.Source
-import com.github.linyuzai.download.core.source.multiple.MultipleSource
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import reactor.core.publisher.Mono
 
 /**
  * 基于协程调度的 [SourceLoader]。
  */
 open class CoroutinesSourceLoader : ConcurrentSourceLoader() {
 
-    override fun concurrentLoad(sources: Collection<Source>, context: DownloadContext): Mono<Source> {
+    override fun concurrentLoad(sources: Collection<Source>, context: DownloadContext) {
         val results = mutableListOf<Source>()
         runBlocking {
             val deferredList = mutableListOf<Deferred<Source>>()
             sources.forEach {
                 val deferred = async(Dispatchers.IO) {
-                    it.load(context).block()
+                    it.load(context)
                     return@async it
                 }
                 deferredList.add(deferred)
@@ -31,6 +29,5 @@ open class CoroutinesSourceLoader : ConcurrentSourceLoader() {
                 results.add(it.await())
             }
         }
-        return Mono.just(MultipleSource(results))
     }
 }

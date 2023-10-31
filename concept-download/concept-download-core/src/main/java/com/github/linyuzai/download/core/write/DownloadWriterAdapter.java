@@ -13,9 +13,8 @@ public interface DownloadWriterAdapter {
      * 匹配一个 {@link DownloadWriter}。
      *
      * @param resource {@link Resource}
-     * @param range                {@link Range}
-     * @param context              {@link DownloadContext}
+     * @param context  {@link DownloadContext}
      * @return 匹配到的 {@link DownloadWriter}
      */
-    DownloadWriter getWriter(Resource resource, Range range, DownloadContext context);
+    DownloadWriter getWriter(Resource resource, DownloadContext context);
 }

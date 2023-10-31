@@ -18,11 +18,10 @@ public interface DownloadWriter extends OrderProvider {
      * 该写入器是否支持写入。
      *
      * @param resource {@link Resource}
-     * @param range    {@link Range}
      * @param context  {@link DownloadContext}
      * @return 如果支持则返回 true
      */
-    boolean support(Resource resource, Range range, DownloadContext context);
+    boolean support(Resource resource, DownloadContext context);
 
     /**
      * 执行写入。

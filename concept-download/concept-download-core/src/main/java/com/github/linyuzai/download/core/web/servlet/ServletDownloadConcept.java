@@ -1,14 +1,14 @@
-package com.github.linyuzai.download.core.concept;
+package com.github.linyuzai.download.core.web.servlet;
 
+import com.github.linyuzai.download.core.concept.DownloadConcept;
+import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
-import com.github.linyuzai.download.core.handler.DownloadHandlerChainImpl;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import reactor.core.publisher.Mono;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -16,18 +16,13 @@ import java.util.List;
  * 基于 {@link DownloadHandlerChain} 的 {@link DownloadConcept} 实现。
  */
 @Getter
-@AllArgsConstructor
-public class ChainDownloadConcept implements DownloadConcept {
+@RequiredArgsConstructor
+public class ServletDownloadConcept implements DownloadConcept {
 
     /**
      * 上下文工厂
      */
     private final DownloadContextFactory contextFactory;
-
-    /**
-     * 返回拦截
-     */
-    private final DownloadReturnInterceptor returnInterceptor;
 
     /**
      * 处理器
@@ -49,11 +44,8 @@ public class ChainDownloadConcept implements DownloadConcept {
         //初始化上下文
         context.initialize();
         //处理链
-        Mono<Void> mono = new DownloadHandlerChainImpl(0, handlers)
-                .next(context)
-                //最后销毁上下文
-                .doAfterTerminate(context::destroy);
-        //拦截返回值
-        return returnInterceptor.intercept(mono);
+        Object next = new ServletDownloadHandlerChain(handlers).next(context);
+        context.destroy();
+        return next;
     }
 }
