@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.autoconfigure;
 
+import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
 import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
@@ -7,15 +8,11 @@ import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
-import com.github.linyuzai.download.autoconfigure.web.servlet.ServletDownloadConcept;
-import com.github.linyuzai.download.core.concept.DownloadConcept;
-import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.event.ApplicationDownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventPublisherInitializer;
-import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.CreateSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.LoadSourceHandler;

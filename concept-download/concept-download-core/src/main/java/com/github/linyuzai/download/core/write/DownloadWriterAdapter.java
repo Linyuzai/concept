@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.web.Range;
 
 /**
  * {@link DownloadWriter} 的适配器。

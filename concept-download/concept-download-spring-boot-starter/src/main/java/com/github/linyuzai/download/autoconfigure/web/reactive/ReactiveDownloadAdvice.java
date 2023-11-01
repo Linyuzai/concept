@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.autoconfigure.web.reactive;
 
-import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptAdvice;
+import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;

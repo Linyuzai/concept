@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.function.Consumer;
 
 /**
  * 持有 {@link ServerHttpResponse} 的 {@link DownloadResponse}，用于 webflux。

@@ -3,7 +3,6 @@ package com.github.linyuzai.download.core.load;
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
-import reactor.core.publisher.Mono;
 
 /**
  * 支持 {@link Source} 的预加载。
