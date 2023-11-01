@@ -8,6 +8,9 @@ ext {
     set('publishDescription', 'Domain Spring Boot Starter')
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-web'
     //api "com.github.linyuzai:concept-domain-core:${ConceptDomainVersion}"
