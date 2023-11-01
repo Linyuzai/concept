@@ -8,6 +8,9 @@ ext {
     set('publishDescription', 'Domain Core 4 DDD')
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
     compileOnly "org.springdoc:springdoc-openapi-ui:${SpringDocVersion}"
 }

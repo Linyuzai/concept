@@ -8,6 +8,9 @@ ext {
     set('publishDescription', 'Reactive 4 Reactor')
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
     compileOnly "io.projectreactor:reactor-core:${ReactorVersion}"
     compileOnly project(':concept-reactive:concept-reactive-core')

@@ -8,6 +8,9 @@ ext {
     set('publishDescription', 'Event 4 MQ')
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
     compileOnly project(':concept-event:concept-event-core')

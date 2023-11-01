@@ -28,14 +28,14 @@ allprojects {
         mavenCentral()
     }
 
-    if (project.name.contains('intellij') || project.name == 'sample') {
+    /*if (project.name.contains('intellij') || project.name == 'sample') {
         sourceCompatibility = '17'
         targetCompatibility = '17'
         return
-    }
+    }*/
 
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     apply plugin: 'java-library'
     //apply plugin: "org.javamodularity.moduleplugin"

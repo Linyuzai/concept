@@ -8,6 +8,9 @@ ext {
     set('publishDescription', 'Domain Mybatis Plus')
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
     compileOnly "com.baomidou:mybatis-plus-boot-starter:${MyBatisPlusVersion}"
     compileOnly project(':concept-domain:concept-domain-core')
