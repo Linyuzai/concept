@@ -260,10 +260,4 @@ public class DownloadConceptCoreAutoConfiguration {
                                                          List<DownloadContextDestroyer> destroyers) {
         return new DefaultDownloadContextFactory(initializers, destroyers);
     }
-
-    @Bean
-    public DownloadConcept downloadConcept(DownloadContextFactory factory,
-                                           List<DownloadHandler> handlers) {
-        return new ServletDownloadConcept(factory, handlers);
-    }
 }
