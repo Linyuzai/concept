@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.web.servlet;
+package com.github.linyuzai.download.autoconfigure.web.servlet;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.handler.DownloadHandler;

@@ -8,7 +8,7 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
 import com.github.linyuzai.download.core.source.reflect.SourceName;
 import com.github.linyuzai.download.core.source.reflect.SourceObject;
-import com.github.linyuzai.download.core.web.reactive.DownloadMono;
+import com.github.linyuzai.download.autoconfigure.web.reactive.DownloadMono;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;

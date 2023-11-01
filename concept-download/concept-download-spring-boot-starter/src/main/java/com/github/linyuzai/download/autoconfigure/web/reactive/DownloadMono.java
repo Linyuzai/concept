@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.web.reactive;
+package com.github.linyuzai.download.autoconfigure.web.reactive;
 
 import com.github.linyuzai.download.core.concept.ValueContainer;
 import lombok.*;

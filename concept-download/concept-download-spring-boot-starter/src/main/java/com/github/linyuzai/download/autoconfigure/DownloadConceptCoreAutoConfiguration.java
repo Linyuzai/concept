@@ -7,12 +7,9 @@ import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
-import com.github.linyuzai.download.core.web.servlet.ServletDownloadConcept;
+import com.github.linyuzai.download.autoconfigure.web.servlet.ServletDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
-import com.github.linyuzai.download.core.concept.DownloadReturnInterceptor;
-import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
-import com.github.linyuzai.download.core.configuration.DownloadConfigurer;
-import com.github.linyuzai.download.core.configuration.DownloadConfigurerInvoker;
+import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.core.context.*;
 import com.github.linyuzai.download.core.event.ApplicationDownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
@@ -42,8 +39,6 @@ import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory
 import com.github.linyuzai.download.core.source.reflect.ReflectionSourceFactory;
 import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
 import com.github.linyuzai.download.core.source.text.TextSourceFactory;
-import com.github.linyuzai.download.core.web.DownloadRequestProvider;
-import com.github.linyuzai.download.core.web.DownloadResponseProvider;
 import com.github.linyuzai.download.core.write.BufferedDownloadWriter;
 import com.github.linyuzai.download.core.write.DefaultDownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.DownloadWriter;
@@ -60,20 +55,14 @@ import java.util.List;
  * 基础组件的配置。
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(DownloadConfiguration.class)
+@EnableConfigurationProperties(DownloadProperties.class)
 public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
-    public DownloadConfigurerInvoker downloadConfigurerInvoker(DownloadConfiguration configuration,
-                                                               List<DownloadConfigurer> configurers) {
-        return new DownloadConfigurerInvoker(configuration, configurers);
-    }
-
-    @Bean
     @ConditionalOnMissingBean
-    public StandardDownloadLogger standardDownloadLogger(DownloadConfigurerInvoker invoker) {
-        boolean enabled = invoker.getConfiguration().getLogger().getStandard().isEnabled() &&
-                invoker.getConfiguration().getLogger().isEnabled();
+    public StandardDownloadLogger standardDownloadLogger(DownloadProperties properties) {
+        boolean enabled = properties.getLogger().getStandard().isEnabled() &&
+                properties.getLogger().isEnabled();
         StandardDownloadLogger logger = new StandardDownloadLogger();
         logger.setEnabled(enabled);
         return logger;
@@ -81,9 +70,9 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TimeSpentCalculationLogger timeSpentCalculationLogger(DownloadConfigurerInvoker invoker) {
-        boolean enabled = invoker.getConfiguration().getLogger().getTimeSpent().isEnabled() &&
-                invoker.getConfiguration().getLogger().isEnabled();
+    public TimeSpentCalculationLogger timeSpentCalculationLogger(DownloadProperties properties) {
+        boolean enabled = properties.getLogger().getTimeSpent().isEnabled() &&
+                properties.getLogger().isEnabled();
         TimeSpentCalculationLogger logger = new TimeSpentCalculationLogger();
         logger.setEnabled(enabled);
         return logger;
@@ -91,11 +80,11 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ProgressCalculationLogger progressCalculationLogger(DownloadConfigurerInvoker invoker) {
-        boolean enabled = invoker.getConfiguration().getLogger().getProgress().isEnabled() &&
-                invoker.getConfiguration().getLogger().isEnabled();
-        Duration duration = Duration.ofMillis(invoker.getConfiguration().getLogger().getProgress().getDuration());
-        boolean percentage = invoker.getConfiguration().getLogger().getProgress().isPercentage();
+    public ProgressCalculationLogger progressCalculationLogger(DownloadProperties properties) {
+        boolean enabled = properties.getLogger().getProgress().isEnabled() &&
+                properties.getLogger().isEnabled();
+        Duration duration = Duration.ofMillis(properties.getLogger().getProgress().getDuration());
+        boolean percentage = properties.getLogger().getProgress().isPercentage();
         ProgressCalculationLogger logger = new ProgressCalculationLogger(duration, percentage);
         logger.setEnabled(enabled);
         return logger;

@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.source.reactive;
+package com.github.linyuzai.download.autoconfigure.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.AbstractLoadSourceEvent;

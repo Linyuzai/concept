@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.log;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
-import com.github.linyuzai.download.core.options.DownloadMethod;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.Setter;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.MethodParameter;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -71,7 +71,7 @@ public abstract class DownloadLogger implements DownloadEventListener {
      * @param message 信息
      */
     public void log(DownloadContext context, String tag, String message) {
-        DownloadMethod downloadMethod = context.getOptions().getDownloadMethod();
+        MethodParameter downloadMethod = context.getOptions().getMethodParameter();
         if (downloadMethod == null) {
             log(getLog(), tag, message);
         } else {

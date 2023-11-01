@@ -3,11 +3,11 @@ package com.github.linyuzai.download.core.options;
 import com.github.linyuzai.download.core.annotation.CompressCache;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
-import com.github.linyuzai.download.core.configuration.DownloadConfiguration;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.core.MethodParameter;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -120,25 +120,14 @@ public class DownloadOptions {
     /**
      * 下载方法，切面中拦截的方法
      */
-    DownloadMethod downloadMethod;
+    MethodParameter methodParameter;
+
+    Object returnValue;
 
     /**
      * 额外的 {@link DownloadEventListener}
      */
     DownloadEventListener eventListener;
-
-    public static DownloadOptions from(DownloadConfiguration configuration) {
-        return new DownloadOptions.Builder()
-                .headers(configuration.getResponse().getHeaders())
-                .sourceCacheEnabled(configuration.getSource().getCache().isEnabled())
-                .sourceCachePath(configuration.getSource().getCache().getPath())
-                .sourceCacheDelete(configuration.getSource().getCache().isDelete())
-                .compressFormat(configuration.getCompress().getFormat())
-                .compressCacheEnabled(configuration.getCompress().getCache().isEnabled())
-                .compressCachePath(configuration.getCompress().getCache().getPath())
-                .compressCacheDelete(configuration.getCompress().getCache().isDelete())
-                .build();
-    }
 
     /**
      * {@link DownloadOptions} 重写器

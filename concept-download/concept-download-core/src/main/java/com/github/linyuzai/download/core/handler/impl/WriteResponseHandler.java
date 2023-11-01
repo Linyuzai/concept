@@ -165,8 +165,6 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
 
     /**
      * 初始化时，将 {@link DownloadWriterAdapter} 设置到 {@link DownloadContext} 中；
-     * 将 {@link DownloadRequestProvider} 设置到 {@link DownloadContext} 中；
-     * 将 {@link DownloadResponseProvider} 设置到 {@link DownloadContext} 中。
      *
      * @param context {@link DownloadContext}
      */

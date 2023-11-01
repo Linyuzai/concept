@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.configuration;
+package com.github.linyuzai.download.autoconfigure.properties;
 
 import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 @Data
 @ConfigurationProperties(prefix = "concept.download")
-public class DownloadConfiguration {
+public class DownloadProperties {
 
     private ResponseConfiguration response = new ResponseConfiguration();
 
