@@ -13,7 +13,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter'
     compileOnly project(':concept-download:concept-download-core')
-    api 'com.squareup.okhttp3:okhttp:4.9.3'
+    compileOnly 'com.squareup.okhttp3:okhttp:4.9.3'
 }
 
 apply from: '../../publish.gradle'
