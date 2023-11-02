@@ -1,13 +1,14 @@
 package com.github.linyuzai.download.core.web;
 
-import com.github.linyuzai.download.core.context.DownloadContext;
 import lombok.SneakyThrows;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 下载响应。
@@ -17,21 +18,9 @@ public interface DownloadResponse {
     /**
      * 写入。
      *
-     * @param consumer 回调 {@link OutputStream}
      * @return {@link Void} 的 {@link Mono}
      */
-    @Deprecated
-    default Mono<Void> write(Consumer<OutputStream> consumer) {
-        //consumer.accept(getOutputStream());
-        return Mono.empty();
-    }
-
-    /**
-     * 获得 {@link OutputStream}。
-     *
-     * @return {@link OutputStream}
-     */
-    OutputStream getOutputStream(DownloadContext context);
+    Object write(Consumer<OutputStream> consumer, Supplier<Object> next, Runnable onComplete) throws IOException;
 
     /**
      * 设置状态码。

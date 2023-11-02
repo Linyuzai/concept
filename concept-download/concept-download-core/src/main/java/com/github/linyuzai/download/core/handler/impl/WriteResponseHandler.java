@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 将 {@link Compression} 写入到 {@link DownloadResponse}。
@@ -59,22 +61,27 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         if (applyHeaders(response, compression, range, context)) {
             //写数据
             DownloadWriter writer = downloadWriterAdapter.getWriter(compression, context);
+            return response.write(new Consumer<OutputStream>() {
 
-            OutputStream os = response.getOutputStream(context);
-            Collection<Part> parts = compression.getParts();
-            Progress progress = new Progress(compression.getLength());
-            for (Part part : parts) {
-                InputStream is = part.getInputStream();
-                writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
-                    //更新并发布写入进度
-                    progress.update(increase);
-                    publisher.publish(new ResponseWritingProgressEvent(context, progress.freeze()));
-                });
-            }
-            os.flush();
-            publisher.publish(new AfterResponseWrittenEvent(context));
+                @SneakyThrows
+                @Override
+                public void accept(OutputStream os) {
+                    Collection<Part> parts = compression.getParts();
+                    Progress progress = new Progress(compression.getLength());
+                    for (Part part : parts) {
+                        InputStream is = part.getInputStream();
+                        writer.write(is, os, range, part.getCharset(), part.getLength(), (current, increase) -> {
+                            //更新并发布写入进度
+                            progress.update(increase);
+                            publisher.publish(new ResponseWritingProgressEvent(context, progress.freeze()));
+                        });
+                    }
+                    os.flush();
+                }
+            }, () -> chain.next(context), () -> publisher.publish(new AfterResponseWrittenEvent(context)));
+        } else {
+            return chain.next(context);
         }
-        return chain.next(context);
     }
 
     /**
@@ -85,15 +92,15 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      * 设置自定义的响应头。
      *
      * @param response    {@link DownloadResponse}
-     * @param compression {@link Compression}
+     * @param resource {@link Compression}
      * @param range       {@link Range}
      * @param context     {@link DownloadContext}
      * @return 是否继续处理
      */
-    public boolean applyHeaders(DownloadResponse response, Compression compression, Range range, DownloadContext context) {
+    public boolean applyHeaders(DownloadResponse response, Resource resource, Range range, DownloadContext context) {
         //Range处理
         response.setBytesAcceptRanges();
-        Long length = compression.getLength();
+        Long length = resource.getLength();
         if (range == null || length == null || length <= 0) {
             response.setContentLength(length);
         } else {
@@ -133,7 +140,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         if (StringUtils.hasText(filename)) {
             filenameToUse = filename;
         } else {
-            filenameToUse = compression.getName();
+            filenameToUse = resource.getName();
         }
         if (inline) {
             response.setInline(filenameToUse);
@@ -146,7 +153,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         if (StringUtils.hasText(contentType)) {
             response.setContentType(contentType);
         } else {
-            String compressionContentType = compression.getContentType();
+            String compressionContentType = resource.getContentType();
             if (compressionContentType == null || compressionContentType.isEmpty()) {
                 response.setContentType(ContentType.Application.OCTET_STREAM);
             } else {

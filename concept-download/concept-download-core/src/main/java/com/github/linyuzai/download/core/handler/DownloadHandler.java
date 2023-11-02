@@ -21,4 +21,8 @@ public interface DownloadHandler extends OrderProvider {
      * @param chain   {@link DownloadHandlerChain}
      */
     Object handle(DownloadContext context, DownloadHandlerChain chain);
+
+    default boolean support(DownloadContext context) {
+        return true;
+    }
 }

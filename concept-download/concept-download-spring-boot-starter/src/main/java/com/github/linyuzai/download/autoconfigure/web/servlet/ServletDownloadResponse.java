@@ -1,27 +1,29 @@
 package com.github.linyuzai.download.autoconfigure.web.servlet;
 
-import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.DownloadResponse;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 持有 {@link HttpServletResponse} 的 {@link DownloadResponse}，用于 webmvc。
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ServletDownloadResponse implements DownloadResponse {
 
-    private HttpServletResponse response;
+    private final HttpServletResponse response;
 
-    @SneakyThrows
     @Override
-    public OutputStream getOutputStream(DownloadContext context) {
-        return response.getOutputStream();
+    public Object write(Consumer<OutputStream> consumer, Supplier<Object> next, Runnable onComplete) throws IOException {
+        consumer.accept(response.getOutputStream());
+        onComplete.run();
+        return next.get();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class ReactiveDownloadAdvice extends ResponseBodyResultHandler {
                                   DownloadConcept concept) {
         super(writers, resolver, registry);
         this.concept = concept;
-        setOrder(getOrder() - 1);
+        //setOrder(getOrder() - 1);
     }
 
     @SuppressWarnings("unchecked")

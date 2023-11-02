@@ -1,7 +1,13 @@
 package com.github.linyuzai.download.autoconfigure.web.reactive;
 
+import com.github.linyuzai.download.core.concept.Part;
+import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.DownloadResponse;
+import com.github.linyuzai.download.core.web.Range;
+import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
+import com.github.linyuzai.download.core.write.DownloadWriter;
+import com.github.linyuzai.download.core.write.Progress;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -15,7 +21,12 @@ import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 持有 {@link ServerHttpResponse} 的 {@link DownloadResponse}，用于 webflux。
@@ -34,14 +45,19 @@ public class ReactiveDownloadResponse implements DownloadResponse {
     }
 
     @Override
-    public OutputStream getOutputStream(DownloadContext context) {
-        if (os == null) {
-            mono = response.writeWith(Flux.create(fluxSink -> {
-                os = new FluxSinkOutputStream(fluxSink, response);
-            }));
-            context.set(Mono.class, mono);
-        }
-        return os;
+    public Object write(Consumer<OutputStream> consumer, Supplier<Object> next, Runnable onComplete) {
+        /*DataBufferUtils.readInputStream(new Callable<InputStream>() {
+                @Override
+                public InputStream call() throws Exception {
+                    return null;
+                }
+        })*/
+        return response.writeWith(Flux.create(sink -> {
+                    os = new FluxSinkOutputStream(sink, response);
+                    consumer.accept(os);
+                }))
+                .doOnSuccess(unused -> onComplete.run())
+                .switchIfEmpty((Mono<Void>) next.get());
     }
 
     @Override
