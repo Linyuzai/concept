@@ -1,9 +1,8 @@
 package com.github.linyuzai.download.core.log;
 
-import com.github.linyuzai.download.core.context.AfterContextDestroyedEvent;
+import com.github.linyuzai.download.core.context.BeforeContextDestroyedEvent;
 import com.github.linyuzai.download.core.context.AfterContextInitializedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import org.springframework.util.StopWatch;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 时间计算日志。
  */
-public class TimeSpentCalculationLogger extends DownloadLogger {
+public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
 
     /**
      * {@link StopWatch} 缓存
@@ -30,8 +29,8 @@ public class TimeSpentCalculationLogger extends DownloadLogger {
             StopWatch watch = new StopWatch();
             watch.start();
             stopWatchMap.put(((AfterContextInitializedEvent) event).getContext().getId(), watch);
-        } else if (event instanceof AfterContextDestroyedEvent) {
-            DownloadContext context = ((AfterContextDestroyedEvent) event).getContext();
+        } else if (event instanceof BeforeContextDestroyedEvent) {
+            DownloadContext context = ((BeforeContextDestroyedEvent) event).getContext();
             String id = context.getId();
             StopWatch watch = stopWatchMap.remove(id);
             if (watch != null) {
@@ -42,8 +41,18 @@ public class TimeSpentCalculationLogger extends DownloadLogger {
         }
     }
 
-    @Override
-    public int getOrder() {
-        return Integer.MAX_VALUE - 1;
+    public static class StopWatch {
+
+        public void start() {
+
+        }
+
+        public void stop() {
+
+        }
+
+        public double getTotalTimeSeconds() {
+            return 0.0;
+        }
     }
 }

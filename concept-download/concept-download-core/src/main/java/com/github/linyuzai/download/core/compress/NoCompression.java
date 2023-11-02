@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.AllArgsConstructor;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -25,7 +26,7 @@ public class NoCompression implements Compression {
      * @return {@link Source#getInputStream()}
      */
     @Override
-    public InputStream getInputStream() {
+    public InputStream getInputStream() throws IOException {
         return source.getInputStream();
     }
 

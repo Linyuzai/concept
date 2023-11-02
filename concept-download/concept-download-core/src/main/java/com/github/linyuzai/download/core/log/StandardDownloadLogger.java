@@ -14,7 +14,7 @@ import com.github.linyuzai.download.core.web.AbstractWriteResponseEvent;
  * 标准流程日志。
  * 每个流程相关的事件都会打印。
  */
-public class StandardDownloadLogger extends DownloadLogger {
+public class StandardDownloadLogger extends LoggingDownloadEventListener {
 
     /**
      * 包括 {@link DownloadContext} 初始化和销毁，

@@ -20,12 +20,6 @@ import java.util.List;
 public class DownloadConceptReactiveAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
-    public WebClientSourceFactory webClientSourceFactory() {
-        return new WebClientSourceFactory();
-    }
-
-    @Bean
     public DownloadConcept downloadConcept(DownloadContextFactory factory,
                                            List<DownloadHandler> handlers) {
         return new ReactiveDownloadConcept(factory, handlers);

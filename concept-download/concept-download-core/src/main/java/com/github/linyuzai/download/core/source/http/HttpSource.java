@@ -8,9 +8,9 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import lombok.*;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,16 +20,14 @@ import java.util.Map;
 /**
  * 使用 {@link HttpURLConnection} 处理 http 请求的 {@link Source}。
  */
-@SuppressWarnings("all")
 @Getter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HttpSource extends RemoteLoadableSource {
 
     @NonNull
-    @Setter
     protected String url;
 
-    @Setter
     protected Map<String, String> headers;
 
     /**
@@ -40,7 +38,7 @@ public class HttpSource extends RemoteLoadableSource {
     @Override
     public String getName() {
         String name = super.getName();
-        if (!StringUtils.hasText(name)) {
+        if (name == null || name.isEmpty()) {
             String path;
             if (url.contains("?")) {
                 path = url.split("\\?")[0];
@@ -74,7 +72,7 @@ public class HttpSource extends RemoteLoadableSource {
      */
     @SneakyThrows
     @Override
-    public InputStream loadRemote(DownloadContext context) {
+    public InputStream loadRemote(DownloadContext context) throws IOException {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         publisher.publish(new LoadHttpSourceEvent(context, this));
         URL u = new URL(url);
@@ -91,7 +89,7 @@ public class HttpSource extends RemoteLoadableSource {
         int code = connection.getResponseCode();
         if (isResponseSuccess(code)) {
             String contentType = getContentType();
-            if (!StringUtils.hasText(contentType)) {
+            if (contentType == null || contentType.isEmpty()) {
                 String ct = connection.getContentType();
                 if (ct != null) {
                     setContentType(ct);

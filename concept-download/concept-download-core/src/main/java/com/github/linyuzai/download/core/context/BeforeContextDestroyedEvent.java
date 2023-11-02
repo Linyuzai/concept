@@ -3,9 +3,9 @@ package com.github.linyuzai.download.core.context;
 /**
  * {@link DownloadContext} 销毁后会发布该事件。
  */
-public class AfterContextDestroyedEvent extends AbstractDestroyContextEvent {
+public class BeforeContextDestroyedEvent extends AbstractDestroyContextEvent {
 
-    public AfterContextDestroyedEvent(DownloadContext context) {
+    public BeforeContextDestroyedEvent(DownloadContext context) {
         super(context, "Context destroyed");
     }
 }

@@ -9,8 +9,10 @@ import lombok.SneakyThrows;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,10 +45,9 @@ public class FilePart extends AbstractPart {
      *
      * @return {@link FileInputStream} 或 {@link EmptyInputStream}
      */
-    @SneakyThrows
     @Override
-    public InputStream openInputStream() {
-        return file.isFile() ? new FileInputStream(file) : new EmptyInputStream();
+    public InputStream openInputStream() throws IOException {
+        return file.isFile() ? Files.newInputStream(file.toPath()) : new EmptyInputStream();
     }
 
     /**

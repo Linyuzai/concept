@@ -37,9 +37,4 @@ public class WebClientSourceFactory extends PrefixSourceFactory {
     protected String[] getPrefixes() {
         return HttpSourceFactory.PREFIXES;
     }
-
-    @Override
-    public int getOrder() {
-        return Integer.MIN_VALUE + 1000;
-    }
 }

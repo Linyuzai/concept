@@ -9,7 +9,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.ContentType;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.springframework.util.StringUtils;
 
 import java.io.*;
 
@@ -75,7 +74,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             }
             CacheNameGenerator generator = context.get(CacheNameGenerator.class);
             String nameToUse = generator.generate(this, context);
-            if (!StringUtils.hasText(nameToUse)) {
+            if (nameToUse == null || nameToUse.isEmpty()) {
                 throw new DownloadException("Cache name is null or empty");
             }
 
@@ -95,7 +94,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
 
             //Content Type
             String contentType = getContentType();
-            if (!StringUtils.hasText(contentType)) {
+            if (contentType == null || contentType.isEmpty()) {
                 setContentType(ContentType.file(cache));
             }
             //设置长度
@@ -180,7 +179,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      *
      * @param context {@link DownloadContext}
      */
-    public abstract void doLoad(OutputStream os, DownloadContext context);
+    public abstract void doLoad(OutputStream os, DownloadContext context) throws IOException;
 
     public static abstract class Builder<T extends AbstractLoadableSource, B extends Builder<T, B>> extends AbstractSource.Builder<T, B> {
 

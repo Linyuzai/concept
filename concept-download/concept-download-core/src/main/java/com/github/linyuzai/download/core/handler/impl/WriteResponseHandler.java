@@ -15,7 +15,6 @@ import com.github.linyuzai.download.core.write.Progress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -137,10 +136,10 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         boolean inline = context.getOptions().isInline();
         String filename = context.getOptions().getFilename();
         String filenameToUse;
-        if (StringUtils.hasText(filename)) {
-            filenameToUse = filename;
-        } else {
+        if (filename == null || filename.isEmpty()) {
             filenameToUse = resource.getName();
+        } else {
+            filenameToUse = filename;
         }
         if (inline) {
             response.setInline(filenameToUse);
@@ -150,15 +149,15 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
 
         //ContentType
         String contentType = context.getOptions().getContentType();
-        if (StringUtils.hasText(contentType)) {
-            response.setContentType(contentType);
-        } else {
+        if (contentType == null || contentType.isEmpty()) {
             String compressionContentType = resource.getContentType();
             if (compressionContentType == null || compressionContentType.isEmpty()) {
                 response.setContentType(ContentType.Application.OCTET_STREAM);
             } else {
                 response.setContentType(compressionContentType);
             }
+        } else {
+            response.setContentType(contentType);
         }
 
         //Headers

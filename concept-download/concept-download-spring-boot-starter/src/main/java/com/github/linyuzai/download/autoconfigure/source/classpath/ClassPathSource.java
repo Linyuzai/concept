@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.source.classpath;
+package com.github.linyuzai.download.autoconfigure.source.classpath;
 
 import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -19,7 +20,7 @@ public class ClassPathSource extends AbstractSource {
      * 持有的 {@link ClassPathResource}
      */
     @NonNull
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     protected ClassPathResource resource;
 
     /**
@@ -27,9 +28,8 @@ public class ClassPathSource extends AbstractSource {
      *
      * @return {@link ClassPathResource#getInputStream()}
      */
-    @SneakyThrows
     @Override
-    public InputStream openInputStream() {
+    public InputStream openInputStream() throws IOException {
         return resource.getInputStream();
     }
 

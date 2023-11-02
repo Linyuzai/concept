@@ -7,8 +7,8 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.Progress;
-import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -25,7 +25,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
      * @return 加载后的 {@link Source}
      */
     @Override
-    public void doLoad(OutputStream os, DownloadContext context) {
+    public void doLoad(OutputStream os, DownloadContext context) throws IOException {
         DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
         DownloadWriter writer = writerAdapter.getWriter(this, context);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
@@ -43,7 +43,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
      * @param context {@link DownloadContext}
      * @return 加载后的 {@link Source}
      */
-    public abstract InputStream loadRemote(DownloadContext context);
+    public abstract InputStream loadRemote(DownloadContext context) throws IOException;
 
     public static abstract class Builder<T extends RemoteLoadableSource, B extends Builder<T, B>> extends AbstractLoadableSource.Builder<T, B> {
 
@@ -54,7 +54,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
 
         @Override
         protected T build(T target) {
-            if (cacheEnabled && !StringUtils.hasText(cachePath)) {
+            if (cacheEnabled && (cachePath == null || cachePath.isEmpty())) {
                 throw new DownloadException("Cache path is null or empty");
             }
             return super.build(target);

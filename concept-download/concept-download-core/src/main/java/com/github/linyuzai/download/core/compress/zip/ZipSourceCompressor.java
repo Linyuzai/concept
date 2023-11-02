@@ -6,7 +6,6 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.ContentType;
-import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.OutputStream;
@@ -16,7 +15,6 @@ import java.util.zip.ZipOutputStream;
 /**
  * 使用 {@link ZipOutputStream} 进行压缩。
  */
-@AllArgsConstructor
 public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStream> {
 
     /**

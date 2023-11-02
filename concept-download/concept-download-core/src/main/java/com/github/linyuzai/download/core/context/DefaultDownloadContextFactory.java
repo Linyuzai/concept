@@ -1,8 +1,9 @@
 package com.github.linyuzai.download.core.context;
 
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,20 +11,21 @@ import java.util.UUID;
 /**
  * {@link DownloadContextFactory} 的默认实现。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class DefaultDownloadContextFactory implements DownloadContextFactory {
 
     /**
      * 初始化器
      */
     @NonNull
-    private List<DownloadContextInitializer> initializers;
+    private final List<DownloadContextInitializer> initializers;
 
     /**
      * 销毁器
      */
     @NonNull
-    private List<DownloadContextDestroyer> destroyers;
+    private final List<DownloadContextDestroyer> destroyers;
 
     /**
      * 创建一个 {@link DefaultDownloadContext}。

@@ -1,19 +1,16 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.web.ContentType;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import org.springframework.util.StringUtils;
+import lombok.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
 
 /**
  * 文件压缩。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class FileCompression extends AbstractCompression {
 
     /**
@@ -27,10 +24,9 @@ public class FileCompression extends AbstractCompression {
      *
      * @return {@link FileInputStream}
      */
-    @SneakyThrows
     @Override
-    public InputStream openInputStream() {
-        return new FileInputStream(file);
+    public InputStream openInputStream() throws IOException {
+        return Files.newInputStream(file.toPath());
     }
 
     /**
@@ -41,7 +37,7 @@ public class FileCompression extends AbstractCompression {
     @Override
     public String getName() {
         String name = super.getName();
-        if (!StringUtils.hasText(name)) {
+        if (name == null || name.isEmpty()) {
             setName(file.getName());
         }
         return super.getName();
@@ -56,7 +52,7 @@ public class FileCompression extends AbstractCompression {
     @Override
     public String getContentType() {
         String contentType = super.getContentType();
-        if (!StringUtils.hasText(contentType)) {
+        if (contentType == null || contentType.isEmpty()) {
             setContentType(ContentType.file(file));
         }
         return super.getContentType();

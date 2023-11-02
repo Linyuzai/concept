@@ -13,7 +13,7 @@ import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
+import lombok.SneakyThrows;
 
 /**
  * 对 {@link Source} 进行压缩。
@@ -38,6 +38,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      *
      * @param context {@link DownloadContext}
      */
+    @SneakyThrows
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Source source = context.get(Source.class);
@@ -51,7 +52,8 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
             publisher.publish(new SourceNoCompressionEvent(context, source));
         } else {
             String compressFormat = context.getOptions().getCompressFormat();
-            String formatToUse = StringUtils.hasText(compressFormat) ? compressFormat : CompressFormat.ZIP;
+            String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
+                    CompressFormat.ZIP : compressFormat;
             SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, context);

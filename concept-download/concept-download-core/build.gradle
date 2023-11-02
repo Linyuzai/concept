@@ -11,7 +11,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter-aop'
+    //compileOnly 'org.springframework.boot:spring-boot-starter-aop'
     compileOnly "io.projectreactor:reactor-core:${ReactorVersion}"
     compileOnly 'javax.activation:activation:1.1.1'
 }

@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.concept;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -19,7 +20,7 @@ public abstract class AbstractPart implements Part {
      * @return 新打开的 {@link InputStream} 或已经持有的 {@link InputStream}
      */
     @Override
-    public InputStream getInputStream() {
+    public InputStream getInputStream() throws IOException {
         if (inputStream == null) {
             inputStream = openInputStream();
         }
@@ -31,7 +32,7 @@ public abstract class AbstractPart implements Part {
      *
      * @return {@link InputStream}
      */
-    public abstract InputStream openInputStream();
+    public abstract InputStream openInputStream() throws IOException;
 
     /**
      * 释放子节点的资源并关闭当前持有的 {@link InputStream}。

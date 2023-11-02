@@ -56,11 +56,15 @@ public class ReactiveDownloadHandlerChain implements DownloadHandlerChain {
         private final DownloadHandler handler;
 
         public Mono<Void> handle(DownloadContext context, DownloadHandlerChain chain) {
-            Object handle = handler.handle(context, chain);
-            if (handle instanceof Publisher<?>) {
-                return Mono.from((Publisher<?>) handle).then();
-            } else {
-                return Mono.justOrEmpty(handle).then();
+            try {
+                Object handle = handler.handle(context, chain);
+                if (handle instanceof Publisher<?>) {
+                    return Mono.from((Publisher<?>) handle).then();
+                } else {
+                    return Mono.justOrEmpty(handle).then();
+                }
+            } catch (Throwable e) {
+                return Mono.error(e);
             }
         }
     }

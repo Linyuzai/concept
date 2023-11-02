@@ -1,12 +1,11 @@
 package com.github.linyuzai.download.core.handler;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.order.OrderProvider;
 
 /**
  * 下载处理器。
  */
-public interface DownloadHandler extends OrderProvider {
+public interface DownloadHandler {
 
     int ORDER_LOOKUP_CACHE = 0;
     int ORDER_CREATE_SOURCE = 100;
@@ -24,5 +23,14 @@ public interface DownloadHandler extends OrderProvider {
 
     default boolean support(DownloadContext context) {
         return true;
+    }
+
+    /**
+     * 默认返回 0。
+     *
+     * @return 0
+     */
+    default int getOrder() {
+        return 0;
     }
 }

@@ -1,7 +1,10 @@
 package com.github.linyuzai.download.core.concept;
 
+import com.github.linyuzai.download.core.context.BeforeContextDestroyedEvent;
+import com.github.linyuzai.download.core.context.AfterContextInitializedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;
@@ -30,11 +33,16 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
         DownloadContext context = contextFactory.create(options);
         //初始化上下文
         context.initialize();
+        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        publisher.publish(new AfterContextInitializedEvent(context));
         List<DownloadHandler> filtered = handlers.stream()
                 .filter(it -> it.support(context))
                 .collect(Collectors.toList());
         //处理链
-        return doDownload(context, filtered, context::destroy);
+        return doDownload(context, filtered, ()->{
+            publisher.publish(new BeforeContextDestroyedEvent(context));
+            context.destroy();
+        });
     }
 
     protected abstract Object doDownload(DownloadContext context, List<DownloadHandler> handlers, Runnable onComplete);

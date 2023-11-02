@@ -29,9 +29,4 @@ public class TextSourceFactory implements SourceFactory {
         publisher.publish(new TextSourceCreatedEvent(context, build));
         return build;
     }
-
-    @Override
-    public int getOrder() {
-        return Integer.MAX_VALUE - 100;
-    }
 }

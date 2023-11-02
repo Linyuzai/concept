@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.concept;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -15,7 +16,7 @@ public interface Part {
      *
      * @return {@link InputStream}
      */
-    InputStream getInputStream();
+    InputStream getInputStream() throws IOException;
 
     /**
      * 获得名称。

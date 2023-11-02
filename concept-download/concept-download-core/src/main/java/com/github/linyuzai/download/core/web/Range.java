@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.web;
 
 import lombok.*;
-import org.springframework.util.StringUtils;
 
 /**
  * 指定资源的范围，对应 'Range' 请求头。
@@ -72,7 +71,7 @@ public class Range {
      * @return 解析得到的 {@link Range} 或 null
      */
     public static Range header(String header) {
-        if (!StringUtils.hasText(header)) {
+        if (header == null || header.isEmpty()) {
             return null;
         }
         String[] split = header.split("=");

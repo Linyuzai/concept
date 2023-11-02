@@ -9,7 +9,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.Progress;
 import lombok.SneakyThrows;
-import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.Collection;
@@ -29,9 +28,8 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param context {@link DownloadContext}
      * @return {@link MemoryCompression} / {@link FileCompression}
      */
-    @SneakyThrows
     @Override
-    public Compression compress(Source source, DownloadWriter writer, DownloadContext context) {
+    public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
         String cachePath = context.getOptions().getCompressCachePath();
         String cacheName = getCacheName(source, context);
         boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
@@ -132,13 +130,13 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
         String compressCacheName = context.getOptions().getCompressCacheName();
         String suffix = getSuffix();
         String nameToUse;
-        if (StringUtils.hasText(compressCacheName)) {
-            nameToUse = compressCacheName;
-        } else {
+        if (compressCacheName == null || compressCacheName.isEmpty()) {
             CacheNameGenerator generator = context.get(CacheNameGenerator.class);
             nameToUse = generator.generate(source, context);
+        } else {
+            nameToUse = compressCacheName;
         }
-        if (!StringUtils.hasText(nameToUse)) {
+        if (nameToUse == null || nameToUse.isEmpty()) {
             throw new DownloadException("Cache name is null or empty");
         }
         if (nameToUse.endsWith(suffix)) {

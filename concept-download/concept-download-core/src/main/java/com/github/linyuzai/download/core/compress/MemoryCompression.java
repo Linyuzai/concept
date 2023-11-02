@@ -1,8 +1,9 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.utils.DownloadUtils;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -10,14 +11,14 @@ import java.io.InputStream;
 /**
  * 内存压缩。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class MemoryCompression extends AbstractCompression {
 
     /**
      * 存储在字节数组中
      */
-    @NonNull
-    protected final byte[] bytes;
+    protected final byte @NonNull [] bytes;
 
     /**
      * 获得一个 {@link ByteArrayInputStream}。

@@ -38,9 +38,4 @@ public class HttpSourceFactory extends PrefixSourceFactory {
     protected String[] getPrefixes() {
         return PREFIXES;
     }
-
-    @Override
-    public int getOrder() {
-        return Integer.MAX_VALUE - 1000;
-    }
 }

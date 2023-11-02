@@ -2,7 +2,6 @@ package com.github.linyuzai.download.core.write;
 
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.web.Range;
 
 import java.io.InputStream;
@@ -12,7 +11,7 @@ import java.nio.charset.Charset;
 /**
  * 具体操作 {@link InputStream} 和 {@link OutputStream} 的写入器。
  */
-public interface DownloadWriter extends OrderProvider {
+public interface DownloadWriter {
 
     /**
      * 该写入器是否支持写入。

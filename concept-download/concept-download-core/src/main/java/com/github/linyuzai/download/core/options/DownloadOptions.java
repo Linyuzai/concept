@@ -7,8 +7,8 @@ import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Builder;
 import lombok.Value;
-import org.springframework.core.MethodParameter;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -120,7 +120,7 @@ public class DownloadOptions {
     /**
      * 下载方法，切面中拦截的方法
      */
-    MethodParameter methodParameter;
+    Method method;
 
     Object returnValue;
 

@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
+import com.github.linyuzai.download.autoconfigure.source.reactive.WebClientSourceFactory;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
 import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
@@ -9,10 +10,11 @@ import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.context.*;
-import com.github.linyuzai.download.core.event.ApplicationDownloadEventPublisher;
+import com.github.linyuzai.download.autoconfigure.event.ApplicationDownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventPublisherInitializer;
+import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.CreateSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.LoadSourceHandler;
@@ -25,8 +27,8 @@ import com.github.linyuzai.download.core.log.TimeSpentCalculationLogger;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
-import com.github.linyuzai.download.core.source.classpath.ClassPathPrefixSourceFactory;
-import com.github.linyuzai.download.core.source.classpath.ClassPathSourceFactory;
+import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathPrefixSourceFactory;
+import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;
@@ -44,6 +46,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.time.Duration;
 import java.util.List;
@@ -99,16 +102,6 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
-    public PublishContextEventInitializer publishContextEventInitializer() {
-        return new PublishContextEventInitializer();
-    }
-
-    @Bean
-    public PublishContextEventDestroyer publishContextEventDestroyer() {
-        return new PublishContextEventDestroyer();
-    }
-
-    @Bean
     @ConditionalOnMissingBean
     public BufferedDownloadWriter bufferedDownloadWriter() {
         return new BufferedDownloadWriter();
@@ -121,60 +114,63 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
+    @Order(0)
     @ConditionalOnMissingBean
     public CollectionSourceFactory collectionSourceFactory() {
         return new CollectionSourceFactory();
     }
 
     @Bean
+    @Order(0)
     @ConditionalOnMissingBean
     public ArraySourceFactory arraySourceFactory() {
         return new ArraySourceFactory();
     }
 
     @Bean
+    @Order(0)
     @ConditionalOnMissingBean
     public SelfSourceFactory selfSourceFactory() {
         return new SelfSourceFactory();
     }
 
     @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public FileSourceFactory fileSourceFactory() {
         return new FileSourceFactory();
     }
 
     @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public FilePrefixSourceFactory filePrefixSourceFactory() {
         return new FilePrefixSourceFactory();
     }
 
     @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public UserHomeSourceFactory userHomeSourceFactory() {
         return new UserHomeSourceFactory();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public TextSourceFactory textSourceFactory() {
-        return new TextSourceFactory();
-    }
-
-    @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public ClassPathSourceFactory classPathResourceSourceFactory() {
         return new ClassPathSourceFactory();
     }
 
     @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public ClassPathPrefixSourceFactory classPathPrefixSourceFactory() {
         return new ClassPathPrefixSourceFactory();
     }
 
     @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public HttpSourceFactory httpSourceFactory() {
         return new HttpSourceFactory();
@@ -187,9 +183,24 @@ public class DownloadConceptCoreAutoConfiguration {
     }*/
 
     @Bean
+    @Order(100)
+    @ConditionalOnMissingBean
+    public WebClientSourceFactory webClientSourceFactory() {
+        return new WebClientSourceFactory();
+    }
+
+    @Bean
+    @Order(100)
     @ConditionalOnMissingBean
     public ReflectionSourceFactory reflectionSourceFactory() {
         return new ReflectionSourceFactory();
+    }
+
+    @Bean
+    @Order(200)
+    @ConditionalOnMissingBean
+    public TextSourceFactory textSourceFactory() {
+        return new TextSourceFactory();
     }
 
     @Bean
@@ -222,6 +233,7 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
+    @Order(DownloadHandler.ORDER_CREATE_SOURCE)
     @ConditionalOnMissingBean
     public CreateSourceHandler createSourceHandler(SourceFactoryAdapter adapter) {
         return new CreateSourceHandler(adapter);
@@ -234,18 +246,21 @@ public class DownloadConceptCoreAutoConfiguration {
     }
 
     @Bean
+    @Order(DownloadHandler.ORDER_LOAD_SOURCE)
     @ConditionalOnMissingBean
     public LoadSourceHandler loadSourceHandler(SourceLoader loader) {
         return new LoadSourceHandler(loader);
     }
 
     @Bean
+    @Order(DownloadHandler.ORDER_COMPRESS_SOURCE)
     @ConditionalOnMissingBean
     public CompressSourceHandler compressSourceHandler(SourceCompressorAdapter adapter) {
         return new CompressSourceHandler(adapter);
     }
 
     @Bean
+    @Order(DownloadHandler.ORDER_WRITE_RESPONSE)
     @ConditionalOnMissingBean
     public WriteResponseHandler writeResponseHandler(DownloadWriterAdapter adapter) {
         return new WriteResponseHandler(adapter);

@@ -2,16 +2,17 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.order.OrderProvider;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
+
+import java.io.IOException;
 
 /**
  * {@link Source} 压缩器。
  *
  * @see ZipSourceCompressor
  */
-public interface SourceCompressor extends OrderProvider {
+public interface SourceCompressor {
 
     /**
      * 获得压缩格式。
@@ -39,5 +40,5 @@ public interface SourceCompressor extends OrderProvider {
      * @param context {@link DownloadContext}
      * @return {@link Compression}
      */
-    Compression compress(Source source, DownloadWriter writer, DownloadContext context);
+    Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException;
 }

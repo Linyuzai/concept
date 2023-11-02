@@ -6,11 +6,12 @@ import com.github.linyuzai.download.core.source.AbstractSource;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.ContentType;
 import lombok.*;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +27,7 @@ public class FileSource extends AbstractSource {
      * 持有的 {@link File}
      */
     @NonNull
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     protected File file;
 
     /**
@@ -40,10 +41,9 @@ public class FileSource extends AbstractSource {
      *
      * @return {@link FileInputStream} 或 {@link EmptyInputStream}
      */
-    @SneakyThrows
     @Override
-    public InputStream openInputStream() {
-        return file.isFile() ? new FileInputStream(file) : new EmptyInputStream();
+    public InputStream openInputStream() throws IOException {
+        return file.isFile() ? Files.newInputStream(file.toPath()) : new EmptyInputStream();
     }
 
     /**
@@ -54,7 +54,7 @@ public class FileSource extends AbstractSource {
     @Override
     public String getName() {
         String name = super.getName();
-        if (!StringUtils.hasText(name)) {
+        if (name == null || name.isEmpty()) {
             setName(file.getName());
         }
         return super.getName();
@@ -68,7 +68,7 @@ public class FileSource extends AbstractSource {
     @Override
     public String getContentType() {
         String contentType = super.getContentType();
-        if (!StringUtils.hasText(contentType)) {
+        if (contentType == null || contentType.isEmpty()) {
             setContentType(ContentType.file(file));
         }
         return super.getContentType();

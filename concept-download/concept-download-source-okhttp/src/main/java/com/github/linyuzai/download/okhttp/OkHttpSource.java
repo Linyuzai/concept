@@ -9,23 +9,22 @@ import lombok.*;
 import okhttp3.*;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * 使用 {@link OkHttpClient} 处理 http 请求的 {@link Source}。
  */
-@SuppressWarnings("all")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OkHttpSource extends HttpSource {
 
-    @Setter
     @NonNull
+    @Setter(AccessLevel.PROTECTED)
     protected OkHttpClient client;
 
-    @SneakyThrows
     @Override
-    public InputStream loadRemote(DownloadContext context) {
+    public InputStream loadRemote(DownloadContext context) throws IOException {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         publisher.publish(new LoadOkHttpSourceEvent(context, this));
         Request.Builder rb = new Request.Builder();
@@ -34,40 +33,41 @@ public class OkHttpSource extends HttpSource {
             rb.headers(Headers.of(headers));
         }
         Request request = rb.build();
-        Response response = client.newCall(request).execute();
-        int code = response.code();
-        if (isResponseSuccess(code)) {
-            ResponseBody body = response.body();
-            if (body == null) {
-                throw new DownloadException("Body is null");
-            }
-            String contentType = getContentType();
-            if (!StringUtils.hasText(contentType)) {
-                MediaType mediaType = body.contentType();
-                if (mediaType != null) {
-                    setContentType(mediaType.toString());
+        try (Response response = client.newCall(request).execute()) {
+            int code = response.code();
+            if (isResponseSuccess(code)) {
+                ResponseBody body = response.body();
+                if (body == null) {
+                    throw new DownloadException("Body is null");
                 }
-            }
-            long l = body.contentLength();
-            if (l != -1) {
-                length = l;
-            }
-            return body.byteStream();
-        } else {
-            StringBuilder builder = new StringBuilder();
-            builder.append(response.code()).append(";");
-            String message = response.message();
-            if (!message.isEmpty()) {
-                builder.append(message).append(";");
-            }
-            ResponseBody body = response.body();
-            if (body != null) {
-                String s = body.string();
-                if (!s.isEmpty()) {
-                    builder.append(s).append(";");
+                String contentType = getContentType();
+                if (!StringUtils.hasText(contentType)) {
+                    MediaType mediaType = body.contentType();
+                    if (mediaType != null) {
+                        setContentType(mediaType.toString());
+                    }
                 }
+                long l = body.contentLength();
+                if (l != -1) {
+                    length = l;
+                }
+                return body.byteStream();
+            } else {
+                StringBuilder builder = new StringBuilder();
+                builder.append(response.code()).append(";");
+                String message = response.message();
+                if (!message.isEmpty()) {
+                    builder.append(message).append(";");
+                }
+                ResponseBody body = response.body();
+                if (body != null) {
+                    String s = body.string();
+                    if (!s.isEmpty()) {
+                        builder.append(s).append(";");
+                    }
+                }
+                throw new DownloadException("code: " + code + ", " + builder);
             }
-            throw new DownloadException("code: " + code + ", " + builder.toString());
         }
     }
 

@@ -7,7 +7,6 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
 import lombok.*;
-import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -18,15 +17,14 @@ import java.util.function.Predicate;
  * 容器化的 {@link Source} 实现。
  */
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MultipleSource implements Source {
 
     /**
      * 实际的 {@link Source} 集合
      */
     @NonNull
-    protected Collection<Source> sources;
+    protected final Collection<Source> sources;
 
     /**
      * 无法获得输入流。
@@ -48,7 +46,7 @@ public class MultipleSource implements Source {
     public String getName() {
         for (Source source : sources) {
             String name = source.getName();
-            if (StringUtils.hasText(name)) {
+            if (name != null && !name.isEmpty()) {
                 return name;
             }
         }

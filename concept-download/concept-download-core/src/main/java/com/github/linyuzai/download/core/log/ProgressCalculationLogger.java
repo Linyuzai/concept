@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.log;
 
-import com.github.linyuzai.download.core.context.AfterContextDestroyedEvent;
+import com.github.linyuzai.download.core.context.BeforeContextDestroyedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * 进度计算日志，包括加载进度，压缩进度，响应写入进度。
  */
 @AllArgsConstructor
-public class ProgressCalculationLogger extends DownloadLogger {
+public class ProgressCalculationLogger extends LoggingDownloadEventListener {
 
     /**
      * 进度缓存
@@ -71,8 +71,8 @@ public class ProgressCalculationLogger extends DownloadLogger {
      */
     @Override
     public void logOnEvent(Object event) {
-        if (event instanceof AfterContextDestroyedEvent) {
-            DownloadContext context = ((AfterContextDestroyedEvent) event).getContext();
+        if (event instanceof BeforeContextDestroyedEvent) {
+            DownloadContext context = ((BeforeContextDestroyedEvent) event).getContext();
             String id = context.getId();
             Map<Object, ProgressInterval> remove = progressIntervalMap.remove(id);
             if (remove != null) {

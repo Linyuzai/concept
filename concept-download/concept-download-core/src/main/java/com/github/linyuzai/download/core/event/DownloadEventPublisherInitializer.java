@@ -2,19 +2,21 @@ package com.github.linyuzai.download.core.event;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextInitializer;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * {@link DownloadEventPublisher} 初始化器。
  * 在 {@link DownloadContext} 初始化时，设置 {@link DownloadEventPublisher}。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class DownloadEventPublisherInitializer implements DownloadContextInitializer {
 
     /**
      * 被设置的 {@link DownloadEventPublisher}
      */
-    private DownloadEventPublisher eventPublisher;
+    private final DownloadEventPublisher eventPublisher;
 
     /**
      * 如果设置了额外的 {@link DownloadEventListener}，

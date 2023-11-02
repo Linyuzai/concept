@@ -57,9 +57,4 @@ public class ReflectionSourceFactory implements SourceFactory {
     protected ReflectionTemplate newTemplate(Class<?> clazz) {
         return new ReflectionTemplate(clazz);
     }
-
-    @Override
-    public int getOrder() {
-        return Integer.MAX_VALUE - 100;
-    }
 }
