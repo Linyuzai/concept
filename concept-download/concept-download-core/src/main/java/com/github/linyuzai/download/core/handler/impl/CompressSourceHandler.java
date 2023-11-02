@@ -3,11 +3,11 @@ package com.github.linyuzai.download.core.handler.impl;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.compress.*;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.event.DownloadLifecycleListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
@@ -20,7 +20,7 @@ import lombok.SneakyThrows;
  */
 @Getter
 @RequiredArgsConstructor
-public class CompressSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
+public class CompressSourceHandler implements DownloadHandler, DownloadLifecycleListener {
 
     /**
      * {@link SourceCompressor} 适配器
@@ -41,17 +41,18 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
     @SneakyThrows
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
+        DownloadOptions options = context.get(DownloadOptions.class);
         Source source = context.get(Source.class);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         Compression compression;
         boolean single = source.isSingle();
-        boolean forceCompress = context.getOptions().isForceCompress();
+        boolean forceCompress = options.isForceCompress();
         //（单一文件 && 没有强制压缩），则不压缩
         if (single && !forceCompress) {
             compression = new NoCompression(source);
             publisher.publish(new SourceNoCompressionEvent(context, source));
         } else {
-            String compressFormat = context.getOptions().getCompressFormat();
+            String compressFormat = options.getCompressFormat();
             String formatToUse = (compressFormat == null || compressFormat.isEmpty()) ?
                     CompressFormat.ZIP : compressFormat;
             SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
@@ -70,7 +71,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      * @param context {@link DownloadContext}
      */
     @Override
-    public void initialize(DownloadContext context) {
+    public void onStart(DownloadContext context) {
         context.set(SourceCompressorAdapter.class, sourceCompressorAdapter);
     }
 
@@ -81,11 +82,12 @@ public class CompressSourceHandler implements DownloadHandler, DownloadContextIn
      * @param context {@link DownloadContext}
      */
     @Override
-    public void destroy(DownloadContext context) {
+    public void onComplete(DownloadContext context) {
         Compression compression = context.get(Compression.class);
         if (compression != null) {
+            DownloadOptions options = context.get(DownloadOptions.class);
             DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-            boolean delete = context.getOptions().isCompressCacheDelete();
+            boolean delete = options.isCompressCacheDelete();
             //是否删除缓存
             if (delete) {
                 compression.deleteCache();

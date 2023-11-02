@@ -1,23 +1,17 @@
 package com.github.linyuzai.download.core.context;
 
-import com.github.linyuzai.download.core.options.DownloadOptions;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * {@link DownloadContext} 的默认实现。
  */
-public class DefaultDownloadContext extends AbstractDownloadContext {
+public class DefaultDownloadContext implements DownloadContext {
 
     /**
      * 用来存储上下文数据
      */
     private final Map<Object, Object> map = new HashMap<>();
-
-    public DefaultDownloadContext(String id, DownloadOptions options) {
-        super(id, options);
-    }
 
     /**
      * 在内部的 {@link HashMap} 中设置一个键值对。
@@ -62,14 +56,5 @@ public class DefaultDownloadContext extends AbstractDownloadContext {
     @Override
     public void remove(Object key) {
         map.remove(key);
-    }
-
-    /**
-     * 销毁并清空 {@link HashMap}。
-     */
-    @Override
-    public void destroy() {
-        super.destroy();
-        map.clear();
     }
 }

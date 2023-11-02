@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.event;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class DownloadEventPublisherInitializer implements DownloadContextInitializer {
+public class DownloadEventPublisherInitializer implements DownloadLifecycleListener {
 
     /**
      * 被设置的 {@link DownloadEventPublisher}
@@ -26,8 +26,9 @@ public class DownloadEventPublisherInitializer implements DownloadContextInitial
      * @param context {@link DownloadContext}
      */
     @Override
-    public void initialize(DownloadContext context) {
-        DownloadEventListener listener = context.getOptions().getEventListener();
+    public void onStart(DownloadContext context) {
+        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadEventListener listener = options.getEventListener();
         DownloadEventPublisher publisher;
         if (listener == null) {
             publisher = eventPublisher;

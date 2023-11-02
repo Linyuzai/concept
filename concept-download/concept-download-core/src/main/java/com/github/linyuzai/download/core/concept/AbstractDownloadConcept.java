@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.concept;
 
-import com.github.linyuzai.download.core.context.BeforeContextDestroyedEvent;
-import com.github.linyuzai.download.core.context.AfterContextInitializedEvent;
+import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
@@ -27,22 +27,21 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
      */
     private final List<DownloadHandler> handlers;
 
+    private final DownloadEventPublisher eventPublisher;
+
     @Override
     public Object download(DownloadOptions options) {
         //创建上下文
-        DownloadContext context = contextFactory.create(options);
-        //初始化上下文
-        context.initialize();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-        publisher.publish(new AfterContextInitializedEvent(context));
+        DownloadContext context = contextFactory.create();
+        context.set(DownloadOptions.class, options);
+        context.set(DownloadEventPublisher.class, eventPublisher);
+        eventPublisher.publish(new DownloadStartedEvent(context));
         List<DownloadHandler> filtered = handlers.stream()
                 .filter(it -> it.support(context))
                 .collect(Collectors.toList());
         //处理链
-        return doDownload(context, filtered, ()->{
-            publisher.publish(new BeforeContextDestroyedEvent(context));
-            context.destroy();
-        });
+        return doDownload(context, filtered, () ->
+                eventPublisher.publish(new DownloadCompletedEvent(context)));
     }
 
     protected abstract Object doDownload(DownloadContext context, List<DownloadHandler> handlers, Runnable onComplete);

@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.log;
 
-import com.github.linyuzai.download.core.context.BeforeContextDestroyedEvent;
-import com.github.linyuzai.download.core.context.AfterContextInitializedEvent;
+import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 
 import java.util.Map;
@@ -25,13 +25,13 @@ public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
      */
     @Override
     public void logOnEvent(Object event) {
-        if (event instanceof AfterContextInitializedEvent) {
+        if (event instanceof DownloadStartedEvent) {
             StopWatch watch = new StopWatch();
             watch.start();
-            stopWatchMap.put(((AfterContextInitializedEvent) event).getContext().getId(), watch);
-        } else if (event instanceof BeforeContextDestroyedEvent) {
-            DownloadContext context = ((BeforeContextDestroyedEvent) event).getContext();
-            String id = context.getId();
+            stopWatchMap.put(((DownloadStartedEvent) event).getContext().get(LOG_ID), watch);
+        } else if (event instanceof DownloadCompletedEvent) {
+            DownloadContext context = ((DownloadCompletedEvent) event).getContext();
+            String id = context.get(LOG_ID);
             StopWatch watch = stopWatchMap.remove(id);
             if (watch != null) {
                 watch.stop();

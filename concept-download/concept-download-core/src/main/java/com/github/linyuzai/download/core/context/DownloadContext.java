@@ -10,20 +10,6 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 public interface DownloadContext {
 
     /**
-     * 获得唯一ID。
-     *
-     * @return 唯一ID
-     */
-    String getId();
-
-    /**
-     * 获得 {@link DownloadOptions}。
-     *
-     * @return {@link DownloadOptions}
-     */
-    DownloadOptions getOptions();
-
-    /**
      * 在上下文中设置一个键值对。
      *
      * @param key   键
@@ -55,14 +41,4 @@ public interface DownloadContext {
      * @param key 键
      */
     void remove(Object key);
-
-    /**
-     * 初始化上下文。
-     */
-    void initialize();
-
-    /**
-     * 销毁上下文。
-     */
-    void destroy();
 }

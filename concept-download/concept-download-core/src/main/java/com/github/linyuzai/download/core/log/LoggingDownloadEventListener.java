@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.log;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,8 @@ import java.lang.reflect.Method;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class LoggingDownloadEventListener implements DownloadEventListener {
+
+    public static final String LOG_ID = "_download_log_id";
 
     /**
      * 标签
@@ -56,7 +59,8 @@ public abstract class LoggingDownloadEventListener implements DownloadEventListe
      */
     public void log(DownloadContext context, String tag, String message) {
         String info;
-        Method method = context.getOptions().getMethod();
+        DownloadOptions options = context.get(DownloadOptions.class);
+        Method method = options.getMethod();
         if (method == null) {
             info = tag + message;
         } else {

@@ -1,11 +1,11 @@
 package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextDestroyer;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.event.DownloadLifecycleListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class CreateSourceHandler implements DownloadHandler, DownloadContextInitializer, DownloadContextDestroyer {
+public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleListener {
 
     /**
      * {@link SourceFactory} 适配器
@@ -33,7 +33,8 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      */
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
-        Object original = context.getOptions().getSource();
+        DownloadOptions options = context.get(DownloadOptions.class);
+        Object original = options.getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);
         Source source = factory.create(original, context);
         context.set(Source.class, source);
@@ -48,7 +49,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      * @param context {@link DownloadContext}
      */
     @Override
-    public void initialize(DownloadContext context) {
+    public void onStart(DownloadContext context) {
         context.set(SourceFactoryAdapter.class, sourceFactoryAdapter);
     }
 
@@ -59,11 +60,12 @@ public class CreateSourceHandler implements DownloadHandler, DownloadContextInit
      * @param context {@link DownloadContext}
      */
     @Override
-    public void destroy(DownloadContext context) {
+    public void onComplete(DownloadContext context) {
         Source source = context.get(Source.class);
         if (source != null) {
             DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-            boolean delete = context.getOptions().isSourceCacheDelete();
+            DownloadOptions options = context.get(DownloadOptions.class);
+            boolean delete = options.isSourceCacheDelete();
             //是否删除缓存
             if (delete) {
                 source.deleteCache();

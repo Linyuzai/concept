@@ -4,10 +4,11 @@ import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.event.DownloadLifecycleListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.web.*;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
  */
 @Getter
 @RequiredArgsConstructor
-public class WriteResponseHandler implements DownloadHandler, DownloadContextInitializer {
+public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleListener {
 
     /**
      * {@link DownloadWriter} 适配器
@@ -132,9 +133,11 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
             }
         }
 
+        DownloadOptions options = context.get(DownloadOptions.class);
+
         //inline 或 attachment
-        boolean inline = context.getOptions().isInline();
-        String filename = context.getOptions().getFilename();
+        boolean inline = options.isInline();
+        String filename = options.getFilename();
         String filenameToUse;
         if (filename == null || filename.isEmpty()) {
             filenameToUse = resource.getName();
@@ -148,7 +151,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         }
 
         //ContentType
-        String contentType = context.getOptions().getContentType();
+        String contentType = options.getContentType();
         if (contentType == null || contentType.isEmpty()) {
             String compressionContentType = resource.getContentType();
             if (compressionContentType == null || compressionContentType.isEmpty()) {
@@ -161,7 +164,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
         }
 
         //Headers
-        Map<String, String> headers = context.getOptions().getHeaders();
+        Map<String, String> headers = options.getHeaders();
         if (headers != null) {
             response.setHeaders(headers);
         }
@@ -175,10 +178,8 @@ public class WriteResponseHandler implements DownloadHandler, DownloadContextIni
      * @param context {@link DownloadContext}
      */
     @Override
-    public void initialize(DownloadContext context) {
+    public void onStart(DownloadContext context) {
         context.set(DownloadWriterAdapter.class, downloadWriterAdapter);
-        //context.set(DownloadRequestProvider.class, downloadRequestProvider);
-        //context.set(DownloadResponseProvider.class, downloadResponseProvider);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.core.log;
 
-import com.github.linyuzai.download.core.context.BeforeContextDestroyedEvent;
+import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
@@ -71,9 +71,9 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
      */
     @Override
     public void logOnEvent(Object event) {
-        if (event instanceof BeforeContextDestroyedEvent) {
-            DownloadContext context = ((BeforeContextDestroyedEvent) event).getContext();
-            String id = context.getId();
+        if (event instanceof DownloadCompletedEvent) {
+            DownloadContext context = ((DownloadCompletedEvent) event).getContext();
+            String id = context.get(LOG_ID);
             Map<Object, ProgressInterval> remove = progressIntervalMap.remove(id);
             if (remove != null) {
                 remove.values().forEach(ProgressInterval::disposable);
@@ -81,7 +81,8 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
         } else if (event instanceof AbstractProgressEvent) {
             AbstractProgressEvent pde = (AbstractProgressEvent) event;
             DownloadContext context = ((AbstractProgressEvent) event).getContext();
-            progressIntervalMap.computeIfAbsent(context.getId(), id ->
+            String id = context.get(LOG_ID);
+            progressIntervalMap.computeIfAbsent(id, k ->
                     new ConcurrentHashMap<>()).computeIfAbsent(getId(pde), o ->
                     new ProgressInterval(this::onProgress)).publish(pde);
         }

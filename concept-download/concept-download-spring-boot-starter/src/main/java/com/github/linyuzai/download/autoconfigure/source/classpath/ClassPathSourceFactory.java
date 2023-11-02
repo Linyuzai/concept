@@ -2,6 +2,7 @@ package com.github.linyuzai.download.autoconfigure.source.classpath;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -20,7 +21,8 @@ public class ClassPathSourceFactory implements SourceFactory {
 
     @Override
     public Source create(Object source, DownloadContext context) {
-        Charset charset = context.getOptions().getCharset();
+        DownloadOptions options = context.get(DownloadOptions.class);
+        Charset charset = options.getCharset();
         ClassPathSource build = new ClassPathSource.Builder<>()
                 .resource((ClassPathResource) source)
                 .charset(charset)

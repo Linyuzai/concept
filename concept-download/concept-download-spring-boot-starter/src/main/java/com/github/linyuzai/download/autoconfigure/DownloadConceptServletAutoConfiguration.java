@@ -3,6 +3,7 @@ package com.github.linyuzai.download.autoconfigure;
 import com.github.linyuzai.download.autoconfigure.web.servlet.ServletDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
+import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,8 @@ public class DownloadConceptServletAutoConfiguration {
 
     @Bean
     public DownloadConcept downloadConcept(DownloadContextFactory factory,
-                                           List<DownloadHandler> handlers) {
-        return new ServletDownloadConcept(factory, handlers);
+                                           List<DownloadHandler> handlers,
+                                           DownloadEventPublisher eventPublisher) {
+        return new ServletDownloadConcept(factory, handlers, eventPublisher);
     }
 }

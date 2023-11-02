@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.cache;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.context.DownloadContextInitializer;
+import com.github.linyuzai.download.core.event.DownloadLifecycleListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class CacheNameGeneratorInitializer implements DownloadContextInitializer {
+public class CacheNameGeneratorInitializer implements DownloadLifecycleListener {
 
     /**
      * 需要设置的 {@link CacheNameGenerator}
@@ -18,12 +18,12 @@ public class CacheNameGeneratorInitializer implements DownloadContextInitializer
     private final CacheNameGenerator cacheNameGenerator;
 
     /**
-     * 在 {@link DownloadContext} 初始化时，设置 {@link CacheNameGenerator}。
+     * 设置 {@link CacheNameGenerator}。
      *
      * @param context {@link DownloadContext}
      */
     @Override
-    public void initialize(DownloadContext context) {
+    public void onStart(DownloadContext context) {
         context.set(CacheNameGenerator.class, cacheNameGenerator);
     }
 }

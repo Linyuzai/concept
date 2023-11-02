@@ -268,8 +268,7 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DownloadContextFactory downloadContextFactory(List<DownloadContextInitializer> initializers,
-                                                         List<DownloadContextDestroyer> destroyers) {
-        return new DefaultDownloadContextFactory(initializers, destroyers);
+    public DownloadContextFactory downloadContextFactory() {
+        return new DefaultDownloadContextFactory();
     }
 }

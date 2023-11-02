@@ -5,6 +5,7 @@ import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.Progress;
@@ -30,9 +31,10 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      */
     @Override
     public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
-        String cachePath = context.getOptions().getCompressCachePath();
+        DownloadOptions options = context.get(DownloadOptions.class);
+        String cachePath = options.getCompressCachePath();
         String cacheName = getCacheName(source, context);
-        boolean cacheEnable = context.getOptions().isCompressCacheEnabled();
+        boolean cacheEnable = options.isCompressCacheEnabled();
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         //是否启用缓存
         if (cacheEnable) {
@@ -127,7 +129,8 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @return 压缩文件缓存名称
      */
     public String getCacheName(Source source, DownloadContext context) {
-        String compressCacheName = context.getOptions().getCompressCacheName();
+        DownloadOptions options = context.get(DownloadOptions.class);
+        String compressCacheName = options.getCompressCacheName();
         String suffix = getSuffix();
         String nameToUse;
         if (compressCacheName == null || compressCacheName.isEmpty()) {

@@ -1,13 +1,16 @@
 package com.github.linyuzai.download.core.log;
 
 import com.github.linyuzai.download.core.compress.AbstractCompressSourceEvent;
-import com.github.linyuzai.download.core.context.AbstractDestroyContextEvent;
-import com.github.linyuzai.download.core.context.AbstractInitializeContextEvent;
+import com.github.linyuzai.download.core.compress.CompressionCacheDeletedEvent;
+import com.github.linyuzai.download.core.compress.CompressionReleasedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.event.DownloadContextEvent;
 import com.github.linyuzai.download.core.load.AbstractLoadSourceEvent;
 import com.github.linyuzai.download.core.source.AbstractCreateSourceEvent;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.source.SourceCacheDeletedEvent;
+import com.github.linyuzai.download.core.source.SourceReleasedEvent;
 import com.github.linyuzai.download.core.web.AbstractWriteResponseEvent;
 
 /**
@@ -28,12 +31,15 @@ public class StandardDownloadLogger extends LoggingDownloadEventListener {
         if (event instanceof DownloadContextEvent) {
             DownloadContextEvent dce = (DownloadContextEvent) event;
             DownloadContext context = dce.getContext();
-            if (event instanceof AbstractInitializeContextEvent ||
+            if (event instanceof DownloadStartedEvent ||
                     event instanceof AbstractCreateSourceEvent ||
                     event instanceof AbstractLoadSourceEvent ||
                     event instanceof AbstractCompressSourceEvent ||
                     event instanceof AbstractWriteResponseEvent ||
-                    event instanceof AbstractDestroyContextEvent) {
+                    event instanceof SourceReleasedEvent ||
+                    event instanceof SourceCacheDeletedEvent ||
+                    event instanceof CompressionReleasedEvent ||
+                    event instanceof CompressionCacheDeletedEvent) {
                 log(context, dce.getMessage());
             }
         }
