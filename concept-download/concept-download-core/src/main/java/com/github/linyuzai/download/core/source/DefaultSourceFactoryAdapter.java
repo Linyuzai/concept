@@ -2,14 +2,16 @@ package com.github.linyuzai.download.core.source;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 /**
  * {@link SourceFactoryAdapter} 的默认实现。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class DefaultSourceFactoryAdapter implements SourceFactoryAdapter {
 
     /**

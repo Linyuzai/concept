@@ -13,6 +13,8 @@ import java.lang.reflect.Method;
 /**
  * 下载日志抽象类。
  */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class LoggingDownloadEventListener implements DownloadEventListener {
@@ -22,19 +24,13 @@ public abstract class LoggingDownloadEventListener implements DownloadEventListe
     /**
      * 标签
      */
-    @Getter
-    @Setter
     private String tag = "Download";
 
     /**
      * 用于标签长度对齐
      */
-    @Getter
-    @Setter
     private int tagLength = 8;
 
-    @Getter
-    @Setter
     private boolean enabled;
 
     @Override

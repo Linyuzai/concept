@@ -1,8 +1,8 @@
 package com.github.linyuzai.download.core.log;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.event.DownloadStartedEvent;
-import com.github.linyuzai.download.core.context.DownloadContext;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

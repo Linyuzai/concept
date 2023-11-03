@@ -1,9 +1,14 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.web.ContentType;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 /**

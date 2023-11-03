@@ -9,7 +9,6 @@ import com.github.linyuzai.download.core.concept.ValueContainer;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
-import com.github.linyuzai.download.core.source.file.FileSource;
 import lombok.Getter;
 import lombok.Setter;
 import org.aopalliance.intercept.MethodInterceptor;

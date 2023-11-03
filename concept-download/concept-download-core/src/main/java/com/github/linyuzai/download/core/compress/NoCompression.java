@@ -2,7 +2,8 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.source.Source;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,13 +13,14 @@ import java.util.Collection;
 /**
  * 不压缩。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class NoCompression implements Compression {
 
     /**
      * 单个的 {@link Source}
      */
-    protected Source source;
+    protected final Source source;
 
     /**
      * 直接返回 {@link Source#getInputStream()}。

@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.log;
 
-import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
 import com.github.linyuzai.download.core.write.AbstractProgressEvent;
@@ -20,6 +20,8 @@ import java.util.function.Consumer;
 /**
  * 进度计算日志，包括加载进度，压缩进度，响应写入进度。
  */
+@Getter
+@Setter
 @AllArgsConstructor
 public class ProgressCalculationLogger extends LoggingDownloadEventListener {
 
@@ -31,15 +33,11 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
     /**
      * 打印间隔
      */
-    @Getter
-    @Setter
     private Duration duration;
 
     /**
      * 是否使用百分比数据
      */
-    @Getter
-    @Setter
     private boolean percentage;
 
     public ProgressCalculationLogger() {

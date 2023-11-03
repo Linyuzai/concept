@@ -6,7 +6,9 @@ import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.file.EmptyInputStream;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

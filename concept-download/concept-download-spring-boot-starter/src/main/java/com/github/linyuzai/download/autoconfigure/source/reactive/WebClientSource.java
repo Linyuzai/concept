@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * 使用 {@link WebClient} 处理 http 请求的 {@link Source}。
  */
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource {
 
@@ -71,12 +70,13 @@ public class WebClientSource extends HttpSource {
         return "WebClientSource(" + url + ")";
     }
 
-    @AllArgsConstructor
+    @Getter
+    @RequiredArgsConstructor
     public class InputStreamBodyExtractor implements BodyExtractor<Mono<Source>, ClientHttpResponse> {
 
-        private OutputStream os;
+        private final OutputStream os;
 
-        private DownloadContext context;
+        private final DownloadContext context;
 
         @Override
         public Mono<Source> extract(ClientHttpResponse response, Context ctx) {

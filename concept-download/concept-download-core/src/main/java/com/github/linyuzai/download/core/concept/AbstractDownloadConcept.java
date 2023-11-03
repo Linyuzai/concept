@@ -1,10 +1,10 @@
 package com.github.linyuzai.download.core.concept;
 
-import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
-import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
+import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;

@@ -3,9 +3,8 @@ package com.github.linyuzai.download.core.source.file;
 import com.github.linyuzai.download.core.concept.AbstractPart;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.web.ContentType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,23 +20,23 @@ import java.util.Collections;
  * 支持 {@link File} 的 {@link Part}。
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FilePart extends AbstractPart {
 
     /**
      * 文件
      */
-    protected File file;
+    protected final File file;
 
     /**
      * 名称
      */
-    protected String name;
+    protected final String name;
 
     /**
      * 路径
      */
-    protected String path;
+    protected final String path;
 
     /**
      * 如果 {@link File#isFile()} 则返回 {@link FileInputStream}，

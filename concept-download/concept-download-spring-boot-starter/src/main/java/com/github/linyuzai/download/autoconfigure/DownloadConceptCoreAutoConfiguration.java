@@ -1,6 +1,9 @@
 package com.github.linyuzai.download.autoconfigure;
 
+import com.github.linyuzai.download.autoconfigure.event.ApplicationDownloadEventPublisher;
 import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
+import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathPrefixSourceFactory;
+import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathSourceFactory;
 import com.github.linyuzai.download.autoconfigure.source.reactive.WebClientSourceFactory;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
@@ -9,8 +12,8 @@ import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
-import com.github.linyuzai.download.core.context.*;
-import com.github.linyuzai.download.autoconfigure.event.ApplicationDownloadEventPublisher;
+import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
+import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadEventPublisherInitializer;
@@ -27,8 +30,6 @@ import com.github.linyuzai.download.core.log.TimeSpentCalculationLogger;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
-import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathPrefixSourceFactory;
-import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathSourceFactory;
 import com.github.linyuzai.download.core.source.file.FilePrefixSourceFactory;
 import com.github.linyuzai.download.core.source.file.FileSourceFactory;
 import com.github.linyuzai.download.core.source.file.UserHomeSourceFactory;

@@ -1,15 +1,8 @@
 package com.github.linyuzai.download.autoconfigure.web.reactive;
 
-import com.github.linyuzai.download.core.concept.Part;
-import com.github.linyuzai.download.core.concept.Resource;
-import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.DownloadResponse;
-import com.github.linyuzai.download.core.web.Range;
-import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
-import com.github.linyuzai.download.core.write.DownloadWriter;
-import com.github.linyuzai.download.core.write.Progress;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -21,10 +14,7 @@ import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -97,12 +87,13 @@ public class ReactiveDownloadResponse implements DownloadResponse {
         }
     }
 
-    @AllArgsConstructor
+    @Getter
+    @RequiredArgsConstructor
     public static class FluxSinkOutputStream extends OutputStream {
 
-        private FluxSink<DataBuffer> fluxSink;
+        private final FluxSink<DataBuffer> fluxSink;
 
-        private ServerHttpResponse response;
+        private final ServerHttpResponse response;
 
         @Override
         public void write(byte[] b) throws IOException {

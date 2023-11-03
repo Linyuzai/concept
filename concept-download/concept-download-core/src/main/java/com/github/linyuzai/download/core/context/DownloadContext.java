@@ -1,7 +1,5 @@
 package com.github.linyuzai.download.core.context;
 
-import com.github.linyuzai.download.core.options.DownloadOptions;
-
 /**
  * 下载上下文。
  *

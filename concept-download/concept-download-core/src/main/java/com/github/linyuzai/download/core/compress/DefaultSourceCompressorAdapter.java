@@ -2,14 +2,16 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 /**
  * {@link SourceCompressorAdapter} 的默认实现。
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {
 
     /**

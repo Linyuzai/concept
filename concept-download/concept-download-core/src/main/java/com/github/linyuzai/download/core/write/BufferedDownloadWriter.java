@@ -3,9 +3,7 @@ package com.github.linyuzai.download.core.write;
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.Range;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -17,6 +15,8 @@ import java.nio.charset.Charset;
  * 使用缓冲区的写入器 / Writer using buffer
  * 默认缓冲区为1M / The default buffer is 1M
  */
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class BufferedDownloadWriter implements DownloadWriter {

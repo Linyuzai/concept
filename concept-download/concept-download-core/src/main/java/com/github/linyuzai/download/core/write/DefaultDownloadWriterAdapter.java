@@ -3,8 +3,8 @@ package com.github.linyuzai.download.core.write;
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * {@link DownloadWriterAdapter} 的默认实现。
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DefaultDownloadWriterAdapter implements DownloadWriterAdapter {
 
     /**
