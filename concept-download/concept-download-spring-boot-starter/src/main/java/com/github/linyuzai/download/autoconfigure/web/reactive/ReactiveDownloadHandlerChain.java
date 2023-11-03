@@ -28,8 +28,6 @@ public class ReactiveDownloadHandlerChain implements DownloadHandlerChain {
     private final List<DownloadHandler> handlers;
 
     /**
-     * 如果可以获得下一个处理器则调用，否则返回 {@link Mono#empty()}。
-     *
      * @param context {@link DownloadContext}
      */
     @Override

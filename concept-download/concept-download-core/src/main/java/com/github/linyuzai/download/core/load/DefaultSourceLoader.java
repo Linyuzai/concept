@@ -13,7 +13,6 @@ public class DefaultSourceLoader implements SourceLoader {
      *
      * @param source  {@link Source}
      * @param context {@link DownloadContext}
-     * @return 加载后的 {@link Source}
      */
     @Override
     public void load(Source source, DownloadContext context) {
