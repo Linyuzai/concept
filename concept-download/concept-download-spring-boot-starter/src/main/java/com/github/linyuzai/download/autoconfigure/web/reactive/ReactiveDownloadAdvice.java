@@ -1,63 +1,58 @@
 package com.github.linyuzai.download.autoconfigure.web.reactive;
 
-import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptAdvice;
+import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.ReactiveAdapterRegistry;
-import org.springframework.http.codec.HttpMessageWriter;
+import org.springframework.core.Ordered;
 import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.HandlerResult;
-import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
-import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
+import org.springframework.web.reactive.HandlerResultHandler;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.function.Function;
-
 @Getter
-public class ReactiveDownloadAdvice extends ResponseBodyResultHandler {
-
-    private static boolean hasMethod;
-
-    static {
-        try {
-            hasMethod = Mono.class.getMethod("deferContextual", Function.class) != null;
-        } catch (Throwable ignore) {
-        }
-    }
+@Setter
+public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
 
     private final DownloadConcept concept;
 
-    public ReactiveDownloadAdvice(List<HttpMessageWriter<?>> writers,
-                                  RequestedContentTypeResolver resolver,
-                                  ReactiveAdapterRegistry registry,
-                                  DownloadConcept concept) {
-        super(writers, resolver, registry);
+    private final DownloadProperties properties;
+
+    private int order;
+
+    public ReactiveDownloadAdvice(DownloadConcept concept, DownloadProperties properties) {
         this.concept = concept;
-        //setOrder(getOrder() - 1);
+        this.properties = properties;
+        setOrder(-1);
+    }
+
+    @Override
+    public boolean supports(HandlerResult result) {
+        /*MethodParameter returnType = result.getReturnTypeSource();
+        Class<?> containingClass = returnType.getContainingClass();
+        return (AnnotatedElementUtils.hasAnnotation(containingClass, Download.class) ||
+                returnType.hasMethodAnnotation(Download.class));*/
+        MethodParameter returnType = result.getReturnTypeSource();
+        return returnType.hasMethodAnnotation(Download.class);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public Mono<Void> handleResult(@NonNull ServerWebExchange exchange, @NonNull HandlerResult result) {
-        HandlerMethod handlerMethod = getHandlerMethod(exchange);
-        if (handlerMethod != null && handlerMethod.hasMethodAnnotation(Download.class)) {
-            MethodParameter returnType = handlerMethod.getReturnType();
-            Object returnValue = result.getReturnValue();
-            DownloadOptions options = DownloadConceptAdvice.buildOptions(returnType, returnValue, null);
-            return (Mono<Void>) concept.download(options);
-        } else {
-            return super.handleResult(exchange, result);
-        }
+        MethodParameter returnType = result.getReturnTypeSource();
+        Object returnValue = result.getReturnValue();
+        DownloadOptions options = properties.toOptions(returnType, returnValue);
+        return (Mono<Void>) concept.download(options);
     }
 
+    @Deprecated
     protected HandlerMethod getHandlerMethod(ServerWebExchange exchange) {
         Object attribute = exchange.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
         if (attribute instanceof HandlerMethod) {

@@ -11,6 +11,10 @@ public interface DownloadExecutor {
     Executor getExecutor();
 
     static Executor getExecutor(DownloadContext context) {
+        DownloadExecutor downloadExecutor = context.get(DownloadExecutor.class);
+        if (downloadExecutor != null) {
+            return downloadExecutor.getExecutor();
+        }
         Executor executor = context.get(Executor.class);
         if (executor != null) {
             return executor;

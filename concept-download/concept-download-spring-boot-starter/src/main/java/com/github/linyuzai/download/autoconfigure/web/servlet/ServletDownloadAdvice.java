@@ -1,6 +1,6 @@
 package com.github.linyuzai.download.autoconfigure.web.servlet;
 
-import com.github.linyuzai.download.autoconfigure.properties.DownloadConceptAdvice;
+import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.options.DownloadOptions;
@@ -19,6 +19,8 @@ public class ServletDownloadAdvice implements ResponseBodyAdvice<Object> {
 
     private final DownloadConcept concept;
 
+    private final DownloadProperties properties;
+
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         return returnType.hasMethodAnnotation(Download.class);
@@ -31,7 +33,7 @@ public class ServletDownloadAdvice implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request,
                                   ServerHttpResponse response) {
-        DownloadOptions options = DownloadConceptAdvice.buildOptions(returnType, body, null);
+        DownloadOptions options = properties.toOptions(returnType, body);
         return concept.download(options);
     }
 }
