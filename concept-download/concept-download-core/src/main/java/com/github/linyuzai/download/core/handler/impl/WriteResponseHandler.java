@@ -49,11 +49,12 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Compression compression = context.get(Compression.class);
+        DownloadOptions options = context.get(DownloadOptions.class);
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         //获得Request
-        DownloadRequest request = context.get(DownloadRequest.class);
+        DownloadRequest request = options.getRequest();
         //获得Response
-        DownloadResponse response = context.get(DownloadResponse.class);
+        DownloadResponse response = options.getResponse();
         //获得Range
         Range range = request.getRange();
         context.set(Range.class, range);
