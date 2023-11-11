@@ -5,6 +5,8 @@ import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.web.DownloadRequest;
+import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.Builder;
 import lombok.Value;
 
@@ -103,14 +105,14 @@ public class DownloadOptions {
     Map<String, String> headers;
 
     /**
-     * 提供支持任意 Request 的接口
+     * Request
      */
-    Object request;
+    DownloadRequest request;
 
     /**
-     * 提供支持任意 Response 的接口
+     * Response
      */
-    Object response;
+    DownloadResponse response;
 
     /**
      * 额外数据

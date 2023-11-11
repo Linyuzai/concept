@@ -9,6 +9,8 @@ import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.web.DownloadRequest;
+import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.MethodParameter;
@@ -27,16 +29,16 @@ import java.util.Objects;
 @ConfigurationProperties(prefix = "concept.download")
 public class DownloadProperties {
 
-    private ResponseConfiguration response = new ResponseConfiguration();
+    private ResponseProperties response = new ResponseProperties();
 
-    private SourceConfiguration source = new SourceConfiguration();
+    private SourceProperties source = new SourceProperties();
 
-    private CompressConfiguration compress = new CompressConfiguration();
+    private CompressProperties compress = new CompressProperties();
 
-    private LoggerConfiguration logger = new LoggerConfiguration();
+    private LoggerProperties logger = new LoggerProperties();
 
     @Data
-    public static class ResponseConfiguration {
+    public static class ResponseProperties {
 
         /**
          * 额外的响应头
@@ -45,24 +47,24 @@ public class DownloadProperties {
     }
 
     @Data
-    public static class SourceConfiguration {
+    public static class SourceProperties {
 
-        private CacheConfiguration cache = new CacheConfiguration();
+        private CacheProperties cache = new CacheProperties();
     }
 
     @Data
-    public static class CompressConfiguration {
+    public static class CompressProperties {
 
         /**
          * 压缩格式
          */
         private String format = CompressFormat.ZIP;
 
-        private CacheConfiguration cache = new CacheConfiguration();
+        private CacheProperties cache = new CacheProperties();
     }
 
     @Data
-    public static class CacheConfiguration {
+    public static class CacheProperties {
 
         /**
          * 是否启用缓存
@@ -81,59 +83,60 @@ public class DownloadProperties {
     }
 
     @Data
-    public static class LoggerConfiguration {
+    public static class LoggerProperties {
 
         /**
          * 是否启用日志
          */
         private boolean enabled;
 
-        private StandardLoggerConfiguration standard = new StandardLoggerConfiguration();
+        private StandardProperties standard = new StandardProperties();
 
-        private TimeSpentLoggerConfiguration timeSpent = new TimeSpentLoggerConfiguration();
+        private TimeSpentProperties timeSpent = new TimeSpentProperties();
 
-        private ProgressLoggerConfiguration progress = new ProgressLoggerConfiguration();
+        private ProgressProperties progress = new ProgressProperties();
+
+        @Data
+        public static class StandardProperties {
+
+            /**
+             * 是否启用标准日志
+             */
+            private boolean enabled = true;
+        }
+
+        @Data
+        public static class TimeSpentProperties {
+
+            /**
+             * 是否启用事件计算日志
+             */
+            private boolean enabled = true;
+        }
+
+        @Data
+        public static class ProgressProperties {
+
+            /**
+             * 是否启用进度计算日志
+             */
+            private boolean enabled = true;
+
+            /**
+             * 间隔，ms
+             */
+            private int duration = 1000;
+
+            /**
+             * 百分比计算
+             */
+            private boolean percentage;
+        }
     }
 
-    @Data
-    public static class StandardLoggerConfiguration {
-
-        /**
-         * 是否启用标准日志
-         */
-        private boolean enabled = true;
-    }
-
-    @Data
-    public static class TimeSpentLoggerConfiguration {
-
-        /**
-         * 是否启用事件计算日志
-         */
-        private boolean enabled = true;
-    }
-
-    @Data
-    public static class ProgressLoggerConfiguration {
-
-        /**
-         * 是否启用进度计算日志
-         */
-        private boolean enabled = true;
-
-        /**
-         * 间隔，ms
-         */
-        private int duration = 1000;
-
-        /**
-         * 百分比计算
-         */
-        private boolean percentage;
-    }
-
-    public DownloadOptions toOptions(MethodParameter method, Object returnValue) {
-        return buildOptions(method, returnValue, this);
+    public DownloadOptions toOptions(MethodParameter method, Object returnValue,
+                                     DownloadRequest request, DownloadResponse response) {
+        return buildOptions(method, returnValue, request, response, this);
     }
 
     /**
@@ -152,6 +155,8 @@ public class DownloadProperties {
      */
     public static DownloadOptions buildOptions(MethodParameter method,
                                                Object returnValue,
+                                               DownloadRequest request,
+                                               DownloadResponse response,
                                                DownloadProperties properties) {
         //如果是 DownloadOptions 直接使用
         if (returnValue instanceof DownloadOptions) {
@@ -161,7 +166,9 @@ public class DownloadProperties {
         SourceCache sourceCache = method.getMethodAnnotation(SourceCache.class);
         CompressCache compressCache = method.getMethodAnnotation(CompressCache.class);
 
-        DownloadOptions.Builder builder = DownloadOptions.builder();
+        DownloadOptions.Builder builder = DownloadOptions.builder()
+                .request(request)
+                .response(response);
 
         builder.method(method.getMethod());
         builder.returnValue(returnValue);
@@ -182,7 +189,7 @@ public class DownloadProperties {
                 .extra(download.extra());
 
         if (sourceCache == null) {
-            DownloadProperties.CacheConfiguration cache =
+            CacheProperties cache =
                     properties.getSource().getCache();
             builder.sourceCacheEnabled(cache.isEnabled())
                     .sourceCachePath(cache.getPath())
@@ -194,7 +201,7 @@ public class DownloadProperties {
         }
 
         if (compressCache == null) {
-            DownloadProperties.CacheConfiguration cache =
+            CacheProperties cache =
                     properties.getCompress().getCache();
             builder.compressCacheEnabled(cache.isEnabled())
                     .compressCachePath(cache.getPath())

@@ -4,6 +4,8 @@ import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.options.DownloadOptions;
+import com.github.linyuzai.download.core.web.DownloadRequest;
+import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.core.MethodParameter;
@@ -48,7 +50,8 @@ public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
     public Mono<Void> handleResult(@NonNull ServerWebExchange exchange, @NonNull HandlerResult result) {
         MethodParameter returnType = result.getReturnTypeSource();
         Object returnValue = result.getReturnValue();
-        DownloadOptions options = properties.toOptions(returnType, returnValue);
+        DownloadOptions options = properties.toOptions(returnType, returnValue,
+                getRequest(exchange), getResponse(exchange));
         return (Mono<Void>) concept.download(options);
     }
 
@@ -59,5 +62,13 @@ public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
             return (HandlerMethod) attribute;
         }
         return null;
+    }
+
+    protected DownloadRequest getRequest(ServerWebExchange exchange) {
+        return new ReactiveDownloadRequest(exchange.getRequest());
+    }
+
+    protected DownloadResponse getResponse(ServerWebExchange exchange) {
+        return new ReactiveDownloadResponse(exchange.getResponse());
     }
 }
