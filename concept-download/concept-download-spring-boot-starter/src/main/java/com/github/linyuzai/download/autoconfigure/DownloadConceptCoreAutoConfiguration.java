@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.autoconfigure.event.ApplicationDownloadEventPublisher;
+import com.github.linyuzai.download.autoconfigure.logger.CommonsDownloadLogger;
 import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathPrefixSourceFactory;
 import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathSourceFactory;
@@ -16,7 +17,6 @@ import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
-import com.github.linyuzai.download.core.event.DownloadEventPublisherInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.CreateSourceHandler;
@@ -24,9 +24,10 @@ import com.github.linyuzai.download.core.handler.impl.LoadSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.WriteResponseHandler;
 import com.github.linyuzai.download.core.load.DefaultSourceLoader;
 import com.github.linyuzai.download.core.load.SourceLoader;
-import com.github.linyuzai.download.core.log.ProgressCalculationLogger;
-import com.github.linyuzai.download.core.log.StandardDownloadLogger;
-import com.github.linyuzai.download.core.log.TimeSpentCalculationLogger;
+import com.github.linyuzai.download.core.logger.DownloadLogger;
+import com.github.linyuzai.download.core.logger.ProgressCalculationLogger;
+import com.github.linyuzai.download.core.logger.StandardDownloadLogger;
+import com.github.linyuzai.download.core.logger.TimeSpentCalculationLogger;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
@@ -58,6 +59,12 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DownloadProperties.class)
 public class DownloadConceptCoreAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DownloadLogger downloadLogger() {
+        return new CommonsDownloadLogger();
+    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -95,11 +102,6 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadEventPublisher downloadEventPublisher(List<DownloadEventListener> listeners) {
         return new ApplicationDownloadEventPublisher(listeners);
-    }
-
-    @Bean
-    public DownloadEventPublisherInitializer downloadEventPublisherInitializer(DownloadEventPublisher publisher) {
-        return new DownloadEventPublisherInitializer(publisher);
     }
 
     @Bean

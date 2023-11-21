@@ -88,7 +88,7 @@ public class DownloadProperties {
         /**
          * 是否启用日志
          */
-        private boolean enabled;
+        private boolean enabled = true;
 
         private StandardProperties standard = new StandardProperties();
 

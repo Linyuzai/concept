@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.logger.DownloadLogger;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -16,8 +17,8 @@ import java.util.List;
  */
 public class ReactiveDownloadConcept extends AbstractDownloadConcept {
 
-    public ReactiveDownloadConcept(DownloadContextFactory contextFactory, List<DownloadHandler> handlers, DownloadEventPublisher eventPublisher) {
-        super(contextFactory, handlers, eventPublisher);
+    public ReactiveDownloadConcept(DownloadContextFactory contextFactory, List<DownloadHandler> handlers, DownloadEventPublisher eventPublisher, DownloadLogger logger) {
+        super(contextFactory, handlers, eventPublisher, logger);
     }
 
     @SuppressWarnings("all")

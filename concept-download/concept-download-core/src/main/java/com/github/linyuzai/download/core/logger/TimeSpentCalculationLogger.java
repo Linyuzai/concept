@@ -1,10 +1,11 @@
-package com.github.linyuzai.download.core.log;
+package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -28,7 +29,9 @@ public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
         if (event instanceof DownloadStartedEvent) {
             StopWatch watch = new StopWatch();
             watch.start();
-            stopWatchMap.put(((DownloadStartedEvent) event).getContext().get(LOG_ID), watch);
+            String logId = UUID.randomUUID().toString();
+            ((DownloadStartedEvent) event).getContext().set(LOG_ID, logId);
+            stopWatchMap.put(logId, watch);
         } else if (event instanceof DownloadCompletedEvent) {
             DownloadContext context = ((DownloadCompletedEvent) event).getContext();
             String id = context.get(LOG_ID);
@@ -43,16 +46,20 @@ public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
 
     public static class StopWatch {
 
-        public void start() {
+        private long start;
 
+        private long span;
+
+        public void start() {
+            start = System.nanoTime();
         }
 
         public void stop() {
-
+            span = System.nanoTime() - start;
         }
 
         public double getTotalTimeSeconds() {
-            return 0.0;
+            return span / 1000000000.0;
         }
     }
 }

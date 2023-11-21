@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.log;
+package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadCompletedEvent;

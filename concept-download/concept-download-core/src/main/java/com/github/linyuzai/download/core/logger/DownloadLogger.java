@@ -1,6 +1,8 @@
-package com.github.linyuzai.download.core.log;
+package com.github.linyuzai.download.core.logger;
 
 public interface DownloadLogger {
+
+    String TAG = "Download >> ";
 
     void info(String message);
 

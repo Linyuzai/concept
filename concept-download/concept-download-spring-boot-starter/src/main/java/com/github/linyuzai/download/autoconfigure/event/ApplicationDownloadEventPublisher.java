@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.event.EventListener;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * 基于 {@link ApplicationEventPublisher} 的 {@link DownloadEventPublisher}，
@@ -19,7 +19,7 @@ public class ApplicationDownloadEventPublisher extends SimpleDownloadEventPublis
 
     private ApplicationEventPublisher applicationEventPublisher;
 
-    public ApplicationDownloadEventPublisher(Collection<DownloadEventListener> listeners) {
+    public ApplicationDownloadEventPublisher(List<DownloadEventListener> listeners) {
         super(listeners);
     }
 

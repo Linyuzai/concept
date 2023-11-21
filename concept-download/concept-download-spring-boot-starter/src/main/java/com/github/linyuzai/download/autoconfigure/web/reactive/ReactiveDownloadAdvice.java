@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.HandlerResult;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 @Getter
 @Setter
+@RestControllerAdvice
 public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
 
     private final DownloadConcept concept;
@@ -31,7 +33,7 @@ public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
     public ReactiveDownloadAdvice(DownloadConcept concept, DownloadProperties properties) {
         this.concept = concept;
         this.properties = properties;
-        setOrder(-1);
+        setOrder(getOrder() - 1);
     }
 
     @Override

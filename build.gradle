@@ -16,6 +16,7 @@ allprojects {
         set('RedissonVersion', '3.22.1')
         set('ReactorVersion', '3.4.25')
         set('RxJava3Version', '3.1.6')
+        set('OkHttpVersion', '4.9.3')
         set('XnioVersion', '3.8.6.Final')
         set('VueVersion', '2.6.11')
         set('VueResourceVersion', '1.5.1')

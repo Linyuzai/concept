@@ -16,6 +16,7 @@ dependencies {
     compileOnly project(':concept-download:concept-download-core')
     compileOnly project(':concept-download:concept-download-source-okhttp')
     compileOnly project(':concept-download:concept-download-load-coroutines')
+    compileOnly "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
 }
 
 apply from: '../../publish.gradle'

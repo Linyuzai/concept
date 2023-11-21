@@ -2,6 +2,7 @@ package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.okhttp.OkHttpSource;
 import com.github.linyuzai.download.okhttp.OkHttpSourceFactory;
+import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,12 +14,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(DownloadConceptCoreAutoConfiguration.class)
-@ConditionalOnClass(OkHttpSourceFactory.class)
+@ConditionalOnClass(OkHttpClient.class)
 public class DownloadConceptSourceOkHttpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnClass(OkHttpSource.class)
     public OkHttpSourceFactory okHttpSourceFactory() {
         return new OkHttpSourceFactory();
     }

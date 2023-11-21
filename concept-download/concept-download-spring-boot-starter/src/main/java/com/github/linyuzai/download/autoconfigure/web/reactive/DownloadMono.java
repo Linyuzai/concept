@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 /**
  * 为了通过 webflux 的参数类型校验，需要返回该对象，并传入真实的返回值。
  */
+@Deprecated
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DownloadMono extends Mono<Void> implements ValueContainer {

@@ -6,6 +6,9 @@ apply plugin: 'io.spring.dependency-management'
 
 version = '0.0.1-SNAPSHOT'
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
 
     implementation project(path: ':concept-domain:concept-domain-core', configuration: 'default')

@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.log;
+package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.compress.AbstractCompressSourceEvent;
 import com.github.linyuzai.download.core.compress.CompressionCacheDeletedEvent;
