@@ -8,9 +8,11 @@ import com.github.linyuzai.download.core.web.DownloadRequest;
 import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.lang.NonNull;
+import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.HandlerMapping;
@@ -22,11 +24,13 @@ import reactor.core.publisher.Mono;
 @Getter
 @Setter
 @RestControllerAdvice
-public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
+public class ReactiveDownloadAdvice implements HandlerResultHandler, EmbeddedValueResolverAware, Ordered {
 
     private final DownloadConcept concept;
 
     private final DownloadProperties properties;
+
+    private StringValueResolver resolver;
 
     private int order;
 
@@ -53,7 +57,7 @@ public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
         MethodParameter returnType = result.getReturnTypeSource();
         Object returnValue = result.getReturnValue();
         DownloadOptions options = properties.toOptions(returnType, returnValue,
-                getRequest(exchange), getResponse(exchange));
+                getRequest(exchange), getResponse(exchange), resolver);
         return (Mono<Void>) concept.download(options);
     }
 
@@ -72,5 +76,10 @@ public class ReactiveDownloadAdvice implements HandlerResultHandler, Ordered {
 
     protected DownloadResponse getResponse(ServerWebExchange exchange) {
         return new ReactiveDownloadResponse(exchange.getResponse());
+    }
+
+    @Override
+    public void setEmbeddedValueResolver(StringValueResolver resolver) {
+        this.resolver = resolver;
     }
 }

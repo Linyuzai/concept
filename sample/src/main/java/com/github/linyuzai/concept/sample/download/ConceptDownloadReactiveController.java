@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.annotation.CompressCache;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
+import com.github.linyuzai.download.core.options.ConfigurableDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
 import com.github.linyuzai.download.core.source.reflect.SourceName;
@@ -149,18 +150,16 @@ public class ConceptDownloadReactiveController {
     @Download(source = "classpath:/download/README.txt")
     @GetMapping("/s17")
     public Mono<Void> s17() {
-        return DownloadMono.value(new DownloadOptions.Rewriter() {
+        return DownloadMono.value(new DownloadOptions.Configurer() {
             @Override
-            public DownloadOptions rewrite(DownloadOptions options) {
+            public void configure(ConfigurableDownloadOptions options) {
                 System.out.println("在这里可以修改本次下载的参数！");
-                return options.toBuilder()
-                        .eventListener(new DownloadEventListener() {
-                            @Override
-                            public void onEvent(Object event) {
-                                System.out.println("Event " + event.getClass());
-                            }
-                        })
-                        .build();
+                options.setEventListener(new DownloadEventListener() {
+                    @Override
+                    public void onEvent(Object event) {
+                        System.out.println("Event " + event.getClass());
+                    }
+                });
             }
         });
     }

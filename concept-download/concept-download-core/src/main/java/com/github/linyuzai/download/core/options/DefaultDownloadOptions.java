@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.DownloadRequest;
 import com.github.linyuzai.download.core.web.DownloadResponse;
+import lombok.Data;
 
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
@@ -19,124 +20,126 @@ import java.util.Map;
  * @see SourceCache
  * @see CompressCache
  */
-public interface DownloadOptions {
+@Data
+public class DefaultDownloadOptions implements ConfigurableDownloadOptions {
 
     /**
      * 需要下载的原始数据对象
      * 后续会适配解析为 {@link Source}
      */
-    Object getSource();
+    Object source;
 
     /**
      * {@link Source} 是否开启缓存
      * 主要用于需要网络操作，如http等数据的缓存
      */
-    boolean isSourceCacheEnabled();
+    boolean sourceCacheEnabled;
 
     /**
      * {@link Source} 的缓存目录
      */
-    String getSourceCachePath();
+    String sourceCachePath;
 
     /**
      * {@link Source} 的缓存在下载结束后是否删除
      */
-    boolean isSourceCacheDelete();
+    boolean sourceCacheDelete;
 
     /**
      * 下载显示的文件名称，即在浏览器上下载下来显示的名称
      */
-    String getFilename();
+    String filename;
 
     /**
      * 在某些格式下可以直接预览，如图片或视频
      */
-    boolean isInline();
+    boolean inline;
 
     /**
      * Content-Type
      */
-    String getContentType();
+    String contentType;
 
     /**
      * 压缩格式
      */
-    String getCompressFormat();
+    String compressFormat;
 
     /**
      * 当只有一个文件时是否强制压缩
      */
-    boolean isForceCompress();
+    boolean forceCompress;
 
     /**
      * 是否开启压缩文件缓存
      * 开启后，将会先在本地生成一个压缩文件缓存
      * 如果文件小可以不开启
      */
-    boolean isCompressCacheEnabled();
+    boolean compressCacheEnabled;
 
     /**
      * 压缩文件的缓存目录
      */
-    String getCompressCachePath();
+    String compressCachePath;
 
     /**
      * 压缩文件缓存名称
      */
-    String getCompressCacheName();
+    String compressCacheName;
 
     /**
      * 是否删除压缩文件
      */
-    boolean isCompressCacheDelete();
+    boolean compressCacheDelete;
 
     /**
      * 如果指定了编码，会使用字符流的方式读
      */
-    Charset getCharset();
+    Charset charset;
 
     /**
      * 额外的响应头
      */
-    Map<String, String> getHeaders();
+    Map<String, String> headers;
 
     /**
      * Request
      */
-    DownloadRequest getRequest();
+    DownloadRequest request;
 
     /**
      * Response
      */
-    DownloadResponse getResponse();
+    DownloadResponse response;
 
     /**
      * 额外数据
      */
-    Object getExtra();
+    Object extra;
 
     /**
      * 下载方法，切面中拦截的方法
      */
-    Method getMethod();
+    Method method;
 
-    Object getReturnValue();
+    Object returnValue;
 
     /**
      * 额外的 {@link DownloadEventListener}
      */
-    DownloadEventListener getEventListener();
+    DownloadEventListener eventListener;
 
     /**
-     * {@link DownloadOptions} 重写器
+     * {@link DefaultDownloadOptions} 重写器
      */
-     interface Configurer {
+    public interface Rewriter {
 
         /**
          * 重写下载参数
          *
-         * @param options {@link DownloadOptions}
+         * @param options {@link DefaultDownloadOptions}
+         * @return 重写后的 {@link DefaultDownloadOptions}
          */
-        void configure(ConfigurableDownloadOptions options);
+        DefaultDownloadOptions rewrite(DefaultDownloadOptions options);
     }
 }

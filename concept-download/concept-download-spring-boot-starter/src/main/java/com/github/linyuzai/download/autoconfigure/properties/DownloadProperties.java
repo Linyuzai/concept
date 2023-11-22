@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.options.DefaultDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.DownloadRequest;
@@ -15,9 +16,11 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.StringUtils;
+import org.springframework.util.StringValueResolver;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -135,18 +138,19 @@ public class DownloadProperties {
     }
 
     public DownloadOptions toOptions(MethodParameter method, Object returnValue,
-                                     DownloadRequest request, DownloadResponse response) {
-        return buildOptions(method, returnValue, request, response, this);
+                                     DownloadRequest request, DownloadResponse response,
+                                     StringValueResolver resolver) {
+        return buildOptions(method, returnValue, request, response, this, resolver);
     }
 
     /**
      * 构建下载参数，
      * 注解的优先级高于全局配置。
      * 如果返回值是 {@link DownloadOptions} 则直接使用；
-     * 如果返回值是 null 或者是 {@link DownloadOptions.Rewriter}
+     * 如果返回值是 null 或者是 {@link DownloadOptions.Configurer}
      * 则使用 {@link Download#source()}，否则使用返回值。
-     * 如果返回值是 {@link DownloadOptions.Rewriter}
-     * 则会调用 {@link DownloadOptions.Rewriter#rewrite(DownloadOptions)}，
+     * 如果返回值是 {@link DownloadOptions.Configurer}
+     * 则会调用 {@link DownloadOptions.Configurer#rewrite(DownloadOptions)}，
      * 回调给开发者重写 {@link DownloadOptions}。
      *
      * @param method      切面方法
@@ -157,7 +161,8 @@ public class DownloadProperties {
                                                Object returnValue,
                                                DownloadRequest request,
                                                DownloadResponse response,
-                                               DownloadProperties properties) {
+                                               DownloadProperties properties,
+                                               StringValueResolver resolver) {
         //如果是 DownloadOptions 直接使用
         if (returnValue instanceof DownloadOptions) {
             return (DownloadOptions) returnValue;
@@ -166,61 +171,57 @@ public class DownloadProperties {
         SourceCache sourceCache = method.getMethodAnnotation(SourceCache.class);
         CompressCache compressCache = method.getMethodAnnotation(CompressCache.class);
 
-        DownloadOptions.Builder builder = DownloadOptions.builder()
-                .request(request)
-                .response(response);
-
-        builder.method(method.getMethod());
-        builder.returnValue(returnValue);
+        DefaultDownloadOptions options = new DefaultDownloadOptions();
+        options.setRequest(request);
+        options.setResponse(response);
+        options.setMethod(method.getMethod());
+        options.setReturnValue(returnValue);
         //如果为 null 或 Rewriter 则使用注解指定的数据，否则使用返回值
-        if (returnValue == null || returnValue instanceof DownloadOptions.Rewriter) {
-            builder.source(download.source());
+        if (returnValue == null || returnValue instanceof DownloadOptions.Configurer) {
+            options.setSource(Arrays.stream(download.source())
+                    .map(resolver::resolveStringValue)
+                    .toArray(String[]::new));
         } else {
-            builder.source(returnValue);
+            options.setSource(returnValue);
         }
 
-        builder.filename(download.filename())
-                .inline(download.inline())
-                .contentType(download.contentType())
-                .compressFormat(buildCompressFormat(download, properties))
-                .forceCompress(download.forceCompress())
-                .charset(buildCharset(download))
-                .headers(buildHeaders(download, properties))
-                .extra(download.extra());
+        options.setFilename(resolver.resolveStringValue(download.filename()));
+        options.setInline(download.inline());
+        options.setContentType(download.contentType());
+        options.setCompressFormat(buildCompressFormat(download, properties));
+        options.setForceCompress(download.forceCompress());
+        options.setCharset(buildCharset(download));
+        options.setHeaders(buildHeaders(download, properties));
+        options.setExtra(resolver.resolveStringValue(download.extra()));
 
         if (sourceCache == null) {
-            CacheProperties cache =
-                    properties.getSource().getCache();
-            builder.sourceCacheEnabled(cache.isEnabled())
-                    .sourceCachePath(cache.getPath())
-                    .sourceCacheDelete(cache.isDelete());
+            CacheProperties cache = properties.getSource().getCache();
+            options.setSourceCacheEnabled(cache.isEnabled());
+            options.setSourceCachePath(cache.getPath());
+            options.setSourceCacheDelete(cache.isDelete());
         } else {
-            builder.sourceCacheEnabled(sourceCache.enabled())
-                    .sourceCachePath(buildSourceCachePath(sourceCache, properties))
-                    .sourceCacheDelete(sourceCache.delete());
+            options.setSourceCacheEnabled(sourceCache.enabled());
+            options.setSourceCachePath(resolver.resolveStringValue(buildSourceCachePath(sourceCache, properties)));
+            options.setSourceCacheDelete(sourceCache.delete());
         }
 
         if (compressCache == null) {
-            CacheProperties cache =
-                    properties.getCompress().getCache();
-            builder.compressCacheEnabled(cache.isEnabled())
-                    .compressCachePath(cache.getPath())
-                    .compressCacheDelete(cache.isDelete());
+            CacheProperties cache = properties.getCompress().getCache();
+            options.setCompressCacheEnabled(cache.isEnabled());
+            options.setCompressCachePath(cache.getPath());
+            options.setCompressCacheDelete(cache.isDelete());
         } else {
-            builder.compressCacheEnabled(compressCache.enabled())
-                    .compressCachePath(buildCompressPath(compressCache, properties))
-                    .compressCacheName(compressCache.name())
-                    .compressCacheDelete(compressCache.delete());
+            options.setCompressCacheEnabled(compressCache.enabled());
+            options.setCompressCachePath(resolver.resolveStringValue(buildCompressPath(compressCache, properties)));
+            options.setCompressCacheName(compressCache.name());
+            options.setCompressCacheDelete(compressCache.delete());
         }
 
-        DownloadOptions options = builder.build();
-
-        if (returnValue instanceof DownloadOptions.Rewriter) {
+        if (returnValue instanceof DownloadOptions.Configurer) {
             //回调重写接口
-            return ((DownloadOptions.Rewriter) returnValue).rewrite(options);
-        } else {
-            return options;
+            ((DownloadOptions.Configurer) returnValue).configure(options);
         }
+        return options;
     }
 
     /**
