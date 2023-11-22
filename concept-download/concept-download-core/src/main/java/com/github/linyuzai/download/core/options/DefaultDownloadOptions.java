@@ -128,18 +128,4 @@ public class DefaultDownloadOptions implements ConfigurableDownloadOptions {
      * 额外的 {@link DownloadEventListener}
      */
     DownloadEventListener eventListener;
-
-    /**
-     * {@link DefaultDownloadOptions} 重写器
-     */
-    public interface Rewriter {
-
-        /**
-         * 重写下载参数
-         *
-         * @param options {@link DefaultDownloadOptions}
-         * @return 重写后的 {@link DefaultDownloadOptions}
-         */
-        DefaultDownloadOptions rewrite(DefaultDownloadOptions options);
-    }
 }
