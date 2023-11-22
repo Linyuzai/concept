@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
+import com.github.linyuzai.download.core.event.DownloadCompleteEvent;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
 import com.github.linyuzai.download.core.write.AbstractProgressEvent;
@@ -69,8 +69,8 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
      */
     @Override
     public void logOnEvent(Object event) {
-        if (event instanceof DownloadCompletedEvent) {
-            DownloadContext context = ((DownloadCompletedEvent) event).getContext();
+        if (event instanceof DownloadCompleteEvent) {
+            DownloadContext context = ((DownloadCompleteEvent) event).getContext();
             String id = context.get(LOG_ID);
             Map<Object, ProgressInterval> remove = progressIntervalMap.remove(id);
             if (remove != null) {

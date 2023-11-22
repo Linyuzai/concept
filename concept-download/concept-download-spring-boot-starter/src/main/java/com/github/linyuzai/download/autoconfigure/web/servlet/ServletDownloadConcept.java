@@ -10,6 +10,7 @@ import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.logger.DownloadLogger;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 基于 {@link DownloadHandlerChain} 的 {@link DownloadConcept} 实现。
@@ -21,9 +22,20 @@ public class ServletDownloadConcept extends AbstractDownloadConcept {
     }
 
     @Override
-    protected Object doDownload(DownloadContext context, List<DownloadHandler> handlers, Runnable onComplete) {
-        Object next = new ServletDownloadHandlerChain(handlers).next(context);
-        onComplete.run();
-        return next;
+    protected Object doDownload(DownloadContext context,
+                                List<DownloadHandler> handlers,
+                                Runnable onSuccess,
+                                Consumer<Throwable> onError,
+                                Runnable onComplete) {
+        try {
+            Object next = new ServletDownloadHandlerChain(handlers).next(context);
+            onSuccess.run();
+            return next;
+        } catch (Throwable e) {
+            onError.accept(e);
+            throw e;
+        } finally {
+            onComplete.run();
+        }
     }
 }

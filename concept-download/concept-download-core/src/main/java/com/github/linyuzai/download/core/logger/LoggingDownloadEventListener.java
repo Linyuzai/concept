@@ -24,7 +24,7 @@ public abstract class LoggingDownloadEventListener implements DownloadEventListe
     /**
      * 标签
      */
-    private String tag = "Download";
+    private String tag = " ";
 
     /**
      * 用于标签长度对齐

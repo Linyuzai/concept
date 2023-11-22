@@ -5,7 +5,7 @@ import com.github.linyuzai.download.core.compress.CompressionCacheDeletedEvent;
 import com.github.linyuzai.download.core.compress.CompressionReleasedEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadContextEvent;
-import com.github.linyuzai.download.core.event.DownloadStartedEvent;
+import com.github.linyuzai.download.core.event.DownloadStartEvent;
 import com.github.linyuzai.download.core.load.AbstractLoadSourceEvent;
 import com.github.linyuzai.download.core.source.AbstractCreateSourceEvent;
 import com.github.linyuzai.download.core.source.Source;
@@ -31,7 +31,7 @@ public class StandardDownloadLogger extends LoggingDownloadEventListener {
         if (event instanceof DownloadContextEvent) {
             DownloadContextEvent dce = (DownloadContextEvent) event;
             DownloadContext context = dce.getContext();
-            if (event instanceof DownloadStartedEvent ||
+            if (event instanceof DownloadStartEvent ||
                     event instanceof AbstractCreateSourceEvent ||
                     event instanceof AbstractLoadSourceEvent ||
                     event instanceof AbstractCompressSourceEvent ||

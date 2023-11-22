@@ -2,9 +2,9 @@ package com.github.linyuzai.download.core.event;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 
-public class DownloadCompletedEvent extends DownloadContextEvent {
+public class DownloadCompleteEvent extends DownloadContextEvent {
 
-    public DownloadCompletedEvent(DownloadContext context) {
+    public DownloadCompleteEvent(DownloadContext context) {
         super(context);
         setMessage("Context destroyed");
     }

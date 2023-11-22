@@ -9,10 +9,10 @@ public interface DownloadLifecycleListener extends DownloadEventListener {
 
     @Override
     default void onEvent(Object event) {
-        if (event instanceof DownloadStartedEvent) {
-            onStart(((DownloadStartedEvent) event).getContext());
-        } else if (event instanceof DownloadCompletedEvent) {
-            onComplete(((DownloadCompletedEvent) event).getContext());
+        if (event instanceof DownloadStartEvent) {
+            onStart(((DownloadStartEvent) event).getContext());
+        } else if (event instanceof DownloadCompleteEvent) {
+            onComplete(((DownloadCompleteEvent) event).getContext());
         }
     }
 

@@ -11,6 +11,7 @@ import com.github.linyuzai.download.core.logger.DownloadLogger;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 基于 {@link DownloadHandlerChain} 的 {@link DownloadConcept} 实现。
@@ -23,8 +24,14 @@ public class ReactiveDownloadConcept extends AbstractDownloadConcept {
 
     @SuppressWarnings("all")
     @Override
-    protected Object doDownload(DownloadContext context, List<DownloadHandler> handlers, Runnable onComplete) {
+    protected Object doDownload(DownloadContext context,
+                                List<DownloadHandler> handlers,
+                                Runnable onSuccess,
+                                Consumer<Throwable> onError,
+                                Runnable onComplete) {
         Object object = new ReactiveDownloadHandlerChain(0, handlers).next(context);
+        ((Mono<?>) object).doOnSuccess(it -> onSuccess.run());
+        ((Mono<?>) object).doOnError(onError);
         ((Mono<?>) object).doAfterTerminate(onComplete);
         return object;
     }

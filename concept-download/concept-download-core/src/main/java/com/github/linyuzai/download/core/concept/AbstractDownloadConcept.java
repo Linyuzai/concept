@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter
@@ -38,13 +39,15 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
         context.set(DownloadLogger.class, logger);
         DownloadEventPublisher publisher = delegateDownloadEventPublisher(options);
         context.set(DownloadEventPublisher.class, publisher);
-        publisher.publish(new DownloadStartedEvent(context));
+        publisher.publish(new DownloadStartEvent(context));
         List<DownloadHandler> filtered = handlers.stream()
                 .filter(it -> it.support(context))
                 .collect(Collectors.toList());
         //处理链
         return doDownload(context, filtered, () ->
-                publisher.publish(new DownloadCompletedEvent(context)));
+                publisher.publish(new DownloadSuccessEvent(context)), e ->
+                publisher.publish(new DownloadErrorEvent(context, e)), () ->
+                publisher.publish(new DownloadCompleteEvent(context)));
     }
 
     protected DownloadEventPublisher delegateDownloadEventPublisher(DownloadOptions options) {
@@ -56,5 +59,5 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
         }
     }
 
-    protected abstract Object doDownload(DownloadContext context, List<DownloadHandler> handlers, Runnable onComplete);
+    protected abstract Object doDownload(DownloadContext context, List<DownloadHandler> handlers, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 }
