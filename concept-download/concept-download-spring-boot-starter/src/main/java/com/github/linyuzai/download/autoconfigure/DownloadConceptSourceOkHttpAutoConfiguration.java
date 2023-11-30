@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
-import com.github.linyuzai.download.okhttp.OkHttpSource;
-import com.github.linyuzai.download.okhttp.OkHttpSourceFactory;
+import com.github.linyuzai.download.core.source.okhttp.OkHttpSource;
+import com.github.linyuzai.download.core.source.okhttp.OkHttpSourceFactory;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

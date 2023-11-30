@@ -30,9 +30,12 @@ public class ReactiveDownloadConcept extends AbstractDownloadConcept {
                                 Consumer<Throwable> onError,
                                 Runnable onComplete) {
         Object object = new ReactiveDownloadHandlerChain(0, handlers).next(context);
-        ((Mono<?>) object).doOnSuccess(it -> onSuccess.run());
-        ((Mono<?>) object).doOnError(onError);
-        ((Mono<?>) object).doAfterTerminate(onComplete);
-        return object;
+        //((Mono<?>) object).doOnSuccess(it -> onSuccess.run());
+        //((Mono<?>) object).doOnError(onError);
+        //((Mono<?>) object).doAfterTerminate(onComplete);
+        return Mono.from((Mono<?>) object)
+                .doOnSuccess(it -> onSuccess.run())
+                .doOnError(onError)
+                .doAfterTerminate(onComplete);
     }
 }

@@ -13,6 +13,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     //compileOnly 'org.springframework.boot:spring-boot-starter-aop'
     compileOnly "io.projectreactor:reactor-core:${ReactorVersion}"
+    compileOnly "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
     compileOnly 'javax.activation:activation:1.1.1'
 }
 

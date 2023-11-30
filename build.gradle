@@ -43,7 +43,7 @@ allprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    if (project.name == 'concept-download-load-coroutines') {
+    if (project.name == 'concept-download-coroutines') {
         apply plugin: 'org.jetbrains.kotlin.jvm'
         apply plugin: 'org.jetbrains.dokka'
 

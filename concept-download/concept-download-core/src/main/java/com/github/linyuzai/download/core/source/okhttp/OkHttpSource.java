@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.okhttp;
+package com.github.linyuzai.download.core.source.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
@@ -7,7 +7,6 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSource;
 import lombok.*;
 import okhttp3.*;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +40,7 @@ public class OkHttpSource extends HttpSource {
                     throw new DownloadException("Body is null");
                 }
                 String contentType = getContentType();
-                if (!StringUtils.hasText(contentType)) {
+                if (contentType == null || contentType.isEmpty()) {
                     MediaType mediaType = body.contentType();
                     if (mediaType != null) {
                         setContentType(mediaType.toString());

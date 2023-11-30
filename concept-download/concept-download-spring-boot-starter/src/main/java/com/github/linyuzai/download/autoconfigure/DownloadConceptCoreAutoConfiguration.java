@@ -37,7 +37,7 @@ import com.github.linyuzai.download.core.source.http.HttpSourceFactory;
 import com.github.linyuzai.download.core.source.multiple.ArraySourceFactory;
 import com.github.linyuzai.download.core.source.multiple.CollectionSourceFactory;
 import com.github.linyuzai.download.core.source.reflect.ReflectionSourceFactory;
-import com.github.linyuzai.download.core.source.self.SelfSourceFactory;
+import com.github.linyuzai.download.core.source.original.OriginalSourceFactory;
 import com.github.linyuzai.download.core.source.text.TextSourceFactory;
 import com.github.linyuzai.download.core.write.BufferedDownloadWriter;
 import com.github.linyuzai.download.core.write.DefaultDownloadWriterAdapter;
@@ -132,8 +132,8 @@ public class DownloadConceptCoreAutoConfiguration {
     @Bean
     @Order(0)
     @ConditionalOnMissingBean
-    public SelfSourceFactory selfSourceFactory() {
-        return new SelfSourceFactory();
+    public OriginalSourceFactory originalSourceFactory() {
+        return new OriginalSourceFactory();
     }
 
     @Bean
