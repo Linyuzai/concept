@@ -10,6 +10,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -25,42 +26,66 @@ public class PublisherSource implements ReactorSource {
     private Source source;
 
     @Override
-    public InputStream getInputStream() {
+    public InputStream getInputStream() throws IOException {
+        if (source != null) {
+            return source.getInputStream();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String getName() {
+        if (source != null) {
+            return source.getName();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String getContentType() {
+        if (source != null) {
+            return source.getContentType();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Charset getCharset() {
+        if (source != null) {
+            return source.getCharset();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Long getLength() {
+        if (source != null) {
+            return source.getLength();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String getDescription() {
+        if (source != null) {
+            return source.getDescription();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isAsyncLoad() {
+        if (source != null) {
+            return source.isAsyncLoad();
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isSingle() {
+        if (source != null) {
+            return source.isSingle();
+        }
         throw new UnsupportedOperationException();
     }
 

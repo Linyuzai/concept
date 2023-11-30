@@ -1,4 +1,4 @@
 com.github.linyuzai.download.autoconfigure.DownloadConceptServletAutoConfiguration
 com.github.linyuzai.download.autoconfigure.DownloadConceptReactiveAutoConfiguration
-com.github.linyuzai.download.autoconfigure.DownloadConceptSourceOkHttpAutoConfiguration
+com.github.linyuzai.download.autoconfigure.DownloadConceptExtensionAutoConfiguration
 com.github.linyuzai.download.autoconfigure.DownloadConceptCoreAutoConfiguration

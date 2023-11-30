@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.autoconfigure;
 
 import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
+import com.github.linyuzai.download.autoconfigure.source.reactive.WebClientSourceFactory;
 import com.github.linyuzai.download.autoconfigure.web.reactive.ReactiveDownloadAdvice;
 import com.github.linyuzai.download.autoconfigure.web.reactive.ReactiveDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
@@ -31,6 +32,14 @@ public class DownloadConceptReactiveAutoConfiguration {
     public SourceLoader sourceLoader() {
         return new ReactorSourceLoader();
     }
+
+    @Bean
+    @Order(50)
+    @ConditionalOnMissingBean
+    public WebClientSourceFactory webClientSourceFactory() {
+        return new WebClientSourceFactory();
+    }
+
 
     @Bean
     public DownloadConcept downloadConcept(DownloadContextFactory factory,

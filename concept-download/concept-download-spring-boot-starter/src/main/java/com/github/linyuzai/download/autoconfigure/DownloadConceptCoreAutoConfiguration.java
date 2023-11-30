@@ -175,19 +175,6 @@ public class DownloadConceptCoreAutoConfiguration {
         return new HttpSourceFactory();
     }
 
-    /*@Bean
-    @ConditionalOnMissingBean
-    public PublisherSourceFactory publisherSourceFactory() {
-        return new PublisherSourceFactory();
-    }*/
-
-    @Bean
-    @Order(100)
-    @ConditionalOnMissingBean
-    public WebClientSourceFactory webClientSourceFactory() {
-        return new WebClientSourceFactory();
-    }
-
     @Bean
     @Order(100)
     @ConditionalOnMissingBean
