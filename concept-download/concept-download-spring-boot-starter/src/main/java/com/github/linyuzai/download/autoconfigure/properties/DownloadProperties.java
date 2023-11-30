@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.cache.Cacheable;
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.options.ConfigurableDownloadOptions;
 import com.github.linyuzai.download.core.options.DefaultDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
@@ -150,7 +151,7 @@ public class DownloadProperties {
      * 如果返回值是 null 或者是 {@link DownloadOptions.Configurer}
      * 则使用 {@link Download#source()}，否则使用返回值。
      * 如果返回值是 {@link DownloadOptions.Configurer}
-     * 则会调用 {@link DownloadOptions.Configurer#rewrite(DownloadOptions)}，
+     * 则会调用 {@link DownloadOptions.Configurer#configure(ConfigurableDownloadOptions)} ，
      * 回调给开发者重写 {@link DownloadOptions}。
      *
      * @param method      切面方法

@@ -39,9 +39,4 @@ public class LoadSourceHandler implements DownloadHandler {
         //context.set(Source.class, load);
         return chain.next(context);
     }
-
-    @Override
-    public int getOrder() {
-        return ORDER_LOAD_SOURCE;
-    }
 }

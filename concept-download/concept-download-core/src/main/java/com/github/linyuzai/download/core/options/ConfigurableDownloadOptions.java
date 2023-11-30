@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.options;
 
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.web.DownloadRequest;
 import com.github.linyuzai.download.core.web.DownloadResponse;
@@ -7,6 +8,7 @@ import com.github.linyuzai.download.core.web.DownloadResponse;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface ConfigurableDownloadOptions extends DownloadOptions {
 
@@ -51,4 +53,6 @@ public interface ConfigurableDownloadOptions extends DownloadOptions {
     void setReturnValue(Object returnValue);
 
     void setEventListener(DownloadEventListener listener);
+
+    void setAsyncConsumer(Consumer<DownloadContext> consumer);
 }

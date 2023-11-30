@@ -98,9 +98,4 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
             publisher.publish(new CompressionReleasedEvent(context, compression));
         }
     }
-
-    @Override
-    public int getOrder() {
-        return ORDER_COMPRESS_SOURCE;
-    }
 }

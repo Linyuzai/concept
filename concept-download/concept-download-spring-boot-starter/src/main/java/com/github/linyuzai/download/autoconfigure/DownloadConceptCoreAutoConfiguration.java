@@ -18,10 +18,7 @@ import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
-import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
-import com.github.linyuzai.download.core.handler.impl.CreateSourceHandler;
-import com.github.linyuzai.download.core.handler.impl.LoadSourceHandler;
-import com.github.linyuzai.download.core.handler.impl.WriteResponseHandler;
+import com.github.linyuzai.download.core.handler.impl.*;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.logger.DownloadLogger;
 import com.github.linyuzai.download.core.logger.ProgressCalculationLogger;
@@ -260,6 +257,13 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public WriteResponseHandler writeResponseHandler(DownloadWriterAdapter adapter) {
         return new WriteResponseHandler(adapter);
+    }
+
+    @Bean
+    @Order(DownloadHandler.ORDER_ASYNC_CONSUME)
+    @ConditionalOnMissingBean
+    public AsyncConsumeHandler asyncConsumeHandler() {
+        return new AsyncConsumeHandler();
     }
 
     @Bean

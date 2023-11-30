@@ -15,9 +15,4 @@ public class LookupCacheHandler implements DownloadHandler {
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         return chain.next(context);
     }
-
-    @Override
-    public int getOrder() {
-        return ORDER_LOOKUP_CACHE;
-    }
 }

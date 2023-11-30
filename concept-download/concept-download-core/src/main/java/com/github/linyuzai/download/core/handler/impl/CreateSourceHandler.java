@@ -76,9 +76,4 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
             publisher.publish(new SourceReleasedEvent(context, source));
         }
     }
-
-    @Override
-    public int getOrder() {
-        return ORDER_CREATE_SOURCE;
-    }
 }

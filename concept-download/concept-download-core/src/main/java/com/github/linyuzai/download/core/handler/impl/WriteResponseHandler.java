@@ -35,6 +35,12 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
      */
     private final DownloadWriterAdapter downloadWriterAdapter;
 
+    @Override
+    public boolean support(DownloadContext context) {
+        DownloadOptions options = context.get(DownloadOptions.class);
+        return options.getAsyncConsumer() == null;
+    }
+
     /**
      * 写 {@link DownloadResponse}。
      * 处理 {@link DownloadRequest} 中的 {@link Range}，
@@ -181,10 +187,5 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
     @Override
     public void onStart(DownloadContext context) {
         context.set(DownloadWriterAdapter.class, downloadWriterAdapter);
-    }
-
-    @Override
-    public int getOrder() {
-        return ORDER_WRITE_RESPONSE;
     }
 }

@@ -12,6 +12,7 @@ public interface DownloadHandler {
     int ORDER_LOAD_SOURCE = 200;
     int ORDER_COMPRESS_SOURCE = 300;
     int ORDER_WRITE_RESPONSE = 400;
+    int ORDER_ASYNC_CONSUME = 400;
 
     /**
      * 执行处理。
@@ -23,14 +24,5 @@ public interface DownloadHandler {
 
     default boolean support(DownloadContext context) {
         return true;
-    }
-
-    /**
-     * 默认返回 0。
-     *
-     * @return 0
-     */
-    default int getOrder() {
-        return 0;
     }
 }

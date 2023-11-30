@@ -3,6 +3,7 @@ package com.github.linyuzai.download.core.options;
 import com.github.linyuzai.download.core.annotation.CompressCache;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.DownloadRequest;
@@ -12,6 +13,7 @@ import lombok.Data;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 下载参数。
@@ -128,4 +130,6 @@ public class DefaultDownloadOptions implements ConfigurableDownloadOptions {
      * 额外的 {@link DownloadEventListener}
      */
     DownloadEventListener eventListener;
+
+    Consumer<DownloadContext> asyncConsumer;
 }
