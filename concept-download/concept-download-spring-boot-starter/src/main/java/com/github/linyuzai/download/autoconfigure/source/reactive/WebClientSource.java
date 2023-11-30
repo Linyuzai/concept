@@ -54,7 +54,7 @@ public class WebClientSource extends HttpSource implements ReactorSource {
     }
 
     protected Mono<InputStream> loadInputStream(DownloadContext context) {
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new LoadWebClientSourceEvent(context, this));
         return WebClient.create()
                 .get()

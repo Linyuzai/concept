@@ -21,13 +21,13 @@ public class ClassPathSourceFactory implements SourceFactory {
 
     @Override
     public Source create(Object source, DownloadContext context) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
         ClassPathSource build = new ClassPathSource.Builder<>()
                 .resource((ClassPathResource) source)
                 .charset(charset)
                 .build();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new ClassPathSourceCreatedEvent(context, build));
         return build;
     }

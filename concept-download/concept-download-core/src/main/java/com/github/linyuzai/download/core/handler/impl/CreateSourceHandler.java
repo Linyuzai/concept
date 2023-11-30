@@ -33,12 +33,12 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
      */
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Object original = options.getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);
         Source source = factory.create(original, context);
         context.set(Source.class, source);
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new AfterSourceCreatedEvent(context, source));
         return chain.next(context);
     }
@@ -63,8 +63,8 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
     public void onComplete(DownloadContext context) {
         Source source = context.get(Source.class);
         if (source != null) {
-            DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
-            DownloadOptions options = context.get(DownloadOptions.class);
+            DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
+            DownloadOptions options = DownloadOptions.get(context);
             boolean delete = options.isSourceCacheDelete();
             //是否删除缓存
             if (delete) {

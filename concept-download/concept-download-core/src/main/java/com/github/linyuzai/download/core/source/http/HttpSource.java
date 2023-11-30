@@ -77,7 +77,7 @@ public class HttpSource extends RemoteLoadableSource {
     //@SneakyThrows
     @Override
     public InputStream loadRemote(DownloadContext context) throws IOException {
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new LoadHttpSourceEvent(context, this));
         HttpURLConnection connection = getConnection();
         int code = connection.getResponseCode();

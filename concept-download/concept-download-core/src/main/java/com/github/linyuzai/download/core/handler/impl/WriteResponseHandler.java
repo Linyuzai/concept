@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.handler.impl;
 
 import com.github.linyuzai.download.core.compress.Compression;
+import com.github.linyuzai.download.core.concept.DownloadMode;
 import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -37,8 +38,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
 
     @Override
     public boolean support(DownloadContext context) {
-        DownloadOptions options = context.get(DownloadOptions.class);
-        return options.getAsyncConsumer() == null;
+        return DownloadMode.getMode(context) == DownloadMode.SYNC;
     }
 
     /**
@@ -55,8 +55,8 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Compression compression = context.get(Compression.class);
-        DownloadOptions options = context.get(DownloadOptions.class);
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadOptions options = DownloadOptions.get(context);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         //获得Request
         DownloadRequest request = options.getRequest();
         //获得Response
@@ -98,10 +98,10 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
      * 设置 Content-Type，
      * 设置自定义的响应头。
      *
-     * @param response    {@link DownloadResponse}
+     * @param response {@link DownloadResponse}
      * @param resource {@link Compression}
-     * @param range       {@link Range}
-     * @param context     {@link DownloadContext}
+     * @param range    {@link Range}
+     * @param context  {@link DownloadContext}
      * @return 是否继续处理
      */
     public boolean applyHeaders(DownloadResponse response, Resource resource, Range range, DownloadContext context) {
@@ -140,7 +140,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
             }
         }
 
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
 
         //inline 或 attachment
         boolean inline = options.isInline();

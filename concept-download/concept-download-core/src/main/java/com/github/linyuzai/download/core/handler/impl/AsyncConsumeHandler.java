@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.handler.impl;
 
+import com.github.linyuzai.download.core.concept.DownloadMode;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadLifecycleListener;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
@@ -11,13 +12,12 @@ public class AsyncConsumeHandler implements DownloadHandler, DownloadLifecycleLi
 
     @Override
     public boolean support(DownloadContext context) {
-        DownloadOptions options = context.get(DownloadOptions.class);
-        return options.getAsyncConsumer() != null;
+        return DownloadMode.getMode(context) == DownloadMode.ASYNC;
     }
 
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         options.getAsyncConsumer().accept(context);
         return null;
     }

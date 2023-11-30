@@ -2,6 +2,7 @@ package com.github.linyuzai.download.autoconfigure.web.servlet;
 
 import com.github.linyuzai.download.core.concept.AbstractDownloadConcept;
 import com.github.linyuzai.download.core.concept.DownloadConcept;
+import com.github.linyuzai.download.core.concept.DownloadMode;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
@@ -9,7 +10,6 @@ import com.github.linyuzai.download.core.executor.DownloadExecutor;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
 import com.github.linyuzai.download.core.logger.DownloadLogger;
-import com.github.linyuzai.download.core.options.DownloadOptions;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -43,10 +43,13 @@ public class ServletDownloadConcept extends AbstractDownloadConcept {
                 onComplete.run();
             }
         };
-        DownloadOptions options = DownloadOptions.getOptions(context);
         Executor executor = DownloadExecutor.getExecutor(context);
-        if (options.getAsyncConsumer() != null && executor != null) {
-            executor.execute(supplier::get);
+        if (DownloadMode.getMode(context) == DownloadMode.ASYNC) {
+            if (executor == null) {
+                new Thread(supplier::get).start();
+            } else {
+                executor.execute(supplier::get);
+            }
             return null;
         } else {
             return supplier.get();

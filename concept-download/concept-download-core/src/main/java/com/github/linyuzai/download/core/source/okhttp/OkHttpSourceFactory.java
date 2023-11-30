@@ -31,7 +31,7 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
     @Override
     public Source create(Object source, DownloadContext context) {
         String url = (String) source;
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
         boolean cacheEnabled = options.isSourceCacheEnabled();
         String cachePath = options.getSourceCachePath();
@@ -43,7 +43,7 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new OkHttpSourceCreatedEvent(context, build));
         return build;
     }

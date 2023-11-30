@@ -33,10 +33,9 @@ public class LoadSourceHandler implements DownloadHandler {
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         Source source = context.get(Source.class);
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         sourceLoader.load(source, context);
         publisher.publish(new AfterSourceLoadedEvent(context, source));
-        //context.set(Source.class, load);
         return chain.next(context);
     }
 }

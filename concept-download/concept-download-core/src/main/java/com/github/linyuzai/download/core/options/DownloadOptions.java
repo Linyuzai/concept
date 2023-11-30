@@ -144,7 +144,7 @@ public interface DownloadOptions {
         void configure(ConfigurableDownloadOptions options);
     }
 
-    static DownloadOptions getOptions(DownloadContext context) {
+    static DownloadOptions get(DownloadContext context) {
         return context.get(DownloadOptions.class);
     }
 }

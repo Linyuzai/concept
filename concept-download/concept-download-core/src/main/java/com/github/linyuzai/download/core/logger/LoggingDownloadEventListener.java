@@ -55,7 +55,7 @@ public abstract class LoggingDownloadEventListener implements DownloadEventListe
      */
     public void log(DownloadContext context, String tag, String message) {
         String info;
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Method method = options.getMethod();
         if (method == null) {
             info = tag + message;

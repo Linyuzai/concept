@@ -19,7 +19,7 @@ public class WebClientSourceFactory extends PrefixSourceFactory {
     @Override
     public Source create(Object source, DownloadContext context) {
         String url = (String) source;
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
         boolean cacheEnabled = options.isSourceCacheEnabled();
         String cachePath = options.getSourceCachePath();
@@ -30,7 +30,7 @@ public class WebClientSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new WebClientSourceCreatedEvent(context, build));
         return build;
     }

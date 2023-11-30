@@ -24,7 +24,7 @@ public class OkHttpSource extends HttpSource {
 
     @Override
     public InputStream loadRemote(DownloadContext context) throws IOException {
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new LoadOkHttpSourceEvent(context, this));
         Request.Builder rb = new Request.Builder();
         rb.url(url);

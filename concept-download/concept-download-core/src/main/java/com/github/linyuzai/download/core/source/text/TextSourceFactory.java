@@ -20,14 +20,14 @@ public class TextSourceFactory implements SourceFactory {
 
     @Override
     public Source create(Object source, DownloadContext context) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
         TextSource build = new TextSource.Builder<>()
                 .text((String) source)
                 .name("text.txt")
                 .charset(charset)
                 .build();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new TextSourceCreatedEvent(context, build));
         return build;
     }

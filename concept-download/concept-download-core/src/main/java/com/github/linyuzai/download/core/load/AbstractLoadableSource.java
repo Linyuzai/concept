@@ -57,7 +57,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     @SneakyThrows
     @Override
     public void load(DownloadContext context) {
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         if (inputStream != null) {
             //直接使用
             publisher.publish(new SourceAlreadyLoadedEvent(context, this));

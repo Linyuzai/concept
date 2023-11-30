@@ -31,11 +31,11 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      */
     @Override
     public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         String cachePath = options.getCompressCachePath();
         String cacheName = getCacheName(source, context);
         boolean cacheEnable = options.isCompressCacheEnabled();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         //是否启用缓存
         if (cacheEnable) {
             File dir = new File(cachePath);
@@ -77,7 +77,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      */
     @SneakyThrows
     public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new SourceCompressionFormatEvent(context, source, getFormat()));
         try (OS nos = newOutputStream(os, source, context)) {
             Progress progress = new Progress(source.getLength());
@@ -129,7 +129,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @return 压缩文件缓存名称
      */
     public String getCacheName(Source source, DownloadContext context) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         String compressCacheName = options.getCompressCacheName();
         String suffix = getSuffix();
         String nameToUse;

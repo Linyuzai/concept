@@ -21,13 +21,13 @@ public class FileSourceFactory implements SourceFactory {
 
     @Override
     public Source create(Object source, DownloadContext context) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
         FileSource build = new FileSource.Builder<>()
                 .file((File) source)
                 .charset(charset)
                 .build();
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new FileSourceCreatedEvent(context, build));
         return build;
     }

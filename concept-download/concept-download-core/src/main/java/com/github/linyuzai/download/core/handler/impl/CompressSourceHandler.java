@@ -41,9 +41,9 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
     @SneakyThrows
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
-        DownloadOptions options = context.get(DownloadOptions.class);
+        DownloadOptions options = DownloadOptions.get(context);
         Source source = context.get(Source.class);
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         Compression compression;
         boolean single = source.isSingle();
         boolean forceCompress = options.isForceCompress();
@@ -85,8 +85,8 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
     public void onComplete(DownloadContext context) {
         Compression compression = context.get(Compression.class);
         if (compression != null) {
-            DownloadOptions options = context.get(DownloadOptions.class);
-            DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+            DownloadOptions options = DownloadOptions.get(context);
+            DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
             boolean delete = options.isCompressCacheDelete();
             //是否删除缓存
             if (delete) {

@@ -37,6 +37,11 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
         DownloadContext context = contextFactory.create();
         context.set(DownloadOptions.class, options);
         context.set(DownloadLogger.class, logger);
+        if (options.getAsyncConsumer() == null) {
+            context.set(DownloadMode.class, DownloadMode.SYNC);
+        } else {
+            context.set(DownloadMode.class, DownloadMode.ASYNC);
+        }
         DownloadEventPublisher publisher = delegateDownloadEventPublisher(options);
         context.set(DownloadEventPublisher.class, publisher);
         publisher.publish(new DownloadStartEvent(context));

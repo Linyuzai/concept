@@ -28,7 +28,7 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
     public void doLoad(OutputStream os, DownloadContext context) throws IOException {
         DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
         DownloadWriter writer = writerAdapter.getWriter(this, context);
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         InputStream is = loadRemote(context);
         Progress progress = new Progress(length);
         writer.write(is, os, null, null, length, (current, increase) -> {

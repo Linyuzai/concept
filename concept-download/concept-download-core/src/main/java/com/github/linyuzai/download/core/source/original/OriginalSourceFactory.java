@@ -17,7 +17,7 @@ public class OriginalSourceFactory implements SourceFactory {
 
     @Override
     public Source create(Object source, DownloadContext context) {
-        DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
+        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new OriginalSourceCreatedEvent(context, (Source) source));
         return (Source) source;
     }
