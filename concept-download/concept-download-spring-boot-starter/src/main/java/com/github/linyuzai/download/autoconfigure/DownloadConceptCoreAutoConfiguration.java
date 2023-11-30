@@ -22,7 +22,6 @@ import com.github.linyuzai.download.core.handler.impl.CompressSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.CreateSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.LoadSourceHandler;
 import com.github.linyuzai.download.core.handler.impl.WriteResponseHandler;
-import com.github.linyuzai.download.core.load.DefaultSourceLoader;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.logger.DownloadLogger;
 import com.github.linyuzai.download.core.logger.ProgressCalculationLogger;
@@ -240,12 +239,6 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public CreateSourceHandler createSourceHandler(SourceFactoryAdapter adapter) {
         return new CreateSourceHandler(adapter);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SourceLoader sourceLoader() {
-        return new DefaultSourceLoader();
     }
 
     @Bean

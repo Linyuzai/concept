@@ -28,6 +28,10 @@ public class HttpSource extends RemoteLoadableSource {
     @NonNull
     protected String url;
 
+    protected int connectTimeout = 5000;
+
+    protected int readTimeout = 5000;
+
     protected Map<String, String> headers;
 
     /**
@@ -70,22 +74,12 @@ public class HttpSource extends RemoteLoadableSource {
      * @param context {@link DownloadContext}
      * @return {@link HttpURLConnection#getInputStream()}
      */
-    @SneakyThrows
+    //@SneakyThrows
     @Override
     public InputStream loadRemote(DownloadContext context) throws IOException {
         DownloadEventPublisher publisher = context.get(DownloadEventPublisher.class);
         publisher.publish(new LoadHttpSourceEvent(context, this));
-        URL u = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection) u.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                connection.setRequestProperty(entry.getKey(), entry.getValue());
-            }
-        }
-        connection.connect();
+        HttpURLConnection connection = getConnection();
         int code = connection.getResponseCode();
         if (isResponseSuccess(code)) {
             String contentType = getContentType();
@@ -107,6 +101,23 @@ public class HttpSource extends RemoteLoadableSource {
             writer.write(connection.getErrorStream(), os, null, null, null);
             throw new DownloadException("code: " + code + ", " + os.toString());
         }
+    }
+
+    private HttpURLConnection getConnection() throws IOException {
+        URL u = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                connection.setRequestProperty(entry.getKey(), entry.getValue());
+            }
+        }
+        connection.setConnectTimeout(connectTimeout);
+        connection.setReadTimeout(readTimeout);
+        connection.connect();
+        return connection;
     }
 
     /**

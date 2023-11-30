@@ -88,7 +88,9 @@ public class ConceptDownloadController2 {
         return "任意的文本将会直接作为文本文件处理";
     }
 
-    @Download(source = "http://192.168.20.112:8088/demo/download")
+    @Download(source = {"https://services.gradle.org/distributions/gradle-8.5-all.zip",
+            "https://services.gradle.org/distributions/gradle-8.4-all.zip"},
+            filename = "测试文件.zip")
     @GetMapping("/s10")
     public void s10() {
     }
@@ -202,6 +204,17 @@ public class ConceptDownloadController2 {
     @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mp4")
     @GetMapping("/video.mp4")
     public void video() {
+    }
+
+    @Download(source = "classpath:/download/video.mp4")
+    @GetMapping("/video")
+    public void video1() {
+    }
+
+    @Download(source = "file:/Users/tanghanzheng/Downloads/培训文档.zip")
+    @GetMapping("100m")
+    public void size100M() {
+
     }
 
     @Data

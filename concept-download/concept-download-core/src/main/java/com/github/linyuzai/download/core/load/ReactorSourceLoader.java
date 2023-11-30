@@ -25,13 +25,10 @@ public class ReactorSourceLoader extends CompletableFutureSourceLoader {
             }
         }
         if (!reactorSources.isEmpty() && !others.isEmpty()) {
-            CompletableFuture<Void> reactorFuture = CompletableFuture.runAsync(() -> {
-                ReactorSource.preload(context, reactorSources);
-
-            });
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                super.concurrentLoad(sources, context);
-            });
+            CompletableFuture<Void> reactorFuture = CompletableFuture.runAsync(() ->
+                    ReactorSource.preload(context, reactorSources));
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() ->
+                    super.concurrentLoad(sources, context));
             CompletableFuture.allOf(reactorFuture, future).get();
         } else if (!reactorSources.isEmpty()) {
             ReactorSource.preload(context, reactorSources);
