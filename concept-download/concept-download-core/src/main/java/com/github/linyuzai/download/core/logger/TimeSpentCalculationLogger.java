@@ -1,8 +1,8 @@
 package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadCompleteEvent;
-import com.github.linyuzai.download.core.event.DownloadStartEvent;
+import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -26,19 +26,18 @@ public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
      */
     @Override
     public void logOnEvent(Object event) {
-        if (event instanceof DownloadStartEvent) {
+        if (event instanceof DownloadStartedEvent) {
             StopWatch watch = new StopWatch();
             watch.start();
-            String logId = UUID.randomUUID().toString();
-            ((DownloadStartEvent) event).getContext().set(LOG_ID, logId);
-            stopWatchMap.put(logId, watch);
-        } else if (event instanceof DownloadCompleteEvent) {
-            DownloadContext context = ((DownloadCompleteEvent) event).getContext();
-            String id = context.get(LOG_ID);
-            StopWatch watch = stopWatchMap.remove(id);
+            DownloadContext context = ((DownloadStartedEvent) event).getContext();
+            stopWatchMap.put(getLogId(context), watch);
+        } else if (event instanceof DownloadCompletedEvent) {
+            DownloadContext context = ((DownloadCompletedEvent) event).getContext();
+            String logId = getLogId(context);
+            StopWatch watch = stopWatchMap.remove(logId);
             if (watch != null) {
                 watch.stop();
-                double seconds = watch.getTotalTimeSeconds();
+                double seconds = watch.seconds();
                 log(context, "Time spent " + seconds + " s");
             }
         }
@@ -58,7 +57,7 @@ public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
             span = System.nanoTime() - start;
         }
 
-        public double getTotalTimeSeconds() {
+        public double seconds() {
             return span / 1000000000.0;
         }
     }

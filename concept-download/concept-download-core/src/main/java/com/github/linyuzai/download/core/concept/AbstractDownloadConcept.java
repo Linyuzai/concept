@@ -44,7 +44,7 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
         }
         DownloadEventPublisher publisher = delegateDownloadEventPublisher(options);
         context.set(DownloadEventPublisher.class, publisher);
-        publisher.publish(new DownloadStartEvent(context));
+        publisher.publish(new DownloadStartedEvent(context));
         List<DownloadHandler> filtered = handlers.stream()
                 .filter(it -> it.support(context))
                 .collect(Collectors.toList());
@@ -52,7 +52,7 @@ public abstract class AbstractDownloadConcept implements DownloadConcept {
         return doDownload(context, filtered, () ->
                 publisher.publish(new DownloadSuccessEvent(context)), e ->
                 publisher.publish(new DownloadErrorEvent(context, e)), () ->
-                publisher.publish(new DownloadCompleteEvent(context)));
+                publisher.publish(new DownloadCompletedEvent(context)));
     }
 
     protected DownloadEventPublisher delegateDownloadEventPublisher(DownloadOptions options) {

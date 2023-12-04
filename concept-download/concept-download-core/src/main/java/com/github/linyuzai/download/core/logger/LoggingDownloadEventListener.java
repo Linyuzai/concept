@@ -2,13 +2,14 @@ package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.options.DownloadOptions;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 /**
  * 下载日志抽象类。
@@ -16,61 +17,61 @@ import java.lang.reflect.Method;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public abstract class LoggingDownloadEventListener implements DownloadEventListener {
 
-    public static final String LOG_ID = "_download_log_id";
-
-    /**
-     * 标签
-     */
-    private String tag = " ";
-
-    /**
-     * 用于标签长度对齐
-     */
-    private int tagLength = 8;
+    public static final String LOG_ID = "_download@log_id";
 
     private boolean enabled;
 
     @Override
     public void onEvent(Object event) {
         if (enabled) {
+            if (event instanceof DownloadStartedEvent) {
+                DownloadContext context = ((DownloadStartedEvent) event).getContext();
+                if (!hasLogId(context)) {
+                    setLogId(context, generateLogId());
+                }
+            }
             logOnEvent(event);
         }
     }
 
     public abstract void logOnEvent(Object event);
 
-    public void log(DownloadContext context, String message) {
-        log(context, tag, message);
-    }
-
     /**
      * 使用类名加方法名作为日志名称。
      *
      * @param context {@link DownloadContext}
-     * @param tag     标签
      * @param message 信息
      */
-    public void log(DownloadContext context, String tag, String message) {
-        String info;
+    public void log(DownloadContext context, String message) {
         DownloadOptions options = DownloadOptions.get(context);
         Method method = options.getMethod();
-        if (method == null) {
-            info = tag + message;
-        } else {
-            info = method.getDeclaringClass().getSimpleName() + "#" + method.getName() + tag + message;
-        }
         DownloadLogger logger = context.get(DownloadLogger.class);
-        logger.info(info);
+        logger.info(getTag(method) + message);
     }
 
-    public String appendTag(String tag) {
-        StringBuilder builder = new StringBuilder(tag);
-        while (builder.length() < tagLength) {
-            builder.append(" ");
+    protected String getTag(Method method) {
+        if (method == null) {
+            return "";
+        } else {
+            return method.getDeclaringClass().getSimpleName() + "#" + method.getName() + " ";
         }
-        return builder.append(" >> ").toString();
+    }
+
+    protected String generateLogId() {
+        return UUID.randomUUID().toString();
+    }
+
+    protected boolean hasLogId(DownloadContext context) {
+        return context.contains(LOG_ID);
+    }
+
+    protected void setLogId(DownloadContext context, String logId) {
+        context.set(LOG_ID, logId);
+    }
+
+    protected String getLogId(DownloadContext context) {
+        return context.get(LOG_ID);
     }
 }

@@ -3,12 +3,14 @@ package com.github.linyuzai.concept.sample.download;
 import com.github.linyuzai.download.core.annotation.CompressCache;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
+import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.options.ConfigurableDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
 import com.github.linyuzai.download.core.source.reflect.SourceName;
 import com.github.linyuzai.download.core.source.reflect.SourceObject;
+import com.github.linyuzai.download.core.web.async.FileConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
@@ -21,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("/concept-download2")
@@ -144,17 +147,11 @@ public class ConceptDownloadController2 {
     @Download(source = "classpath:/download/README.txt")
     @GetMapping("/s17")
     public DownloadOptions.Configurer s17() {
-        return new DownloadOptions.Configurer() {
-            @Override
-            public void configure(ConfigurableDownloadOptions options) {
-                System.out.println("在这里可以修改本次下载的参数！");
-                options.setEventListener(new DownloadEventListener() {
-                    @Override
-                    public void onEvent(Object event) {
-                        System.out.println("Event " + event.getClass());
-                    }
-                });
-            }
+        return options -> {
+            System.out.println("在这里可以修改本次下载的参数！");
+            options.setAsyncConsumer((FileConsumer) file -> {
+
+            });
         };
     }
 

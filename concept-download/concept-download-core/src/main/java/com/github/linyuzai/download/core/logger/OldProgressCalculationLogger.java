@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
@@ -15,53 +16,67 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+*/
 /**
  * 进度计算日志，包括加载进度，压缩进度，响应写入进度。
- */
+ *//*
+
 @Getter
 @Setter
 @AllArgsConstructor
-public class ProgressCalculationLogger extends LoggingDownloadEventListener {
+public class OldProgressCalculationLogger extends LoggingDownloadEventListener {
 
-    /**
+    */
+/**
      * 进度缓存
-     */
+     *//*
+
     private final Map<String, Map<Object, ProgressInterval>> progressIntervalMap = new ConcurrentHashMap<>();
 
-    /**
+    */
+/**
      * 打印间隔
-     */
+     *//*
+
     private Duration duration;
 
-    /**
+    */
+/**
      * 是否使用百分比数据
-     */
+     *//*
+
     private boolean percentage;
 
-    /**
+    */
+/**
      * 进度事件回调。
      *
      * @param event 进度事件
-     */
+     *//*
+
     public void onProgress(AbstractProgressEvent event) {
         log(event.getContext(), percentage ? event.getPercentageMessage() : event.getRatioMessage());
     }
 
-    /**
+    */
+/**
      * 监听到 {@link DownloadContext} 销毁事件时，移除缓存；
      * 监听到 {@link AbstractProgressEvent} 事件时，打印更新进度。
      *
      * @param event 事件
-     */
+     *//*
+
     @Override
     public void logOnEvent(Object event) {
         if (event instanceof DownloadCompletedEvent) {
             DownloadContext context = ((DownloadCompletedEvent) event).getContext();
             String id = getLogId(context);
-            progressIntervalMap.remove(id);
+            Map<Object, ProgressInterval> remove = progressIntervalMap.remove(id);
+            if (remove != null) {
+                remove.values().forEach(ProgressInterval::disposable);
+            }
         } else if (event instanceof AbstractProgressEvent) {
             AbstractProgressEvent pde = (AbstractProgressEvent) event;
             DownloadContext context = ((AbstractProgressEvent) event).getContext();
@@ -72,12 +87,14 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
         }
     }
 
-    /**
+    */
+/**
      * 根据事件获得id。
      *
      * @param event 事件
      * @return id
-     */
+     *//*
+
     protected Object getId(AbstractProgressEvent event) {
         if (event instanceof SourceLoadingProgressEvent) {
             return ((SourceLoadingProgressEvent) event).getSource();
@@ -88,68 +105,118 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
         }
     }
 
-    /**
+    */
+/**
      * 进度间隔触发器。
-     */
+     *//*
+
     public class ProgressInterval {
 
-        private boolean last;
+        */
+/**
+         * 为 true 可更新打印
+         * 为 false 忽略更新
+         *//*
 
-        private long start = System.nanoTime();
+        private volatile boolean ready = true;
 
-        /**
+        */
+/**
          * 更新回调
-         */
+         *//*
+
         private final Consumer<AbstractProgressEvent> consumer;
 
-        /**
+        */
+/**
+         * 间隔触发的 {@link Disposable}
+         *//*
+
+        private final Disposable disposable;
+
+        */
+/**
          * {@link AbstractProgressEvent} 持有者
-         */
+         *//*
+
         private final ProgressEventHolder holder = new ProgressEventHolder();
 
         public ProgressInterval(Consumer<AbstractProgressEvent> consumer) {
             this.consumer = consumer;
+            disposable = Flux.interval(duration).subscribe(unused -> ready = true);
         }
 
-        /**
+        */
+/**
          * 发布事件更新。
          * 如果已经到达 100% 直接更新并不再订阅更新；
          * 否则根据 ready 值，true 更新，false 忽略。
          *
          * @param event 事件
-         */
+         *//*
+
         public void publish(AbstractProgressEvent event) {
-            if (!last && event.getProgress().getTotal() != null &&
+            if (event.getProgress().getTotal() != null &&
                     event.getProgress().getCurrent() == event.getProgress().getTotal()) {
-                last = true;
-                consumer.accept(event);
+                update(event);
+                disposable();
             } else {
-                long time = System.nanoTime();
-                if ((time - start >= duration.toNanos()) && holder.update(event)) {
-                    consumer.accept(event);
-                    start = time;
+                if (ready) {
+                    update(event);
                 }
             }
         }
+
+        */
+/**
+         * 更新回调。
+         *
+         * @param event 事件
+         *//*
+
+        private synchronized void update(AbstractProgressEvent event) {
+            if (holder.update(event)) {
+                ready = false;
+                consumer.accept(event);
+            }
+        }
+
+        */
+/**
+         * 取消订阅。
+         *//*
+
+        public void disposable() {
+            if (disposable != null && !disposable.isDisposed()) {
+                disposable.dispose();
+            }
+            holder.reset();
+        }
     }
 
-    /**
+    */
+/**
      * {@link AbstractProgressEvent} 持有者。
-     */
+     *//*
+
     @Data
     public static class ProgressEventHolder {
 
-        /**
+        */
+/**
          * 持有的事件
-         */
+         *//*
+
         private volatile AbstractProgressEvent event;
 
-        /**
+        */
+/**
          * 根据当前持有的事件和新事件判断是否需要更新。
          *
          * @param newEvent 新事件
          * @return 是否需要更新
-         */
+         *//*
+
         public boolean update(AbstractProgressEvent newEvent) {
             if (event == null) {
                 event = newEvent;
@@ -163,5 +230,15 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
                 }
             }
         }
+
+        */
+/**
+         * 释放事件资源。
+         *//*
+
+        public void reset() {
+            event = null;
+        }
     }
 }
+*/
