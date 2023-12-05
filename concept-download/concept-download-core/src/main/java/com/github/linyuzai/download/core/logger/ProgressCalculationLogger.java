@@ -4,18 +4,15 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
-import com.github.linyuzai.download.core.write.AbstractProgressEvent;
+import com.github.linyuzai.download.core.write.ProgressEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -46,13 +43,13 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
      *
      * @param event 进度事件
      */
-    public void onProgress(AbstractProgressEvent event) {
+    public void onProgress(ProgressEvent event) {
         log(event.getContext(), percentage ? event.getPercentageMessage() : event.getRatioMessage());
     }
 
     /**
      * 监听到 {@link DownloadContext} 销毁事件时，移除缓存；
-     * 监听到 {@link AbstractProgressEvent} 事件时，打印更新进度。
+     * 监听到 {@link ProgressEvent} 事件时，打印更新进度。
      *
      * @param event 事件
      */
@@ -62,9 +59,9 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
             DownloadContext context = ((DownloadCompletedEvent) event).getContext();
             String id = getLogId(context);
             progressIntervalMap.remove(id);
-        } else if (event instanceof AbstractProgressEvent) {
-            AbstractProgressEvent pde = (AbstractProgressEvent) event;
-            DownloadContext context = ((AbstractProgressEvent) event).getContext();
+        } else if (event instanceof ProgressEvent) {
+            ProgressEvent pde = (ProgressEvent) event;
+            DownloadContext context = ((ProgressEvent) event).getContext();
             String id = getLogId(context);
             progressIntervalMap.computeIfAbsent(id, k ->
                     new ConcurrentHashMap<>()).computeIfAbsent(getId(pde), o ->
@@ -78,13 +75,13 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
      * @param event 事件
      * @return id
      */
-    protected Object getId(AbstractProgressEvent event) {
+    protected Object getId(ProgressEvent event) {
         if (event instanceof SourceLoadingProgressEvent) {
             return ((SourceLoadingProgressEvent) event).getSource();
         } else if (event instanceof ResponseWritingProgressEvent) {
             return ResponseWritingProgressEvent.class;
         } else {
-            return AbstractProgressEvent.class;
+            return ProgressEvent.class;
         }
     }
 
@@ -100,14 +97,14 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
         /**
          * 更新回调
          */
-        private final Consumer<AbstractProgressEvent> consumer;
+        private final Consumer<ProgressEvent> consumer;
 
         /**
-         * {@link AbstractProgressEvent} 持有者
+         * {@link ProgressEvent} 持有者
          */
         private final ProgressEventHolder holder = new ProgressEventHolder();
 
-        public ProgressInterval(Consumer<AbstractProgressEvent> consumer) {
+        public ProgressInterval(Consumer<ProgressEvent> consumer) {
             this.consumer = consumer;
         }
 
@@ -118,7 +115,7 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
          *
          * @param event 事件
          */
-        public void publish(AbstractProgressEvent event) {
+        public void publish(ProgressEvent event) {
             if (!last && event.getProgress().getTotal() != null &&
                     event.getProgress().getCurrent() == event.getProgress().getTotal()) {
                 last = true;
@@ -134,7 +131,7 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
     }
 
     /**
-     * {@link AbstractProgressEvent} 持有者。
+     * {@link ProgressEvent} 持有者。
      */
     @Data
     public static class ProgressEventHolder {
@@ -142,7 +139,7 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
         /**
          * 持有的事件
          */
-        private volatile AbstractProgressEvent event;
+        private volatile ProgressEvent event;
 
         /**
          * 根据当前持有的事件和新事件判断是否需要更新。
@@ -150,7 +147,7 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
          * @param newEvent 新事件
          * @return 是否需要更新
          */
-        public boolean update(AbstractProgressEvent newEvent) {
+        public boolean update(ProgressEvent newEvent) {
             if (event == null) {
                 event = newEvent;
                 return true;

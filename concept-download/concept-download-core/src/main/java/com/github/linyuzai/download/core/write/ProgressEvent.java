@@ -10,14 +10,14 @@ import lombok.NonNull;
  * 进度相关的事件的父类。
  */
 @Getter
-public abstract class AbstractProgressEvent extends DownloadContextEvent {
+public abstract class ProgressEvent extends DownloadContextEvent {
 
     /**
      * 进度
      */
     private final Progress progress;
 
-    public AbstractProgressEvent(@NonNull DownloadContext context, Progress progress, String message) {
+    public ProgressEvent(@NonNull DownloadContext context, Progress progress, String message) {
         super(context);
         this.progress = progress;
         setMessage(message);
