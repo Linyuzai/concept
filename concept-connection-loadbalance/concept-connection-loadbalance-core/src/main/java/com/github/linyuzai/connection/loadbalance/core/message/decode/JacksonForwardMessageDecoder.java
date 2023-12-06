@@ -34,9 +34,8 @@ public class JacksonForwardMessageDecoder implements MessageDecoder {
         JsonNode node = readTree(message);
         JsonNode headersNode = node.get("headers");
         String headersJson = headersNode.toString();
-        LinkedHashMap<String, String> headers = objectMapper.readValue(headersJson,
-                new TypeReference<LinkedHashMap<String, String>>() {
-                });
+        LinkedHashMap<String, String> headers = objectMapper.readValue(headersJson, new TypeReference<>() {
+        });
         String binary = headers.getOrDefault(Message.BINARY, Boolean.FALSE.toString());
         JsonNode payloadNode = node.get("payload");
         if (Boolean.parseBoolean(binary)) {
@@ -47,7 +46,7 @@ public class JacksonForwardMessageDecoder implements MessageDecoder {
         } else {
             TextMessage decoded = new TextMessage();
             decoded.setHeaders(headers);
-            decoded.setPayload(payloadNode.asText());
+            decoded.setPayload(payloadNode.toString());
             return decoded;
         }
     }
