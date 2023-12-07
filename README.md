@@ -25,3 +25,10 @@
 - Spring Cloud & Spring Boot 基建
   - [模块化项目生成插件（IDEA）](../../wiki/Concept-Cloud-Plugin-Intellij)
   - [全局请求响应拦截](../../wiki/Concept-Cloud-Web)
+ 
+# 计划
+
+- download 2.0 版本（重构 + 支持异步消费大文件）
+- connection-loadbalance 可选根据类名反序列化
+- job组件
+- connection-loadbalance 支持 sse
