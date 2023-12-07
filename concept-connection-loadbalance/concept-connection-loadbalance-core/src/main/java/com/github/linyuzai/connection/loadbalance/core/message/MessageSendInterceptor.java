@@ -14,8 +14,8 @@ public interface MessageSendInterceptor {
      * 返回 true 表示拦截，消息不会发送。
      * 返回 false 表示不拦截，消息继续发送。
      * <p>
-     * Message will not be send if return true.
-     * Message will be send if return false.
+     * Message will not be sent if return true.
+     * Message will be sent if return false.
      */
     boolean intercept(Message message, Connection connection);
 }

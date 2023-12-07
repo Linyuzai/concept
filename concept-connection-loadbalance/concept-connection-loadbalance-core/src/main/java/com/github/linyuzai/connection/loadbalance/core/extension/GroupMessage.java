@@ -13,7 +13,7 @@ import java.util.Collection;
  * 配合 {@link GroupSelector} 使用。
  * <p>
  * Messages based on groups.
- * Message will be send to groups with {@link GroupSelector}.
+ * Message will be sent to groups with {@link GroupSelector}.
  */
 public class GroupMessage extends ObjectMessage implements MessageCondition {
 

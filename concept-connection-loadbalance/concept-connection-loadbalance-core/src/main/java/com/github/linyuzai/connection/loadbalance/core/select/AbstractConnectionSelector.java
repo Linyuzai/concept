@@ -45,7 +45,7 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
             return select;
         }
 
-        Collection<Connection> observables = repository.select(Connection.Type.OBSERVABLE);
+        Collection<Connection> observables = selectObservables(message, concept);
 
         if (select == null || select.isEmpty()) {
             //没有对应的连接，直接进行转发
@@ -55,7 +55,7 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
 
         if (message.needBroadcast()) {
             //广播
-            //Forward if need broadcast
+            //Forward if you need broadcast
             List<Connection> combine = new ArrayList<>(select.size() + observables.size());
             combine.addAll(select);
             combine.addAll(observables);
@@ -65,6 +65,11 @@ public abstract class AbstractConnectionSelector extends AbstractScoped implemen
             //If set broadcast is true and client connections is not empty
             return select;
         }
+    }
+
+    protected Collection<Connection> selectObservables(Message message, ConnectionLoadBalanceConcept concept) {
+        ConnectionRepository repository = concept.getConnectionRepository();
+        return repository.select(Connection.Type.OBSERVABLE);
     }
 
     /**

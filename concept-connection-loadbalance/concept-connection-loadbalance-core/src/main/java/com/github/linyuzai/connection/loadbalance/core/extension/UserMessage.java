@@ -13,7 +13,7 @@ import java.util.Collection;
  * 配合 {@link UserSelector} 使用。
  * <p>
  * Messages based on users.
- * Message will be send to users with {@link UserSelector}.
+ * Message will be sent to users with {@link UserSelector}.
  */
 public class UserMessage extends ObjectMessage implements MessageCondition {
 
