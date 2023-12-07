@@ -29,7 +29,6 @@
 # 计划
 
 - download 2.0 版本（重构 + 支持异步消费大文件）
-- connection-loadbalance 添加基于缓存精确转发的 `ConnectionSelector`
 - connection-loadbalance 可选根据类名反序列化
 - job组件
 - connection-loadbalance 支持 sse
