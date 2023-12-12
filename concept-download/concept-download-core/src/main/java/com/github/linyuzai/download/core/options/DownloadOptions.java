@@ -66,6 +66,11 @@ public interface DownloadOptions {
     String getCompressFormat();
 
     /**
+     * 密码
+     */
+    String getCompressPassword();
+
+    /**
      * 当只有一个文件时是否强制压缩
      */
     boolean isForceCompress();

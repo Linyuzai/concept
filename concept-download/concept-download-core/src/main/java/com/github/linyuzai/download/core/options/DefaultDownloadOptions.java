@@ -68,6 +68,11 @@ public class DefaultDownloadOptions implements ConfigurableDownloadOptions {
     String compressFormat;
 
     /**
+     * 密码
+     */
+    String compressPassword;
+
+    /**
      * 当只有一个文件时是否强制压缩
      */
     boolean forceCompress;

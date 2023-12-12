@@ -19,7 +19,7 @@ public interface SourceCompressor {
      *
      * @return 压缩格式
      */
-    String getFormat();
+    String[] getFormats();
 
     /**
      * 判断是否支持对应的压缩格式。
@@ -29,7 +29,12 @@ public interface SourceCompressor {
      * @return 如果支持则返回 true
      */
     default boolean support(String format, DownloadContext context) {
-        return format.equalsIgnoreCase(getFormat());
+        for (String supported : getFormats()) {
+            if (format.equalsIgnoreCase(supported)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -26,7 +26,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
      * @return {@link ZipOutputStream}
      */
     @Override
-    public ZipOutputStream newOutputStream(OutputStream os, Source source, DownloadContext context) {
+    public ZipOutputStream newOutputStream(OutputStream os, Source source, String format, DownloadContext context) {
         return new ZipOutputStream(os);
     }
 
@@ -60,7 +60,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
      * @return .zip
      */
     @Override
-    public String getSuffix() {
+    public String getSuffix(String format) {
         return CompressFormat.ZIP_SUFFIX;
     }
 
@@ -70,7 +70,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
      * @return application/x-zip-compressed
      */
     @Override
-    public String getContentType() {
+    public String getContentType(String format) {
         return ContentType.Application.X_ZIP_COMPRESSED;
     }
 
@@ -80,7 +80,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
      * @return zip
      */
     @Override
-    public String getFormat() {
-        return CompressFormat.ZIP;
+    public String[] getFormats() {
+        return new String[]{CompressFormat.ZIP};
     }
 }

@@ -28,6 +28,8 @@ public interface ConfigurableDownloadOptions extends DownloadOptions {
 
     void setCompressFormat(String format);
 
+    void setCompressPassword(String password);
+
     void setForceCompress(boolean force);
 
     void setCompressCacheEnabled(boolean enabled);

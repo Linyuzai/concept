@@ -32,8 +32,9 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
     @Override
     public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
         DownloadOptions options = DownloadOptions.get(context);
+        String format = options.getCompressFormat();
         String cachePath = options.getCompressCachePath();
-        String cacheName = getCacheName(source, context);
+        String cacheName = getCacheName(source, format, context);
         boolean cacheEnable = options.isCompressCacheEnabled();
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         //是否启用缓存
@@ -54,7 +55,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
                 }
             }
             FileCompression compression = new FileCompression(cache);
-            compression.setContentType(getContentType());
+            compression.setContentType(getContentType(format));
             return compression;
         } else {
             //在内存中压缩
@@ -63,7 +64,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             doCompress(source, os, writer, context);
             MemoryCompression compression = new MemoryCompression(os.toByteArray());
             compression.setName(cacheName);
-            compression.setContentType(getContentType());
+            compression.setContentType(getContentType(format));
             return compression;
         }
     }
@@ -76,10 +77,12 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param writer {@link DownloadWriter}
      */
     @SneakyThrows
-    public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) {
+    public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) throws IOException {
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new SourceCompressionFormatEvent(context, source, getFormat()));
-        try (OS nos = newOutputStream(os, source, context)) {
+        DownloadOptions options = DownloadOptions.get(context);
+        String format = options.getCompressFormat();
+        publisher.publish(new SourceCompressionFormatEvent(context, source, format));
+        try (OS nos = newOutputStream(os, source, format, context)) {
             Progress progress = new Progress(source.getLength());
             Collection<Part> parts = source.getParts();
             for (Part part : parts) {
@@ -102,7 +105,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param context {@link DownloadContext}
      * @return 新建的压缩输出流
      */
-    public abstract OS newOutputStream(OutputStream os, Source source, DownloadContext context);
+    public abstract OS newOutputStream(OutputStream os, Source source, String format, DownloadContext context) throws IOException;
 
     /**
      * 写入之前调用。
@@ -110,7 +113,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param part {@link Part}
      * @param os   {@link OS}
      */
-    public abstract void beforeWrite(Part part, OS os);
+    public abstract void beforeWrite(Part part, OS os) throws IOException;
 
     /**
      * 写入之后调用。
@@ -118,7 +121,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param part {@link Part}
      * @param os   {@link OS}
      */
-    public abstract void afterWrite(Part part, OS os);
+    public abstract void afterWrite(Part part, OS os) throws IOException;
 
     /**
      * 如果指定了压缩文件缓存名称则使用指定的名称，
@@ -128,10 +131,10 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param context {@link DownloadContext}
      * @return 压缩文件缓存名称
      */
-    public String getCacheName(Source source, DownloadContext context) {
+    public String getCacheName(Source source, String format, DownloadContext context) {
         DownloadOptions options = DownloadOptions.get(context);
         String compressCacheName = options.getCompressCacheName();
-        String suffix = getSuffix();
+        String suffix = getSuffix(format);
         String nameToUse;
         if (compressCacheName == null || compressCacheName.isEmpty()) {
             CacheNameGenerator generator = context.get(CacheNameGenerator.class);
@@ -158,12 +161,12 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      *
      * @return 后缀
      */
-    public abstract String getSuffix();
+    public abstract String getSuffix(String format);
 
     /**
      * 获得压缩文件的 Content-Type
      *
      * @return Content-Type
      */
-    public abstract String getContentType();
+    public abstract String getContentType(String format);
 }
