@@ -28,6 +28,6 @@
  
 # 计划
 
-- download 2.0 版本（重构 + 支持异步消费大文件）
+- download 2.0 版本（重构 + 支持异步消费大文件 + 压缩加密）
 - job组件
 - connection-loadbalance 支持 sse
