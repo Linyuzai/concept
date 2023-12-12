@@ -8,7 +8,7 @@
 - 长期维护并同步中央仓库
 - 欢迎提bug&火速优化bug
 
-> 由于工作原因，`Issues`处理主要会在周末
+> 由于工作原因，非紧急`Issues`处理主要会在周末
 
 # 目录
 
@@ -25,3 +25,9 @@
 - Spring Cloud & Spring Boot 基建
   - [模块化项目生成插件（IDEA）](../../wiki/Concept-Cloud-Plugin-Intellij)
   - [全局请求响应拦截](../../wiki/Concept-Cloud-Web)
+ 
+# 计划
+
+- download 2.0 版本（重构 + 支持异步消费大文件 + 压缩加密）
+- job组件
+- connection-loadbalance 支持 sse
