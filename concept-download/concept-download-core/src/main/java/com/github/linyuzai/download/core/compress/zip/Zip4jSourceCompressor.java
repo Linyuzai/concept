@@ -27,6 +27,11 @@ public class Zip4jSourceCompressor extends AbstractSourceCompressor<ZipOutputStr
     }
 
     @Override
+    public boolean supportPassword(DownloadContext context) {
+        return true;
+    }
+
+    @Override
     public void beforeWrite(Part part, ZipOutputStream os) throws IOException {
         ZipParameters parameters = new ZipParameters();
         parameters.setFileNameInZip(part.getPath());

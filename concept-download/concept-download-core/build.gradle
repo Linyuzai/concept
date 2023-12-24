@@ -15,6 +15,7 @@ dependencies {
     compileOnly "io.projectreactor:reactor-core:${ReactorVersion}"
     compileOnly "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
     compileOnly "net.lingala.zip4j:zip4j:${Zip4jVersion}"
+    compileOnly "org.apache.commons:commons-compress:${CommonsCompressVersion}"
     compileOnly 'javax.activation:activation:1.1.1'
 }
 

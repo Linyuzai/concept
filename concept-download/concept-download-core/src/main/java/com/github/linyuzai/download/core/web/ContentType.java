@@ -13,6 +13,8 @@ public class ContentType {
     public static class Application {
         public static final String OCTET_STREAM = "application/octet-stream";
         public static final String X_ZIP_COMPRESSED = "application/x-zip-compressed";
+        public static final String X_TAR = "application/x-tar";
+        public static final String X_TAR_GZ = "application/x-compressed-tar";
     }
 
     public static class Text {

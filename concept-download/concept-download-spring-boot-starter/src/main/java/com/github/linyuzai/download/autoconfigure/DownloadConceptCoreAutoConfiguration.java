@@ -11,6 +11,10 @@ import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
 import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
+import com.github.linyuzai.download.core.compress.tar.TarArchiveSourceCompressor;
+import com.github.linyuzai.download.core.compress.targz.TarGZArchiveSourceCompressor;
+import com.github.linyuzai.download.core.compress.zip.Zip4jSourceCompressor;
+import com.github.linyuzai.download.core.compress.zip.ZipArchiveSourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
 import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
@@ -39,7 +43,9 @@ import com.github.linyuzai.download.core.write.BufferedDownloadWriter;
 import com.github.linyuzai.download.core.write.DefaultDownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -205,10 +211,51 @@ public class DownloadConceptCoreAutoConfiguration {
         return new CacheNameGeneratorInitializer(generator);
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public ZipSourceCompressor zipSourceCompressor() {
-        return new ZipSourceCompressor();
+    @Configuration
+    @ConditionalOnMissingClass({
+            "net.lingala.zip4j.io.outputstream.ZipOutputStream",
+            "org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream"})
+    public static class ZipAutoConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ZipSourceCompressor zipSourceCompressor() {
+            return new ZipSourceCompressor();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnClass(name = "net.lingala.zip4j.io.outputstream.ZipOutputStream")
+    public static class Zip4jAutoConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public Zip4jSourceCompressor zip4jSourceCompressor() {
+            return new Zip4jSourceCompressor();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnClass(name = "org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream")
+    public static class CAutoConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ZipArchiveSourceCompressor zipArchiveSourceCompressor() {
+            return new ZipArchiveSourceCompressor();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public TarArchiveSourceCompressor tarArchiveSourceCompressor() {
+            return new TarArchiveSourceCompressor();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public TarGZArchiveSourceCompressor tarGZArchiveSourceCompressor() {
+            return new TarGZArchiveSourceCompressor();
+        }
     }
 
     @Bean

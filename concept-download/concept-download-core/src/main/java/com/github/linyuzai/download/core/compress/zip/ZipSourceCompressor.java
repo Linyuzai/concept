@@ -30,6 +30,11 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
         return new ZipOutputStream(os);
     }
 
+    @Override
+    public boolean supportPassword(DownloadContext context) {
+        return false;
+    }
+
     /**
      * 写之前添加一个 {@link ZipEntry}。
      *

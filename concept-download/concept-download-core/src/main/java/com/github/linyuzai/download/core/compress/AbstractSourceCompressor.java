@@ -9,7 +9,6 @@ import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.Progress;
-import lombok.SneakyThrows;
 
 import java.io.*;
 import java.util.Collection;
@@ -50,8 +49,9 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             } else {
                 publisher.publish(new SourceFileCompressionEvent(context, source, cache));
                 //写入缓存文件
-                try (FileOutputStream fos = new FileOutputStream(cache)) {
-                    doCompress(source, fos, writer, context);
+                try (FileOutputStream fos = new FileOutputStream(cache);
+                     OutputStream wrapper = wrapper(fos)) {
+                    doCompress(source, wrapper, writer, context);
                 }
             }
             FileCompression compression = new FileCompression(cache);
@@ -60,9 +60,12 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
         } else {
             //在内存中压缩
             publisher.publish(new SourceMemoryCompressionEvent(context, source));
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            doCompress(source, os, writer, context);
-            MemoryCompression compression = new MemoryCompression(os.toByteArray());
+            MemoryCompression compression;
+            try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+                 OutputStream wrapper = wrapper(os)) {
+                doCompress(source, wrapper, writer, context);
+                compression = new MemoryCompression(os.toByteArray());
+            }
             compression.setName(cacheName);
             compression.setContentType(getContentType(format));
             return compression;
@@ -76,11 +79,14 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param os     {@link OutputStream}
      * @param writer {@link DownloadWriter}
      */
-    @SneakyThrows
     public void doCompress(Source source, OutputStream os, DownloadWriter writer, DownloadContext context) throws IOException {
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         DownloadOptions options = DownloadOptions.get(context);
         String format = options.getCompressFormat();
+        String password = options.getCompressPassword();
+        if (password != null && !password.isEmpty() && !supportPassword(context)) {
+            throw new IllegalArgumentException("Password not supported");
+        }
         publisher.publish(new SourceCompressionFormatEvent(context, source, format));
         try (OS nos = newOutputStream(os, source, format, context)) {
             Progress progress = new Progress(source.getLength());
@@ -96,6 +102,12 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             }
         }
     }
+
+    protected OutputStream wrapper(OutputStream os) throws IOException {
+        return os;
+    }
+
+    public abstract boolean supportPassword(DownloadContext context);
 
     /**
      * 新建一个压缩输出流。
