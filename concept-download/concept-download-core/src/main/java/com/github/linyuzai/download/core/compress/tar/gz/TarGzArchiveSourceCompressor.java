@@ -1,4 +1,4 @@
-package com.github.linyuzai.download.core.compress.targz;
+package com.github.linyuzai.download.core.compress.tar.gz;
 
 import com.github.linyuzai.download.core.compress.CompressFormat;
 import com.github.linyuzai.download.core.compress.tar.TarArchiveSourceCompressor;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class TarGZArchiveSourceCompressor extends TarArchiveSourceCompressor {
+public class TarGzArchiveSourceCompressor extends TarArchiveSourceCompressor {
 
     @Override
     protected OutputStream wrapper(OutputStream os) throws IOException {

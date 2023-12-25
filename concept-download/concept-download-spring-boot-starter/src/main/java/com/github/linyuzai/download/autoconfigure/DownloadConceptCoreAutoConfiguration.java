@@ -12,7 +12,7 @@ import com.github.linyuzai.download.core.compress.DefaultSourceCompressorAdapter
 import com.github.linyuzai.download.core.compress.SourceCompressor;
 import com.github.linyuzai.download.core.compress.SourceCompressorAdapter;
 import com.github.linyuzai.download.core.compress.tar.TarArchiveSourceCompressor;
-import com.github.linyuzai.download.core.compress.targz.TarGZArchiveSourceCompressor;
+import com.github.linyuzai.download.core.compress.tar.gz.TarGzArchiveSourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.Zip4jSourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipArchiveSourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
@@ -237,7 +237,7 @@ public class DownloadConceptCoreAutoConfiguration {
 
     @Configuration
     @ConditionalOnClass(name = "org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream")
-    public static class CAutoConfiguration {
+    public static class ArchiveAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
@@ -253,8 +253,8 @@ public class DownloadConceptCoreAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public TarGZArchiveSourceCompressor tarGZArchiveSourceCompressor() {
-            return new TarGZArchiveSourceCompressor();
+        public TarGzArchiveSourceCompressor tarGzArchiveSourceCompressor() {
+            return new TarGzArchiveSourceCompressor();
         }
     }
 
