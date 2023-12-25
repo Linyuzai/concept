@@ -6,6 +6,5 @@ public class DownloadCompletedEvent extends DownloadContextEvent {
 
     public DownloadCompletedEvent(DownloadContext context) {
         super(context);
-        setMessage("Context destroyed");
     }
 }

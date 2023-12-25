@@ -9,6 +9,6 @@ import com.github.linyuzai.download.core.source.Source;
 public class SourceNoCompressionEvent extends AbstractCompressSourceEvent {
 
     public SourceNoCompressionEvent(DownloadContext context, Source source) {
-        super(context, source, "Compress skipped");
+        super(context, source, "Compression skipped");
     }
 }

@@ -13,6 +13,8 @@ public interface DownloadLifecycleListener extends DownloadEventListener {
             onStart(((DownloadStartedEvent) event).getContext());
         } else if (event instanceof DownloadCompletedEvent) {
             onComplete(((DownloadCompletedEvent) event).getContext());
+        } else if (event instanceof DownloadErrorEvent) {
+            onError(((DownloadErrorEvent) event).getError(), ((DownloadErrorEvent) event).getContext());
         }
     }
 
@@ -21,6 +23,10 @@ public interface DownloadLifecycleListener extends DownloadEventListener {
     }
 
     default void onComplete(DownloadContext context) {
+
+    }
+
+    default void onError(Throwable e, DownloadContext context) {
 
     }
 }
