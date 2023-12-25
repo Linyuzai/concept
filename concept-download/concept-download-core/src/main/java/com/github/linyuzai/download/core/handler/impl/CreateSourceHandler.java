@@ -27,7 +27,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
      * 通过 {@link SourceFactoryAdapter} 获得适配的 {@link SourceFactory}，
      * 通过 {@link SourceFactory} 创建对应的 {@link Source}，
      * 将 {@link Source} 设置到 {@link DownloadContext} 中，
-     * 发布 {@link AfterSourceCreatedEvent} 事件。
+     * 发布 {@link SourceCreatedEvent} 事件。
      *
      * @param context {@link DownloadContext}
      */
@@ -39,7 +39,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
         Source source = factory.create(original, context);
         context.set(Source.class, source);
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new AfterSourceCreatedEvent(context, source));
+        publisher.publish(new SourceCreatedEvent(context, source));
         return chain.next(context);
     }
 

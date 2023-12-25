@@ -4,7 +4,7 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
-import com.github.linyuzai.download.core.load.AfterSourceLoadedEvent;
+import com.github.linyuzai.download.core.load.SourceLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class LoadSourceHandler implements DownloadHandler {
     /**
      * 加载 {@link Source}。
      * 使用 {@link SourceLoader} 加载所有的 {@link Source}，
-     * 发布 {@link AfterSourceLoadedEvent} 事件，
+     * 发布 {@link SourceLoadedEvent} 事件，
      * 设置新的 {@link Source} 到 {@link DownloadContext} 中。
      *
      * @param context {@link DownloadContext}
@@ -35,7 +35,7 @@ public class LoadSourceHandler implements DownloadHandler {
         Source source = context.get(Source.class);
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         sourceLoader.load(source, context);
-        publisher.publish(new AfterSourceLoadedEvent(context, source));
+        publisher.publish(new SourceLoadedEvent(context, source));
         return chain.next(context);
     }
 }

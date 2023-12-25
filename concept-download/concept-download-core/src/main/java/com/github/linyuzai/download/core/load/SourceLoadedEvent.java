@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * {@link Source} 加载相关的事件的父类。
+ * {@link Source} 加载完成后会发布该事件。
  */
 @Getter
-public abstract class AbstractLoadSourceEvent extends DownloadContextEvent {
+public class SourceLoadedEvent extends DownloadContextEvent {
 
     /**
      * 被加载的 {@link Source}
@@ -18,9 +18,8 @@ public abstract class AbstractLoadSourceEvent extends DownloadContextEvent {
     @NonNull
     private final Source source;
 
-    public AbstractLoadSourceEvent(DownloadContext context, @NonNull Source source, String message) {
+    public SourceLoadedEvent(DownloadContext context, @NonNull Source source) {
         super(context);
         this.source = source;
-        setMessage(message);
     }
 }

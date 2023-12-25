@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.autoconfigure.source.classpath;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
@@ -23,12 +22,9 @@ public class ClassPathSourceFactory implements SourceFactory {
     public Source create(Object source, DownloadContext context) {
         DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
-        ClassPathSource build = new ClassPathSource.Builder<>()
+        return new ClassPathSource.Builder<>()
                 .resource((ClassPathResource) source)
                 .charset(charset)
                 .build();
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new ClassPathSourceCreatedEvent(context, build));
-        return build;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.original;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
 
@@ -17,8 +16,6 @@ public class OriginalSourceFactory implements SourceFactory {
 
     @Override
     public Source create(Object source, DownloadContext context) {
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new OriginalSourceCreatedEvent(context, (Source) source));
         return (Source) source;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.http;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
@@ -24,16 +23,13 @@ public class HttpSourceFactory extends PrefixSourceFactory {
         Charset charset = options.getCharset();
         boolean cacheEnabled = options.isSourceCacheEnabled();
         String cachePath = options.getSourceCachePath();
-        HttpSource build = new HttpSource.Builder<>()
+        return new HttpSource.Builder<>()
                 .url(url)
                 .asyncLoad(true)
                 .charset(charset)
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new HttpSourceCreatedEvent(context, build));
-        return build;
     }
 
     @Override

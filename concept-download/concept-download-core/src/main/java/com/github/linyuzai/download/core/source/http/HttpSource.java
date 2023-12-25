@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.http;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.load.RemoteLoadableSource;
 import com.github.linyuzai.download.core.source.Source;
@@ -74,11 +73,10 @@ public class HttpSource extends RemoteLoadableSource {
      * @param context {@link DownloadContext}
      * @return {@link HttpURLConnection#getInputStream()}
      */
-    //@SneakyThrows
     @Override
     public InputStream loadRemote(DownloadContext context) throws IOException {
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new LoadHttpSourceEvent(context, this));
+        //DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
+        //publisher.publish(new LoadHttpSourceEvent(context, this));
         HttpURLConnection connection = getConnection();
         int code = connection.getResponseCode();
         if (isResponseSuccess(code)) {

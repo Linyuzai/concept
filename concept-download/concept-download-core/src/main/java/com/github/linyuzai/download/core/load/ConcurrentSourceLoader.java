@@ -13,6 +13,7 @@ import java.util.Collection;
 /**
  * 支持并发的 {@link SourceLoader}。
  */
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class ConcurrentSourceLoader implements SourceLoader {
@@ -20,7 +21,6 @@ public abstract class ConcurrentSourceLoader implements SourceLoader {
     /**
      * 单个文件的时候串行加载
      */
-    @Getter
     @Setter
     private boolean serialOnSingle = true;
 

@@ -8,6 +8,7 @@ import lombok.SneakyThrows;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 
 public class CompletableFutureSourceLoader extends ConcurrentSourceLoader {
 
@@ -15,16 +16,15 @@ public class CompletableFutureSourceLoader extends ConcurrentSourceLoader {
     @Override
     public void concurrentLoad(Collection<Source> sources, DownloadContext context) {
         Executor executor = DownloadExecutor.getExecutor(context);
-        CompletableFuture<?>[] futures;
+        Function<Source, CompletableFuture<?>> function;
         if (executor == null) {
-            futures = sources.stream()
-                    .map(it -> CompletableFuture.runAsync(() -> it.load(context)))
-                    .toArray(CompletableFuture[]::new);
+            function = it -> CompletableFuture.runAsync(() -> it.load(context));
         } else {
-            futures = sources.stream()
-                    .map(it -> CompletableFuture.runAsync(() -> it.load(context), executor))
-                    .toArray(CompletableFuture[]::new);
+            function = it -> CompletableFuture.runAsync(() -> it.load(context), executor);
         }
+        CompletableFuture<?>[] futures = sources.stream()
+                .map(function)
+                .toArray(CompletableFuture[]::new);
         CompletableFuture.allOf(futures).get();
     }
 }

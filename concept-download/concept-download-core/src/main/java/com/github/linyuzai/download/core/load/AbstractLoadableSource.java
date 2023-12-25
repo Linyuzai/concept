@@ -81,7 +81,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             File cache = new File(dir, nameToUse);
             //缓存存在
             if (cache.exists()) {
-                publisher.publish(new SourceLoadedCacheUsedEvent(context, this, cache.getAbsolutePath()));
+                publisher.publish(new SourceLoadedUsingCacheEvent(context, this, cache.getAbsolutePath()));
             } else {
                 //写到缓存文件
                 FileOutputStream fos = new FileOutputStream(cache);

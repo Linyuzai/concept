@@ -45,7 +45,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             File cache = new File(dir, cacheName);
             //缓存是否存在
             if (cache.exists()) {
-                publisher.publish(new SourceCompressedCacheUsedEvent(context, source, cache.getAbsolutePath()));
+                publisher.publish(new SourceCompressedUsingCacheEvent(context, source, cache.getAbsolutePath()));
             } else {
                 publisher.publish(new SourceFileCompressionEvent(context, source, cache));
                 //写入缓存文件

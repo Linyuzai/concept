@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
@@ -35,7 +34,7 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
         Charset charset = options.getCharset();
         boolean cacheEnabled = options.isSourceCacheEnabled();
         String cachePath = options.getSourceCachePath();
-        OkHttpSource build = new OkHttpSource.Builder<>()
+        return new OkHttpSource.Builder<>()
                 .client(client)
                 .url(url)
                 .asyncLoad(true)
@@ -43,9 +42,6 @@ public class OkHttpSourceFactory extends PrefixSourceFactory {
                 .cacheEnabled(cacheEnabled)
                 .cachePath(cachePath)
                 .build();
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new OkHttpSourceCreatedEvent(context, build));
-        return build;
     }
 
     @Override

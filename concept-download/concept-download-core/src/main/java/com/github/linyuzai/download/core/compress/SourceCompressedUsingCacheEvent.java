@@ -8,14 +8,14 @@ import lombok.Getter;
  * {@link Source} 压缩使用缓存时会发布该事件。
  */
 @Getter
-public class SourceCompressedCacheUsedEvent extends AbstractCompressSourceEvent {
+public class SourceCompressedUsingCacheEvent extends AbstractCompressSourceEvent {
 
     /**
      * 缓存
      */
     private final String cache;
 
-    public SourceCompressedCacheUsedEvent(DownloadContext context, Source source, String cache) {
+    public SourceCompressedUsingCacheEvent(DownloadContext context, Source source, String cache) {
         super(context, source, "Compress source using cache " + cache);
         this.cache = cache;
     }

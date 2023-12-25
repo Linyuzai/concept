@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.text;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactory;
@@ -22,13 +21,10 @@ public class TextSourceFactory implements SourceFactory {
     public Source create(Object source, DownloadContext context) {
         DownloadOptions options = DownloadOptions.get(context);
         Charset charset = options.getCharset();
-        TextSource build = new TextSource.Builder<>()
+        return new TextSource.Builder<>()
                 .text((String) source)
                 .name("text.txt")
                 .charset(charset)
                 .build();
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new TextSourceCreatedEvent(context, build));
-        return build;
     }
 }

@@ -6,6 +6,5 @@ public class DownloadStartedEvent extends DownloadContextEvent {
 
     public DownloadStartedEvent(DownloadContext context) {
         super(context);
-        setMessage("Context initialized");
     }
 }

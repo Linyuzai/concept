@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.autoconfigure.source.reactive;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSource;
@@ -56,8 +55,8 @@ public class WebClientSource extends HttpSource implements ReactorSource {
     }
 
     protected Mono<InputStream> loadInputStream(DownloadContext context) {
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new LoadWebClientSourceEvent(context, this));
+        //DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
+        //publisher.publish(new LoadWebClientSourceEvent(context, this));
         return WebClient.create()
                 .get()
                 .uri(url)

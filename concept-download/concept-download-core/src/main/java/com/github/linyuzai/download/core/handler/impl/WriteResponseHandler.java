@@ -47,7 +47,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
      * 设置 {@link DownloadResponse} 的响应头，
      * 将 {@link Compression} 写入到 {@link DownloadResponse} 中
      * 并发布 {@link ResponseWritingProgressEvent} 事件，
-     * 最后发布 {@link AfterResponseWrittenEvent} 事件。
+     * 最后发布 {@link ResponseWrittenEvent} 事件。
      *
      * @param context {@link DownloadContext}
      */
@@ -85,7 +85,7 @@ public class WriteResponseHandler implements DownloadHandler, DownloadLifecycleL
                     }
                     os.flush();
                 }
-            }, () -> chain.next(context), () -> publisher.publish(new AfterResponseWrittenEvent(context)));
+            }, () -> chain.next(context), () -> publisher.publish(new ResponseWrittenEvent(context)));
         } else {
             return chain.next(context);
         }

@@ -1,7 +1,6 @@
 package com.github.linyuzai.download.core.source.okhttp;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.exception.DownloadException;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.http.HttpSource;
@@ -24,8 +23,8 @@ public class OkHttpSource extends HttpSource {
 
     @Override
     public InputStream loadRemote(DownloadContext context) throws IOException {
-        DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        publisher.publish(new LoadOkHttpSourceEvent(context, this));
+        //DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
+        //publisher.publish(new LoadOkHttpSourceEvent(context, this));
         Request.Builder rb = new Request.Builder();
         rb.url(url);
         if (headers != null) {
