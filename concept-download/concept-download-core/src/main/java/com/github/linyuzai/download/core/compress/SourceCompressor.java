@@ -41,9 +41,10 @@ public interface SourceCompressor {
      * 如果支持对应的格式就会调用该方法执行压缩。
      *
      * @param source  {@link Source}
+     * @param format  压缩格式
      * @param writer  {@link DownloadWriter}
      * @param context {@link DownloadContext}
      * @return {@link Compression}
      */
-    Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException;
+    Compression compress(Source source, String format, DownloadWriter writer, DownloadContext context) throws IOException;
 }

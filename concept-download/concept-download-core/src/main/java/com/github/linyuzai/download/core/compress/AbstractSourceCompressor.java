@@ -24,14 +24,14 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * 如果启用缓存并且缓存不存在，压缩到本地缓存文件。
      *
      * @param source  {@link Source}
+     * @param format  压缩格式
      * @param writer  {@link DownloadWriter}
      * @param context {@link DownloadContext}
      * @return {@link MemoryCompression} / {@link FileCompression}
      */
     @Override
-    public Compression compress(Source source, DownloadWriter writer, DownloadContext context) throws IOException {
+    public Compression compress(Source source, String format, DownloadWriter writer, DownloadContext context) throws IOException {
         DownloadOptions options = DownloadOptions.get(context);
-        String format = options.getCompressFormat();
         String cachePath = options.getCompressCachePath();
         String cacheName = getCacheName(source, format, context);
         boolean cacheEnable = options.isCompressCacheEnabled();

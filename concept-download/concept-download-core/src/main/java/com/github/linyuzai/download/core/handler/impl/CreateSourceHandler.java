@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.handler.impl;
 
+import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.event.DownloadLifecycleListener;
@@ -33,6 +34,9 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
      */
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
+        if (context.contains(Compression.class)) {
+            return chain.next(context);
+        }
         DownloadOptions options = DownloadOptions.get(context);
         Object original = options.getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);

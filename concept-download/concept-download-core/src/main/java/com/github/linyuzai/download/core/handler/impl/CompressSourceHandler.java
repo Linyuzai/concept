@@ -41,6 +41,9 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
     @SneakyThrows
     @Override
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
+        if (context.contains(Compression.class)) {
+            return chain.next(context);
+        }
         DownloadOptions options = DownloadOptions.get(context);
         Source source = context.get(Source.class);
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
@@ -58,7 +61,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
             SourceCompressor compressor = sourceCompressorAdapter.getCompressor(formatToUse, context);
             DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
             DownloadWriter writer = writerAdapter.getWriter(source, context);
-            compression = compressor.compress(source, writer, context);
+            compression = compressor.compress(source, formatToUse, writer, context);
         }
         publisher.publish(new SourceCompressedEvent(context, source, compression));
         context.set(Compression.class, compression);
