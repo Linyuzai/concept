@@ -33,7 +33,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
      * 可通过 {@link Download#forceCompress()} 强制压缩。
      * 根据指定或默认的压缩格式，通过 {@link SourceCompressorAdapter} 获得 {@link SourceCompressor}，
      * 通过 {@link SourceCompressor} 执行压缩。
-     * 发布 {@link AfterSourceCompressedEvent} 事件，
+     * 发布 {@link SourceCompressedEvent} 事件，
      * 将压缩后的 {@link Compression} 设置到 {@link DownloadContext} 中。
      *
      * @param context {@link DownloadContext}
@@ -60,7 +60,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
             DownloadWriter writer = writerAdapter.getWriter(source, context);
             compression = compressor.compress(source, writer, context);
         }
-        publisher.publish(new AfterSourceCompressedEvent(context, source, compression));
+        publisher.publish(new SourceCompressedEvent(context, source, compression));
         context.set(Compression.class, compression);
         return chain.next(context);
     }

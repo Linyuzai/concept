@@ -11,6 +11,5 @@ public class DownloadErrorEvent extends DownloadContextEvent {
     public DownloadErrorEvent(DownloadContext context, Throwable error) {
         super(context);
         this.error = error;
-        setMessage("Error");
     }
 }

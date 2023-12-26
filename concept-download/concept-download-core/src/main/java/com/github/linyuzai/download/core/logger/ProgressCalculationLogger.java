@@ -1,7 +1,7 @@
 package com.github.linyuzai.download.core.logger;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
+import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
 import com.github.linyuzai.download.core.write.ProgressEvent;
@@ -24,11 +24,6 @@ import java.util.function.Consumer;
 public class ProgressCalculationLogger extends LoggingDownloadEventListener {
 
     /**
-     * 进度缓存
-     */
-    private final Map<String, Map<Object, ProgressInterval>> progressIntervalMap = new ConcurrentHashMap<>();
-
-    /**
      * 打印间隔
      */
     private Duration duration;
@@ -48,24 +43,23 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
     }
 
     /**
-     * 监听到 {@link DownloadContext} 销毁事件时，移除缓存；
      * 监听到 {@link ProgressEvent} 事件时，打印更新进度。
      *
      * @param event 事件
      */
     @Override
     public void logOnEvent(Object event) {
-        if (event instanceof DownloadCompletedEvent) {
-            DownloadContext context = ((DownloadCompletedEvent) event).getContext();
-            String id = getLogId(context);
-            progressIntervalMap.remove(id);
+        if (event instanceof DownloadStartedEvent) {
+            DownloadContext context = ((DownloadStartedEvent) event).getContext();
+            context.set(ProgressInterval.class, new ConcurrentHashMap<>());
         } else if (event instanceof ProgressEvent) {
             ProgressEvent pde = (ProgressEvent) event;
             DownloadContext context = ((ProgressEvent) event).getContext();
-            String id = getLogId(context);
-            progressIntervalMap.computeIfAbsent(id, k ->
-                    new ConcurrentHashMap<>()).computeIfAbsent(getId(pde), o ->
-                    new ProgressInterval(this::onProgress)).publish(pde);
+            Map<Object, ProgressInterval> map = context.get(ProgressInterval.class);
+            if (map != null) {
+                map.computeIfAbsent(getId(pde), o ->
+                        new ProgressInterval(this::onProgress)).publish(pde);
+            }
         }
     }
 

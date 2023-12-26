@@ -9,7 +9,10 @@ import com.github.linyuzai.download.core.load.SourceAlreadyLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoadedUsingCacheEvent;
 import com.github.linyuzai.download.core.source.*;
+import com.github.linyuzai.download.core.utils.DownloadUtils;
 import com.github.linyuzai.download.core.web.ResponseWrittenEvent;
+
+import java.io.File;
 
 /**
  * 标准流程日志。
@@ -38,22 +41,37 @@ public class StandardDownloadLogger extends LoggingDownloadEventListener {
             } else if (event instanceof SourceLoadedEvent) {
                 log(context, "Source loaded: " + getSource(event));
             } else if (event instanceof SourceAlreadyLoadedEvent) {
-                log(context, "Skip load " + getSource(event) + " for already loaded");
+                log(context, "Source load skip for already loaded: " + getSource(event));
             } else if (event instanceof SourceLoadedUsingCacheEvent) {
                 String cache = ((SourceLoadedUsingCacheEvent) event).getCache();
-                log(context, "Load " + getSource(event) + " using cache " + cache);
-            } else if (event instanceof AbstractCompressSourceEvent) {
-                //TODO 压缩事件
+                log(context, "Source load using cache " + cache + ": " + getSource(event));
+            } else if (event instanceof SourceCompressedEvent) {
+                Source source = ((SourceCompressedEvent) event).getSource();
+                Compression compression = ((SourceCompressedEvent) event).getCompression();
+                log(context, "Source compressed " + DownloadUtils.formatCompressedSize(source, compression));
+            } else if (event instanceof SourceNoCompressionEvent) {
+                log(context, "Source compress skip: " + getSource(event));
+            } else if (event instanceof SourceCompressedUsingCacheEvent) {
+                String cache = ((SourceCompressedUsingCacheEvent) event).getCache();
+                log(context, "Source compress using cache " + cache + ": " + getSource(event));
+            } else if (event instanceof SourceCompressionFormatEvent) {
+                String format = ((SourceCompressionFormatEvent) event).getFormat();
+                log(context, "Source compress using " + format + ": " + getSource(event));
+            } else if (event instanceof SourceFileCompressionEvent) {
+                File file = ((SourceFileCompressionEvent) event).getFile();
+                log(context, "Source compress with file " + file.getAbsolutePath() + ": " + getSource(event));
+            } else if (event instanceof SourceMemoryCompressionEvent) {
+                log(context, "Source compress in memory: " + getSource(event));
             } else if (event instanceof ResponseWrittenEvent) {
                 log(context, "Response written");
             } else if (event instanceof SourceCacheDeletedEvent) {
-                log(context, "Source " + getSource(event) + " cache deleted");
+                log(context, "Source cache deleted: " + getSource(event));
             } else if (event instanceof SourceReleasedEvent) {
-                log(context, "Source " + getSource(event) + " resource released");
+                log(context, "Source resource released: " + getSource(event));
             } else if (event instanceof CompressionCacheDeletedEvent) {
-                log(context, "Compression " + getCompression(event) + " cache deleted");
+                log(context, "Compression cache deleted: " + getCompression(event));
             } else if (event instanceof CompressionReleasedEvent) {
-                log(context, "Compression " + getCompression(event) + " resource released");
+                log(context, "Compression resource released: " + getCompression(event));
             }
         }
     }

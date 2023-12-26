@@ -1,6 +1,7 @@
 package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
+import com.github.linyuzai.download.core.source.AbstractSourceEvent;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 
@@ -8,7 +9,7 @@ import lombok.Getter;
  * {@link Source} 压缩使用缓存时会发布该事件。
  */
 @Getter
-public class SourceCompressedUsingCacheEvent extends AbstractCompressSourceEvent {
+public class SourceCompressedUsingCacheEvent extends AbstractSourceEvent {
 
     /**
      * 缓存
@@ -16,7 +17,7 @@ public class SourceCompressedUsingCacheEvent extends AbstractCompressSourceEvent
     private final String cache;
 
     public SourceCompressedUsingCacheEvent(DownloadContext context, Source source, String cache) {
-        super(context, source, "Compress source using cache " + cache);
+        super(context, source);
         this.cache = cache;
     }
 }

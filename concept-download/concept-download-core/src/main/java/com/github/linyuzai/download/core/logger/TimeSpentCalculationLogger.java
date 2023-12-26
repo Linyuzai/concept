@@ -4,18 +4,10 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadCompletedEvent;
 import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * 时间计算日志。
  */
 public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
-
-    /**
-     * {@link StopWatch} 缓存
-     */
-    private final Map<String, StopWatch> stopWatchMap = new ConcurrentHashMap<>();
 
     /**
      * {@link DownloadContext} 初始化时开始计算，
@@ -29,11 +21,10 @@ public class TimeSpentCalculationLogger extends LoggingDownloadEventListener {
             StopWatch watch = new StopWatch();
             watch.start();
             DownloadContext context = ((DownloadStartedEvent) event).getContext();
-            stopWatchMap.put(getLogId(context), watch);
+            context.set(StopWatch.class, watch);
         } else if (event instanceof DownloadCompletedEvent) {
             DownloadContext context = ((DownloadCompletedEvent) event).getContext();
-            String logId = getLogId(context);
-            StopWatch watch = stopWatchMap.remove(logId);
+            StopWatch watch = context.get(StopWatch.class);
             if (watch != null) {
                 watch.stop();
                 double seconds = watch.seconds();

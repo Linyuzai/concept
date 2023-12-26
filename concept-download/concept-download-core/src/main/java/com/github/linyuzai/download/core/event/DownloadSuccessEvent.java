@@ -6,6 +6,5 @@ public class DownloadSuccessEvent extends DownloadContextEvent {
 
     public DownloadSuccessEvent(DownloadContext context) {
         super(context);
-        setMessage("Success");
     }
 }
