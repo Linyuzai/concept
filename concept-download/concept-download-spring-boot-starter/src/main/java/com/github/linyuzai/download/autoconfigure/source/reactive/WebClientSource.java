@@ -24,10 +24,9 @@ import java.util.Map;
 public class WebClientSource extends HttpSource implements ReactorSource {
 
     /**
-     * 不会被调用。
+     * 请求资源。
      *
      * @param context {@link DownloadContext}
-     * @return {@link Mono#empty()}
      */
     @SneakyThrows
     @Override

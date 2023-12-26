@@ -1,9 +1,12 @@
 package com.github.linyuzai.download.core.logger;
 
+import com.github.linyuzai.download.core.compress.SourceCompressingProgressEvent;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadStartedEvent;
 import com.github.linyuzai.download.core.load.SourceLoadingProgressEvent;
+import com.github.linyuzai.download.core.utils.DownloadUtils;
 import com.github.linyuzai.download.core.web.ResponseWritingProgressEvent;
+import com.github.linyuzai.download.core.write.Progress;
 import com.github.linyuzai.download.core.write.ProgressEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +42,59 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
      * @param event 进度事件
      */
     public void onProgress(ProgressEvent event) {
-        log(event.getContext(), percentage ? event.getPercentageMessage() : event.getRatioMessage());
+        String s;
+        if (event instanceof ResponseWritingProgressEvent) {
+            s = "Writing response ";
+        } else if (event instanceof SourceCompressingProgressEvent) {
+            s = "Compressing source ";
+        } else if (event instanceof SourceLoadingProgressEvent) {
+            s = "Loading " + ((SourceLoadingProgressEvent) event).getSource().getDescription() + " ";
+        } else {
+            s = "Progressing ";
+        }
+        String msg = s + (percentage ? getPercentageMessage(event) : getRatioMessage(event));
+        log(event.getContext(), msg);
+    }
+
+    /**
+     * 如果存在总大小则返回百分比，
+     * 否则返回当前进度。
+     *
+     * @return 百分比或当前进度
+     */
+    public String getPercentageMessage(ProgressEvent event) {
+        Progress progress = event.getProgress();
+        if (progress.hasTotal()) {
+            double v = (progress.getCurrent() * 1.0 / progress.getTotal()) * 100.0;
+            String format = String.format("%.2f", v);
+            return format + "%";
+        } else {
+            return getCurrentMessage(progress);
+        }
+    }
+
+    /**
+     * 如果存在总大小则返回比值，
+     * 否则返回当前进度。
+     *
+     * @return 比值或当前进度
+     */
+    public String getRatioMessage(ProgressEvent event) {
+        Progress progress = event.getProgress();
+        if (progress.hasTotal()) {
+            return DownloadUtils.format(progress.getCurrent()) + "/" + DownloadUtils.format(progress.getTotal());
+        } else {
+            return getCurrentMessage(progress);
+        }
+    }
+
+    /**
+     * 返回当前进度的格式化数据。
+     *
+     * @return 当前进度
+     */
+    public String getCurrentMessage(Progress progress) {
+        return DownloadUtils.format(progress.getCurrent());
     }
 
     /**

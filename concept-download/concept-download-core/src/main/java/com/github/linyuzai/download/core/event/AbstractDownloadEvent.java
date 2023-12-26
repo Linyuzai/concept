@@ -10,10 +10,5 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractDownloadEvent implements DownloadEvent {
 
-    /**
-     * 事件信息
-     */
-    private String message;
-
     private long timestamp = System.currentTimeMillis();
 }

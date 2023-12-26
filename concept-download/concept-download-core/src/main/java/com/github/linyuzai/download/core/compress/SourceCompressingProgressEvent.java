@@ -10,41 +10,7 @@ import com.github.linyuzai.download.core.write.ProgressEvent;
  */
 public class SourceCompressingProgressEvent extends ProgressEvent {
 
-    private static final String CS = "Compressing source ";
-
     public SourceCompressingProgressEvent(DownloadContext context, Progress progress) {
-        super(context, progress, CS + progress.getCurrent() + "/" + progress.getTotal());
-    }
-
-    /**
-     * 返回当前进度的格式化数据。
-     *
-     * @return 当前进度
-     */
-    @Override
-    public String getCurrentMessage() {
-        return CS + super.getCurrentMessage();
-    }
-
-    /**
-     * 如果存在总大小则返回比值，
-     * 否则返回当前进度。
-     *
-     * @return 比值或当前进度
-     */
-    @Override
-    public String getRatioMessage() {
-        return CS + super.getRatioMessage();
-    }
-
-    /**
-     * 如果存在总大小则返回百分比，
-     * 否则返回当前进度。
-     *
-     * @return 百分比或当前进度
-     */
-    @Override
-    public String getPercentageMessage() {
-        return CS + super.getPercentageMessage();
+        super(context, progress);
     }
 }
