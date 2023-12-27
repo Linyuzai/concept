@@ -11,6 +11,7 @@ import com.github.linyuzai.download.core.options.ConfigurableDownloadOptions;
 import com.github.linyuzai.download.core.options.DefaultDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.Source;
+import com.github.linyuzai.download.core.utils.DownloadUtils;
 import com.github.linyuzai.download.core.web.DownloadRequest;
 import com.github.linyuzai.download.core.web.DownloadResponse;
 import lombok.Data;
@@ -21,10 +22,7 @@ import org.springframework.util.StringValueResolver;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 全局下载配置。
@@ -177,7 +175,7 @@ public class DownloadProperties {
         options.setResponse(response);
         options.setMethod(method.getMethod());
         options.setReturnValue(returnValue);
-        //如果为 null 或 Rewriter 则使用注解指定的数据，否则使用返回值
+        //如果为 null 或 Configurer 则使用注解指定的数据，否则使用返回值
         if (returnValue == null || returnValue instanceof DownloadOptions.Configurer) {
             options.setSource(Arrays.stream(download.source())
                     .map(resolver::resolveStringValue)
@@ -221,6 +219,9 @@ public class DownloadProperties {
         if (returnValue instanceof DownloadOptions.Configurer) {
             //回调重写接口
             ((DownloadOptions.Configurer) returnValue).configure(options);
+        }
+        if (DownloadUtils.isEmpty(options.getSource())) {
+            throw new IllegalArgumentException("Nothing to download");
         }
         return options;
     }

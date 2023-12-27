@@ -3,6 +3,9 @@ package com.github.linyuzai.download.core.utils;
 import com.github.linyuzai.download.core.compress.Compression;
 import com.github.linyuzai.download.core.source.Source;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+
 /**
  * 工具类。
  */
@@ -56,5 +59,48 @@ public class DownloadUtils {
             builder.append(" (").append(String.format("%.2f", r)).append("%)");
         }
         return builder.toString();
+    }
+
+    public static boolean isEmpty(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o.getClass().isArray()) {
+            int length = Array.getLength(o);
+            if (length == 0) {
+                return true;
+            }
+            for (int i = 0; i < length; i++) {
+                Object element = Array.get(o, i);
+                if (isEmpty0(element)) {
+                    continue;
+                }
+                return false;
+            }
+            return true;
+        }
+        if (o instanceof Collection) {
+            if (((Collection<?>) o).isEmpty()) {
+                return true;
+            }
+            for (Object next : (Collection<?>) o) {
+                if (isEmpty0(next)) {
+                    continue;
+                }
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isEmpty0(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o instanceof String) {
+            return ((String) o).isEmpty();
+        }
+        return false;
     }
 }
