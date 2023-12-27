@@ -3,14 +3,13 @@ package com.github.linyuzai.concept.sample.download;
 import com.github.linyuzai.download.core.annotation.CompressCache;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
-import com.github.linyuzai.download.core.context.DownloadContext;
-import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.options.ConfigurableDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
 import com.github.linyuzai.download.core.source.reflect.SourceName;
 import com.github.linyuzai.download.core.source.reflect.SourceObject;
 import com.github.linyuzai.download.core.web.async.FileConsumer;
+import com.github.linyuzai.download.core.web.async.InputStreamConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
@@ -21,6 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -120,11 +120,24 @@ public class ConceptDownloadController2 {
     @CompressCache(group = "listAndCache", name = "Async.zip")
     @GetMapping("/async")
     public DownloadOptions.Configurer async() {
-        return options -> {
-            System.out.println("在这里可以修改本次下载的参数！");
-            options.setAsyncConsumer((FileConsumer) file -> {
-                System.out.println(file.getAbsolutePath());
-            });
+        return new DownloadOptions.Configurer() {
+            @Override
+            public void configure(ConfigurableDownloadOptions options) {
+                System.out.println("在这里可以修改本次下载的参数！");
+                options.setAsyncConsumer(new InputStreamConsumer() {
+                    @Override
+                    public void consumer(InputStream is) {
+                        //输入流
+                    }
+                });
+                options.setAsyncConsumer(new FileConsumer() {
+                    @Override
+                    public void consumer(File file) {
+                        //文件
+                        System.out.println(file.getAbsolutePath());
+                    }
+                });
+            }
         };
     }
 
