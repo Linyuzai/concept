@@ -84,11 +84,13 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 publisher.publish(new SourceLoadedUsingCacheEvent(context, this, cache.getAbsolutePath()));
             } else {
                 //写到缓存文件
-                FileOutputStream fos = new FileOutputStream(cache);
-                try {
+                try (FileOutputStream fos = new FileOutputStream(cache)) {
                     doLoad(fos, context);
-                } finally {
-                    closeStream(fos);
+                } catch (Throwable e) {
+                    if (cache.exists()) {
+                        boolean delete = cache.delete();
+                    }
+                    throw e;
                 }
             }
 
@@ -109,13 +111,11 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             inputStream = getCacheInputStream(cache);
         } else {
             //内存加载
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            try {
+            byte[] bytes;
+            try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 doLoad(os, context);
-            } finally {
-                closeStream(os);
+                bytes = os.toByteArray();
             }
-            byte[] bytes = os.toByteArray();
             long l = bytes.length;
             if (length == null) {
                 length = l;
@@ -133,6 +133,7 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      *
      * @param os {@link OutputStream}
      */
+    @Deprecated
     private void closeStream(OutputStream os) {
         try {
             os.close();

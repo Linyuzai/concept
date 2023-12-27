@@ -52,6 +52,11 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
                 try (FileOutputStream fos = new FileOutputStream(cache);
                      OutputStream wrapper = wrapper(fos)) {
                     doCompress(source, wrapper, writer, context);
+                } catch (Throwable e) {
+                    if (cache.exists()) {
+                        boolean delete = cache.delete();
+                    }
+                    throw e;
                 }
             }
             FileCompression compression = new FileCompression(cache);
