@@ -31,148 +31,101 @@ public class ConceptDownloadController2 {
 
     @Download
     @GetMapping("error")
-    public Object error() {
-        return new Object();
-    }
-
-    @GetMapping("/ex")
-    public void ex() {
-        throw new RuntimeException();
-    }
-
-    @Download(source = "file:/Users/Shared/README.txt")
-    @GetMapping("/s1")
-    public void s1() {
+    public void error() {
+        throw new RuntimeException("Error");
     }
 
     @Download
-    @GetMapping("/s2")
-    public String s2() {
-        return "file:/Users/Shared/README.txt";
-    }
+    @GetMapping("/empty")
+    public void empty() {
 
-    @Download
-    @GetMapping("/s3")
-    public File s3() {
-        return new File("/Users/Shared/README.txt");
-    }
-
-    @Download(source = "user.home:/Public/README.txt")
-    @GetMapping("/s4")
-    public void s4() {
-    }
-
-    @Download
-    @GetMapping("/s5")
-    public String s5() {
-        return "user.home:/Public/README.txt";
     }
 
     @Download(source = "classpath:/download/README.txt")
-    @GetMapping("/s6")
-    public void s6() {
+    @GetMapping("/oneOnAnnotation")
+    public void oneOnAnnotation() {
     }
 
-    @Download
-    @GetMapping("/s7")
-    public String s7() {
-        return "classpath:/download/README.txt";
-    }
-
-    @Download
-    @GetMapping("/s8")
-    public ClassPathResource s8() {
-        return new ClassPathResource("/download/README.txt");
-    }
-
-    @Download(filename = "s9.txt")
-    @GetMapping("/s9")
-    public String s9() {
-        return "任意的文本将会直接作为文本文件处理";
-    }
-
-    @Download(source = {"https://services.gradle.org/distributions/gradle-8.5-all.zip",
-            "https://services.gradle.org/distributions/gradle-8.4-all.zip"},
-            filename = "测试文件.zip")
-    @GetMapping("/s10")
-    public void s10() {
-    }
-
-    @Download
-    @GetMapping("/s11")
-    public String s11() {
-        return "http://192.168.20.112:8088/demo/download";
-    }
-
-    @Download(source = "classpath:/download/README.txt", forceCompress = true)
-    @GetMapping("/s12")
-    public void s12() {
+    @Download(source = {
+            "classpath:/download/README.txt",
+            "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download/image.jpg",
+            "user.home:/IdeaProjects/Github/x/concept/sample/src/main/resources/download/video.mp4",
+            "https://services.gradle.org/distributions/gradle-8.4-all.zip"
+    })
+    @GetMapping("/listOnAnnotation")
+    public void listOnAnnotation() {
     }
 
     @Download(source = "classpath:/download/README_GBK.txt",
             filename = "readme.zip",
             charset = "GBK",
             forceCompress = true)
-    @GetMapping("/s13")
-    public void s13() {
+    @GetMapping("/charsetAndForceCompress")
+    public void charsetAndForceCompress() {
+    }
+
+    @Download(filename = "AnyText.txt")
+    @GetMapping("/anyText")
+    public String anyText() {
+        return "任意的文本将会直接作为文本文件处理";
     }
 
     @Download(source = {
-            "classpath:/download/text.txt",
-            "http://192.168.20.112:8088/demo/download"},
-            filename = "压缩包14.zip")
-    @GetMapping("/s14")
-    public void s14() {
+            "https://services.gradle.org/distributions/gradle-8.4-all.zip",
+            "https://services.gradle.org/distributions/gradle-8.5-all.zip"
+    }, filename = "ManyHttp.zip")
+    @GetMapping("/manyHttp")
+    public void manyHttp() {
     }
 
-    @Download(filename = "压缩包15.zip")
-    @GetMapping("/s15")
-    public List<Object> s15() {
+    @Download(source = {
+            "classpath:/download/README.txt",
+            "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download",
+    }, filename = "Dir.zip")
+    @GetMapping("/dir")
+    public void dir() {
+    }
+
+    @Download(filename = "List.zip")
+    @GetMapping("/list")
+    public List<Object> list() {
         List<Object> list = new ArrayList<>();
-        list.add(new File("/Users/Shared/README.txt"));
-        list.add(new ClassPathResource("/download/image.jpg"));
-        list.add("http://192.168.20.112:8088/demo/download");
+        list.add(new File("/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download/image.jpg"));
+        list.add(new ClassPathResource("/download/README.txt"));
+        list.add("https://services.gradle.org/distributions/gradle-8.4-all.zip");
+        list.add("https://services.gradle.org/distributions/gradle-8.5-all.zip");
         return list;
     }
 
-    @Download(filename = "压缩包16.zip")
-    @SourceCache(group = "s16", delete = true)
-    @CompressCache(group = "s16", name = "s16.zip", delete = true)
-    @GetMapping("/s16")
-    public List<Object> s16() {
-        return s15();
+    @Download(filename = "ListAndCache.zip")
+    @SourceCache(group = "listAndCache")
+    @CompressCache(group = "listAndCache", name = "CompressCache.zip")
+    @GetMapping("/listAndCache")
+    public List<Object> listAndCache() {
+        return list();
     }
 
+    @Download(filename = "ListAndCacheAndDelete.zip")
+    @SourceCache(group = "listAndCacheAndDelete_s", delete = true)
+    @CompressCache(group = "listAndCacheAndDelete_c", name = "Temp.zip", delete = true)
+    @GetMapping("/listAndCacheAndDelete")
+    public List<Object> listAndCacheAndDelete() {
+        return list();
+    }
+
+    //TODO 当加载失败或压缩失败时，会遗留错误的缓存文件
 
     @Download(source = "classpath:/download/README.txt")
-    @GetMapping("/s17")
-    public DownloadOptions.Configurer s17() {
+    @SourceCache(group = "listAndCache")
+    @CompressCache(group = "listAndCache", name = "Async.zip")
+    @GetMapping("/async")
+    public DownloadOptions.Configurer async() {
         return options -> {
             System.out.println("在这里可以修改本次下载的参数！");
             options.setAsyncConsumer((FileConsumer) file -> {
-
+                System.out.println(file.getAbsolutePath());
             });
         };
-    }
-
-    @Download
-    @GetMapping("/s18")
-    public File s18() {
-        return new File("/Users/Shared");
-    }
-
-    @Download(filename = "s19.zip")
-    @SourceCache(group = "s19")
-    @CompressCache(group = "s19", name = "s19.zip")
-    @GetMapping("/s19")
-    public List<BusinessModel> s19() {
-        List<BusinessModel> businessModels = new ArrayList<>();
-        businessModels.add(new BusinessModel("1.jar", "http://192.168.20.112:8088/demo/download"));
-        businessModels.add(new BusinessModel("2.jar", "http://192.168.20.112:8088/demo/download2"));
-        businessModels.add(new BusinessModel("3.jar", "http://192.168.20.112:8088/demo/download3"));
-        businessModels.add(new BusinessModel("classpath.txt", "classpath:/download/README.txt"));
-        businessModels.add(new BusinessModel("file", new File("/Users/Shared")));
-        return businessModels;
     }
 
     @Download
@@ -187,31 +140,31 @@ public class ConceptDownloadController2 {
         return Flux.just("123", "classpath:/download/image.jpg");
     }
 
-    //@Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
-    @Download(source = "classpath:/download/text.txt")
+    @Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
     @GetMapping("/text.txt")
-    public void readme() {
+    public void inlineText() {
     }
 
     @Download(source = "classpath:/download/image.jpg", inline = true, contentType = "image/jpeg")
     @GetMapping("/image.jpg")
-    public void image() {
+    public void inlineImage() {
     }
 
     @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mp4")
     @GetMapping("/video.mp4")
-    public void video() {
+    public void inlineVideo() {
     }
 
-    @Download(source = "classpath:/download/video.mp4")
-    @GetMapping("/video")
-    public void video1() {
-    }
-
-    @Download(source = "file:/Users/tanghanzheng/Downloads/培训文档.zip")
-    @GetMapping("100m")
-    public void size100M() {
-
+    @Download(filename = "POJO.zip")
+    @SourceCache(group = "pojo")
+    @CompressCache(group = "pojo", name = "POJO.zip")
+    @GetMapping("/pojo")
+    public List<BusinessModel> pojo() {
+        List<BusinessModel> businessModels = new ArrayList<>();
+        businessModels.add(new BusinessModel("http.zip", "https://services.gradle.org/distributions/gradle-8.4-all.zip"));
+        businessModels.add(new BusinessModel("classpath.txt", "classpath:/download/README.txt"));
+        businessModels.add(new BusinessModel("dir", new File("/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download")));
+        return businessModels;
     }
 
     @Data

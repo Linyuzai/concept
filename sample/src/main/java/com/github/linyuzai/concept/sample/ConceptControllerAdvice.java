@@ -10,8 +10,7 @@ public class ConceptControllerAdvice {
 
     @ExceptionHandler(Throwable.class)
     public Object handle(Throwable e) {
-        System.out.println("ExceptionHandler");
-        log.error("", e);
+        log.error("ExceptionHandler", e);
         return null;
     }
 }
