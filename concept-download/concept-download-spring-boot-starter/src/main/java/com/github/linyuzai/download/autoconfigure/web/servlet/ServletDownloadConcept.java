@@ -38,7 +38,7 @@ public class ServletDownloadConcept extends AbstractDownloadConcept {
                 return next;
             } catch (Throwable e) {
                 onError.accept(e);
-                throw e;
+                return null;
             } finally {
                 onComplete.run();
             }

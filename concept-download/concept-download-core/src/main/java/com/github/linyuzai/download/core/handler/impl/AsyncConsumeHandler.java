@@ -19,7 +19,7 @@ public class AsyncConsumeHandler implements DownloadHandler, DownloadLifecycleLi
     public Object handle(DownloadContext context, DownloadHandlerChain chain) {
         DownloadOptions options = DownloadOptions.get(context);
         options.getAsyncConsumer().accept(context);
-        return null;
+        return chain.next(context);
     }
 
     @Override

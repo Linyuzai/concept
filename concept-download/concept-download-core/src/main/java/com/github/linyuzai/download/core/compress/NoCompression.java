@@ -79,7 +79,7 @@ public class NoCompression implements Compression {
      */
     @Override
     public String getDescription() {
-        return "NoCompression:" + source.getDescription();
+        return "NoCompression(" + source.getDescription() + ")";
     }
 
     /**

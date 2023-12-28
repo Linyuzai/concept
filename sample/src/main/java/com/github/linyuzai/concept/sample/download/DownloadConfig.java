@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DownloadConfig {
 
-    @Bean
+    //@Bean
     public SourceLoader sourceLoader() {
         System.out.println("Use coroutines source loader");
         return new CoroutinesSourceLoader();

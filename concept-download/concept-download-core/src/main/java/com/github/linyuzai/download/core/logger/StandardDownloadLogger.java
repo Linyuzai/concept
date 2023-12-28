@@ -37,56 +37,44 @@ public class StandardDownloadLogger extends LoggingDownloadEventListener {
             } else if (event instanceof DownloadCompletedEvent) {
                 log(context, "Context destroyed");
             } else if (event instanceof SourceCreatedEvent) {
-                log(context, "Source created: " + getSource(event));
+                Source source = ((SourceCreatedEvent) event).getSource();
+                log(context, "Source created: " + source.getDescription());
             } else if (event instanceof SourceLoadedEvent) {
-                log(context, "Source loaded: " + getSource(event));
+                log(context, "Source loaded");
             } else if (event instanceof SourceAlreadyLoadedEvent) {
-                log(context, "Source load skip for already loaded: " + getSource(event));
+                log(context, "Source load skip for already loaded");
             } else if (event instanceof SourceLoadedUsingCacheEvent) {
                 String cache = ((SourceLoadedUsingCacheEvent) event).getCache();
-                log(context, "Source load using cache " + cache + ": " + getSource(event));
+                log(context, "Source load using cache '" + cache + "'");
             } else if (event instanceof SourceCompressedEvent) {
                 Source source = ((SourceCompressedEvent) event).getSource();
                 Compression compression = ((SourceCompressedEvent) event).getCompression();
-                log(context, "Source compressed " + DownloadUtils.formatCompressedSize(source, compression));
+                log(context, "Source compressed " +
+                        DownloadUtils.formatCompressedSize(source, compression));
             } else if (event instanceof SourceNoCompressionEvent) {
-                log(context, "Source compress skip: " + getSource(event));
+                log(context, "Source compress skip");
             } else if (event instanceof SourceCompressedUsingCacheEvent) {
                 String cache = ((SourceCompressedUsingCacheEvent) event).getCache();
-                log(context, "Source compress using cache " + cache + ": " + getSource(event));
+                log(context, "Source compress using cache '" + cache + "'");
             } else if (event instanceof SourceCompressionFormatEvent) {
                 String format = ((SourceCompressionFormatEvent) event).getFormat();
-                log(context, "Source compress using " + format + ": " + getSource(event));
+                log(context, "Source compress using " + format);
             } else if (event instanceof SourceFileCompressionEvent) {
                 File file = ((SourceFileCompressionEvent) event).getFile();
-                log(context, "Source compress with file " + file.getAbsolutePath() + ": " + getSource(event));
+                log(context, "Source compress with file '" + file.getAbsolutePath() + "'");
             } else if (event instanceof SourceMemoryCompressionEvent) {
-                log(context, "Source compress in memory: " + getSource(event));
+                log(context, "Source compress in memory");
             } else if (event instanceof ResponseWrittenEvent) {
                 log(context, "Response written");
             } else if (event instanceof SourceCacheDeletedEvent) {
-                log(context, "Source cache deleted: " + getSource(event));
+                log(context, "Source cache deleted");
             } else if (event instanceof SourceReleasedEvent) {
-                log(context, "Source resource released: " + getSource(event));
+                log(context, "Source resource released");
             } else if (event instanceof CompressionCacheDeletedEvent) {
-                log(context, "Compression cache deleted: " + getCompression(event));
+                log(context, "Compression cache deleted");
             } else if (event instanceof CompressionReleasedEvent) {
-                log(context, "Compression resource released: " + getCompression(event));
+                log(context, "Compression resource released");
             }
         }
-    }
-
-    protected String getSource(Object event) {
-        if (event instanceof AbstractSourceEvent) {
-            return ((AbstractSourceEvent) event).getSource().getDescription();
-        }
-        return "[Unknown]";
-    }
-
-    protected String getCompression(Object event) {
-        if (event instanceof AbstractCompressionEvent) {
-            return ((AbstractCompressionEvent) event).getCompression().getDescription();
-        }
-        return "[Unknown]";
     }
 }

@@ -41,11 +41,18 @@ public abstract class LoggingDownloadEventListener implements DownloadEventListe
         logger.info(getTag(method) + message);
     }
 
+    public void error(DownloadContext context, Throwable e) {
+        DownloadOptions options = DownloadOptions.get(context);
+        Method method = options.getMethod();
+        DownloadLogger logger = context.get(DownloadLogger.class);
+        logger.error(getTag(method), e);
+    }
+
     protected String getTag(Method method) {
         if (method == null) {
             return "";
         } else {
-            return method.getDeclaringClass().getSimpleName() + "#" + method.getName() + " ";
+            return "[" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "] ";
         }
     }
 }

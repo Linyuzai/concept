@@ -78,9 +78,9 @@ dependencies {
     //compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'
 
     compileOnly 'org.springframework.boot:spring-boot-starter'
-    compileOnly 'org.springframework.boot:spring-boot-starter-aop'
-    //compileOnly 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    //compileOnly 'org.springframework.boot:spring-boot-starter-aop'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    //compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     //compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
     compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
 

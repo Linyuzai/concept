@@ -16,14 +16,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("/concept-download2")
@@ -50,7 +47,7 @@ public class ConceptDownloadController2 {
             "classpath:/download/README.txt",
             "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download/image.jpg",
             "user.home:/IdeaProjects/Github/x/concept/sample/src/main/resources/download/video.mp4",
-            "https://services.gradle.org/distributions/gradle-8.4-all.zip"
+            "https://services.gradle.org/distributions/gradle-2.0-all.zip"
     })
     @GetMapping("/listOnAnnotation")
     public void listOnAnnotation() {
@@ -71,8 +68,8 @@ public class ConceptDownloadController2 {
     }
 
     @Download(source = {
-            "https://services.gradle.org/distributions/gradle-8.4-all.zip",
-            "https://services.gradle.org/distributions/gradle-8.5-all.zip"
+            "https://services.gradle.org/distributions/gradle-2.0-all.zip",
+            "https://services.gradle.org/distributions/gradle-3.0-all.zip"
     }, filename = "ManyHttp.zip")
     @GetMapping("/manyHttp")
     public void manyHttp() {
@@ -92,8 +89,8 @@ public class ConceptDownloadController2 {
         List<Object> list = new ArrayList<>();
         list.add(new File("/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download/image.jpg"));
         list.add(new ClassPathResource("/download/README.txt"));
-        list.add("https://services.gradle.org/distributions/gradle-8.4-all.zip");
-        list.add("https://services.gradle.org/distributions/gradle-8.5-all.zip");
+        list.add("https://services.gradle.org/distributions/gradle-2.0-all.zip");
+        list.add("https://services.gradle.org/distributions/gradle-3.0-all.zip");
         return list;
     }
 
@@ -113,9 +110,18 @@ public class ConceptDownloadController2 {
         return list();
     }
 
-    //TODO 当加载失败或压缩失败时，会遗留错误的缓存文件
+    @Download(source = {
+            "https://services.gradle.org/distributions/gradle-2.0-all.zip",
+            "http://localhost:1234/error"
+    }, filename = "LoadAndCompressError.zip")
+    @SourceCache(group = "loadAndCompressError")
+    @CompressCache(group = "loadAndCompressError", name = "CompressCache.zip")
+    @GetMapping("/loadAndCompressError")
+    public void loadAndCompressError() {
 
-    @Download(source = "classpath:/download/README.txt")
+    }
+
+    @Download
     @SourceCache(group = "listAndCache")
     @CompressCache(group = "listAndCache", name = "Async.zip")
     @GetMapping("/async")
@@ -124,6 +130,7 @@ public class ConceptDownloadController2 {
             @Override
             public void configure(ConfigurableDownloadOptions options) {
                 System.out.println("在这里可以修改本次下载的参数！");
+                options.setSource(list());
                 options.setAsyncConsumer(new InputStreamConsumer() {
                     @Override
                     public void consumer(InputStream is) {
@@ -141,7 +148,7 @@ public class ConceptDownloadController2 {
         };
     }
 
-    @Download
+    /*@Download
     @GetMapping("/s20")
     public Mono<String> s20() {
         return Mono.just("123");
@@ -151,7 +158,7 @@ public class ConceptDownloadController2 {
     @GetMapping("/s21")
     public Flux<String> s21() {
         return Flux.just("123", "classpath:/download/image.jpg");
-    }
+    }*/
 
     @Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
     @GetMapping("/text.txt")
@@ -174,7 +181,7 @@ public class ConceptDownloadController2 {
     @GetMapping("/pojo")
     public List<BusinessModel> pojo() {
         List<BusinessModel> businessModels = new ArrayList<>();
-        businessModels.add(new BusinessModel("http.zip", "https://services.gradle.org/distributions/gradle-8.4-all.zip"));
+        businessModels.add(new BusinessModel("http.zip", "https://services.gradle.org/distributions/gradle-2.0-all.zip"));
         businessModels.add(new BusinessModel("classpath.txt", "classpath:/download/README.txt"));
         businessModels.add(new BusinessModel("dir", new File("/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download")));
         return businessModels;

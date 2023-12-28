@@ -92,11 +92,22 @@ public class DownloadProperties {
          */
         private boolean enabled = true;
 
+        private ErrorProperties error = new ErrorProperties();
+
         private StandardProperties standard = new StandardProperties();
 
         private TimeSpentProperties timeSpent = new TimeSpentProperties();
 
         private ProgressProperties progress = new ProgressProperties();
+
+        @Data
+        public static class ErrorProperties {
+
+            /**
+             * 是否启用异常日志
+             */
+            private boolean enabled = true;
+        }
 
         @Data
         public static class StandardProperties {

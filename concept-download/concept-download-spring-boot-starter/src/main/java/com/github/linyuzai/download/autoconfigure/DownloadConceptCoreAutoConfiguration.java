@@ -5,6 +5,7 @@ import com.github.linyuzai.download.autoconfigure.logger.CommonsDownloadLogger;
 import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathPrefixSourceFactory;
 import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathSourceFactory;
+import com.github.linyuzai.download.autoconfigure.web.DownloadHttpMessageConverter;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
 import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
@@ -23,10 +24,7 @@ import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.*;
 import com.github.linyuzai.download.core.load.SourceLoader;
-import com.github.linyuzai.download.core.logger.DownloadLogger;
-import com.github.linyuzai.download.core.logger.ProgressCalculationLogger;
-import com.github.linyuzai.download.core.logger.StandardDownloadLogger;
-import com.github.linyuzai.download.core.logger.TimeSpentCalculationLogger;
+import com.github.linyuzai.download.core.logger.*;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
 import com.github.linyuzai.download.core.source.SourceFactory;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
@@ -65,6 +63,16 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadLogger downloadLogger() {
         return new CommonsDownloadLogger();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ErrorDownloadLogger errorDownloadLogger(DownloadProperties properties) {
+        boolean enabled = properties.getLogger().getError().isEnabled() &&
+                properties.getLogger().isEnabled();
+        ErrorDownloadLogger logger = new ErrorDownloadLogger();
+        logger.setEnabled(enabled);
+        return logger;
     }
 
     @Bean
@@ -303,5 +311,10 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadContextFactory downloadContextFactory() {
         return new DefaultDownloadContextFactory();
+    }
+
+    @Bean
+    public DownloadHttpMessageConverter downloadHttpMessageConverter() {
+        return new DownloadHttpMessageConverter();
     }
 }

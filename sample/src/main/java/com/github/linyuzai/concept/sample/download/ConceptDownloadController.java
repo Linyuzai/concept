@@ -15,8 +15,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -176,7 +174,7 @@ public class ConceptDownloadController {
         return businessModels;
     }
 
-    @Download
+    /*@Download
     @GetMapping("/s20")
     public Mono<String> s20() {
         return Mono.just("123");
@@ -186,7 +184,7 @@ public class ConceptDownloadController {
     @GetMapping("/s21")
     public Flux<String> s21() {
         return Flux.just("123", "classpath:/download/image.jpg");
-    }
+    }*/
 
     //@Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
     @Download(source = "classpath:/download/text.txt")
