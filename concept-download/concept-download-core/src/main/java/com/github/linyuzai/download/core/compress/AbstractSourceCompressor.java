@@ -18,6 +18,24 @@ import java.util.Collection;
  */
 public abstract class AbstractSourceCompressor<OS extends OutputStream> implements SourceCompressor {
 
+    @Override
+    public boolean support(String format, DownloadContext context) {
+        for (String supported : getFormats()) {
+            if (format.equalsIgnoreCase(supported)) {
+                if (supportEncryption(context)) {
+                    return true;
+                } else {
+                    DownloadOptions options = DownloadOptions.get(context);
+                    String password = options.getCompressPassword();
+                    if (password == null || password.isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * 如果没有启用缓存，使用内存压缩；
      * 如果启用缓存并且缓存存在，直接使用缓存；
@@ -88,10 +106,6 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         DownloadOptions options = DownloadOptions.get(context);
         String format = options.getCompressFormat();
-        String password = options.getCompressPassword();
-        if (password != null && !password.isEmpty() && !supportPassword(context)) {
-            throw new IllegalArgumentException("Password not supported");
-        }
         publisher.publish(new SourceCompressionFormatEvent(context, source, format));
         try (OS nos = newOutputStream(os, source, format, context)) {
             Progress progress = new Progress(source.getLength());
@@ -112,7 +126,10 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
         return os;
     }
 
-    public abstract boolean supportPassword(DownloadContext context);
+    /**
+     * 是否支持加密
+     */
+    public abstract boolean supportEncryption(DownloadContext context);
 
     /**
      * 新建一个压缩输出流。

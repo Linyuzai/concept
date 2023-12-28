@@ -27,7 +27,7 @@ public class Zip4jSourceCompressor extends AbstractSourceCompressor<ZipOutputStr
     }
 
     @Override
-    public boolean supportPassword(DownloadContext context) {
+    public boolean supportEncryption(DownloadContext context) {
         return true;
     }
 

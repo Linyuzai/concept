@@ -28,14 +28,7 @@ public interface SourceCompressor {
      * @param context {@link DownloadContext}
      * @return 如果支持则返回 true
      */
-    default boolean support(String format, DownloadContext context) {
-        for (String supported : getFormats()) {
-            if (format.equalsIgnoreCase(supported)) {
-                return true;
-            }
-        }
-        return false;
-    }
+     boolean support(String format, DownloadContext context);
 
     /**
      * 如果支持对应的格式就会调用该方法执行压缩。

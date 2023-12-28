@@ -44,7 +44,7 @@ public class ZipArchiveSourceCompressor extends AbstractSourceCompressor<ZipArch
     }
 
     @Override
-    public boolean supportPassword(DownloadContext context) {
+    public boolean supportEncryption(DownloadContext context) {
         return false;
     }
 

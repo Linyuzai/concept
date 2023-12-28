@@ -62,6 +62,8 @@ public class DownloadProperties {
          */
         private String format = CompressFormat.ZIP;
 
+        private String password;
+
         private CacheProperties cache = new CacheProperties();
     }
 
@@ -197,11 +199,12 @@ public class DownloadProperties {
 
         options.setFilename(resolver.resolveStringValue(download.filename()));
         options.setInline(download.inline());
-        options.setContentType(download.contentType());
-        options.setCompressFormat(buildCompressFormat(download, properties));
+        options.setContentType(resolver.resolveStringValue(download.contentType()));
+        options.setCompressFormat(buildCompressFormat(download, properties, resolver));
+        options.setCompressPassword(buildCompressPassword(download, properties, resolver));
         options.setForceCompress(download.forceCompress());
-        options.setCharset(buildCharset(download));
-        options.setHeaders(buildHeaders(download, properties));
+        options.setCharset(buildCharset(download, resolver));
+        options.setHeaders(buildHeaders(download, properties, resolver));
         options.setExtra(resolver.resolveStringValue(download.extra()));
 
         if (sourceCache == null) {
@@ -211,7 +214,7 @@ public class DownloadProperties {
             options.setSourceCacheDelete(cache.isDelete());
         } else {
             options.setSourceCacheEnabled(sourceCache.enabled());
-            options.setSourceCachePath(resolver.resolveStringValue(buildSourceCachePath(sourceCache, properties)));
+            options.setSourceCachePath(buildSourceCachePath(sourceCache, properties, resolver));
             options.setSourceCacheDelete(sourceCache.delete());
         }
 
@@ -222,7 +225,7 @@ public class DownloadProperties {
             options.setCompressCacheDelete(cache.isDelete());
         } else {
             options.setCompressCacheEnabled(compressCache.enabled());
-            options.setCompressCachePath(resolver.resolveStringValue(buildCompressPath(compressCache, properties)));
+            options.setCompressCachePath(buildCompressPath(compressCache, properties, resolver));
             options.setCompressCacheName(compressCache.name());
             options.setCompressCacheDelete(compressCache.delete());
         }
@@ -245,12 +248,25 @@ public class DownloadProperties {
      * @param download 注解 {@link Download}
      * @return 压缩格式
      */
-    private static String buildCompressFormat(Download download, DownloadProperties properties) {
+    private static String buildCompressFormat(Download download,
+                                              DownloadProperties properties,
+                                              StringValueResolver resolver) {
         String compressFormat = download.compressFormat();
         if (StringUtils.hasText(compressFormat)) {
-            return compressFormat;
+            return resolver.resolveStringValue(compressFormat);
         } else {
             return properties.getCompress().getFormat();
+        }
+    }
+
+    private static String buildCompressPassword(Download download,
+                                                DownloadProperties properties,
+                                                StringValueResolver resolver) {
+        String compressPassword = download.compressPassword();
+        if (StringUtils.hasText(compressPassword)) {
+            return resolver.resolveStringValue(compressPassword);
+        } else {
+            return properties.getCompress().getPassword();
         }
     }
 
@@ -262,9 +278,15 @@ public class DownloadProperties {
      * @param download 注解 {@link Download}
      * @return 指定的编码或 null
      */
-    private static Charset buildCharset(Download download) {
+    private static Charset buildCharset(Download download, StringValueResolver resolver) {
         String charset = download.charset();
-        return StringUtils.hasText(charset) ? Charset.forName(charset) : null;
+        if (StringUtils.hasText(charset)) {
+            String resolved = resolver.resolveStringValue(charset);
+            if (StringUtils.hasText(resolved)) {
+                return Charset.forName(resolved);
+            }
+        }
+        return null;
     }
 
     /**
@@ -273,7 +295,9 @@ public class DownloadProperties {
      * @param download 注解 {@link Download}
      * @return 额外响应头的 {@link Map} 对象
      */
-    private static Map<String, String> buildHeaders(Download download, DownloadProperties properties) {
+    private static Map<String, String> buildHeaders(Download download,
+                                                    DownloadProperties properties,
+                                                    StringValueResolver resolver) {
         Map<String, String> headerMap = new LinkedHashMap<>();
         Map<String, String> globalHeaders = properties.getResponse().getHeaders();
         //全局响应头
@@ -284,7 +308,9 @@ public class DownloadProperties {
         String[] headers = download.headers();
         if (headers.length % 2 == 0) {
             for (int i = 0; i < headers.length; i += 2) {
-                headerMap.put(headers[i], headers[i + 1]);
+                String name = resolver.resolveStringValue(headers[i]);
+                String value = resolver.resolveStringValue(headers[i + 1]);
+                headerMap.put(name, value);
             }
             return headerMap;
         } else {
@@ -298,12 +324,19 @@ public class DownloadProperties {
      * @param cache {@link SourceCache}
      * @return {@link Source} 的缓存路径
      */
-    private static String buildSourceCachePath(SourceCache cache, DownloadProperties properties) {
+    private static String buildSourceCachePath(SourceCache cache,
+                                               DownloadProperties properties,
+                                               StringValueResolver resolver) {
         String path = properties.getSource().getCache().getPath();
         if (cache.group().isEmpty()) {
             return path;
         } else {
-            return new File(path, cache.group()).getAbsolutePath();
+            String resolved = resolver.resolveStringValue(cache.group());
+            if (StringUtils.hasText(resolved)) {
+                return new File(path, resolved).getAbsolutePath();
+            } else {
+                return path;
+            }
         }
     }
 
@@ -313,12 +346,19 @@ public class DownloadProperties {
      * @param cache {@link CompressCache}
      * @return {@link Compression} 的缓存路径
      */
-    private static String buildCompressPath(CompressCache cache, DownloadProperties properties) {
+    private static String buildCompressPath(CompressCache cache,
+                                            DownloadProperties properties,
+                                            StringValueResolver resolver) {
         String path = properties.getCompress().getCache().getPath();
         if (cache.group().isEmpty()) {
             return path;
         } else {
-            return new File(path, cache.group()).getAbsolutePath();
+            String resolved = resolver.resolveStringValue(cache.group());
+            if (StringUtils.hasText(resolved)) {
+                return new File(path, resolved).getAbsolutePath();
+            } else {
+                return path;
+            }
         }
     }
 }

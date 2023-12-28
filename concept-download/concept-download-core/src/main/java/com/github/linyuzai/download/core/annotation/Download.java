@@ -39,6 +39,11 @@ public @interface Download {
     String compressFormat() default "";
 
     /**
+     * 压缩密码
+     */
+    String compressPassword() default "";
+
+    /**
      * 如果下载的是单个文件默认不会压缩，
      * 该属性可以强制让单个文件的下载也进行压缩。
      */
