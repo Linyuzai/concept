@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("all")
 public class DownloadHttpMessageConverter implements GenericHttpMessageConverter<Object> {
 
     @Override

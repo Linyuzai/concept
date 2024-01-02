@@ -22,6 +22,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+//webmvc base ok
+//webflux base
+//source loader
+//compress format/password
 @RestController
 @RequestMapping("/concept-download2")
 public class ConceptDownloadController2 {
@@ -36,6 +40,16 @@ public class ConceptDownloadController2 {
     @GetMapping("/empty")
     public void empty() {
 
+    }
+
+    @GetMapping("text")
+    public String text() {
+        return "text1";
+    }
+
+    @Download(source = "http://localhost:18080/concept-download2/text")
+    @GetMapping("/httpText")
+    public void httpText() {
     }
 
     @Download(source = "classpath:/download/README.txt")

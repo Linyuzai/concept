@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.*;
+import java.nio.file.Files;
 
 /**
  * 支持预加载的 {@link Source}。
@@ -157,9 +158,8 @@ public abstract class AbstractLoadableSource extends AbstractSource {
      * @param cache 缓存文件
      * @return 缓存文件的 {@link FileInputStream}
      */
-    @SneakyThrows
-    public InputStream getCacheInputStream(File cache) {
-        return new FileInputStream(cache);
+    public InputStream getCacheInputStream(File cache) throws IOException {
+        return Files.newInputStream(cache.toPath());
     }
 
     /**

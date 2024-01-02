@@ -52,6 +52,7 @@ public class ProgressCalculationLogger extends LoggingDownloadEventListener {
         } else {
             s = "Progressing ";
         }
+        //log(event.getContext(), "\033[F");
         String msg = s + (percentage ? getPercentageMessage(event) : getRatioMessage(event));
         log(event.getContext(), msg);
     }
