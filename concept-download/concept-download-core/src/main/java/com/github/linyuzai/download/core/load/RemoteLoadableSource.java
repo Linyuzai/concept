@@ -22,7 +22,6 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
      *
      * @param os      {@link OutputStream}
      * @param context {@link DownloadContext}
-     * @return 加载后的 {@link Source}
      */
     @Override
     public void doLoad(OutputStream os, DownloadContext context) throws IOException {

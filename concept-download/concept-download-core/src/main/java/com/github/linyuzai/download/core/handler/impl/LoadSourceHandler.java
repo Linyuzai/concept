@@ -4,11 +4,15 @@ import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.DownloadHandlerChain;
+import com.github.linyuzai.download.core.load.ReactorSourceLoader;
 import com.github.linyuzai.download.core.load.SourceLoadedEvent;
 import com.github.linyuzai.download.core.load.SourceLoader;
+import com.github.linyuzai.download.core.load.reactive.ReactiveSourceLoader;
 import com.github.linyuzai.download.core.source.Source;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.function.Supplier;
 
 /**
  * 对所有的 {@link Source} 进行加载。
@@ -37,6 +41,14 @@ public class LoadSourceHandler implements DownloadHandler {
             return chain.next(context);
         }
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
+        /*if (sourceLoader instanceof ReactiveSourceLoader) {
+            return ((ReactiveSourceLoader) sourceLoader).load(source, context, () ->
+                    chain.next(context));
+        } else {
+            sourceLoader.load(source, context);
+            publisher.publish(new SourceLoadedEvent(context, source));
+            return chain.next(context);
+        }*/
         sourceLoader.load(source, context);
         publisher.publish(new SourceLoadedEvent(context, source));
         return chain.next(context);

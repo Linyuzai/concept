@@ -13,7 +13,6 @@ import java.nio.charset.Charset;
 /**
  * 匹配前缀 'http://' 或 'https://' 并使用 {@link WebClient} 的 {@link SourceFactory}。
  */
-@Deprecated
 public class WebClientSourceFactory extends PrefixSourceFactory {
 
     @Override

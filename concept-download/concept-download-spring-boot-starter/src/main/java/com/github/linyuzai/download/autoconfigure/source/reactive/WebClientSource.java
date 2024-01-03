@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * 使用 {@link WebClient} 处理 http 请求的 {@link Source}。
  */
-@Deprecated
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource implements ReactorSource {
 
@@ -35,9 +34,7 @@ public class WebClientSource extends HttpSource implements ReactorSource {
         if (inputStream != null) {
             return inputStream;
         }
-        return loadInputStream(context)
-                .toFuture()
-                .get();
+        return loadInputStream(context).block();
     }
 
     @Override
@@ -50,6 +47,7 @@ public class WebClientSource extends HttpSource implements ReactorSource {
         return loadInputStream(context)
                 .flatMap(it -> {
                     inputStream = it;
+                    asyncLoad = false;
                     return Mono.empty();
                 });
     }

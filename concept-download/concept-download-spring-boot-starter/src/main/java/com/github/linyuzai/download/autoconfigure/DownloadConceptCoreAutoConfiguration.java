@@ -23,6 +23,7 @@ import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.*;
+import com.github.linyuzai.download.core.load.CompletableFutureSourceLoader;
 import com.github.linyuzai.download.core.load.SourceLoader;
 import com.github.linyuzai.download.core.logger.*;
 import com.github.linyuzai.download.core.source.DefaultSourceFactoryAdapter;
@@ -206,6 +207,12 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public SourceFactoryAdapter sourceFactoryAdapter(List<SourceFactory> factories) {
         return new DefaultSourceFactoryAdapter(factories);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SourceLoader sourceLoader() {
+        return new CompletableFutureSourceLoader();
     }
 
     @Bean

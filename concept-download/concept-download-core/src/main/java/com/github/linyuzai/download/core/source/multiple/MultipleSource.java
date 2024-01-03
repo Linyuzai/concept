@@ -189,7 +189,7 @@ public class MultipleSource implements Source {
      * @return 所有符合条件的 {@link Source} 的 {@link Part}
      */
     @Override
-    public Collection<Source> list(Predicate<Source> predicate) {
+    public List<Source> list(Predicate<Source> predicate) {
         List<Source> all = new ArrayList<>();
         for (Source source : sources) {
             all.addAll(source.list(predicate));

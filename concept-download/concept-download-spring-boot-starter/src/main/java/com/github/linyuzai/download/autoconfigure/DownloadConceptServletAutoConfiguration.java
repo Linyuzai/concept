@@ -27,12 +27,6 @@ import java.util.List;
 public class DownloadConceptServletAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
-    public SourceLoader sourceLoader() {
-        return new CompletableFutureSourceLoader();
-    }
-
-    @Bean
     public DownloadConcept downloadConcept(DownloadContextFactory factory,
                                            List<DownloadHandler> handlers,
                                            DownloadEventPublisher eventPublisher,

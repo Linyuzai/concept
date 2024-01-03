@@ -7,6 +7,7 @@ import com.github.linyuzai.download.core.load.Loadable;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -38,7 +39,7 @@ public interface Source extends Resource, Loadable {
      *
      * @return 列出的所有的 {@link Source}
      */
-    default Collection<Source> list() {
+    default List<Source> list() {
         return list(source -> true);
     }
 
@@ -49,7 +50,7 @@ public interface Source extends Resource, Loadable {
      * @param predicate 过滤条件
      * @return 列出的所有符合条件的 {@link Source}
      */
-    default Collection<Source> list(Predicate<Source> predicate) {
+    default List<Source> list(Predicate<Source> predicate) {
         if (predicate.test(this)) {
             return Collections.singletonList(this);
         } else {
