@@ -5,8 +5,6 @@ import com.github.linyuzai.download.core.source.Source;
 
 /**
  * {@link Source} 加载器。
- *
- * @see DefaultSourceLoader
  */
 public interface SourceLoader {
 

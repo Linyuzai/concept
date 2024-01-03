@@ -16,6 +16,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.InputStream;
@@ -23,8 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 //webmvc base ok
-//webflux base
-//source loader
+//webflux base ok
+//source loader ok
+//okhttp ok
+//executor
 //compress format/password
 @RestController
 @RequestMapping("/concept-download2")
@@ -162,17 +166,43 @@ public class ConceptDownloadController2 {
         };
     }
 
-    /*@Download
-    @GetMapping("/s20")
-    public Mono<String> s20() {
-        return Mono.just("123");
+    @Download
+    @GetMapping("/mono")
+    public Mono<String> mono() {
+        return Mono.just(anyText());
     }
 
     @Download
-    @GetMapping("/s21")
-    public Flux<String> s21() {
-        return Flux.just("123", "classpath:/download/image.jpg");
-    }*/
+    @GetMapping("/flux")
+    public Flux<Object> flux() {
+        return Flux.fromIterable(list());
+    }
+
+    @Download
+    @CompressCache(group = "reactiveAsync", name = "reactiveAsync.zip")
+    @GetMapping("/reactiveAsync")
+    public DownloadOptions.Configurer reactiveAsync() {
+        return new DownloadOptions.Configurer() {
+            @Override
+            public void configure(ConfigurableDownloadOptions options) {
+                System.out.println("在这里可以修改本次下载的参数！");
+                options.setSource(flux());
+                options.setAsyncConsumer(new InputStreamConsumer() {
+                    @Override
+                    public void consumer(InputStream is) {
+                        //输入流
+                    }
+                });
+                options.setAsyncConsumer(new FileConsumer() {
+                    @Override
+                    public void consumer(File file) {
+                        //文件
+                        System.out.println(file.getAbsolutePath());
+                    }
+                });
+            }
+        };
+    }
 
     @Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
     @GetMapping("/text.txt")

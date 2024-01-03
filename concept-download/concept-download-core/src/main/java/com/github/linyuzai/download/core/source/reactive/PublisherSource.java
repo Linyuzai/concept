@@ -1,5 +1,6 @@
 package com.github.linyuzai.download.core.source.reactive;
 
+import com.github.linyuzai.download.core.concept.Part;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.source.SourceFactoryAdapter;
@@ -14,8 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
@@ -70,7 +73,7 @@ public class PublisherSource implements ReactorSource {
         if (source != null) {
             return source.getDescription();
         }
-        throw new UnsupportedOperationException();
+        return publisher.toString();
     }
 
     @Override
@@ -78,7 +81,7 @@ public class PublisherSource implements ReactorSource {
         if (source != null) {
             return source.isAsyncLoad();
         }
-        throw new UnsupportedOperationException();
+        return true;
     }
 
     @Override
@@ -90,7 +93,102 @@ public class PublisherSource implements ReactorSource {
     }
 
     @Override
+    public List<Source> list() {
+        if (source != null) {
+            return source.list();
+        }
+        return ReactorSource.super.list();
+    }
+
+    @Override
+    public List<Source> list(Predicate<Source> predicate) {
+        if (source != null) {
+            return source.list(predicate);
+        }
+        return ReactorSource.super.list(predicate);
+    }
+
+    @Override
+    public Collection<Part> getParts() {
+        if (source != null) {
+            return source.getParts();
+        }
+        return ReactorSource.super.getParts();
+    }
+
+    @Override
+    public boolean isCacheEnabled() {
+        if (source != null) {
+            return source.isCacheEnabled();
+        }
+        return ReactorSource.super.isCacheEnabled();
+    }
+
+    @Override
+    public boolean isCacheExisted() {
+        if (source != null) {
+            return source.isCacheExisted();
+        }
+        return ReactorSource.super.isCacheExisted();
+    }
+
+    @Override
+    public String getCachePath() {
+        if (source != null) {
+            return source.getCachePath();
+        }
+        return ReactorSource.super.getCachePath();
+    }
+
+    @Override
+    public void deleteCache() {
+        if (source != null) {
+            source.deleteCache();
+        }
+        ReactorSource.super.deleteCache();
+    }
+
+    @Override
+    public String getPath() {
+        if (source != null) {
+            return source.getPath();
+        }
+        return ReactorSource.super.getPath();
+    }
+
+    @Override
+    public Collection<Part> getChildren() {
+        if (source != null) {
+            return source.getChildren();
+        }
+        return ReactorSource.super.getChildren();
+    }
+
+    @Override
+    public void release() {
+        if (source != null) {
+            source.release();
+        }
+        ReactorSource.super.release();
+    }
+
+    @Override
     public Mono<Void> preload(DownloadContext context) {
+        return create(context).then();
+    }
+
+    @Override
+    public void load(DownloadContext context) {
+        if (source == null) {
+            source = create(context).block();
+        }
+
+        if (source != null) {
+            source.load(context);
+        }
+    }
+
+    protected Mono<Source> create(DownloadContext context) {
         SourceFactoryAdapter adapter = context.get(SourceFactoryAdapter.class);
         return Flux.from(publisher)
                 .map(it -> adapter.getFactory(it, context).create(it, context))
@@ -104,17 +202,11 @@ public class PublisherSource implements ReactorSource {
                         }
                     }
                     if (monoList.isEmpty()) {
-                        return Mono.empty();
+                        return Mono.just(source);
                     } else {
-                        return Mono.zip(monoList, Function.identity()).then();
+                        return Mono.zip(monoList, Function.identity())
+                                .map(zip -> source);
                     }
                 });
-    }
-
-    @Override
-    public void load(DownloadContext context) {
-        if (source != null) {
-            source.load(context);
-        }
     }
 }

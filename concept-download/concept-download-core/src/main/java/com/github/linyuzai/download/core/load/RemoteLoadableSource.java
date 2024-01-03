@@ -28,12 +28,13 @@ public abstract class RemoteLoadableSource extends AbstractLoadableSource {
         DownloadWriterAdapter writerAdapter = context.get(DownloadWriterAdapter.class);
         DownloadWriter writer = writerAdapter.getWriter(this, context);
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
-        InputStream is = loadRemote(context);
-        Progress progress = new Progress(length);
-        writer.write(is, os, null, null, length, (current, increase) -> {
-            progress.update(increase);
-            publisher.publish(new SourceLoadingProgressEvent(context, this, progress.freeze()));
-        });
+        try (InputStream is = loadRemote(context)) {
+            Progress progress = new Progress(length);
+            writer.write(is, os, null, null, length, (current, increase) -> {
+                progress.update(increase);
+                publisher.publish(new SourceLoadingProgressEvent(context, this, progress.freeze()));
+            });
+        }
     }
 
     /**

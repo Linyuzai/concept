@@ -74,6 +74,8 @@ dependencies {
 
     implementation 'io.socket:socket.io-server:4.0.1'
 
+    //implementation "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
+
     //compileOnly 'org.springframework.cloud:spring-cloud-starter'
     //compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'
 

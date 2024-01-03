@@ -31,41 +31,40 @@ public class OkHttpSource extends HttpSource {
             rb.headers(Headers.of(headers));
         }
         Request request = rb.build();
-        try (Response response = client.newCall(request).execute()) {
-            int code = response.code();
-            if (isResponseSuccess(code)) {
-                ResponseBody body = response.body();
-                if (body == null) {
-                    throw new DownloadException("Body is null");
-                }
-                String contentType = getContentType();
-                if (contentType == null || contentType.isEmpty()) {
-                    MediaType mediaType = body.contentType();
-                    if (mediaType != null) {
-                        setContentType(mediaType.toString());
-                    }
-                }
-                long l = body.contentLength();
-                if (l != -1) {
-                    length = l;
-                }
-                return body.byteStream();
-            } else {
-                StringBuilder builder = new StringBuilder();
-                builder.append(response.code()).append(";");
-                String message = response.message();
-                if (!message.isEmpty()) {
-                    builder.append(message).append(";");
-                }
-                ResponseBody body = response.body();
-                if (body != null) {
-                    String s = body.string();
-                    if (!s.isEmpty()) {
-                        builder.append(s).append(";");
-                    }
-                }
-                throw new DownloadException("code: " + code + ", " + builder);
+        Response response = client.newCall(request).execute();
+        int code = response.code();
+        if (isResponseSuccess(code)) {
+            ResponseBody body = response.body();
+            if (body == null) {
+                throw new DownloadException("Body is null");
             }
+            String contentType = getContentType();
+            if (contentType == null || contentType.isEmpty()) {
+                MediaType mediaType = body.contentType();
+                if (mediaType != null) {
+                    setContentType(mediaType.toString());
+                }
+            }
+            long l = body.contentLength();
+            if (l != -1) {
+                length = l;
+            }
+            return body.byteStream();
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append(response.code()).append(";");
+            String message = response.message();
+            if (!message.isEmpty()) {
+                builder.append(message).append(";");
+            }
+            ResponseBody body = response.body();
+            if (body != null) {
+                String s = body.string();
+                if (!s.isEmpty()) {
+                    builder.append(s).append(";");
+                }
+            }
+            throw new DownloadException("code: " + code + ", " + builder);
         }
     }
 
