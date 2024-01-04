@@ -40,8 +40,8 @@ public class ConceptDownloadController2 {
 
     @Download
     @GetMapping("/empty")
-    public void empty() {
-
+    public String empty() {
+        return "file:/empty";
     }
 
     @GetMapping("text")
