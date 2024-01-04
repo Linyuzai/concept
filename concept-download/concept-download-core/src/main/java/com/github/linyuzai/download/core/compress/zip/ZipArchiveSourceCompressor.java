@@ -49,12 +49,12 @@ public class ZipArchiveSourceCompressor extends AbstractSourceCompressor<ZipArch
     }
 
     @Override
-    public void beforeWrite(Part part, ZipArchiveOutputStream os) throws IOException {
+    public void beforeWrite(Part part, ZipArchiveOutputStream os, DownloadContext context) throws IOException {
         os.putArchiveEntry(new ZipArchiveEntry(part.getPath()));
     }
 
     @Override
-    public void afterWrite(Part part, ZipArchiveOutputStream os) throws IOException {
+    public void afterWrite(Part part, ZipArchiveOutputStream os, DownloadContext context) throws IOException {
         os.closeArchiveEntry();
     }
 

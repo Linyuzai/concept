@@ -9,6 +9,7 @@ import com.github.linyuzai.download.core.source.Source;
 import com.github.linyuzai.download.core.web.ContentType;
 import net.lingala.zip4j.io.outputstream.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,14 +33,24 @@ public class Zip4jSourceCompressor extends AbstractSourceCompressor<ZipOutputStr
     }
 
     @Override
-    public void beforeWrite(Part part, ZipOutputStream os) throws IOException {
+    public void beforeWrite(Part part, ZipOutputStream os, DownloadContext context) throws IOException {
         ZipParameters parameters = new ZipParameters();
         parameters.setFileNameInZip(part.getPath());
+        initZipParameters(parameters, context);
         os.putNextEntry(parameters);
     }
 
+    protected void initZipParameters(ZipParameters parameters, DownloadContext context) {
+        DownloadOptions options = DownloadOptions.get(context);
+        String password = options.getCompressPassword();
+        if (password != null && !password.isEmpty()) {
+            parameters.setEncryptFiles(true);
+            parameters.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
+        }
+    }
+
     @Override
-    public void afterWrite(Part part, ZipOutputStream os) throws IOException {
+    public void afterWrite(Part part, ZipOutputStream os, DownloadContext context) throws IOException {
         os.closeEntry();
     }
 

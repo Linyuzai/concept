@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Deprecated
 public interface ReactiveSourceLoader extends SourceLoader {
 
     default Object load(Source source, DownloadContext context, Supplier<?> supplier) {

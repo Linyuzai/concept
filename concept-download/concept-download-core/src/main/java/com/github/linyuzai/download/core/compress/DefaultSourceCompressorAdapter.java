@@ -2,6 +2,7 @@ package com.github.linyuzai.download.core.compress;
 
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.exception.DownloadException;
+import com.github.linyuzai.download.core.options.DownloadOptions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +35,12 @@ public class DefaultSourceCompressorAdapter implements SourceCompressorAdapter {
                 return compressor;
             }
         }
-        throw new DownloadException("No SourceCompressor support: " + format);
+        DownloadOptions options = DownloadOptions.get(context);
+        String password = options.getCompressPassword();
+        if (password == null || password.isEmpty()) {
+            throw new DownloadException("No SourceCompressor support: " + format);
+        } else {
+            throw new DownloadException("No SourceCompressor support with encryption: " + format);
+        }
     }
 }

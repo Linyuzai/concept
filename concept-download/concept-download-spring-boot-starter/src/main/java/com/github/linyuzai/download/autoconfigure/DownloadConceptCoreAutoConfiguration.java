@@ -21,6 +21,8 @@ import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.event.DownloadEventPublisher;
+import com.github.linyuzai.download.core.executor.DownloadExecutor;
+import com.github.linyuzai.download.core.executor.DownloadExecutorInitializer;
 import com.github.linyuzai.download.core.handler.DownloadHandler;
 import com.github.linyuzai.download.core.handler.impl.*;
 import com.github.linyuzai.download.core.load.CompletableFutureSourceLoader;
@@ -42,6 +44,7 @@ import com.github.linyuzai.download.core.write.BufferedDownloadWriter;
 import com.github.linyuzai.download.core.write.DefaultDownloadWriterAdapter;
 import com.github.linyuzai.download.core.write.DownloadWriter;
 import com.github.linyuzai.download.core.write.DownloadWriterAdapter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -59,6 +62,16 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DownloadProperties.class)
 public class DownloadConceptCoreAutoConfiguration {
+
+    @Configuration
+    @ConditionalOnBean(DownloadExecutor.class)
+    public static class DownloadExecutorInitializerAutoConfiguration {
+
+        @Bean
+        public DownloadExecutorInitializer downloadExecutorInitializer(DownloadExecutor executor) {
+            return new DownloadExecutorInitializer(executor);
+        }
+    }
 
     @Bean
     @ConditionalOnMissingBean

@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * 使用 {@link WebClient} 处理 http 请求的 {@link Source}。
  */
+@Deprecated
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WebClientSource extends HttpSource implements ReactorSource {
 

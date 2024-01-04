@@ -43,7 +43,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
      */
     @SneakyThrows
     @Override
-    public void beforeWrite(Part part, ZipOutputStream os) {
+    public void beforeWrite(Part part, ZipOutputStream os, DownloadContext context) {
         os.putNextEntry(new ZipEntry(part.getPath()));
     }
 
@@ -55,7 +55,7 @@ public class ZipSourceCompressor extends AbstractSourceCompressor<ZipOutputStrea
      */
     @SneakyThrows
     @Override
-    public void afterWrite(Part part, ZipOutputStream os) {
+    public void afterWrite(Part part, ZipOutputStream os, DownloadContext context) {
         os.closeEntry();
     }
 

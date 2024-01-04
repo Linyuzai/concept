@@ -51,12 +51,17 @@ public class TarArchiveSourceCompressor extends AbstractSourceCompressor<TarArch
     }
 
     @Override
-    public void beforeWrite(Part part, TarArchiveOutputStream os) throws IOException {
-        os.putArchiveEntry(new TarArchiveEntry(part.getPath()));
+    public void beforeWrite(Part part, TarArchiveOutputStream os, DownloadContext context) throws IOException {
+        TarArchiveEntry entry = new TarArchiveEntry(part.getPath());
+        Long length = part.getLength();
+        if (length != null) {
+            entry.setSize(length);
+        }
+        os.putArchiveEntry(entry);
     }
 
     @Override
-    public void afterWrite(Part part, TarArchiveOutputStream os) throws IOException {
+    public void afterWrite(Part part, TarArchiveOutputStream os, DownloadContext context) throws IOException {
         os.closeArchiveEntry();
     }
 

@@ -26,7 +26,7 @@ public class PublisherSource implements ReactorSource {
 
     private final Publisher<?> publisher;
 
-    private Source source;
+    private Source source;  
 
     @Override
     public InputStream getInputStream() throws IOException {

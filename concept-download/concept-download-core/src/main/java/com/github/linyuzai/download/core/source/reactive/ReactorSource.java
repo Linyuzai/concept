@@ -10,6 +10,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
+@Deprecated
 public interface ReactorSource extends Source {
 
     Mono<Void> preload(DownloadContext context);

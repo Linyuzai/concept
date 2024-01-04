@@ -74,6 +74,9 @@ dependencies {
 
     implementation 'io.socket:socket.io-server:4.0.1'
 
+    //implementation "net.lingala.zip4j:zip4j:${Zip4jVersion}"
+    implementation "org.apache.commons:commons-compress:${CommonsCompressVersion}"
+
     //implementation "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
 
     //compileOnly 'org.springframework.cloud:spring-cloud-starter'

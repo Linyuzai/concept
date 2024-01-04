@@ -28,8 +28,8 @@ import java.util.List;
 //webflux base ok
 //source loader ok
 //okhttp ok
-//executor
-//compress format/password
+//executor ok
+//compress format/password ok
 @RestController
 @RequestMapping("/concept-download2")
 public class ConceptDownloadController2 {
@@ -101,6 +101,27 @@ public class ConceptDownloadController2 {
     public void dir() {
     }
 
+    @Download(source = {
+            "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download",
+    }, filename = "Password.zip", compressPassword = "123456")
+    @GetMapping("/password")
+    public void password() {
+    }
+
+    @Download(source = {
+            "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download",
+    }, filename = "Tar.tar", compressFormat = "tar")
+    @GetMapping("/tar")
+    public void tar() {
+    }
+
+    @Download(source = {
+            "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download",
+    }, filename = "TarGz.tar.gz", compressFormat = "tar.gz")
+    @GetMapping("/tarGz")
+    public void tarGz() {
+    }
+
     @Download(filename = "List.zip")
     @GetMapping("/list")
     public List<Object> list() {
@@ -137,6 +158,20 @@ public class ConceptDownloadController2 {
     @GetMapping("/loadAndCompressError")
     public void loadAndCompressError() {
 
+    }
+
+    @Download
+    @SourceCache(group = "listAndCache")
+    @CompressCache(group = "listAndCache", name = "Configurer.zip")
+    @GetMapping("/configurer")
+    public DownloadOptions.Configurer configurer() {
+        return new DownloadOptions.Configurer() {
+            @Override
+            public void configure(ConfigurableDownloadOptions options) {
+                System.out.println("在这里可以修改本次下载的参数！");
+                options.setSource(list());
+            }
+        };
     }
 
     @Download

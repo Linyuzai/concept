@@ -112,12 +112,12 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
             Collection<Part> parts = source.getParts();
             for (Part part : parts) {
                 InputStream is = part.getInputStream();
-                beforeWrite(part, nos);
+                beforeWrite(part, nos, context);
                 writer.write(is, nos, null, part.getCharset(), part.getLength(), (current, increase) -> {
                     progress.update(increase);
                     publisher.publish(new SourceCompressingProgressEvent(context, progress.freeze()));
                 });
-                afterWrite(part, nos);
+                afterWrite(part, nos, context);
             }
         }
     }
@@ -147,7 +147,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param part {@link Part}
      * @param os   {@link OS}
      */
-    public abstract void beforeWrite(Part part, OS os) throws IOException;
+    public abstract void beforeWrite(Part part, OS os, DownloadContext context) throws IOException;
 
     /**
      * 写入之后调用。
@@ -155,7 +155,7 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
      * @param part {@link Part}
      * @param os   {@link OS}
      */
-    public abstract void afterWrite(Part part, OS os) throws IOException;
+    public abstract void afterWrite(Part part, OS os, DownloadContext context) throws IOException;
 
     /**
      * 如果指定了压缩文件缓存名称则使用指定的名称，
