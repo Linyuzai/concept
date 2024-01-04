@@ -74,7 +74,7 @@ dependencies {
 
     implementation 'io.socket:socket.io-server:4.0.1'
 
-    //implementation "net.lingala.zip4j:zip4j:${Zip4jVersion}"
+    implementation "net.lingala.zip4j:zip4j:${Zip4jVersion}"
     implementation "org.apache.commons:commons-compress:${CommonsCompressVersion}"
 
     //implementation "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
@@ -84,8 +84,8 @@ dependencies {
 
     compileOnly 'org.springframework.boot:spring-boot-starter'
     //compileOnly 'org.springframework.boot:spring-boot-starter-aop'
-    //compileOnly 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    //compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     //compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
     compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
 

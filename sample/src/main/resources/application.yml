@@ -9,6 +9,8 @@ management:
   health:
     rabbit:
       enabled: false
+download:
+  password: qwe123
 #spring:
 #  mvc:
 #    pathmatch:

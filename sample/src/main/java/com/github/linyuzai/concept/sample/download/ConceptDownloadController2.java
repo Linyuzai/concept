@@ -16,8 +16,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.InputStream;
@@ -103,7 +101,7 @@ public class ConceptDownloadController2 {
 
     @Download(source = {
             "file:/Users/tanghanzheng/IdeaProjects/Github/x/concept/sample/src/main/resources/download",
-    }, filename = "Password.zip", compressPassword = "123456")
+    }, filename = "Password.zip", compressPassword = "${download.password}")
     @GetMapping("/password")
     public void password() {
     }
@@ -201,7 +199,7 @@ public class ConceptDownloadController2 {
         };
     }
 
-    @Download
+    /*@Download
     @GetMapping("/mono")
     public Mono<String> mono() {
         return Mono.just(anyText());
@@ -211,9 +209,9 @@ public class ConceptDownloadController2 {
     @GetMapping("/flux")
     public Flux<Object> flux() {
         return Flux.fromIterable(list());
-    }
+    }*/
 
-    @Download
+    /*@Download
     @CompressCache(group = "reactiveAsync", name = "reactiveAsync.zip")
     @GetMapping("/reactiveAsync")
     public DownloadOptions.Configurer reactiveAsync() {
@@ -237,7 +235,7 @@ public class ConceptDownloadController2 {
                 });
             }
         };
-    }
+    }*/
 
     @Download(source = "classpath:/download/text.txt", inline = true, charset = "utf-8", contentType = "text/plain;charset=utf-8")
     @GetMapping("/text.txt")
