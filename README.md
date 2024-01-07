@@ -14,7 +14,7 @@
 
 - 一个注解实现下载接口
   - [1.x.x：一个注解实现下载接口](../../wiki/Concept-Download)
-  - [2.x.x：支持异步消费，压缩加密，`SpEL`](../../wiki/Concept-Download-2)
+  - [2.x.x：支持异步消费，压缩加密，SpEL](../../wiki/Concept-Download-2)
 - [异步回调转为同步返回](../../wiki/Concept-Sync-Waiting)
 - [动态加载外部 jar 中的 Class](../../wiki/Concept-Plugin)
 - [协同开发之动态路由](../../wiki/Concept-Router)
