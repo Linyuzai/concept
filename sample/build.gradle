@@ -30,11 +30,9 @@ dependencies {
     //implementation 'com.github.linyuzai:concept-mapqueue-core:1.1.0'
     implementation project(path: ':concept-mapqueue:concept-mapqueue-core', configuration: 'default')
 
-    /*compile "com.github.linyuzai:concept-download-spring-boot-starter:1.2.0"
-    compile "com.github.linyuzai:concept-download-source-okhttp:1.2.0"
-    compile "com.github.linyuzai:concept-download-load-coroutines:1.2.0"*/
+    //implementation "com.github.linyuzai:concept-download-spring-boot-starter:2.0.0"
+    //implementation "com.github.linyuzai:concept-download-coroutines:2.0.0"
     implementation project(path: ':concept-download:concept-download-core', configuration: 'default')
-    //implementation project(path: ':concept-download:concept-download-source-okhttp', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-coroutines', configuration: 'default')
     implementation project(path: ':concept-download:concept-download-spring-boot-starter', configuration: 'default')
 
