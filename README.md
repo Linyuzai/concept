@@ -12,7 +12,9 @@
 
 # 目录
 
-- [一个注解实现下载接口](../../wiki/Concept-Download)
+- 一个注解实现下载接口
+  - [1.x.x：一个注解实现下载接口](../../wiki/Concept-Download)
+  - [2.x.x：支持异步消费，压缩加密，`SpEL`](../../wiki/Concept-Download-2)
 - [异步回调转为同步返回](../../wiki/Concept-Sync-Waiting)
 - [动态加载外部 jar 中的 Class](../../wiki/Concept-Plugin)
 - [协同开发之动态路由](../../wiki/Concept-Router)
@@ -28,6 +30,6 @@
  
 # 计划
 
-- download 2.0 版本（重构 + 支持异步消费大文件 + 压缩加密）
 - job组件
+- 插件多场景隔离 + starter
 - connection-loadbalance 支持 sse
