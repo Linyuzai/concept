@@ -1,0 +1,17 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptJobVersion
+ext {
+    set('publishName', 'Job Core')
+    set('publishDescription', 'Job Adapter')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+}
+
+apply from: '../../publish.gradle'
+

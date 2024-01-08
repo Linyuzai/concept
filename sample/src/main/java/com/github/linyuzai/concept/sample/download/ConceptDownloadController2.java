@@ -3,6 +3,7 @@ package com.github.linyuzai.concept.sample.download;
 import com.github.linyuzai.download.core.annotation.CompressCache;
 import com.github.linyuzai.download.core.annotation.Download;
 import com.github.linyuzai.download.core.annotation.SourceCache;
+import com.github.linyuzai.download.core.event.DownloadEventListener;
 import com.github.linyuzai.download.core.options.ConfigurableDownloadOptions;
 import com.github.linyuzai.download.core.options.DownloadOptions;
 import com.github.linyuzai.download.core.source.reflect.SourceModel;
@@ -182,6 +183,12 @@ public class ConceptDownloadController2 {
             public void configure(ConfigurableDownloadOptions options) {
                 System.out.println("在这里可以修改本次下载的参数！");
                 options.setSource(list());
+                options.setEventListener(new DownloadEventListener() {
+                    @Override
+                    public void onEvent(Object event) {
+
+                    }
+                });
                 options.setAsyncConsumer(new InputStreamConsumer() {
                     @Override
                     public void consumer(InputStream is) {
