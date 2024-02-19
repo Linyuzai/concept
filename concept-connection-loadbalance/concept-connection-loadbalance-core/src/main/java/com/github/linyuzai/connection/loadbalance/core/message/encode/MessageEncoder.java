@@ -20,11 +20,6 @@ public interface MessageEncoder {
      */
     Object encode(Message message, Connection connection, ConnectionLoadBalanceConcept concept);
 
-    @Deprecated
-    default Object encode(Message message, ConnectionLoadBalanceConcept concept) {
-        return encode(message, null, concept);
-    }
-
     /**
      * 编码。
      * <p>
@@ -32,11 +27,6 @@ public interface MessageEncoder {
      */
     default Object encode(Message message, Connection connection) {
         return encode(message, connection, null);
-    }
-
-    @Deprecated
-    default Object encode(Message message) {
-        return encode(message, null, null);
     }
 
     /**
@@ -62,21 +52,9 @@ public interface MessageEncoder {
             return delegate.encode(message, connection, concept);
         }
 
-        @Deprecated
-        @Override
-        public Object encode(Message message, ConnectionLoadBalanceConcept concept) {
-            return delegate.encode(message, concept);
-        }
-
         @Override
         public Object encode(Message message, Connection connection) {
             return delegate.encode(message, connection, concept);
-        }
-
-        @Deprecated
-        @Override
-        public Object encode(Message message) {
-            return delegate.encode(message, concept);
         }
     }
 }

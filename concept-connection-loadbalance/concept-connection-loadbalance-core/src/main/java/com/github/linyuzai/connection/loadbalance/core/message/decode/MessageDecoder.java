@@ -20,11 +20,6 @@ public interface MessageDecoder {
      */
     Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept);
 
-    @Deprecated
-    default Message decode(Object message, ConnectionLoadBalanceConcept concept) {
-        return decode(message, null, concept);
-    }
-
     /**
      * 解码。
      * <p>
@@ -32,11 +27,6 @@ public interface MessageDecoder {
      */
     default Message decode(Object message, Connection connection) {
         return decode(message, connection, null);
-    }
-
-    @Deprecated
-    default Message decode(Object message) {
-        return decode(message, null, null);
     }
 
     /**
@@ -62,21 +52,9 @@ public interface MessageDecoder {
             return delegate.decode(message, connection, concept);
         }
 
-        @Deprecated
-        @Override
-        public Message decode(Object message, ConnectionLoadBalanceConcept concept) {
-            return delegate.decode(message, concept);
-        }
-
         @Override
         public Message decode(Object message, Connection connection) {
             return delegate.decode(message, connection, concept);
-        }
-
-        @Deprecated
-        @Override
-        public Message decode(Object message) {
-            return delegate.decode(message, concept);
         }
     }
 }

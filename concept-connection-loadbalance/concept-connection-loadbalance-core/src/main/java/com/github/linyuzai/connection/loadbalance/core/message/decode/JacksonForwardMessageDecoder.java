@@ -47,7 +47,11 @@ public class JacksonForwardMessageDecoder implements MessageDecoder {
         } else {
             TextMessage decoded = new TextMessage();
             decoded.setHeaders(headers);
-            decoded.setPayload(payloadNode.toString());
+            if (payloadNode.isTextual()) {
+                decoded.setPayload(payloadNode.asText());
+            } else {
+                decoded.setPayload(objectMapper.writeValueAsString(payloadNode));
+            }
             return decoded;
         }
     }

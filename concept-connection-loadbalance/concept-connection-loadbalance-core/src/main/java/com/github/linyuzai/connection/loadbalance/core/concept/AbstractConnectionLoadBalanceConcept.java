@@ -352,21 +352,75 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     }
 
     /**
+     * 创建消息。
+     * 同时添加额外的消息头。
+     * <p>
+     * Create message with additional headers.
+     */
+    @Override
+    public Message createMessage(Object o, Map<String, String> headers) {
+        Message message = createMessage(o);
+        if (headers != null) {
+            message.getHeaders().putAll(headers);
+        }
+        return message;
+    }
+
+    /**
      * 发送消息。
      * <p>
      * Send message.
      */
     @Override
     public void send(Object msg) {
-        //创建消息
-        //Create message
         Message message = createMessage(msg);
+        ConnectionSelector selector = getConnectionSelector(message);
+        doSend(message, selector);
+    }
+
+    /**
+     * 发送消息。
+     * 同时添加额外的消息头。
+     * <p>
+     * Send message with additional headers.
+     */
+    @Override
+    public void send(Object msg, Map<String, String> headers) {
+        Message message = createMessage(msg, headers);
+        ConnectionSelector selector = getConnectionSelector(message);
+        doSend(message, selector);
+    }
+
+    /**
+     * 发送消息。
+     * 同时指定连接选择器。
+     * <p>
+     * Send message with connection selector.
+     */
+    @Override
+    public void send(Object msg, ConnectionSelector selector) {
+        doSend(createMessage(msg), selector);
+    }
+
+    /**
+     * 发送消息。
+     * 同时添加额外的消息头。
+     * 同时指定连接选择器。
+     * <p>
+     * Send message with additional headers and connection selector.
+     */
+    @Override
+    public void send(Object msg, Map<String, String> headers, ConnectionSelector selector) {
+        doSend(createMessage(msg, headers), selector);
+    }
+
+    protected void doSend(Message message, ConnectionSelector selector) {
+        if (selector == null) {
+            throw new IllegalArgumentException("No connection selector adapted for message: " + message);
+        }
         //初始化消息
         //Init message
         initMessage(message);
-        //连接选择器
-        //Get connection selector
-        ConnectionSelector selector = getConnectionSelector(message);
         //选择连接
         //Select connections
         Collection<Connection> connections = selector.select(message);
@@ -392,23 +446,6 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             }
         }
         eventPublisher.publish(new MessageSendEvent(message, connections));
-    }
-
-    /**
-     * 发送消息。
-     * 同时添加额外的消息头。
-     * <p>
-     * Send message with additional headers.
-     */
-    @Override
-    public void send(Object msg, Map<String, String> headers) {
-        if (headers == null) {
-            send(msg);
-            return;
-        }
-        Message message = createMessage(msg);
-        message.getHeaders().putAll(headers);
-        send(message);
     }
 
     /**

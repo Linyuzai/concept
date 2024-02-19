@@ -110,6 +110,14 @@ public interface ConnectionLoadBalanceConcept {
     Message createMessage(Object o);
 
     /**
+     * 创建消息。
+     * 同时添加额外的消息头。
+     * <p>
+     * Create message with additional headers.
+     */
+    Message createMessage(Object o, Map<String, String> headers);
+
+    /**
      * 发送消息。
      * <p>
      * Send message.
@@ -123,6 +131,23 @@ public interface ConnectionLoadBalanceConcept {
      * Send message with additional headers.
      */
     void send(Object msg, Map<String, String> headers);
+
+    /**
+     * 发送消息。
+     * 同时指定连接选择器。
+     * <p>
+     * Send message with connection selector.
+     */
+    void send(Object msg, ConnectionSelector selector);
+
+    /**
+     * 发送消息。
+     * 同时添加额外的消息头。
+     * 同时指定连接选择器。
+     * <p>
+     * Send message with additional headers and connection selector.
+     */
+    void send(Object msg, Map<String, String> headers, ConnectionSelector selector);
 
     ConnectionRepository getConnectionRepository();
 
