@@ -2,6 +2,7 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.config.annotation.ServletWebSocketHandlerRegistry;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
  * <p>
  * {@link WebSocketConfigurer} for default service based on {@link ServletWebSocketConnection}.
  */
+@Getter
 @RequiredArgsConstructor
 public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 

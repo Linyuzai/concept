@@ -3,7 +3,9 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -16,7 +18,8 @@ import java.util.function.Consumer;
  * <p>
  * {@link WebSocketHandler} for forwarding message client based on {@link ServletWebSocketConnection}.
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ServletWebSocketSubscriberHandler implements WebSocketHandler {
 
     private final ConnectionLoadBalanceConcept concept;

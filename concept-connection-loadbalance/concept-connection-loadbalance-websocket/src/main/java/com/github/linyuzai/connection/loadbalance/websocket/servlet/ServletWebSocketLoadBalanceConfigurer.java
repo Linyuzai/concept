@@ -1,7 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
@@ -10,10 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
  * <p>
  * {@link WebSocketConfigurer} for service load balancing based on {@link ServletWebSocketConnection}.
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ServletWebSocketLoadBalanceConfigurer implements WebSocketConfigurer {
 
-    private WebSocketLoadBalanceConcept concept;
+    private final WebSocketLoadBalanceConcept concept;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

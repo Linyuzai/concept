@@ -2,7 +2,6 @@ package com.github.linyuzai.connection.loadbalance.websocket.javax;
 
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.context.ServletContextAware;
 
@@ -15,7 +14,6 @@ import javax.websocket.WebSocketContainer;
  * <p>
  * Connection subscriber based on {@link WebSocketContainer}.
  */
-@NoArgsConstructor
 public abstract class ContainerWebSocketConnectionSubscriber<T extends WebSocketConnection>
         extends WebSocketConnectionSubscriber<T> implements ServletContextAware {
 

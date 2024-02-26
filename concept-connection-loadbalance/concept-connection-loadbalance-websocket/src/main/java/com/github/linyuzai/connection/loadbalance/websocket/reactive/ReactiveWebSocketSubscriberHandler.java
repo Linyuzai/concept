@@ -2,9 +2,9 @@ package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -21,12 +21,12 @@ import java.util.function.BiConsumer;
  * {@link WebSocketHandler} based on {@link ReactiveWebSocketConnection} for forwarding message client.
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReactiveWebSocketSubscriberHandler implements WebSocketHandler {
 
-    private ConnectionLoadBalanceConcept concept;
+    private final ConnectionLoadBalanceConcept concept;
 
-    private BiConsumer<WebSocketSession, FluxSink<WebSocketMessage>> sessionConsumer;
+    private final BiConsumer<WebSocketSession, FluxSink<WebSocketMessage>> sessionConsumer;
 
     @NonNull
     @Override

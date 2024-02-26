@@ -2,8 +2,9 @@ package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -16,10 +17,11 @@ import reactor.core.publisher.Mono;
  * <p>
  * {@link WebSocketHandler} based on {@link ReactiveWebSocketConnection} for service load balancing.
  */
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ReactiveWebSocketLoadBalanceHandler implements WebSocketHandler {
 
-    private WebSocketLoadBalanceConcept concept;
+    private final WebSocketLoadBalanceConcept concept;
 
     @NonNull
     @Override
