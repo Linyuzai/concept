@@ -1,0 +1,19 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptSseLoadbalanceVersion
+ext {
+    set('publishName', 'Connection Load Balance SSE')
+    set('publishDescription', 'Load Balance 4 SSE')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
+}
+
+apply from: '../../publish.gradle'

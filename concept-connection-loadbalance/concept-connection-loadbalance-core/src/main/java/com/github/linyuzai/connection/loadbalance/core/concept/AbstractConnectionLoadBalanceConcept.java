@@ -209,6 +209,7 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         connection.setMessageEncoder(encoder);
         connection.setMessageDecoder(decoder);
         connection.setMessageRetryStrategy(retryStrategy);
+        connection.initialize();
         connectionRepository.add(connection);
         eventPublisher.publish(new ConnectionEstablishEvent(connection));
     }

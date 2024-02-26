@@ -138,6 +138,15 @@ public interface Connection {
     ConnectionLoadBalanceConcept getConcept();
 
     /**
+     * 初始化。
+     * <p>
+     * initialize.
+     */
+    default void initialize() {
+
+    }
+
+    /**
      * 发送消息。
      * <p>
      * Send message.
