@@ -11,6 +11,11 @@ public class SseLoadBalanceConcept extends AbstractConnectionLoadBalanceConcept 
 
     public static final String ID = "sse";
 
+    /**
+     * 服务间订阅端点
+     */
+    public static final String SUBSCRIBER_ENDPOINT = "/concept-sse-subscriber";
+
     @Override
     public String getId() {
         return ID;

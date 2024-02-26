@@ -1,24 +1,24 @@
-package com.github.linyuzai.connection.loadbalance.websocket.concept;
+package com.github.linyuzai.connection.loadbalance.sse.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ProtocolConnectionSubscriber;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * ws 连接订阅者。
+ * SSE 连接订阅者。
  * <p>
- * ws connection subscriber.
+ * SSE connection subscriber.
  */
 @Getter
 @Setter
-public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnection>
+public abstract class SseConnectionSubscriber<T extends SseConnection>
         extends ProtocolConnectionSubscriber<T> {
 
-    private String protocol = "ws";
+    private String protocol = "http";
 
     @Override
     public String getEndpoint() {
-        return WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
+        return SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
     }
 
     public abstract String getType();

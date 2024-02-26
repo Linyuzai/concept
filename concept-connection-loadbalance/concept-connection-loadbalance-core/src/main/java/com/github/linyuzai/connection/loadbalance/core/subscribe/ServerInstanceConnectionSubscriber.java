@@ -114,7 +114,22 @@ public abstract class ServerInstanceConnectionSubscriber<T extends Connection> i
         return null;
     }
 
-    public abstract void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
+    /*public abstract void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
+                                     Consumer<T> onSuccess,
+                                     Consumer<Throwable> onError,
+                                     Runnable onComplete);*/
+
+    public void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
+                            Consumer<T> onSuccess, Consumer<Throwable> onError,
+                            Runnable onComplete) {
+        URI uri = getUri(server);
+        doSubscribe(uri, concept, connection -> {
+            connection.getMetadata().put(ConnectionServer.class, server);
+            onSuccess.accept(connection);
+        }, onError, onComplete);
+    }
+
+    public abstract void doSubscribe(URI uri, ConnectionLoadBalanceConcept concept,
                                      Consumer<T> onSuccess,
                                      Consumer<Throwable> onError,
                                      Runnable onComplete);
