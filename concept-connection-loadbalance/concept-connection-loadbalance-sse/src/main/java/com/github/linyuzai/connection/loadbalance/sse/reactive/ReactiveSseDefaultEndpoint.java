@@ -29,7 +29,7 @@ public class ReactiveSseDefaultEndpoint {
                     ReactiveSseCreateRequest request = new ReactiveSseCreateRequest(id, path, fluxSink);
                     concept.onEstablish(request, params);
                 }))
-                .doOnError(it -> concept.onError(id, Connection.Type.OBSERVABLE, it))
-                .doOnComplete(() -> concept.onClose(id, Connection.Type.OBSERVABLE, null));
+                .doOnError(it -> concept.onError(id, Connection.Type.CLIENT, it))
+                .doOnComplete(() -> concept.onClose(id, Connection.Type.CLIENT, null));
     }
 }

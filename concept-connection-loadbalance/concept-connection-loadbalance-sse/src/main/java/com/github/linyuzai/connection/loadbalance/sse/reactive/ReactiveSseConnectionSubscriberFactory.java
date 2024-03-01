@@ -12,12 +12,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ReactiveSseConnectionSubscriberFactory extends SseConnectionSubscriberFactory<ReactiveSseConnection> {
+public class ReactiveSseConnectionSubscriberFactory extends SseConnectionSubscriberFactory<ReactiveSubscriberSseConnection> {
 
     private ReactiveSseClientFactory sseClientFactory;
 
     @Override
-    public SseConnectionSubscriber<ReactiveSseConnection> doCreate(String scope) {
+    public SseConnectionSubscriber<ReactiveSubscriberSseConnection> doCreate(String scope) {
         return new ReactiveSseConnectionSubscriber(sseClientFactory);
     }
 }
