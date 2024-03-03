@@ -14,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("${concept.sse.server.default-endpoint.prefix:concept-sse}")
 @RequiredArgsConstructor
-public class ReactiveSseDefaultEndpoint {
+public class ReactiveSseServerEndpoint {
 
     private final SseIdGenerator sseIdGenerator;
 

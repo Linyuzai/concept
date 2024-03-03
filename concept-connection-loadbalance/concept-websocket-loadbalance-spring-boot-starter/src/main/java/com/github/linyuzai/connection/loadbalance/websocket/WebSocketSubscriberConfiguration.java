@@ -292,7 +292,7 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         @Bean
         @Order(100)
         @ConditionalOnMissingBean
-        public ConnectionSubscribeHandler connectionSubscribeHandler() {
+        public ConnectionSubscribeHandler wsConnectionSubscribeHandler() {
             return new ConnectionSubscribeHandler().addScopes(WebSocketScoped.NAME);
         }
 
@@ -300,7 +300,7 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         @Order(300)
         @ConditionalOnMissingBean
         @ConditionalOnProperty(value = "concept.websocket.load-balance.monitor.enabled", havingValue = "true", matchIfMissing = true)
-        public ScheduledConnectionLoadBalanceMonitor scheduledConnectionLoadBalanceMonitor(
+        public ScheduledConnectionLoadBalanceMonitor wsScheduledConnectionLoadBalanceMonitor(
                 WebSocketLoadBalanceProperties properties) {
             long period = properties.getLoadBalance().getMonitor().getPeriod();
             boolean logger = properties.getLoadBalance().getMonitor().isLogger();

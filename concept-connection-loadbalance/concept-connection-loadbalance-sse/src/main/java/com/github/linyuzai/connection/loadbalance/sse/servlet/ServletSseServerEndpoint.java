@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("${concept.sse.server.default-endpoint.prefix:concept-sse}")
 @RequiredArgsConstructor
-public class ServletSseDefaultEndpoint {
+public class ServletSseServerEndpoint {
 
     private final SseIdGenerator sseIdGenerator;
 

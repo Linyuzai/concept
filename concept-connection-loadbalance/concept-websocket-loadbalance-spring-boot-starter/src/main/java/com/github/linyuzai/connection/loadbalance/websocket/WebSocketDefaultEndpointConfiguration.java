@@ -19,7 +19,7 @@ public class WebSocketDefaultEndpointConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.path-selector",
             name = "enabled", havingValue = "true")
-    public DefaultEndpointPathSelector defaultEndpointPathSelector(WebSocketLoadBalanceProperties properties) {
+    public DefaultEndpointPathSelector wsDefaultEndpointPathSelector(WebSocketLoadBalanceProperties properties) {
         String prefix = WebSocketLoadBalanceConcept.
                 formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
         return new DefaultEndpointPathSelector(prefix).addScopes(WebSocketScoped.NAME);
@@ -28,7 +28,7 @@ public class WebSocketDefaultEndpointConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.user-selector",
             name = "enabled", havingValue = "true")
-    public UserSelector userSelector() {
+    public UserSelector wsUserSelector() {
         return new UserSelector().addScopes(WebSocketScoped.NAME);
     }
 
@@ -36,7 +36,7 @@ public class WebSocketDefaultEndpointConfiguration {
     @Order(1000)
     @ConditionalOnProperty(prefix = "concept.websocket.server.default-endpoint.user-selector",
             name = "enabled", havingValue = "true")
-    public DefaultEndpointUserMetadataRegister defaultEndpointUserMetadataRegister() {
+    public DefaultEndpointUserMetadataRegister wsDefaultEndpointUserMetadataRegister() {
         return new DefaultEndpointUserMetadataRegister();
     }
 }

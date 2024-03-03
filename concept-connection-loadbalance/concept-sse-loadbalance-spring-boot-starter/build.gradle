@@ -1,0 +1,31 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptSseLoadbalanceVersion
+ext {
+    set('publishName', 'SSE Load Balance Spring Boot Starter')
+    set('publishDescription', 'Load Balance 4 SSE')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
+    compileOnly 'org.springframework.boot:spring-boot-starter-data-redis'
+    compileOnly 'org.springframework.kafka:spring-kafka'
+    compileOnly "org.redisson:redisson:${RedissonVersion}"
+    compileOnly "com.squareup.okhttp3:okhttp-sse:${OkHttpVersion}"
+
+    //api "com.github.linyuzai:concept-connection-loadbalance-core:${ConceptConnectionLoadbalanceVersion}"
+    //api "com.github.linyuzai:concept-connection-loadbalance-autoconfigure:${ConceptConnectionLoadbalanceVersion}"
+    //api "com.github.linyuzai:concept-connection-loadbalance-sse:${ConceptSseLoadbalanceVersion}"
+
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-core')
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure')
+    compileOnly project(':concept-connection-loadbalance:concept-connection-loadbalance-sse')
+}
+
+apply from: '../../publish.gradle'
