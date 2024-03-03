@@ -36,8 +36,18 @@ public class ServletSseLoadBalanceConfiguration {
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
             havingValue = "SSE", matchIfMissing = true)
-    public static class WebSocketSubscriberMasterConfiguration
+    public static class SseSubscriberMasterConfiguration
             extends SseSubscriberConfiguration.OkHttpSseConfiguration
+            implements SseSubscriberConfiguration.MasterProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(OkHttpClient.class)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
+            havingValue = "SSE_SSL", matchIfMissing = true)
+    public static class SseSSLSubscriberMasterConfiguration
+            extends SseSubscriberConfiguration.OkHttpSseSSLConfiguration
             implements SseSubscriberConfiguration.MasterProvider {
     }
 

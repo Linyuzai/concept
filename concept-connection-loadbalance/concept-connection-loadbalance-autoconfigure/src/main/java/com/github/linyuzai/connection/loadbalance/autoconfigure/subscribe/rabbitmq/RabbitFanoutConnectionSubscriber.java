@@ -64,6 +64,7 @@ public class RabbitFanoutConnectionSubscriber extends AbstractMasterSlaveConnect
         return connection;
     }
 
+    @Deprecated
     protected MessageListenerContainer createMessageListenerContainer(String queue, MessageListener messageListener) {
         AcknowledgeRabbitListenerEndpoint endpoint =
                 new AcknowledgeRabbitListenerEndpoint(AcknowledgeMode.MANUAL);

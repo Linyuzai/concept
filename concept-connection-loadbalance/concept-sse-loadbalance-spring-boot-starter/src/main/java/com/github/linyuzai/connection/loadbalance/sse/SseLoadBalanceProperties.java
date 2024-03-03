@@ -155,6 +155,7 @@ public class SseLoadBalanceProperties {
             NONE,
 
             SSE,
+            SSE_SSL,
 
             REDISSON_TOPIC,
             REDISSON_TOPIC_REACTIVE,

@@ -184,13 +184,19 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
         }
     }
 
-    public abstract static class OkHttpSseConfiguration extends ServletSseBaseConfiguration {
+    public abstract static class ReactiveSseSSLConfiguration extends ReactiveSseBaseConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
-        public OkHttpSseClientFactory okHttpSseClientFactory() {
-            return new DefaultOkHttpSseClientFactory();
+        public ReactiveSseConnectionSubscriberFactory reactiveSseConnectionSubscriberFactory(ReactiveSseClientFactory sseClientFactory) {
+            ReactiveSseConnectionSubscriberFactory factory =
+                    new ReactiveSseConnectionSubscriberFactory();
+            factory.setProtocol("https");
+            factory.setSseClientFactory(sseClientFactory);
+            return factory;
         }
+    }
+
+    public abstract static class OkHttpSseConfiguration extends OkHttpSseBaseConfiguration {
 
         @Bean
         public OkHttpSseConnectionSubscriberFactory okHttpSseConnectionSubscriberFactory(OkHttpSseClientFactory sseClientFactory) {
@@ -199,6 +205,27 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
             factory.setProtocol("http");
             factory.setSseClientFactory(sseClientFactory);
             return factory;
+        }
+    }
+
+    public abstract static class OkHttpSseSSLConfiguration extends OkHttpSseBaseConfiguration {
+
+        @Bean
+        public OkHttpSseConnectionSubscriberFactory okHttpSseConnectionSubscriberFactory(OkHttpSseClientFactory sseClientFactory) {
+            OkHttpSseConnectionSubscriberFactory factory =
+                    new OkHttpSseConnectionSubscriberFactory();
+            factory.setProtocol("https");
+            factory.setSseClientFactory(sseClientFactory);
+            return factory;
+        }
+    }
+
+    public abstract static class OkHttpSseBaseConfiguration extends ServletSseBaseConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public OkHttpSseClientFactory okHttpSseClientFactory() {
+            return new DefaultOkHttpSseClientFactory();
         }
     }
 

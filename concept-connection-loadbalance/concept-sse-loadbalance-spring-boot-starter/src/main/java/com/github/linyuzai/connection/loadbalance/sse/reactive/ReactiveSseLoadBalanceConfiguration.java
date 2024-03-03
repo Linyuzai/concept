@@ -34,8 +34,17 @@ public class ReactiveSseLoadBalanceConfiguration {
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
             havingValue = "SSE", matchIfMissing = true)
-    public static class WebSocketSubscriberMasterConfiguration
+    public static class SseSubscriberMasterConfiguration
             extends SseSubscriberConfiguration.ReactiveSseConfiguration
+            implements SseSubscriberConfiguration.MasterProvider {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
+            havingValue = "SSE_SSL", matchIfMissing = true)
+    public static class SseSSLSubscriberMasterConfiguration
+            extends SseSubscriberConfiguration.ReactiveSseSSLConfiguration
             implements SseSubscriberConfiguration.MasterProvider {
     }
 

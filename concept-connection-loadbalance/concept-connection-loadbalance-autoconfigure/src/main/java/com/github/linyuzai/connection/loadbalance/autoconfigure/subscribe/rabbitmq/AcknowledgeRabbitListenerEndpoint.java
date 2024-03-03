@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint;
  * <p>
  * {@link RabbitListenerEndpoint} specified {@link AcknowledgeMode}.
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class AcknowledgeRabbitListenerEndpoint implements RabbitListenerEndpoint {
