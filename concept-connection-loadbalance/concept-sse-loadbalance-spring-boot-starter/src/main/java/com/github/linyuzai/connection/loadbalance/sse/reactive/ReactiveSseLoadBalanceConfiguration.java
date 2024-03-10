@@ -42,7 +42,7 @@ public class ReactiveSseLoadBalanceConfiguration {
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
-            havingValue = "SSE_SSL", matchIfMissing = true)
+            havingValue = "SSE_SSL")
     public static class SseSSLSubscriberMasterConfiguration
             extends SseSubscriberConfiguration.ReactiveSseSSLConfiguration
             implements SseSubscriberConfiguration.MasterProvider {

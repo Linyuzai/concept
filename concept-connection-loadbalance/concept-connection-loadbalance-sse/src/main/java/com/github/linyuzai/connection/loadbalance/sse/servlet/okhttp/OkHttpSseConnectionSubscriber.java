@@ -37,7 +37,7 @@ public class OkHttpSseConnectionSubscriber extends SseConnectionSubscriber<OkHtt
 
                 @Override
                 public void onEvent(@NonNull EventSource eventSource, @Nullable String id, @Nullable String type, @NonNull String data) {
-                    concept.onMessage(connection, eventSource);
+                    concept.onMessage(connection, data);
                 }
 
                 @Override

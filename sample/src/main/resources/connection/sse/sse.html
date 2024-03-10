@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE</title>
+</head>
+<body>
+
+</body>
+<script>
+    //判断浏览器是否支持SSE
+    if (!!window.EventSource) {
+        const source = new EventSource('http://localhost:18080/concept-sse/test');
+        //const source = new EventSource('http://localhost:18080/sse/create');
+
+        //响应消息-实现方式1
+        // source.onmessage = function (event) {
+        //     text = document.getElementById('result').innerText;
+        //     text += '\n' + event.data;
+        //     document.getElementById('result').innerText = text;
+        // };
+        source.onopen = function() {
+            console.log("连接打开.");
+        }
+
+        source.onerror = function (e) {
+            console.log("连接异常.");
+            console.log(e);
+        }
+
+        source.onmessage = function(e) {
+            console.log(e);
+        }
+
+    } else {
+        console.log("你的浏览器不支持SSE");
+    }
+</script>
+</html>

@@ -1,14 +1,9 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
+import com.github.linyuzai.connection.loadbalance.autoconfigure.ConnectionLoadBalanceEnvironment;
 import lombok.NonNull;
-import org.springframework.boot.web.reactive.context.ConfigurableReactiveWebEnvironment;
-import org.springframework.boot.web.reactive.context.ReactiveWebApplicationContext;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
-import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.web.context.ConfigurableWebEnvironment;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 
@@ -17,9 +12,7 @@ import java.util.Arrays;
  * <p>
  * Import selector for ws load balancing.
  */
-public class WebSocketLoadBalanceImportSelector implements ImportSelector, EnvironmentAware {
-
-    private Environment environment;
+public class WebSocketLoadBalanceImportSelector extends ConnectionLoadBalanceEnvironment implements ImportSelector {
 
     @Override
     public String @NonNull [] selectImports(@NonNull AnnotationMetadata metadata) {
@@ -30,7 +23,7 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
     }
 
     private WebSocketType getType() {
-        WebSocketType type = environment.getProperty("concept.websocket.type",
+        WebSocketType type = getEnvironment().getProperty("concept.websocket.type",
                 WebSocketType.class, WebSocketType.AUTO);
         if (type == WebSocketType.AUTO) {
             return deduceServerType();
@@ -50,40 +43,5 @@ public class WebSocketLoadBalanceImportSelector implements ImportSelector, Envir
             return WebSocketType.REACTIVE;
         }
         throw new IllegalArgumentException("WebSocket type can not deduce");
-    }
-
-    /**
-     * 是否是 Servlet 环境
-     *
-     * @return 是否是 Servlet 环境
-     */
-    private boolean isServletWebApplication() {
-        if (environment instanceof ConfigurableWebEnvironment) {
-            return true;
-        }
-        if (environment instanceof WebApplicationContext) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 是否是 Reactive 环境
-     *
-     * @return 是否是 Reactive 环境
-     */
-    private boolean isReactiveWebApplication() {
-        if (environment instanceof ConfigurableReactiveWebEnvironment) {
-            return true;
-        }
-        if (environment instanceof ReactiveWebApplicationContext) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void setEnvironment(@NonNull Environment environment) {
-        this.environment = environment;
     }
 }

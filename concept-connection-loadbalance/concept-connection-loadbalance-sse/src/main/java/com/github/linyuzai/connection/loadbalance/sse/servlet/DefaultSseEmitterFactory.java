@@ -6,6 +6,6 @@ public class DefaultSseEmitterFactory implements SseEmitterFactory {
 
     @Override
     public SseEmitter create() {
-        return new SseEmitter();
+        return new SseEmitter(0L);
     }
 }

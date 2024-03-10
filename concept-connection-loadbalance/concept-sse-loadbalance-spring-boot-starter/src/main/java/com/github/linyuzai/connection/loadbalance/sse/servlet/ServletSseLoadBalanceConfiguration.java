@@ -45,7 +45,7 @@ public class ServletSseLoadBalanceConfiguration {
     @ConditionalOnClass(OkHttpClient.class)
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
-            havingValue = "SSE_SSL", matchIfMissing = true)
+            havingValue = "SSE_SSL")
     public static class SseSSLSubscriberMasterConfiguration
             extends SseSubscriberConfiguration.OkHttpSseSSLConfiguration
             implements SseSubscriberConfiguration.MasterProvider {

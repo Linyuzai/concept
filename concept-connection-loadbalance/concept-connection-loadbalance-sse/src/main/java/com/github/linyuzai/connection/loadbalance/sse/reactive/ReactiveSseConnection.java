@@ -17,7 +17,6 @@ public class ReactiveSseConnection extends SseConnection {
     @SuppressWarnings("unchecked")
     @Override
     public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-
         if (message instanceof ServerSentEvent) {
             fluxSink.next((ServerSentEvent<Object>) message);
         } else {
@@ -28,5 +27,7 @@ public class ReactiveSseConnection extends SseConnection {
     @Override
     public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         fluxSink.complete();
+        //onSuccess.run();
+        //onComplete.run();
     }
 }

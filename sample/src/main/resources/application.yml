@@ -107,7 +107,11 @@ concept:
   cloud:
     web:
       intercept:
+        enabled: false
+        response:
+          enabled: false
         request:
+          enabled: false
           predicate:
             request-path:
               - patterns:

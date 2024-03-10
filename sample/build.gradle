@@ -53,9 +53,11 @@ dependencies {
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-core', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-websocket', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-netty', configuration: 'default')
+    implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-sse', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-connection-loadbalance-autoconfigure', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-websocket-loadbalance-spring-boot-starter', configuration: 'default')
     implementation project(path: ':concept-connection-loadbalance:concept-netty-loadbalance-spring-boot-starter', configuration: 'default')
+    implementation project(path: ':concept-connection-loadbalance:concept-sse-loadbalance-spring-boot-starter', configuration: 'default')
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
@@ -75,7 +77,7 @@ dependencies {
     implementation "net.lingala.zip4j:zip4j:${Zip4jVersion}"
     implementation "org.apache.commons:commons-compress:${CommonsCompressVersion}"
 
-    //implementation "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${OkHttpVersion}"
 
     //compileOnly 'org.springframework.cloud:spring-cloud-starter'
     //compileOnly 'org.springframework.cloud:spring-cloud-loadbalancer'

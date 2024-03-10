@@ -1,8 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.sse;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.EnableConnectionLoadBalanceConfiguration;
-import com.github.linyuzai.connection.loadbalance.sse.reactive.ReactiveSseLoadBalanceConfiguration;
-import com.github.linyuzai.connection.loadbalance.sse.servlet.ServletSseLoadBalanceConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 
@@ -19,8 +17,6 @@ import java.lang.annotation.*;
 @Inherited
 @EnableConnectionLoadBalanceConfiguration
 @EnableConfigurationProperties(SseLoadBalanceProperties.class)
-@Import({SseLoadBalanceConfiguration.class,
-        ServletSseLoadBalanceConfiguration.class,
-        ReactiveSseLoadBalanceConfiguration.class})
+@Import({SseLoadBalanceImportSelector.class, SseLoadBalanceConfiguration.class})
 public @interface EnableSseLoadBalanceConcept {
 }

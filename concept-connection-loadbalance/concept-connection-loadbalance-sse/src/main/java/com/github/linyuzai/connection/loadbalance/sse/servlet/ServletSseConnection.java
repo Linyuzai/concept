@@ -18,11 +18,7 @@ public class ServletSseConnection extends SseConnection {
     @Override
     public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            if (message instanceof SseEmitter.SseEventBuilder) {
-                sseEmitter.send((SseEmitter.SseEventBuilder) message);
-            } else {
-                sseEmitter.send(message);
-            }
+            sseEmitter.send(message);
             onSuccess.run();
         } catch (IOException e) {
             onError.accept(new MessageTransportException(e));
