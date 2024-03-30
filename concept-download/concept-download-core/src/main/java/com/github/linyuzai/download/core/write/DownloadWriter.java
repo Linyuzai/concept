@@ -4,6 +4,7 @@ import com.github.linyuzai.download.core.concept.Resource;
 import com.github.linyuzai.download.core.context.DownloadContext;
 import com.github.linyuzai.download.core.web.Range;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -31,7 +32,7 @@ public interface DownloadWriter {
      * @param charset {@link Charset}
      * @param length  总大小，可能为 null
      */
-    default void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) {
+    default void write(InputStream is, OutputStream os, Range range, Charset charset, Long length) throws IOException {
         write(is, os, range, charset, length, null);
     }
 
@@ -45,7 +46,7 @@ public interface DownloadWriter {
      * @param length   总大小，可能为 null
      * @param callback 回调当前进度和增长的大小
      */
-    void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback);
+    void write(InputStream is, OutputStream os, Range range, Charset charset, Long length, Callback callback) throws IOException;
 
     /**
      * 进度回调。

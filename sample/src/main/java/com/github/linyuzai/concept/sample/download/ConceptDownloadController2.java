@@ -13,6 +13,7 @@ import com.github.linyuzai.download.core.web.async.FileConsumer;
 import com.github.linyuzai.download.core.web.async.InputStreamConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/concept-download2")
 public class ConceptDownloadController2 {
+
+    @Autowired
+    private DownloadMockService downloadMockService;
 
     @Download
     @GetMapping("error")
@@ -257,6 +261,11 @@ public class ConceptDownloadController2 {
     @Download(source = "classpath:/download/video.mp4", inline = true, contentType = "video/mp4")
     @GetMapping("/video.mp4")
     public void inlineVideo() {
+    }
+
+    @GetMapping("/mock")
+    public void mock() {
+        downloadMockService.mock();
     }
 
     @Download(filename = "POJO.zip")

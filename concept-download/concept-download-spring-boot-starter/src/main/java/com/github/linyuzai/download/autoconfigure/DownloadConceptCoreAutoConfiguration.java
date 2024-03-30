@@ -6,6 +6,7 @@ import com.github.linyuzai.download.autoconfigure.properties.DownloadProperties;
 import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathPrefixSourceFactory;
 import com.github.linyuzai.download.autoconfigure.source.classpath.ClassPathSourceFactory;
 import com.github.linyuzai.download.autoconfigure.web.DownloadHttpMessageConverter;
+import com.github.linyuzai.download.autoconfigure.web.mock.DownloadMock;
 import com.github.linyuzai.download.core.cache.CacheNameGenerator;
 import com.github.linyuzai.download.core.cache.CacheNameGeneratorInitializer;
 import com.github.linyuzai.download.core.cache.TimestampCacheNameGenerator;
@@ -17,6 +18,7 @@ import com.github.linyuzai.download.core.compress.tar.gz.TarGzArchiveSourceCompr
 import com.github.linyuzai.download.core.compress.zip.Zip4jSourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipArchiveSourceCompressor;
 import com.github.linyuzai.download.core.compress.zip.ZipSourceCompressor;
+import com.github.linyuzai.download.core.concept.DownloadConcept;
 import com.github.linyuzai.download.core.context.DefaultDownloadContextFactory;
 import com.github.linyuzai.download.core.context.DownloadContextFactory;
 import com.github.linyuzai.download.core.event.DownloadEventListener;
@@ -331,6 +333,12 @@ public class DownloadConceptCoreAutoConfiguration {
     @ConditionalOnMissingBean
     public DownloadContextFactory downloadContextFactory() {
         return new DefaultDownloadContextFactory();
+    }
+
+    @Bean
+    public DownloadMock downloadMock(DownloadConcept concept,
+                                     DownloadProperties properties) {
+        return new DownloadMock(concept, properties);
     }
 
     @Bean

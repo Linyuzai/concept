@@ -3,6 +3,7 @@ package com.github.linyuzai.download.autoconfigure.web.servlet;
 import com.github.linyuzai.download.core.web.DownloadRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.server.ServerHttpRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,10 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class ServletDownloadRequest implements DownloadRequest {
 
-    private final HttpServletRequest request;
+    private final ServerHttpRequest request;
 
     @Override
     public String getHeader(String name) {
-        return request.getHeader(name);
+        return request.getHeaders().getFirst(name);
     }
 }

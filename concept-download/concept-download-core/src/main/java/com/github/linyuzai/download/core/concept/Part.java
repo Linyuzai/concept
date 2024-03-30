@@ -65,6 +65,12 @@ public interface Part {
     }
 
     /**
+     * 准备
+     */
+    default void prepare() {
+    }
+
+    /**
      * 释放资源。
      */
     default void release() {

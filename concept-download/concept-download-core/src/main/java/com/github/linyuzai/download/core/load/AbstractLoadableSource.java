@@ -130,19 +130,6 @@ public abstract class AbstractLoadableSource extends AbstractSource {
     }
 
     /**
-     * 关闭流。
-     *
-     * @param os {@link OutputStream}
-     */
-    @Deprecated
-    private void closeStream(OutputStream os) {
-        try {
-            os.close();
-        } catch (IOException ignore) {
-        }
-    }
-
-    /**
      * 预加载时获得。
      *
      * @return 持有的 {@link InputStream}

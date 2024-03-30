@@ -41,6 +41,7 @@ public class CreateSourceHandler implements DownloadHandler, DownloadLifecycleLi
         Object original = options.getSource();
         SourceFactory factory = sourceFactoryAdapter.getFactory(original, context);
         Source source = factory.create(original, context);
+        source.prepare();
         context.set(Source.class, source);
         DownloadEventPublisher publisher = DownloadEventPublisher.get(context);
         publisher.publish(new SourceCreatedEvent(context, source));

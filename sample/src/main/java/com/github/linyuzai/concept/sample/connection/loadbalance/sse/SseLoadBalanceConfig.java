@@ -1,3 +1,4 @@
+/*
 package com.github.linyuzai.concept.sample.connection.loadbalance.sse;
 
 import com.github.linyuzai.connection.loadbalance.sse.EnableSseLoadBalanceConcept;
@@ -22,3 +23,4 @@ public class SseLoadBalanceConfig {
     }
 
 }
+*/

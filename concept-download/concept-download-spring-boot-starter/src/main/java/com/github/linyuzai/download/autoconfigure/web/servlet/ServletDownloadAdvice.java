@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -49,11 +48,11 @@ public class ServletDownloadAdvice implements ResponseBodyAdvice<Object>, Embedd
     }
 
     protected DownloadRequest getRequest(ServerHttpRequest request) {
-        return new ServletDownloadRequest(((ServletServerHttpRequest) request).getServletRequest());
+        return new ServletDownloadRequest(request);
     }
 
     protected DownloadResponse getResponse(ServerHttpResponse response) {
-        return new ServletDownloadResponse(((ServletServerHttpResponse) response).getServletResponse());
+        return new ServletDownloadResponse(response);
     }
 
     @Override

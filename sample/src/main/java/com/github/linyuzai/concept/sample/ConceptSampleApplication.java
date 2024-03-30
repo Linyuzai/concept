@@ -18,7 +18,7 @@ import java.util.*;
 
 //@EnableSwagger2
 @Slf4j
-@SpringBootApplication(scanBasePackages = "com.github.linyuzai.concept.sample.connection.loadbalance.sse"
+@SpringBootApplication(scanBasePackages = "com.github.linyuzai.concept.sample.download"
         , exclude = DataSourceAutoConfiguration.class)
 public class ConceptSampleApplication {
 

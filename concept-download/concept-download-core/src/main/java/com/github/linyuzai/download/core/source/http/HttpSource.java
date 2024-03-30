@@ -97,7 +97,7 @@ public class HttpSource extends RemoteLoadableSource {
             DownloadWriter writer = writerAdapter.getWriter(this, context);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             writer.write(connection.getErrorStream(), os, null, null, null);
-            throw new DownloadException("code: " + code + ", " + os.toString());
+            throw new DownloadException("code: " + code + ", " + os);
         }
     }
 

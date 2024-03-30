@@ -63,6 +63,7 @@ public class CompressSourceHandler implements DownloadHandler, DownloadLifecycle
             DownloadWriter writer = writerAdapter.getWriter(source, context);
             compression = compressor.compress(source, formatToUse, writer, context);
         }
+        compression.prepare();
         publisher.publish(new SourceCompressedEvent(context, source, compression));
         context.set(Compression.class, compression);
         return chain.next(context);

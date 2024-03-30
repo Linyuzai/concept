@@ -34,7 +34,6 @@ public interface DownloadResponse {
      *
      * @param filename 文件名
      */
-
     default void setAttachment(String filename) {
         setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encode(filename));
     }
