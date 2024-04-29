@@ -218,7 +218,7 @@ public class SseLoadBalanceConfiguration {
     @Bean
     @Order(200)
     @ConditionalOnProperty(prefix = "concept.sse.server.heartbeat",
-            name = "enabled", havingValue = "true", matchIfMissing = true)
+            name = "enabled", havingValue = "true")
     public ConnectionHeartbeatManager sseClientConnectionHeartbeatManager(
             SseLoadBalanceProperties properties) {
         long timeout = properties.getServer().getHeartbeat().getTimeout();
@@ -231,10 +231,10 @@ public class SseLoadBalanceConfiguration {
         return manager;
     }
 
-    @Bean
+    /*@Bean
     @Order(200)
     @ConditionalOnProperty(value = "concept.sse.load-balance.heartbeat.enabled",
-            havingValue = "true", matchIfMissing = true)
+            havingValue = "true")
     public ConnectionHeartbeatManager sseLoadBalanceConnectionHeartbeatManager(
             SseLoadBalanceProperties properties) {
         long timeout = properties.getLoadBalance().getHeartbeat().getTimeout();
@@ -246,7 +246,7 @@ public class SseLoadBalanceConfiguration {
         manager.setPeriod(period);
         manager.addScopes(SseScoped.NAME);
         return manager;
-    }
+    }*/
 
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean

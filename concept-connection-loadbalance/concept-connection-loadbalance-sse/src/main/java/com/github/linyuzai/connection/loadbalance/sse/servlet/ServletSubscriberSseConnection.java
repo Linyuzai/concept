@@ -1,24 +1,25 @@
-package com.github.linyuzai.connection.loadbalance.sse.servlet.okhttp;
+package com.github.linyuzai.connection.loadbalance.sse.servlet;
 
 import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseConnection;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import okhttp3.sse.EventSource;
 
+import java.net.HttpURLConnection;
 import java.util.function.Consumer;
 
-@Deprecated
 @Getter
 @Setter
-public class OkHttpSseConnection extends SubscriberSseConnection {
+@RequiredArgsConstructor
+public class ServletSubscriberSseConnection extends SubscriberSseConnection {
 
-    private EventSource eventSource;
+    private HttpURLConnection http;
 
     @Override
     public void doClose(Object reason, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            if (eventSource != null) {
-                eventSource.cancel();
+            if (http != null) {
+                http.disconnect();
             }
             onSuccess.run();
         } catch (Throwable e) {

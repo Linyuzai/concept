@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -61,5 +62,20 @@ public class AbstractConnectionEventPublisher implements ConnectionEventPublishe
     @Override
     public void register(Collection<? extends ConnectionEventListener> listeners, ConnectionLoadBalanceConcept concept) {
         this.listeners.addAll(listeners);
+    }
+
+    @Override
+    public void unregister(ConnectionEventListener listener, ConnectionLoadBalanceConcept concept) {
+        this.listeners.remove(listener);
+    }
+
+    @Override
+    public void unregister(Collection<? extends ConnectionEventListener> listeners, ConnectionLoadBalanceConcept concept) {
+        this.listeners.removeAll(listeners);
+    }
+
+    @Override
+    public List<ConnectionEventListener> getListeners() {
+        return Collections.unmodifiableList(listeners);
     }
 }

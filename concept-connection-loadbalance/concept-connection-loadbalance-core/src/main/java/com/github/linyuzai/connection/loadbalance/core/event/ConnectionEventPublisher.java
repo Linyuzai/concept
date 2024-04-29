@@ -4,8 +4,8 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 事件发布者。
@@ -46,6 +46,30 @@ public interface ConnectionEventPublisher {
     default void register(Collection<? extends ConnectionEventListener> listeners) {
         register(listeners, null);
     }
+
+    /**
+     * 注销事件监听器。
+     * <p>
+     * Unregister event listener.
+     */
+    void unregister(ConnectionEventListener listener, ConnectionLoadBalanceConcept concept);
+
+    default void unregister(ConnectionEventListener listener) {
+        unregister(listener, null);
+    }
+
+    /**
+     * 注销事件监听器。
+     * <p>
+     * Unregister event listeners.
+     */
+    void unregister(Collection<? extends ConnectionEventListener> listeners, ConnectionLoadBalanceConcept concept);
+
+    default void unregister(Collection<? extends ConnectionEventListener> listeners) {
+        unregister(listeners, null);
+    }
+
+    List<ConnectionEventListener> getListeners();
 
     /**
      * 事件发布者代理。
@@ -93,6 +117,31 @@ public interface ConnectionEventPublisher {
         @Override
         public void register(Collection<? extends ConnectionEventListener> listeners) {
             delegate.register(listeners, concept);
+        }
+
+        @Override
+        public void unregister(ConnectionEventListener listener, ConnectionLoadBalanceConcept concept) {
+            delegate.unregister(listener, concept);
+        }
+
+        @Override
+        public void unregister(ConnectionEventListener listener) {
+            delegate.unregister(listener, concept);
+        }
+
+        @Override
+        public void unregister(Collection<? extends ConnectionEventListener> listeners, ConnectionLoadBalanceConcept concept) {
+            delegate.unregister(listeners, concept);
+        }
+
+        @Override
+        public void unregister(Collection<? extends ConnectionEventListener> listeners) {
+            delegate.unregister(listeners, concept);
+        }
+
+        @Override
+        public List<ConnectionEventListener> getListeners() {
+            return delegate.getListeners();
         }
     }
 }

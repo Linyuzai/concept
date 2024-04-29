@@ -12,14 +12,14 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseScoped;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseSubscribeHandler;
 import com.github.linyuzai.connection.loadbalance.sse.reactive.*;
+import com.github.linyuzai.connection.loadbalance.sse.servlet.DefaultServletSseLoadBalanceRunner;
+import com.github.linyuzai.connection.loadbalance.sse.servlet.ServletSseConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.sse.servlet.ServletSseLoadBalanceEndpoint;
-import com.github.linyuzai.connection.loadbalance.sse.servlet.okhttp.DefaultOkHttpSseClientFactory;
-import com.github.linyuzai.connection.loadbalance.sse.servlet.okhttp.OkHttpSseClientFactory;
-import com.github.linyuzai.connection.loadbalance.sse.servlet.okhttp.OkHttpSseConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.sse.servlet.ServletSseLoadBalanceRunner;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
@@ -172,6 +172,76 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
         }
     }
 
+    /*public abstract static class OkHttpSseConfiguration extends OkHttpSseBaseConfiguration {
+
+        @Bean
+        public OkHttpSseConnectionSubscriberFactory okHttpSseConnectionSubscriberFactory(
+                OkHttpSseClientFactory sseClientFactory) {
+            OkHttpSseConnectionSubscriberFactory factory =
+                    new OkHttpSseConnectionSubscriberFactory();
+            factory.setProtocol("http");
+            factory.setSseClientFactory(sseClientFactory);
+            return factory;
+        }
+    }
+
+    public abstract static class OkHttpSseSSLConfiguration extends OkHttpSseBaseConfiguration {
+
+        @Bean
+        public OkHttpSseConnectionSubscriberFactory okHttpSseConnectionSubscriberFactory(
+                OkHttpSseClientFactory sseClientFactory) {
+            OkHttpSseConnectionSubscriberFactory factory =
+                    new OkHttpSseConnectionSubscriberFactory();
+            factory.setProtocol("https");
+            factory.setSseClientFactory(sseClientFactory);
+            return factory;
+        }
+    }
+
+    public abstract static class OkHttpSseBaseConfiguration extends ServletSseBaseConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public OkHttpSseClientFactory okHttpSseClientFactory() {
+            return new DefaultOkHttpSseClientFactory();
+        }
+    }*/
+
+    public abstract static class ServletSseConfiguration extends ServletSseExConfiguration {
+
+        @Bean
+        public ServletSseConnectionSubscriberFactory servletSseConnectionSubscriberFactory(
+                ServletSseLoadBalanceRunner runner) {
+            ServletSseConnectionSubscriberFactory factory =
+                    new ServletSseConnectionSubscriberFactory();
+            factory.setProtocol("http");
+            factory.setServletSseLoadBalanceRunner(runner);
+            return factory;
+        }
+    }
+
+    public abstract static class ServletSseSSLConfiguration extends ServletSseExConfiguration {
+
+        @Bean
+        public ServletSseConnectionSubscriberFactory servletSseConnectionSubscriberFactory(
+                ServletSseLoadBalanceRunner runner) {
+            ServletSseConnectionSubscriberFactory factory =
+                    new ServletSseConnectionSubscriberFactory();
+            factory.setProtocol("https");
+            factory.setServletSseLoadBalanceRunner(runner);
+            return factory;
+        }
+    }
+
+    public abstract static class ServletSseExConfiguration extends ServletSseBaseConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ServletSseLoadBalanceRunner servletSseLoadBalanceRunner() {
+            return new DefaultServletSseLoadBalanceRunner("LBSse-");
+        }
+    }
+
     public abstract static class ReactiveSseConfiguration extends ReactiveSseBaseConfiguration {
 
         @Bean
@@ -196,36 +266,12 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
         }
     }
 
-    public abstract static class OkHttpSseConfiguration extends OkHttpSseBaseConfiguration {
+    public static class ServletSseBaseConfiguration extends SseBaseConfiguration {
 
         @Bean
-        public OkHttpSseConnectionSubscriberFactory okHttpSseConnectionSubscriberFactory(OkHttpSseClientFactory sseClientFactory) {
-            OkHttpSseConnectionSubscriberFactory factory =
-                    new OkHttpSseConnectionSubscriberFactory();
-            factory.setProtocol("http");
-            factory.setSseClientFactory(sseClientFactory);
-            return factory;
-        }
-    }
-
-    public abstract static class OkHttpSseSSLConfiguration extends OkHttpSseBaseConfiguration {
-
-        @Bean
-        public OkHttpSseConnectionSubscriberFactory okHttpSseConnectionSubscriberFactory(OkHttpSseClientFactory sseClientFactory) {
-            OkHttpSseConnectionSubscriberFactory factory =
-                    new OkHttpSseConnectionSubscriberFactory();
-            factory.setProtocol("https");
-            factory.setSseClientFactory(sseClientFactory);
-            return factory;
-        }
-    }
-
-    public abstract static class OkHttpSseBaseConfiguration extends ServletSseBaseConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public OkHttpSseClientFactory okHttpSseClientFactory() {
-            return new DefaultOkHttpSseClientFactory();
+        public ServletSseLoadBalanceEndpoint servletSseLoadBalanceEndpoint(
+                SseLoadBalanceConcept concept) {
+            return new ServletSseLoadBalanceEndpoint(concept);
         }
     }
 
@@ -244,22 +290,20 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
         }
     }
 
-    public static class ServletSseBaseConfiguration extends SseBaseConfiguration {
-
-        @Bean
-        public ServletSseLoadBalanceEndpoint servletSseLoadBalanceEndpoint(
-                SseLoadBalanceConcept concept) {
-            return new ServletSseLoadBalanceEndpoint(concept);
-        }
-    }
-
     public static class SseBaseConfiguration {
 
-        @Bean
+        /*@Bean
         @Order(100)
         @ConditionalOnMissingBean
         public ConnectionSubscribeHandler sseConnectionSubscribeHandler() {
             return new ConnectionSubscribeHandler().addScopes(SseScoped.NAME);
+        }*/
+
+        @Bean
+        @Order(100)
+        @ConditionalOnMissingBean
+        public SseSubscribeHandler sseSubscribeHandler() {
+            return new SseSubscribeHandler();
         }
 
         @Bean

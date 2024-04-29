@@ -148,7 +148,7 @@ public class SseLoadBalanceProperties {
          * <p>
          * Heartbeat properties.
          */
-        private HeartbeatProperties heartbeat = new HeartbeatProperties();
+        //private HeartbeatProperties heartbeat = new HeartbeatProperties();
 
         public enum MasterSubscriber {
 
@@ -263,7 +263,7 @@ public class SseLoadBalanceProperties {
          * <p>
          * Whether to enable heartbeat.
          */
-        private boolean enabled = true;
+        private Boolean enabled;
 
         /**
          * 心跳超时时间，毫秒。

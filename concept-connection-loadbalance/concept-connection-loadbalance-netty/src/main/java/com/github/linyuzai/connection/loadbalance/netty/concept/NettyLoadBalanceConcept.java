@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.netty.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AbstractConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import lombok.RequiredArgsConstructor;
 
 /**

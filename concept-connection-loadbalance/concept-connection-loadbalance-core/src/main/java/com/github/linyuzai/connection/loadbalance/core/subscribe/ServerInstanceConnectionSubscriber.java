@@ -3,11 +3,11 @@ package com.github.linyuzai.connection.loadbalance.core.subscribe;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
-import lombok.*;
+import lombok.SneakyThrows;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
+import java.net.URLEncoder;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -82,6 +82,10 @@ public abstract class ServerInstanceConnectionSubscriber<T extends Connection> i
                 exist.close(Connection.Close.NOT_ALIVE);
             }
         }
+        if (interceptSubscribe(server, concept)) {
+            onComplete.run();
+            return;
+        }
         doSubscribe(server, concept, connection -> {
             onSuccess.accept(connection);
             ConnectionServer local = concept.getConnectionServerManager().getLocal();
@@ -89,6 +93,11 @@ public abstract class ServerInstanceConnectionSubscriber<T extends Connection> i
                 connection.send(concept.createMessage(local));
             }
         }, e -> onError.accept(new ConnectionServerSubscribeException(server, e.getMessage(), e)), onComplete);
+    }
+
+    public boolean interceptSubscribe(ConnectionServer server,
+                                      ConnectionLoadBalanceConcept concept) {
+        return false;
     }
 
     /**
@@ -122,7 +131,7 @@ public abstract class ServerInstanceConnectionSubscriber<T extends Connection> i
     public void doSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept,
                             Consumer<T> onSuccess, Consumer<Throwable> onError,
                             Runnable onComplete) {
-        URI uri = getUri(server);
+        URI uri = getUri(server, concept);
         doSubscribe(uri, concept, connection -> {
             connection.getMetadata().put(ConnectionServer.class, server);
             onSuccess.accept(connection);
@@ -133,6 +142,36 @@ public abstract class ServerInstanceConnectionSubscriber<T extends Connection> i
                                      Consumer<T> onSuccess,
                                      Consumer<Throwable> onError,
                                      Runnable onComplete);
+
+    /**
+     * 拼接对应服务实例连接的 {@link URI}
+     *
+     * @param server 服务实例
+     * @return 对应的 {@link URI}
+     */
+    @SneakyThrows
+    public URI getUri(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
+        Map<String, String> params = getParams(concept);
+        List<String> list = new ArrayList<>();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            list.add(URLEncoder.encode(entry.getKey(), "UTF-8")
+                    + "=" +
+                    URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+        String join = list.isEmpty() ? "" : "?" + String.join("&", list);
+        return URI.create(getUri(server).toString() + join);
+    }
+
+    public URI getUri(ConnectionServer server) {
+        return URI.create(getProtocol() + "://" +
+                getHost(server) + ":" +
+                getPort(server) +
+                getEndpoint());
+    }
+
+    public Map<String, String> getParams(ConnectionLoadBalanceConcept concept) {
+        return Collections.emptyMap();
+    }
 
     /**
      * 获得对应服务的连接 host
@@ -168,18 +207,6 @@ public abstract class ServerInstanceConnectionSubscriber<T extends Connection> i
             return server.getPort();
         }
         return Integer.parseInt(port);
-    }
-
-    /**
-     * 拼接对应服务实例连接的 {@link URI}
-     *
-     * @param server 服务实例
-     * @return 对应的 {@link URI}
-     */
-    @SneakyThrows
-    public URI getUri(ConnectionServer server) {
-        return new URI(getProtocol() + "://" + getHost(server) + ":" + getPort(server) +
-                getEndpoint());
     }
 
     public String getHostKey() {

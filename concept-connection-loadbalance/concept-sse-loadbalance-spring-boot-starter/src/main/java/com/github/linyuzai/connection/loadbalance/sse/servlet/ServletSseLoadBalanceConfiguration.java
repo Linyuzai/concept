@@ -4,11 +4,7 @@ import com.github.linyuzai.connection.loadbalance.sse.SseDefaultEndpointConfigur
 import com.github.linyuzai.connection.loadbalance.sse.SseSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
-import okhttp3.OkHttpClient;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,23 +27,43 @@ public class ServletSseLoadBalanceConfiguration {
         return new ServletSseMessageCodecAdapter();
     }
 
+    /*@Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(EventSource.class)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
+            havingValue = "SSE", matchIfMissing = true)
+    public static class OkHttpSseSubscriberMasterConfiguration
+            extends SseSubscriberConfiguration.OkHttpSseConfiguration
+            implements SseSubscriberConfiguration.MasterProvider {
+    }*/
+
+    /*@Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(EventSource.class)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
+            havingValue = "SSE_SSL")
+    public static class OkHttpSseSSLSubscriberMasterConfiguration
+            extends SseSubscriberConfiguration.OkHttpSseSSLConfiguration
+            implements SseSubscriberConfiguration.MasterProvider {
+    }*/
+
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(OkHttpClient.class)
+    //@ConditionalOnMissingClass("okhttp3.sse.EventSource")
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
             havingValue = "SSE", matchIfMissing = true)
     public static class SseSubscriberMasterConfiguration
-            extends SseSubscriberConfiguration.OkHttpSseConfiguration
+            extends SseSubscriberConfiguration.ServletSseConfiguration
             implements SseSubscriberConfiguration.MasterProvider {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(OkHttpClient.class)
+    //@ConditionalOnMissingClass("okhttp3.sse.EventSource")
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
             havingValue = "SSE_SSL")
     public static class SseSSLSubscriberMasterConfiguration
-            extends SseSubscriberConfiguration.OkHttpSseSSLConfiguration
+            extends SseSubscriberConfiguration.ServletSseSSLConfiguration
             implements SseSubscriberConfiguration.MasterProvider {
     }
 
@@ -68,7 +84,7 @@ public class ServletSseLoadBalanceConfiguration {
         public ServletSseServerEndpoint servletSseServerEndpoint(
                 SseIdGenerator idGenerator,
                 SseEmitterFactory factory,
-                 SseLoadBalanceConcept concept) {
+                SseLoadBalanceConcept concept) {
             return new ServletSseServerEndpoint(idGenerator, factory, concept);
         }
     }

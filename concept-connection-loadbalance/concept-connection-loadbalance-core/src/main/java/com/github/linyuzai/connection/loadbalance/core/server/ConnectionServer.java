@@ -6,9 +6,11 @@ import java.util.Map;
 /**
  * 连接服务。
  * <p>
- * A server can be connect.
+ * A server can be connected.
  */
 public interface ConnectionServer {
+
+    String LB_HOST_PORT = "lbHostPort";
 
     static String url(ConnectionServer server) {
         if (server == null) {
