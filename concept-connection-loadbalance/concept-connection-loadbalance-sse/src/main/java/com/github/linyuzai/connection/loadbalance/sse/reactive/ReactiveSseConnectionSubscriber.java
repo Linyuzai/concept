@@ -31,12 +31,10 @@ public class ReactiveSseConnectionSubscriber extends SseConnectionSubscriber<Rea
                 .retrieve()
                 .bodyToFlux(String.class)
                 .doOnSubscribe(subscription -> onSuccess.accept(connection))
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) {
-                        System.out.println(s);
-                    }
-                }, onError, onComplete);
+                .subscribe(message -> concept.onMessage(connection, message), e -> {
+                    connection.closeSubscriber();
+                    onError.accept(e);
+                }, onComplete);
         connection.setDisposable(disposable);
     }
 

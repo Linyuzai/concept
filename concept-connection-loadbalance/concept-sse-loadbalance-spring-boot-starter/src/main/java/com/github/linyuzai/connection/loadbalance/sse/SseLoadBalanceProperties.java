@@ -55,7 +55,7 @@ public class SseLoadBalanceProperties {
          * <p>
          * Heartbeat properties.
          */
-        private HeartbeatProperties heartbeat = new HeartbeatProperties();
+        //private HeartbeatProperties heartbeat = new HeartbeatProperties();
 
         @Data
         public static class DefaultEndpointProperties {

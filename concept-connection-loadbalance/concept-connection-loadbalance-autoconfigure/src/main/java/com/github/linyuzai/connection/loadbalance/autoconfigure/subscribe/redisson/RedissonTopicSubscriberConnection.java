@@ -1,7 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.AliveForeverConnection;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.redisson.api.RTopic;

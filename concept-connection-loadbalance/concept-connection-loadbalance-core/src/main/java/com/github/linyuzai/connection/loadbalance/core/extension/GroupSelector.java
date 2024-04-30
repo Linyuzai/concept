@@ -1,7 +1,7 @@
 package com.github.linyuzai.connection.loadbalance.core.extension;
 
-import com.github.linyuzai.connection.loadbalance.core.select.filter.FilterConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.select.MetadataSelector;
+import com.github.linyuzai.connection.loadbalance.core.select.filter.FilterConnectionSelector;
 
 /**
  * 分组连接选择器。

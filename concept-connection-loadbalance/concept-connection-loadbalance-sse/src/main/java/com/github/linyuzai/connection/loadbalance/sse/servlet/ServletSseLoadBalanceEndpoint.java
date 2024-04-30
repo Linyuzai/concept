@@ -1,18 +1,20 @@
 package com.github.linyuzai.connection.loadbalance.sse.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
-import com.github.linyuzai.connection.loadbalance.sse.concept.*;
+import com.github.linyuzai.connection.loadbalance.sse.concept.DefaultSseIdGenerator;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseTimeoutException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.net.URI;
-import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer.LB_HOST_PORT;
 
 @Getter
 @Setter
@@ -28,16 +30,14 @@ public class ServletSseLoadBalanceEndpoint {
     private final SseLoadBalanceConcept concept;
 
     @GetMapping
-    public SseEmitter loadBalanceEndpoint(@RequestParam(LB_HOST_PORT) String lbHostPort) {
-        Map<Object,Object> metadata = new LinkedHashMap<>();
-        metadata.put(LB_HOST_PORT, lbHostPort);
-        Object id = sseIdGenerator.generateId(metadata);
+    public SseEmitter loadBalanceEndpoint(@RequestParam Map<Object, Object> params) {
+        Object id = sseIdGenerator.generateId(params);
         SseEmitter emitter = sseEmitterFactory.create();
         ServletSseCreateRequest request = new ServletSseCreateRequest(id, SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT, emitter);
         ServletSseConnection connection = new ServletSseConnection(emitter);
         connection.setCreateRequest(request);
         connection.setType(Connection.Type.OBSERVABLE);
-        connection.setMetadata(metadata);
+        connection.getMetadata().putAll(params);
         emitter.onError(e -> concept.onError(connection, e));
         emitter.onCompletion(() -> concept.onClose(connection, null));
         emitter.onTimeout(() -> concept.onError(connection, new SseTimeoutException("SSE Timeout")));

@@ -2,13 +2,11 @@ package com.github.linyuzai.connection.loadbalance.sse;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.ConnectionSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.logger.CommonsConnectionLoggerFactory;
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionFactory;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventListener;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisherFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ScheduledExecutorFactory;
 import com.github.linyuzai.connection.loadbalance.core.executor.ThreadPoolScheduledExecutorFactory;
-import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeartbeatManager;
 import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
@@ -215,7 +213,7 @@ public class SseLoadBalanceConfiguration {
         return factory;
     }
 
-    @Bean
+    /*@Bean
     @Order(200)
     @ConditionalOnProperty(prefix = "concept.sse.server.heartbeat",
             name = "enabled", havingValue = "true")
@@ -229,7 +227,7 @@ public class SseLoadBalanceConfiguration {
         manager.setPeriod(period);
         manager.addScopes(SseScoped.NAME);
         return manager;
-    }
+    }*/
 
     /*@Bean
     @Order(200)

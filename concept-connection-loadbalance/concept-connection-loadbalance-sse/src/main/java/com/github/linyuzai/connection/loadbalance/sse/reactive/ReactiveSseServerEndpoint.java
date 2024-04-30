@@ -27,9 +27,12 @@ public class ReactiveSseServerEndpoint {
         Object id = sseIdGenerator.generateId(params);
         return sseFluxFactory.create(Flux.create((FluxSink<ServerSentEvent<Object>> fluxSink) -> {
                     ReactiveSseCreateRequest request = new ReactiveSseCreateRequest(id, path, fluxSink);
+                    //fluxSink.onCancel(() -> {});
+                    fluxSink.onDispose(() -> concept.onClose(id, Connection.Type.CLIENT, null));
                     concept.onEstablish(request, params);
                 }))
                 .doOnError(it -> concept.onError(id, Connection.Type.CLIENT, it))
-                .doOnComplete(() -> concept.onClose(id, Connection.Type.CLIENT, null));
+                //.doOnComplete(() -> concept.onClose(id, Connection.Type.CLIENT, null))
+                .doAfterTerminate(() -> concept.onClose(id, Connection.Type.CLIENT, null));
     }
 }

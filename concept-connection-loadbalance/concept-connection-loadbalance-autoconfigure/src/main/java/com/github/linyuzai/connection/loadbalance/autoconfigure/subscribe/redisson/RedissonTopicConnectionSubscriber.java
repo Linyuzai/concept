@@ -6,7 +6,8 @@ import com.github.linyuzai.connection.loadbalance.core.message.idempotent.Messag
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.AbstractMasterSlaveConnectionSubscriber;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 

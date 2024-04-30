@@ -25,7 +25,8 @@ import com.github.linyuzai.connection.loadbalance.core.select.filter.FilterConne
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.*;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriber;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.masterslave.*;
 import lombok.Getter;
 import lombok.NonNull;

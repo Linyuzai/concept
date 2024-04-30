@@ -3,7 +3,6 @@ package com.github.linyuzai.connection.loadbalance.sse.servlet;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.message.decode.MessageDecoder;
 import com.github.linyuzai.connection.loadbalance.core.message.encode.MessageEncoder;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseMessageCodecAdapter;
 import lombok.Getter;
@@ -28,11 +27,6 @@ public class ServletSseMessageCodecAdapter extends SseMessageCodecAdapter {
         return new ServletSseMessageEncoder(encoder);
     }
 
-    @Override
-    public MessageDecoder getForwardMessageDecoder(MessageDecoder decoder) {
-        return new ServletSseMessageDecoder(decoder);
-    }
-
     @Getter
     @RequiredArgsConstructor
     public static class ServletSseMessageEncoder implements MessageEncoder {
@@ -49,19 +43,6 @@ public class ServletSseMessageCodecAdapter extends SseMessageCodecAdapter {
             } else {
                 return encoded;
             }
-        }
-    }
-
-    @Deprecated
-    @Getter
-    @RequiredArgsConstructor
-    public static class ServletSseMessageDecoder implements MessageDecoder {
-
-        private final MessageDecoder decoder;
-
-        @Override
-        public Message decode(Object message, Connection connection, ConnectionLoadBalanceConcept concept) {
-            return decoder.decode(message, connection, concept);
         }
     }
 }

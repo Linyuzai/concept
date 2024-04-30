@@ -3,8 +3,9 @@ package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnectionSubscriber;
-import lombok.*;
-import org.springframework.web.reactive.socket.client.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.reactive.socket.client.WebSocketClient;
 
 import java.net.URI;
 import java.util.function.Consumer;

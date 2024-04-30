@@ -1,17 +1,13 @@
 package com.github.linyuzai.connection.loadbalance.sse.concept;
 
-import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEstablishEvent;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ProtocolConnectionSubscriber;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer.LB_HOST_PORT;
 
@@ -27,7 +23,7 @@ public abstract class SseConnectionSubscriber<T extends SseConnection>
 
     private String protocol = "http";
 
-    private Map<String, Boolean> connectingServers = new ConcurrentHashMap<>();
+    //private Map<String, Boolean> connectingServers = new ConcurrentHashMap<>();
 
     /*@Override
     public boolean interceptSubscribe(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
@@ -44,6 +40,7 @@ public abstract class SseConnectionSubscriber<T extends SseConnection>
         }
     }*/
 
+    @Override
     public Map<String, String> getParams(ConnectionLoadBalanceConcept concept) {
         ConnectionServer local = concept.getConnectionServerManager().getLocal();
         String params = ConnectionServer.url(local);
@@ -59,7 +56,7 @@ public abstract class SseConnectionSubscriber<T extends SseConnection>
 
     public abstract String getType();
 
-    @Deprecated
+    /*@Deprecated
     @Getter
     @RequiredArgsConstructor
     public class ConnectingListener implements SseEventListener {
@@ -79,5 +76,5 @@ public abstract class SseConnectionSubscriber<T extends SseConnection>
                 }
             }
         }
-    }
+    }*/
 }

@@ -13,8 +13,8 @@ import com.github.linyuzai.connection.loadbalance.core.heartbeat.ConnectionHeart
 import com.github.linyuzai.connection.loadbalance.core.logger.ConnectionLoggerFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
-import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifierFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.idempotent.InMemoryMessageIdempotentVerifierFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifierFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.SimpleMessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;

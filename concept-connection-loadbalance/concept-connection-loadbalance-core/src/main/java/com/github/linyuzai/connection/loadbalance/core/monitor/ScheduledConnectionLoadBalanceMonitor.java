@@ -5,7 +5,6 @@ import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventList
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptDestroyEvent;
 import com.github.linyuzai.connection.loadbalance.core.event.ConnectionLoadBalanceConceptInitializeEvent;
 import com.github.linyuzai.connection.loadbalance.core.scope.AbstractScoped;
-import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeErrorEvent;
 import lombok.Getter;
 import lombok.Setter;
 
