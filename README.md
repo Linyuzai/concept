@@ -31,6 +31,5 @@
  
 # 计划
 
+- 插件2.0
 - job组件
-- 插件多场景隔离 + starter
-- connection-loadbalance 支持 sse
