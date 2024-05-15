@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketSubscriberConfiguration;
@@ -63,7 +64,7 @@ public class ServletWebSocketLoadBalanceConfiguration {
                 WebSocketLoadBalanceConcept concept,
                 WebSocketLoadBalanceProperties properties,
                 @Autowired(required = false) DefaultEndpointCustomizer customizer) {
-            String prefix = WebSocketLoadBalanceConcept
+            String prefix = ConnectionLoadBalanceConcept
                     .formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
             return new ServletWebSocketServerConfigurer(concept, prefix, customizer);
         }
