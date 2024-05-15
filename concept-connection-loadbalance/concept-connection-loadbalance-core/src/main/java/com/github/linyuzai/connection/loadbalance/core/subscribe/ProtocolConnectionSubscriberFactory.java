@@ -10,11 +10,16 @@ public abstract class ProtocolConnectionSubscriberFactory<T extends Connection> 
 
     private String protocol;
 
+    private String endpoint;
+
     @Override
     public ConnectionSubscriber create(String scope) {
         ProtocolConnectionSubscriber<T> subscriber = doCreate(scope);
         if (protocol != null && !protocol.isEmpty()) {
             subscriber.setProtocol(protocol);
+        }
+        if (endpoint != null && !endpoint.isEmpty()) {
+            subscriber.setEndpoint(endpoint);
         }
         return subscriber;
     }

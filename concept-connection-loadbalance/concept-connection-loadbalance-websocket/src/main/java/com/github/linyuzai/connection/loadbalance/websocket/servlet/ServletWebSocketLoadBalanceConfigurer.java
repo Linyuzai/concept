@@ -17,10 +17,11 @@ public class ServletWebSocketLoadBalanceConfigurer implements WebSocketConfigure
 
     private final WebSocketLoadBalanceConcept concept;
 
+    private final String endpoint;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new ServletWebSocketLoadBalanceHandler(concept),
-                        WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
+        registry.addHandler(new ServletWebSocketLoadBalanceHandler(concept), endpoint)
                 .setAllowedOrigins("*");
     }
 }

@@ -105,6 +105,13 @@ public class WebSocketLoadBalanceProperties {
                  * Whether to enable path selection.
                  */
                 private boolean enabled = false;
+
+                /**
+                 * 默认路径前缀。
+                 * <p>
+                 * Default path prefix.
+                 */
+                private String prefix;
             }
 
             @Data
@@ -122,6 +129,16 @@ public class WebSocketLoadBalanceProperties {
 
     @Data
     public static class LoadBalanceProperties {
+
+        /**
+         * 通过 websocket 互连时订阅端的端点路径，默认 '/concept-websocket-subscriber'
+         */
+        private String subscriberEndpoint = WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
+
+        /**
+         * 通过 websocket 互连时发布端的端点路径，默认 '/concept-websocket-subscriber'
+         */
+        private String observableEndpoint = WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
 
         /**
          * 主订阅类型，默认 WEBSOCKET。

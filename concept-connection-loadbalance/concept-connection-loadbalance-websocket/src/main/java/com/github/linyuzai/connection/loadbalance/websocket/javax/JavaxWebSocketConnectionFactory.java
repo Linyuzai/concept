@@ -12,6 +12,7 @@ import java.util.Map;
  * <p>
  * {@link JavaxWebSocketConnection} connection factory.
  */
+@Deprecated
 public class JavaxWebSocketConnectionFactory extends WebSocketConnectionFactory<JavaxWebSocketConnection> {
 
     @Override

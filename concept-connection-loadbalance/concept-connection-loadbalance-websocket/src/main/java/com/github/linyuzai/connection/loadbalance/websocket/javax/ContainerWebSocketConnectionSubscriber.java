@@ -14,6 +14,7 @@ import javax.websocket.WebSocketContainer;
  * <p>
  * Connection subscriber based on {@link WebSocketContainer}.
  */
+@Deprecated
 public abstract class ContainerWebSocketConnectionSubscriber<T extends WebSocketConnection>
         extends WebSocketConnectionSubscriber<T> implements ServletContextAware {
 

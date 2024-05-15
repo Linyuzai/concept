@@ -11,7 +11,9 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ProtocolConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseScoped;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseSubscribeHandler;
@@ -214,11 +216,13 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
 
         @Bean
         public ServletSseConnectionSubscriberFactory servletSseConnectionSubscriberFactory(
-                ServletSseLoadBalanceRunner runner) {
+                ServletSseLoadBalanceRunner runner,
+                SseLoadBalanceProperties properties) {
             ServletSseConnectionSubscriberFactory factory =
                     new ServletSseConnectionSubscriberFactory();
             factory.setProtocol("http");
             factory.setServletSseLoadBalanceRunner(runner);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -227,11 +231,13 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
 
         @Bean
         public ServletSseConnectionSubscriberFactory servletSseConnectionSubscriberFactory(
-                ServletSseLoadBalanceRunner runner) {
+                ServletSseLoadBalanceRunner runner,
+                SseLoadBalanceProperties properties) {
             ServletSseConnectionSubscriberFactory factory =
                     new ServletSseConnectionSubscriberFactory();
             factory.setProtocol("https");
             factory.setServletSseLoadBalanceRunner(runner);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -248,11 +254,14 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
     public abstract static class ReactiveSseConfiguration extends ReactiveSseBaseConfiguration {
 
         @Bean
-        public ReactiveSseConnectionSubscriberFactory reactiveSseConnectionSubscriberFactory(ReactiveSseClientFactory sseClientFactory) {
+        public ReactiveSseConnectionSubscriberFactory reactiveSseConnectionSubscriberFactory(
+                ReactiveSseClientFactory sseClientFactory,
+                SseLoadBalanceProperties properties) {
             ReactiveSseConnectionSubscriberFactory factory =
                     new ReactiveSseConnectionSubscriberFactory();
             factory.setProtocol("http");
             factory.setSseClientFactory(sseClientFactory);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -260,11 +269,14 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
     public abstract static class ReactiveSseSSLConfiguration extends ReactiveSseBaseConfiguration {
 
         @Bean
-        public ReactiveSseConnectionSubscriberFactory reactiveSseConnectionSubscriberFactory(ReactiveSseClientFactory sseClientFactory) {
+        public ReactiveSseConnectionSubscriberFactory reactiveSseConnectionSubscriberFactory(
+                ReactiveSseClientFactory sseClientFactory,
+                SseLoadBalanceProperties properties) {
             ReactiveSseConnectionSubscriberFactory factory =
                     new ReactiveSseConnectionSubscriberFactory();
             factory.setProtocol("https");
             factory.setSseClientFactory(sseClientFactory);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -273,8 +285,10 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
 
         @Bean
         public ServletSseLoadBalanceEndpoint servletSseLoadBalanceEndpoint(
-                SseLoadBalanceConcept concept) {
-            return new ServletSseLoadBalanceEndpoint(concept);
+                SseLoadBalanceConcept concept, SseLoadBalanceProperties properties) {
+            String endpoint = ConnectionLoadBalanceConcept
+                    .formatEndpoint(properties.getLoadBalance().getObservableEndpoint());
+            return new ServletSseLoadBalanceEndpoint(concept, endpoint);
         }
     }
 
@@ -288,12 +302,21 @@ public class SseSubscriberConfiguration extends ConnectionSubscriberConfiguratio
 
         @Bean
         public ReactiveSseLoadBalanceEndpoint reactiveSseLoadBalanceEndpoint(
-                SseLoadBalanceConcept concept) {
-            return new ReactiveSseLoadBalanceEndpoint(concept);
+                SseLoadBalanceConcept concept, SseLoadBalanceProperties properties) {
+            String endpoint = ConnectionLoadBalanceConcept
+                    .formatEndpoint(properties.getLoadBalance().getObservableEndpoint());
+            return new ReactiveSseLoadBalanceEndpoint(concept, endpoint);
         }
     }
 
     public static class SseBaseConfiguration {
+
+        protected void setLoadBalanceEndpoint(ProtocolConnectionSubscriberFactory<?> factory,
+                                              SseLoadBalanceProperties properties) {
+            String endpoint = ConnectionLoadBalanceConcept
+                    .formatEndpoint(properties.getLoadBalance().getSubscriberEndpoint());
+            factory.setEndpoint(endpoint);
+        }
 
         /*@Bean
         @Order(100)

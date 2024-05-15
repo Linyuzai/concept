@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
  * <p>
  * Endpoint configuration based on {@link JavaxWebSocketConnection} forwarding message client.
  */
+@Deprecated
 @ClientEndpoint
 public class JavaxWebSocketSubscriberEndpoint {
 

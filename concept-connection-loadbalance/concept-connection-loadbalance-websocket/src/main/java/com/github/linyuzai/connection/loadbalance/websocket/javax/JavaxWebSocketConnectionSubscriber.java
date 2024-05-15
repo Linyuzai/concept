@@ -14,6 +14,7 @@ import java.util.function.Consumer;
  * <p>
  * {@link JavaxWebSocketConnection} connection subscriber.
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class JavaxWebSocketConnectionSubscriber extends

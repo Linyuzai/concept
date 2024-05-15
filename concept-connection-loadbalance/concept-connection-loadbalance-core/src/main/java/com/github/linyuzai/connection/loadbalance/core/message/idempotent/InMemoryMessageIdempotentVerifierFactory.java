@@ -12,6 +12,6 @@ public class InMemoryMessageIdempotentVerifierFactory extends AbstractScopedFact
 
     @Override
     public MessageIdempotentVerifier create(String scope) {
-        return new InMemoryMessageIdempotentVerifier();
+        return new InMemoryMessageIdempotentVerifier(30 * 60 * 1000L, 30 * 60 * 1000L);
     }
 }

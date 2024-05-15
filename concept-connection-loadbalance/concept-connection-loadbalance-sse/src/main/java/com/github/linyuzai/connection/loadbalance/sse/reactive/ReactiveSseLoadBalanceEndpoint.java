@@ -20,7 +20,7 @@ import java.util.Map;
 @Getter
 @Setter
 @RestController
-@RequestMapping(SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
+@RequestMapping("${concept.sse.load-balance.observable-endpoint:concept-sse-subscriber}")
 @RequiredArgsConstructor
 public class ReactiveSseLoadBalanceEndpoint {
 
@@ -30,11 +30,13 @@ public class ReactiveSseLoadBalanceEndpoint {
 
     private final SseLoadBalanceConcept concept;
 
+    private final String endpoint;
+
     @GetMapping
     public Flux<ServerSentEvent<Object>> loadBalanceEndpoint(@RequestParam Map<Object, Object> params) {
         Object id = sseIdGenerator.generateId(params);
         return sseFluxFactory.create(Flux.create((FluxSink<ServerSentEvent<Object>> fluxSink) -> {
-                    ReactiveSseCreateRequest request = new ReactiveSseCreateRequest(id, SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT, fluxSink);
+                    ReactiveSseCreateRequest request = new ReactiveSseCreateRequest(id, endpoint, fluxSink);
                     ReactiveSseConnection connection = new ReactiveSseConnection(fluxSink);
                     connection.setCreateRequest(request);
                     connection.setType(Connection.Type.OBSERVABLE);

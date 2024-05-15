@@ -16,6 +16,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.idempotent.InMemo
 import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifierFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.SimpleMessageRetryStrategyAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.sender.MessageSenderFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
@@ -257,6 +258,7 @@ public class WebSocketLoadBalanceConfiguration {
             List<ConnectionFactory> connectionFactories,
             List<ConnectionSelector> connectionSelectors,
             List<MessageFactory> messageFactories,
+            List<MessageSenderFactory> messageSenderFactories,
             List<MessageCodecAdapter> messageCodecAdapters,
             List<MessageRetryStrategyAdapter> messageRetryStrategyAdapters,
             List<MessageIdempotentVerifierFactory> messageIdempotentVerifierFactories,
@@ -271,6 +273,7 @@ public class WebSocketLoadBalanceConfiguration {
                 .addConnectionFactories(connectionFactories)
                 .addConnectionSelectors(connectionSelectors)
                 .addMessageFactories(messageFactories)
+                .addMessageSenderFactories(messageSenderFactories)
                 .addMessageCodecAdapters(messageCodecAdapters)
                 .addMessageRetryStrategyAdapters(messageRetryStrategyAdapters)
                 .addMessageIdempotentVerifierFactories(messageIdempotentVerifierFactories)

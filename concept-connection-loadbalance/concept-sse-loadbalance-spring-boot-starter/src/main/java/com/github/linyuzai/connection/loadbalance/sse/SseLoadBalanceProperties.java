@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.sse;
 
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -114,6 +115,16 @@ public class SseLoadBalanceProperties {
 
     @Data
     public static class LoadBalanceProperties {
+
+        /**
+         * 通过 SSE 互连时订阅端的端点路径，默认 '/concept-sse-subscriber'
+         */
+        private String subscriberEndpoint = SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
+
+        /**
+         * 通过 SSE 互连时发布端的端点路径，默认 '/concept-sse-subscriber'
+         */
+        private String observableEndpoint = SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
 
         /**
          * 主订阅类型，默认 SSE。

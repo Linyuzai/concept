@@ -21,6 +21,7 @@ import java.util.function.Consumer;
  * <p>
  * {@link WebSocketConnection} implementation based on {@link Session}.
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class JavaxWebSocketConnection extends WebSocketConnection {

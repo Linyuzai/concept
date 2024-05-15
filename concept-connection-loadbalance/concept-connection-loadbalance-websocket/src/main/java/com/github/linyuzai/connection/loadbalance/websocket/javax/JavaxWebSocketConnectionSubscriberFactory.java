@@ -8,6 +8,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketCon
  * <p>
  * Javax WebSocket connection subscriber factory.
  */
+@Deprecated
 public class JavaxWebSocketConnectionSubscriberFactory
         extends WebSocketConnectionSubscriberFactory<JavaxWebSocketConnection> {
 

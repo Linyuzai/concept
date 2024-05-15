@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * Message codec adapter for {@link JavaxWebSocketConnection}.
  */
+@Deprecated
 public class JavaxWebSocketMessageCodecAdapter extends WebSocketMessageCodecAdapter {
 
     @Override

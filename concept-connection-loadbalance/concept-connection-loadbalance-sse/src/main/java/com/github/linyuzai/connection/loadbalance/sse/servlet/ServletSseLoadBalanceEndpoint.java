@@ -19,7 +19,7 @@ import java.util.Map;
 @Getter
 @Setter
 @RestController
-@RequestMapping(SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
+@RequestMapping("${concept.sse.load-balance.observable-endpoint:concept-sse-subscriber}")
 @RequiredArgsConstructor
 public class ServletSseLoadBalanceEndpoint {
 
@@ -29,11 +29,13 @@ public class ServletSseLoadBalanceEndpoint {
 
     private final SseLoadBalanceConcept concept;
 
+    private final String endpoint;
+
     @GetMapping
     public SseEmitter loadBalanceEndpoint(@RequestParam Map<Object, Object> params) {
         Object id = sseIdGenerator.generateId(params);
         SseEmitter emitter = sseEmitterFactory.create();
-        ServletSseCreateRequest request = new ServletSseCreateRequest(id, SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT, emitter);
+        ServletSseCreateRequest request = new ServletSseCreateRequest(id, endpoint, emitter);
         ServletSseConnection connection = new ServletSseConnection(emitter);
         connection.setCreateRequest(request);
         connection.setType(Connection.Type.OBSERVABLE);

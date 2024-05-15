@@ -8,6 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageCodecAdapt
 import com.github.linyuzai.connection.loadbalance.core.message.MessageFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifier;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.sender.MessageSender;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
@@ -161,6 +162,8 @@ public interface ConnectionLoadBalanceConcept {
 
     List<MessageFactory> getMessageFactories();
 
+    MessageSender getMessageSender();
+
     MessageCodecAdapter getMessageCodecAdapter();
 
     MessageRetryStrategyAdapter getMessageRetryStrategyAdapter();
@@ -172,4 +175,25 @@ public interface ConnectionLoadBalanceConcept {
     ConnectionLogger getLogger();
 
     ConnectionEventPublisher getEventPublisher();
+
+    static String formatPrefix(String prefix) {
+        StringBuilder builder = new StringBuilder();
+        if (!prefix.startsWith("/")) {
+            builder.append("/");
+        }
+        builder.append(prefix);
+        if (!prefix.endsWith("/")) {
+            builder.append("/");
+        }
+        return builder.toString();
+    }
+
+    static String formatEndpoint(String endpoint) {
+        StringBuilder builder = new StringBuilder();
+        if (!endpoint.startsWith("/")) {
+            builder.append("/");
+        }
+        builder.append(endpoint);
+        return builder.toString();
+    }
 }

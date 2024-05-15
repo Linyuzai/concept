@@ -101,7 +101,6 @@ public abstract class AbstractConnection implements Connection {
         //如果连接已经关闭则直接返回异常
         //Return error if connection has been closed
         if (isClosed()) {
-
             onError.accept(new IllegalStateException("Connection is closed"));
             onComplete.run();
             return;

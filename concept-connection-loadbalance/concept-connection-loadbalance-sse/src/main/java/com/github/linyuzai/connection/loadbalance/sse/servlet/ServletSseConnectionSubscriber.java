@@ -26,7 +26,7 @@ public class ServletSseConnectionSubscriber extends SseConnectionSubscriber<Serv
         try {
             ServletSubscriberSseConnection connection = new ServletSubscriberSseConnection();
             Object id = sseIdGenerator.generateId(null);
-            connection.setCreateRequest(new SubscriberSseCreateRequest(id));
+            connection.setCreateRequest(new SubscriberSseCreateRequest(id, getEndpoint()));
             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
             http.setRequestMethod("GET");
             http.connect();

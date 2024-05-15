@@ -16,10 +16,7 @@ public abstract class WebSocketConnectionSubscriber<T extends WebSocketConnectio
 
     private String protocol = "ws";
 
-    @Override
-    public String getEndpoint() {
-        return WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
-    }
+    private String endpoint = WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
 
     public abstract String getType();
 }

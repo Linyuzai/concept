@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
  * <p>
  * Endpoint configuration based on {@link JavaxWebSocketConnection} for inter-service load balancing.
  */
+@Deprecated
 @ServerEndpoint(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT)
 public class JavaxWebSocketLoadBalanceEndpoint {
 

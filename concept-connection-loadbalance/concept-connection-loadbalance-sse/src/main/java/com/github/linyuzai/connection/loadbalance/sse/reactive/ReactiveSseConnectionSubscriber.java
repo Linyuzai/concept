@@ -25,7 +25,7 @@ public class ReactiveSseConnectionSubscriber extends SseConnectionSubscriber<Rea
         WebClient client = sseClientFactory.create();
         ReactiveSubscriberSseConnection connection = new ReactiveSubscriberSseConnection();
         Object id = sseIdGenerator.generateId(null);
-        connection.setCreateRequest(new SubscriberSseCreateRequest(id));
+        connection.setCreateRequest(new SubscriberSseCreateRequest(id, getEndpoint()));
         Disposable disposable = client.get()
                 .uri(uri)
                 .retrieve()

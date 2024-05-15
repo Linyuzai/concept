@@ -11,8 +11,10 @@ import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redis.reactive.ReactiveRedisTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.RedissonTopicConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.autoconfigure.subscribe.redisson.reactive.ReactiveRedissonTopicConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.monitor.ScheduledConnectionLoadBalanceMonitor;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeHandler;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.ProtocolConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import com.github.linyuzai.connection.loadbalance.websocket.javax.JavaxWebSocketConnectionSubscriberFactory;
@@ -177,24 +179,30 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
         }
     }
 
+    @Deprecated
     public abstract static class JavaxWebSocketConfiguration extends JavaxWebSocketBaseConfiguration {
 
         @Bean
-        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory() {
+        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory(
+                WebSocketLoadBalanceProperties properties) {
             JavaxWebSocketConnectionSubscriberFactory factory =
                     new JavaxWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
 
+    @Deprecated
     public abstract static class JavaxWebSocketSSLConfiguration extends JavaxWebSocketBaseConfiguration {
 
         @Bean
-        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory() {
+        public JavaxWebSocketConnectionSubscriberFactory javaxWebSocketConnectionSubscriberFactory(
+                WebSocketLoadBalanceProperties properties) {
             JavaxWebSocketConnectionSubscriberFactory factory =
                     new JavaxWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -202,11 +210,14 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ReactiveWebSocketConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
-        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(ReactiveWebSocketClientFactory webSocketClientFactory) {
+        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(
+                ReactiveWebSocketClientFactory webSocketClientFactory,
+                WebSocketLoadBalanceProperties properties) {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
             factory.setWebSocketClientFactory(webSocketClientFactory);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -214,11 +225,14 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ReactiveWebSocketSSLConfiguration extends ReactiveWebSocketBaseConfiguration {
 
         @Bean
-        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(ReactiveWebSocketClientFactory webSocketClientFactory) {
+        public ReactiveWebSocketConnectionSubscriberFactory reactiveWebSocketConnectionSubscriberFactory(
+                ReactiveWebSocketClientFactory webSocketClientFactory,
+                WebSocketLoadBalanceProperties properties) {
             ReactiveWebSocketConnectionSubscriberFactory factory =
                     new ReactiveWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
             factory.setWebSocketClientFactory(webSocketClientFactory);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -226,11 +240,14 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ServletWebSocketConfiguration extends ServletWebSocketBaseConfiguration {
 
         @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(ServletWebSocketClientFactory webSocketClientFactory) {
+        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(
+                ServletWebSocketClientFactory webSocketClientFactory,
+                WebSocketLoadBalanceProperties properties) {
             ServletWebSocketConnectionSubscriberFactory factory =
                     new ServletWebSocketConnectionSubscriberFactory();
             factory.setProtocol("ws");
             factory.setWebSocketClientFactory(webSocketClientFactory);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
@@ -238,15 +255,19 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
     public abstract static class ServletWebSocketSSLConfiguration extends ServletWebSocketBaseConfiguration {
 
         @Bean
-        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(ServletWebSocketClientFactory webSocketClientFactory) {
+        public ServletWebSocketConnectionSubscriberFactory servletWebSocketConnectionSubscriberFactory(
+                ServletWebSocketClientFactory webSocketClientFactory,
+                WebSocketLoadBalanceProperties properties) {
             ServletWebSocketConnectionSubscriberFactory factory =
                     new ServletWebSocketConnectionSubscriberFactory();
             factory.setProtocol("wss");
             factory.setWebSocketClientFactory(webSocketClientFactory);
+            setLoadBalanceEndpoint(factory, properties);
             return factory;
         }
     }
 
+    @Deprecated
     public static class JavaxWebSocketBaseConfiguration extends WebSocketBaseConfiguration {
 
         @Bean
@@ -267,8 +288,10 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
 
         @Bean
         public ReactiveWebSocketLoadBalanceHandlerMapping reactiveWebSocketLoadBalanceHandlerMapping(
-                WebSocketLoadBalanceConcept concept) {
-            return new ReactiveWebSocketLoadBalanceHandlerMapping(concept);
+                WebSocketLoadBalanceConcept concept, WebSocketLoadBalanceProperties properties) {
+            String endpoint = ConnectionLoadBalanceConcept.
+                    formatEndpoint(properties.getLoadBalance().getObservableEndpoint());
+            return new ReactiveWebSocketLoadBalanceHandlerMapping(concept, endpoint);
         }
     }
 
@@ -282,12 +305,21 @@ public class WebSocketSubscriberConfiguration extends ConnectionSubscriberConfig
 
         @Bean
         public ServletWebSocketLoadBalanceConfigurer servletWebSocketLoadBalanceConfigurer(
-                WebSocketLoadBalanceConcept concept) {
-            return new ServletWebSocketLoadBalanceConfigurer(concept);
+                WebSocketLoadBalanceConcept concept, WebSocketLoadBalanceProperties properties) {
+            String endpoint = ConnectionLoadBalanceConcept.
+                    formatEndpoint(properties.getLoadBalance().getObservableEndpoint());
+            return new ServletWebSocketLoadBalanceConfigurer(concept, endpoint);
         }
     }
 
     public static class WebSocketBaseConfiguration {
+
+        protected void setLoadBalanceEndpoint(ProtocolConnectionSubscriberFactory<?> factory,
+                                              WebSocketLoadBalanceProperties properties) {
+            String endpoint = ConnectionLoadBalanceConcept.
+                    formatEndpoint(properties.getLoadBalance().getSubscriberEndpoint());
+            factory.setEndpoint(endpoint);
+        }
 
         @Bean
         @Order(100)

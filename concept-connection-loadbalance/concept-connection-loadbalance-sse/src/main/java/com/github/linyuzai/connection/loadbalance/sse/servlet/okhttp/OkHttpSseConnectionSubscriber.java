@@ -34,7 +34,7 @@ public class OkHttpSseConnectionSubscriber extends SseConnectionSubscriber<OkHtt
         try {
             OkHttpSseConnection connection = new OkHttpSseConnection();
             Object id = sseIdGenerator.generateId(null);
-            connection.setCreateRequest(new SubscriberSseCreateRequest(id));
+            connection.setCreateRequest(new SubscriberSseCreateRequest(id, getEndpoint()));
             OkHttpClient client = sseClientFactory.create();
             Request request = new Request.Builder()
                     .url(uri.toURL())

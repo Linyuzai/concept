@@ -25,6 +25,7 @@ public enum WebSocketType {
      * <p>
      * Use javax configuration.
      */
+    @Deprecated
     JAVAX(JavaxWebSocketLoadBalanceConfiguration.class),
 
     /**

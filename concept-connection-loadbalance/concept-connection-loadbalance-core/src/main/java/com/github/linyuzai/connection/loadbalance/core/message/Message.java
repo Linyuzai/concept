@@ -52,6 +52,13 @@ public interface Message {
     String POOLED = "_lb:pooled";
 
     /**
+     * 标记该消息转发需要反序列化的类型。
+     * <p>
+     * Key of message header for message deserialization.
+     */
+    String DESERIALIZED_CLASS = "_lb:deserialized_class";
+
+    /**
      * 获得消息头。
      * <p>
      * Get message headers.

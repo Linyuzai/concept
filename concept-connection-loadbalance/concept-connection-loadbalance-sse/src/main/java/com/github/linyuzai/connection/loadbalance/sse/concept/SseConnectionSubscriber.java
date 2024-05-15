@@ -23,6 +23,8 @@ public abstract class SseConnectionSubscriber<T extends SseConnection>
 
     private String protocol = "http";
 
+    private String endpoint = SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
+
     //private Map<String, Boolean> connectingServers = new ConcurrentHashMap<>();
 
     /*@Override
@@ -47,11 +49,6 @@ public abstract class SseConnectionSubscriber<T extends SseConnection>
         Map<String, String> map = new LinkedHashMap<>();
         map.put(LB_HOST_PORT, params);
         return map;
-    }
-
-    @Override
-    public String getEndpoint() {
-        return SseLoadBalanceConcept.SUBSCRIBER_ENDPOINT;
     }
 
     public abstract String getType();

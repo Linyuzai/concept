@@ -7,7 +7,7 @@ import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.message.BinaryMessage;
 import com.github.linyuzai.connection.loadbalance.core.message.Message;
-import com.github.linyuzai.connection.loadbalance.core.message.TextMessage;
+import com.github.linyuzai.connection.loadbalance.core.message.ObjectMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -47,12 +47,22 @@ public class JacksonForwardMessageDecoder implements MessageDecoder {
             decoded.setPayload(payloadNode.binaryValue());
             return decoded;
         } else {
-            TextMessage decoded = new TextMessage();
+            ObjectMessage decoded = new ObjectMessage();
             decoded.setHeaders(headers);
+            String payload;
             if (payloadNode.isTextual()) {
-                decoded.setPayload(payloadNode.asText());
+                payload = payloadNode.asText();
             } else {
-                decoded.setPayload(objectMapper.writeValueAsString(payloadNode));
+                payload = objectMapper.writeValueAsString(payloadNode);
+            }
+
+            //如果设置了反序列化的类型就反序列化成对象
+            String deserializedClass = headers.get(Message.DESERIALIZED_CLASS);
+            if (deserializedClass == null || deserializedClass.isEmpty()) {
+                decoded.setPayload(payload);
+            } else {
+                decoded.setPayload(objectMapper.readValue(payload,
+                        Class.forName(deserializedClass)));
             }
             return decoded;
         }

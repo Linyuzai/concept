@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
  * <p>
  * Endpoint configuration based on {@link JavaxWebSocketConnection} default service.
  */
+@Deprecated
 @ServerEndpoint(WebSocketLoadBalanceConcept.SERVER_ENDPOINT_PREFIX + "{type}")
 public class JavaxWebSocketServerEndpoint {
 

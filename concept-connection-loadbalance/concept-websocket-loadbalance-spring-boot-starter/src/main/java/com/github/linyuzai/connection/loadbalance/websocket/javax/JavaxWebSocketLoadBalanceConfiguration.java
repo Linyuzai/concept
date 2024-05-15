@@ -14,6 +14,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
  * <p>
  * Javax WebSocket load balancing configuration.
  */
+@Deprecated
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class JavaxWebSocketLoadBalanceConfiguration {

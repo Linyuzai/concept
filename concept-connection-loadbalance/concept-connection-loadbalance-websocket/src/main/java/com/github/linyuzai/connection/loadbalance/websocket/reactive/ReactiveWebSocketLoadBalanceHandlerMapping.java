@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public class ReactiveWebSocketLoadBalanceHandlerMapping extends SimpleUrlHandlerMapping {
 
-    public ReactiveWebSocketLoadBalanceHandlerMapping(WebSocketLoadBalanceConcept concept) {
+    public ReactiveWebSocketLoadBalanceHandlerMapping(WebSocketLoadBalanceConcept concept, String endpoint) {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put(WebSocketLoadBalanceConcept.SUBSCRIBER_ENDPOINT, new ReactiveWebSocketLoadBalanceHandler(concept));
+        map.put(endpoint, new ReactiveWebSocketLoadBalanceHandler(concept));
         setUrlMap(map);
         setOrder(100);
     }

@@ -14,6 +14,9 @@ import com.github.linyuzai.connection.loadbalance.core.message.idempotent.Messag
 import com.github.linyuzai.connection.loadbalance.core.message.idempotent.MessageIdempotentVerifierFactory;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategy;
 import com.github.linyuzai.connection.loadbalance.core.message.retry.MessageRetryStrategyAdapter;
+import com.github.linyuzai.connection.loadbalance.core.message.sender.DefaultMessageSenderFactory;
+import com.github.linyuzai.connection.loadbalance.core.message.sender.MessageSender;
+import com.github.linyuzai.connection.loadbalance.core.message.sender.MessageSenderFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepository;
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.scope.Scoped;
@@ -35,6 +38,7 @@ import lombok.Setter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Concept 抽象类。
@@ -62,6 +66,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected List<ConnectionSelector> connectionSelectors;
 
     protected List<MessageFactory> messageFactories;
+
+    protected MessageSender messageSender;
 
     protected MessageCodecAdapter messageCodecAdapter;
 
@@ -438,15 +444,16 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         //消息准备
         //Message prepare
         eventPublisher.publish(new MessagePrepareEvent(message, connections));
-        //遍历发送
-        //Foreach send
-        for (Connection connection : connections) {
+        List<Runnable> runnableList = connections.stream().map(it -> (Runnable) () -> {
             try {
-                connection.send(message);
+                it.send(message);
             } catch (Throwable e) {
-                eventPublisher.publish(new MessageSendErrorEvent(connection, message, e));
+                eventPublisher.publish(new MessageSendErrorEvent(it, message, e));
             }
-        }
+        }).collect(Collectors.toList());
+        //发送
+        //Send
+        messageSender.send(runnableList);
         eventPublisher.publish(new MessageSendEvent(message, connections));
     }
 
@@ -513,6 +520,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
         protected List<ConnectionSelector> connectionSelectors = new ArrayList<>();
 
         protected List<MessageFactory> messageFactories = new ArrayList<>();
+
+        protected List<MessageSenderFactory> messageSenderFactories = new ArrayList<>();
 
         protected List<MessageCodecAdapter> messageCodecAdapters = new ArrayList<>();
 
@@ -585,6 +594,16 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
          */
         public B addMessageFactories(Collection<? extends MessageFactory> factories) {
             this.messageFactories.addAll(factories);
+            return (B) this;
+        }
+
+        /**
+         * 添加消息发送者工厂。
+         * <p>
+         * Add factory of message sender.
+         */
+        public B addMessageSenderFactories(Collection<? extends MessageSenderFactory> factories) {
+            this.messageSenderFactories.addAll(factories);
             return (B) this;
         }
 
@@ -679,6 +698,11 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             //Add a message factory support any object
             messageFactories.add(new ObjectMessageFactory());
 
+            //添加一个消息发送者
+            //Add a message sender
+            messageSenderFactories.add(new DefaultMessageSenderFactory()
+                    .addScopes(getScope()));
+
             //添加一个基础消息编解码适配器
             //Add a basic message codec adapter
             messageCodecAdapters.add(new BaseMessageCodecAdapter()
@@ -702,6 +726,8 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
                     withConnectionSelectorFilterChain(withScope(connectionSelectors))));
             concept.setMessageFactories(MessageFactory.Delegate.delegate(concept,
                     withScope(messageFactories)));
+            concept.setMessageSender(MessageSender.Delegate.delegate(concept,
+                    withScopeFactory(MessageSender.class, messageSenderFactories)));
             concept.setMessageCodecAdapter(
                     withMessageCodecAdapterChain(concept, withScope(messageCodecAdapters)));
             concept.setMessageRetryStrategyAdapter(
