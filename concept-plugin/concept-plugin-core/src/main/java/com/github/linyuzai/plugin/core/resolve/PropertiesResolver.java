@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Properties;
 /**
  * {@link Properties} 解析器
  */
-@DependOnResolvers(PropertiesNameResolver.class)
+@HandlerDependency(PropertiesNameResolver.class)
 public abstract class PropertiesResolver extends AbstractPluginResolver<List<String>, Map<String, Properties>> {
 
     /**
@@ -31,12 +32,12 @@ public abstract class PropertiesResolver extends AbstractPluginResolver<List<Str
     }
 
     @Override
-    public Object getDependedKey() {
+    public Object getParameterKey() {
         return Plugin.PROPERTIES_NAME;
     }
 
     @Override
-    public Object getResolvedKey() {
+    public Object getResultKey() {
         return Plugin.PROPERTIES;
     }
 

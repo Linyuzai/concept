@@ -8,6 +8,7 @@ package com.github.linyuzai.plugin.core.resolve;
  * 这样就可以通过一定方式自动设置额外的解析器，
  * 不需要手动添加大量的解析器。
  */
+@Deprecated
 public interface PluginResolverDependency {
 
     /**

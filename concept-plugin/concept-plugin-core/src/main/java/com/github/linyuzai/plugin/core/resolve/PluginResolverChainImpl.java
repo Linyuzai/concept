@@ -49,10 +49,14 @@ public class PluginResolverChainImpl implements PluginResolverChain {
                 Iterator<PluginFilter> filterIterator = filters.iterator();
                 while (filterIterator.hasNext()) {
                     PluginFilter filter = filterIterator.next();
-                    Class<? extends PluginResolver> filterWith = filter.filterWith();
-                    if (filterWith.isInstance(resolver)) {
-                        filterIterator.remove();
-                        filter.filter(context);
+                    if (filter.support(context)) {
+                        Collection<Class<? extends PluginResolver>> dependencies = filter.getDependencies();
+                        for (Class<? extends PluginResolver> dependency : dependencies) {
+                            if (dependency.isInstance(resolver)) {
+                                filterIterator.remove();
+                                filter.filter(context);
+                            }
+                        }
                     }
                 }
             }

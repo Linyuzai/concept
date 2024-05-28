@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.PropertiesNameResolver;
 import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
@@ -14,7 +14,7 @@ import java.util.zip.ZipEntry;
 /**
  * jar 中 {@link Properties} 解析器
  */
-@DependOnResolvers(PropertiesNameResolver.class)
+@HandlerDependency(PropertiesNameResolver.class)
 public class JarPropertiesResolver extends PropertiesResolver {
 
     /**

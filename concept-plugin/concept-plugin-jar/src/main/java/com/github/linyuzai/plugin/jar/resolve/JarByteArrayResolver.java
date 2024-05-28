@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.ByteArrayResolver;
-import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.SneakyThrows;
 
@@ -15,7 +15,7 @@ import java.util.zip.ZipFile;
 /**
  * jar 中非 class 文件的内容解析器
  */
-@DependOnResolvers(JarPathNameResolver.class)
+@HandlerDependency(JarPathNameResolver.class)
 public class JarByteArrayResolver extends ByteArrayResolver<List<String>, Map<String, byte[]>> {
 
     /**

@@ -3,15 +3,16 @@ package com.github.linyuzai.plugin.core.extract;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.resolve.PluginResolverDependency;
-import lombok.AllArgsConstructor;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 插件提取器
  */
-public interface PluginExtractor extends PluginResolverDependency {
+public interface PluginExtractor extends PluginHandler.Dependency<PluginResolver> {
 
     /**
      * 提取插件
@@ -24,23 +25,23 @@ public interface PluginExtractor extends PluginResolverDependency {
      * 插件提取执行器
      */
     @Getter
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     class Invoker {
 
         /**
          * 插件匹配器
          */
-        private PluginMatcher matcher;
+        private final PluginMatcher matcher;
 
         /**
          * 插件转换器
          */
-        private PluginConvertor convertor;
+        private final PluginConvertor convertor;
 
         /**
          * 插件格式器
          */
-        private PluginFormatter formatter;
+        private final PluginFormatter formatter;
 
         /**
          * 执行插件提取。

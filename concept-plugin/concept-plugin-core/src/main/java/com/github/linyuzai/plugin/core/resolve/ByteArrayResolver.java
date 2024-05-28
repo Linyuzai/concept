@@ -1,8 +1,10 @@
 package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
@@ -17,8 +19,8 @@ import java.io.InputStream;
  * @param <R> 解析后的插件类型
  */
 @Getter
-@AllArgsConstructor
-@DependOnResolvers(PathNameResolver.class)
+@RequiredArgsConstructor
+@HandlerDependency(PathNameResolver.class)
 public abstract class ByteArrayResolver<T, R> extends AbstractPluginResolver<T, R> {
 
     /**
@@ -31,12 +33,12 @@ public abstract class ByteArrayResolver<T, R> extends AbstractPluginResolver<T, 
     }
 
     @Override
-    public Object getDependedKey() {
+    public Object getParameterKey() {
         return Plugin.PATH_NAME;
     }
 
     @Override
-    public Object getResolvedKey() {
+    public Object getResultKey() {
         return Plugin.BYTE_ARRAY;
     }
 

@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
-import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 import java.util.LinkedHashMap;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 类名解析器
  */
-@DependOnResolvers(JarPathNameResolver.class)
+@HandlerDependency(JarPathNameResolver.class)
 public class JarClassNameResolver extends AbstractPluginResolver<List<String>, Map<String, String>> {
 
     /**
@@ -37,12 +37,12 @@ public class JarClassNameResolver extends AbstractPluginResolver<List<String>, M
     }
 
     @Override
-    public Object getDependedKey() {
+    public Object getParameterKey() {
         return JarPlugin.PATH_NAME;
     }
 
     @Override
-    public Object getResolvedKey() {
+    public Object getResultKey() {
         return JarPlugin.CLASS_NAME;
     }
 }

@@ -1,11 +1,11 @@
 package com.github.linyuzai.plugin.jar.filter;
 
 import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
-import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarClassResolver;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  * 类上注解过滤器
  */
 @Getter
-@AllArgsConstructor
-@FilterWithResolver(JarClassResolver.class)
+@RequiredArgsConstructor
+@HandlerDependency(JarClassResolver.class)
 public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
     /**

@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
-import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.SneakyThrows;
 
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * 实例解析器
  */
-@DependOnResolvers(JarClassResolver.class)
+@HandlerDependency(JarClassResolver.class)
 public class JarInstanceResolver extends AbstractPluginResolver<Map<String, Class<?>>, Map<String, Object>> {
 
     /**
@@ -70,12 +70,12 @@ public class JarInstanceResolver extends AbstractPluginResolver<Map<String, Clas
     }
 
     @Override
-    public Object getDependedKey() {
+    public Object getParameterKey() {
         return JarPlugin.CLASS;
     }
 
     @Override
-    public Object getResolvedKey() {
+    public Object getResultKey() {
         return JarPlugin.INSTANCE;
     }
 }

@@ -16,8 +16,10 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 动态插件提取器。
@@ -307,13 +309,12 @@ public class DynamicExtractor implements PluginExtractor {
      *
      * @return 所有依赖的解析器 {@link PluginResolver} 的类
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public Class<? extends PluginResolver>[] dependencies() {
+    public Collection<Class<? extends PluginResolver>> getDependencies() {
         return methodInvokersMap.values().stream()
                 .flatMap(it -> it.values().stream())
-                .flatMap(it -> Arrays.stream(it.getMatcher().dependencies()))
+                .flatMap(it -> it.getMatcher().getDependencies().stream())
                 .distinct()
-                .toArray(Class[]::new);
+                .collect(Collectors.toList());
     }
 }

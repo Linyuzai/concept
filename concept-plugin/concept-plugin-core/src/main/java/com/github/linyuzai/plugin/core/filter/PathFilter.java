@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.PathNameResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
  * 路径过滤器
  */
 @Getter
-@FilterWithResolver(PathNameResolver.class)
+@HandlerDependency(PathNameResolver.class)
 public class PathFilter extends AbstractPluginFilter<List<String>> {
 
     /**

@@ -11,6 +11,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Deprecated
 public @interface DependOnResolvers {
 
     /**
@@ -18,5 +19,5 @@ public @interface DependOnResolvers {
      *
      * @return 需要依赖的插件解析器 {@link PluginResolver}
      */
-    Class<? extends PluginResolver>[] value() default {};
+    Class<PluginResolver>[] value() default {};
 }

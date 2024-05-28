@@ -50,18 +50,9 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
         context.publish(new PluginFilteredEvent(context, this, original, filtered));
     }
 
-    /**
-     * 获得插件过滤器 {@link PluginFilter} 需要依赖的插件处理器 {@link PluginResolver}。
-     * 增加缓存操作。
-     *
-     * @return 所需要依赖的插件处理器 {@link PluginResolver} 的类
-     */
     @Override
-    public Class<? extends PluginResolver> filterWith() {
-        if (filterWith == null) {
-            filterWith = PluginFilter.super.filterWith();
-        }
-        return filterWith;
+    public boolean support(PluginContext context) {
+        return true;
     }
 
     /**

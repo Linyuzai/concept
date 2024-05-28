@@ -32,8 +32,6 @@ public class JarPluginConcept extends AbstractPluginConcept {
                             Collection<PluginResolver> pluginResolvers,
                             Collection<PluginFilter> pluginFilters,
                             Collection<PluginExtractor> pluginExtractors) {
-        super(pluginContextFactory, pluginEventPublisher, pluginFactories,
-                pluginResolvers, pluginFilters, pluginExtractors);
     }
 
     public static class Builder extends AbstractBuilder<Builder> {

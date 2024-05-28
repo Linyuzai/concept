@@ -23,6 +23,6 @@ public class JarURLPluginFactory extends JarPluginFactory {
     @Override
     public JarPlugin doCreate(Object o, JarPluginConcept concept) {
         URL url = (URL) o;
-        return new JarPlugin(url, createPluginClassLoader(url, concept), concept);
+        return new JarPlugin(url, createPluginClassLoader(url, concept));
     }
 }

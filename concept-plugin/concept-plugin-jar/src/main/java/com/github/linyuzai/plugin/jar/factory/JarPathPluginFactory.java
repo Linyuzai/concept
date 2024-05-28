@@ -24,7 +24,7 @@ public class JarPathPluginFactory extends JarPluginFactory {
     @Override
     public JarPlugin doCreate(Object o, JarPluginConcept concept) {
         URL url = parseURL((String) o);
-        return new JarPlugin(url, createPluginClassLoader(url, concept), concept);
+        return new JarPlugin(url, createPluginClassLoader(url, concept));
     }
 
     @SneakyThrows

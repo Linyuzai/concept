@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 
 /**
  * {@link PluginResolver} 抽象类
@@ -18,15 +18,22 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      */
     @Override
     public void resolve(PluginContext context) {
-        Object dependedKey = getDependedKey();
-        T depended = context.get(dependedKey);
+        Object parameterKey = getParameterKey();
+        Object resultKey = getResultKey();
+        PluginTree tree = context.get(PluginTree.class);
+        tree.getTransformer()
+                .create(this)
+                .parameterId(parameterKey)
+                .transform(t -> t.<T, R>map(n -> doResolve(n, context)))
+                .resultId(resultKey);
+        /*T depended = context.get(dependedKey);
         if (depended == null) {
             throw new PluginException("No plugin can be resolved with key: " + dependedKey);
         }
         R resolved = doResolve(depended, context);
-        Object resolvedKey = getResolvedKey();
         context.set(resolvedKey, resolved);
         context.publish(new PluginResolvedEvent(context, this, dependedKey, depended, resolvedKey, resolved));
+        */
     }
 
     /**
@@ -37,29 +44,29 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      */
     @Override
     public boolean support(PluginContext context) {
-        return context.contains(getDependedKey());
+        return context.contains(PluginTree.class);
     }
 
     /**
      * 基于泛型及上下文 {@link PluginContext} 的插件解析
      *
-     * @param plugin  未解析的插件
+     * @param source  未解析的插件
      * @param context 上下文 {@link PluginContext}
      * @return 解析后的插件
      */
-    public abstract R doResolve(T plugin, PluginContext context);
+    public abstract R doResolve(T source, PluginContext context);
 
     /**
      * 未解析的插件的 key
      *
      * @return 未解析的插件的 key
      */
-    public abstract Object getDependedKey();
+    public abstract Object getParameterKey();
 
     /**
      * 解析后插件的 key
      *
      * @return 解析后插件的 key
      */
-    public abstract Object getResolvedKey();
+    public abstract Object getResultKey();
 }

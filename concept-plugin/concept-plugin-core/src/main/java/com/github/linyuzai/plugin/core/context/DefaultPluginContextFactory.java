@@ -11,12 +11,11 @@ public class DefaultPluginContextFactory implements PluginContextFactory {
     /**
      * 创建一个默认上下文 {@link DefaultPluginContext}
      *
-     * @param plugin  插件 {@link Plugin}
      * @param concept {@link PluginConcept}
      * @return 上下文 {@link DefaultPluginContext}
      */
     @Override
-    public PluginContext create(Plugin plugin, PluginConcept concept) {
-        return new DefaultPluginContext(concept, plugin);
+    public PluginContext create(PluginConcept concept) {
+        return new DefaultPluginContext(null);
     }
 }

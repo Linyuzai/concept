@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * {@link java.util.Properties} 名称解析器
  */
-@DependOnResolvers(PathNameResolver.class)
+@HandlerDependency(PathNameResolver.class)
 public class PropertiesNameResolver extends AbstractPluginResolver<List<String>, List<String>> {
 
     /**
@@ -27,12 +28,12 @@ public class PropertiesNameResolver extends AbstractPluginResolver<List<String>,
     }
 
     @Override
-    public Object getDependedKey() {
+    public Object getParameterKey() {
         return Plugin.PATH_NAME;
     }
 
     @Override
-    public Object getResolvedKey() {
+    public Object getResultKey() {
         return Plugin.PROPERTIES_NAME;
     }
 }

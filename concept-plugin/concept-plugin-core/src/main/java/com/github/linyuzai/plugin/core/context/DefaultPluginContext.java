@@ -1,10 +1,8 @@
 package com.github.linyuzai.plugin.core.context;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,29 +11,17 @@ import java.util.Map;
  * {@link PluginContext} 默认实现。
  * 通过 {@link LinkedHashMap} 缓存数据。
  */
-@SuppressWarnings("unchecked")
+@RequiredArgsConstructor
 public class DefaultPluginContext implements PluginContext {
 
-    private final PluginConcept concept;
-
-    private final Plugin plugin;
-
     @Getter
-    private final Map<Object, Object> content = new LinkedHashMap<>();
+    private final PluginContext parent;
 
-    public DefaultPluginContext(@NonNull PluginConcept concept, @NonNull Plugin plugin) {
-        this.concept = concept;
-        this.plugin = plugin;
-    }
+    private final Map<Object, Object> map = new LinkedHashMap<>();
 
     @Override
-    public <C extends PluginConcept> C getPluginConcept() {
-        return (C) concept;
-    }
-
-    @Override
-    public <P extends Plugin> P getPlugin() {
-        return (P) plugin;
+    public PluginContext createSubContext() {
+        return new DefaultPluginContext(this);
     }
 
     /**
@@ -52,19 +38,25 @@ public class DefaultPluginContext implements PluginContext {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T get(Object key) {
-        return (T) content.get(key);
+        return (T) map.get(key);
     }
 
     @Override
     public void set(Object key, Object value) {
-        content.put(key, value);
+        map.put(key, value);
     }
 
     @Override
     public boolean contains(Object key) {
-        return content.containsKey(key);
+        return map.containsKey(key);
+    }
+
+    @Override
+    public void remove(Object key) {
+        map.remove(key);
     }
 
     @Override
@@ -74,6 +66,6 @@ public class DefaultPluginContext implements PluginContext {
 
     @Override
     public void destroy() {
-        content.clear();
+        map.clear();
     }
 }

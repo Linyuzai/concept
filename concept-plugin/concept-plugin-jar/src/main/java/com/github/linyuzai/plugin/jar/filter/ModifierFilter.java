@@ -1,11 +1,11 @@
 package com.github.linyuzai.plugin.jar.filter;
 
 import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
-import com.github.linyuzai.plugin.core.filter.FilterWithResolver;
+import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarClassResolver;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  * {@link java.lang.reflect.Modifier} 过滤器
  */
 @Getter
-@AllArgsConstructor
-@FilterWithResolver(JarClassResolver.class)
+@RequiredArgsConstructor
+@HandlerDependency(JarClassResolver.class)
 public class ModifierFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
 
     /**

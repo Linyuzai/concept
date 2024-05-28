@@ -14,12 +14,12 @@ import java.lang.reflect.Type;
  *
  * @param <T> 插件类型
  */
+@Setter
 public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtractor<T> {
 
     /**
      * {@link TypeMetadata} 工厂
      */
-    @Setter
     protected TypeMetadataFactory typeMetadataFactory;
 
     /**

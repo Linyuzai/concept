@@ -1,20 +1,25 @@
 package com.github.linyuzai.plugin.jar.concept;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.jar.classloader.PluginClassLoader;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Properties;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
 
 /**
  * 基于 jar 的插件
  */
 @Getter
-public class JarPlugin implements Plugin {
+public class JarPlugin extends AbstractPlugin {
 
     public static final String JAR_PREFIX = PREFIX + "JAR@";
 
@@ -36,16 +41,13 @@ public class JarPlugin implements Plugin {
      */
     private final PluginClassLoader pluginClassLoader;
 
-    private final PluginConcept pluginConcept;
-
     private JarURLConnection connection;
 
     private JarFile file;
 
-    public JarPlugin(URL url, PluginClassLoader classLoader, JarPluginConcept concept) {
+    public JarPlugin(URL url, PluginClassLoader pluginClassLoader) {
         this.url = url;
-        this.pluginClassLoader = classLoader;
-        this.pluginConcept = concept;
+        this.pluginClassLoader = pluginClassLoader;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class JarPlugin implements Plugin {
      */
     @SneakyThrows
     @Override
-    public void prepare() {
+    public void onPrepare(PluginContext context) {
         this.connection = (JarURLConnection) getUrl().openConnection();
         this.file = getConnection().getJarFile();
     }
@@ -67,15 +69,25 @@ public class JarPlugin implements Plugin {
      * 释放资源，关闭资源文件的引用
      */
     @Override
-    public void release() {
+    public void onRelease(PluginContext context) {
         if (file != null) {
             try {
                 file.close();
             } catch (Throwable ignore) {
             }
+            file = null;
+            connection = null;
         }
-        file = null;
-        connection = null;
+    }
+
+    @Override
+    public Collection<Object> collectContent(PluginContext context) {
+        return file.stream()
+                .map(ZipEntry::getName)
+                //测试之后win环境中读取也不会存在\\的分隔符
+                //.map(it -> it.replaceAll("\\\\", "/"))
+                .filter(it -> !it.endsWith("/"))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolverChainImpl;
+import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -26,51 +27,39 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 上下文工厂
      */
-    protected final PluginContextFactory pluginContextFactory;
+    protected PluginContextFactory pluginContextFactory;
 
     /**
      * 事件发布者
      */
-    protected final PluginEventPublisher pluginEventPublisher;
+    protected PluginEventPublisher pluginEventPublisher;
+
+    protected PluginTreeFactory pluginTreeFactory;
 
     /**
      * 插件工厂
      */
-    protected final Collection<PluginFactory> pluginFactories;
+    protected Collection<PluginFactory> pluginFactories;
 
     /**
      * 插件解析器
      */
-    protected final Collection<PluginResolver> pluginResolvers;
+    protected Collection<PluginResolver> pluginResolvers;
 
     /**
      * 插件过滤器
      */
-    protected final Collection<PluginFilter> pluginFilters;
+    protected Collection<PluginFilter> pluginFilters;
 
     /**
      * 插件提取器
      */
-    protected final Collection<PluginExtractor> pluginExtractors;
+    protected Collection<PluginExtractor> pluginExtractors;
 
     /**
      * 插件缓存
      */
     protected final Map<Object, Plugin> plugins = new ConcurrentHashMap<>();
-
-    protected AbstractPluginConcept(PluginContextFactory pluginContextFactory,
-                                    PluginEventPublisher pluginEventPublisher,
-                                    Collection<PluginFactory> pluginFactories,
-                                    Collection<PluginResolver> pluginResolvers,
-                                    Collection<PluginFilter> pluginFilters,
-                                    Collection<PluginExtractor> pluginExtractors) {
-        this.pluginContextFactory = pluginContextFactory;
-        this.pluginEventPublisher = pluginEventPublisher;
-        this.pluginFactories = pluginFactories;
-        this.pluginResolvers = pluginResolvers;
-        this.pluginFilters = pluginFilters;
-        this.pluginExtractors = pluginExtractors;
-    }
 
     /**
      * 创建插件，如创建失败则抛出异常
@@ -83,21 +72,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         if (o instanceof Plugin) {
             return (Plugin) o;
         }
-        Plugin plugin = create0(o);
-        if (plugin == null) {
-            throw new PluginException("Plugin can not create: " + o);
-        }
-        return plugin;
-    }
-
-    /**
-     * 创建插件。遍历所有的插件工厂尝试创建插件。
-     * 如果没有匹配的工厂则返回 null。
-     *
-     * @param o 插件源
-     * @return 插件 {@link Plugin} 或 null
-     */
-    private Plugin create0(Object o) {
         for (PluginFactory factory : pluginFactories) {
             if (factory.support(o, this)) {
                 return factory.create(o, this);
@@ -109,7 +83,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 加载插件。
      * 通过 {@link PluginFactory} 创建插件，
-     * 准备插件 {@link Plugin#prepare()}，
+     * 准备插件 {@link Plugin#prepare(PluginContext)}，
      * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
      * 执行插件解析链 {@link PluginResolver}，
      * 通过 {@link PluginExtractor} 提取插件，
@@ -121,24 +95,25 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     public Plugin load(Object o) {
         Plugin plugin = create(o);
         if (plugin == null) {
-            throw new PluginException("Plugin is null");
+            throw new PluginException("Plugin can not create: " + o);
         }
 
         pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
-        //准备插件
-        plugin.prepare();
-
-        pluginEventPublisher.publish(new PluginPreparedEvent(plugin));
-
         //创建上下文
-        PluginContext context = pluginContextFactory.create(plugin, this);
+        PluginContext context = pluginContextFactory.create(this);
+        //初始化上下文
+        context.initialize();
 
+        pluginTreeFactory.create(plugin, this);
+
+        //准备插件
+        plugin.prepare(context);
+        context.set(Plugin.class, plugin);
         //在上下文中添加事件发布者
         context.set(PluginEventPublisher.class, pluginEventPublisher);
 
-        //初始化上下文
-        context.initialize();
+        pluginEventPublisher.publish(new PluginPreparedEvent(plugin));
 
         //解析插件
         new PluginResolverChainImpl(new ArrayList<>(pluginResolvers), new ArrayList<>(pluginFilters))
@@ -149,16 +124,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             extractor.extract(context);
         }
 
+        plugin.release(context);
         //销毁上下文
         context.destroy();
-
-        plugin.release();
         pluginEventPublisher.publish(new PluginReleasedEvent(plugin));
 
         plugins.put(plugin.getId(), plugin);
 
         pluginEventPublisher.publish(new PluginLoadedEvent(plugin));
-
         return plugin;
     }
 
@@ -464,7 +437,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         private void addResolversDependOnExtractors(Collection<? extends PluginExtractor> extractors) {
             for (PluginExtractor extractor : extractors) {
                 //插件提取器依赖的插件解析器
-                Class<? extends PluginResolver>[] dependencies = extractor.dependencies();
+                Collection<Class<? extends PluginResolver>> dependencies = extractor.getDependencies();
                 for (Class<? extends PluginResolver> dependency : dependencies) {
                     //已经存在
                     if (containsResolver(dependency)) {
@@ -498,7 +471,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             Set<Class<? extends PluginResolver>> unfounded = new HashSet<>();
             for (PluginResolver resolver : resolvers) {
                 //插件解析器依赖的插件解析器
-                Class<? extends PluginResolver>[] dependencies = resolver.dependencies();
+                Collection<Class<? extends PluginResolver>> dependencies = resolver.getDependencies();
                 for (Class<? extends PluginResolver> dependency : dependencies) {
                     //已经存在
                     if (containsResolver(dependency)) {

@@ -10,6 +10,7 @@ import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 /**
  * {@link PluginExtractor} 的抽象类
@@ -133,7 +134,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @return 依赖的解析器 {@link PluginResolver} 的类
      */
     @Override
-    public Class<? extends PluginResolver>[] dependencies() {
-        return getInvoker().getMatcher().dependencies();
+    public Collection<Class<? extends PluginResolver>> getDependencies() {
+        return getInvoker().getMatcher().getDependencies();
     }
 }

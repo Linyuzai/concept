@@ -12,10 +12,11 @@ public interface PluginContext {
     /**
      * 获得 {@link PluginConcept}
      *
-     * @param <C> {@link PluginConcept} 类型
      * @return {@link PluginConcept}
      */
-    <C extends PluginConcept> C getPluginConcept();
+    default PluginConcept getConcept() {
+        return getPlugin().getConcept();
+    }
 
     /**
      * 获得插件 {@link Plugin}
@@ -23,7 +24,21 @@ public interface PluginContext {
      * @param <P> {@link Plugin} 类型
      * @return {@link Plugin}
      */
-    <P extends Plugin> P getPlugin();
+    default <P extends Plugin> P getPlugin() {
+        return get(Plugin.class);
+    }
+
+    default PluginContext getRoot() {
+        PluginContext parent = getParent();
+        if (parent == null) {
+            return this;
+        }
+        return parent.getRoot();
+    }
+
+    PluginContext getParent();
+
+    PluginContext createSubContext();
 
     void publish(Object event);
 
@@ -51,6 +66,13 @@ public interface PluginContext {
      * @return 如果存在返回 true，否则返回 false
      */
     boolean contains(Object key);
+
+    /**
+     * 通过键移除一个键值对。
+     *
+     * @param key 键
+     */
+    void remove(Object key);
 
     /**
      * 初始化

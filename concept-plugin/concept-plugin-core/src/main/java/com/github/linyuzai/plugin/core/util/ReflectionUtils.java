@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.util;
 
 import lombok.SneakyThrows;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -13,6 +14,18 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
+
+    public static <A extends Annotation> A findAnnotation(Class<?> clazz, Class<A> annotationType) {
+        Class<?> c = clazz;
+        while (c != null) {
+            A annotation = c.getAnnotation(annotationType);
+            if (annotation != null) {
+                return annotation;
+            }
+            c = c.getSuperclass();
+        }
+        return null;
+    }
 
     /**
      * 将 {@link Type} 转为 {@link Class}

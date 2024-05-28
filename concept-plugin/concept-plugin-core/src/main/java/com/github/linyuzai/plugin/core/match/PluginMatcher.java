@@ -1,12 +1,13 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolve.PluginResolverDependency;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 
 /**
  * 插件匹配器
  */
-public interface PluginMatcher extends PluginResolverDependency {
+public interface PluginMatcher extends PluginHandler.Dependency<PluginResolver> {
 
     /**
      * 匹配插件

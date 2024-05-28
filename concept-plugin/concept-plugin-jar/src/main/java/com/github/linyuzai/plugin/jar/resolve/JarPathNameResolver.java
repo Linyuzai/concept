@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.jar.resolve;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
-import com.github.linyuzai.plugin.core.resolve.DependOnResolvers;
 import com.github.linyuzai.plugin.core.resolve.PathNameResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
@@ -14,7 +13,6 @@ import java.util.zip.ZipEntry;
 /**
  * 路径名称解析器
  */
-@DependOnResolvers(JarEntryResolver.class)
 public class JarPathNameResolver extends AbstractPluginResolver<List<JarEntry>, List<String>>
         implements PathNameResolver {
 
@@ -27,6 +25,7 @@ public class JarPathNameResolver extends AbstractPluginResolver<List<JarEntry>, 
      */
     @Override
     public List<String> doResolve(List<JarEntry> entries, PluginContext context) {
+
         return entries.stream()
                 .map(ZipEntry::getName)
                 //测试之后win环境中读取也不会存在\\的分隔符
@@ -37,12 +36,12 @@ public class JarPathNameResolver extends AbstractPluginResolver<List<JarEntry>, 
     }
 
     @Override
-    public Object getDependedKey() {
+    public Object getParameterKey() {
         return JarPlugin.ENTRY;
     }
 
     @Override
-    public Object getResolvedKey() {
+    public Object getResultKey() {
         return JarPlugin.PATH_NAME;
     }
 }
