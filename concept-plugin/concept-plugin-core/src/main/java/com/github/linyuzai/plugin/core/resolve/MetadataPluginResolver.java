@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.resolve;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.read.ContentReader;
 import com.github.linyuzai.plugin.core.read.MetadataReader;
 import com.github.linyuzai.plugin.core.read.PropertiesMetadataReader;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
@@ -24,7 +25,7 @@ public class MetadataPluginResolver implements PluginResolver {
         PluginTree tree = context.get(PluginTree.class);
         tree.getTransformer()
                 .create(this)
-                .parameter(tree.getRoot())
+                .inbound(tree.getRoot())
                 .transform(node -> node.<String>filter(name -> {
                     if (metadataFilename.equals(name)) {
                         Plugin plugin = node.getPlugin();
@@ -34,13 +35,13 @@ public class MetadataPluginResolver implements PluginResolver {
                         return true;
                     }
                 }))
-                .resultId(Plugin.PATH_NAME);
+                .outboundKey(Plugin.PATH_NAME);
 
     }
 
     @SneakyThrows
     private void readMetadata(Plugin plugin) {
-        try (InputStream is = plugin.read(null, metadataFilename)) {
+        try (InputStream is = plugin.read(ContentReader.class, metadataFilename)) {
             Properties properties = new Properties();
             properties.load(is);
             MetadataReader reader = new PropertiesMetadataReader(properties);

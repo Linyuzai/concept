@@ -18,14 +18,15 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      */
     @Override
     public void resolve(PluginContext context) {
-        Object parameterKey = getParameterKey();
-        Object resultKey = getResultKey();
+        Object inboundKey = getInboundKey();
+        Object outboundKey = getOutboundKey();
         PluginTree tree = context.get(PluginTree.class);
         tree.getTransformer()
                 .create(this)
-                .parameterId(parameterKey)
-                .transform(t -> t.<T, R>map(n -> doResolve(n, context)))
-                .resultId(resultKey);
+                .inboundKey(inboundKey)
+                .transform(node -> node.<T, R>map(value -> doResolve(value, context)))
+                .outboundKey(outboundKey);
+        context.publish(new PluginResolvedEvent(context, this, inboundKey, outboundKey));
         /*T depended = context.get(dependedKey);
         if (depended == null) {
             throw new PluginException("No plugin can be resolved with key: " + dependedKey);
@@ -61,12 +62,12 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      *
      * @return 未解析的插件的 key
      */
-    public abstract Object getParameterKey();
+    public abstract Object getInboundKey();
 
     /**
      * 解析后插件的 key
      *
      * @return 解析后插件的 key
      */
-    public abstract Object getResultKey();
+    public abstract Object getOutboundKey();
 }

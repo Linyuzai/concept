@@ -32,10 +32,11 @@ public class ModifierFilter extends AbstractPluginFilter<Map<String, Class<?>>> 
     }
 
     @Override
-    public Map<String, Class<?>> doFilter(Map<String, Class<?>> plugins) {
-        return plugins.entrySet().stream()
-                .filter(it -> filterWithNegation(filterClass(it.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public boolean doFilter(Map<String, Class<?>> plugins) {
+        return true;
+        /*return plugins.entrySet().stream()
+                .filter(it -> applyNegation(filterClass(it.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
     }
 
     @Override

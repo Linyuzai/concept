@@ -13,9 +13,6 @@ import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.jar.classloader.JarPluginClassLoaderFactory;
 import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
 import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
-import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
-import com.github.linyuzai.plugin.jar.factory.JarPathPluginFactory;
-import com.github.linyuzai.plugin.jar.factory.JarURLPluginFactory;
 import com.github.linyuzai.plugin.jar.resolve.JarByteArrayResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarPathNameResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarPropertiesResolver;
@@ -71,9 +68,9 @@ public class JarPluginConcept extends AbstractPluginConcept {
                 pluginClassLoaderFactory = new JarPluginClassLoaderFactory(getClass().getClassLoader());
             }
 
-            addFactory(new JarPathPluginFactory(pluginClassLoaderFactory));
-            addFactory(new JarFilePluginFactory(pluginClassLoaderFactory));
-            addFactory(new JarURLPluginFactory(pluginClassLoaderFactory));
+
+            //addFactory(new JarPathPluginFactory(pluginClassLoaderFactory));
+            //addFactory(new JarFilePluginFactory(pluginClassLoaderFactory));
 
             preBuild();
 

@@ -70,12 +70,12 @@ public class JarInstanceResolver extends AbstractPluginResolver<Map<String, Clas
     }
 
     @Override
-    public Object getParameterKey() {
+    public Object getInboundKey() {
         return JarPlugin.CLASS;
     }
 
     @Override
-    public Object getResultKey() {
+    public Object getOutboundKey() {
         return JarPlugin.INSTANCE;
     }
 }

@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.jar.factory;
 
-import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 
@@ -11,12 +11,8 @@ import java.io.File;
  */
 public class JarFilePluginFactory extends JarPathPluginFactory {
 
-    public JarFilePluginFactory(PluginClassLoaderFactory factory) {
-        super(factory);
-    }
-
     @Override
-    public boolean support(Object o) {
+    public boolean support(Object o, PluginConcept concept) {
         return o instanceof File;
     }
 

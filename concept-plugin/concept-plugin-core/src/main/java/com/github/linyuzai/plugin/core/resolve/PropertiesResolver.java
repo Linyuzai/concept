@@ -32,12 +32,12 @@ public abstract class PropertiesResolver extends AbstractPluginResolver<List<Str
     }
 
     @Override
-    public Object getParameterKey() {
+    public Object getInboundKey() {
         return Plugin.PROPERTIES_NAME;
     }
 
     @Override
-    public Object getResultKey() {
+    public Object getOutboundKey() {
         return Plugin.PROPERTIES;
     }
 

@@ -25,7 +25,7 @@ public class JarEntryResolver implements PluginResolver {
         List<JarEntry> entries = plugin.getFile()
                 .stream().collect(Collectors.toList());
         context.set(JarPlugin.ENTRY, entries);
-        context.publish(new PluginResolvedEvent(context, this, JarPlugin.ENTRY, entries));
+        //context.publish(new PluginResolvedEvent(context, this, JarPlugin.ENTRY, entries));
     }
 
     @Override

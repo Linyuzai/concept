@@ -36,12 +36,12 @@ public class JarPathNameResolver extends AbstractPluginResolver<List<JarEntry>, 
     }
 
     @Override
-    public Object getParameterKey() {
+    public Object getInboundKey() {
         return JarPlugin.ENTRY;
     }
 
     @Override
-    public Object getResultKey() {
+    public Object getOutboundKey() {
         return JarPlugin.PATH_NAME;
     }
 }

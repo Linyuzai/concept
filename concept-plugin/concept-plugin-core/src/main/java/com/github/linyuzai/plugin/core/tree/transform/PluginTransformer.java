@@ -7,24 +7,24 @@ import java.util.function.Function;
 
 public interface PluginTransformer {
 
-    ParameterStage create(PluginHandler handler);
+    InboundStage create(PluginHandler handler);
 
-    interface ParameterStage {
+    interface InboundStage {
 
-        TransformStage parameter(PluginTree.Node node);
+        TransformStage inbound(PluginTree.Node node);
 
-        TransformStage parameterId(Object parameterId);
+        TransformStage inboundKey(Object inboundKey);
     }
 
     interface TransformStage {
 
-        ResultStage transform(Function<PluginTree.Node, PluginTree.Node> transform);
+        OutboundStage transform(Function<PluginTree.Node, PluginTree.Node> transform);
     }
 
-    interface ResultStage {
+    interface OutboundStage {
 
-        PluginTree.Node result();
+        PluginTree.Node outbound();
 
-        void resultId(Object resultId);
+        void outboundKey(Object outboundKey);
     }
 }

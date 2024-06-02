@@ -1,23 +1,18 @@
 package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.resolve.PluginResolver;
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * {@link PluginFilter} 的抽象类
  *
  * @param <T> 插件类型
  */
+@Getter
 public abstract class AbstractPluginFilter<T> implements PluginFilter {
 
-    @Getter
     protected boolean negate;
-
-    @Setter
-    protected Class<? extends PluginResolver> filterWith;
 
     /**
      * 取反
@@ -40,19 +35,27 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
      */
     @Override
     public void filter(PluginContext context) {
-        Object key = getKey();
+        Object inboundKey = getInboundKey();
+        Object outboundKey = getOutboundKey();
+        PluginTree tree = context.get(PluginTree.class);
+        tree.getTransformer()
+                .create(this)
+                .inboundKey(inboundKey)
+                .transform(node -> node.<T>filter(value -> applyNegation(doFilter(value))))
+                .outboundKey(outboundKey);
+        /*Object key = getKey();
         T original = context.get(key);
         if (original == null) {
             throw new PluginException("No plugin can be filtered with key: " + key);
         }
         T filtered = doFilter(original);
         context.set(key, filtered);
-        context.publish(new PluginFilteredEvent(context, this, original, filtered));
+        context.publish(new PluginFilteredEvent(context, this, original, filtered));*/
     }
 
     @Override
     public boolean support(PluginContext context) {
-        return true;
+        return context.contains(PluginTree.class);
     }
 
     /**
@@ -61,8 +64,16 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
      * @param filter 是否过滤
      * @return 结合取反配置是否过滤
      */
-    public boolean filterWithNegation(boolean filter) {
+    public boolean applyNegation(boolean filter) {
         return negate != filter;
+    }
+
+    public Object getInboundKey() {
+        return getKey();
+    }
+
+    public Object getOutboundKey() {
+        return getKey();
     }
 
     /**
@@ -78,6 +89,6 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
      * @param original 需要过滤的插件
      * @return 过滤之后的插件
      */
-    public abstract T doFilter(T original);
+    public abstract boolean doFilter(T original);
 
 }

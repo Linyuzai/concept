@@ -30,10 +30,11 @@ public class ClassNameFilter extends AbstractPluginFilter<Map<String, String>> {
     }
 
     @Override
-    public Map<String, String> doFilter(Map<String, String> plugins) {
-        return plugins.entrySet().stream()
-                .filter(it -> filterWithNegation(matchClassName(it.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public boolean doFilter(Map<String, String> plugins) {
+        return true;
+        /*return plugins.entrySet().stream()
+                .filter(it -> applyNegation(matchClassName(it.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
     }
 
     @Override

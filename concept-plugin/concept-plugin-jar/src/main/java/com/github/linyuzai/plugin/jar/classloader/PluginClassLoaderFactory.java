@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.jar.classloader;
 
-import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 
 import java.net.URL;
 
@@ -12,9 +12,9 @@ public interface PluginClassLoaderFactory {
     /**
      * 创建插件类加载器
      *
-     * @param url     插件地址 {@link URL}
-     * @param concept {@link JarPluginConcept}
+     * @param urls     插件地址 {@link URL}
+     * @param concept {@link PluginConcept}
      * @return 插件类加载器 {@link PluginClassLoader}
      */
-    PluginClassLoader create(URL url, JarPluginConcept concept);
+    PluginClassLoader create(URL[] urls, PluginConcept concept);
 }

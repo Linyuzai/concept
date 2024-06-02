@@ -39,10 +39,11 @@ public class NameFilter extends AbstractPluginFilter<List<String>> {
     }
 
     @Override
-    public List<String> doFilter(List<String> plugins) {
-        return plugins.stream()
-                .filter(it -> filterWithNegation(matchName(it)))
-                .collect(Collectors.toList());
+    public boolean doFilter(List<String> plugins) {
+        return true;
+        /*return plugins.stream()
+                .filter(it -> applyNegation(matchName(it)))
+                .collect(Collectors.toList());*/
     }
 
     /**

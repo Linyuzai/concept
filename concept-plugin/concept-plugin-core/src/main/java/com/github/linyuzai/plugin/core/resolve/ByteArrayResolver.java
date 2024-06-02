@@ -33,12 +33,12 @@ public abstract class ByteArrayResolver<T, R> extends AbstractPluginResolver<T, 
     }
 
     @Override
-    public Object getParameterKey() {
+    public Object getInboundKey() {
         return Plugin.PATH_NAME;
     }
 
     @Override
-    public Object getResultKey() {
+    public Object getOutboundKey() {
         return Plugin.BYTE_ARRAY;
     }
 

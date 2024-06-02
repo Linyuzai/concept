@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.classloader;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
 import lombok.Getter;
@@ -14,11 +15,11 @@ import java.util.Collection;
 @Getter
 public class JarPluginClassLoader extends PluginClassLoader {
 
-    private final JarPluginConcept pluginConcept;
+    private final PluginConcept concept;
 
-    public JarPluginClassLoader(URL[] urls, ClassLoader parent, JarPluginConcept concept) {
+    public JarPluginClassLoader(URL[] urls, ClassLoader parent, PluginConcept concept) {
         super(urls, parent);
-        this.pluginConcept = concept;
+        this.concept = concept;
     }
 
     /**
@@ -34,7 +35,7 @@ public class JarPluginClassLoader extends PluginClassLoader {
         try {
             return super.findClass(name);
         } catch (Throwable e) {
-            Collection<Plugin> plugins = pluginConcept.getPlugins().values();
+            Collection<Plugin> plugins = concept.getPlugins().values();
             for (Plugin plugin : plugins) {
                 if (plugin instanceof JarPlugin) {
                     PluginClassLoader classLoader = ((JarPlugin) plugin).getPluginClassLoader();

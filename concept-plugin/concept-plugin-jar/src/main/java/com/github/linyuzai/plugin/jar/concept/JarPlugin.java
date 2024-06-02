@@ -1,25 +1,22 @@
 package com.github.linyuzai.plugin.jar.concept;
 
-import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.jar.classloader.PluginClassLoader;
+import com.github.linyuzai.plugin.jar.classloader.PluginClassLoaderFactory;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Properties;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
 
 /**
  * 基于 jar 的插件
  */
 @Getter
-public class JarPlugin extends AbstractPlugin {
+public class JarPlugin extends ZipPlugin {
 
     public static final String JAR_PREFIX = PREFIX + "JAR@";
 
@@ -31,28 +28,23 @@ public class JarPlugin extends AbstractPlugin {
 
     public static final String INSTANCE = JAR_PREFIX + "INSTANCE";
 
-    /**
-     * 资源的 URL
-     */
-    private final URL url;
+    private final PluginClassLoaderFactory pluginClassLoaderFactory;
 
     /**
      * 插件类加载器
      */
-    private final PluginClassLoader pluginClassLoader;
+    private PluginClassLoader pluginClassLoader;
+
+    /**
+     * 资源的 URL
+     */
+    private URL url;
 
     private JarURLConnection connection;
 
-    private JarFile file;
-
-    public JarPlugin(URL url, PluginClassLoader pluginClassLoader) {
-        this.url = url;
-        this.pluginClassLoader = pluginClassLoader;
-    }
-
-    @Override
-    public Object getId() {
-        return getUrl();
+    public JarPlugin(String path, PluginClassLoaderFactory pluginClassLoaderFactory) {
+        super(path);
+        this.pluginClassLoaderFactory = pluginClassLoaderFactory;
     }
 
     /**
@@ -61,8 +53,38 @@ public class JarPlugin extends AbstractPlugin {
     @SneakyThrows
     @Override
     public void onPrepare(PluginContext context) {
+        this.url = parseURL(getPath());
+        this.pluginClassLoader = pluginClassLoaderFactory.create(new URL[]{url}, getConcept());
+        super.onPrepare(context);
+    }
+
+    @Override
+    protected JarFile createFile() throws IOException {
         this.connection = (JarURLConnection) getUrl().openConnection();
-        this.file = getConnection().getJarFile();
+        return getConnection().getJarFile();
+    }
+
+    @Override
+    public JarFile getFile() {
+        return (JarFile) super.getFile();
+    }
+
+    @SneakyThrows
+    public URL parseURL(String jarPath) {
+        //"jar".equals(((URL) o).getProtocol()
+        String url;
+        if (jarPath.startsWith("http")) {
+            if (jarPath.endsWith("/")) {
+                jarPath = jarPath.substring(0, jarPath.length() - 1);
+            }
+            url = "jar:" + jarPath + "!/";
+        } else {
+            if (jarPath.startsWith("/")) {
+                jarPath = jarPath.substring(1);
+            }
+            url = "jar:file:/" + jarPath + "!/";
+        }
+        return new URL(url);
     }
 
     /**
@@ -70,28 +92,12 @@ public class JarPlugin extends AbstractPlugin {
      */
     @Override
     public void onRelease(PluginContext context) {
-        if (file != null) {
-            try {
-                file.close();
-            } catch (Throwable ignore) {
-            }
-            file = null;
-            connection = null;
-        }
-    }
-
-    @Override
-    public Collection<Object> collectContent(PluginContext context) {
-        return file.stream()
-                .map(ZipEntry::getName)
-                //测试之后win环境中读取也不会存在\\的分隔符
-                //.map(it -> it.replaceAll("\\\\", "/"))
-                .filter(it -> !it.endsWith("/"))
-                .collect(Collectors.toList());
+        super.onRelease(context);
+        connection = null;
     }
 
     @Override
     public String toString() {
-        return "JarPlugin(" + url + ")";
+        return "JarPlugin(" + getPath() + ")";
     }
 }

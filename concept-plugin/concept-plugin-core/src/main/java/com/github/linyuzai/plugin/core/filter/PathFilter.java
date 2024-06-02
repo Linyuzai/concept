@@ -34,10 +34,11 @@ public class PathFilter extends AbstractPluginFilter<List<String>> {
     }
 
     @Override
-    public List<String> doFilter(List<String> plugins) {
-        return plugins.stream()
-                .filter(it -> filterWithNegation(matchPath(it)))
-                .collect(Collectors.toList());
+    public boolean doFilter(List<String> plugins) {
+        return true;
+        /*return plugins.stream()
+                .filter(it -> applyNegation(matchPath(it)))
+                .collect(Collectors.toList());*/
     }
 
     @Override

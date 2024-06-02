@@ -39,12 +39,12 @@ public class JarClassResolver extends AbstractPluginResolver<Map<String, String>
     }
 
     @Override
-    public Object getParameterKey() {
+    public Object getInboundKey() {
         return JarPlugin.CLASS_NAME;
     }
 
     @Override
-    public Object getResultKey() {
+    public Object getOutboundKey() {
         return JarPlugin.CLASS;
     }
 }

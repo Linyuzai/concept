@@ -98,6 +98,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             throw new PluginException("Plugin can not create: " + o);
         }
 
+        plugin.setConcept(this);
+
         pluginEventPublisher.publish(new PluginCreatedEvent(plugin));
 
         //创建上下文

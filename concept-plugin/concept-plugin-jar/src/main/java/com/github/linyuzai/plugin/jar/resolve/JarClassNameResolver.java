@@ -37,12 +37,12 @@ public class JarClassNameResolver extends AbstractPluginResolver<List<String>, M
     }
 
     @Override
-    public Object getParameterKey() {
+    public Object getInboundKey() {
         return JarPlugin.PATH_NAME;
     }
 
     @Override
-    public Object getResultKey() {
+    public Object getOutboundKey() {
         return JarPlugin.CLASS_NAME;
     }
 }

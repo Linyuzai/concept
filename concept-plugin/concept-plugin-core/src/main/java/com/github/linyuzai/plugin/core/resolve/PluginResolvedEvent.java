@@ -18,46 +18,20 @@ public class PluginResolvedEvent extends PluginContextEvent {
     /**
      * 依赖的 key
      */
-    private final Object dependedKey;
-
-    /**
-     * 依赖的对象
-     */
-    private final Object depended;
+    private final Object inboundKey;
 
     /**
      * 解析的 key
      */
-    private final Object resolvedKey;
-
-    /**
-     * 解析后的对象
-     */
-    private final Object resolved;
+    private final Object outboundKey;
 
     public PluginResolvedEvent(PluginContext context,
                                PluginResolver resolver,
-                               Object resolvedKey,
-                               Object resolved) {
+                               Object inboundKey,
+                               Object outboundKey) {
         super(context);
         this.resolver = resolver;
-        this.dependedKey = null;
-        this.depended = null;
-        this.resolvedKey = resolvedKey;
-        this.resolved = resolved;
-    }
-
-    public PluginResolvedEvent(PluginContext context,
-                               PluginResolver resolver,
-                               Object dependedKey,
-                               Object depended,
-                               Object resolvedKey,
-                               Object resolved) {
-        super(context);
-        this.resolver = resolver;
-        this.dependedKey = dependedKey;
-        this.depended = depended;
-        this.resolvedKey = resolvedKey;
-        this.resolved = resolved;
+        this.inboundKey = inboundKey;
+        this.outboundKey = outboundKey;
     }
 }

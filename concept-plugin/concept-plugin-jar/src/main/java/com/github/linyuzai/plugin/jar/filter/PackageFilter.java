@@ -35,11 +35,12 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
     }
 
     @Override
-    public Map<String, String> doFilter(Map<String, String> plugins) {
-        return plugins.entrySet()
+    public boolean doFilter(Map<String, String> plugins) {
+        return true;
+        /*return plugins.entrySet()
                 .stream()
-                .filter(it -> filterWithNegation(matchPackage(it.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(it -> applyNegation(matchPackage(it.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
     }
 
     @Override

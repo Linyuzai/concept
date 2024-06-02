@@ -35,7 +35,7 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     }
 
     @Override
-    public PluginTransformer.ParameterStage create(PluginHandler handler) {
+    public InboundStage create(PluginHandler handler) {
         return new TransformerStages(handler);
     }
 
@@ -121,9 +121,9 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     @Getter
     @RequiredArgsConstructor
     public class TransformerStages implements
-            PluginTransformer.ParameterStage,
+            InboundStage,
             PluginTransformer.TransformStage,
-            PluginTransformer.ResultStage {
+            OutboundStage {
 
         private final PluginHandler handler;
 
@@ -132,35 +132,35 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
         private Node result;
 
         @Override
-        public PluginTransformer.TransformStage parameter(Node tree) {
+        public PluginTransformer.TransformStage inbound(Node tree) {
             parameter = tree;
             return this;
         }
 
         @Override
-        public PluginTransformer.TransformStage parameterId(Object parameterId) {
-            HandleStage trace = getTracer().getTrace(parameterId);
+        public PluginTransformer.TransformStage inboundKey(Object inboundKey) {
+            HandleStage trace = getTracer().getTrace(inboundKey);
             if (trace == null) {
-                throw new IllegalArgumentException("No plugin tree found: " + parameterId);
+                throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
             }
             parameter = trace.getTree().getRoot();
             return this;
         }
 
         @Override
-        public PluginTransformer.ResultStage transform(Function<Node, Node> transform) {
+        public OutboundStage transform(Function<Node, Node> transform) {
             result = transform.apply(parameter);
             return this;
         }
 
         @Override
-        public Node result() {
+        public Node outbound() {
             return result;
         }
 
         @Override
-        public void resultId(Object resultId) {
-            HandleStage trace = getTracer().getTrace(resultId);
+        public void outboundKey(Object outboundKey) {
+            HandleStage trace = getTracer().getTrace(outboundKey);
 
         }
     }

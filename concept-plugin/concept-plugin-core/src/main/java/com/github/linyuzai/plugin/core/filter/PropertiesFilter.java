@@ -39,14 +39,14 @@ public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Propertie
      * @return 过滤之后的 {@link Properties}
      */
     @Override
-    public Map<Object, Properties> doFilter(Map<Object, Properties> plugins) {
+    public boolean doFilter(Map<Object, Properties> plugins) {
         Map<Object, Properties> map = new LinkedHashMap<>();
         for (Map.Entry<Object, Properties> entry : plugins.entrySet()) {
             Properties properties = entry.getValue();
             Set<String> propertyNames = properties.stringPropertyNames();
             Properties newProperties = new Properties();
             for (String propertyName : propertyNames) {
-                if (filterWithNegation(matchPropertiesKey(propertyName))) {
+                if (applyNegation(matchPropertiesKey(propertyName))) {
                     String propertyValue = properties.getProperty(propertyName);
                     newProperties.setProperty(propertyName, propertyValue);
                 }
@@ -55,7 +55,7 @@ public class PropertiesFilter extends AbstractPluginFilter<Map<Object, Propertie
                 map.put(entry.getKey(), newProperties);
             }
         }
-        return map;
+        return true;
     }
 
     /**
