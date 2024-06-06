@@ -4,9 +4,10 @@ import java.io.*;
 import java.net.*;
 import java.security.Permission;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
- * {@link java.net.JarURLConnection} used to support {@link NestedJarFile#getUrl()}.
+ * {@link java.net.JarURLConnection} used to support {@link NestedJarFile#getURL()}.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
@@ -55,7 +56,7 @@ public class NestedJarConnection extends JarURLConnection {
 
     private JarEntry jarEntry;
 
-    private NestedJarConnection(URL url, NestedJarFile jarFile, JarEntryName jarEntryName) throws IOException {
+    public NestedJarConnection(URL url, NestedJarFile jarFile, JarEntryName jarEntryName) throws IOException {
         // What we pass to super is ultimately ignored
         super(EMPTY_JAR_URL);
         this.url = url;
@@ -65,9 +66,9 @@ public class NestedJarConnection extends JarURLConnection {
 
     @Override
     public void connect() throws IOException {
-        if (this.jarFile == null) {
+        /*if (this.jarFile == null) {
             throw FILE_NOT_FOUND_EXCEPTION;
-        }
+        }*/
         if (!this.jarEntryName.isEmpty() && this.jarEntry == null) {
             this.jarEntry = this.jarFile.getJarEntry(getEntryName());
             if (this.jarEntry == null) {
@@ -78,16 +79,16 @@ public class NestedJarConnection extends JarURLConnection {
     }
 
     @Override
-    public java.util.jar.JarFile getJarFile() throws IOException {
+    public JarFile getJarFile() throws IOException {
         connect();
         return this.jarFile;
     }
 
     @Override
     public URL getJarFileURL() {
-        if (this.jarFile == null) {
+        /*if (this.jarFile == null) {
             throw NOT_FOUND_CONNECTION_EXCEPTION;
-        }
+        }*/
         if (this.jarFileUrl == null) {
             this.jarFileUrl = buildJarFileUrl();
         }
@@ -96,7 +97,7 @@ public class NestedJarConnection extends JarURLConnection {
 
     private URL buildJarFileUrl() {
         try {
-            String spec = this.jarFile.getUrl().getFile();
+            String spec = this.jarFile.getURL().getFile();
             if (spec.endsWith(SEPARATOR)) {
                 spec = spec.substring(0, spec.length() - SEPARATOR.length());
             }
@@ -110,7 +111,7 @@ public class NestedJarConnection extends JarURLConnection {
     }
 
     @Override
-    public java.util.jar.JarEntry getJarEntry() throws IOException {
+    public JarEntry getJarEntry() throws IOException {
         if (this.jarEntryName == null || this.jarEntryName.isEmpty()) {
             return null;
         }
@@ -120,17 +121,17 @@ public class NestedJarConnection extends JarURLConnection {
 
     @Override
     public String getEntryName() {
-        if (this.jarFile == null) {
+        /*if (this.jarFile == null) {
             throw NOT_FOUND_CONNECTION_EXCEPTION;
-        }
+        }*/
         return this.jarEntryName.toString();
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        if (this.jarFile == null) {
+        /*if (this.jarFile == null) {
             throw FILE_NOT_FOUND_EXCEPTION;
-        }
+        }*/
         if (this.jarEntryName.isEmpty() && this.jarFile.getType() == NestedJarFile.Type.DIRECT) {
             throw new IOException("no entry name specified");
         }
@@ -161,9 +162,9 @@ public class NestedJarConnection extends JarURLConnection {
 
     @Override
     public long getContentLengthLong() {
-        if (this.jarFile == null) {
+        /*if (this.jarFile == null) {
             return -1;
-        }
+        }*/
         try {
             if (this.jarEntryName.isEmpty()) {
                 return this.jarFile.size();
@@ -188,9 +189,9 @@ public class NestedJarConnection extends JarURLConnection {
 
     @Override
     public Permission getPermission() throws IOException {
-        if (this.jarFile == null) {
+        /*if (this.jarFile == null) {
             throw FILE_NOT_FOUND_EXCEPTION;
-        }
+        }*/
         if (this.permission == null) {
             this.permission = this.jarFile.getPermission();
         }
@@ -270,7 +271,7 @@ public class NestedJarConnection extends JarURLConnection {
     /**
      * A JarEntryName parsed from a URL String.
      */
-    static class JarEntryName {
+    public static class JarEntryName {
 
         private final StringSequence name;
 

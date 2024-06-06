@@ -2,12 +2,15 @@ package com.github.linyuzai.plugin.core.tree;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.read.PluginReader;
 import com.github.linyuzai.plugin.core.tree.trace.PluginTracer;
 import com.github.linyuzai.plugin.core.tree.transform.PluginTransformer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -21,7 +24,12 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     private final Map<Object, HandleStage> traceMap = new LinkedHashMap<>();
 
     public DefaultPluginTree(Plugin plugin) {
-        root = createNode(plugin.getId().toString(), plugin, plugin, null);
+        root = createNode(plugin.getId(), plugin, plugin, null);
+    }
+
+    @Override
+    public Object getId() {
+        return root.getId();
     }
 
     @Override
@@ -50,7 +58,7 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     }
 
     protected DefaultNode createNode(Object id, Object value, Plugin plugin, Node parent) {
-        return new DefaultNode(id, value, plugin, parent);
+        return new DefaultNode(id, value, plugin, this, parent);
     }
 
     @SuppressWarnings("unchecked")
@@ -64,37 +72,48 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
 
         private final Plugin plugin;
 
+        private final PluginTree tree;
+
         private final Node parent;
 
         private final Collection<Node> children = new ArrayList<>();
 
         @Override
-        public <T, R> Node map(Function<T, R> function) {
-            return doMap(null, function);
+        public Node map(Function<Node, Object> function) {
+            return doMap(null, function, node -> true);
         }
 
-        protected <T, R> Node doMap(Node parent, Function<T, R> function) {
+        @Override
+        public Node map(Function<Node, Object> function, Predicate<Node> predicate) {
+            return doMap(null, function, predicate);
+        }
+
+        protected Node doMap(Node parent, Function<Node, Object> function, Predicate<Node> predicate) {
             Object apply;
-            if (needHandle()) {
-                apply = function.apply((T) value);
+            if (isContentNode()) {
+                if (!predicate.test(this)) {
+                    return null;
+                }
+                apply = function.apply(this);
             } else {
                 apply = value;
             }
             DefaultNode node = createNode(id, apply, plugin, parent);
             List<Node> collect = children.stream()
-                    .map(it -> doMap(node, function))
+                    .map(it -> doMap(node, function, predicate))
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             node.children.addAll(collect);
             return node;
         }
 
         @Override
-        public <T> Node filter(Predicate<T> predicate) {
+        public Node filter(Predicate<Node> predicate) {
             return doFilter(null, predicate);
         }
 
-        public <T> Node doFilter(Node parent, Predicate<T> predicate) {
-            if (needHandle() && !predicate.test((T) value)) {
+        public Node doFilter(Node parent, Predicate<Node> predicate) {
+            if (isContentNode() && !predicate.test(this)) {
                 return null;
             }
             DefaultNode node = createNode(id, value, plugin, parent);
@@ -107,13 +126,19 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
         }
 
         @Override
+        public void forEach(Consumer<Node> consumer) {
+            consumer.accept(this);
+            children.forEach(it -> it.forEach(consumer));
+        }
+
+        @Override
         public DefaultNode create(Object id, Object value, Plugin plugin) {
             DefaultNode node = createNode(id, value, plugin, this);
             children.add(node);
             return node;
         }
 
-        protected boolean needHandle() {
+        protected boolean isContentNode() {
             return !(value instanceof Plugin);
         }
     }

@@ -16,6 +16,7 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
      *
      * @param context 上下文 {@link PluginContext}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void resolve(PluginContext context) {
         Object inboundKey = getInboundKey();
@@ -24,7 +25,9 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
         tree.getTransformer()
                 .create(this)
                 .inboundKey(inboundKey)
-                .transform(node -> node.<T, R>map(value -> doResolve(value, context)))
+                .transform(node -> node.map(
+                        it -> doResolve((T) it.getValue(), context),
+                        it -> doFilter((T) it.getValue(), context)))
                 .outboundKey(outboundKey);
         context.publish(new PluginResolvedEvent(context, this, inboundKey, outboundKey));
         /*T depended = context.get(dependedKey);
@@ -46,6 +49,10 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
     @Override
     public boolean support(PluginContext context) {
         return context.contains(PluginTree.class);
+    }
+
+    public boolean doFilter(T source, PluginContext context) {
+        return true;
     }
 
     /**

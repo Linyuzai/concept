@@ -33,9 +33,7 @@ public class DefaultPluginContext implements PluginContext {
     @Override
     public void publish(Object event) {
         PluginEventPublisher publisher = get(PluginEventPublisher.class);
-        if (publisher != null) {
-            publisher.publish(event);
-        }
+        publisher.publish(event);
     }
 
     @SuppressWarnings("unchecked")

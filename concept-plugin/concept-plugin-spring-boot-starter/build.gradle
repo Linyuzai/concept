@@ -5,7 +5,7 @@ version ConceptPluginVersion
 
 ext {
     set('publishName', 'Plugin Spring Boot Starter')
-    set('publishDescription', 'Dynamic loading class with external jar simply and gracefully')
+    set('publishDescription', 'Dynamic loading classes with external jar simply and gracefully')
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -13,7 +13,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
     compileOnly project(':concept-plugin:concept-plugin-core')
-    compileOnly project(':concept-plugin:concept-plugin-jar')
+    //compileOnly project(':concept-plugin:concept-plugin-jar')
 }
 
 apply from: '../../publish.gradle'

@@ -52,10 +52,10 @@ public class CentralDirectoryFileHeader implements FileHeader {
 
 	private long localHeaderOffset;
 
-	CentralDirectoryFileHeader() {
+	public CentralDirectoryFileHeader() {
 	}
 
-	CentralDirectoryFileHeader(byte[] header, int headerOffset, AsciiBytes name, byte[] extra, AsciiBytes comment,
+	public CentralDirectoryFileHeader(byte[] header, int headerOffset, AsciiBytes name, byte[] extra, AsciiBytes comment,
 			long localHeaderOffset) {
 		this.header = header;
 		this.headerOffset = headerOffset;
@@ -65,7 +65,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		this.localHeaderOffset = localHeaderOffset;
 	}
 
-	void load(byte[] data, int dataOffset, RandomAccessData variableData, long variableOffset, NestedJarEntryFilter filter)
+	public void load(byte[] data, int dataOffset, RandomAccessData variableData, long variableOffset, NestedJarEntry.Filter filter)
 			throws IOException {
 		// Load fixed part
 		this.header = data;
@@ -123,7 +123,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		throw new IOException("Zip64 Extended Information Extra Field not found");
 	}
 
-	AsciiBytes getName() {
+	public AsciiBytes getName() {
 		return this.name;
 	}
 
@@ -132,7 +132,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		return this.name.matches(name, suffix);
 	}
 
-	boolean isDirectory() {
+	public boolean isDirectory() {
 		return this.name.endsWith(SLASH);
 	}
 
@@ -141,7 +141,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		return (int) Bytes.littleEndianValue(this.header, this.headerOffset + 10, 2);
 	}
 
-	long getTime() {
+	public long getTime() {
 		long datetime = Bytes.littleEndianValue(this.header, this.headerOffset + 12, 4);
 		return decodeMsDosFormatDateTime(datetime);
 	}
@@ -164,7 +164,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 				.truncatedTo(ChronoUnit.SECONDS).toEpochMilli();
 	}
 
-	long getCrc() {
+	public long getCrc() {
 		return Bytes.littleEndianValue(this.header, this.headerOffset + 16, 4);
 	}
 
@@ -178,15 +178,15 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		return Bytes.littleEndianValue(this.header, this.headerOffset + 24, 4);
 	}
 
-	byte[] getExtra() {
+	public byte[] getExtra() {
 		return this.extra;
 	}
 
-	boolean hasExtra() {
+	public boolean hasExtra() {
 		return this.extra.length > 0;
 	}
 
-	AsciiBytes getComment() {
+	public AsciiBytes getComment() {
 		return this.comment;
 	}
 
@@ -202,7 +202,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		return new CentralDirectoryFileHeader(header, 0, this.name, header, this.comment, this.localHeaderOffset);
 	}
 
-	static CentralDirectoryFileHeader fromRandomAccessData(RandomAccessData data, long offset, NestedJarEntryFilter filter)
+	public static CentralDirectoryFileHeader fromRandomAccessData(RandomAccessData data, long offset, NestedJarEntry.Filter filter)
 			throws IOException {
 		CentralDirectoryFileHeader fileHeader = new CentralDirectoryFileHeader();
 		byte[] bytes = data.read(offset, 46);
@@ -210,7 +210,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		return fileHeader;
 	}
 
-	private static int getChronoValue(long value, ChronoField field) {
+	public static int getChronoValue(long value, ChronoField field) {
 		ValueRange range = field.range();
 		return Math.toIntExact(Math.min(Math.max(value, range.getMinimum()), range.getMaximum()));
 	}

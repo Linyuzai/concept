@@ -21,7 +21,7 @@ package com.github.linyuzai.plugin.jar.extension;
  *
  * @author Phillip Webb
  */
-interface CentralDirectoryVisitor {
+public interface CentralDirectoryVisitor {
 
 	void visitStart(CentralDirectoryEndRecord endRecord, RandomAccessData centralDirectoryData);
 

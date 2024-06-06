@@ -1,22 +1,20 @@
 package com.github.linyuzai.plugin.core.filter;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginEntry;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
-import com.github.linyuzai.plugin.core.resolve.PathNameResolver;
+import com.github.linyuzai.plugin.core.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 路径过滤器
  */
 @Getter
-@HandlerDependency(PathNameResolver.class)
-public class PathFilter extends AbstractPluginFilter<List<String>> {
+@HandlerDependency(EntryResolver.class)
+public class PathFilter extends AbstractPluginFilter<PluginEntry> {
 
     /**
      * 路径模式
@@ -34,16 +32,13 @@ public class PathFilter extends AbstractPluginFilter<List<String>> {
     }
 
     @Override
-    public boolean doFilter(List<String> plugins) {
-        return true;
-        /*return plugins.stream()
-                .filter(it -> applyNegation(matchPath(it)))
-                .collect(Collectors.toList());*/
+    public boolean doFilter(PluginEntry entry) {
+        return matchPath(entry.getName());
     }
 
     @Override
     public Object getKey() {
-        return Plugin.PATH_NAME;
+        return PluginEntry.class;
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.jar.extension;
 
+import lombok.Getter;
+
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -56,22 +58,25 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 
 	private final RandomAccessData data;
 
+	@Getter
 	private final Type type;
 
 	private URL url;
 
-	private String urlString;
+	//private String urlString;
 
-	private NestedJarFileEntries entries;
+	private final NestedJarFileEntries entries;
 
-	private Supplier<Manifest> manifestSupplier;
+	private final Supplier<Manifest> manifestSupplier;
 
 	private SoftReference<Manifest> manifest;
 
+	@Getter
 	private boolean signed;
 
 	private String comment;
 
+	@Getter
 	private volatile boolean closed;
 
 	//private volatile JarFileWrapper wrapper;
@@ -90,7 +95,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	 * @param file the root jar file
 	 * @throws IOException if the file cannot be read
 	 */
-	NestedJarFile(RandomAccessDataFile file) throws IOException {
+	private NestedJarFile(RandomAccessDataFile file) throws IOException {
 		this(file, "", file, Type.DIRECT);
 	}
 
@@ -108,7 +113,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		this(rootFile, pathFromRoot, data, null, type, null);
 	}
 
-	private NestedJarFile(RandomAccessDataFile rootFile, String pathFromRoot, RandomAccessData data, NestedJarEntryFilter filter,
+	private NestedJarFile(RandomAccessDataFile rootFile, String pathFromRoot, RandomAccessData data, NestedJarEntry.Filter filter,
 						  Type type, Supplier<Manifest> manifestSupplier) throws IOException {
 		super(rootFile.getFile());
 		this.rootFile = rootFile;
@@ -243,7 +248,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		return this.entries.getEntry(name);
 	}
 
-	InputStream getInputStream() throws IOException {
+	public InputStream getInputStream() throws IOException {
 		return this.data.getInputStream();
 	}
 
@@ -256,7 +261,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		return getInputStream((entry != null) ? entry.getName() : null);
 	}
 
-	InputStream getInputStream(String name) throws IOException {
+	public InputStream getInputStream(String name) throws IOException {
 		return this.entries.getInputStream(name);
 	}
 
@@ -294,7 +299,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 
 	private NestedJarFile createJarFileFromDirectoryEntry(NestedJarEntry entry) throws IOException {
 		AsciiBytes name = entry.getAsciiBytesName();
-		NestedJarEntryFilter filter = (candidate) -> {
+		NestedJarEntry.Filter filter = (candidate) -> {
 			if (candidate.startsWith(name) && !candidate.equals(name)) {
 				return candidate.substring(name.length());
 			}
@@ -346,18 +351,14 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		}
 	}
 
-	boolean isClosed() {
-		return this.closed;
-	}
-
-	String getUrlString() throws MalformedURLException {
+	/*String getUrlString() throws MalformedURLException {
 		if (this.urlString == null) {
-			this.urlString = getUrl().toString();
+			this.urlString = getURL().toString();
 		}
 		return this.urlString;
-	}
+	}*/
 
-	public URL getUrl() throws MalformedURLException {
+	public URL getURL() throws MalformedURLException {
 		if (this.url == null) {
 			String file = this.rootFile.getFile().toURI() + this.pathFromRoot + "!/";
 			file = file.replace("file:////", "file://"); // Fix UNC paths
@@ -376,11 +377,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		return this.rootFile.getFile() + this.pathFromRoot;
 	}
 
-	boolean isSigned() {
-		return this.signed;
-	}
-
-	NestedJarEntryCertification getCertification(NestedJarEntry entry) {
+	NestedJarEntry.Certification getCertification(NestedJarEntry entry) {
 		try {
 			return this.entries.getCertification(entry);
 		}
@@ -395,10 +392,6 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 
 	protected String getPathFromRoot() {
 		return this.pathFromRoot;
-	}
-
-	Type getType() {
-		return this.type;
 	}
 
 	/**

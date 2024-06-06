@@ -73,8 +73,8 @@ public class NestedJarHandler extends URLStreamHandler {
 
 	private boolean isUrlInJarFile(URL url, NestedJarFile jarFile) throws MalformedURLException {
 		// Try the path first to save building a new url string each time
-		return url.getPath().startsWith(jarFile.getUrl().getPath())
-				&& url.toString().startsWith(jarFile.getUrlString());
+		return url.getPath().startsWith(jarFile.getURL().getPath())
+				&& url.toString().startsWith(jarFile.getURL().toString());
 	}
 
 	/*private URLConnection openFallbackConnection(URL url, Exception reason) throws IOException {

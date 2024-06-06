@@ -21,10 +21,9 @@ public interface PluginContext {
     /**
      * 获得插件 {@link Plugin}
      *
-     * @param <P> {@link Plugin} 类型
      * @return {@link Plugin}
      */
-    default <P extends Plugin> P getPlugin() {
+    default Plugin getPlugin() {
         return get(Plugin.class);
     }
 

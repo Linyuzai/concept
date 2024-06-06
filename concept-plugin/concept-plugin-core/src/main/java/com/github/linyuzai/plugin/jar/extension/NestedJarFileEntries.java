@@ -1,19 +1,3 @@
-/*
- * Copyright 2012-2022 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.github.linyuzai.plugin.jar.extension;
 
 import java.io.IOException;
@@ -35,9 +19,6 @@ import java.util.zip.ZipEntry;
  * <p>
  * A typical Spring Boot application will have somewhere in the region of 10,500 entries
  * which should consume about 122K.
- *
- * @author Phillip Webb
- * @author Andy Wilkinson
  */
 public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<NestedJarEntry> {
 
@@ -74,7 +55,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 	private final NestedJarFile jarFile;
 
-	private final NestedJarEntryFilter filter;
+	private final NestedJarEntry.Filter filter;
 
 	private RandomAccessData centralDirectoryData;
 
@@ -88,7 +69,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 	private Boolean multiReleaseJar;
 
-	private NestedJarEntryCertification[] certifications;
+	private NestedJarEntry.Certification[] certifications;
 
 	private final Map<Integer, FileHeader> entriesCache = Collections
 			.synchronizedMap(new LinkedHashMap<Integer, FileHeader>(16, 0.75f, true) {
@@ -100,7 +81,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 			});
 
-	NestedJarFileEntries(NestedJarFile jarFile, NestedJarEntryFilter filter) {
+	public NestedJarFileEntries(NestedJarFile jarFile, NestedJarEntry.Filter filter) {
 		this.jarFile = jarFile;
 		this.filter = filter;
 		if (RUNTIME_VERSION == BASE_VERSION) {
@@ -339,10 +320,10 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 		return (this.filter != null) ? this.filter.apply(name) : name;
 	}
 
-	NestedJarEntryCertification getCertification(NestedJarEntry entry) throws IOException {
-		NestedJarEntryCertification[] certifications = this.certifications;
+	NestedJarEntry.Certification getCertification(NestedJarEntry entry) throws IOException {
+		NestedJarEntry.Certification[] certifications = this.certifications;
 		if (certifications == null) {
-			certifications = new NestedJarEntryCertification[this.size];
+			certifications = new NestedJarEntry.Certification[this.size];
 			// We fall back to use JarInputStream to obtain the certs. This isn't that
 			// fast, but hopefully doesn't happen too often.
 			try (JarInputStream certifiedJarStream = new JarInputStream(this.jarFile.getData().getInputStream())) {
@@ -352,14 +333,14 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 					certifiedJarStream.closeEntry();
 					int index = getEntryIndex(certifiedEntry.getName());
 					if (index != -1) {
-						certifications[index] = NestedJarEntryCertification.from(certifiedEntry);
+						certifications[index] = NestedJarEntry.Certification.from(certifiedEntry);
 					}
 				}
 			}
 			this.certifications = certifications;
 		}
-		NestedJarEntryCertification certification = certifications[entry.getIndex()];
-		return (certification != null) ? certification : NestedJarEntryCertification.NONE;
+		NestedJarEntry.Certification certification = certifications[entry.getIndex()];
+		return (certification != null) ? certification : NestedJarEntry.Certification.NONE;
 	}
 
 	private int getEntryIndex(CharSequence name) {

@@ -33,6 +33,7 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
      *
      * @param context 上下文 {@link PluginContext}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void filter(PluginContext context) {
         Object inboundKey = getInboundKey();
@@ -41,7 +42,7 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
         tree.getTransformer()
                 .create(this)
                 .inboundKey(inboundKey)
-                .transform(node -> node.<T>filter(value -> applyNegation(doFilter(value))))
+                .transform(node -> node.filter(it -> applyNegation(doFilter((T) it.getValue()))))
                 .outboundKey(outboundKey);
         /*Object key = getKey();
         T original = context.get(key);

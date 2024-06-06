@@ -11,6 +11,7 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolverChainImpl;
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -106,12 +107,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         PluginContext context = pluginContextFactory.create(this);
         //初始化上下文
         context.initialize();
+        context.set(Plugin.class, plugin);
 
-        pluginTreeFactory.create(plugin, this);
+        PluginTree tree = pluginTreeFactory.create(plugin, this);
+        context.set(PluginTree.class, tree);
+        context.set(PluginTree.Node.class, tree.getRoot());
 
         //准备插件
         plugin.prepare(context);
-        context.set(Plugin.class, plugin);
         //在上下文中添加事件发布者
         context.set(PluginEventPublisher.class, pluginEventPublisher);
 

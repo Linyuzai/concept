@@ -1,10 +1,11 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.read.PluginReadable;
 import com.github.linyuzai.plugin.core.read.PluginReader;
+import com.github.linyuzai.plugin.core.read.metadata.PluginMetadata;
 
-import java.util.Collection;
-import java.util.Properties;
+import java.io.IOException;
 
 /**
  * 插件抽象
@@ -23,11 +24,9 @@ public interface Plugin {
 
     Object getId();
 
-    void addReaders(PluginReader... readers);
+    <T> T read(Class<T> readable, Object key);
 
-    Collection<PluginReader> getReaders(Class<? extends PluginReader> type);
-
-    <T> T read(Class<? extends PluginReader> type, String name);
+    PluginMetadata getMetadata();
 
     PluginConcept getConcept();
 

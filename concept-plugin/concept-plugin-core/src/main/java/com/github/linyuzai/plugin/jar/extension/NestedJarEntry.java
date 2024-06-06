@@ -16,6 +16,8 @@
 
 package com.github.linyuzai.plugin.jar.extension;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,19 +35,23 @@ import java.util.jar.Manifest;
  */
 public class NestedJarEntry extends JarEntry implements FileHeader {
 
+	@Getter
 	private final int index;
 
 	private final AsciiBytes name;
 
+	@Getter
 	private final AsciiBytes headerName;
 
+	@Getter
 	private final NestedJarFile jarFile;
 
-	private long localHeaderOffset;
+	@Getter
+	private final long localHeaderOffset;
 
-	private volatile NestedJarEntryCertification certification;
+	private volatile Certification certification;
 
-	NestedJarEntry(NestedJarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
+	public NestedJarEntry(NestedJarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
 		super((nameAlias != null) ? nameAlias.toString() : header.getName().toString());
 		this.index = index;
 		this.name = (nameAlias != null) ? nameAlias : header.getName();
@@ -63,11 +69,7 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 		}
 	}
 
-	int getIndex() {
-		return this.index;
-	}
-
-	AsciiBytes getAsciiBytesName() {
+	public AsciiBytes getAsciiBytesName() {
 		return this.name;
 	}
 
@@ -81,8 +83,8 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 	 * @return the URL for the entry
 	 * @throws MalformedURLException if the URL is not valid
 	 */
-	URL getUrl() throws MalformedURLException {
-		return new URL(this.jarFile.getUrl(), getName());
+	public URL getURL() throws MalformedURLException {
+		return new URL(this.jarFile.getURL(), getName());
 	}
 
 	@Override
@@ -101,11 +103,11 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 		return getCertification().getCodeSigners();
 	}
 
-	private NestedJarEntryCertification getCertification() {
+	public Certification getCertification() {
 		if (!this.jarFile.isSigned()) {
-			return NestedJarEntryCertification.NONE;
+			return Certification.NONE;
 		}
-		NestedJarEntryCertification certification = this.certification;
+		Certification certification = this.certification;
 		if (certification == null) {
 			certification = this.jarFile.getCertification(this);
 			this.certification = certification;
@@ -113,9 +115,63 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 		return certification;
 	}
 
-	@Override
-	public long getLocalHeaderOffset() {
-		return this.localHeaderOffset;
+	public NestedJarFile asJarFile() throws IOException {
+		return jarFile.getNestedJarFile(this);
 	}
 
+	/**
+	 * Interface that can be used to filter and optionally rename jar entries.
+	 *
+	 * @author Phillip Webb
+	 */
+	public interface Filter {
+
+		/**
+		 * Apply the jar entry filter.
+		 * @param name the current entry name. This may be different that the original entry
+		 * name if a previous filter has been applied
+		 * @return the new name of the entry or {@code null} if the entry should not be
+		 * included.
+		 */
+		AsciiBytes apply(AsciiBytes name);
+
+	}
+
+	/**
+	 * {@link Certificate} and {@link CodeSigner} details for a {@link NestedJarEntry} from a signed
+	 * {@link NestedJarFile}.
+	 *
+	 * @author Phillip Webb
+	 */
+	public static class Certification {
+
+		static final Certification NONE = new Certification(null, null);
+
+		private final Certificate[] certificates;
+
+		private final CodeSigner[] codeSigners;
+
+		Certification(Certificate[] certificates, CodeSigner[] codeSigners) {
+			this.certificates = certificates;
+			this.codeSigners = codeSigners;
+		}
+
+		Certificate[] getCertificates() {
+			return (this.certificates != null) ? this.certificates.clone() : null;
+		}
+
+		CodeSigner[] getCodeSigners() {
+			return (this.codeSigners != null) ? this.codeSigners.clone() : null;
+		}
+
+		static Certification from(JarEntry certifiedEntry) {
+			Certificate[] certificates = (certifiedEntry != null) ? certifiedEntry.getCertificates() : null;
+			CodeSigner[] codeSigners = (certifiedEntry != null) ? certifiedEntry.getCodeSigners() : null;
+			if (certificates == null && codeSigners == null) {
+				return NONE;
+			}
+			return new Certification(certificates, codeSigners);
+		}
+
+	}
 }

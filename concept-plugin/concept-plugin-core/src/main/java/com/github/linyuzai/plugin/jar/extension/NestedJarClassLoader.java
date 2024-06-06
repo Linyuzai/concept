@@ -7,12 +7,6 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.jar.JarFile;
 
-/**
- * @author Phillip Webb
- * @author Dave Syer
- * @author Andy Wilkinson
- * @since 1.0.0
- */
 public class NestedJarClassLoader extends URLClassLoader {
 
     static {

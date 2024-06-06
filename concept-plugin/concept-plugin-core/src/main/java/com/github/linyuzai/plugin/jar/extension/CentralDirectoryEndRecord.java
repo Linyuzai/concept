@@ -1,32 +1,12 @@
-/*
- * Copyright 2012-2022 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.github.linyuzai.plugin.jar.extension;
 
 import java.io.IOException;
 
 /**
  * A ZIP File "End of central directory record" (EOCD).
- *
- * @author Phillip Webb
- * @author Andy Wilkinson
- * @author Camille Vienot
  * @see <a href="https://en.wikipedia.org/wiki/Zip_%28file_format%29">Zip File Format</a>
  */
-class CentralDirectoryEndRecord {
+public class CentralDirectoryEndRecord {
 
 	private static final int MINIMUM_SIZE = 22;
 
@@ -55,7 +35,7 @@ class CentralDirectoryEndRecord {
 	 * @param data the source data
 	 * @throws IOException in case of I/O errors
 	 */
-	CentralDirectoryEndRecord(RandomAccessData data) throws IOException {
+	public CentralDirectoryEndRecord(RandomAccessData data) throws IOException {
 		this.block = createBlockFromEndOfData(data, READ_BLOCK_SIZE);
 		this.size = MINIMUM_SIZE;
 		this.offset = this.block.length - this.size;
@@ -96,7 +76,7 @@ class CentralDirectoryEndRecord {
 	 * @param data the source data
 	 * @return the offset within the data where the archive begins
 	 */
-	long getStartOfArchive(RandomAccessData data) {
+	public long getStartOfArchive(RandomAccessData data) {
 		long length = Bytes.littleEndianValue(this.block, this.offset + 12, 4);
 		long specifiedOffset = (this.zip64End != null) ? this.zip64End.centralDirectoryOffset
 				: Bytes.littleEndianValue(this.block, this.offset + 16, 4);
@@ -112,7 +92,7 @@ class CentralDirectoryEndRecord {
 	 * @param data the source data
 	 * @return the central directory data
 	 */
-	RandomAccessData getCentralDirectory(RandomAccessData data) {
+	public RandomAccessData getCentralDirectory(RandomAccessData data) {
 		if (this.zip64End != null) {
 			return this.zip64End.getCentralDirectory(data);
 		}
@@ -125,7 +105,7 @@ class CentralDirectoryEndRecord {
 	 * Return the number of ZIP entries in the file.
 	 * @return the number of records in the zip
 	 */
-	int getNumberOfRecords() {
+	public int getNumberOfRecords() {
 		if (this.zip64End != null) {
 			return this.zip64End.getNumberOfRecords();
 		}
@@ -133,13 +113,13 @@ class CentralDirectoryEndRecord {
 		return (int) numberOfRecords;
 	}
 
-	String getComment() {
+	public String getComment() {
 		int commentLength = (int) Bytes.littleEndianValue(this.block, this.offset + COMMENT_LENGTH_OFFSET, 2);
 		AsciiBytes comment = new AsciiBytes(this.block, this.offset + COMMENT_LENGTH_OFFSET + 2, commentLength);
 		return comment.toString();
 	}
 
-	boolean isZip64() {
+	public boolean isZip64() {
 		return this.zip64End != null;
 	}
 
@@ -149,7 +129,7 @@ class CentralDirectoryEndRecord {
 	 * @see <a href="https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT">Chapter
 	 * 4.3.14 of Zip64 specification</a>
 	 */
-	private static final class Zip64End {
+	public static final class Zip64End {
 
 		private static final int ZIP64_ENDTOT = 32; // total number of entries
 
@@ -165,7 +145,7 @@ class CentralDirectoryEndRecord {
 
 		private final int numberOfRecords;
 
-		private Zip64End(RandomAccessData data, Zip64Locator locator) throws IOException {
+		public Zip64End(RandomAccessData data, Zip64Locator locator) throws IOException {
 			this.locator = locator;
 			byte[] block = data.read(locator.getZip64EndOffset(), 56);
 			this.centralDirectoryOffset = Bytes.littleEndianValue(block, ZIP64_ENDOFF, 8);

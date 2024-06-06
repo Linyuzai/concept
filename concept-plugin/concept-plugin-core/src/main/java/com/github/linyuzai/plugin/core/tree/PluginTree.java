@@ -5,10 +5,13 @@ import com.github.linyuzai.plugin.core.tree.trace.PluginTracer;
 import com.github.linyuzai.plugin.core.tree.transform.PluginTransformer;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface PluginTree {
+
+    Object getId();
 
     Node getRoot();
 
@@ -24,13 +27,19 @@ public interface PluginTree {
 
         Plugin getPlugin();
 
+        PluginTree getTree();
+
         Node getParent();
 
         Collection<Node> getChildren();
 
-        <T, R> Node map(Function<T, R> function);
+        Node map(Function<Node, Object> function);
 
-        <T> Node filter(Predicate<T> predicate);
+        Node map(Function<Node, Object> function, Predicate<Node> predicate);
+
+        Node filter(Predicate<Node> predicate);
+
+        void forEach(Consumer<Node> consumer);
 
         Node create(Object id, Object value, Plugin plugin);
     }

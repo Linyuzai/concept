@@ -1,19 +1,3 @@
-/*
- * Copyright 2012-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.github.linyuzai.plugin.jar.extension;
 
 import java.util.Objects;
@@ -35,11 +19,11 @@ public class StringSequence implements CharSequence {
 
 	private int hash;
 
-	StringSequence(String source) {
+	public StringSequence(String source) {
 		this(source, 0, (source != null) ? source.length() : -1);
 	}
 
-	StringSequence(String source, int start, int end) {
+	public StringSequence(String source, int start, int end) {
 		Objects.requireNonNull(source, "Source must not be null");
 		if (start < 0) {
 			throw new StringIndexOutOfBoundsException(start);
@@ -52,7 +36,7 @@ public class StringSequence implements CharSequence {
 		this.end = end;
 	}
 
-	StringSequence subSequence(int start) {
+	public StringSequence subSequence(int start) {
 		return subSequence(start, length());
 	}
 
@@ -90,23 +74,23 @@ public class StringSequence implements CharSequence {
 		return this.source.charAt(this.start + index);
 	}
 
-	int indexOf(char ch) {
+	public int indexOf(char ch) {
 		return this.source.indexOf(ch, this.start) - this.start;
 	}
 
-	int indexOf(String str) {
+	public int indexOf(String str) {
 		return this.source.indexOf(str, this.start) - this.start;
 	}
 
-	int indexOf(String str, int fromIndex) {
+	public int indexOf(String str, int fromIndex) {
 		return this.source.indexOf(str, this.start + fromIndex) - this.start;
 	}
 
-	boolean startsWith(String prefix) {
+	public boolean startsWith(String prefix) {
 		return startsWith(prefix, 0);
 	}
 
-	boolean startsWith(String prefix, int offset) {
+	public boolean startsWith(String prefix, int offset) {
 		int prefixLength = prefix.length();
 		int length = length();
 		if (length - prefixLength - offset < 0) {

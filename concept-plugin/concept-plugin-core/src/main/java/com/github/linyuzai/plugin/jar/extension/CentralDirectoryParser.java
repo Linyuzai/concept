@@ -27,7 +27,7 @@ import java.util.List;
  * @author Andy Wilkinson
  * @see CentralDirectoryVisitor
  */
-class CentralDirectoryParser {
+public class CentralDirectoryParser {
 
 	private static final int CENTRAL_DIRECTORY_HEADER_BASE_SIZE = 46;
 
