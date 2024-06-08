@@ -2,8 +2,6 @@ package com.github.linyuzai.plugin.core.tree;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.tree.trace.PluginTracer;
-import com.github.linyuzai.plugin.core.tree.transform.PluginTransformer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,10 +10,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @RequiredArgsConstructor
-public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginTracer {
+public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, PluginTree.Tracer {
 
     private final Node root;
 
@@ -31,12 +30,12 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     }
 
     @Override
-    public PluginTransformer getTransformer() {
+    public Transformer getTransformer() {
         return this;
     }
 
     @Override
-    public PluginTracer getTracer() {
+    public Tracer getTracer() {
         return this;
     }
 
@@ -46,20 +45,19 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     }
 
     @Override
-    public Collection<Object> getTraceIds() {
-        return Collections.unmodifiableSet(traceMap.keySet());
+    public HandleStage getTrace(Object id) {
+        return traceMap.get(id);
     }
 
     @Override
-    public HandleStage getTrace(Object id) {
-        return traceMap.get(id);
+    public Stream<HandleStage> stream() {
+        return traceMap.values().stream();
     }
 
     protected DefaultNode createNode(Object id, String name, Object value, Node parent) {
         return new DefaultNode(id, name, value, this, parent);
     }
 
-    @SuppressWarnings("unchecked")
     @Getter
     @RequiredArgsConstructor
     public class DefaultNode implements Node, NodeFactory {
@@ -88,13 +86,13 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
 
         protected Node doMap(Node parent, Function<Node, Object> function, Predicate<Node> predicate) {
             Object apply;
-            if (isContentNode()) {
+            if (isPluginNode()) {
+                apply = value;
+            } else {
                 if (!predicate.test(this)) {
                     return null;
                 }
                 apply = function.apply(this);
-            } else {
-                apply = value;
             }
             DefaultNode node = createNode(id, name, apply, parent);
             List<Node> collect = children.stream()
@@ -111,7 +109,7 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
         }
 
         public Node doFilter(Node parent, Predicate<Node> predicate) {
-            if (isContentNode() && !predicate.test(this)) {
+            if (!isPluginNode() && !predicate.test(this)) {
                 return null;
             }
             DefaultNode node = createNode(id, name, value, parent);
@@ -130,61 +128,74 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
         }
 
         @Override
+        public boolean isPluginNode() {
+            return value instanceof Plugin;
+        }
+
+        @Override
         public DefaultNode create(Object id, String name, Object value) {
             DefaultNode node = createNode(id, name, value, this);
             children.add(node);
             return node;
         }
-
-        protected boolean isContentNode() {
-            return !(value instanceof Plugin);
-        }
     }
 
     @Getter
     @RequiredArgsConstructor
-    public class TransformerStages implements
-            InboundStage,
-            PluginTransformer.TransformStage,
-            OutboundStage {
+    public class TransformerStages implements InboundStage, TransformStage, OutboundStage {
 
         private final PluginHandler handler;
 
-        private Node parameter;
+        private Node inbound;
 
-        private Node result;
+        private Node outbound;
 
         @Override
-        public PluginTransformer.TransformStage inbound(Node tree) {
-            parameter = tree;
+        public Transformer.TransformStage inbound(Node node) {
+            inbound = node;
             return this;
         }
 
         @Override
-        public PluginTransformer.TransformStage inboundKey(Object inboundKey) {
-            HandleStage trace = getTracer().getTrace(inboundKey);
+        public Transformer.TransformStage inboundKey(Object inboundKey) {
+            HandleStage trace = traceMap.get(inboundKey);
             if (trace == null) {
                 throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
             }
-            parameter = trace.getTree().getRoot();
+            inbound = trace.getTreeRoot();
             return this;
         }
 
         @Override
-        public OutboundStage transform(Function<Node, Node> transform) {
-            result = transform.apply(parameter);
+        public OutboundStage transform(Function<Node, Node> transformer) {
+            outbound = transformer.apply(inbound);
             return this;
         }
 
         @Override
         public Node outbound() {
-            return result;
+            return outbound;
         }
 
         @Override
         public void outboundKey(Object outboundKey) {
-            HandleStage trace = getTracer().getTrace(outboundKey);
+            traceMap.compute(outboundKey, (k, trace) -> new TracerStages(outbound, handler, trace));
+        }
+    }
 
+    @Getter
+    @RequiredArgsConstructor
+    public static class TracerStages implements HandleStage {
+
+        private final Node treeRoot;
+
+        private final PluginHandler handler;
+
+        private final HandleStage next;
+
+        @Override
+        public HandleStage next() {
+            return next;
         }
     }
 }

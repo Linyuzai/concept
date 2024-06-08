@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.format;
 
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +14,7 @@ import java.util.Map;
  */
 @Getter
 @AllArgsConstructor
-public class MapToArrayFormatter extends AbstractPluginFormatter<Map<?, ?>, Object> {
+public class MapToArrayFormatter extends TreeNodePluginFormatter<Object> {
 
     /**
      * 数组的类型
@@ -23,16 +24,15 @@ public class MapToArrayFormatter extends AbstractPluginFormatter<Map<?, ?>, Obje
     /**
      * 格式化，根据数组类型实例化并添加 {@link Map} 的 value
      *
-     * @param source 被格式化的对象
+     * @param nodes 被格式化的对象
      * @return 数组格式的插件
      */
     @Override
-    public Object doFormat(Map<?, ?> source) {
-        List<Object> values = new ArrayList<>(source.values());
-        Object array = Array.newInstance(arrayClass, values.size());
-        for (int i = 0; i < values.size(); i++) {
-            Object o = values.get(i);
-            Array.set(array, i, o);
+    public Object formatNodes(List<PluginTree.Node> nodes) {
+        Object array = Array.newInstance(arrayClass, nodes.size());
+        for (int i = 0; i < nodes.size(); i++) {
+            PluginTree.Node node = nodes.get(i);
+            Array.set(array, i, node.getValue());
         }
         return array;
     }

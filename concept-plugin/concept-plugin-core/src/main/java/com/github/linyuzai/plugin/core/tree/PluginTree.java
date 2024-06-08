@@ -1,13 +1,12 @@
 package com.github.linyuzai.plugin.core.tree;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.tree.trace.PluginTracer;
-import com.github.linyuzai.plugin.core.tree.transform.PluginTransformer;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
 
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public interface PluginTree {
 
@@ -15,9 +14,9 @@ public interface PluginTree {
 
     Node getRoot();
 
-    PluginTransformer getTransformer();
+    Transformer getTransformer();
 
-    PluginTracer getTracer();
+    Tracer getTracer();
 
     interface Node {
 
@@ -40,10 +39,52 @@ public interface PluginTree {
         Node filter(Predicate<Node> predicate);
 
         void forEach(Consumer<Node> consumer);
+
+        boolean isPluginNode();
     }
 
     interface NodeFactory {
 
         Node create(Object id, String name, Object value);
+    }
+
+    interface Transformer {
+
+        InboundStage create(PluginHandler handler);
+
+        interface InboundStage {
+
+            TransformStage inbound(Node node);
+
+            TransformStage inboundKey(Object inboundKey);
+        }
+
+        interface TransformStage {
+
+            OutboundStage transform(Function<Node, Node> transform);
+        }
+
+        interface OutboundStage {
+
+            Node outbound();
+
+            void outboundKey(Object outboundKey);
+        }
+    }
+
+    interface Tracer {
+
+        HandleStage getTrace(Object id);
+
+        Stream<HandleStage> stream();
+
+        interface HandleStage {
+
+            PluginTree.Node getTreeRoot();
+
+            PluginHandler getHandler();
+
+            HandleStage next();
+        }
     }
 }

@@ -8,7 +8,6 @@ import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.match.PropertiesMatcher;
 import com.github.linyuzai.plugin.core.type.MapTypeMetadata;
 import com.github.linyuzai.plugin.core.type.ObjectTypeMetadata;
@@ -31,7 +30,7 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
     /**
      * 匹配类型为 {@link Properties} {@link Map}
      * 及对应类型的 {@link java.util.Collection} {@link java.util.List} {@link java.util.Set}
-     * {@link java.util.Map} 和数组或是添加了 {@link PluginProperties} 注解
+     * {@link java.util.Map} 和数组
      *
      * @param metadata    {@link TypeMetadata}
      * @param annotations 注解
@@ -44,11 +43,11 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
                 || metadata instanceof MapTypeMetadata && elementClass == String.class) {
             return new PropertiesMatcher(annotations);
         }
-        for (Annotation annotation : annotations) {
+        /*for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginProperties.class) {
                 return new PropertiesMatcher(annotations);
             }
-        }
+        }*/
         return null;
     }
 

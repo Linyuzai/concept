@@ -94,10 +94,9 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
     public boolean hasContent(PluginTree.Node node) {
         AtomicInteger size = new AtomicInteger(0);
         node.forEach(it -> {
-            if (it instanceof Plugin) {
-                return;
+            if (!it.isPluginNode()) {
+                size.incrementAndGet();
             }
-            size.incrementAndGet();
         });
         return size.get() > 0;
     }

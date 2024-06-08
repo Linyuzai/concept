@@ -5,7 +5,6 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.match.PluginText;
-import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
 import lombok.NonNull;
@@ -75,7 +74,6 @@ public class DynamicExtractor implements PluginExtractor {
     /**
      * 通过 {@link Parameter} 获得一个执行器。
      * 如果标注了特殊的注解将会直接匹配，
-     * {@link PluginProperties} 返回 {@link PropertiesExtractor} 对应的执行器，
      * {@link PluginText} 返回 {@link ContentExtractor} 对应的执行器。
      * 否则按照 {@link PluginContextExtractor} {@link PluginObjectExtractor}
      * {@link PropertiesExtractor} {@link ContentExtractor} 的顺序匹配执行器。
@@ -116,13 +114,11 @@ public class DynamicExtractor implements PluginExtractor {
      * @return 如果是明确指定的返回 true，否则返回 false
      */
     public boolean hasExplicitAnnotation(Annotation annotation) {
-        return annotation.annotationType() == PluginProperties.class ||
-                annotation.annotationType() == PluginText.class;
+        return annotation.annotationType() == PluginText.class;
     }
 
     /**
      * 根据明确指定的注解获得对应的执行器。
-     * {@link PluginProperties} 返回 {@link PropertiesExtractor} 对应的执行器，
      * {@link PluginText} 返回 {@link ContentExtractor} 对应的执行器。
      *
      * @param annotation 注解
@@ -130,9 +126,9 @@ public class DynamicExtractor implements PluginExtractor {
      * @return 插件提取执行器
      */
     public Invoker getExplicitInvoker(Annotation annotation, Parameter parameter) {
-        if (annotation.annotationType() == PluginProperties.class) {
+        /*if (annotation.annotationType() == PluginProperties.class) {
             return getPropertiesInvoker(parameter);
-        }
+        }*/
         if (annotation.annotationType() == PluginText.class) {
             String charset = ((PluginText) annotation).charset();
             return getContentInvoker(parameter, charset.isEmpty() ? null : Charset.forName(charset));

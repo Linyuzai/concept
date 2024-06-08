@@ -9,8 +9,9 @@ import java.util.function.Supplier;
 /**
  * {@link Properties} 过滤器
  */
+@Deprecated
 @Getter
-public class PropertiesFilter extends AbstractPluginFilter<Supplier<Properties>> {
+class PropertiesFilter extends AbstractPluginFilter<Supplier<Properties>> {
 
     /**
      * 属性健模式

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Deprecated
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PluginProperties {
+@interface PluginProperties {
 
     /**
      * 属性名
