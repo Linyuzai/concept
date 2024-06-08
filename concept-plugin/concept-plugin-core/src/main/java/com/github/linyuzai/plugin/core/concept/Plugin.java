@@ -1,32 +1,22 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.read.PluginReadable;
-import com.github.linyuzai.plugin.core.read.PluginReader;
-import com.github.linyuzai.plugin.core.read.metadata.PluginMetadata;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 插件抽象
  */
 public interface Plugin {
 
-    String PREFIX = "CONCEPT_PLUGIN@";
-
-    String PATH_NAME = PREFIX + "PATH_NAME";
-
-    String BYTE_ARRAY = PREFIX + "BYTE_ARRAY";
-
-    String PROPERTIES_NAME = PREFIX + "PROPERTIES_NAME";
-
-    String PROPERTIES = PREFIX + "PROPERTIES";
-
     Object getId();
 
     <T> T read(Class<T> readable, Object key);
 
-    PluginMetadata getMetadata();
+    Metadata getMetadata();
+
+    void setMetadata(Metadata metadata);
 
     PluginConcept getConcept();
 
@@ -41,4 +31,29 @@ public interface Plugin {
      * 释放
      */
     void release(PluginContext context);
+
+    interface Metadata {
+
+        String get(String key);
+
+        String get(String key, String defaultValue);
+
+        boolean isEmpty();
+    }
+
+    interface Entry {
+
+        Object getId();
+
+        String getName();
+
+        Plugin getPlugin();
+
+        Content getContent();
+    }
+
+    interface Content {
+
+        InputStream getInputStream() throws IOException;
+    }
 }

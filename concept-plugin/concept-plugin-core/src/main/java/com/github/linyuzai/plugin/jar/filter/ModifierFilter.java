@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -18,7 +17,7 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(JarClassResolver.class)
-public class ModifierFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
+public class ModifierFilter extends AbstractPluginFilter<Class<?>> {
 
     /**
      * {@link java.lang.reflect.Modifier} 对应的 {@link Function}
@@ -31,11 +30,8 @@ public class ModifierFilter extends AbstractPluginFilter<Map<String, Class<?>>> 
     }
 
     @Override
-    public boolean doFilter(Map<String, Class<?>> plugins) {
-        return true;
-        /*return plugins.entrySet().stream()
-                .filter(it -> applyNegation(filterClass(it.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
+    public boolean doFilter(Class<?> clazz) {
+        return filterClass(clazz);
     }
 
     @Override

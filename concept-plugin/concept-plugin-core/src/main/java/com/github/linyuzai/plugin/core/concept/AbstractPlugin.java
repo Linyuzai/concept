@@ -2,9 +2,7 @@ package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.DefaultPluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.read.PluginReadable;
 import com.github.linyuzai.plugin.core.read.PluginReader;
-import com.github.linyuzai.plugin.core.read.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,11 +12,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
+@Setter
 public abstract class AbstractPlugin implements Plugin {
 
     private final Collection<PluginReader> readers = new ArrayList<>();
 
-    @Setter
+    private Metadata metadata;
+
     private PluginConcept concept;
 
     public void addReader(PluginReader reader) {
@@ -47,26 +47,21 @@ public abstract class AbstractPlugin implements Plugin {
         return null;
     }
 
-    @Override
-    public PluginMetadata getMetadata() {
-        return read(PluginMetadata.class, null);
-    }
-
     protected PluginContext createReadContent() {
         return new DefaultPluginContext(null);
     }
 
     @Override
     public void prepare(PluginContext context) {
-        PluginTree.Node node = context.get(PluginTree.Node.class);
-        Collection<PluginEntry> entries = collectEntries(context);
-        for (PluginEntry entry : entries) {
-            Plugin subPlugin = getConcept().create(entry);
+        PluginTree.NodeFactory node = context.get(PluginTree.Node.class);
+        Collection<Entry> entries = collectEntries(context);
+        for (Entry entry : entries) {
+            Plugin subPlugin = getConcept().create(entry, context);
             if (subPlugin == null) {
-                node.create(entry.getName(), entry, this);
+                node.create(entry.getId(), entry.getName(), entry);
             } else {
-                PluginTree.Node subTree = node.create(entry.getName(), subPlugin, this);
-                PluginContext subContext = context.createSubContext();
+                PluginTree.Node subTree = node.create(subPlugin.getId(), entry.getName(), subPlugin);
+                PluginContext subContext = context.createSubContext(false);
                 subContext.initialize();
                 subContext.set(Plugin.class, subPlugin);
                 subContext.set(PluginTree.Node.class, subTree);
@@ -81,11 +76,14 @@ public abstract class AbstractPlugin implements Plugin {
     public void release(PluginContext context) {
         PluginTree.Node node = context.get(PluginTree.Node.class);
         for (PluginTree.Node child : node.getChildren()) {
-            PluginContext subContext = context.createSubContext();
-            subContext.set(PluginTree.Node.class, child);
-            subContext.set(Plugin.class, child.getPlugin());
-            child.getPlugin().release(subContext);
-            subContext.destroy();
+            if (child.getValue() instanceof Plugin) {
+                Plugin subPlugin = (Plugin) child.getValue();
+                PluginContext subContext = context.createSubContext(false);
+                subContext.set(PluginTree.Node.class, child);
+                subContext.set(Plugin.class, subPlugin);
+                subPlugin.release(subContext);
+                subContext.destroy();
+            }
         }
         for (PluginReader reader : readers) {
             try {
@@ -97,7 +95,7 @@ public abstract class AbstractPlugin implements Plugin {
         onRelease(context);
     }
 
-    public abstract Collection<PluginEntry> collectEntries(PluginContext context);
+    public abstract Collection<Entry> collectEntries(PluginContext context);
 
     public void onPrepare(PluginContext context) {
 

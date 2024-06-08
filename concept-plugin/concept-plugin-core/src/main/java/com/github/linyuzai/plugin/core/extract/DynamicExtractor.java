@@ -3,7 +3,8 @@ package com.github.linyuzai.plugin.core.extract;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.match.PluginContent;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.match.PluginText;
 import com.github.linyuzai.plugin.core.match.PluginProperties;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
@@ -16,10 +17,8 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 动态插件提取器。
@@ -77,7 +76,7 @@ public class DynamicExtractor implements PluginExtractor {
      * 通过 {@link Parameter} 获得一个执行器。
      * 如果标注了特殊的注解将会直接匹配，
      * {@link PluginProperties} 返回 {@link PropertiesExtractor} 对应的执行器，
-     * {@link PluginContent} 返回 {@link ContentExtractor} 对应的执行器。
+     * {@link PluginText} 返回 {@link ContentExtractor} 对应的执行器。
      * 否则按照 {@link PluginContextExtractor} {@link PluginObjectExtractor}
      * {@link PropertiesExtractor} {@link ContentExtractor} 的顺序匹配执行器。
      *
@@ -118,13 +117,13 @@ public class DynamicExtractor implements PluginExtractor {
      */
     public boolean hasExplicitAnnotation(Annotation annotation) {
         return annotation.annotationType() == PluginProperties.class ||
-                annotation.annotationType() == PluginContent.class;
+                annotation.annotationType() == PluginText.class;
     }
 
     /**
      * 根据明确指定的注解获得对应的执行器。
      * {@link PluginProperties} 返回 {@link PropertiesExtractor} 对应的执行器，
-     * {@link PluginContent} 返回 {@link ContentExtractor} 对应的执行器。
+     * {@link PluginText} 返回 {@link ContentExtractor} 对应的执行器。
      *
      * @param annotation 注解
      * @param parameter  参数 {@link Parameter}
@@ -134,8 +133,8 @@ public class DynamicExtractor implements PluginExtractor {
         if (annotation.annotationType() == PluginProperties.class) {
             return getPropertiesInvoker(parameter);
         }
-        if (annotation.annotationType() == PluginContent.class) {
-            String charset = ((PluginContent) annotation).charset();
+        if (annotation.annotationType() == PluginText.class) {
+            String charset = ((PluginText) annotation).charset();
             return getContentInvoker(parameter, charset.isEmpty() ? null : Charset.forName(charset));
         }
         throw new PluginException(annotation + " has no explicit invoker");
@@ -309,12 +308,13 @@ public class DynamicExtractor implements PluginExtractor {
      *
      * @return 所有依赖的解析器 {@link PluginResolver} 的类
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public Collection<Class<? extends PluginResolver>> getDependencies() {
+    public Class<? extends PluginHandler>[] getDependencies() {
         return methodInvokersMap.values().stream()
                 .flatMap(it -> it.values().stream())
-                .flatMap(it -> it.getMatcher().getDependencies().stream())
+                .flatMap(it -> Arrays.stream(it.getMatcher().getDependencies()))
                 .distinct()
-                .collect(Collectors.toList());
+                .toArray(Class[]::new);
     }
 }

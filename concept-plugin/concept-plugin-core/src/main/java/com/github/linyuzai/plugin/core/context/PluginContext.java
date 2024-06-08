@@ -15,7 +15,7 @@ public interface PluginContext {
      * @return {@link PluginConcept}
      */
     default PluginConcept getConcept() {
-        return getPlugin().getConcept();
+        return get(PluginConcept.class);
     }
 
     /**
@@ -37,7 +37,7 @@ public interface PluginContext {
 
     PluginContext getParent();
 
-    PluginContext createSubContext();
+    PluginContext createSubContext(boolean inherit);
 
     void publish(Object event);
 

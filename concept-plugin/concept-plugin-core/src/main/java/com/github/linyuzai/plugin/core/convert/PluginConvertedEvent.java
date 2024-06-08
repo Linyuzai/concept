@@ -18,20 +18,20 @@ public class PluginConvertedEvent extends PluginContextEvent {
     /**
      * 原始对象
      */
-    private final Object original;
+    private final Object inbound;
 
     /**
      * 转换后对象
      */
-    private final Object converted;
+    private final Object outbound;
 
     public PluginConvertedEvent(PluginContext context,
                                 PluginConvertor convertor,
-                                Object original,
-                                Object converted) {
+                                Object inbound,
+                                Object outbound) {
         super(context);
         this.convertor = convertor;
-        this.original = original;
-        this.converted = converted;
+        this.inbound = inbound;
+        this.outbound = outbound;
     }
 }

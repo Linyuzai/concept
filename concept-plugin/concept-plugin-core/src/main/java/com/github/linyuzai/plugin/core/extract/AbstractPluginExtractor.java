@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 
@@ -134,7 +135,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @return 依赖的解析器 {@link PluginResolver} 的类
      */
     @Override
-    public Collection<Class<? extends PluginResolver>> getDependencies() {
+    public Class<? extends PluginHandler>[] getDependencies() {
         return getInvoker().getMatcher().getDependencies();
     }
 }

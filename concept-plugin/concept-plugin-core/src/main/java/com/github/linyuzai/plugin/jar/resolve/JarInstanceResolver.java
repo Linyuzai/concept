@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 /**
  * 实例解析器
  */
+//TODO BeanDefinition
 @HandlerDependency(JarClassResolver.class)
 public class JarInstanceResolver extends AbstractPluginResolver<Class<?>, Object> {
 

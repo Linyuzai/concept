@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.extract;
 
-import com.github.linyuzai.plugin.core.convert.ByteArrayToInputStreamMapConvertor;
-import com.github.linyuzai.plugin.core.convert.ByteArrayToStringMapConvertor;
+import com.github.linyuzai.plugin.core.convert.ContentToInputStreamConvertor;
+import com.github.linyuzai.plugin.core.convert.ContentToStringConvertor;
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
@@ -62,8 +62,8 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
 
     /**
      * 根据 {@link TypeMetadata} 和注解获得 {@link PluginConvertor}。
-     * 特殊情况，如果是 {@link InputStream} 返回 {@link ByteArrayToInputStreamMapConvertor}，
-     * {@link String} 返回 {@link ByteArrayToStringMapConvertor}。
+     * 特殊情况，如果是 {@link InputStream} 返回 {@link ContentToInputStreamConvertor}，
+     * {@link String} 返回 {@link ContentToStringConvertor}。
      *
      * @param metadata    {@link TypeMetadata}
      * @param annotations 注解
@@ -73,10 +73,10 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
     public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> elementClass = metadata.getElementClass();
         if (InputStream.class == elementClass) {
-            return new ByteArrayToInputStreamMapConvertor();
+            return new ContentToInputStreamConvertor();
         }
         if (String.class == elementClass) {
-            return new ByteArrayToStringMapConvertor(charset);
+            return new ContentToStringConvertor(charset);
         }
         return super.getConvertor(metadata, annotations);
     }

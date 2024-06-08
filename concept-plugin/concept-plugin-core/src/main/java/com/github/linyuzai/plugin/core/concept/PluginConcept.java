@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import java.io.IOException;
+import com.github.linyuzai.plugin.core.context.PluginContext;
+
 import java.util.Map;
 
 /**
@@ -14,7 +15,7 @@ public interface PluginConcept {
      * @param o 插件源
      * @return 插件 {@link Plugin}
      */
-    Plugin create(Object o);
+    Plugin create(Object o, PluginContext context);
 
     /**
      * 加载插件

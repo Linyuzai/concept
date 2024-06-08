@@ -84,7 +84,7 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 	 * @throws MalformedURLException if the URL is not valid
 	 */
 	public URL getURL() throws MalformedURLException {
-		return new URL(this.jarFile.getURL(), getName());
+		return new URL(this.jarFile.getURL(), getName(), new NestedJarHandler(jarFile));
 	}
 
 	@Override

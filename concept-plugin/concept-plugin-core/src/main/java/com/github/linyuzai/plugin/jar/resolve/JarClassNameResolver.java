@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.jar.resolve;
 
-import com.github.linyuzai.plugin.core.concept.PluginEntry;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
@@ -11,10 +11,10 @@ import com.github.linyuzai.plugin.jar.concept.JarPlugin;
  * 类名解析器
  */
 @HandlerDependency(EntryResolver.class)
-public class JarClassNameResolver extends AbstractPluginResolver<PluginEntry, String> {
+public class JarClassNameResolver extends AbstractPluginResolver<Plugin.Entry, String> {
 
     @Override
-    public boolean doFilter(PluginEntry source, PluginContext context) {
+    public boolean doFilter(Plugin.Entry source, PluginContext context) {
         return source.getName().endsWith(".class");
     }
 
@@ -26,7 +26,7 @@ public class JarClassNameResolver extends AbstractPluginResolver<PluginEntry, St
      * @return 类名
      */
     @Override
-    public String doResolve(PluginEntry entry, PluginContext context) {
+    public String doResolve(Plugin.Entry entry, PluginContext context) {
         String name = entry.getName();
         return name.substring(0, name.lastIndexOf("."))
                 .replaceAll("/", ".");
@@ -34,11 +34,11 @@ public class JarClassNameResolver extends AbstractPluginResolver<PluginEntry, St
 
     @Override
     public Object getInboundKey() {
-        return PluginEntry.class;
+        return Plugin.Entry.class;
     }
 
     @Override
     public Object getOutboundKey() {
-        return JarPlugin.CLASS_NAME;
+        return JarPlugin.CLASSNAME;
     }
 }

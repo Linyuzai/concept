@@ -2,13 +2,11 @@ package com.github.linyuzai.plugin.core.tree;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.read.PluginReader;
 import com.github.linyuzai.plugin.core.tree.trace.PluginTracer;
 import com.github.linyuzai.plugin.core.tree.transform.PluginTransformer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,7 +22,7 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
     private final Map<Object, HandleStage> traceMap = new LinkedHashMap<>();
 
     public DefaultPluginTree(Plugin plugin) {
-        root = createNode(plugin.getId(), plugin, plugin, null);
+        root = createNode(plugin.getId(), "", plugin, null);
     }
 
     @Override
@@ -57,20 +55,20 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
         return traceMap.get(id);
     }
 
-    protected DefaultNode createNode(Object id, Object value, Plugin plugin, Node parent) {
-        return new DefaultNode(id, value, plugin, this, parent);
+    protected DefaultNode createNode(Object id, String name, Object value, Node parent) {
+        return new DefaultNode(id, name, value, this, parent);
     }
 
     @SuppressWarnings("unchecked")
     @Getter
     @RequiredArgsConstructor
-    public class DefaultNode implements Node {
+    public class DefaultNode implements Node, NodeFactory {
 
         private final Object id;
 
-        private final Object value;
+        private final String name;
 
-        private final Plugin plugin;
+        private final Object value;
 
         private final PluginTree tree;
 
@@ -98,7 +96,7 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
             } else {
                 apply = value;
             }
-            DefaultNode node = createNode(id, apply, plugin, parent);
+            DefaultNode node = createNode(id, name, apply, parent);
             List<Node> collect = children.stream()
                     .map(it -> doMap(node, function, predicate))
                     .filter(Objects::nonNull)
@@ -116,7 +114,7 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
             if (isContentNode() && !predicate.test(this)) {
                 return null;
             }
-            DefaultNode node = createNode(id, value, plugin, parent);
+            DefaultNode node = createNode(id, name, value, parent);
             List<Node> collect = children.stream()
                     .map(it -> doFilter(parent, predicate))
                     .filter(Objects::nonNull)
@@ -132,8 +130,8 @@ public class DefaultPluginTree implements PluginTree, PluginTransformer, PluginT
         }
 
         @Override
-        public DefaultNode create(Object id, Object value, Plugin plugin) {
-            DefaultNode node = createNode(id, value, plugin, this);
+        public DefaultNode create(Object id, String name, Object value) {
+            DefaultNode node = createNode(id, name, value, this);
             children.add(node);
             return node;
         }

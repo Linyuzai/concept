@@ -1,22 +1,21 @@
 package com.github.linyuzai.plugin.core.match;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.filter.PropertiesFilter;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 /**
  * {@link Properties} 匹配器
  */
 @Getter
 @HandlerDependency(PropertiesResolver.class)
-public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Properties>> {
+public class PropertiesMatcher extends AbstractPluginMatcher<Supplier<Properties>> {
 
     /**
      * {@link Properties} 过滤器
@@ -37,37 +36,12 @@ public class PropertiesMatcher extends AbstractPluginMatcher<Map<Object, Propert
 
     @Override
     public Object getKey() {
-        return Plugin.PROPERTIES;
-    }
-
-    /**
-     * 遍历所有的 {@link Properties}，先根据路径和名称过滤；
-     * 如果 {@link PropertiesFilter} 不为 null 则再使用 {@link PropertiesFilter} 过滤。
-     *
-     * @param propertiesMap {@link Properties} 插件 {@link Map}
-     * @return 过滤之后的 {@link Properties}
-     */
-    @Override
-    public Map<Object, Properties> filter(Map<Object, Properties> propertiesMap) {
-        Map<Object, Properties> map = new LinkedHashMap<>();
-        for (Map.Entry<Object, Properties> entry : propertiesMap.entrySet()) {
-            Object key = entry.getKey();
-            if (key instanceof String) {
-                if (filterWithAnnotation((String) key)) {
-                    map.put(entry.getKey(), entry.getValue());
-                }
-            } else {
-                map.put(entry.getKey(), entry.getValue());
-            }
-        }
-        if (propertiesFilter != null) {
-            //return propertiesFilter.doFilter(map);
-        }
-        return map;
+        return Properties.class;
     }
 
     @Override
-    public boolean isEmpty(Map<Object, Properties> filtered) {
-        return filtered.isEmpty();
+    public boolean doFilter(Supplier<Properties> source, PluginContext context) {
+        //TODO 需要过滤？
+        return true;
     }
 }

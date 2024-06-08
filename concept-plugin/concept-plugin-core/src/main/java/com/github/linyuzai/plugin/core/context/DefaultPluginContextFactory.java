@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.context;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 
 /**

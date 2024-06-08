@@ -73,14 +73,10 @@ public abstract class JarPluginMatcher<T> extends AbstractPluginMatcher<T> {
     /**
      * 结合类相关的注解进行过滤
      *
-     * @param pathAndName 路径和名称
-     * @param clazz       类
+     * @param clazz 类
      * @return 是否匹配
      */
-    public boolean filterWithAnnotation(String pathAndName, Class<?> clazz) {
-        if (!filterWithAnnotation(pathAndName)) {
-            return false;
-        }
+    public boolean applyFilters(Class<?> clazz) {
         if (packageFilter != null && !packageFilter.matchPackage(clazz.getName())) {
             return false;
         }

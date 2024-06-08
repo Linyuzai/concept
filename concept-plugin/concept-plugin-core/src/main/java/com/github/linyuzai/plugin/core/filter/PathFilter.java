@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.filter;
 
-import com.github.linyuzai.plugin.core.concept.PluginEntry;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
@@ -14,7 +14,7 @@ import java.util.Collection;
  */
 @Getter
 @HandlerDependency(EntryResolver.class)
-public class PathFilter extends AbstractPluginFilter<PluginEntry> {
+public class PathFilter extends AbstractPluginFilter<Plugin.Entry> {
 
     /**
      * 路径模式
@@ -32,13 +32,13 @@ public class PathFilter extends AbstractPluginFilter<PluginEntry> {
     }
 
     @Override
-    public boolean doFilter(PluginEntry entry) {
+    public boolean doFilter(Plugin.Entry entry) {
         return matchPath(entry.getName());
     }
 
     @Override
     public Object getKey() {
-        return PluginEntry.class;
+        return Plugin.Entry.class;
     }
 
     /**

@@ -3,50 +3,73 @@ package com.github.linyuzai.plugin.core.resolve;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 /**
  * {@link Properties} 解析器
  */
-@HandlerDependency(PropertiesNameResolver.class)
-public abstract class PropertiesResolver extends AbstractPluginResolver<List<String>, Map<String, Properties>> {
+@HandlerDependency(EntryResolver.class)
+public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Supplier<Properties>> {
+
+    @Override
+    public boolean doFilter(Plugin.Entry entry, PluginContext context) {
+        return entry.getName().endsWith(".properties");
+    }
 
     /**
      * 将所有名称对象的文件都加载到 {@link Properties} 对象中
      *
-     * @param propertiesNames 名称
-     * @param context         上下文 {@link PluginContext}
+     * @param entry   插件项
+     * @param context 上下文 {@link PluginContext}
      * @return {@link Properties} 的 {@link Map}
      */
     @Override
-    public Map<String, Properties> doResolve(List<String> propertiesNames, PluginContext context) {
-        Map<String, Properties> propertiesMap = new LinkedHashMap<>();
-        for (String propertiesName : propertiesNames) {
-            propertiesMap.put(propertiesName, load(context, propertiesName));
-        }
-        return propertiesMap;
+    public Supplier<Properties> doResolve(Plugin.Entry entry, PluginContext context) {
+        return new PropertiesContent(entry.getContent());
     }
 
     @Override
     public Object getInboundKey() {
-        return Plugin.PROPERTIES_NAME;
+        return Plugin.Entry.class;
     }
 
     @Override
     public Object getOutboundKey() {
-        return Plugin.PROPERTIES;
+        return Properties.class;
     }
 
-    /**
-     * 根据名称加载一个 {@link Properties} 对象
-     *
-     * @param context        上下文 {@link PluginContext}
-     * @param propertiesName 名称
-     * @return {@link Properties} 对象
-     */
-    public abstract Properties load(PluginContext context, String propertiesName);
+    @RequiredArgsConstructor
+    public static class PropertiesContent implements Supplier<Properties> {
+
+        private final Plugin.Content content;
+
+        private volatile Properties properties;
+
+        @Override
+        public Properties get() {
+            if (properties == null) {
+                synchronized (this) {
+                    if (properties == null) {
+                        properties = load();
+                    }
+                }
+            }
+            return properties;
+        }
+
+        @SneakyThrows
+        protected Properties load() {
+            try (InputStream is = content.getInputStream()) {
+                Properties properties = new Properties();
+                properties.load(is);
+                return properties;
+            }
+        }
+    }
 }

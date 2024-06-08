@@ -1,15 +1,12 @@
 package com.github.linyuzai.plugin.jar.concept;
 
 import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
-import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginEntry;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.read.metadata.PropertiesMetadataReader;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.jar.extension.NestedJarEntry;
 import com.github.linyuzai.plugin.jar.extension.NestedJarFile;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
-import com.github.linyuzai.plugin.jar.read.JarContentReader;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -28,15 +25,13 @@ import java.util.stream.Collectors;
 @Getter
 public class JarPlugin extends AbstractPlugin {
 
-    public static final String JAR_PREFIX = Plugin.PREFIX + "JAR@";
+    public static final String PREFIX = "CONCEPT_PLUGIN@JAR@";
 
-    public static final String ENTRY = JAR_PREFIX + "ENTRY";
+    public static final String CLASSNAME = PREFIX + "CLASSNAME";
 
-    public static final String CLASS_NAME = JAR_PREFIX + "CLASS_NAME";
+    public static final String CLASS = PREFIX + "CLASS";
 
-    public static final String CLASS = JAR_PREFIX + "CLASS";
-
-    public static final String INSTANCE = JAR_PREFIX + "INSTANCE";
+    public static final String INSTANCE = PREFIX + "INSTANCE";
 
     private final URL url;
 
@@ -54,7 +49,7 @@ public class JarPlugin extends AbstractPlugin {
     }
 
     @Override
-    public Collection<PluginEntry> collectEntries(PluginContext context) {
+    public Collection<Entry> collectEntries(PluginContext context) {
         return jarFile.stream()
                 .map(NestedJarEntry.class::cast)
                 .map(it -> new JarPluginEntry(this, jarFile, it))
@@ -66,22 +61,7 @@ public class JarPlugin extends AbstractPlugin {
      */
     @Override
     public void onPrepare(PluginContext context) {
-        prepareContentReader(context);
-        prepareMetadataReader(context);
         prepareClassReader(context);
-    }
-
-    protected void prepareContentReader(PluginContext context) {
-        addReader(new JarContentReader(jarFile));
-    }
-
-    @SneakyThrows
-    protected void prepareMetadataReader(PluginContext context) {
-        //只处理主插件
-        PluginTree.Node node = context.get(PluginTree.Node.class);
-        if (node == null || node.getParent() == null) {
-            addReader(new PropertiesMetadataReader(this));
-        }
     }
 
     @SneakyThrows
@@ -135,5 +115,10 @@ public class JarPlugin extends AbstractPlugin {
     @Override
     public String toString() {
         return "JarPlugin(" + url + ")";
+    }
+
+    public static class Mode extends ZipPlugin.Mode {
+
+        public static final String NESTED = "NESTED";
     }
 }

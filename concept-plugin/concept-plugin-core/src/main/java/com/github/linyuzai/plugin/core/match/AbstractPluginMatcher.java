@@ -1,13 +1,15 @@
 package com.github.linyuzai.plugin.core.match;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.filter.NameFilter;
 import com.github.linyuzai.plugin.core.filter.PathFilter;
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.lang.annotation.Annotation;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link PluginMatcher} 抽象类。
@@ -52,36 +54,52 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
      */
     @Override
     public Object match(PluginContext context) {
-        Object key = getKey();
-        T source = context.get(key);
-        if (source == null) {
-            throw new PluginException("Plugin can not be matched with key: " + key);
+        Object inboundKey = getKey();
+        PluginTree tree = context.get(PluginTree.class);
+        PluginTree.Node outbound = tree.getTransformer()
+                .create(this)
+                .inboundKey(inboundKey)
+                .transform(node -> node.filter(it -> filter(it, context)))
+                .outbound();
+        if (hasContent(outbound)) {
+            context.publish(new PluginMatchedEvent(context, this, inboundKey, outbound));
+            return outbound;
         }
-        T filtered = filter(source);
-        if (filtered == null) {
-            return null;
-        }
-        if (isEmpty(filtered)) {
-            return null;
-        }
-        context.publish(new PluginMatchedEvent(context, this, source, filtered));
-        return filtered;
+        return null;
     }
 
     /**
      * 结合路径和名称进行过滤
      *
-     * @param pathAndName 路径名称
+     * @param node 路径名称
      * @return 是否满足过滤条件
      */
-    public boolean filterWithAnnotation(String pathAndName) {
-        if (pathFilter != null && !pathFilter.matchPath(pathAndName)) {
+    @SuppressWarnings("unchecked")
+    public boolean filter(PluginTree.Node node, PluginContext context) {
+        if (pathFilter != null && !pathFilter.matchPath(node.getName())) {
             return false;
         }
-        if (nameFilter != null && !nameFilter.matchName(pathAndName)) {
+        if (nameFilter != null && !nameFilter.matchName(node.getName())) {
             return false;
         }
-        return true;
+        return doFilter((T) node.getValue(), context);
+    }
+
+    /**
+     * 过滤后的插件是否为空
+     *
+     * @param node 过滤后的插件
+     * @return 如果为空返回 true 否则返回 false
+     */
+    public boolean hasContent(PluginTree.Node node) {
+        AtomicInteger size = new AtomicInteger(0);
+        node.forEach(it -> {
+            if (it instanceof Plugin) {
+                return;
+            }
+            size.incrementAndGet();
+        });
+        return size.get() > 0;
     }
 
     /**
@@ -97,13 +115,5 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
      * @param source 被过滤的插件
      * @return 过滤后的插件
      */
-    public abstract T filter(T source);
-
-    /**
-     * 过滤后的插件是否为空
-     *
-     * @param filtered 过滤后的插件
-     * @return 如果为空返回 true 否则返回 false
-     */
-    public abstract boolean isEmpty(T filtered);
+    public abstract boolean doFilter(T source, PluginContext context);
 }

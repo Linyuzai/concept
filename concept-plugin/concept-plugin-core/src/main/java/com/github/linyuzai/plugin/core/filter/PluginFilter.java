@@ -2,17 +2,11 @@ package com.github.linyuzai.plugin.core.filter;
 
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 
 /**
  * 插件过滤器
  */
-public interface PluginFilter extends PluginHandler, PluginHandler.Dependency<PluginResolver> {
-
-    @Override
-    default void handle(PluginContext context) {
-        filter(context);
-    }
+public interface PluginFilter extends PluginHandler, PluginHandler.Dependency {
 
     /**
      * 过滤插件

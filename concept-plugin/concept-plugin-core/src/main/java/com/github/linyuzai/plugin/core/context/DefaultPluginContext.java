@@ -20,8 +20,12 @@ public class DefaultPluginContext implements PluginContext {
     private final Map<Object, Object> map = new LinkedHashMap<>();
 
     @Override
-    public PluginContext createSubContext() {
-        return new DefaultPluginContext(this);
+    public PluginContext createSubContext(boolean inherit) {
+        DefaultPluginContext context = new DefaultPluginContext(this);
+        if (inherit) {
+            context.map.putAll(this.map);
+        }
+        return context;
     }
 
     /**

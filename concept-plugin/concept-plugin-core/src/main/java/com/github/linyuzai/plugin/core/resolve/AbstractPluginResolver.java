@@ -30,25 +30,6 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
                         it -> doFilter((T) it.getValue(), context)))
                 .outboundKey(outboundKey);
         context.publish(new PluginResolvedEvent(context, this, inboundKey, outboundKey));
-        /*T depended = context.get(dependedKey);
-        if (depended == null) {
-            throw new PluginException("No plugin can be resolved with key: " + dependedKey);
-        }
-        R resolved = doResolve(depended, context);
-        context.set(resolvedKey, resolved);
-        context.publish(new PluginResolvedEvent(context, this, dependedKey, depended, resolvedKey, resolved));
-        */
-    }
-
-    /**
-     * 判断上下文 {@link PluginContext} 是否存在特定 key
-     *
-     * @param context 上下文 {@link PluginContext}
-     * @return 如果上下文中存在 key 则返回 true 否则返回 false
-     */
-    @Override
-    public boolean support(PluginContext context) {
-        return context.contains(PluginTree.class);
     }
 
     public boolean doFilter(T source, PluginContext context) {

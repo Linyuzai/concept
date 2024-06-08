@@ -44,19 +44,7 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
                 .inboundKey(inboundKey)
                 .transform(node -> node.filter(it -> applyNegation(doFilter((T) it.getValue()))))
                 .outboundKey(outboundKey);
-        /*Object key = getKey();
-        T original = context.get(key);
-        if (original == null) {
-            throw new PluginException("No plugin can be filtered with key: " + key);
-        }
-        T filtered = doFilter(original);
-        context.set(key, filtered);
-        context.publish(new PluginFilteredEvent(context, this, original, filtered));*/
-    }
-
-    @Override
-    public boolean support(PluginContext context) {
-        return context.contains(PluginTree.class);
+        context.publish(new PluginFilteredEvent(context, this, inboundKey, outboundKey));
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.convert;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 
 /**
  * {@link PluginConvertor} 抽象类。
@@ -20,10 +21,15 @@ public abstract class AbstractPluginConvertor<T, R> implements PluginConvertor {
     @SuppressWarnings("unchecked")
     @Override
     public Object convert(Object source, PluginContext context) {
-        T original = (T) source;
-        R converted = doConvert(original);
-        context.publish(new PluginConvertedEvent(context, this, original, converted));
-        return converted;
+        PluginTree.Node inbound = (PluginTree.Node) source;
+        PluginTree tree = context.get(PluginTree.class);
+        PluginTree.Node outbound = tree.getTransformer()
+                .create(this)
+                .inbound(inbound)
+                .transform(node -> node.map(it -> doConvert((T) it.getValue())))
+                .outbound();
+        context.publish(new PluginConvertedEvent(context, this, inbound, outbound));
+        return outbound;
     }
 
     /**

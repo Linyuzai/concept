@@ -1,18 +1,17 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.ContentResolver;
 
 import java.lang.annotation.Annotation;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * 内容匹配器
  */
 @HandlerDependency(ContentResolver.class)
-public class ContentMatcher extends AbstractPluginMatcher<Map<Object, byte[]>> {
+public class ContentMatcher extends AbstractPluginMatcher<Plugin.Content> {
 
     public ContentMatcher(Annotation[] annotations) {
         super(annotations);
@@ -20,27 +19,11 @@ public class ContentMatcher extends AbstractPluginMatcher<Map<Object, byte[]>> {
 
     @Override
     public Object getKey() {
-        return Plugin.BYTE_ARRAY;
+        return Plugin.Content.class;
     }
 
     @Override
-    public Map<Object, byte[]> filter(Map<Object, byte[]> bytesMap) {
-        Map<Object, byte[]> map = new LinkedHashMap<>();
-        for (Map.Entry<Object, byte[]> entry : bytesMap.entrySet()) {
-            Object key = entry.getKey();
-            if (key instanceof String) {
-                if (filterWithAnnotation((String) key)) {
-                    map.put(entry.getKey(), entry.getValue());
-                }
-            } else {
-                map.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return map;
-    }
-
-    @Override
-    public boolean isEmpty(Map<Object, byte[]> filtered) {
-        return filtered.isEmpty();
+    public boolean doFilter(Plugin.Content source, PluginContext context) {
+        return true;
     }
 }

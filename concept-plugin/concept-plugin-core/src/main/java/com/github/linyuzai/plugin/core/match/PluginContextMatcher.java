@@ -1,14 +1,14 @@
 package com.github.linyuzai.plugin.core.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 插件上下文 {@link PluginContext} 匹配器
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PluginContextMatcher implements PluginMatcher {
 
     /**

@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.core.read;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.read.metadata.PluginMetadata;
 
 import java.io.IOException;
 import java.util.*;
@@ -24,7 +23,7 @@ public abstract class DependencyReader implements PluginReader {
             return doRead;
         }
         for (Plugin plugin : context.getConcept().getPlugins().values()) {
-            PluginMetadata metadata = plugin.getMetadata();
+            Plugin.Metadata metadata = plugin.getMetadata();
             String name = metadata.get("concept.plugin.name");
             if (name == null || name.isEmpty()) {
                 continue;
@@ -44,7 +43,7 @@ public abstract class DependencyReader implements PluginReader {
     public abstract Class<?> getReadableType();
 
     public List<String> getDependencies(Plugin plugin) throws IOException {
-        PluginMetadata metadata = plugin.getMetadata();
+        Plugin.Metadata metadata = plugin.getMetadata();
         String classes = metadata.get("concept.plugin.dependency.class");
         if (classes == null) {
             return Collections.emptyList();

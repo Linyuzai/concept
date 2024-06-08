@@ -16,22 +16,22 @@ public class PluginFilteredEvent extends PluginContextEvent {
     private final PluginFilter filter;
 
     /**
-     * 原始对象
+     * 依赖的 key
      */
-    private final Object original;
+    private final Object inboundKey;
 
     /**
-     * 过滤后对象
+     * 解析的 key
      */
-    private final Object filtered;
+    private final Object outboundKey;
 
     public PluginFilteredEvent(PluginContext context,
                                PluginFilter filter,
-                               Object original,
-                               Object filtered) {
+                               Object inboundKey,
+                               Object outboundKey) {
         super(context);
         this.filter = filter;
-        this.original = original;
-        this.filtered = filtered;
+        this.inboundKey = inboundKey;
+        this.outboundKey = outboundKey;
     }
 }

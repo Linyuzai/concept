@@ -6,12 +6,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 /**
  * 插件解析器
  */
-public interface PluginResolver extends PluginHandler, PluginHandler.Dependency<PluginResolver> {
-
-    @Override
-    default void handle(PluginContext context) {
-        resolve(context);
-    }
+public interface PluginResolver extends PluginHandler, PluginHandler.Dependency {
 
     /**
      * 解析

@@ -23,9 +23,9 @@ public interface PluginTree {
 
         Object getId();
 
-        Object getValue();
+        String getName();
 
-        Plugin getPlugin();
+        Object getValue();
 
         PluginTree getTree();
 
@@ -40,7 +40,10 @@ public interface PluginTree {
         Node filter(Predicate<Node> predicate);
 
         void forEach(Consumer<Node> consumer);
+    }
 
-        Node create(Object id, Object value, Plugin plugin);
+    interface NodeFactory {
+
+        Node create(Object id, String name, Object value);
     }
 }

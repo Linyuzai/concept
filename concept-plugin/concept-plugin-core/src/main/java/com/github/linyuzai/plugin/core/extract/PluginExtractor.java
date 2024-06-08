@@ -5,14 +5,13 @@ import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
  * 插件提取器
  */
-public interface PluginExtractor extends PluginHandler.Dependency<PluginResolver> {
+public interface PluginExtractor extends PluginHandler.Dependency {
 
     /**
      * 提取插件

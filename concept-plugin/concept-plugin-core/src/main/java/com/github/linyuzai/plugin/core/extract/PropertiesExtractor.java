@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.extract;
 
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.convert.PropertiesToMapMapConvertor;
+import com.github.linyuzai.plugin.core.convert.PropertiesToMapConvertor;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.format.AbstractPluginFormatter;
 import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
@@ -69,8 +69,8 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
 
     /**
      * 根据 {@link TypeMetadata} 和注解获得 {@link PluginConvertor}。
-     * 特殊情况，如果是 {@link Properties} 或 {@link Map} 返回 {@link PropertiesToMapMapConvertor}，
-     * {@link String} 并且是一个 {@link Map} 则返回 {@link PropertiesToMapMapConvertor} 作为单个配置的类型。
+     * 特殊情况，如果是 {@link Properties} 或 {@link Map} 返回 {@link PropertiesToMapConvertor}，
+     * {@link String} 并且是一个 {@link Map} 则返回 {@link PropertiesToMapConvertor} 作为单个配置的类型。
      *
      * @param metadata    {@link TypeMetadata}
      * @param annotations 注解
@@ -80,10 +80,10 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
     public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> elementClass = metadata.getElementClass();
         if (elementClass != Properties.class && Map.class.isAssignableFrom(elementClass)) {
-            return new PropertiesToMapMapConvertor(elementClass);
+            return new PropertiesToMapConvertor(elementClass);
         }
         if (metadata instanceof MapTypeMetadata && elementClass == String.class) {
-            return new PropertiesToMapMapConvertor(metadata.getContainerClass());
+            return new PropertiesToMapConvertor(metadata.getContainerClass());
         }
         return super.getConvertor(metadata, annotations);
     }

@@ -27,7 +27,7 @@ public class JarClassResolver extends AbstractPluginResolver<String, Class<?>> {
 
     @Override
     public Object getInboundKey() {
-        return JarPlugin.CLASS_NAME;
+        return JarPlugin.CLASSNAME;
     }
 
     @Override

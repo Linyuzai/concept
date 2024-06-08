@@ -1,26 +1,17 @@
 package com.github.linyuzai.plugin.core.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.concept.PluginEntry;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 
 public abstract class SubPluginFactory implements PluginFactory {
 
     @Override
-    public boolean support(Object o, PluginConcept concept) {
-        if (o instanceof PluginEntry) {
-            return doSupport((PluginEntry) o, concept);
-        } else {
-            return false;
+    public Plugin create(Object o, PluginContext context) {
+        if (o instanceof Plugin.Entry) {
+            return doCreate((Plugin.Entry) o, context);
         }
+        return null;
     }
 
-    public abstract boolean doSupport(PluginEntry entry, PluginConcept concept);
-
-    @Override
-    public Plugin create(Object o, PluginConcept concept) {
-        return doCreate((PluginEntry) o, concept);
-    }
-
-    public abstract Plugin doCreate(PluginEntry entry, PluginConcept concept);
+    public abstract Plugin doCreate(Plugin.Entry entry, PluginContext context);
 }

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * 类上注解过滤器
@@ -18,7 +17,7 @@ import java.util.Map;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(JarClassResolver.class)
-public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>> {
+public class AnnotationFilter extends AbstractPluginFilter<Class<?>> {
 
     /**
      * 注解类
@@ -31,11 +30,8 @@ public class AnnotationFilter extends AbstractPluginFilter<Map<String, Class<?>>
     }
 
     @Override
-    public boolean doFilter(Map<String, Class<?>> plugins) {
-        return true;
-        /*return plugins.entrySet().stream()
-                .filter(it -> applyNegation(hasAnnotation(it.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
+    public boolean doFilter(Class<?> clazz) {
+        return hasAnnotation(clazz);
     }
 
     @Override

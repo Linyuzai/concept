@@ -9,14 +9,13 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * 包名过滤器
  */
 @Getter
 @HandlerDependency(JarClassNameResolver.class)
-public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
+public class PackageFilter extends AbstractPluginFilter<String> {
 
     /**
      * 包名
@@ -34,17 +33,13 @@ public class PackageFilter extends AbstractPluginFilter<Map<String, String>> {
     }
 
     @Override
-    public boolean doFilter(Map<String, String> plugins) {
-        return true;
-        /*return plugins.entrySet()
-                .stream()
-                .filter(it -> applyNegation(matchPackage(it.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));*/
+    public boolean doFilter(String packageName) {
+        return matchPackage(packageName);
     }
 
     @Override
     public Object getKey() {
-        return JarPlugin.CLASS_NAME;
+        return JarPlugin.CLASSNAME;
     }
 
     /**

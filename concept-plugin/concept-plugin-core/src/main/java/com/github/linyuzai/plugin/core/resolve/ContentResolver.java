@@ -1,9 +1,8 @@
 package com.github.linyuzai.plugin.core.resolve;
 
-import com.github.linyuzai.plugin.core.concept.PluginEntry;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
-import com.github.linyuzai.plugin.core.read.content.PluginContent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,21 +18,21 @@ import java.io.InputStream;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(EntryResolver.class)
-public class ContentResolver extends AbstractPluginResolver<PluginEntry, PluginContent> {
+public class ContentResolver extends AbstractPluginResolver<Plugin.Entry, Plugin.Content> {
 
     @Override
-    public PluginContent doResolve(PluginEntry source, PluginContext context) {
+    public Plugin.Content doResolve(Plugin.Entry source, PluginContext context) {
         return source.getContent();
     }
 
     @Override
     public Object getInboundKey() {
-        return PluginEntry.class;
+        return Plugin.Entry.class;
     }
 
     @Override
     public Object getOutboundKey() {
-        return PluginContent.class;
+        return Plugin.Content.class;
     }
 
     /**
