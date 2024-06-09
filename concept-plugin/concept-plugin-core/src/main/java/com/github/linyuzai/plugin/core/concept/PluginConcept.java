@@ -1,13 +1,27 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
  * 插件概念
  */
 public interface PluginConcept {
+
+    void initialize();
+
+    void destroy();
+
+    void addExtractors(PluginExtractor... extractors);
+
+    void addExtractors(Collection<? extends PluginExtractor> extractors);
+
+    void removeExtractors(PluginExtractor... extractors);
+
+    void removeExtractors(Collection<? extends PluginExtractor> extractors);
 
     /**
      * 创建插件
@@ -26,13 +40,23 @@ public interface PluginConcept {
     Plugin load(Object o);
 
     /**
+     * 加载插件
+     *
+     * @param o 插件源
+     * @return 插件 {@link Plugin}
+     */
+    Plugin load(Object o, String group);
+
+    Plugin unload(Object o);
+
+    /**
      * 卸载插件
      *
      * @param o 插件源
      */
-    Plugin unload(Object o);
+    Plugin unload(Object o, String group);
 
-    boolean isLoad(Object o);
+    boolean isLoaded(Object o);
 
     /**
      * 发布事件

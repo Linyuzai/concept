@@ -3,19 +3,16 @@ package com.github.linyuzai.concept.sample.plugin;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
+import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.core.match.PluginProperties;
-import com.github.linyuzai.plugin.core.util.PluginLoadLogger;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
-import com.github.linyuzai.plugin.jar.concept.JarPluginConcept;
-import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
+import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
@@ -25,9 +22,9 @@ public class ConceptPluginSample {
     /**
      * 插件提取配置
      */
-    private final JarPluginConcept concept = new JarPluginConcept.Builder()
+    private final PluginConcept concept = new DefaultPluginConcept.Builder()
             //回调到标注了@OnPluginExtract的方法
-            .extractTo(this)
+            .addExtractors(new JarDynamicExtractor(this))
             .build();
 
     /**
@@ -42,7 +39,7 @@ public class ConceptPluginSample {
      * @param deviceType 配置文件中定义的设备类型
      */
     @OnPluginExtract
-    public void onPluginExtract(DeviceOperation operation, @PluginProperties("device.type") String deviceType) {
+    public void onPluginExtract(DeviceOperation operation, /*@PluginProperties("device.type")*/ String deviceType) {
         operationMap.put(deviceType, operation);
     }
 

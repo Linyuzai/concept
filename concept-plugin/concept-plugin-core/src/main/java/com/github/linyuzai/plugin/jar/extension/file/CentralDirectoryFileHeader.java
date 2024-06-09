@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.extension.file;
+
+import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -65,7 +67,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		this.localHeaderOffset = localHeaderOffset;
 	}
 
-	public void load(byte[] data, int dataOffset, RandomAccessData variableData, long variableOffset, NestedJarEntry.Filter filter)
+	public void load(byte[] data, int dataOffset, RandomAccessData variableData, long variableOffset, ExJarEntry.Filter filter)
 			throws IOException {
 		// Load fixed part
 		this.header = data;
@@ -202,7 +204,7 @@ public class CentralDirectoryFileHeader implements FileHeader {
 		return new CentralDirectoryFileHeader(header, 0, this.name, header, this.comment, this.localHeaderOffset);
 	}
 
-	public static CentralDirectoryFileHeader fromRandomAccessData(RandomAccessData data, long offset, NestedJarEntry.Filter filter)
+	public static CentralDirectoryFileHeader fromRandomAccessData(RandomAccessData data, long offset, ExJarEntry.Filter filter)
 			throws IOException {
 		CentralDirectoryFileHeader fileHeader = new CentralDirectoryFileHeader();
 		byte[] bytes = data.read(offset, 46);

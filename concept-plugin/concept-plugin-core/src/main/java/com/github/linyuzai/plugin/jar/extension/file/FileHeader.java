@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.extension.file;
+
+import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
 
 import java.util.zip.ZipEntry;
 
@@ -22,7 +24,7 @@ import java.util.zip.ZipEntry;
  * A file header record that has been loaded from a Jar file.
  *
  * @author Phillip Webb
- * @see NestedJarEntry
+ * @see ExJarEntry
  * @see CentralDirectoryFileHeader
  */
 public interface FileHeader {

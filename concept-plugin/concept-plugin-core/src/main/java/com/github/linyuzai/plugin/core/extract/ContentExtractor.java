@@ -3,16 +3,13 @@ package com.github.linyuzai.plugin.core.extract;
 import com.github.linyuzai.plugin.core.convert.ContentToInputStreamConvertor;
 import com.github.linyuzai.plugin.core.convert.ContentToStringConvertor;
 import com.github.linyuzai.plugin.core.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
+import com.github.linyuzai.plugin.core.format.ObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -25,15 +22,17 @@ import java.nio.charset.Charset;
  * @param <T> 插件类型
  */
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     /**
      * 提取成 {@link String} 时的编码
      */
-    private Charset charset;
+    private final Charset charset;
+
+    public ContentExtractor() {
+        charset = null;
+    }
 
     public ContentExtractor(String charset) {
         this.charset = Charset.forName(charset);
@@ -83,7 +82,7 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
 
     /**
      * 根据 {@link TypeMetadata} 和注解获得 {@link PluginFormatter}。
-     * 特殊情况，如果是 byte[] 则返回 {@link MapToObjectFormatter}
+     * 特殊情况，如果是 byte[] 则返回 {@link ObjectFormatter}
      *
      * @param metadata    {@link TypeMetadata}
      * @param annotations 注解
@@ -92,7 +91,7 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
     @Override
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
         if (metadata instanceof ArrayTypeMetadata && metadata.getElementClass() == byte.class) {
-            return new MapToObjectFormatter();
+            return new ObjectFormatter();
         }
         return super.getFormatter(metadata, annotations);
     }

@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.jar.concept;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.jar.extension.NestedJarEntry;
-import com.github.linyuzai.plugin.jar.extension.NestedJarFile;
+import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
+import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -16,9 +16,9 @@ public class JarPluginEntry implements Plugin.Entry {
 
     private final Plugin plugin;
 
-    private final NestedJarFile jarFile;
+    private final ExJarFile jarFile;
 
-    private final NestedJarEntry jarEntry;
+    private final ExJarEntry jarEntry;
 
     @SneakyThrows
     @Override

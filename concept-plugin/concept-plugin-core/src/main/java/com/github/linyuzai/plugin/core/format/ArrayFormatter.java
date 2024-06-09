@@ -1,11 +1,10 @@
 package com.github.linyuzai.plugin.core.format;
 
 import com.github.linyuzai.plugin.core.tree.PluginTree;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +12,8 @@ import java.util.Map;
  * {@link Map} 转数组的格式器
  */
 @Getter
-@AllArgsConstructor
-public class MapToArrayFormatter extends TreeNodePluginFormatter<Object> {
+@RequiredArgsConstructor
+public class ArrayFormatter extends TreeNodePluginFormatter<Object> {
 
     /**
      * 数组的类型

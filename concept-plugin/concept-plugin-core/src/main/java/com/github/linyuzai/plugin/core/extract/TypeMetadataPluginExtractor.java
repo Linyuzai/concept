@@ -133,17 +133,17 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
      */
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
         if (metadata instanceof MapTypeMetadata) {
-            return new MapToMapFormatter(metadata.getContainerClass());
+            return new MapFormatter(metadata.getContainerClass());
         } else if (metadata instanceof ListTypeMetadata) {
-            return new MapToListFormatter(metadata.getContainerClass());
+            return new ListFormatter(metadata.getContainerClass());
         } else if (metadata instanceof SetTypeMetadata) {
-            return new MapToSetFormatter(metadata.getContainerClass());
+            return new SetFormatter(metadata.getContainerClass());
         } else if (metadata instanceof CollectionTypeMetadata) {
-            return new MapToListFormatter(metadata.getContainerClass());
+            return new ListFormatter(metadata.getContainerClass());
         } else if (metadata instanceof ArrayTypeMetadata) {
-            return new MapToArrayFormatter(metadata.getContainerClass());
+            return new ArrayFormatter(metadata.getContainerClass());
         } else if (metadata instanceof ObjectTypeMetadata) {
-            return new MapToObjectFormatter();
+            return new ObjectFormatter();
         } else {
             return null;
         }

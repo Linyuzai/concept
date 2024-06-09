@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.extension.file;
 
 /**
  * Utilities for dealing with bytes from ZIP files.

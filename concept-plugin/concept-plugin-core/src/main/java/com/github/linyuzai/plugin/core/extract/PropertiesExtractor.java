@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.convert.PropertiesToMapConvertor;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.format.AbstractPluginFormatter;
-import com.github.linyuzai.plugin.core.format.MapToObjectFormatter;
+import com.github.linyuzai.plugin.core.format.ObjectFormatter;
 import com.github.linyuzai.plugin.core.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.match.PluginMatcher;
@@ -89,7 +89,7 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
 
     /**
      * 根据 {@link TypeMetadata} 和注解获得 {@link PluginFormatter}。
-     * 特殊情况，如果是 {@link String} 并且是一个 {@link Map} 则返回 {@link MapToObjectFormatter}，
+     * 特殊情况，如果是 {@link String} 并且是一个 {@link Map} 则返回 {@link ObjectFormatter}，
      * {@link String} 并且是一个 {@link Object} 则返回 {@link PropertiesFormatter}，
      *
      * @param metadata    {@link TypeMetadata}
@@ -100,7 +100,7 @@ public abstract class PropertiesExtractor<T> extends TypeMetadataPluginExtractor
     public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
         Class<?> elementClass = metadata.getElementClass();
         if (metadata instanceof MapTypeMetadata && elementClass == String.class) {
-            return new MapToObjectFormatter();
+            return new ObjectFormatter();
         }
         if (metadata instanceof ObjectTypeMetadata && elementClass == String.class) {
             return new PropertiesFormatter();

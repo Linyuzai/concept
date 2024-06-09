@@ -15,9 +15,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 动态插件提取器。
@@ -44,31 +42,43 @@ public class DynamicExtractor implements PluginExtractor {
      * @param target 方法执行对象
      */
     public DynamicExtractor(@NonNull Object target) {
+        this(target, getPluginMethod(target));
+    }
+
+    public DynamicExtractor(@NonNull Object target, Method... methods) {
         this.target = target;
-        Class<?> clazz = this.target.getClass();
+        for (Method method : methods) {
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+            Parameter[] parameters = method.getParameters();
+            for (int i = 0; i < parameters.length; i++) {
+                Invoker invoker = getInvoker(parameters[i]);
+                if (invoker == null) {
+                    throw new PluginException("Can not invoke " + parameters[i]);
+                }
+                methodInvokersMap.computeIfAbsent(method, m ->
+                        new LinkedHashMap<>()).put(i, invoker);
+            }
+        }
+    }
+
+    private static Method[] getPluginMethod(Object target) {
+        Class<?> clazz = target.getClass();
+        List<Method> annotated = new ArrayList<>();
         while (clazz != null && clazz != Object.class) {
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 if (method.isAnnotationPresent(OnPluginExtract.class)) {
-                    if (!method.isAccessible()) {
-                        method.setAccessible(true);
-                    }
-                    Parameter[] parameters = method.getParameters();
-                    for (int i = 0; i < parameters.length; i++) {
-                        Invoker invoker = getInvoker(parameters[i]);
-                        if (invoker == null) {
-                            throw new PluginException("Can not invoke " + parameters[i]);
-                        }
-                        methodInvokersMap.computeIfAbsent(method, m ->
-                                new LinkedHashMap<>()).put(i, invoker);
-                    }
+                    annotated.add(method);
                 }
             }
             clazz = clazz.getSuperclass();
         }
-        if (methodInvokersMap.isEmpty()) {
+        if (annotated.isEmpty()) {
             throw new PluginException("No method has @OnPluginExtract");
         }
+        return annotated.toArray(new Method[0]);
     }
 
     /**

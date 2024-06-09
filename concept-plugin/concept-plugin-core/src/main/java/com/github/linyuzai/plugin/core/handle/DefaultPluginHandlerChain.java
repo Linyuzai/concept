@@ -15,7 +15,7 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
 
     private final List<Entry> entries = new ArrayList<>();
 
-    public DefaultPluginHandlerChain(List<PluginHandler> handlers) {
+    public DefaultPluginHandlerChain(Collection<? extends PluginHandler> handlers) {
         List<PluginHandler> resolvers = new ArrayList<>();
         List<PluginHandler> filters = new ArrayList<>();
         for (PluginHandler handler : handlers) {

@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.extension.file;
 
 import java.nio.charset.StandardCharsets;
 

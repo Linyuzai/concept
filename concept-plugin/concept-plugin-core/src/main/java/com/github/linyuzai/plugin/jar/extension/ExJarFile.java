@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.extension;
 
+import com.github.linyuzai.plugin.jar.extension.file.*;
 import lombok.Getter;
 
 import java.io.File;
@@ -28,9 +29,9 @@ import java.util.zip.ZipEntry;
  * Extended variant of {@link java.util.jar.JarFile} that behaves in the same way but
  * offers the following additional functionality.
  * <ul>
- * <li>A nested {@link NestedJarFile} can be {@link #getNestedJarFile(ZipEntry) obtained} based
+ * <li>A nested {@link ExJarFile} can be {@link #getNestedJarFile(ZipEntry) obtained} based
  * on any directory entry.</li>
- * <li>A nested {@link NestedJarFile} can be {@link #getNestedJarFile(ZipEntry) obtained} for
+ * <li>A nested {@link ExJarFile} can be {@link #getNestedJarFile(ZipEntry) obtained} for
  * embedded JAR files (as long as their entry is not compressed).</li>
  * </ul>
  *
@@ -38,7 +39,7 @@ import java.util.zip.ZipEntry;
  * @author Andy Wilkinson
  * @since 1.0.0
  */
-public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
+public class ExJarFile extends JarFile implements Iterable<JarEntry> {
 
 	private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF";
 
@@ -65,7 +66,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 
 	//private String urlString;
 
-	private final NestedJarFileEntries entries;
+	private final ExJarFileEntries entries;
 
 	private final Supplier<Manifest> manifestSupplier;
 
@@ -82,25 +83,25 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	//private volatile JarFileWrapper wrapper;
 
 	/**
-	 * Create a new {@link NestedJarFile} backed by the specified file.
+	 * Create a new {@link ExJarFile} backed by the specified file.
 	 * @param file the root jar file
 	 * @throws IOException if the file cannot be read
 	 */
-	public NestedJarFile(File file) throws IOException {
+	public ExJarFile(File file) throws IOException {
 		this(new RandomAccessDataFile(file));
 	}
 
 	/**
-	 * Create a new {@link NestedJarFile} backed by the specified file.
+	 * Create a new {@link ExJarFile} backed by the specified file.
 	 * @param file the root jar file
 	 * @throws IOException if the file cannot be read
 	 */
-	private NestedJarFile(RandomAccessDataFile file) throws IOException {
+	private ExJarFile(RandomAccessDataFile file) throws IOException {
 		this(file, "", file, Type.DIRECT);
 	}
 
 	/**
-	 * Private constructor used to create a new {@link NestedJarFile} either directly or from a
+	 * Private constructor used to create a new {@link ExJarFile} either directly or from a
 	 * nested entry.
 	 * @param rootFile the root jar file
 	 * @param pathFromRoot the name of this file
@@ -108,18 +109,18 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	 * @param type the type of the jar file
 	 * @throws IOException if the file cannot be read
 	 */
-	private NestedJarFile(RandomAccessDataFile rootFile, String pathFromRoot, RandomAccessData data, Type type)
+	private ExJarFile(RandomAccessDataFile rootFile, String pathFromRoot, RandomAccessData data, Type type)
 			throws IOException {
 		this(rootFile, pathFromRoot, data, null, type, null);
 	}
 
-	private NestedJarFile(RandomAccessDataFile rootFile, String pathFromRoot, RandomAccessData data, NestedJarEntry.Filter filter,
-						  Type type, Supplier<Manifest> manifestSupplier) throws IOException {
+	private ExJarFile(RandomAccessDataFile rootFile, String pathFromRoot, RandomAccessData data, ExJarEntry.Filter filter,
+					  Type type, Supplier<Manifest> manifestSupplier) throws IOException {
 		super(rootFile.getFile());
 		this.rootFile = rootFile;
 		this.pathFromRoot = pathFromRoot;
 		CentralDirectoryParser parser = new CentralDirectoryParser();
-		this.entries = parser.addVisitor(new NestedJarFileEntries(this, filter));
+		this.entries = parser.addVisitor(new ExJarFileEntries(this, filter));
 		this.type = type;
 		parser.addVisitor(centralDirectoryVisitor());
 		try {
@@ -152,14 +153,14 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 
 			@Override
 			public void visitStart(CentralDirectoryEndRecord endRecord, RandomAccessData centralDirectoryData) {
-				NestedJarFile.this.comment = endRecord.getComment();
+				ExJarFile.this.comment = endRecord.getComment();
 			}
 
 			@Override
 			public void visitFileHeader(CentralDirectoryFileHeader fileHeader, long dataOffset) {
 				AsciiBytes name = fileHeader.getName();
 				if (name.startsWith(META_INF) && name.endsWith(SIGNATURE_FILE_EXTENSION)) {
-					NestedJarFile.this.signed = true;
+					ExJarFile.this.signed = true;
 				}
 			}
 
@@ -229,13 +230,13 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		return (Iterator) this.entries.iterator(this::ensureOpen);
 	}
 
-	public NestedJarEntry getJarEntry(CharSequence name) {
+	public ExJarEntry getJarEntry(CharSequence name) {
 		return this.entries.getEntry(name);
 	}
 
 	@Override
-	public NestedJarEntry getJarEntry(String name) {
-		return (NestedJarEntry) getEntry(name);
+	public ExJarEntry getJarEntry(String name) {
+		return (ExJarEntry) getEntry(name);
 	}
 
 	public boolean containsEntry(String name) {
@@ -255,8 +256,8 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	@Override
 	public synchronized InputStream getInputStream(ZipEntry entry) throws IOException {
 		ensureOpen();
-		if (entry instanceof NestedJarEntry) {
-			return this.entries.getInputStream((NestedJarEntry) entry);
+		if (entry instanceof ExJarEntry) {
+			return this.entries.getInputStream((ExJarEntry) entry);
 		}
 		return getInputStream((entry != null) ? entry.getName() : null);
 	}
@@ -266,22 +267,22 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	}
 
 	/**
-	 * Return a nested {@link NestedJarFile} loaded from the specified entry.
+	 * Return a nested {@link ExJarFile} loaded from the specified entry.
 	 * @param entry the zip entry
-	 * @return a {@link NestedJarFile} for the entry
+	 * @return a {@link ExJarFile} for the entry
 	 * @throws IOException if the nested jar file cannot be read
 	 */
-	public synchronized NestedJarFile getNestedJarFile(ZipEntry entry) throws IOException {
-		return getNestedJarFile((NestedJarEntry) entry);
+	public synchronized ExJarFile getNestedJarFile(ZipEntry entry) throws IOException {
+		return getNestedJarFile((ExJarEntry) entry);
 	}
 
 	/**
-	 * Return a nested {@link NestedJarFile} loaded from the specified entry.
+	 * Return a nested {@link ExJarFile} loaded from the specified entry.
 	 * @param entry the zip entry
-	 * @return a {@link NestedJarFile} for the entry
+	 * @return a {@link ExJarFile} for the entry
 	 * @throws IOException if the nested jar file cannot be read
 	 */
-	public synchronized NestedJarFile getNestedJarFile(NestedJarEntry entry) throws IOException {
+	public synchronized ExJarFile getNestedJarFile(ExJarEntry entry) throws IOException {
 		try {
 			return createJarFileFromEntry(entry);
 		}
@@ -290,26 +291,26 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		}
 	}
 
-	private NestedJarFile createJarFileFromEntry(NestedJarEntry entry) throws IOException {
+	private ExJarFile createJarFileFromEntry(ExJarEntry entry) throws IOException {
 		if (entry.isDirectory()) {
 			return createJarFileFromDirectoryEntry(entry);
 		}
 		return createJarFileFromFileEntry(entry);
 	}
 
-	private NestedJarFile createJarFileFromDirectoryEntry(NestedJarEntry entry) throws IOException {
+	private ExJarFile createJarFileFromDirectoryEntry(ExJarEntry entry) throws IOException {
 		AsciiBytes name = entry.getAsciiBytesName();
-		NestedJarEntry.Filter filter = (candidate) -> {
+		ExJarEntry.Filter filter = (candidate) -> {
 			if (candidate.startsWith(name) && !candidate.equals(name)) {
 				return candidate.substring(name.length());
 			}
 			return null;
 		};
-		return new NestedJarFile(this.rootFile, this.pathFromRoot + "!/" + entry.getName().substring(0, name.length() - 1),
+		return new ExJarFile(this.rootFile, this.pathFromRoot + "!/" + entry.getName().substring(0, name.length() - 1),
 				this.data, filter, Type.NESTED_DIRECTORY, this.manifestSupplier);
 	}
 
-	private NestedJarFile createJarFileFromFileEntry(NestedJarEntry entry) throws IOException {
+	private ExJarFile createJarFileFromFileEntry(ExJarEntry entry) throws IOException {
 		if (entry.getMethod() != ZipEntry.STORED) {
 			throw new IllegalStateException(
 					"Unable to open nested entry '" + entry.getName() + "'. It has been compressed and nested "
@@ -317,7 +318,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 							+ "mechanism used to create your executable jar file");
 		}
 		RandomAccessData entryData = this.entries.getEntryData(entry.getName());
-		return new NestedJarFile(this.rootFile, this.pathFromRoot + "!/" + entry.getName(), entryData,
+		return new ExJarFile(this.rootFile, this.pathFromRoot + "!/" + entry.getName(), entryData,
 				Type.NESTED_JAR);
 	}
 
@@ -362,7 +363,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		if (this.url == null) {
 			String file = this.rootFile.getFile().toURI() + this.pathFromRoot + "!/";
 			file = file.replace("file:////", "file://"); // Fix UNC paths
-			this.url = new URL("jar", "", -1, file, new NestedJarHandler(this));
+			this.url = new URL("jar", "", -1, file, new ExJarHandler(this));
 		}
 		return this.url;
 	}
@@ -377,7 +378,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 		return this.rootFile.getFile() + this.pathFromRoot;
 	}
 
-	NestedJarEntry.Certification getCertification(NestedJarEntry entry) {
+	ExJarEntry.Certification getCertification(ExJarEntry entry) {
 		try {
 			return this.entries.getCertification(entry);
 		}
@@ -421,7 +422,7 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	}*/
 
 	/**
-	 * The type of a {@link NestedJarFile}.
+	 * The type of a {@link ExJarFile}.
 	 */
 	enum Type {
 
@@ -434,9 +435,9 @@ public class NestedJarFile extends JarFile implements Iterable<JarEntry> {
 	 */
 	private static class JarEntryEnumeration implements Enumeration<JarEntry> {
 
-		private final Iterator<NestedJarEntry> iterator;
+		private final Iterator<ExJarEntry> iterator;
 
-		JarEntryEnumeration(Iterator<NestedJarEntry> iterator) {
+		JarEntryEnumeration(Iterator<ExJarEntry> iterator) {
 			this.iterator = iterator;
 		}
 

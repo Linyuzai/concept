@@ -3,21 +3,18 @@ package com.github.linyuzai.plugin.jar.concept;
 import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
-import com.github.linyuzai.plugin.jar.extension.NestedJarEntry;
-import com.github.linyuzai.plugin.jar.extension.NestedJarFile;
+import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
+import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
-import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 /**
  * 基于 jar 的插件
@@ -35,10 +32,10 @@ public class JarPlugin extends AbstractPlugin {
 
     private final URL url;
 
-    private final NestedJarFile jarFile;
+    private final ExJarFile jarFile;
 
     @SneakyThrows
-    public JarPlugin(NestedJarFile jarFile) {
+    public JarPlugin(ExJarFile jarFile) {
         this.jarFile = jarFile;
         this.url = jarFile.getURL();
     }
@@ -49,11 +46,11 @@ public class JarPlugin extends AbstractPlugin {
     }
 
     @Override
-    public Collection<Entry> collectEntries(PluginContext context) {
-        return jarFile.stream()
-                .map(NestedJarEntry.class::cast)
+    public void collectEntries(PluginContext context, Consumer<Entry> consumer) {
+        jarFile.stream()
+                .map(ExJarEntry.class::cast)
                 .map(it -> new JarPluginEntry(this, jarFile, it))
-                .collect(Collectors.toList());
+                .forEach(consumer);
     }
 
     /**
@@ -88,7 +85,7 @@ public class JarPlugin extends AbstractPlugin {
     public void onRelease(PluginContext context) {
         try {
             jarFile.close();
-        } catch (IOException e) {
+        } catch (Throwable e) {
             //TODO
         }
     }
@@ -117,8 +114,10 @@ public class JarPlugin extends AbstractPlugin {
         return "JarPlugin(" + url + ")";
     }
 
-    public static class Mode extends ZipPlugin.Mode {
+    public static class Mode {
 
-        public static final String NESTED = "NESTED";
+        public static final String FILE = "FILE";
+
+        public static final String STREAM = "STREAM";
     }
 }

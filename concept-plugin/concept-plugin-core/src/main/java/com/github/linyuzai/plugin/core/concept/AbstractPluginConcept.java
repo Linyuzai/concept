@@ -1,20 +1,20 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.extract.DynamicExtractor;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.util.*;
@@ -24,7 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link PluginConcept} 抽象类
  */
 @Getter
+@Setter
 public abstract class AbstractPluginConcept implements PluginConcept {
+
+    public static final String DEFAULT_GROUP = "default";
 
     /**
      * 上下文工厂
@@ -38,7 +41,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginTreeFactory treeFactory;
 
-    protected PluginHandlerChain handlerChain;
+    protected PluginHandlerChainFactory handlerChainFactory;
+
+    protected Collection<PluginHandler> handlers;
 
     /**
      * 插件工厂
@@ -46,24 +51,65 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected Collection<PluginFactory> pluginFactories;
 
     /**
-     * 插件解析器
-     */
-    protected Collection<PluginResolver> resolvers;
-
-    /**
-     * 插件过滤器
-     */
-    protected Collection<PluginFilter> filters;
-
-    /**
      * 插件提取器
      */
     protected Collection<PluginExtractor> extractors;
+
+    protected volatile PluginHandlerChain handlerChain;
 
     /**
      * 插件缓存
      */
     protected final Map<Object, Plugin> plugins = new ConcurrentHashMap<>();
+
+    @Override
+    public void initialize() {
+
+    }
+
+    @Override
+    public void destroy() {
+        //TODO release plugin
+    }
+
+    @Override
+    public void addExtractors(PluginExtractor... extractors) {
+        addExtractors(Arrays.asList(extractors));
+        resetHandlerChain();
+    }
+
+    @Override
+    public void addExtractors(Collection<? extends PluginExtractor> extractors) {
+        this.extractors.addAll(extractors);
+
+    }
+
+    @Override
+    public void removeExtractors(PluginExtractor... extractors) {
+        removeExtractors(Arrays.asList(extractors));
+        resetHandlerChain();
+    }
+
+    @Override
+    public void removeExtractors(Collection<? extends PluginExtractor> extractors) {
+        this.extractors.removeAll(extractors);
+    }
+
+    protected PluginHandlerChain getHandlerChain() {
+        if (handlerChain == null) {
+            synchronized (this) {
+                if (handlerChain == null) {
+                    //TODO 根据 提取器筛选解析器
+                    handlerChain = handlerChainFactory.create(handlers);
+                }
+            }
+        }
+        return handlerChain;
+    }
+
+    protected void resetHandlerChain() {
+        handlerChain = null;
+    }
 
     /**
      * 创建插件，如创建失败则抛出异常
@@ -85,6 +131,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         return null;
     }
 
+    @Override
+    public Plugin load(Object o) {
+        return load(o, DEFAULT_GROUP);
+    }
+
     /**
      * 加载插件。
      * 通过 {@link PluginFactory} 创建插件，
@@ -97,7 +148,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin load(Object o) {
+    public Plugin load(Object o, String group) {
         //创建上下文
         PluginContext context = contextFactory.create(this);
         context.set(PluginConcept.class, this);
@@ -127,9 +178,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         eventPublisher.publish(new PluginPreparedEvent(plugin));
 
         //解析插件
-        /*new PluginResolverChainImpl(new ArrayList<>(resolvers), new ArrayList<>(filters))
-                .next(context);*/
-        handlerChain.next(context);
+        getHandlerChain().next(context);
 
         //提取插件
         for (PluginExtractor extractor : extractors) {
@@ -141,10 +190,16 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         context.destroy();
         eventPublisher.publish(new PluginReleasedEvent(plugin));
 
+
         plugins.put(plugin.getId(), plugin);
 
         eventPublisher.publish(new PluginLoadedEvent(plugin));
         return plugin;
+    }
+
+    @Override
+    public Plugin unload(Object o) {
+        return unload(o, DEFAULT_GROUP);
     }
 
     /**
@@ -154,7 +209,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin unload(Object o) {
+    public Plugin unload(Object o, String group) {
         Plugin plugin = plugins.remove(o);
         if (plugin == null) {
             if (o instanceof Plugin) {
@@ -177,7 +232,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @return 如果加载返回 true 否则返回 false
      */
     @Override
-    public boolean isLoad(Object o) {
+    public boolean isLoaded(Object o) {
         return plugins.containsKey(o) || (o instanceof Plugin && plugins.containsValue(o));
     }
 
@@ -203,64 +258,63 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @SuppressWarnings("unchecked")
-    public static abstract class AbstractBuilder<T extends AbstractBuilder<T>> {
+    public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends AbstractPluginConcept> {
 
-        protected PluginContextFactory pluginContextFactory;
+        protected PluginContextFactory contextFactory;
 
-        protected PluginEventPublisher pluginEventPublisher;
+        protected PluginHandlerChainFactory handlerChainFactory;
 
-        protected final List<PluginEventListener> pluginEventListeners = new ArrayList<>();
+        protected PluginTreeFactory treeFactory;
 
-        protected final List<PluginFactory> pluginFactories = new ArrayList<>();
+        protected PluginEventPublisher eventPublisher;
 
-        protected final List<PluginResolver> pluginResolvers = new ArrayList<>();
+        protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
-        protected final List<PluginFilter> pluginFilters = new ArrayList<>();
+        protected List<PluginFactory> pluginFactories = new ArrayList<>();
 
-        protected final List<PluginExtractor> pluginExtractors = new ArrayList<>();
+        protected List<PluginHandler> handlers = new ArrayList<>();
 
-        protected Map<Class<? extends PluginResolver>, Class<? extends PluginResolver>>
-                resolverDefaultImpl = new HashMap<>();
+        protected List<PluginExtractor> extractors = new ArrayList<>();
 
         /**
          * 设置上下文工厂
          *
          * @param contextFactory 上下文工厂
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T contextFactory(PluginContextFactory contextFactory) {
-            this.pluginContextFactory = contextFactory;
-            return (T) this;
+        public B contextFactory(PluginContextFactory contextFactory) {
+            this.contextFactory = contextFactory;
+            return (B) this;
+        }
+
+        public B handlerChainFactory(PluginHandlerChainFactory handlerChainFactory) {
+            this.handlerChainFactory = handlerChainFactory;
+            return (B) this;
+        }
+
+        public B treeFactory(PluginTreeFactory treeFactory) {
+            this.treeFactory = treeFactory;
+            return (B) this;
         }
 
         /**
          * 设置事件发布者
          *
          * @param eventPublisher 事件发布者
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T eventPublisher(PluginEventPublisher eventPublisher) {
-            this.pluginEventPublisher = eventPublisher;
-            return (T) this;
-        }
-
-        /**
-         * 添加事件监听器
-         *
-         * @param listener 事件监听器
-         * @return {@link T}
-         */
-        public T addEventListener(PluginEventListener listener) {
-            return addEventListeners(listener);
+        public B eventPublisher(PluginEventPublisher eventPublisher) {
+            this.eventPublisher = eventPublisher;
+            return (B) this;
         }
 
         /**
          * 添加事件监听器
          *
          * @param listeners 事件监听器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addEventListeners(PluginEventListener... listeners) {
+        public B addEventListeners(PluginEventListener... listeners) {
             return addEventListeners(Arrays.asList(listeners));
         }
 
@@ -268,30 +322,20 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * 添加事件监听器
          *
          * @param listeners 事件监听器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addEventListeners(Collection<? extends PluginEventListener> listeners) {
-            this.pluginEventListeners.addAll(listeners);
-            return (T) this;
-        }
-
-        /**
-         * 添加插件工厂
-         *
-         * @param factory 插件工厂
-         * @return {@link T}
-         */
-        public T addFactory(PluginFactory factory) {
-            return addFactories(factory);
+        public B addEventListeners(Collection<? extends PluginEventListener> listeners) {
+            this.eventListeners.addAll(listeners);
+            return (B) this;
         }
 
         /**
          * 添加插件工厂
          *
          * @param factories 插件工厂
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addFactories(PluginFactory... factories) {
+        public B addFactories(PluginFactory... factories) {
             return addFactories(Arrays.asList(factories));
         }
 
@@ -299,30 +343,20 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * 添加插件工厂
          *
          * @param factories 插件工厂
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addFactories(Collection<? extends PluginFactory> factories) {
+        public B addFactories(Collection<? extends PluginFactory> factories) {
             this.pluginFactories.addAll(factories);
-            return (T) this;
-        }
-
-        /**
-         * 添加插件解析器
-         *
-         * @param resolver 插件解析器
-         * @return {@link T}
-         */
-        public T addResolver(PluginResolver resolver) {
-            return addResolvers(resolver);
+            return (B) this;
         }
 
         /**
          * 添加插件解析器
          *
          * @param resolvers 插件解析器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addResolvers(PluginResolver... resolvers) {
+        public B addResolvers(PluginResolver... resolvers) {
             return addResolvers(Arrays.asList(resolvers));
         }
 
@@ -330,43 +364,20 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * 添加插件解析器
          *
          * @param resolvers 插件解析器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addResolvers(Collection<? extends PluginResolver> resolvers) {
-            this.pluginResolvers.addAll(resolvers);
-            return (T) this;
-        }
-
-        /**
-         * 添加插件解析器实现映射
-         *
-         * @param resolverClass     插件解析器类
-         * @param resolverImplClass 插件解析器实现类
-         * @return {@link T}
-         */
-        public T mappingResolver(Class<? extends PluginResolver> resolverClass,
-                                 Class<? extends PluginResolver> resolverImplClass) {
-            resolverDefaultImpl.put(resolverClass, resolverImplClass);
-            return (T) this;
-        }
-
-        /**
-         * 添加插件过滤器
-         *
-         * @param filter 插件过滤器
-         * @return {@link T}
-         */
-        public T addFilter(PluginFilter filter) {
-            return addFilters(filter);
+        public B addResolvers(Collection<? extends PluginResolver> resolvers) {
+            this.handlers.addAll(resolvers);
+            return (B) this;
         }
 
         /**
          * 添加插件过滤器
          *
          * @param filters 插件过滤器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addFilters(PluginFilter... filters) {
+        public B addFilters(PluginFilter... filters) {
             return addFilters(Arrays.asList(filters));
         }
 
@@ -374,30 +385,20 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * 添加插件过滤器
          *
          * @param filters 插件过滤器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addFilters(Collection<? extends PluginFilter> filters) {
-            this.pluginFilters.addAll(filters);
-            return (T) this;
-        }
-
-        /**
-         * 添加插件提取器
-         *
-         * @param extractor 插件提取器
-         * @return {@link T}
-         */
-        public T addExtractor(PluginExtractor extractor) {
-            return addExtractors(extractor);
+        public B addFilters(Collection<? extends PluginFilter> filters) {
+            this.handlers.addAll(filters);
+            return (B) this;
         }
 
         /**
          * 添加插件提取器
          *
          * @param extractors 插件提取器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addExtractors(PluginExtractor... extractors) {
+        public B addExtractors(PluginExtractor... extractors) {
             return addExtractors(Arrays.asList(extractors));
         }
 
@@ -405,46 +406,33 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * 添加插件提取器
          *
          * @param extractors 插件提取器
-         * @return {@link T}
+         * @return {@link B}
          */
-        public T addExtractors(Collection<? extends PluginExtractor> extractors) {
-            this.pluginExtractors.addAll(extractors);
-            return (T) this;
+        public B addExtractors(Collection<? extends PluginExtractor> extractors) {
+            this.extractors.addAll(extractors);
+            return (B) this;
         }
 
-        /**
-         * 动态匹配插件
-         *
-         * @param callback 回调对象
-         * @return {@link T}
-         */
-        public T extractTo(Object callback) {
-            return addExtractor(new DynamicExtractor(callback));
+        public T build() {
+            T concept = create();
+            eventPublisher.register(eventListeners);
+            concept.setContextFactory(contextFactory);
+            concept.setHandlerChainFactory(handlerChainFactory);
+            concept.setTreeFactory(treeFactory);
+            concept.setEventPublisher(eventPublisher);
+            concept.setHandlers(handlers);
+            concept.setExtractors(extractors);
+            return concept;
         }
 
-        protected void preBuild() {
-            if (pluginContextFactory == null) {
-                pluginContextFactory = new DefaultPluginContextFactory();
-            }
-
-            if (pluginEventPublisher == null) {
-                pluginEventPublisher = new DefaultPluginEventPublisher();
-            }
-
-            pluginEventPublisher.register(pluginEventListeners);
-
-            List<PluginResolver> customResolvers = new ArrayList<>(pluginResolvers);
-            pluginResolvers.clear();
-
-            addResolversWithDependencies(customResolvers);
-            addResolversDependOnExtractors(pluginExtractors);
-        }
+        protected abstract T create();
 
         /**
          * 遍历插件提取器，添加插件提取器依赖的插件解析器
          *
          * @param extractors 插件提取器
          */
+        @Deprecated
         @SneakyThrows
         private void addResolversDependOnExtractors(Collection<? extends PluginExtractor> extractors) {
             for (PluginExtractor extractor : extractors) {
@@ -471,13 +459,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          *
          * @param resolvers 插件解析器
          */
+        @Deprecated
         @SneakyThrows
         private void addResolversWithDependencies(Collection<? extends PluginResolver> resolvers) {
             if (resolvers.isEmpty()) {
                 return;
             }
             for (PluginResolver resolver : resolvers) {
-                pluginResolvers.add(0, resolver);
+                this.handlers.add(0, resolver);
             }
 
             Set<Class<? extends PluginHandler>> unfounded = new HashSet<>();
@@ -513,7 +502,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return 如果已经存在返回 true 否则返回 false
          */
         private boolean containsResolver(Class<? extends PluginHandler> target) {
-            for (PluginResolver resolver : pluginResolvers) {
+            for (PluginHandler resolver : handlers) {
                 if (target.isInstance(resolver)) {
                     return true;
                 }

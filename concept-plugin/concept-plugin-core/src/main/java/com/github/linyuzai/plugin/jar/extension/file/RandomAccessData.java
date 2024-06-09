@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.extension.file;
 
 import java.io.EOFException;
 import java.io.IOException;

@@ -10,16 +10,18 @@ import java.util.Map;
 /**
  * byte[] 转 {@link String} 的转换器
  */
-@Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ContentToStringConvertor extends AbstractPluginConvertor<Plugin.Content, String> {
 
     /**
      * 编码
      */
-    private Charset charset;
+    private final Charset charset;
+
+    public ContentToStringConvertor() {
+        this.charset = null;
+    }
 
     public ContentToStringConvertor(String charset) {
         this.charset = Charset.forName(charset);

@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.core.autoload;
 
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.util.function.Predicate;
@@ -12,33 +12,33 @@ import java.util.function.Predicate;
  * 监听插件位置
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginLocation {
 
     /**
      * 路径
      */
-    private String path;
+    private final String path;
 
     /**
      * 过滤器
      */
-    private Predicate<String> filter;
+    private final Predicate<String> filter;
 
     /**
      * 触发创建回调
      */
-    private boolean notifyCreate;
+    private final boolean notifyCreate;
 
     /**
      * 触发修改回调
      */
-    private boolean notifyModify;
+    private final boolean notifyModify;
 
     /**
      * 触发删除回调
      */
-    private boolean notifyDelete;
+    private final boolean notifyDelete;
 
     public static final class Builder {
         private String path;

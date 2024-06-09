@@ -2,31 +2,30 @@ package com.github.linyuzai.plugin.zip.concept;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.util.PluginUtils;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ZipPluginEntry implements Plugin.Entry {
 
-    private final Plugin plugin;
+    private final Object id;
 
     private final String name;
 
-    private ZipPluginEntry parent;
+    private final Plugin plugin;
 
-    private final byte[] bytes;
+    private final Plugin.Entry parent;
 
-    @Override
-    public Object getId() {
-        return null;
-    }
+    private SoftReference<byte[]> bytes;
 
     @Override
     public Plugin.Content getContent() {
@@ -37,21 +36,22 @@ public class ZipPluginEntry implements Plugin.Entry {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            if (bytes != null) {
-                return new ByteArrayInputStream(bytes);
+            byte[] get = bytes.get();
+            if (get != null) {
+                return new ByteArrayInputStream(get);
             }
-            if (parent != null) {
-                InputStream is = parent.getContent().getInputStream();
-                ZipInputStream zis = new ZipInputStream(is);
+            try (InputStream is = parent.getContent().getInputStream();
+                 ZipInputStream zis = new ZipInputStream(is)) {
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     if (name.equals(entry.getName())) {
-                        return zis;
+                        byte[] read = PluginUtils.read(zis);
+                        bytes = new SoftReference<>(read);
+                        return new ByteArrayInputStream(read);
                     }
                 }
-                throw new PluginException("Plugin entry not found");
             }
-            throw new PluginException("Plugin entry data error");
+            throw new PluginException("Plugin entry not found");
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.github.linyuzai.plugin.jar.extension;
 
+import com.github.linyuzai.plugin.jar.extension.file.AsciiBytes;
+import com.github.linyuzai.plugin.jar.extension.file.StringSequence;
+
 import java.io.*;
 import java.net.*;
 import java.security.Permission;
@@ -7,13 +10,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * {@link java.net.JarURLConnection} used to support {@link NestedJarFile#getURL()}.
+ * {@link java.net.JarURLConnection} used to support {@link ExJarFile#getURL()}.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @author Rostyslav Dudka
  */
-public class NestedJarConnection extends JarURLConnection {
+public class ExJarConnection extends JarURLConnection {
 
     //private static ThreadLocal<Boolean> useFastExceptions = new ThreadLocal<>();
 
@@ -46,7 +49,7 @@ public class NestedJarConnection extends JarURLConnection {
 
     //private static final JarURLConnection NOT_FOUND_CONNECTION = JarURLConnection.notFound();
 
-    private final NestedJarFile jarFile;
+    private final ExJarFile jarFile;
 
     private Permission permission;
 
@@ -56,7 +59,7 @@ public class NestedJarConnection extends JarURLConnection {
 
     private JarEntry jarEntry;
 
-    public NestedJarConnection(URL url, NestedJarFile jarFile, JarEntryName jarEntryName) throws IOException {
+    public ExJarConnection(URL url, ExJarFile jarFile, JarEntryName jarEntryName) throws IOException {
         // What we pass to super is ultimately ignored
         super(EMPTY_JAR_URL);
         this.url = url;
@@ -132,7 +135,7 @@ public class NestedJarConnection extends JarURLConnection {
         /*if (this.jarFile == null) {
             throw FILE_NOT_FOUND_EXCEPTION;
         }*/
-        if (this.jarEntryName.isEmpty() && this.jarFile.getType() == NestedJarFile.Type.DIRECT) {
+        if (this.jarEntryName.isEmpty() && this.jarFile.getType() == ExJarFile.Type.DIRECT) {
             throw new IOException("no entry name specified");
         }
         connect();
@@ -144,7 +147,7 @@ public class NestedJarConnection extends JarURLConnection {
         return inputStream;
     }
 
-    private void throwFileNotFound(Object entry, NestedJarFile jarFile) throws FileNotFoundException {
+    private void throwFileNotFound(Object entry, ExJarFile jarFile) throws FileNotFoundException {
         /*if (Boolean.TRUE.equals(useFastExceptions.get())) {
             throw FILE_NOT_FOUND_EXCEPTION;
         }*/
@@ -215,7 +218,7 @@ public class NestedJarConnection extends JarURLConnection {
         //JarURLConnection.useFastExceptions.set(useFastExceptions);
     }*/
 
-    public static NestedJarConnection get(URL url, NestedJarFile jarFile) throws IOException {
+    public static ExJarConnection get(URL url, ExJarFile jarFile) throws IOException {
         StringSequence spec = new StringSequence(url.getFile());
         int index = indexOfRootSpec(spec, jarFile.getPathFromRoot());
         if (index == -1) {
@@ -226,7 +229,7 @@ public class NestedJarConnection extends JarURLConnection {
         int separator;
         while ((separator = spec.indexOf(SEPARATOR, index)) > 0) {
             JarEntryName entryName = JarEntryName.get(spec.subSequence(index, separator));
-            NestedJarEntry jarEntry = jarFile.getJarEntry(entryName.toCharSequence());
+            ExJarEntry jarEntry = jarFile.getJarEntry(entryName.toCharSequence());
             if (jarEntry == null) {
                 throw new IllegalArgumentException("Jar entity not found: " + entryName);
                 //return JarURLConnection.notFound(jarFile, entryName);
@@ -242,7 +245,7 @@ public class NestedJarConnection extends JarURLConnection {
                 && !jarFile.containsEntry(jarEntryName.toString())) {
             return NOT_FOUND_CONNECTION;
         }*/
-        return new NestedJarConnection(url, jarFile, jarEntryName);
+        return new ExJarConnection(url, jarFile, jarEntryName);
     }
 
     private static int indexOfRootSpec(StringSequence file, String pathFromRoot) {

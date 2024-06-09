@@ -6,13 +6,13 @@ import java.net.*;
 import java.util.regex.Pattern;
 
 /**
- * {@link URLStreamHandler} for Spring Boot loader {@link NestedJarFile}s.
+ * {@link URLStreamHandler} for Spring Boot loader {@link ExJarFile}s.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @since 1.0.0
  */
-public class NestedJarHandler extends URLStreamHandler {
+public class ExJarHandler extends URLStreamHandler {
 
 	// NOTE: in order to be found as a URL protocol handler, this class must be public,
 	// must be named Handler and must be in a package ending '.jar'
@@ -45,7 +45,7 @@ public class NestedJarHandler extends URLStreamHandler {
 		rootFileCache = new SoftReference<>(null);
 	}*/
 
-	private final NestedJarFile jarFile;
+	private final ExJarFile jarFile;
 
 	//private URLStreamHandler fallbackHandler;
 
@@ -53,16 +53,16 @@ public class NestedJarHandler extends URLStreamHandler {
 		this(null);
 	}*/
 
-	public NestedJarHandler(NestedJarFile jarFile) {
+	public ExJarHandler(ExJarFile jarFile) {
 		this.jarFile = jarFile;
 	}
 
 	@Override
 	protected URLConnection openConnection(URL url) throws IOException {
 		if (this.jarFile != null && isUrlInJarFile(url, this.jarFile)) {
-			return NestedJarConnection.get(url, this.jarFile);
+			return ExJarConnection.get(url, this.jarFile);
 		}
-		return NestedJarConnection.get(url, getRootJarFileFromUrl(url));
+		return ExJarConnection.get(url, getRootJarFileFromUrl(url));
 		/*try {
 			return JarURLConnection.get(url, getRootJarFileFromUrl(url));
 		}
@@ -71,7 +71,7 @@ public class NestedJarHandler extends URLStreamHandler {
 		}*/
 	}
 
-	private boolean isUrlInJarFile(URL url, NestedJarFile jarFile) throws MalformedURLException {
+	private boolean isUrlInJarFile(URL url, ExJarFile jarFile) throws MalformedURLException {
 		// Try the path first to save building a new url string each time
 		return url.getPath().startsWith(jarFile.getURL().getPath())
 				&& url.toString().startsWith(jarFile.getURL().toString());
@@ -338,7 +338,7 @@ public class NestedJarHandler extends URLStreamHandler {
 		return SEPARATOR_PATTERN.matcher(path).replaceAll("/");
 	}
 
-	public NestedJarFile getRootJarFileFromUrl(URL url) throws IOException {
+	public ExJarFile getRootJarFileFromUrl(URL url) throws IOException {
 		String spec = url.getFile();
 		int separatorIndex = spec.indexOf(SEPARATOR);
 		if (separatorIndex == -1) {
@@ -348,13 +348,13 @@ public class NestedJarHandler extends URLStreamHandler {
 		return getRootJarFile(name);
 	}
 
-	private NestedJarFile getRootJarFile(String name) throws IOException {
+	private ExJarFile getRootJarFile(String name) throws IOException {
 		try {
 			if (!name.startsWith(FILE_PROTOCOL)) {
 				throw new IllegalStateException("Not a file URL");
 			}
 			File file = new File(URI.create(name));
-			return new NestedJarFile(file);
+			return new ExJarFile(file);
 			/*Map<File, JarFile> cache = rootFileCache.get();
 			JarFile result = (cache != null) ? cache.get(file) : null;
 			if (result == null) {
@@ -369,7 +369,7 @@ public class NestedJarHandler extends URLStreamHandler {
 	}
 
 	/**
-	 * Add the given {@link NestedJarFile} to the root file cache.
+	 * Add the given {@link ExJarFile} to the root file cache.
 	 * @param sourceFile the source file to add
 	 * @param jarFile the jar file.
 	 */

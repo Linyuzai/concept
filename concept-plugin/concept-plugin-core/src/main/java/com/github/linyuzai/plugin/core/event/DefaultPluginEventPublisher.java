@@ -37,7 +37,7 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
      *
      * @return {@link PluginEventListener} 的不可变集合
      */
-    public Collection<PluginEventListener> getPluginEventListeners() {
+    public Collection<PluginEventListener> getEventListeners() {
         return Collections.unmodifiableCollection(listeners);
     }
 }

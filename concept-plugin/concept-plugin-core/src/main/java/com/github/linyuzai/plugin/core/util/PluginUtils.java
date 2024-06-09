@@ -1,7 +1,5 @@
 package com.github.linyuzai.plugin.core.util;
 
-import com.github.linyuzai.plugin.jar.extension.NestedJarHandler;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

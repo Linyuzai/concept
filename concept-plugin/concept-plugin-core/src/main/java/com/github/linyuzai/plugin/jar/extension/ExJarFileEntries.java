@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.jar.extension;
 
+import com.github.linyuzai.plugin.jar.extension.file.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -10,7 +12,7 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 /**
- * Provides access to entries from a {@link NestedJarFile}. In order to reduce memory
+ * Provides access to entries from a {@link ExJarFile}. In order to reduce memory
  * consumption entry details are stored using arrays. The {@code hashCodes} array stores
  * the hash code of the entry name, the {@code centralDirectoryOffsets} provides the
  * offset to the central directory record and {@code positions} provides the original
@@ -20,7 +22,7 @@ import java.util.zip.ZipEntry;
  * A typical Spring Boot application will have somewhere in the region of 10,500 entries
  * which should consume about 122K.
  */
-public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<NestedJarEntry> {
+public class ExJarFileEntries implements CentralDirectoryVisitor, Iterable<ExJarEntry> {
 
 	private static final Runnable NO_VALIDATION = () -> {
 	};
@@ -53,9 +55,9 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 	protected static final int ENTRY_CACHE_SIZE = 25;
 
-	private final NestedJarFile jarFile;
+	private final ExJarFile jarFile;
 
-	private final NestedJarEntry.Filter filter;
+	private final ExJarEntry.Filter filter;
 
 	private RandomAccessData centralDirectoryData;
 
@@ -69,7 +71,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 	private Boolean multiReleaseJar;
 
-	private NestedJarEntry.Certification[] certifications;
+	private ExJarEntry.Certification[] certifications;
 
 	private final Map<Integer, FileHeader> entriesCache = Collections
 			.synchronizedMap(new LinkedHashMap<Integer, FileHeader>(16, 0.75f, true) {
@@ -81,7 +83,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 			});
 
-	public NestedJarFileEntries(NestedJarFile jarFile, NestedJarEntry.Filter filter) {
+	public ExJarFileEntries(ExJarFile jarFile, ExJarEntry.Filter filter) {
 		this.jarFile = jarFile;
 		this.filter = filter;
 		if (RUNTIME_VERSION == BASE_VERSION) {
@@ -162,11 +164,11 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 	}
 
 	@Override
-	public Iterator<NestedJarEntry> iterator() {
+	public Iterator<ExJarEntry> iterator() {
 		return new EntryIterator(NO_VALIDATION);
 	}
 
-	Iterator<NestedJarEntry> iterator(Runnable validator) {
+	Iterator<ExJarEntry> iterator(Runnable validator) {
 		return new EntryIterator(validator);
 	}
 
@@ -174,8 +176,8 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 		return getEntry(name, FileHeader.class, true) != null;
 	}
 
-	NestedJarEntry getEntry(CharSequence name) {
-		return getEntry(name, NestedJarEntry.class, true);
+	ExJarEntry getEntry(CharSequence name) {
+		return getEntry(name, ExJarEntry.class, true);
 	}
 
 	InputStream getInputStream(String name) throws IOException {
@@ -218,7 +220,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 		T entry = doGetEntry(name, type, cacheEntry, null);
 		if (!isMetaInfEntry(name) && isMultiReleaseJar()) {
 			int version = RUNTIME_VERSION;
-			AsciiBytes nameAlias = (entry instanceof NestedJarEntry) ? ((NestedJarEntry) entry).getAsciiBytesName()
+			AsciiBytes nameAlias = (entry instanceof ExJarEntry) ? ((ExJarEntry) entry).getAsciiBytesName()
 					: new AsciiBytes(name.toString());
 			while (version > BASE_VERSION) {
 				T versionedEntry = doGetEntry("META-INF/versions/" + version + "/" + name, type, cacheEntry, nameAlias);
@@ -288,8 +290,8 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 			FileHeader cached = this.entriesCache.get(index);
 			FileHeader entry = (cached != null) ? cached
 					: CentralDirectoryFileHeader.fromRandomAccessData(this.centralDirectoryData, offset, this.filter);
-			if (CentralDirectoryFileHeader.class.equals(entry.getClass()) && type.equals(NestedJarEntry.class)) {
-				entry = new NestedJarEntry(this.jarFile, index, (CentralDirectoryFileHeader) entry, nameAlias);
+			if (CentralDirectoryFileHeader.class.equals(entry.getClass()) && type.equals(ExJarEntry.class)) {
+				entry = new ExJarEntry(this.jarFile, index, (CentralDirectoryFileHeader) entry, nameAlias);
 			}
 			if (cacheEntry && cached != entry) {
 				this.entriesCache.put(index, entry);
@@ -320,10 +322,10 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 		return (this.filter != null) ? this.filter.apply(name) : name;
 	}
 
-	NestedJarEntry.Certification getCertification(NestedJarEntry entry) throws IOException {
-		NestedJarEntry.Certification[] certifications = this.certifications;
+	ExJarEntry.Certification getCertification(ExJarEntry entry) throws IOException {
+		ExJarEntry.Certification[] certifications = this.certifications;
 		if (certifications == null) {
-			certifications = new NestedJarEntry.Certification[this.size];
+			certifications = new ExJarEntry.Certification[this.size];
 			// We fall back to use JarInputStream to obtain the certs. This isn't that
 			// fast, but hopefully doesn't happen too often.
 			try (JarInputStream certifiedJarStream = new JarInputStream(this.jarFile.getData().getInputStream())) {
@@ -333,14 +335,14 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 					certifiedJarStream.closeEntry();
 					int index = getEntryIndex(certifiedEntry.getName());
 					if (index != -1) {
-						certifications[index] = NestedJarEntry.Certification.from(certifiedEntry);
+						certifications[index] = ExJarEntry.Certification.from(certifiedEntry);
 					}
 				}
 			}
 			this.certifications = certifications;
 		}
-		NestedJarEntry.Certification certification = certifications[entry.getIndex()];
-		return (certification != null) ? certification : NestedJarEntry.Certification.NONE;
+		ExJarEntry.Certification certification = certifications[entry.getIndex()];
+		return (certification != null) ? certification : ExJarEntry.Certification.NONE;
 	}
 
 	private int getEntryIndex(CharSequence name) {
@@ -371,7 +373,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 	/**
 	 * Iterator for contained entries.
 	 */
-	private final class EntryIterator implements Iterator<NestedJarEntry> {
+	private final class EntryIterator implements Iterator<ExJarEntry> {
 
 		private final Runnable validator;
 
@@ -385,18 +387,18 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 		@Override
 		public boolean hasNext() {
 			this.validator.run();
-			return this.index < NestedJarFileEntries.this.size;
+			return this.index < ExJarFileEntries.this.size;
 		}
 
 		@Override
-		public NestedJarEntry next() {
+		public ExJarEntry next() {
 			this.validator.run();
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			int entryIndex = NestedJarFileEntries.this.positions[this.index];
+			int entryIndex = ExJarFileEntries.this.positions[this.index];
 			this.index++;
-			return getEntry(entryIndex, NestedJarEntry.class, false, null);
+			return getEntry(entryIndex, ExJarEntry.class, false, null);
 		}
 
 	}
@@ -434,7 +436,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 		@Override
 		public void swap(int i, int j) {
-			NestedJarFileEntries.swap(this.offsets, i, j);
+			ExJarFileEntries.swap(this.offsets, i, j);
 		}
 
 		@Override
@@ -462,7 +464,7 @@ public class NestedJarFileEntries implements CentralDirectoryVisitor, Iterable<N
 
 		@Override
 		public void swap(int i, int j) {
-			NestedJarFileEntries.swap(this.offsets, i, j);
+			ExJarFileEntries.swap(this.offsets, i, j);
 		}
 
 		@Override

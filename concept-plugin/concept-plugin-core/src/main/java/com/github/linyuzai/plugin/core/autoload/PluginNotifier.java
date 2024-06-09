@@ -2,10 +2,9 @@ package com.github.linyuzai.plugin.core.autoload;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.net.URL;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.util.function.BiConsumer;
@@ -14,7 +13,7 @@ import java.util.function.BiConsumer;
  * 插件自动加载通知者
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public abstract class PluginNotifier implements BiConsumer<String, WatchEvent.Kind<?>> {
 
     protected final PluginConcept concept;

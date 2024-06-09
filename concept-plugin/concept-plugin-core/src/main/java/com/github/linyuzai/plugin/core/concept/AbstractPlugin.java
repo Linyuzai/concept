@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter
@@ -54,8 +55,7 @@ public abstract class AbstractPlugin implements Plugin {
     @Override
     public void prepare(PluginContext context) {
         PluginTree.NodeFactory node = context.get(PluginTree.Node.class);
-        Collection<Entry> entries = collectEntries(context);
-        for (Entry entry : entries) {
+        collectEntries(context, entry -> {
             Plugin subPlugin = getConcept().create(entry, context);
             if (subPlugin == null) {
                 node.create(entry.getId(), entry.getName(), entry);
@@ -68,7 +68,7 @@ public abstract class AbstractPlugin implements Plugin {
                 subPlugin.prepare(subContext);
                 subContext.destroy();
             }
-        }
+        });
         onPrepare(context);
     }
 
@@ -95,7 +95,7 @@ public abstract class AbstractPlugin implements Plugin {
         onRelease(context);
     }
 
-    public abstract Collection<Entry> collectEntries(PluginContext context);
+    public abstract void collectEntries(PluginContext context, Consumer<Entry> consumer);
 
     public void onPrepare(PluginContext context) {
 

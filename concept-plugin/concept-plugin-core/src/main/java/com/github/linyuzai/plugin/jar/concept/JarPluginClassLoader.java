@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.concept;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -7,20 +7,20 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.jar.JarFile;
 
-public class NestedJarClassLoader extends URLClassLoader {
+public class JarPluginClassLoader extends URLClassLoader {
 
     static {
         ClassLoader.registerAsParallelCapable();
     }
 
     /**
-     * Create a new {@link NestedJarClassLoader} instance.
+     * Create a new {@link JarPluginClassLoader} instance.
      *
      * @param urls   the URLs from which to load classes and resources
      * @param parent the parent class loader for delegation
      * @since 2.3.1
      */
-    public NestedJarClassLoader(URL[] urls, ClassLoader parent) {
+    public JarPluginClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
     }
 

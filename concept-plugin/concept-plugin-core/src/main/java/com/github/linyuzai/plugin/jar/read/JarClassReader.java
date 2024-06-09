@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.jar.read;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.read.DependencyReader;
-import com.github.linyuzai.plugin.jar.extension.NestedJarClassLoader;
+import com.github.linyuzai.plugin.jar.concept.JarPluginClassLoader;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -16,12 +16,12 @@ public class JarClassReader extends DependencyReader implements ClassReader {
 
     private final List<URL> urls;
 
-    private final NestedJarClassLoader jarClassLoader;
+    private final JarPluginClassLoader jarClassLoader;
 
     public JarClassReader(Plugin plugin, List<URL> urls) throws IOException {
         super(plugin);
         this.urls = urls;
-        this.jarClassLoader = new NestedJarClassLoader(urls.toArray(new URL[0]), getClass().getClassLoader());
+        this.jarClassLoader = new JarPluginClassLoader(urls.toArray(new URL[0]), getClass().getClassLoader());
     }
 
     @Override

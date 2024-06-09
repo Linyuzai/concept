@@ -16,6 +16,9 @@
 
 package com.github.linyuzai.plugin.jar.extension;
 
+import com.github.linyuzai.plugin.jar.extension.file.AsciiBytes;
+import com.github.linyuzai.plugin.jar.extension.file.CentralDirectoryFileHeader;
+import com.github.linyuzai.plugin.jar.extension.file.FileHeader;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -28,12 +31,12 @@ import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 /**
- * Extended variant of {@link JarEntry} returned by {@link NestedJarFile}s.
+ * Extended variant of {@link JarEntry} returned by {@link ExJarFile}s.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
  */
-public class NestedJarEntry extends JarEntry implements FileHeader {
+public class ExJarEntry extends JarEntry implements FileHeader {
 
 	@Getter
 	private final int index;
@@ -44,14 +47,14 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 	private final AsciiBytes headerName;
 
 	@Getter
-	private final NestedJarFile jarFile;
+	private final ExJarFile jarFile;
 
 	@Getter
 	private final long localHeaderOffset;
 
 	private volatile Certification certification;
 
-	public NestedJarEntry(NestedJarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
+	public ExJarEntry(ExJarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
 		super((nameAlias != null) ? nameAlias.toString() : header.getName().toString());
 		this.index = index;
 		this.name = (nameAlias != null) ? nameAlias : header.getName();
@@ -79,12 +82,12 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 	}
 
 	/**
-	 * Return a {@link URL} for this {@link NestedJarEntry}.
+	 * Return a {@link URL} for this {@link ExJarEntry}.
 	 * @return the URL for the entry
 	 * @throws MalformedURLException if the URL is not valid
 	 */
 	public URL getURL() throws MalformedURLException {
-		return new URL(this.jarFile.getURL(), getName(), new NestedJarHandler(jarFile));
+		return new URL(this.jarFile.getURL(), getName(), new ExJarHandler(jarFile));
 	}
 
 	@Override
@@ -115,7 +118,7 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 		return certification;
 	}
 
-	public NestedJarFile asJarFile() throws IOException {
+	public ExJarFile asJarFile() throws IOException {
 		return jarFile.getNestedJarFile(this);
 	}
 
@@ -138,8 +141,8 @@ public class NestedJarEntry extends JarEntry implements FileHeader {
 	}
 
 	/**
-	 * {@link Certificate} and {@link CodeSigner} details for a {@link NestedJarEntry} from a signed
-	 * {@link NestedJarFile}.
+	 * {@link Certificate} and {@link CodeSigner} details for a {@link ExJarEntry} from a signed
+	 * {@link ExJarFile}.
 	 *
 	 * @author Phillip Webb
 	 */

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.linyuzai.plugin.jar.extension;
+package com.github.linyuzai.plugin.jar.extension.file;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class CentralDirectoryParser {
 
 	private final List<CentralDirectoryVisitor> visitors = new ArrayList<>();
 
-	<T extends CentralDirectoryVisitor> T addVisitor(T visitor) {
+	public <T extends CentralDirectoryVisitor> T addVisitor(T visitor) {
 		this.visitors.add(visitor);
 		return visitor;
 	}
@@ -45,7 +45,7 @@ public class CentralDirectoryParser {
 	 * @return the actual archive data without any prefix bytes
 	 * @throws IOException on error
 	 */
-	RandomAccessData parse(RandomAccessData data, boolean skipPrefixBytes) throws IOException {
+	public RandomAccessData parse(RandomAccessData data, boolean skipPrefixBytes) throws IOException {
 		CentralDirectoryEndRecord endRecord = new CentralDirectoryEndRecord(data);
 		if (skipPrefixBytes) {
 			data = getArchiveData(endRecord, data);

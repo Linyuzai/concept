@@ -2,10 +2,9 @@ package com.github.linyuzai.plugin.core.format;
 
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,15 +13,15 @@ import java.util.stream.Collectors;
  * {@link Map} 转 {@link List} 的格式器
  */
 @Getter
-@AllArgsConstructor
-public class MapToListFormatter extends TreeNodePluginFormatter<List<Object>> {
+@RequiredArgsConstructor
+public class ListFormatter extends TreeNodePluginFormatter<List<Object>> {
 
     /**
      * {@link List} 的类型
      */
     private final Class<?> listClass;
 
-    public MapToListFormatter() {
+    public ListFormatter() {
         this(List.class);
     }
 

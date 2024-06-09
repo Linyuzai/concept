@@ -3,15 +3,15 @@ package com.github.linyuzai.plugin.core.util;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoEvent;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.event.*;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.function.Consumer;
 
 /**
  * 插件加载日志
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PluginLoadLogger implements PluginEventListener {
 
     @NonNull

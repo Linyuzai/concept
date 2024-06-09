@@ -21,28 +21,12 @@ import java.util.zip.ZipInputStream;
 
 public class ZipPluginFactory extends MetadataPluginFactory<File> {
 
+    @SneakyThrows
     @Override
     public Plugin doCreate(File file, Plugin.Metadata metadata, PluginContext context) {
-        String mode = getMode(file, metadata, context);
-        return createInMode(file, mode, context);
-    }
-
-    public String getMode(File file, Plugin.Metadata metadata, PluginContext context) {
-        return metadata.get("concept.plugin.zip.mode", ZipPlugin.Mode.MEMORY);
-    }
-
-    @SneakyThrows
-    public Plugin createInMode(File file, String mode, PluginContext context) {
         ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()));
         URL url = getURL(file);
-        switch (mode.toUpperCase()) {
-            case ZipPlugin.Mode.MEMORY:
-                return new ZipPlugin(zis, url, null);
-            case ZipPlugin.Mode.FILE:
-                return new ZipPlugin(zis, url, new RootFileEntry(url, file));
-            default:
-                throw new IllegalArgumentException("Mode not supported: " + mode);
-        }
+        return new ZipPlugin(zis, url, new RootFileEntry(url, file));
     }
 
     @Override
