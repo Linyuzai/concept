@@ -59,4 +59,8 @@ public class JarPlugin extends ZipPlugin {
         }
         return null;
     }
+
+    public interface ClassName {
+
+    }
 }

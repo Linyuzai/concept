@@ -11,7 +11,7 @@ import java.util.jar.JarFile;
 public class ExJarPluginClassLoader extends AbstractPluginClassLoader {
 
     static {
-        ClassLoader.registerAsParallelCapable();
+        registerAsParallelCapable();
     }
 
     /**

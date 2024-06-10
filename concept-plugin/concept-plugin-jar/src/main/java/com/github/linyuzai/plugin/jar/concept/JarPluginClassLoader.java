@@ -12,7 +12,7 @@ import java.util.jar.Manifest;
 public class JarPluginClassLoader extends AbstractPluginClassLoader {
 
     static {
-        ClassLoader.registerAsParallelCapable();
+        registerAsParallelCapable();
     }
 
     private final Map<String, Plugin.Content> packages = new ConcurrentHashMap<>();

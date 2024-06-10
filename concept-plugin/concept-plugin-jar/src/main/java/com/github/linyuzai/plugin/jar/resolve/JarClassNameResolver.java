@@ -5,7 +5,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.resolve.EntryResolver;
-import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 /**
  * 类名解析器
@@ -39,6 +39,6 @@ public class JarClassNameResolver extends AbstractPluginResolver<Plugin.Entry, S
 
     @Override
     public Object getOutboundKey() {
-        return ExJarPlugin.CLASSNAME;
+        return JarPlugin.ClassName.class;
     }
 }

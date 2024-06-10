@@ -15,7 +15,7 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter'
 
     compileOnly project(':concept-plugin:concept-plugin-core')
-    //compileOnly project(':concept-plugin:concept-plugin-jar')
+    compileOnly project(':concept-plugin:concept-plugin-jar')
 }
 
 apply from: '../../publish.gradle'

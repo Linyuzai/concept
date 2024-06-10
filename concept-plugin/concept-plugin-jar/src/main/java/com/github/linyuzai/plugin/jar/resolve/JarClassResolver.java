@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
-import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 /**
  * 类解析器
@@ -27,11 +27,11 @@ public class JarClassResolver extends AbstractPluginResolver<String, Class<?>> {
 
     @Override
     public Object getInboundKey() {
-        return ExJarPlugin.CLASSNAME;
+        return JarPlugin.ClassName.class;
     }
 
     @Override
     public Object getOutboundKey() {
-        return ExJarPlugin.CLASS;
+        return Class.class;
     }
 }

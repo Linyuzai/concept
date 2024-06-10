@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.jar.filter;
 import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
-import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
 import lombok.Getter;
 
@@ -39,7 +39,7 @@ public class PackageFilter extends AbstractPluginFilter<String> {
 
     @Override
     public Object getKey() {
-        return ExJarPlugin.CLASSNAME;
+        return JarPlugin.ClassName.class;
     }
 
     /**

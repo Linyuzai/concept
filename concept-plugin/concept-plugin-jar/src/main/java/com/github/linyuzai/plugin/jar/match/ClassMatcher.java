@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.jar.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
-import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarClassResolver;
 
 import java.lang.annotation.Annotation;
@@ -19,7 +18,7 @@ public class ClassMatcher extends JarPluginMatcher<Class<?>> {
 
     @Override
     public Object getKey() {
-        return ExJarPlugin.CLASS;
+        return Class.class;
     }
 
     /**

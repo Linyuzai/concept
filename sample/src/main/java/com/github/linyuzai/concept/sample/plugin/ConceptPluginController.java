@@ -11,7 +11,7 @@ import com.github.linyuzai.plugin.core.match.PluginName;
 import com.github.linyuzai.plugin.core.match.PluginPath;
 import com.github.linyuzai.plugin.core.util.PluginLoadLogger;
 import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
-import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
 import com.github.linyuzai.plugin.jar.filter.PackageFilter;
@@ -693,7 +693,7 @@ public class ConceptPluginController {
      */
     @OnPluginExtract
     private void onPluginExtract(
-            JarPlugin plugin, PluginContext context,
+            ExJarPlugin plugin, PluginContext context,
 
             //所有的 CustomPlugin 类和 properties 文件
             List<Class<? extends CustomPlugin>> p0, Properties p1,

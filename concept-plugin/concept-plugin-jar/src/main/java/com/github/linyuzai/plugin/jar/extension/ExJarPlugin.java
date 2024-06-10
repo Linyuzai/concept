@@ -19,14 +19,6 @@ import java.util.function.Consumer;
 @Getter
 public class ExJarPlugin extends AbstractPlugin {
 
-    public static final String PREFIX = "CONCEPT_PLUGIN@JAR@";
-
-    public static final String CLASSNAME = PREFIX + "CLASSNAME";
-
-    public static final String CLASS = PREFIX + "CLASS";
-
-    public static final String INSTANCE = PREFIX + "INSTANCE";
-
     private final URL url;
 
     private final ExJarFile jarFile;
