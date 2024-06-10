@@ -30,14 +30,14 @@ public abstract class PluginNotifier implements BiConsumer<String, WatchEvent.Ki
     public void accept(String path, WatchEvent.Kind<?> kind) {
         if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
             Plugin plugin = load(path);
-            concept.publish(new PluginAutoLoadEvent(plugin));
+            concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin));
         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
             Plugin plugin = reload(path);
-            concept.publish(new PluginAutoReloadEvent(plugin));
+            concept.getEventPublisher().publish(new PluginAutoReloadEvent(plugin));
         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
             Plugin plugin = unload(path);
             if (plugin != null) {
-                concept.publish(new PluginAutoUnloadEvent(plugin));
+                concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin));
             }
         }
     }

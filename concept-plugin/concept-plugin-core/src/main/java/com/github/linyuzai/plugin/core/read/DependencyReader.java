@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.core.read;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,7 +11,7 @@ public abstract class DependencyReader implements PluginReader {
     //TODO 正则匹配
     private final Set<String> dependencies = new LinkedHashSet<>();
 
-    public DependencyReader(Plugin plugin) throws IOException {
+    public DependencyReader(Plugin plugin) {
         dependencies.addAll(getDependencies(plugin));
     }
 
@@ -22,7 +21,11 @@ public abstract class DependencyReader implements PluginReader {
         if (doRead != null) {
             return doRead;
         }
-        for (Plugin plugin : context.getConcept().getPlugins().values()) {
+        List<Plugin> plugins = context.getConcept()
+                .getRepository()
+                .stream()
+                .collect(Collectors.toList());
+        for (Plugin plugin : plugins) {
             Plugin.Metadata metadata = plugin.getMetadata();
             String name = metadata.get("concept.plugin.name");
             if (name == null || name.isEmpty()) {
@@ -42,7 +45,7 @@ public abstract class DependencyReader implements PluginReader {
 
     public abstract Class<?> getReadableType();
 
-    public List<String> getDependencies(Plugin plugin) throws IOException {
+    public List<String> getDependencies(Plugin plugin) {
         Plugin.Metadata metadata = plugin.getMetadata();
         String classes = metadata.get("concept.plugin.dependency.class");
         if (classes == null) {

@@ -22,15 +22,19 @@ public interface Plugin {
 
     void setConcept(PluginConcept concept);
 
+    void initialize();
+
+    void destroy();
+
     /**
      * 准备
      */
-    void prepare(PluginContext context);
+    void open(PluginContext context);
 
     /**
      * 释放
      */
-    void release(PluginContext context);
+    void close(PluginContext context);
 
     interface Metadata {
 

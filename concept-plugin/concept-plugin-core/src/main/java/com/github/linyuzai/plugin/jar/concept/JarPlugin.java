@@ -1,123 +1,62 @@
 package com.github.linyuzai.plugin.jar.concept;
 
-import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
-import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
-import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
-import lombok.Getter;
-import lombok.SneakyThrows;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.zip.ZipInputStream;
 
-/**
- * 基于 jar 的插件
- */
-@Getter
-public class JarPlugin extends AbstractPlugin {
+public class JarPlugin extends ZipPlugin {
 
-    public static final String PREFIX = "CONCEPT_PLUGIN@JAR@";
-
-    public static final String CLASSNAME = PREFIX + "CLASSNAME";
-
-    public static final String CLASS = PREFIX + "CLASS";
-
-    public static final String INSTANCE = PREFIX + "INSTANCE";
-
-    private final URL url;
-
-    private final ExJarFile jarFile;
-
-    @SneakyThrows
-    public JarPlugin(ExJarFile jarFile) {
-        this.jarFile = jarFile;
-        this.url = jarFile.getURL();
+    public JarPlugin(ZipInputStream inputStream, URL url, Entry parent) {
+        super(inputStream, url, parent);
     }
 
     @Override
-    public Object getId() {
-        return url;
-    }
-
-    @Override
-    public void collectEntries(PluginContext context, Consumer<Entry> consumer) {
-        jarFile.stream()
-                .map(ExJarEntry.class::cast)
-                .map(it -> new JarPluginEntry(this, jarFile, it))
-                .forEach(consumer);
-    }
-
-    /**
-     * 准备，通过 {@link JarURLConnection} 来读取 jar 内容
-     */
-    @Override
-    public void onPrepare(PluginContext context) {
-        prepareClassReader(context);
-    }
-
-    @SneakyThrows
-    protected void prepareClassReader(PluginContext context) {
+    public void onOpen(PluginContext context) {
         PluginTree.Node node = context.get(PluginTree.Node.class);
-        if (node != null && node.getParent() == null) {
-            List<URL> urls = new ArrayList<>();
-            node.forEach(node1 -> {
-                Object value = node1.getValue();
-                if (value instanceof JarPlugin) {
-                    try {
-                        urls.add(((JarPlugin) value).jarFile.getURL());
-                    } catch (MalformedURLException e) {
-                        //TODO
-                        //context.publish();
-                    }
+        if (node == null || node.getParent() != null) {
+            return;
+        }
+        Map<String, Content> classes = new HashMap<>();
+        Map<String, Content> packages = new HashMap<>();
+        collectClassContents(node, classes, packages);
+        JarPluginClassLoader classLoader =
+                new JarPluginClassLoader(packages, classes, getClass().getClassLoader());
+        addReader(new JarClassReader(this, classLoader));
+    }
+
+    protected void collectClassContents(PluginTree.Node node,
+                                        Map<String, Content> classes,
+                                        Map<String, Content> packages) {
+        node.forEach(it -> {
+            Object value = it.getValue();
+            if (value instanceof Entry) {
+                Entry entry = (Entry) value;
+                if (entry.getName().endsWith("/")) {
+                    packages.computeIfAbsent(entry.getName(), name -> findManifestContent(it));
+                } else if (entry.getName().endsWith(".class")) {
+                    classes.putIfAbsent(entry.getName(), entry.getContent());
                 }
-            });
-            addReader(new JarClassReader(this, urls));
-        }
-    }
-
-    @Override
-    public void onRelease(PluginContext context) {
-        try {
-            jarFile.close();
-        } catch (Throwable e) {
-            //TODO
-        }
-    }
-
-    @SneakyThrows
-    @Deprecated
-    public URL parseURL(String jarPath) {
-        //"jar".equals(((URL) o).getProtocol()
-        String url;
-        if (jarPath.startsWith("http")) {
-            if (jarPath.endsWith("/")) {
-                jarPath = jarPath.substring(0, jarPath.length() - 1);
             }
-            url = "jar:" + jarPath + "!/";
-        } else {
-            if (jarPath.startsWith("/")) {
-                jarPath = jarPath.substring(1);
+        });
+    }
+
+    protected Content findManifestContent(PluginTree.Node node) {
+        PluginTree.Node parent = node.getParent();
+        for (PluginTree.Node child : parent.getChildren()) {
+            Object childValue = child.getValue();
+            if (childValue instanceof Entry) {
+                Entry childEntry = (Entry) childValue;
+                if (JarFile.MANIFEST_NAME.equals(child.getName())) {
+                    return childEntry.getContent();
+                }
             }
-            url = "jar:file:/" + jarPath + "!/";
         }
-        return new URL(url);
-    }
-
-    @Override
-    public String toString() {
-        return "JarPlugin(" + url + ")";
-    }
-
-    public static class Mode {
-
-        public static final String FILE = "FILE";
-
-        public static final String STREAM = "STREAM";
+        return null;
     }
 }

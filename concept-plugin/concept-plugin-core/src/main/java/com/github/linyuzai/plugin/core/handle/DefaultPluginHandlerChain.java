@@ -63,7 +63,7 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
             Class<? extends PluginHandler>[] dependencies =
                     ((PluginHandler.Dependency) handler).getDependencies();
             if (dependencies.length == 0) {
-                container.add(handler);
+                addHandler(handler, container);
             } else {
                 for (Class<? extends PluginHandler> dependency : dependencies) {
                     if (containsDependency(dependency, container)) {
@@ -75,10 +75,10 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                     }
                     resolveDependency(dependence, handlers, container);
                 }
-                container.add(handler);
+                addHandler(handler, container);
             }
         } else {
-            container.add(handler);
+            addHandler(handler, container);
         }
     }
 
@@ -100,6 +100,13 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
             }
         }
         return null;
+    }
+
+    protected void addHandler(PluginHandler handler, Collection<PluginHandler> container) {
+        if (container.contains(handler)) {
+            return;
+        }
+        container.add(handler);
     }
 
     @Override

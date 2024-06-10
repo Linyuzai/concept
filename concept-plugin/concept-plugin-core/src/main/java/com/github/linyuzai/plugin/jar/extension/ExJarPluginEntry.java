@@ -1,8 +1,6 @@
-package com.github.linyuzai.plugin.jar.concept;
+package com.github.linyuzai.plugin.jar.extension;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
-import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -12,7 +10,7 @@ import java.io.InputStream;
 
 @Getter
 @RequiredArgsConstructor
-public class JarPluginEntry implements Plugin.Entry {
+public class ExJarPluginEntry implements Plugin.Entry {
 
     private final Plugin plugin;
 
@@ -33,6 +31,9 @@ public class JarPluginEntry implements Plugin.Entry {
 
     @Override
     public Plugin.Content getContent() {
+        if (jarEntry.isDirectory()) {
+            return null;
+        }
         return new EntryContent();
     }
 

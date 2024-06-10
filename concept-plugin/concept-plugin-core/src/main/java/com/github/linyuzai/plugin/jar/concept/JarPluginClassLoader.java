@@ -1,88 +1,64 @@
 package com.github.linyuzai.plugin.jar.concept;
 
-import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.util.jar.JarFile;
+import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.util.PluginUtils;
 
-public class JarPluginClassLoader extends URLClassLoader {
+import java.io.IOException;
+import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.Manifest;
+
+public class JarPluginClassLoader extends AbstractPluginClassLoader {
 
     static {
         ClassLoader.registerAsParallelCapable();
     }
 
+    private final Map<String, Plugin.Content> packages = new ConcurrentHashMap<>();
+
+    private final Map<String, Plugin.Content> classes = new ConcurrentHashMap<>();
+
     /**
      * Create a new {@link JarPluginClassLoader} instance.
      *
-     * @param urls   the URLs from which to load classes and resources
      * @param parent the parent class loader for delegation
      * @since 2.3.1
      */
-    public JarPluginClassLoader(URL[] urls, ClassLoader parent) {
-        super(urls, parent);
+    public JarPluginClassLoader(Map<String, Plugin.Content> packages,
+                                Map<String, Plugin.Content> classes,
+                                ClassLoader parent) {
+        super(new URL[0], parent);
+        this.packages.putAll(packages);
+        this.classes.putAll(classes);
     }
 
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        String path = name.replace('.', '/').concat(".class");
+        Plugin.Content content = classes.get(path);
+        if (content == null) {
+            throw new ClassNotFoundException(name);
+        }
         try {
-            definePackageIfNecessary(name);
-        } catch (IllegalArgumentException ex) {
-            // Tolerate race condition due to being parallel capable
-            if (getPackage(name) == null) {
-                // This should never happen as the IllegalArgumentException indicates
-                // that the package has already been defined and, therefore,
-                // getPackage(name) should not return null.
-                throw new AssertionError("Package " + name + " has already been defined but it could not be found");
-            }
-        }
-        return super.loadClass(name, resolve);
-    }
-
-    /**
-     * Define a package before a {@code findClass} call is made. This is necessary to
-     * ensure that the appropriate manifest for nested JARs is associated with the
-     * package.
-     *
-     * @param className the class name being found
-     */
-    private void definePackageIfNecessary(String className) {
-        int lastDot = className.lastIndexOf('.');
-        if (lastDot >= 0) {
-            String packageName = className.substring(0, lastDot);
-            if (getPackage(packageName) == null) {
-                try {
-                    definePackage(className, packageName);
-                } catch (IllegalArgumentException ex) {
-                    // Tolerate race condition due to being parallel capable
-                    if (getPackage(packageName) == null) {
-                        // This should never happen as the IllegalArgumentException
-                        // indicates that the package has already been defined and,
-                        // therefore, getPackage(name) should not have returned null.
-                        throw new AssertionError(
-                                "Package " + packageName + " has already been defined but it could not be found");
-                    }
-                }
-            }
+            byte[] bytes = PluginUtils.read(content.getInputStream());
+            return defineClass(name, bytes, 0, bytes.length);
+        } catch (IOException e) {
+            throw new ClassNotFoundException(name, e);
         }
     }
 
-    private void definePackage(String className, String packageName) {
+    @Override
+    protected void definePackage(String className, String packageName) {
         String packageEntryName = packageName.replace('.', '/') + "/";
         String classEntryName = className.replace('.', '/') + ".class";
-        for (URL url : getURLs()) {
-            try {
-                URLConnection connection = url.openConnection();
-                if (connection instanceof JarURLConnection) {
-                    JarFile jarFile = ((JarURLConnection) connection).getJarFile();
-                    if (jarFile.getEntry(classEntryName) != null && jarFile.getEntry(packageEntryName) != null
-                            && jarFile.getManifest() != null) {
-                        definePackage(packageName, jarFile.getManifest(), url);
-                    }
+        if (packages.containsKey(packageEntryName) && classes.containsKey(classEntryName)) {
+            Plugin.Content content = packages.get(packageEntryName);
+            if (content != null) {
+                try {
+                    definePackage(packageName, new Manifest(content.getInputStream()), null);
+                } catch (IOException e) {
                 }
-            } catch (IOException ex) {
-                // Ignore
             }
         }
     }

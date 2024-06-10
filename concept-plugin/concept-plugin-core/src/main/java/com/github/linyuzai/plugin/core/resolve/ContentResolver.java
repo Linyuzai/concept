@@ -21,6 +21,11 @@ import java.io.InputStream;
 public class ContentResolver extends AbstractPluginResolver<Plugin.Entry, Plugin.Content> {
 
     @Override
+    public boolean doFilter(Plugin.Entry source, PluginContext context) {
+        return source.getContent() != null;
+    }
+
+    @Override
     public Plugin.Content doResolve(Plugin.Entry source, PluginContext context) {
         return source.getContent();
     }

@@ -26,7 +26,11 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
     public Plugin doCreate(File file, Plugin.Metadata metadata, PluginContext context) {
         ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()));
         URL url = getURL(file);
-        return new ZipPlugin(zis, url, new RootFileEntry(url, file));
+        return createZipPlugin(zis, url, new RootFileEntry(url, file));
+    }
+
+    protected ZipPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
+        return new ZipPlugin(zis, url, parent);
     }
 
     @Override

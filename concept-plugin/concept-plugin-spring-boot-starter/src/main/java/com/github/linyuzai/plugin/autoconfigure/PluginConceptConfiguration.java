@@ -13,6 +13,8 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
+import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
@@ -23,7 +25,6 @@ import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
 import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarClassResolver;
-import com.github.linyuzai.plugin.jar.resolve.JarInstanceResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,30 @@ import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class PluginConceptConfiguration {
+
+    @Configuration(proxyBeanMethods = false)
+    public static class JarConfiguration {
+
+        @Bean
+        public JarPluginFactory jarPluginFactory() {
+            return new JarPluginFactory();
+        }
+
+        @Bean
+        public JarSubPluginFactory jarSubPluginFactory() {
+            return new JarSubPluginFactory();
+        }
+
+        @Bean
+        public JarClassNameResolver jarClassNameResolver() {
+            return new JarClassNameResolver();
+        }
+
+        @Bean
+        public JarClassResolver jarClassResolver() {
+            return new JarClassResolver();
+        }
+    }
 
     @Bean
     public static DynamicPluginProcessor dynamicPluginProcessor() {
@@ -59,18 +84,14 @@ public class PluginConceptConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public PluginRepository pluginRepository() {
+        return new DefaultPluginRepository();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public PluginEventPublisher pluginEventPublisher(ApplicationEventPublisher eventPublisher) {
         return new ApplicationConnectionEventPublisher(eventPublisher);
-    }
-
-    @Bean
-    public JarPluginFactory jarPluginFactory() {
-        return new JarPluginFactory();
-    }
-
-    @Bean
-    public JarSubPluginFactory jarSubPluginFactory() {
-        return new JarSubPluginFactory();
     }
 
     @Bean
@@ -88,26 +109,12 @@ public class PluginConceptConfiguration {
         return new PropertiesResolver();
     }
 
-    @Bean
-    public JarClassNameResolver jarClassNameResolver() {
-        return new JarClassNameResolver();
-    }
-
-    @Bean
-    public JarInstanceResolver jarInstanceResolver() {
-        return new JarInstanceResolver();
-    }
-
-    @Bean
-    public JarClassResolver jarClassResolver() {
-        return new JarClassResolver();
-    }
-
     @Bean(initMethod = "initialize", destroyMethod = "destroy")
     @ConditionalOnMissingBean
     public PluginConcept pluginConcept(PluginContextFactory contextFactory,
                                        PluginHandlerChainFactory handlerChainFactory,
                                        PluginTreeFactory treeFactory,
+                                       PluginRepository repository,
                                        PluginEventPublisher eventPublisher,
                                        List<PluginFactory> factories,
                                        List<PluginResolver> resolvers,
@@ -118,6 +125,7 @@ public class PluginConceptConfiguration {
                 .contextFactory(contextFactory)
                 .handlerChainFactory(handlerChainFactory)
                 .treeFactory(treeFactory)
+                .repository(repository)
                 .eventPublisher(eventPublisher)
                 .addFactories(factories)
                 .addResolvers(resolvers)

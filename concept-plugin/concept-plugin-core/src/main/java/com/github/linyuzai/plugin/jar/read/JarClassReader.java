@@ -3,25 +3,20 @@ package com.github.linyuzai.plugin.jar.read;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.read.DependencyReader;
-import com.github.linyuzai.plugin.jar.concept.JarPluginClassLoader;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 
 @Getter
 public class JarClassReader extends DependencyReader implements ClassReader {
 
-    private final List<URL> urls;
+    private final ClassLoader classLoader;
 
-    private final JarPluginClassLoader jarClassLoader;
-
-    public JarClassReader(Plugin plugin, List<URL> urls) throws IOException {
+    public JarClassReader(Plugin plugin, ClassLoader classLoader) {
         super(plugin);
-        this.urls = urls;
-        this.jarClassLoader = new JarPluginClassLoader(urls.toArray(new URL[0]), getClass().getClassLoader());
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -33,7 +28,7 @@ public class JarClassReader extends DependencyReader implements ClassReader {
     @SneakyThrows
     @Override
     public Class<?> doRead(Object key) {
-        return jarClassLoader.loadClass(String.valueOf(key));
+        return classLoader.loadClass(String.valueOf(key));
     }
 
     @Override
@@ -43,6 +38,8 @@ public class JarClassReader extends DependencyReader implements ClassReader {
 
     @Override
     public void close() throws IOException {
-        jarClassLoader.close();
+        if (classLoader instanceof Closeable) {
+            ((Closeable) classLoader).close();
+        }
     }
 }

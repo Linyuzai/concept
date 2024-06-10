@@ -5,9 +5,9 @@ import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
 import com.github.linyuzai.plugin.jar.match.PluginClassName;
 import com.github.linyuzai.plugin.jar.match.PluginPackage;
-import lombok.NonNull;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
@@ -16,8 +16,12 @@ import java.lang.reflect.Type;
  */
 public class JarDynamicExtractor extends DynamicExtractor {
 
-    public JarDynamicExtractor(@NonNull Object target) {
+    public JarDynamicExtractor(Object target) {
         super(target);
+    }
+
+    public JarDynamicExtractor(Object target, Method... methods) {
+        super(target, methods);
     }
 
     /**
@@ -32,7 +36,7 @@ public class JarDynamicExtractor extends DynamicExtractor {
         if (invoker != null) {
             return invoker;
         }
-        return getInvoker0(parameter);
+        return getJarInvoker(parameter);
     }
 
     /**
@@ -41,52 +45,31 @@ public class JarDynamicExtractor extends DynamicExtractor {
      * @param parameter 方法参数
      * @return 插件提取执行器或 null
      */
-    private Invoker getInvoker0(Parameter parameter) {
+    protected Invoker getJarInvoker(Parameter parameter) {
         Invoker classInvoker = getClassInvoker(parameter);
         if (classInvoker != null) {
             return classInvoker;
-        }
-        Invoker instanceInvoker = getInstanceInvoker(parameter);
-        if (instanceInvoker != null) {
-            return instanceInvoker;
         }
         return null;
     }
 
     /**
-     * 额外匹配类相关的指定注解
-     *
-     * @param annotation 注解
-     * @return 如果是明确指定的返回 true，否则返回 false
-     */
-    @Override
-    public boolean hasExplicitAnnotation(Annotation annotation) {
-        if (annotation.annotationType() == PluginAnnotation.class ||
-                annotation.annotationType() == PluginClass.class ||
-                annotation.annotationType() == PluginClassName.class ||
-                annotation.annotationType() == PluginPackage.class) {
-            return true;
-        }
-        return super.hasExplicitAnnotation(annotation);
-    }
-
-    /**
      * 额外匹配类相关的执行器。
-     * {@link ClassExtractor} {@link InstanceExtractor} 对应的执行器。
+     * {@link ClassExtractor} 对应的执行器。
      *
      * @param annotation 注解
      * @param parameter  参数 {@link Parameter}
      * @return 插件提取执行器
      */
     @Override
-    public Invoker getExplicitInvoker(Annotation annotation, Parameter parameter) {
+    public Invoker getAnnotationInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginAnnotation.class ||
                 annotation.annotationType() == PluginClass.class ||
                 annotation.annotationType() == PluginClassName.class ||
                 annotation.annotationType() == PluginPackage.class) {
-            return getInvoker0(parameter);
+            return getJarInvoker(parameter);
         }
-        return super.getExplicitInvoker(annotation, parameter);
+        return super.getAnnotationInvoker(annotation, parameter);
     }
 
     /**
@@ -98,36 +81,6 @@ public class JarDynamicExtractor extends DynamicExtractor {
     public Invoker getClassInvoker(Parameter parameter) {
         try {
             return new ClassExtractor<Void>() {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
-
-                @Override
-                public void onExtract(Void plugin) {
-
-                }
-            }.getInvoker();
-        } catch (Throwable e) {
-            return null;
-        }
-    }
-
-    /**
-     * 尝试获得类提取器 {@link InstanceExtractor} 对应的执行器
-     *
-     * @param parameter 方法参数
-     * @return 类提取器 {@link InstanceExtractor} 对应的执行器或 null
-     */
-    public Invoker getInstanceInvoker(Parameter parameter) {
-        try {
-            return new InstanceExtractor<Void>() {
 
                 @Override
                 public Type getGenericType() {

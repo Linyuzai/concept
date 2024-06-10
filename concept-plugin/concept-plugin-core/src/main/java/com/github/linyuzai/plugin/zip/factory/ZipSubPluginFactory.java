@@ -11,12 +11,15 @@ import java.util.zip.ZipInputStream;
 
 public class ZipSubPluginFactory extends SubPluginFactory {
 
+    private static final String SEPARATOR = "!/";
+
+    @SneakyThrows
     @Override
     public Plugin doCreate(Plugin.Entry entry, PluginContext context) {
         if (supportEntry(entry, context)) {
             Object id = entry.getId();
             if (id instanceof URL) {
-                URL url = (URL) id;
+                URL url = new URL((URL) id, entry.getName() + SEPARATOR);
                 return createFromEntry(entry, url, context);
             }
         }
@@ -26,7 +29,11 @@ public class ZipSubPluginFactory extends SubPluginFactory {
     @SneakyThrows
     protected Plugin createFromEntry(Plugin.Entry entry, URL url, PluginContext context) {
         ZipInputStream zis = new ZipInputStream(entry.getContent().getInputStream());
-        return new ZipPlugin(zis, url, entry);
+        return createZipPlugin(zis, url, entry);
+    }
+
+    protected ZipPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
+        return new ZipPlugin(zis, url, parent);
     }
 
     protected boolean supportEntry(Plugin.Entry entry, PluginContext context) {

@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.processor;
 
+import com.github.linyuzai.plugin.autoconfigure.bean.BeanDynamicExtractor;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.extract.DynamicExtractor;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +71,7 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
         PluginConcept concept = applicationContext.getBean(PluginConcept.class);
         List<PluginExtractor> extractors = new ArrayList<>();
         for (PluginMethods pms : pluginMethods) {
-            extractors.add(new DynamicExtractor(pms.target, pms.methods));
+            extractors.add(new BeanDynamicExtractor(applicationContext, pms.target, pms.methods));
         }
         concept.addExtractors(extractors);
         pluginMethods.clear();

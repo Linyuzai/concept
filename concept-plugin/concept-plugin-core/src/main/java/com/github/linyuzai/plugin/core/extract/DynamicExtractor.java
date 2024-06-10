@@ -7,7 +7,6 @@ import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.match.PluginText;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
@@ -41,11 +40,11 @@ public class DynamicExtractor implements PluginExtractor {
      *
      * @param target 方法执行对象
      */
-    public DynamicExtractor(@NonNull Object target) {
+    public DynamicExtractor(Object target) {
         this(target, getPluginMethod(target));
     }
 
-    public DynamicExtractor(@NonNull Object target, Method... methods) {
+    public DynamicExtractor(Object target, Method... methods) {
         this.target = target;
         for (Method method : methods) {
             if (!method.isAccessible()) {
@@ -94,8 +93,9 @@ public class DynamicExtractor implements PluginExtractor {
     public Invoker getInvoker(Parameter parameter) {
         Annotation[] annotations = parameter.getAnnotations();
         for (Annotation annotation : annotations) {
-            if (hasExplicitAnnotation(annotation)) {
-                return getExplicitInvoker(annotation, parameter);
+            Invoker invoker = getAnnotationInvoker(annotation, parameter);
+            if (invoker != null) {
+                return invoker;
             }
         }
         Invoker pluginContextInvoker = getPluginContextInvoker(parameter);
@@ -118,16 +118,6 @@ public class DynamicExtractor implements PluginExtractor {
     }
 
     /**
-     * 是否是明确指定的注解
-     *
-     * @param annotation 注解
-     * @return 如果是明确指定的返回 true，否则返回 false
-     */
-    public boolean hasExplicitAnnotation(Annotation annotation) {
-        return annotation.annotationType() == PluginText.class;
-    }
-
-    /**
      * 根据明确指定的注解获得对应的执行器。
      * {@link PluginText} 返回 {@link ContentExtractor} 对应的执行器。
      *
@@ -135,15 +125,12 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter  参数 {@link Parameter}
      * @return 插件提取执行器
      */
-    public Invoker getExplicitInvoker(Annotation annotation, Parameter parameter) {
-        /*if (annotation.annotationType() == PluginProperties.class) {
-            return getPropertiesInvoker(parameter);
-        }*/
+    public Invoker getAnnotationInvoker(Annotation annotation, Parameter parameter) {
         if (annotation.annotationType() == PluginText.class) {
             String charset = ((PluginText) annotation).charset();
             return getContentInvoker(parameter, charset.isEmpty() ? null : Charset.forName(charset));
         }
-        throw new PluginException(annotation + " has no explicit invoker");
+        return null;
     }
 
     /**

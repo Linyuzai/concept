@@ -10,6 +10,7 @@ import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
@@ -18,7 +19,6 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link PluginConcept} 抽象类
@@ -26,8 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @Setter
 public abstract class AbstractPluginConcept implements PluginConcept {
-
-    public static final String DEFAULT_GROUP = "default";
 
     /**
      * 上下文工厂
@@ -43,12 +41,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginHandlerChainFactory handlerChainFactory;
 
+    protected PluginRepository repository;
+
     protected Collection<PluginHandler> handlers;
 
     /**
      * 插件工厂
      */
-    protected Collection<PluginFactory> pluginFactories;
+    protected Collection<PluginFactory> factories;
 
     /**
      * 插件提取器
@@ -57,11 +57,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected volatile PluginHandlerChain handlerChain;
 
-    /**
-     * 插件缓存
-     */
-    protected final Map<Object, Plugin> plugins = new ConcurrentHashMap<>();
-
     @Override
     public void initialize() {
 
@@ -69,7 +64,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public void destroy() {
-        //TODO release plugin
+        repository.stream().forEach(Plugin::destroy);
     }
 
     @Override
@@ -122,7 +117,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         if (o instanceof Plugin) {
             return (Plugin) o;
         }
-        for (PluginFactory factory : pluginFactories) {
+        for (PluginFactory factory : factories) {
             Plugin plugin = factory.create(o, context);
             if (plugin != null) {
                 return plugin;
@@ -131,15 +126,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         return null;
     }
 
-    @Override
-    public Plugin load(Object o) {
-        return load(o, DEFAULT_GROUP);
-    }
-
     /**
      * 加载插件。
      * 通过 {@link PluginFactory} 创建插件，
-     * 准备插件 {@link Plugin#prepare(PluginContext)}，
+     * 准备插件 {@link Plugin#open(PluginContext)}，
      * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
      * 执行插件解析链 {@link PluginResolver}，
      * 通过 {@link PluginExtractor} 提取插件，
@@ -148,7 +138,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin load(Object o, String group) {
+    public Plugin load(Object o) {
         //创建上下文
         PluginContext context = contextFactory.create(this);
         context.set(PluginConcept.class, this);
@@ -164,6 +154,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         eventPublisher.publish(new PluginCreatedEvent(plugin));
 
+        plugin.initialize();
+
         context.set(Plugin.class, plugin);
 
         PluginTree tree = treeFactory.create(plugin, this);
@@ -171,9 +163,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         context.set(PluginTree.Node.class, tree.getRoot());
 
         //准备插件
-        plugin.prepare(context);
-        //在上下文中添加事件发布者
-        context.set(PluginEventPublisher.class, eventPublisher);
+        plugin.open(context);
 
         eventPublisher.publish(new PluginPreparedEvent(plugin));
 
@@ -185,21 +175,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             extractor.extract(context);
         }
 
-        plugin.release(context);
+        plugin.close(context);
         //销毁上下文
         context.destroy();
         eventPublisher.publish(new PluginReleasedEvent(plugin));
 
-
-        plugins.put(plugin.getId(), plugin);
+        repository.add(plugin);
 
         eventPublisher.publish(new PluginLoadedEvent(plugin));
         return plugin;
-    }
-
-    @Override
-    public Plugin unload(Object o) {
-        return unload(o, DEFAULT_GROUP);
     }
 
     /**
@@ -209,53 +193,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin unload(Object o, String group) {
-        Plugin plugin = plugins.remove(o);
-        if (plugin == null) {
-            if (o instanceof Plugin) {
-                if (plugins.values().remove(o)) {
-                    eventPublisher.publish(new PluginUnloadedEvent((Plugin) o));
-                    return (Plugin) o;
-                }
-            }
-        } else {
-            eventPublisher.publish(new PluginUnloadedEvent(plugin));
-            return plugin;
+    public Plugin unload(Object o) {
+        Plugin removed = repository.remove(o);
+        if (removed != null) {
+            eventPublisher.publish(new PluginUnloadedEvent(removed));
         }
-        return null;
+        return removed;
     }
 
-    /**
-     * 插件是否加载
-     *
-     * @param o 插件 id 或插件对象
-     * @return 如果加载返回 true 否则返回 false
-     */
-    @Override
-    public boolean isLoaded(Object o) {
-        return plugins.containsKey(o) || (o instanceof Plugin && plugins.containsValue(o));
-    }
-
-    /**
-     * 发布事件
-     *
-     * @param event 事件
-     */
-    @Override
-    public void publish(Object event) {
-        eventPublisher.publish(event);
-    }
-
-    /**
-     * 获得插件
-     *
-     * @param id 插件 id
-     * @return 插件或 null
-     */
-    @Override
-    public Plugin getPlugin(Object id) {
-        return plugins.get(id);
-    }
 
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends AbstractPluginConcept> {
@@ -266,11 +211,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected PluginTreeFactory treeFactory;
 
+        protected PluginRepository repository;
+
         protected PluginEventPublisher eventPublisher;
 
         protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
-        protected List<PluginFactory> pluginFactories = new ArrayList<>();
+        protected List<PluginFactory> factories = new ArrayList<>();
 
         protected List<PluginHandler> handlers = new ArrayList<>();
 
@@ -294,6 +241,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         public B treeFactory(PluginTreeFactory treeFactory) {
             this.treeFactory = treeFactory;
+            return (B) this;
+        }
+
+        public B repository(PluginRepository repository) {
+            this.repository = repository;
             return (B) this;
         }
 
@@ -346,7 +298,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addFactories(Collection<? extends PluginFactory> factories) {
-            this.pluginFactories.addAll(factories);
+            this.factories.addAll(factories);
             return (B) this;
         }
 
@@ -419,7 +371,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setContextFactory(contextFactory);
             concept.setHandlerChainFactory(handlerChainFactory);
             concept.setTreeFactory(treeFactory);
+            concept.setRepository(repository);
             concept.setEventPublisher(eventPublisher);
+            concept.setFactories(factories);
             concept.setHandlers(handlers);
             concept.setExtractors(extractors);
             return concept;

@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.jar.resolve;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.resolve.AbstractPluginResolver;
-import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
@@ -13,8 +13,9 @@ import java.lang.reflect.Modifier;
  * 实例解析器
  */
 //TODO BeanDefinition
+@Deprecated
 @HandlerDependency(JarClassResolver.class)
-public class JarInstanceResolver extends AbstractPluginResolver<Class<?>, Object> {
+class JarInstanceResolver extends AbstractPluginResolver<Class<?>, Object> {
 
     @Override
     public boolean doFilter(Class<?> source, PluginContext context) {
@@ -24,12 +25,12 @@ public class JarInstanceResolver extends AbstractPluginResolver<Class<?>, Object
     /**
      * 对所有的类尝试实例化
      *
-     * @param clazz 类
-     * @param context  上下文 {@link PluginContext}
+     * @param clazz   类
+     * @param context 上下文 {@link PluginContext}
      * @return 实例
      */
     @Override
-    public  Object doResolve(Class<?> clazz, PluginContext context) {
+    public Object doResolve(Class<?> clazz, PluginContext context) {
         return newInstance(clazz);
     }
 
@@ -68,11 +69,11 @@ public class JarInstanceResolver extends AbstractPluginResolver<Class<?>, Object
 
     @Override
     public Object getInboundKey() {
-        return JarPlugin.CLASS;
+        return ExJarPlugin.CLASS;
     }
 
     @Override
     public Object getOutboundKey() {
-        return JarPlugin.INSTANCE;
+        return ExJarPlugin.INSTANCE;
     }
 }

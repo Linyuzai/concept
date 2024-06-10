@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.jar.filter;
 
 import com.github.linyuzai.plugin.core.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
-import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class ClassNameFilter extends AbstractPluginFilter<String> {
 
     @Override
     public Object getKey() {
-        return JarPlugin.CLASSNAME;
+        return ExJarPlugin.CLASSNAME;
     }
 
     /**

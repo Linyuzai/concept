@@ -7,11 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.lang.ref.SoftReference;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -36,19 +32,21 @@ public class ZipPlugin extends AbstractPlugin {
     public void collectEntries(PluginContext context, Consumer<Entry> consumer) {
         ZipEntry entry;
         while ((entry = inputStream.getNextEntry()) != null) {
-            if (entry.isDirectory()) {
-                continue;
-            }
             String name = entry.getName();
-            byte[] bytes = PluginUtils.read(inputStream);
             URL id = new URL(url, name);
-            consumer.accept(new ZipPluginEntry(id, name, this, parent, new SoftReference<>(bytes)));
+            byte[] bytes;
+            if (entry.isDirectory()) {
+                bytes = null;
+            } else {
+                bytes = PluginUtils.read(inputStream);
+            }
+            consumer.accept(new ZipPluginEntry(id, name, this, parent, bytes));
             inputStream.closeEntry();
         }
     }
 
     @Override
-    public void onRelease(PluginContext context) {
+    public void onClose(PluginContext context) {
         try {
             inputStream.close();
         } catch (Throwable e) {

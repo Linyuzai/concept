@@ -53,27 +53,33 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     @Override
-    public void prepare(PluginContext context) {
+    public void initialize() {
+        onInitialize();
+    }
+
+    @Override
+    public void open(PluginContext context) {
         PluginTree.NodeFactory node = context.get(PluginTree.Node.class);
         collectEntries(context, entry -> {
             Plugin subPlugin = getConcept().create(entry, context);
             if (subPlugin == null) {
                 node.create(entry.getId(), entry.getName(), entry);
             } else {
+                subPlugin.setConcept(getConcept());
                 PluginTree.Node subTree = node.create(subPlugin.getId(), entry.getName(), subPlugin);
                 PluginContext subContext = context.createSubContext(false);
                 subContext.initialize();
                 subContext.set(Plugin.class, subPlugin);
                 subContext.set(PluginTree.Node.class, subTree);
-                subPlugin.prepare(subContext);
+                subPlugin.open(subContext);
                 subContext.destroy();
             }
         });
-        onPrepare(context);
+        onOpen(context);
     }
 
     @Override
-    public void release(PluginContext context) {
+    public void close(PluginContext context) {
         PluginTree.Node node = context.get(PluginTree.Node.class);
         for (PluginTree.Node child : node.getChildren()) {
             if (child.getValue() instanceof Plugin) {
@@ -81,10 +87,15 @@ public abstract class AbstractPlugin implements Plugin {
                 PluginContext subContext = context.createSubContext(false);
                 subContext.set(PluginTree.Node.class, child);
                 subContext.set(Plugin.class, subPlugin);
-                subPlugin.release(subContext);
+                subPlugin.close(subContext);
                 subContext.destroy();
             }
         }
+        onClose(context);
+    }
+
+    @Override
+    public void destroy() {
         for (PluginReader reader : readers) {
             try {
                 reader.close();
@@ -92,16 +103,24 @@ public abstract class AbstractPlugin implements Plugin {
                 //TODO
             }
         }
-        onRelease(context);
+        onDestroy();
     }
 
     public abstract void collectEntries(PluginContext context, Consumer<Entry> consumer);
 
-    public void onPrepare(PluginContext context) {
+    public void onInitialize() {
 
     }
 
-    public void onRelease(PluginContext context) {
+    public void onDestroy() {
+
+    }
+
+    public void onOpen(PluginContext context) {
+
+    }
+
+    public void onClose(PluginContext context) {
 
     }
 }

@@ -76,49 +76,53 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public Node map(Function<Node, Object> function) {
-            return doMap(null, function, node -> true);
+            return doMap(this, null, function, node -> true);
         }
 
         @Override
         public Node map(Function<Node, Object> function, Predicate<Node> predicate) {
-            return doMap(null, function, predicate);
+            return doMap(this, null, function, predicate);
         }
 
-        protected Node doMap(Node parent, Function<Node, Object> function, Predicate<Node> predicate) {
+        protected Node doMap(Node node, Node parent, Function<Node, Object> function, Predicate<Node> predicate) {
             Object apply;
-            if (isPluginNode()) {
-                apply = value;
-            } else {
-                if (!predicate.test(this)) {
+            if (isTransformable(node)) {
+                if (!predicate.test(node)) {
                     return null;
                 }
-                apply = function.apply(this);
+                apply = function.apply(node);
+            } else {
+                apply = node.getValue();
             }
-            DefaultNode node = createNode(id, name, apply, parent);
-            List<Node> collect = children.stream()
-                    .map(it -> doMap(node, function, predicate))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            node.children.addAll(collect);
-            return node;
+            DefaultNode create = createNode(node.getId(), node.getName(), apply, parent);
+            if (!node.getChildren().isEmpty()) {
+                List<Node> collect = node.getChildren().stream()
+                        .map(it -> doMap(it, create, function, predicate))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                create.children.addAll(collect);
+            }
+            return create;
         }
 
         @Override
         public Node filter(Predicate<Node> predicate) {
-            return doFilter(null, predicate);
+            return doFilter(this, null, predicate);
         }
 
-        public Node doFilter(Node parent, Predicate<Node> predicate) {
-            if (!isPluginNode() && !predicate.test(this)) {
+        public Node doFilter(Node node, Node parent, Predicate<Node> predicate) {
+            if (isTransformable(node) && !predicate.test(node)) {
                 return null;
             }
-            DefaultNode node = createNode(id, name, value, parent);
-            List<Node> collect = children.stream()
-                    .map(it -> doFilter(parent, predicate))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            node.children.addAll(collect);
-            return node;
+            DefaultNode create = createNode(node.getId(), node.getName(), node.getValue(), parent);
+            if (!node.getChildren().isEmpty()) {
+                List<Node> collect = node.getChildren().stream()
+                        .map(it -> doFilter(it, create, predicate))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                create.children.addAll(collect);
+            }
+            return create;
         }
 
         @Override
@@ -130,6 +134,19 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
         @Override
         public boolean isPluginNode() {
             return value instanceof Plugin;
+        }
+
+        protected boolean isTransformable(Node node) {
+            if (node.isPluginNode()) {
+                return false;
+            }
+            if (node.getValue() instanceof Plugin.Entry) {
+                Plugin.Entry entry = (Plugin.Entry) node.getValue();
+                if (entry.getContent() == null) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
