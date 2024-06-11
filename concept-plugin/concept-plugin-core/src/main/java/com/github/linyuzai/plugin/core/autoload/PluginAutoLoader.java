@@ -14,4 +14,6 @@ public interface PluginAutoLoader {
      * 停止监听
      */
     void stop();
+
+    void addGroup(String group);
 }

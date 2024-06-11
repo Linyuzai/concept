@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.core.util;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLStreamHandler;
 
 public class PluginUtils {
 

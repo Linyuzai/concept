@@ -58,40 +58,49 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     @Override
-    public void open(PluginContext context) {
+    public void prepare(PluginContext context) {
         PluginTree.NodeFactory node = context.get(PluginTree.Node.class);
         collectEntries(context, entry -> {
-            Plugin subPlugin = getConcept().create(entry, context);
+            PluginConcept concept = context.getConcept();
+
+            PluginContext subContext = context.createSubContext(false);
+            subContext.set(PluginConcept.class, concept);
+            subContext.initialize();
+
+            Plugin subPlugin = getConcept().create(entry, subContext);
             if (subPlugin == null) {
                 node.create(entry.getId(), entry.getName(), entry);
             } else {
-                subPlugin.setConcept(getConcept());
-                PluginTree.Node subTree = node.create(subPlugin.getId(), entry.getName(), subPlugin);
-                PluginContext subContext = context.createSubContext(false);
-                subContext.initialize();
+                subPlugin.setConcept(concept);
+                subPlugin.initialize();
+
+                PluginTree.Node subTree = node.create(entry.getId(), entry.getName(), subPlugin);
                 subContext.set(Plugin.class, subPlugin);
                 subContext.set(PluginTree.Node.class, subTree);
-                subPlugin.open(subContext);
+
+                subPlugin.prepare(subContext);
+
                 subContext.destroy();
             }
         });
-        onOpen(context);
+        onPrepare(context);
     }
 
     @Override
-    public void close(PluginContext context) {
+    public void release(PluginContext context) {
         PluginTree.Node node = context.get(PluginTree.Node.class);
         for (PluginTree.Node child : node.getChildren()) {
             if (child.getValue() instanceof Plugin) {
                 Plugin subPlugin = (Plugin) child.getValue();
                 PluginContext subContext = context.createSubContext(false);
+                subContext.initialize();
                 subContext.set(PluginTree.Node.class, child);
                 subContext.set(Plugin.class, subPlugin);
-                subPlugin.close(subContext);
+                subPlugin.release(subContext);
                 subContext.destroy();
             }
         }
-        onClose(context);
+        onRelease(context);
     }
 
     @Override
@@ -99,8 +108,7 @@ public abstract class AbstractPlugin implements Plugin {
         for (PluginReader reader : readers) {
             try {
                 reader.close();
-            } catch (IOException e) {
-                //TODO
+            } catch (IOException ignore) {
             }
         }
         onDestroy();
@@ -116,11 +124,17 @@ public abstract class AbstractPlugin implements Plugin {
 
     }
 
-    public void onOpen(PluginContext context) {
+    public void onPrepare(PluginContext context) {
 
     }
 
-    public void onClose(PluginContext context) {
+    public void onRelease(PluginContext context) {
 
+    }
+
+    @Override
+    public String toString() {
+        String name = metadata.get(Metadata.KEY_NAME, getId().toString());
+        return getClass().getSimpleName() + "(" + name + ")";
     }
 }

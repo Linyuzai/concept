@@ -29,14 +29,35 @@ public interface Plugin {
     /**
      * 准备
      */
-    void open(PluginContext context);
+    void prepare(PluginContext context);
 
     /**
      * 释放
      */
-    void close(PluginContext context);
+    void release(PluginContext context);
 
     interface Metadata {
+
+        String KEY_NAME = "concept.plugin.name";
+
+        String KEY_DEPENDENCIES = "concept.plugin.dependencies";
+
+        Metadata EMPTY = new Metadata() {
+            @Override
+            public String get(String key) {
+                return null;
+            }
+
+            @Override
+            public String get(String key, String defaultValue) {
+                return defaultValue;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return true;
+            }
+        };
 
         String get(String key);
 

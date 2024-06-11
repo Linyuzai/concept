@@ -14,6 +14,5 @@ public class EntryResolver implements PluginResolver {
                 .inbound(tree.getRoot())
                 .transform(node -> node)
                 .outboundKey(Plugin.Entry.class);
-
     }
 }

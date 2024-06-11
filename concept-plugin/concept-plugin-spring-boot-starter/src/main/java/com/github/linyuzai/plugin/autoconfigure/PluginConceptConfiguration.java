@@ -1,7 +1,13 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
+import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
+import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
+import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
+import com.github.linyuzai.plugin.core.autoload.PluginExecutorProvider;
+import com.github.linyuzai.plugin.core.autoload.PluginLocation;
+import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
@@ -13,6 +19,9 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
+import com.github.linyuzai.plugin.core.logger.PluginLoadLogger;
+import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.resolve.ContentResolver;
@@ -21,11 +30,13 @@ import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
+import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
 import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
 import com.github.linyuzai.plugin.jar.resolve.JarClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,6 +67,12 @@ public class PluginConceptConfiguration {
         @Bean
         public JarClassResolver jarClassResolver() {
             return new JarClassResolver();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public PluginLocation.Filter jarLocationFilter() {
+            return new JarLocationFilter();
         }
     }
 
@@ -95,6 +112,22 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public PluginLogger pluginLogger() {
+        return new CommonsPluginLogger();
+    }
+
+    @Bean
+    public PluginLoadLogger pluginLoadLogger(PluginLogger logger) {
+        return new PluginLoadLogger(logger);
+    }
+
+    @Bean
+    public PluginErrorLogger pluginErrorLogger(PluginLogger logger) {
+        return new PluginErrorLogger(logger);
+    }
+
+    @Bean
     public EntryResolver pluginEntryResolver() {
         return new EntryResolver();
     }
@@ -116,6 +149,7 @@ public class PluginConceptConfiguration {
                                        PluginTreeFactory treeFactory,
                                        PluginRepository repository,
                                        PluginEventPublisher eventPublisher,
+                                       PluginLogger logger,
                                        List<PluginFactory> factories,
                                        List<PluginResolver> resolvers,
                                        List<PluginFilter> filters,
@@ -127,11 +161,39 @@ public class PluginConceptConfiguration {
                 .treeFactory(treeFactory)
                 .repository(repository)
                 .eventPublisher(eventPublisher)
+                .logger(logger)
                 .addFactories(factories)
                 .addResolvers(resolvers)
                 .addFilters(filters)
                 .addExtractors(extractors)
                 .addEventListeners(eventListeners)
                 .build();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "concept.plugin.autoload.enabled", havingValue = "true", matchIfMissing = true)
+    public static class AutoloadConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public PluginExecutorProvider pluginExecutorProvider() {
+            return PluginExecutorProvider.NO_EXECUTOR;
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public PluginLocation pluginLocation(PluginConceptProperties properties,
+                                             PluginLocation.Filter filter) {
+            String basePath = properties.getAutoload().getLocation().getBasePath();
+            return new PluginLocation(basePath, filter);
+        }
+
+        @Bean(initMethod = "start", destroyMethod = "stop")
+        @ConditionalOnMissingBean
+        public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
+                                                 PluginExecutorProvider executorProvider,
+                                                 PluginLocation location) {
+            return new WatchServicePluginAutoLoader(concept, executorProvider.get(), location);
+        }
     }
 }

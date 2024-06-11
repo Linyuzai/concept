@@ -8,7 +8,11 @@ public abstract class SubPluginFactory implements PluginFactory {
     @Override
     public Plugin create(Object o, PluginContext context) {
         if (o instanceof Plugin.Entry) {
-            return doCreate((Plugin.Entry) o, context);
+            Plugin plugin = doCreate((Plugin.Entry) o, context);
+            if (plugin != null) {
+                plugin.setMetadata(Plugin.Metadata.EMPTY);
+            }
+            return plugin;
         }
         return null;
     }

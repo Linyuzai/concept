@@ -140,12 +140,12 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
             if (node.isPluginNode()) {
                 return false;
             }
-            if (node.getValue() instanceof Plugin.Entry) {
+            /*if (node.getValue() instanceof Plugin.Entry) {
                 Plugin.Entry entry = (Plugin.Entry) node.getValue();
                 if (entry.getContent() == null) {
                     return false;
                 }
-            }
+            }*/
             return true;
         }
 
@@ -179,7 +179,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
             if (trace == null) {
                 throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
             }
-            inbound = trace.getTreeRoot();
+            inbound = trace.getNode();
             return this;
         }
 
@@ -204,7 +204,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
     @RequiredArgsConstructor
     public static class TracerStages implements HandleStage {
 
-        private final Node treeRoot;
+        private final Node node;
 
         private final PluginHandler handler;
 

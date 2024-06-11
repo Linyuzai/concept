@@ -23,9 +23,9 @@ public class JarPluginFactory extends ZipPluginFactory {
     public Plugin doCreate(File file, Plugin.Metadata metadata, PluginContext context) {
         String mode = getMode(file, metadata, context);
         switch (mode.toUpperCase()) {
-            case ExJarPlugin.Mode.FILE:
+            case JarPlugin.Mode.FILE:
                 return new ExJarPlugin(new ExJarFile(file));
-            case ExJarPlugin.Mode.STREAM:
+            case JarPlugin.Mode.STREAM:
                 return super.doCreate(file, metadata, context);
             default:
                 throw new PluginException("Plugin mode not supported");
@@ -33,7 +33,7 @@ public class JarPluginFactory extends ZipPluginFactory {
     }
 
     public String getMode(File file, Plugin.Metadata metadata, PluginContext context) {
-        return metadata.get("concept.plugin.jar.mode", ExJarPlugin.Mode.STREAM);
+        return metadata.get("concept.plugin.jar.mode", JarPlugin.Mode.STREAM);
     }
 
     @Override

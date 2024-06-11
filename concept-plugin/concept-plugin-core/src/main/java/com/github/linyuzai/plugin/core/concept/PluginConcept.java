@@ -3,10 +3,10 @@ package com.github.linyuzai.plugin.core.concept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * 插件概念
@@ -56,4 +56,6 @@ public interface PluginConcept {
     PluginRepository getRepository();
 
     PluginEventPublisher getEventPublisher();
+
+    PluginLogger getLogger();
 }

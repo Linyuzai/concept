@@ -38,7 +38,7 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
         try (ZipFile zipFile = new ZipFile(file)) {
             ZipEntry entry = zipFile.getEntry("plugin.properties");
             if (entry == null) {
-                return new EmptyMetadata();
+                return Plugin.Metadata.EMPTY;
             }
             try (InputStream is = zipFile.getInputStream(entry)) {
                 Properties properties = new Properties();
@@ -137,24 +137,6 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
         @Override
         public boolean isEmpty() {
             return properties.isEmpty();
-        }
-    }
-
-    public static class EmptyMetadata implements Plugin.Metadata {
-
-        @Override
-        public String get(String key) {
-            return null;
-        }
-
-        @Override
-        public String get(String key, String defaultValue) {
-            return defaultValue;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return true;
         }
     }
 }

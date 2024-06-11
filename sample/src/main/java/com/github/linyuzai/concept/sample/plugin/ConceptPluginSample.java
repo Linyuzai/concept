@@ -1,12 +1,10 @@
 package com.github.linyuzai.concept.sample.plugin;
 
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
 import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,8 +67,8 @@ public class ConceptPluginSample {
         return operation.operate(device, opType, opValue);
     }
 
-    private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
-            .locations(new PluginLocation.Builder()
+    /*private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
+            .locations(new PluginPath.Builder()
                     .path("/Users/concept/plugin/")
                     .filter(it -> it.endsWith(".jar"))
                     .build())
@@ -81,9 +79,9 @@ public class ConceptPluginSample {
             .onError(e -> log.error("Plugin auto load error", e))
             .build();
 
-    /**
+    *//**
      *
-     */
+     *//*
     @PostConstruct
     private void start() {
         loader.start();
@@ -92,5 +90,5 @@ public class ConceptPluginSample {
     @PreDestroy
     private void stop() {
         loader.stop();
-    }
+    }*/
 }

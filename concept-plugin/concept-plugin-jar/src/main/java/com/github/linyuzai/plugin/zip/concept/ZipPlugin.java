@@ -46,16 +46,10 @@ public class ZipPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onClose(PluginContext context) {
+    public void onRelease(PluginContext context) {
         try {
             inputStream.close();
-        } catch (Throwable e) {
-            //TODO
+        } catch (Throwable ignore) {
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ZipPlugin(" + url + ")";
     }
 }

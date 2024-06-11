@@ -1,115 +1,80 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.exception.PluginException;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
-import java.util.function.Predicate;
+import java.util.Arrays;
 
-/**
- * 监听插件位置
- */
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class PluginLocation {
 
     /**
-     * 路径
+     * 默认的缓存路径。
      */
-    private final String path;
+    public static String DEFAULT_BASE_PATH = new File(System.getProperty("user.home"), "concept/plugin").getAbsolutePath();
 
-    /**
-     * 过滤器
-     */
-    private final Predicate<String> filter;
+    private final String basePath;
 
-    /**
-     * 触发创建回调
-     */
-    private final boolean notifyCreate;
+    private final Filter filter;
 
-    /**
-     * 触发修改回调
-     */
-    private final boolean notifyModify;
-
-    /**
-     * 触发删除回调
-     */
-    private final boolean notifyDelete;
-
-    public static final class Builder {
-        private String path;
-        private Predicate<String> filter;
-        private boolean notifyCreate = true;
-        private boolean notifyModify = true;
-        private boolean notifyDelete = true;
-
-        /**
-         * 设置监听的路径
-         *
-         * @param path 监听的路径
-         * @return {@link Builder}
-         */
-        public Builder path(String path) {
-            this.path = path;
-            return this;
+    public String[] getGroups() {
+        File file = new File(basePath);
+        File[] files = file.listFiles(File::isDirectory);
+        if (files == null) {
+            return new String[0];
         }
+        return Arrays.stream(files)
+                .map(File::getName)
+                .toArray(String[]::new);
+    }
 
-        /**
-         * 设置文件名过滤器
-         *
-         * @param filter 文件名过滤器
-         * @return {@link Builder}
-         */
-        public Builder filter(Predicate<String> filter) {
-            this.filter = filter;
-            return this;
-        }
+    public String getGroupPath(String group) {
+        return new File(basePath, group).getAbsolutePath();
+    }
 
-        /**
-         * 设置是否监听文件新增
-         *
-         * @param notifyCreate 是否监听文件新增
-         * @return {@link Builder}
-         */
-        public Builder notifyCreate(boolean notifyCreate) {
-            this.notifyCreate = notifyCreate;
-            return this;
-        }
-
-        /**
-         * 设置是否监听文件修改
-         *
-         * @param notifyModify 是否监听文件修改
-         * @return {@link Builder}
-         */
-        public Builder notifyModify(boolean notifyModify) {
-            this.notifyModify = notifyModify;
-            return this;
-        }
-
-        /**
-         * 设置是否监听文件删除
-         *
-         * @param notifyDelete 是否监听文件删除
-         * @return {@link Builder}
-         */
-        public Builder notifyDelete(boolean notifyDelete) {
-            this.notifyDelete = notifyDelete;
-            return this;
-        }
-
-        public PluginLocation build() {
-            if (path == null || path.isEmpty()) {
-                throw new PluginException("Path is null or empty");
+    public String getGroup(String path) {
+        if (path.startsWith(basePath)) {
+            File file = new File(path);
+            String parent;
+            while ((parent = file.getParent()) != null) {
+                if (parent.equals(basePath)) {
+                    return file.getName();
+                }
+                file = file.getParentFile();
             }
-            if (path.endsWith(File.separator)) {
-                path = path.substring(0, path.length() - 1);
-            }
-            return new PluginLocation(path, filter, notifyCreate, notifyModify, notifyDelete);
         }
+        return null;
+    }
+
+    public String[] getPlugins(String group) {
+        File file = new File(basePath, group);
+        File[] files = file.listFiles(pathname -> {
+            String name = pathname.getName();
+            if (pathname.isDirectory() && name.startsWith("_")) {
+                return false;
+            }
+            return filter.filter(group, name);
+        });
+        if (files == null) {
+            return new String[0];
+        }
+        return Arrays.stream(files)
+                .map(File::getName)
+                .toArray(String[]::new);
+    }
+
+    public String getPluginPath(String group, String name) {
+        if (filter.filter(group, name)) {
+            return new File(getGroupPath(group), name).getAbsolutePath();
+        } else {
+            return null;
+        }
+    }
+
+    public interface Filter {
+
+        boolean filter(String group, String name);
     }
 }

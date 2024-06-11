@@ -4,12 +4,14 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.exception.PluginLoadException;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
@@ -36,6 +38,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 事件发布者
      */
     protected PluginEventPublisher eventPublisher;
+
+    protected PluginLogger logger;
 
     protected PluginTreeFactory treeFactory;
 
@@ -64,7 +68,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public void destroy() {
-        repository.stream().forEach(Plugin::destroy);
+        repository.stream().forEach(this::unload);
     }
 
     @Override
@@ -129,7 +133,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 加载插件。
      * 通过 {@link PluginFactory} 创建插件，
-     * 准备插件 {@link Plugin#open(PluginContext)}，
+     * 准备插件 {@link Plugin#prepare(PluginContext)}，
      * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
      * 执行插件解析链 {@link PluginResolver}，
      * 通过 {@link PluginExtractor} 提取插件，
@@ -141,49 +145,47 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     public Plugin load(Object o) {
         //创建上下文
         PluginContext context = contextFactory.create(this);
-        context.set(PluginConcept.class, this);
-        //初始化上下文
-        context.initialize();
+        try {
+            //初始化上下文
+            context.set(PluginConcept.class, this);
+            context.initialize();
 
-        Plugin plugin = create(o, context);
-        if (plugin == null) {
-            throw new PluginException("Plugin can not create: " + o);
+            Plugin plugin = create(o, context);
+            if (plugin == null) {
+                throw new PluginException("Plugin can not create: " + o);
+            }
+            plugin.setConcept(this);
+            plugin.initialize();
+            eventPublisher.publish(new PluginCreatedEvent(plugin));
+
+            PluginTree tree = treeFactory.create(plugin, this);
+            context.set(Plugin.class, plugin);
+            context.set(PluginTree.class, tree);
+            context.set(PluginTree.Node.class, tree.getRoot());
+
+            //准备插件
+            plugin.prepare(context);
+            eventPublisher.publish(new PluginPreparedEvent(context));
+
+            //解析插件
+            getHandlerChain().next(context);
+            //提取插件
+            for (PluginExtractor extractor : extractors) {
+                extractor.extract(context);
+            }
+
+            plugin.release(context);
+            eventPublisher.publish(new PluginReleasedEvent(context));
+
+            //销毁上下文
+            context.destroy();
+            repository.add(plugin);
+            eventPublisher.publish(new PluginLoadedEvent(plugin));
+
+            return plugin;
+        } catch (Throwable e) {
+            throw new PluginLoadException(context, e);
         }
-
-        plugin.setConcept(this);
-
-        eventPublisher.publish(new PluginCreatedEvent(plugin));
-
-        plugin.initialize();
-
-        context.set(Plugin.class, plugin);
-
-        PluginTree tree = treeFactory.create(plugin, this);
-        context.set(PluginTree.class, tree);
-        context.set(PluginTree.Node.class, tree.getRoot());
-
-        //准备插件
-        plugin.open(context);
-
-        eventPublisher.publish(new PluginPreparedEvent(plugin));
-
-        //解析插件
-        getHandlerChain().next(context);
-
-        //提取插件
-        for (PluginExtractor extractor : extractors) {
-            extractor.extract(context);
-        }
-
-        plugin.close(context);
-        //销毁上下文
-        context.destroy();
-        eventPublisher.publish(new PluginReleasedEvent(plugin));
-
-        repository.add(plugin);
-
-        eventPublisher.publish(new PluginLoadedEvent(plugin));
-        return plugin;
     }
 
     /**
@@ -196,11 +198,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     public Plugin unload(Object o) {
         Plugin removed = repository.remove(o);
         if (removed != null) {
+            removed.destroy();
             eventPublisher.publish(new PluginUnloadedEvent(removed));
         }
         return removed;
     }
-
 
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends AbstractPluginConcept> {
@@ -214,6 +216,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected PluginRepository repository;
 
         protected PluginEventPublisher eventPublisher;
+
+        protected PluginLogger logger;
 
         protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
@@ -257,6 +261,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B eventPublisher(PluginEventPublisher eventPublisher) {
             this.eventPublisher = eventPublisher;
+            return (B) this;
+        }
+
+        public B logger(PluginLogger logger) {
+            this.logger = logger;
             return (B) this;
         }
 

@@ -80,7 +80,7 @@ public interface PluginTree {
 
         interface HandleStage {
 
-            PluginTree.Node getTreeRoot();
+            PluginTree.Node getNode();
 
             PluginHandler getHandler();
 

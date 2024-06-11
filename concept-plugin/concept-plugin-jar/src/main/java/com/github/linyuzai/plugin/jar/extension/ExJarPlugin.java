@@ -46,13 +46,13 @@ public class ExJarPlugin extends AbstractPlugin {
      * 准备，通过 {@link JarURLConnection} 来读取 jar 内容
      */
     @Override
-    public void onOpen(PluginContext context) {
-        PluginTree.Node node = context.get(PluginTree.Node.class);
-        if (node == null || node.getParent() != null) {
+    public void onPrepare(PluginContext context) {
+        PluginTree tree = context.get(PluginTree.class);
+        if (tree == null) {
             return;
         }
         List<URL> urls = new ArrayList<>();
-        node.forEach(it -> {
+        tree.getRoot().forEach(it -> {
             if (it.isPluginNode() && it.getId() instanceof URL) {
                 URL url = (URL) it.getId();
                 urls.add(url);
@@ -67,23 +67,10 @@ public class ExJarPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onClose(PluginContext context) {
+    public void onRelease(PluginContext context) {
         try {
             jarFile.close();
-        } catch (Throwable e) {
-            //TODO
+        } catch (Throwable ignore) {
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ExJarPlugin(" + url + ")";
-    }
-
-    public static class Mode {
-
-        public static final String FILE = "FILE";
-
-        public static final String STREAM = "STREAM";
     }
 }

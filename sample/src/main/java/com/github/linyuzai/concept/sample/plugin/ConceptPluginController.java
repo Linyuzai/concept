@@ -1,16 +1,11 @@
 package com.github.linyuzai.concept.sample.plugin;
 
-import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.PluginLocation;
-import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.match.PluginName;
-import com.github.linyuzai.plugin.core.match.PluginPath;
-import com.github.linyuzai.plugin.core.util.PluginLoadLogger;
-import com.github.linyuzai.plugin.jar.autoload.JarNotifier;
+import com.github.linyuzai.plugin.core.logger.PluginLoadLogger;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
 import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
@@ -25,12 +20,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @RestController
@@ -659,16 +651,16 @@ public class ConceptPluginController {
                 }
             })*/
             .addExtractors(new JarDynamicExtractor(this))//自动匹配回调添加了@OnPluginExtract注解的方法参数
-            .addEventListeners(new PluginLoadLogger(log::info))
+            //.addEventListeners(new PluginLoadLogger(log::info))
             .build();
 
-    private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
+    /*private final PluginAutoLoader loader = new WatchServicePluginAutoLoader.Builder()
             .locations(
-                    new PluginLocation.Builder()
+                    new PluginPath.Builder()
                             .path("/Users/tanghanzheng/concept/plugin")
                             .filter(it -> it.endsWith(".jar"))
                             .build(),
-                    new PluginLocation.Builder()
+                    new PluginPath.Builder()
                             .path("/Users/tanghanzheng/concept/plugin2")
                             .filter(it -> it.endsWith(".jar"))
                             .build())
@@ -686,7 +678,7 @@ public class ConceptPluginController {
     @PreDestroy
     private void stop() {
         loader.stop();
-    }
+    }*/
 
     /**
      * 插件匹配回调
@@ -722,7 +714,7 @@ public class ConceptPluginController {
             //@PluginProperties("plugin.b") String p8,
 
             //一个指定目录下的 properties 文件
-            @PluginPath("plugin") Properties p9,
+            @com.github.linyuzai.plugin.core.match.PluginPath("plugin") Properties p9,
 
             //名称为 config.json 的文件内容
             @PluginName("plugin.json") String p10) {

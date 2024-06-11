@@ -17,14 +17,14 @@ public class JarPlugin extends ZipPlugin {
     }
 
     @Override
-    public void onOpen(PluginContext context) {
-        PluginTree.Node node = context.get(PluginTree.Node.class);
-        if (node == null || node.getParent() != null) {
+    public void onPrepare(PluginContext context) {
+        PluginTree tree = context.get(PluginTree.class);
+        if (tree == null) {
             return;
         }
         Map<String, Content> classes = new HashMap<>();
         Map<String, Content> packages = new HashMap<>();
-        collectClassContents(node, classes, packages);
+        collectClassContents(tree.getRoot(), classes, packages);
         JarPluginClassLoader classLoader =
                 new JarPluginClassLoader(packages, classes, getClass().getClassLoader());
         addReader(new JarClassReader(this, classLoader));
@@ -62,5 +62,12 @@ public class JarPlugin extends ZipPlugin {
 
     public interface ClassName {
 
+    }
+
+    public static class Mode {
+
+        public static final String FILE = "FILE";
+
+        public static final String STREAM = "STREAM";
     }
 }
