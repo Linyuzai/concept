@@ -12,10 +12,15 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
 
     compileOnly project(':concept-plugin:concept-plugin-core')
     compileOnly project(':concept-plugin:concept-plugin-jar')
+
+    api "org.webjars:vue:${VueVersion}"
+    api "org.webjars.npm:vue-resource:${VueResourceVersion}"
+    api "org.webjars.npm:element-ui:${ElementUIVersion}"
 }
 
 apply from: '../../publish.gradle'

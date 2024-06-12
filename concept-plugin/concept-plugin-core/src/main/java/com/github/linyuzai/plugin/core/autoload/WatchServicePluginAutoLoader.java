@@ -83,6 +83,11 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    @Override
+    public Boolean getGroupState(String group) {
+        return watchStates.getOrDefault(group, false);
+    }
+
     private void notifyOnStart(String group) {
         String[] names = location.getPlugins(group);
         for (String name : names) {

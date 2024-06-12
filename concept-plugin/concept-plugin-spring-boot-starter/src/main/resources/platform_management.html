@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+        body {
+            font-family: "微软雅黑"
+        }
+
+        html, body, .el-container {
+            /*设置内部填充为0，几个布局元素之间没有间距*/
+            /* padding-top: 0;*/
+            /*外部间距也是如此设置*/
+            margin: 0;
+            /*统一设置高度为100%*/
+            height: 100%;
+        }
+
+        .el-submenu {
+            font-weight: bold;
+        }
+
+        .el-table-column {
+            /*width: 16.6%;*/
+        }
+
+        .el-button--small {
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+<div id="proxy-router-app">
+    <el-container style="height: 100vh">
+        <el-header>
+            <h1>Platform Management</h1>
+        </el-header>
+        <el-main>
+            <el-container style="border: 1px solid #eee">
+                <el-aside style="background-color: rgb(238, 241, 246)" width="300px">
+                    <el-menu>
+                        <el-menu-item @click="selectAndRefreshPlatformInstances">
+                            <b>平台实例管理</b>
+                        </el-menu-item>
+                        <el-menu-item @click="selectAndRefreshPluginFiles">
+                            <b>插件文件管理</b>
+                        </el-menu-item>
+                    </el-menu>
+                </el-aside>
+                <el-container v-show="selectMenu == 'INSTANCE'">
+                    <el-header style="text-align: left; font-size: 12px;padding-top: 20px">
+                        <el-input placeholder="搜索平台实例" style="width: 200px;"
+                                  v-model="platformSearch"></el-input>
+                    </el-header>
+
+                    <el-main>
+                        <el-table
+                                :data="platformInstances.filter(data => !platformSearch||data.platformId.toLowerCase().includes(platformSearch.toLowerCase()))"
+                                style="width: 100%;">
+                            <el-table-column prop="platformId" label="Platform Id">
+                            </el-table-column>
+                            <el-table-column prop="className" label="Class Name">
+                            </el-table-column>
+                            <el-table-column prop="info" label="Info">
+                            </el-table-column>
+                            <el-table-column prop="loaded" label="Load/Unload" width="300">
+                                <template slot-scope="scope">
+                                    <el-switch @change="loadInstance(scope.row)" v-model="scope.row.loaded"></el-switch>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-main>
+                </el-container>
+                <el-container v-show="selectMenu == 'PLUGIN'">
+                    <el-header style="text-align: left; font-size: 12px;padding-top: 20px">
+                        <el-input placeholder="搜索插件文件" style="width: 200px;float: left"
+                                  v-model="pluginSearch"></el-input>
+                        <el-upload action="/platform-management/plugin/upload"
+                                   :on-success="refreshPluginFiles"
+                                   :file-list="[]">
+                            <el-button type="primary" icon="el-icon-upload2" style="margin-left: 20px"></el-button>
+                        </el-upload>
+                    </el-header>
+
+                    <el-main>
+                        <el-table
+                                :data="pluginFiles.filter(data => !pluginSearch||data.path.toLowerCase().includes(pluginSearch.toLowerCase()))"
+                                style="width: 100%;">
+                            <el-table-column prop="path" label="File Path">
+                            </el-table-column>
+                            <el-table-column prop="loaded" label="Load/Unload" width="300">
+                                <template slot-scope="scope">
+                                    <el-switch @change="loadPlugin(scope.row)" v-model="scope.row.loaded"></el-switch>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="lastModified" label="Last Modified" :formatter="formatDate"
+                                             width="300">
+                            </el-table-column>
+                            <el-table-column prop="path" label="Operation" width="300">
+                                <template slot-scope="scope">
+                                    <el-upload v-if="scope.row.loaded"
+                                               :data="scope.row"
+                                               :on-success="refreshPluginFiles"
+                                               :file-list="[]"
+                                               action="/platform-management/plugin/update">
+                                        <el-button size="small" type="primary" icon="el-icon-upload2">
+                                            Hot Swap
+                                        </el-button>
+                                    </el-upload>
+                                    <el-button v-else size="small"
+                                               type="danger"
+                                               icon="el-icon-delete"
+                                               @click="deletePluginFile(scope.row)"></el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-main>
+                </el-container>
+            </el-container>
+        </el-main>
+        <el-footer style="text-align: center;color: #999999">
+            © 2021 Landsky
+        </el-footer>
+    </el-container>
+</div>
+</body>
+<script>
+    var urlPrefix = window.location.pathname.replace('/platform_management.html', '');
+
+    console.log(urlPrefix);
+
+    //<link rel="stylesheet" type="text/css" href="/elementui/index-v2.15.0.css">
+    function loadLinks(urls) {
+        var head = document.getElementsByTagName('head')[0];
+        urls.forEach(url => {
+            var link = document.createElement("link");
+            link.type = "text/css";
+            link.rel = 'stylesheet';
+            link.href = urlPrefix + url;
+            head.appendChild(link);
+        });
+    }
+
+    function loadScripts(urls) {
+        var html = document.getElementsByTagName('html')[0];
+        urls.forEach(url => {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = urlPrefix + url;
+            script.async = false;
+            html.appendChild(script);
+        });
+    }
+
+    loadLinks(['/elementui/index-v2.15.0.css']);
+    loadScripts(['/vue/vue-v2.6.11.js',
+        '/vue/vue-resource-v1.5.1.js',
+        '/elementui/index-v2.15.0.js',
+        '/platform_management.js']);
+    //loadScript('/vue/vue-router-v2.6.0.js');
+    //loadScript('/vue/contextmenu-v1.3.13.js');
+
+    //https://unpkg.com/vue-router@2.0.0/dist/vue-router.js
+</script>
+</html>

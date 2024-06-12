@@ -16,4 +16,6 @@ public interface PluginAutoLoader {
     void stop();
 
     void addGroup(String group);
+
+    Boolean getGroupState(String group);
 }

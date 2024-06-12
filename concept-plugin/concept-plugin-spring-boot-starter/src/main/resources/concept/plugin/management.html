@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Concept Router</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/element-ui/2.15.1/lib/theme-chalk/index.css">
+    <!--<link rel="stylesheet" type="text/css" href="/concept-router/elementui/index-v2.15.0.css">-->
+    <style>
+
+        body {
+            font-family: "微软雅黑"
+        }
+
+        html, body, .el-container {
+            /*设置内部填充为0，几个布局元素之间没有间距*/
+            /* padding-top: 0;*/
+            /*外部间距也是如此设置*/
+            margin: 0;
+            /*统一设置高度为100%*/
+            height: 100%;
+        }
+
+        .el-table::before {
+            height: 0;
+        }
+
+        .el-submenu {
+            font-weight: bold;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .github-corner:hover .octo-arm {
+            animation: octocat-wave 560ms ease-in-out
+        }
+
+        @keyframes octocat-wave {
+            0%, 100% {
+                transform: rotate(0)
+            }
+            20%, 60% {
+                transform: rotate(-25deg)
+            }
+            40%, 80% {
+                transform: rotate(10deg)
+            }
+        }
+
+        @media (max-width: 500px) {
+            .github-corner:hover .octo-arm {
+                animation: none
+            }
+
+            .github-corner .octo-arm {
+                animation: octocat-wave 560ms ease-in-out
+            }
+        }
+
+    </style>
+</head>
+<body>
+<div id="concept-plugin-app">
+    <el-container style="height: 100vh">
+        <el-header style="height: 100px;padding-bottom: 15px;border-bottom: 1px solid #eee;">
+            <h1 style="margin-top: 15px;"
+                v-cloak>
+                <span style="color: #333333;font-weight: normal;font-size:50px;">
+                    CONCEPT PLUGIN
+                </span>
+                <span style="color: #909399;font-weight: lighter;font-size:14px">
+                    {{version}}
+                </span>
+            </h1>
+            <a href="https://github.com/Linyuzai/concept" target="_blank" class="github-corner"
+               aria-label="View source on GitHub">
+                <svg width="75" height="75" viewBox="0 0 250 250"
+                     style="fill:#333333; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+                     aria-hidden="true">
+                    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+                    <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+                          fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+                    <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+                          fill="currentColor" class="octo-body"></path>
+                </svg>
+            </a>
+        </el-header>
+        <el-container>
+            <el-aside>
+                <el-menu style="height: 100%;"
+                         @select="selectGroup">
+                    <el-menu-item :index="group.name"
+                                  v-for="group in groups">
+                        <i v-if="group.state" class="el-icon-folder-checked"></i>
+                        <i v-else class="el-icon-folder-delete"></i>
+                        <span slot="title">{{group.name}}</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
+            <el-main style="height: 100%;">
+                <el-container style="height: 100%;">
+                    <el-header style="text-align: left; font-size: 12px;padding-top: 20px;">
+                        <el-input placeholder="搜索匹配路径" v-model="routerSearch" style="width: 300px"></el-input>
+                        <el-button-group style="float: right;margin-left: 20px">
+                            <el-button @click="openRouterDialog()" icon="el-icon-plus"></el-button>
+                            <el-button @click="refreshRouters()" icon="el-icon-refresh"></el-button>
+                            <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
+                        </el-button-group>
+                        <el-dialog :title="dialog.router.title"
+                                   :visible.sync="dialog.router.visible">
+                            <el-form :model="dialog.router.form" :rules="dialog.router.rules"
+                                     ref="dialog.router.form">
+                                <el-form-item label="匹配服务" prop="serviceId">
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            指定请求的服务的 serviceId<br/>
+                                            或使用 '*' 表示任意服务
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                    <!--<el-input v-model="dialog.router.form.serviceId"></el-input>-->
+                                    <el-select allow-create filterable
+                                               v-model="dialog.router.form.serviceId"
+                                               @visible-change="refreshServices">
+                                        <el-option :label="service"
+                                                   :key="service"
+                                                   :value="service"
+                                                   v-for="service in services"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="匹配路径" prop="pathPattern">
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            指定请求的路径<br/>
+                                            可以使用通配符，如 '/service-a/**'<br/>
+                                            '/service-a/module-b/**' 的优先级高于 '/service-a/**'
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                    <el-input v-model="dialog.router.form.pathPattern"
+                                              name="pathPattern"
+                                              autocomplete></el-input>
+                                </el-form-item>
+                                <el-form-item label="服务地址" prop="serverAddress">
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            指定路由的服务地址<br/>
+                                            格式 '192.168.30.100:8760'<br/>
+                                            可以不指定端口，如 '192.168.30.100'
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                    <el-input v-model="dialog.router.form.serverAddress"
+                                              name="serverAddress"
+                                              autocomplete></el-input>
+                                </el-form-item>
+                                <el-form-item label="强制路由" prop="forced">
+                                    <el-switch v-model="dialog.router.form.forced"></el-switch>
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            当匹配到的服务地址没有可用的实例时<br/>
+                                            如果强制路由开启则会导致服务不可用<br/>
+                                            如果强制路由关闭则会通过原本的路由规则重新选择一个服务
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                </el-form-item>
+                                <el-form-item label="是否启用" prop="enabled">
+                                    <el-switch v-model="dialog.router.form.enabled"></el-switch>
+                                </el-form-item>
+                            </el-form>
+                            <div class="dialog-footer" slot="footer">
+                                <el-button @click="dialog.router.visible = false" v-cloak>取 消</el-button>
+                                <el-button v-if="dialog.router.add" @click="addRouter" type="primary" v-cloak>添 加
+                                </el-button>
+                                <el-button v-else @click="updateRouter" type="primary" v-cloak>编 辑</el-button>
+                            </div>
+                        </el-dialog>
+                    </el-header>
+                    <el-main ref="tableMain" style="height:100%;padding-bottom: 0">
+                        <el-table
+                                :data="routerList.filter(data => !routerSearch||data.pathPattern.toLowerCase().includes(routerSearch.toLowerCase()))"
+                                @cell-dblclick="routerCellDblClick"
+                                style="width: 100%;border-bottom-width: 0"
+                                height="100%">
+                            <el-table-column align="center" label="序号" type="index">
+                            </el-table-column>
+                            <el-table-column align="center" prop="serviceId">
+                                <template slot="header">
+                                <span>匹配服务
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            指定请求的服务的 serviceId<br/>
+                                            或使用 '*' 表示任意服务
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                </span>
+                                </template>
+                                <template slot-scope="scope">
+                                    <!--<el-input v-if="scope.row.serviceIdInEdit"
+                                              v-model="scope.row.serviceId"
+                                              @blur="onRouterConfirm(scope.row)"
+                                              v-focus>
+                                    </el-input>-->
+                                    <el-select allow-create filterable
+                                               v-if="scope.row.serviceIdInEdit"
+                                               v-model="scope.row.serviceId"
+                                               :value="selectServiceId"
+                                               @visible-change="refreshServices($event,scope.row)"
+                                               @change="onRouterConfirm(scope.row)"
+                                               v-focus>
+                                        <el-option :label="service"
+                                                   :key="service"
+                                                   :value="service"
+                                                   v-for="service in services"></el-option>
+                                    </el-select>
+                                    <span v-else>{{ scope.row.serviceId }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" prop="pathPattern" label="匹配路径">
+                                <template slot="header">
+                                <span>匹配路径
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            指定请求的路径<br/>
+                                            可以使用通配符，如 '/service-a/**'<br/>
+                                            '/service-a/module-b/**' 的优先级高于 '/service-a/**'
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                </span>
+                                </template>
+                                <template slot-scope="scope">
+                                    <el-form v-if="scope.row.pathPatternInEdit"
+                                             @submit.native.prevent>
+                                        <el-input v-model="scope.row.pathPattern"
+                                                  @blur="onRouterConfirm(scope.row)"
+                                                  @keyup.enter.native="onRouterConfirm(scope.row)"
+                                                  name="pathPattern"
+                                                  autocomplete v-focus>
+                                        </el-input>
+                                    </el-form>
+                                    <span v-else>{{ scope.row.pathPattern }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" prop="serverAddress" label="服务地址">
+                                <template slot="header">
+                                <span>服务地址
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            指定路由的服务地址<br/>
+                                            格式 '192.168.30.100:8760'<br/>
+                                            可以不指定端口，如 '192.168.30.100'
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                </span>
+                                </template>
+                                <template slot-scope="scope">
+                                    <el-form v-if="scope.row.serverAddressInEdit"
+                                             @submit.native.prevent>
+                                        <el-input v-model="scope.row.serverAddress"
+                                                  @blur="onRouterConfirm(scope.row)"
+                                                  @keyup.enter.native="onRouterConfirm(scope.row)"
+                                                  name="serverAddress"
+                                                  autocomplete v-focus>
+                                        </el-input>
+                                    </el-form>
+                                    <span v-else>{{ scope.row.serverAddress }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="强制路由" prop="forced">
+                                <template slot="header">
+                                <span>强制路由
+                                    <el-tooltip class="item" effect="dark" placement="right">
+                                        <div slot="content" v-cloak>
+                                            当匹配到的服务地址没有可用的实例时<br/>
+                                            如果强制路由开启则会导致服务不可用<br/>
+                                            如果强制路由关闭则会通过原本的路由规则重新选择一个服务
+                                        </div>
+                                        <i class="el-icon-warning-outline" v-cloak></i>
+                                    </el-tooltip>
+                                </span>
+                                </template>
+                                <template slot-scope="scope">
+                                    <el-switch @change="updateRouterShortcut(scope.row)"
+                                               v-model="scope.row.forced"></el-switch>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="是否启用" prop="enabled">
+                                <template slot-scope="scope">
+                                    <el-switch @change="updateRouterShortcut(scope.row)"
+                                               v-model="scope.row.enabled"></el-switch>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="操作" prop="url">
+                                <template slot-scope="scope">
+                                    <el-button @click="openRouterDialog(scope.row)" icon="el-icon-edit-outline"
+                                               type="primary"></el-button>
+                                    <el-button @click="deleteRouter(scope.row)" icon="el-icon-delete"
+                                               type="danger"></el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-main>
+                </el-container>
+            </el-main>
+        </el-container>
+        <el-footer style="text-align: center;color: #999999;height: 55px;padding-top: 15px;border-top: 1px solid #eee;"
+                   v-cloak>
+            ©2024 Linyuzai
+        </el-footer>
+    </el-container>
+</div>
+</body>
+<script src="/webjars/vue/2.6.11/vue.js" type="text/javascript"></script>
+<script src="/webjars/vue-resource/1.5.1/dist/vue-resource.min.js" type="text/javascript"></script>
+<script src="/webjars/element-ui/2.15.1/lib/index.js" type="text/javascript"></script>
+<script>
+    let app = new Vue({
+        el: "#concept-plugin-app",
+        data: {
+            groups: [],
+
+            prefix: '',
+            version: '',
+            services: ['*'],
+            routerList: [],
+            routerSearch: '',
+            dialog: {
+                router: {
+                    visible: false,
+                    add: true,
+                    title: "添加路由",
+                    rules: {
+                        serviceId: [
+                            {required: true, message: '匹配服务不能为空', trigger: 'blur'}
+                        ],
+                        pathPattern: [
+                            {required: true, message: '匹配路径不能为空', trigger: 'blur'}
+                        ],
+                        serverAddress: [
+                            {required: true, message: '服务地址不能为空', trigger: 'blur'}
+                        ],
+                        forced: [
+                            {required: true, message: 'forced is null', trigger: 'change'}
+                        ],
+                        enabled: [
+                            {required: true, message: 'enabled is null', trigger: 'change'}
+                        ]
+                    },
+                    form: {},
+                    init: {
+                        id: '',
+                        serviceId: '*',
+                        pathPattern: '',
+                        serverAddress: '',
+                        forced: false,
+                        enabled: true
+                    },
+                    row: {}
+                }
+            }
+        },
+        methods: {
+            selectGroup(index) {
+                alert(index);
+            },
+            refreshGroups() {
+                this.$http.get('/concept-plugin/management/groups')
+                    .then((response) => {
+                        let body = response.body;
+                        if (body.success) {
+                            this.groups = body.data;
+                        } else {
+                            console.log(response);
+                        }
+                    });
+            },
+            explain() {
+                let content =
+                    "本产品主要用于多人开发时提高接口调试效率<br/>" +
+                    "正式服务请在打包时排除该库<br/>" +
+                    "或使用 'concept.router.enabled=false' 禁用该功能"
+                this.$alert(content, '说明', {dangerouslyUseHTMLString: true});
+            },
+            buildUrl(path) {
+                let p = this.prefix;
+                if (!p.startsWith('/')) {
+                    p = '/' + p;
+                }
+                if (p.endsWith('/')) {
+                    p = p.substring(0, p.length - 1)
+                }
+                return p + path;
+            },
+            getVersion() {
+                this.version = 'v'
+                /*this.$http.get(this.buildUrl('/concept-router/management/version'))
+                    .then((response) => {
+                        if (response.body.success) {
+                            this.version = response.body.object;
+                        } else {
+                            console.log(response);
+                        }
+                    });*/
+            },
+            refreshServices(visible, row) {
+                if (visible) {
+                    /*this.$http.get(this.buildUrl('/concept-router/management/services'))
+                        .then((response) => {
+                            if (response.body.success) {
+                                this.services = response.body.object;
+                            } else {
+                                console.log(response);
+                            }
+                        });*/
+                } else {
+                    if (row !== undefined) {
+                        row.serviceIdInEdit = false;
+                        this.$forceUpdate();
+                    }
+                }
+            },
+            refreshRouters() {
+                /*this.$http.get(this.buildUrl('/concept-router/management/list'))
+                    .then((response) => {
+                        if (response.body.success) {
+                            this.routerList = response.body.object;
+                        } else {
+                            this.$notify.error({
+                                title: '查询失败',
+                                message: response.body.message,
+                                position: 'bottom-right'
+                            });
+                            this.routerList = [];
+                            console.log(response);
+                        }
+                    }, (response) => {
+                        this.$notify.error({
+                            title: '查询失败',
+                            message: '路由刷新失败',
+                            position: 'bottom-right'
+                        });
+                        this.routerList = [];
+                        console.log(response);
+                    });*/
+            },
+            openRouterDialog(row) {
+                let form = this.$refs['dialog.router.form'];
+                if (form !== undefined) {
+                    form.resetFields();
+                }
+                if (row === undefined) {
+                    this.dialog.router.add = true;
+                    this.dialog.router.title = '添加路由';
+                    this.dialog.router.form = JSON.parse(JSON.stringify(this.dialog.router.init));
+                    this.dialog.router.visible = true;
+                } else {
+                    this.dialog.router.add = false;
+                    this.dialog.router.title = '编辑路由';
+                    this.dialog.router.form = JSON.parse(JSON.stringify(row));
+                    this.dialog.router.visible = true;
+                }
+            },
+            addRouter() {
+                this.$refs['dialog.router.form'].validate((valid) => {
+                    if (valid) {
+                        this.$http.post(this.buildUrl("/concept-router/management/add"), this.dialog.router.form)
+                            .then((response) => {
+                                if (response.body.success) {
+                                    this.$notify.success({
+                                        title: '提交成功',
+                                        message: '路由已添加',
+                                        position: 'bottom-right'
+                                    });
+                                    this.dialog.router.visible = false;
+                                    this.refreshRouters();
+                                } else {
+                                    this.$notify.error({
+                                        title: '提交失败',
+                                        message: response.body.message,
+                                        position: 'bottom-right'
+                                    });
+                                    console.log(response);
+                                }
+                            }, (response) => {
+                                this.$notify.error({
+                                    title: '提交失败',
+                                    message: '路由添加失败',
+                                    position: 'bottom-right'
+                                });
+                                console.log(response);
+                            });
+                    }
+                    return valid;
+                });
+            },
+            updateRouter() {
+                this.$refs['dialog.router.form'].validate((valid) => {
+                    if (valid) {
+                        this.updateRouterShortcut(this.dialog.router.form);
+                        this.dialog.router.visible = false;
+                        this.refreshRouters();
+                    }
+                    return valid;
+                });
+            },
+            updateRouterShortcut(row, old) {
+                this.$http.put(this.buildUrl("/concept-router/management/update"), row)
+                    .then((response) => {
+                        if (response.body.success) {
+                            this.$notify.success({
+                                title: '提交成功',
+                                message: '路由已更新',
+                                position: 'bottom-right'
+                            });
+                        } else {
+                            if (old !== undefined) {
+                                this.refreshRouters();
+                            }
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: response.body.message,
+                                position: 'bottom-right'
+                            });
+                            console.log(response);
+                        }
+                    }, (response) => {
+                        if (old !== undefined) {
+                            this.refreshRouters();
+                        }
+                        this.$notify.error({
+                            title: '提交失败',
+                            message: '路由修改失败',
+                            position: 'bottom-right'
+                        });
+                        console.log(response);
+                    });
+            },
+            deleteRouter(row) {
+                console.log(row);
+                let param = {id: row.id};
+                this.$http.delete(this.buildUrl('/concept-router/management/delete'), {params: param})
+                    .then((response) => {
+                        if (response.body.success) {
+                            this.$notify.success({
+                                title: '提交成功',
+                                message: '路由已删除',
+                                position: 'bottom-right'
+                            });
+                            this.refreshRouters();
+                        } else {
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: response.body.message,
+                                position: 'bottom-right'
+                            });
+                            console.log(response);
+                        }
+                    }, (response) => {
+                        this.$notify.error({
+                            title: '提交失败',
+                            message: '路由删除失败',
+                            position: 'bottom-right'
+                        });
+                        console.log(response);
+                    });
+            },
+            routerCellDblClick(row, column, cell, event) {
+                this.dialog.router.row = JSON.parse(JSON.stringify(row));
+                if (column.property === 'serviceId') {
+                    row.serviceIdInEdit = true;
+                    //this.$set(row, "serviceIdInEdit", true);
+                }
+                if (column.property === 'pathPattern') {
+                    row.pathPatternInEdit = true;
+                    //this.$set(row, "pathPatternInEdit", true);
+                }
+                if (column.property === 'serverAddress') {
+                    row.serverAddressInEdit = true;
+                    //this.$set(row, "serverAddressInEdit", true);
+                }
+                this.$forceUpdate();
+            },
+            onRouterConfirm(row) {
+                let update = row.serviceIdInEdit || row.pathPatternInEdit || row.serverAddressInEdit;
+                row.serviceIdInEdit = false;
+                row.pathPatternInEdit = false;
+                row.serverAddressInEdit = false;
+                if (update) {
+                    let old = this.dialog.router.row;
+                    if (row.id === old.id) {
+                        if (row.serviceId === '') {
+                            row.serviceId = old.serviceId;
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: '匹配服务不能为空',
+                                position: 'bottom-right'
+                            });
+                            return;
+                        }
+                        if (row.pathPattern === '') {
+                            row.pathPattern = old.pathPattern;
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: '匹配路径不能为空',
+                                position: 'bottom-right'
+                            });
+                            return;
+                        }
+                        if (row.serverAddress === '') {
+                            row.serverAddress = old.serverAddress;
+                            this.$notify.error({
+                                title: '提交失败',
+                                message: '服务地址不能为空',
+                                position: 'bottom-right'
+                            });
+                            return;
+                        }
+                        if (row.serviceId !== old.serviceId ||
+                            row.pathPattern !== old.pathPattern ||
+                            row.serverAddress !== old.serverAddress) {
+                            this.updateRouterShortcut(row, old);
+                        }
+                    }
+                    this.$forceUpdate();
+                }
+            }
+        },
+        directives: {
+            focus: {
+                inserted: function (el) {
+                    if (el.childNodes[1].childNodes[1] === undefined) {
+                        el.childNodes[1].focus();
+                    } else {
+                        el.childNodes[1].childNodes[1].focus();
+                    }
+                }
+            }
+        },
+        computed: {},
+        mounted: function () {
+            this.refreshGroups();
+            this.getVersion();
+            this.refreshRouters();
+        }
+    });
+</script>
+</html>

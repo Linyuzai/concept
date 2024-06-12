@@ -9,8 +9,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @EnableConfigurationProperties(PluginConceptProperties.class)
-@Import(PluginConceptConfiguration.class)
+@Import({PluginConceptConfiguration.class, PluginManagementConfiguration.class})
 public @interface EnablePluginConcept {
-
 
 }
