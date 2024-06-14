@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.preperties;
 
-import com.github.linyuzai.plugin.core.autoload.PluginLocation;
+import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

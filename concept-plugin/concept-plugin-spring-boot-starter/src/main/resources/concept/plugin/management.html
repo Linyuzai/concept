@@ -67,15 +67,15 @@
             <h1 style="margin-top: 15px;"
                 v-cloak>
                 <span style="color: #333333;font-weight: normal;font-size:50px;">
-                    CONCEPT PLUGIN
+                    {{settings.title}}
                 </span>
                 <span style="color: #909399;font-weight: lighter;font-size:14px">
-                    {{version}}
+                    {{settings.version}}
                 </span>
             </h1>
             <a href="https://github.com/Linyuzai/concept" target="_blank" class="github-corner"
                aria-label="View source on GitHub">
-                <svg width="75" height="75" viewBox="0 0 250 250"
+                <svg width="70" height="70" viewBox="0 0 250 250"
                      style="fill:#333333; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
                      aria-hidden="true">
                     <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
@@ -89,6 +89,7 @@
         <el-container>
             <el-aside>
                 <el-menu style="height: 100%;"
+                         :default-active="group"
                          @select="selectGroup">
                     <el-menu-item :index="group.name"
                                   v-for="group in groups">
@@ -101,122 +102,38 @@
             <el-main style="height: 100%;">
                 <el-container style="height: 100%;">
                     <el-header style="text-align: left; font-size: 12px;padding-top: 20px;">
-                        <el-input placeholder="搜索匹配路径" v-model="routerSearch" style="width: 300px"></el-input>
-                        <el-button-group style="float: right;margin-left: 20px">
+                        <el-input placeholder="搜索插件"
+                                  v-model="pluginSearch"
+                                  clearable
+                                  autocomplete="on"
+                                  style="width: 300px;float: left">
+                            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                        </el-input>
+                        <el-upload action="/concept-plugin/management/upload"
+                                   :on-success="refreshPlugins"
+                                   :data="{group: this.group}"
+                                   :file-list="[]">
+                            <el-button type="primary" icon="el-icon-upload2" style="margin-left: 20px"></el-button>
+                        </el-upload>
+                        <!--<el-button-group style="float: right;margin-left: 20px">
                             <el-button @click="openRouterDialog()" icon="el-icon-plus"></el-button>
-                            <el-button @click="refreshRouters()" icon="el-icon-refresh"></el-button>
+                            <el-button @click="refreshPlugins()" icon="el-icon-refresh"></el-button>
                             <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
-                        </el-button-group>
-                        <el-dialog :title="dialog.router.title"
-                                   :visible.sync="dialog.router.visible">
-                            <el-form :model="dialog.router.form" :rules="dialog.router.rules"
-                                     ref="dialog.router.form">
-                                <el-form-item label="匹配服务" prop="serviceId">
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            指定请求的服务的 serviceId<br/>
-                                            或使用 '*' 表示任意服务
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                    <!--<el-input v-model="dialog.router.form.serviceId"></el-input>-->
-                                    <el-select allow-create filterable
-                                               v-model="dialog.router.form.serviceId"
-                                               @visible-change="refreshServices">
-                                        <el-option :label="service"
-                                                   :key="service"
-                                                   :value="service"
-                                                   v-for="service in services"></el-option>
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item label="匹配路径" prop="pathPattern">
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            指定请求的路径<br/>
-                                            可以使用通配符，如 '/service-a/**'<br/>
-                                            '/service-a/module-b/**' 的优先级高于 '/service-a/**'
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                    <el-input v-model="dialog.router.form.pathPattern"
-                                              name="pathPattern"
-                                              autocomplete></el-input>
-                                </el-form-item>
-                                <el-form-item label="服务地址" prop="serverAddress">
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            指定路由的服务地址<br/>
-                                            格式 '192.168.30.100:8760'<br/>
-                                            可以不指定端口，如 '192.168.30.100'
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                    <el-input v-model="dialog.router.form.serverAddress"
-                                              name="serverAddress"
-                                              autocomplete></el-input>
-                                </el-form-item>
-                                <el-form-item label="强制路由" prop="forced">
-                                    <el-switch v-model="dialog.router.form.forced"></el-switch>
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            当匹配到的服务地址没有可用的实例时<br/>
-                                            如果强制路由开启则会导致服务不可用<br/>
-                                            如果强制路由关闭则会通过原本的路由规则重新选择一个服务
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                </el-form-item>
-                                <el-form-item label="是否启用" prop="enabled">
-                                    <el-switch v-model="dialog.router.form.enabled"></el-switch>
-                                </el-form-item>
-                            </el-form>
-                            <div class="dialog-footer" slot="footer">
-                                <el-button @click="dialog.router.visible = false" v-cloak>取 消</el-button>
-                                <el-button v-if="dialog.router.add" @click="addRouter" type="primary" v-cloak>添 加
-                                </el-button>
-                                <el-button v-else @click="updateRouter" type="primary" v-cloak>编 辑</el-button>
-                            </div>
-                        </el-dialog>
+                        </el-button-group>-->
                     </el-header>
                     <el-main ref="tableMain" style="height:100%;padding-bottom: 0">
                         <el-table
-                                :data="routerList.filter(data => !routerSearch||data.pathPattern.toLowerCase().includes(routerSearch.toLowerCase()))"
-                                @cell-dblclick="routerCellDblClick"
+                                :data="plugins.filter(data => !pluginSearch||data.plugin.toLowerCase().includes(pluginSearch.toLowerCase()) || data.name.toLowerCase().includes(pluginSearch.toLowerCase()))"
                                 style="width: 100%;border-bottom-width: 0"
                                 height="100%">
                             <el-table-column align="center" label="序号" type="index">
                             </el-table-column>
-                            <el-table-column align="center" prop="serviceId">
+                            <el-table-column align="center" prop="plugin" label="插件包">
                                 <template slot="header">
-                                <span>匹配服务
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            指定请求的服务的 serviceId<br/>
-                                            或使用 '*' 表示任意服务
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                </span>
+                                    <span>插件包</span>
                                 </template>
                                 <template slot-scope="scope">
-                                    <!--<el-input v-if="scope.row.serviceIdInEdit"
-                                              v-model="scope.row.serviceId"
-                                              @blur="onRouterConfirm(scope.row)"
-                                              v-focus>
-                                    </el-input>-->
-                                    <el-select allow-create filterable
-                                               v-if="scope.row.serviceIdInEdit"
-                                               v-model="scope.row.serviceId"
-                                               :value="selectServiceId"
-                                               @visible-change="refreshServices($event,scope.row)"
-                                               @change="onRouterConfirm(scope.row)"
-                                               v-focus>
-                                        <el-option :label="service"
-                                                   :key="service"
-                                                   :value="service"
-                                                   v-for="service in services"></el-option>
-                                    </el-select>
-                                    <span v-else>{{ scope.row.serviceId }}</span>
+                                    {{ scope.row.plugin }}
                                 </template>
                             </el-table-column>
                             <el-table-column align="center" prop="pathPattern" label="匹配路径">
@@ -322,7 +239,14 @@
     let app = new Vue({
         el: "#concept-plugin-app",
         data: {
+            settings: {
+                title: "Concept Plugin",
+                version: "v2"
+            },
+            group: '',
             groups: [],
+            pluginSearch: '',
+            plugins: [],
 
             prefix: '',
             version: '',
@@ -365,8 +289,12 @@
             }
         },
         methods: {
+            initSettings() {
+
+            },
             selectGroup(index) {
-                alert(index);
+                this.group = index;
+                this.refreshPlugins();
             },
             refreshGroups() {
                 this.$http.get('/concept-plugin/management/groups')
@@ -374,7 +302,24 @@
                         let body = response.body;
                         if (body.success) {
                             this.groups = body.data;
+                            if (!this.group && this.groups.length > 0) {
+                                this.group = this.groups[0].name;
+                            }
+                            this.refreshPlugins();
                         } else {
+                            this.groups = [];
+                            console.log(response);
+                        }
+                    });
+            },
+            refreshPlugins() {
+                this.$http.get('/concept-plugin/management/plugins?group=' + this.group)
+                    .then((response) => {
+                        let body = response.body;
+                        if (body.success) {
+                            this.plugins = body.data;
+                        } else {
+                            this.plugins = [];
                             console.log(response);
                         }
                     });
@@ -643,9 +588,8 @@
         },
         computed: {},
         mounted: function () {
+            this.initSettings();
             this.refreshGroups();
-            this.getVersion();
-            this.refreshRouters();
         }
     });
 </script>

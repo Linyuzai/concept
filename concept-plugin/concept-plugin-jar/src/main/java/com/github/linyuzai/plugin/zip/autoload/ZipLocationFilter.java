@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.zip.autoload;
 
-import com.github.linyuzai.plugin.core.autoload.PluginLocation;
+import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 
 public class ZipLocationFilter implements PluginLocation.Filter {
 

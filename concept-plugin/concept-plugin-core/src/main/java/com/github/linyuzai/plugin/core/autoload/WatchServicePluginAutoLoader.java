@@ -1,14 +1,13 @@
 package com.github.linyuzai.plugin.core.autoload;
 
+import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginLoadErrorEvent;
-import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,7 +70,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     @Override
     public void addGroup(String group) {
-        final Path path = Paths.get(location.getGroupPath(group));
+        final Path path = Paths.get(location.getLoadedPath(group));
         try {
             path.register(watchService,
                     StandardWatchEventKinds.ENTRY_CREATE,
@@ -88,8 +87,18 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         return watchStates.getOrDefault(group, false);
     }
 
+    @Override
+    public Plugin getPlugin(String group, String name) {
+        String path = location.getLoadedPluginPath(group, name);
+        Object pluginId = pathIdMapping.get(path);
+        if (pluginId == null) {
+            return null;
+        }
+        return concept.getRepository().get(pluginId);
+    }
+
     private void notifyOnStart(String group) {
-        String[] names = location.getPlugins(group);
+        String[] names = location.getLoadedPlugins(group);
         for (String name : names) {
             onNotify(StandardWatchEventKinds.ENTRY_CREATE, group, name);
         }
@@ -149,7 +158,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     }
 
     public void onNotify(WatchEvent.Kind<?> kind, String group, String name) {
-        String pluginPath = location.getPluginPath(group, name);
+        String pluginPath = location.getLoadedPluginPath(group, name);
         if (pluginPath == null) {
             return;
         }

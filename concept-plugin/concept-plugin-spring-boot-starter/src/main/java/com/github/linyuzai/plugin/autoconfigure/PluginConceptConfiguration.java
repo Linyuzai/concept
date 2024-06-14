@@ -6,7 +6,8 @@ import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperti
 import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginExecutorProvider;
-import com.github.linyuzai.plugin.core.autoload.PluginLocation;
+import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
+import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -185,7 +186,7 @@ public class PluginConceptConfiguration {
         public PluginLocation pluginLocation(PluginConceptProperties properties,
                                              PluginLocation.Filter filter) {
             String basePath = properties.getAutoload().getLocation().getBasePath();
-            return new PluginLocation(basePath, filter);
+            return new LocalPluginLocation(basePath, filter);
         }
 
         @Bean(initMethod = "start", destroyMethod = "stop")
