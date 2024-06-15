@@ -6,13 +6,13 @@ import java.util.stream.Stream;
 
 public interface PluginRepository {
 
-    Plugin get(Object id);
+    Plugin get(Object o);
 
-    void add(Plugin plugin);
+    void add(Object o, Plugin plugin);
 
-    Plugin remove(Object plugin);
+    Plugin remove(Object o);
 
-    boolean contains(Object plugin);
+    boolean contains(Object o);
 
     Stream<Plugin> stream();
 }

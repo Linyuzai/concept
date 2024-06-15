@@ -48,6 +48,12 @@ public interface PluginConcept {
      */
     Plugin unload(Object o);
 
+    boolean isLoaded(Object o);
+
+    boolean isLoading(Object o);
+
+    boolean isUnloading(Object o);
+
     /**
      * 获得插件存储
      *

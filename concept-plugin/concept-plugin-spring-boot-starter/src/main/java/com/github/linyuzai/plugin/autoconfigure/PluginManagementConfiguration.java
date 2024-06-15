@@ -18,7 +18,7 @@ public class PluginManagementConfiguration {
     @Configuration(proxyBeanMethods = false)
     public static class WebMvcConfiguration implements WebMvcConfigurer {
 
-        @Bean
+        @Bean(initMethod = "init")
         public ServletPluginManagementController servletPluginManagementController() {
             return new ServletPluginManagementController();
         }
@@ -37,7 +37,7 @@ public class PluginManagementConfiguration {
     @Configuration(proxyBeanMethods = false)
     public static class WebFluxConfiguration implements WebFluxConfigurer {
 
-        @Bean
+        @Bean(initMethod = "init")
         public ReactivePluginManagementController reactivePluginManagementController() {
             return new ReactivePluginManagementController();
         }

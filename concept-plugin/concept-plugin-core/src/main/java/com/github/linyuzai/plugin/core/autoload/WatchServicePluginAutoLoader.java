@@ -33,8 +33,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      */
     private final PluginLocation location;
 
-    private final Map<String, Object> pathIdMapping = new ConcurrentHashMap<>();
-
     private final Map<String, Boolean> watchStates = new ConcurrentHashMap<>();
 
     private WatchService watchService;
@@ -85,16 +83,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     @Override
     public Boolean getGroupState(String group) {
         return watchStates.getOrDefault(group, false);
-    }
-
-    @Override
-    public Plugin getPlugin(String group, String name) {
-        String path = location.getLoadedPluginPath(group, name);
-        Object pluginId = pathIdMapping.get(path);
-        if (pluginId == null) {
-            return null;
-        }
-        return concept.getRepository().get(pluginId);
     }
 
     private void notifyOnStart(String group) {
@@ -158,48 +146,48 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     }
 
     public void onNotify(WatchEvent.Kind<?> kind, String group, String name) {
-        String pluginPath = location.getLoadedPluginPath(group, name);
-        if (pluginPath == null) {
+        String path = location.getLoadedPluginPath(group, name);
+        if (path == null) {
             return;
         }
         if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-            onFileCreated(pluginPath);
+            onFileCreated(path);
         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-            onFileModified(pluginPath);
+            onFileModified(path);
         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-            onFileDeleted(pluginPath);
+            onFileDeleted(path);
         }
     }
 
     /**
      * 文件创建
      *
-     * @param pluginPath 监听到的事件
+     * @param path 监听到的事件
      */
-    public void onFileCreated(String pluginPath) {
-        Plugin plugin = load(pluginPath);
-        concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin));
+    public void onFileCreated(String path) {
+        Plugin plugin = load(path);
+        concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
     }
 
     /**
      * 文件修改
      *
-     * @param pluginPath 监听到的事件
+     * @param path 监听到的事件
      */
-    public void onFileModified(String pluginPath) {
-        Plugin plugin = reload(pluginPath);
-        concept.getEventPublisher().publish(new PluginAutoReloadEvent(plugin));
+    public void onFileModified(String path) {
+        Plugin plugin = reload(path);
+        concept.getEventPublisher().publish(new PluginAutoReloadEvent(plugin, path));
     }
 
     /**
      * 文件删除
      *
-     * @param pluginPath 监听到的事件
+     * @param path 监听到的事件
      */
-    public void onFileDeleted(String pluginPath) {
-        Plugin plugin = unload(pluginPath);
+    public void onFileDeleted(String path) {
+        Plugin plugin = unload(path);
         if (plugin != null) {
-            concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin));
+            concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin, path));
         }
     }
 
@@ -207,32 +195,26 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         concept.getEventPublisher().publish(new PluginLoadErrorEvent(e));
     }
 
-    public Plugin load(String pluginPath) {
-        Plugin plugin = concept.load(pluginPath);
-        pathIdMapping.put(pluginPath, plugin.getId());
-        return plugin;
+    public Plugin load(String path) {
+        return concept.load(path);
     }
 
     /**
      * 卸载并移除映射关系
      *
-     * @param pluginPath 文件路径
+     * @param path 文件路径
      */
-    public Plugin unload(String pluginPath) {
-        Object id = pathIdMapping.remove(pluginPath);
-        if (id == null) {
-            return null;
-        }
-        return concept.unload(id);
+    public Plugin unload(String path) {
+        return concept.unload(path);
     }
 
     /**
      * 重新加载
      *
-     * @param pluginPath 插件源
+     * @param path 插件源
      */
-    public Plugin reload(String pluginPath) {
-        unload(pluginPath);
-        return load(pluginPath);
+    public Plugin reload(String path) {
+        unload(path);
+        return load(path);
     }
 }

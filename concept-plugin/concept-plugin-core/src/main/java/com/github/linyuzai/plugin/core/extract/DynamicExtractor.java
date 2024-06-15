@@ -154,7 +154,7 @@ public class DynamicExtractor implements PluginExtractor {
                 }
 
                 @Override
-                public void onExtract(PluginContext plugin) {
+                public void onExtract(PluginContext context) {
 
                 }
             }.getInvoker();
@@ -184,7 +184,7 @@ public class DynamicExtractor implements PluginExtractor {
                 }
 
                 @Override
-                public void onExtract(Plugin plugin) {
+                public void onExtract(Plugin plugin, PluginContext context) {
 
                 }
             }.getInvoker();
@@ -214,7 +214,7 @@ public class DynamicExtractor implements PluginExtractor {
                 }
 
                 @Override
-                public void onExtract(Void plugin) {
+                public void onExtract(Void plugin, PluginContext context) {
 
                 }
             }.getInvoker();
@@ -244,7 +244,7 @@ public class DynamicExtractor implements PluginExtractor {
                 }
 
                 @Override
-                public void onExtract(Void plugin) {
+                public void onExtract(Void plugin, PluginContext context) {
 
                 }
             }.getInvoker();

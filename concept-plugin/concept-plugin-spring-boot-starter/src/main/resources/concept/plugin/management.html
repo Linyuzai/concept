@@ -20,7 +20,7 @@
             height: 100%;
         }
 
-        .el-table::before {
+        .el-table::before, .el-table__fixed-right::before, .el-table__fixed::before {
             height: 0;
         }
 
@@ -111,113 +111,62 @@
                         </el-input>
                         <el-upload action="/concept-plugin/management/upload"
                                    :on-success="refreshPlugins"
-                                   :data="{group: this.group}"
-                                   :file-list="[]">
+                                   :on-error="uploadError"
+                                   :data="{group: this.group}">
+                            <!--:file-list="[]"-->
                             <el-button type="primary" icon="el-icon-upload2" style="margin-left: 20px"></el-button>
                         </el-upload>
-                        <!--<el-button-group style="float: right;margin-left: 20px">
-                            <el-button @click="openRouterDialog()" icon="el-icon-plus"></el-button>
-                            <el-button @click="refreshPlugins()" icon="el-icon-refresh"></el-button>
-                            <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
-                        </el-button-group>-->
                     </el-header>
                     <el-main ref="tableMain" style="height:100%;padding-bottom: 0">
                         <el-table
                                 :data="plugins.filter(data => !pluginSearch||data.plugin.toLowerCase().includes(pluginSearch.toLowerCase()) || data.name.toLowerCase().includes(pluginSearch.toLowerCase()))"
                                 style="width: 100%;border-bottom-width: 0"
                                 height="100%">
-                            <el-table-column align="center" label="序号" type="index">
+                            <el-table-column align="center" label="序号" type="index" fixed>
                             </el-table-column>
-                            <el-table-column align="center" prop="plugin" label="插件包">
-                                <template slot="header">
-                                    <span>插件包</span>
-                                </template>
+                            <el-table-column align="center" prop="plugin" label="插件包" sortable fixed>
+                                <!--<template slot="header">插件包</template>
                                 <template slot-scope="scope">
                                     {{ scope.row.plugin }}
-                                </template>
+                                </template>-->
                             </el-table-column>
-                            <el-table-column align="center" prop="pathPattern" label="匹配路径">
+                            <el-table-column align="center" prop="name" label="插件名称" sortable>
                                 <template slot="header">
-                                <span>匹配路径
+                                <span>插件名称
                                     <el-tooltip class="item" effect="dark" placement="right">
                                         <div slot="content" v-cloak>
-                                            指定请求的路径<br/>
-                                            可以使用通配符，如 '/service-a/**'<br/>
-                                            '/service-a/module-b/**' 的优先级高于 '/service-a/**'
+                                            插件配置 'plugin.properties' 中定义的名称<br/>
+                                            即 'concept.plugin.name' 属性值
                                         </div>
                                         <i class="el-icon-warning-outline" v-cloak></i>
                                     </el-tooltip>
                                 </span>
                                 </template>
                                 <template slot-scope="scope">
-                                    <el-form v-if="scope.row.pathPatternInEdit"
-                                             @submit.native.prevent>
-                                        <el-input v-model="scope.row.pathPattern"
-                                                  @blur="onRouterConfirm(scope.row)"
-                                                  @keyup.enter.native="onRouterConfirm(scope.row)"
-                                                  name="pathPattern"
-                                                  autocomplete v-focus>
-                                        </el-input>
-                                    </el-form>
-                                    <span v-else>{{ scope.row.pathPattern }}</span>
+                                    {{ scope.row.name }}
                                 </template>
                             </el-table-column>
-                            <el-table-column align="center" prop="serverAddress" label="服务地址">
-                                <template slot="header">
-                                <span>服务地址
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            指定路由的服务地址<br/>
-                                            格式 '192.168.30.100:8760'<br/>
-                                            可以不指定端口，如 '192.168.30.100'
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                </span>
-                                </template>
+                            <el-table-column align="center" prop="timestamp" label="上传时间" sortable>
+                                <template slot="header">上传时间</template>
                                 <template slot-scope="scope">
-                                    <el-form v-if="scope.row.serverAddressInEdit"
-                                             @submit.native.prevent>
-                                        <el-input v-model="scope.row.serverAddress"
-                                                  @blur="onRouterConfirm(scope.row)"
-                                                  @keyup.enter.native="onRouterConfirm(scope.row)"
-                                                  name="serverAddress"
-                                                  autocomplete v-focus>
-                                        </el-input>
-                                    </el-form>
-                                    <span v-else>{{ scope.row.serverAddress }}</span>
+                                    {{ scope.row.timestamp }}
                                 </template>
                             </el-table-column>
-                            <el-table-column align="center" label="强制路由" prop="forced">
-                                <template slot="header">
-                                <span>强制路由
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            当匹配到的服务地址没有可用的实例时<br/>
-                                            如果强制路由开启则会导致服务不可用<br/>
-                                            如果强制路由关闭则会通过原本的路由规则重新选择一个服务
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                </span>
-                                </template>
+                            <el-table-column align="center" prop="state" label="插件状态" sortable fixed="right">
+                                <template slot="header">插件状态</template>
                                 <template slot-scope="scope">
-                                    <el-switch @change="updateRouterShortcut(scope.row)"
-                                               v-model="scope.row.forced"></el-switch>
+                                    {{ scope.row.state }}
                                 </template>
                             </el-table-column>
-                            <el-table-column align="center" label="是否启用" prop="enabled">
+                            <el-table-column align="center" label="操作" prop="url" fixed="right" width="250">
                                 <template slot-scope="scope">
-                                    <el-switch @change="updateRouterShortcut(scope.row)"
-                                               v-model="scope.row.enabled"></el-switch>
-                                </template>
-                            </el-table-column>
-                            <el-table-column align="center" label="操作" prop="url">
-                                <template slot-scope="scope">
-                                    <el-button @click="openRouterDialog(scope.row)" icon="el-icon-edit-outline"
-                                               type="primary"></el-button>
-                                    <el-button @click="deleteRouter(scope.row)" icon="el-icon-delete"
-                                               type="danger"></el-button>
+                                    <el-button v-if="scope.row.state==='loaded'" @click="unloadPlugin(scope.row.plugin)" type="text">卸载</el-button>
+                                    <el-button v-if="scope.row.state==='loaded'" @click="" type="text">重新加载</el-button>
+                                    <el-button v-if="scope.row.state==='loaded'" @click="" type="text">查看配置</el-button>
+                                    <el-button v-if="scope.row.state==='unloaded'" @click="loadPlugin(scope.row.plugin)" type="text">加载</el-button>
+                                    <el-button v-if="scope.row.state==='unloaded'" @click="" type="text">重命名</el-button>
+                                    <el-button v-if="scope.row.state==='unloaded'" @click="deletePlugin(scope.row.plugin)" type="text">删除</el-button>
+                                    <el-button @click="" type="text">下载</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -324,6 +273,48 @@
                         }
                     });
             },
+            uploadError(err, file, fileList) {
+                this.$notify.error({
+                    title: '插件上传',
+                    message: '上传失败',
+                    position: 'bottom-right'
+                });
+                console.log(err);
+            },
+            loadPlugin(name) {
+                this.$http.get('/concept-plugin/management/load?group=' + this.group + '&name=' + name)
+                    .then((response) => {
+                        let body = response.body;
+                        if (body.success) {
+                            this.refreshPlugins();
+                        } else {
+                            console.log(response);
+                        }
+                    });
+            },
+            unloadPlugin(name) {
+                this.$http.get('/concept-plugin/management/unload?group=' + this.group + '&name=' + name)
+                    .then((response) => {
+                        let body = response.body;
+                        if (body.success) {
+                            this.refreshPlugins();
+                        } else {
+                            console.log(response);
+                        }
+                    });
+            },
+            deletePlugin(name) {
+                this.$http.get('/concept-plugin/management/delete?group=' + this.group + '&name=' + name)
+                    .then((response) => {
+                        let body = response.body;
+                        if (body.success) {
+                            this.refreshPlugins();
+                        } else {
+                            console.log(response);
+                        }
+                    });
+            },
+
             explain() {
                 let content =
                     "本产品主要用于多人开发时提高接口调试效率<br/>" +

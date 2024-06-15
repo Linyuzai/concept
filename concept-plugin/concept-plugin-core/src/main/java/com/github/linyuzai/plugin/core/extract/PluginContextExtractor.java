@@ -34,4 +34,11 @@ public abstract class PluginContextExtractor<T extends PluginContext> extends Ab
         }
         return null;
     }
+
+    @Override
+    public void onExtract(T plugin, PluginContext context) {
+        onExtract(plugin);
+    }
+
+    public abstract void onExtract(T context);
 }

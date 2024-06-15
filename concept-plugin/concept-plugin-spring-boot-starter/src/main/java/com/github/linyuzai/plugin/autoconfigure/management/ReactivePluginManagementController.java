@@ -15,7 +15,7 @@ public class ReactivePluginManagementController extends PluginManagementControll
     public Mono<Void> upload(@RequestPart("file") Flux<FilePart> files, @RequestPart("group") String group) {
         return files.flatMap(it -> {
             String filename = it.filename();
-            String path = location.getLoadedPluginPath(group, filename);
+            String path = location.getUnloadedPluginPath(group, filename);
             return it.transferTo(new File(path));
         }).collectList().then();
     }

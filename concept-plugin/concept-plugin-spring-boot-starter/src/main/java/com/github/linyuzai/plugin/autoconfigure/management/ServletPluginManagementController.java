@@ -17,7 +17,7 @@ public class ServletPluginManagementController extends PluginManagementControlle
     public void upload(@RequestParam("file") MultipartFile[] files, @RequestParam("group") String group) throws IOException {
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
-            String path = location.getLoadedPluginPath(group, filename);
+            String path = location.getUnloadedPluginPath(group, filename);
             file.transferTo(new File(path));
         }
     }

@@ -118,7 +118,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         if (invoke == null) {
             return;
         }
-        onExtract((T) invoke);
+        onExtract((T) invoke, context);
         context.publish(new PluginExtractedEvent(context, this, invoke));
     }
 
@@ -127,7 +127,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      *
      * @param plugin 插件对象
      */
-    public abstract void onExtract(T plugin);
+    public abstract void onExtract(T plugin, PluginContext context);
 
     /**
      * 依赖的解析器 {@link PluginResolver}

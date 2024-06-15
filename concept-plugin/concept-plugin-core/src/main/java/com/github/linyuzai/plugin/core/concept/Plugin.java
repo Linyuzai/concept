@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.read.PluginReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +13,6 @@ public interface Plugin {
 
     Object getId();
 
-    <T> T read(Class<T> readable, Object key);
-
     Metadata getMetadata();
 
     void setMetadata(Metadata metadata);
@@ -21,6 +20,16 @@ public interface Plugin {
     PluginConcept getConcept();
 
     void setConcept(PluginConcept concept);
+
+    void addReader(PluginReader reader);
+
+    void removeReader(PluginReader reader);
+
+    void addDestroyListener(DestroyListener listener);
+
+    void removeDestroyListener(DestroyListener listener);
+
+    <T> T read(Class<T> readable, Object key);
 
     void initialize();
 
@@ -80,5 +89,10 @@ public interface Plugin {
     interface Content {
 
         InputStream getInputStream() throws IOException;
+    }
+
+    interface DestroyListener {
+
+        void onDestroy(Plugin plugin);
     }
 }

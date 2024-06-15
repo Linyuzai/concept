@@ -1,8 +1,13 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
+import com.github.linyuzai.plugin.core.autoload.PluginAutoLoadEvent;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
+import com.github.linyuzai.plugin.core.autoload.PluginAutoReloadEvent;
+import com.github.linyuzai.plugin.core.autoload.PluginAutoUnloadEvent;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +15,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -24,11 +25,50 @@ public class PluginManagementController {
 
     protected final Log log = LogFactory.getLog("PluginManagement");
 
+    protected final Set<String> loadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    protected final Set<String> unloadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    @Autowired
+    protected PluginConcept concept;
+
     @Autowired
     protected PluginLocation location;
 
     @Autowired
     protected PluginAutoLoader loader;
+
+    public void init() {
+        concept.getEventPublisher().register(new PluginAutoLoadListener());
+    }
+
+    @GetMapping("load")
+    public Response load(@RequestParam("group") String group, @RequestParam("name") String name) {
+        return manage(() -> {
+            String path = location.getLoadedPluginPath(group, name);
+            loadingSet.add(path);
+            location.load(group, name);
+            return null;
+        }, () -> "加载失败");
+    }
+
+    @GetMapping("unload")
+    public Response unload(@RequestParam("group") String group, @RequestParam("name") String name) {
+        return manage(() -> {
+            String path = location.getLoadedPluginPath(group, name);
+            unloadingSet.add(path);
+            location.unload(group, name);
+            return null;
+        }, () -> "卸载失败");
+    }
+
+    @GetMapping("delete")
+    public Response delete(@RequestParam("group") String group, @RequestParam("name") String name) {
+        return manage(() -> {
+            location.delete(group, name);
+            return null;
+        }, () -> "删除失败");
+    }
 
     @GetMapping("groups")
     public Response groups() {
@@ -71,8 +111,12 @@ public class PluginManagementController {
     }
 
     public ManagedPlugin loadedPlugin(String group, String plugin) {
-        Plugin get = loader.getPlugin(group, plugin);
+        String path = location.getLoadedPluginPath(group, plugin);
+        Plugin get = concept.getRepository().get(path);
         if (get == null) {
+            if (loadingSet.contains(path)) {
+                return new ManagedPlugin(plugin, "", "loading");
+            }
             return new ManagedPlugin(plugin, "", "error");
         } else {
             String name = get.getMetadata().get(Plugin.Metadata.KEY_NAME, "");
@@ -81,6 +125,10 @@ public class PluginManagementController {
     }
 
     public ManagedPlugin unloadedPlugin(String group, String plugin) {
+        String path = location.getLoadedPluginPath(group, plugin);
+        if (unloadingSet.contains(path)) {
+            return new ManagedPlugin(plugin, "", "unloading");
+        }
         return new ManagedPlugin(plugin, "", "unloaded");
     }
 
@@ -94,6 +142,22 @@ public class PluginManagementController {
 
     public Response failure(String message) {
         return new Response(false, message);
+    }
+
+    public class PluginAutoLoadListener implements PluginEventListener {
+
+        @Override
+        public void onEvent(Object event) {
+            if (event instanceof PluginAutoLoadEvent) {
+                loadingSet.remove(((PluginAutoLoadEvent) event).getPath());
+            } else if (event instanceof PluginAutoReloadEvent) {
+
+            } else if (event instanceof PluginAutoUnloadEvent) {
+                unloadingSet.remove(((PluginAutoUnloadEvent) event).getPath());
+            } else {
+
+            }
+        }
     }
 
     @Getter

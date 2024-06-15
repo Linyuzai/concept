@@ -20,6 +20,8 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.lock.DefaultPluginLock;
+import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLoadLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
@@ -90,20 +92,26 @@ public class PluginConceptConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PluginHandlerChainFactory pluginHandlerChainFactory() {
-        return new DefaultPluginHandlerChainFactory();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public PluginTreeFactory pluginTreeFactory() {
         return new DefaultPluginTreeFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
+    public PluginHandlerChainFactory pluginHandlerChainFactory() {
+        return new DefaultPluginHandlerChainFactory();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public PluginRepository pluginRepository() {
         return new DefaultPluginRepository();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PluginLock pluginLock() {
+        return new DefaultPluginLock();
     }
 
     @Bean
@@ -149,6 +157,7 @@ public class PluginConceptConfiguration {
                                        PluginHandlerChainFactory handlerChainFactory,
                                        PluginTreeFactory treeFactory,
                                        PluginRepository repository,
+                                       PluginLock lock,
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
                                        List<PluginFactory> factories,
@@ -161,6 +170,7 @@ public class PluginConceptConfiguration {
                 .handlerChainFactory(handlerChainFactory)
                 .treeFactory(treeFactory)
                 .repository(repository)
+                .lock(lock)
                 .eventPublisher(eventPublisher)
                 .logger(logger)
                 .addFactories(factories)

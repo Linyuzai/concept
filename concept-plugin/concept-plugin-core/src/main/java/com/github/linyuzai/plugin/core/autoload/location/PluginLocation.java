@@ -33,6 +33,12 @@ public interface PluginLocation {
 
     String getDeletedPluginPath(String group, String name);
 
+    void load(String group, String name);
+
+    void unload(String group, String name);
+
+    void delete(String group, String name);
+
     interface Filter {
 
         boolean filter(String group, String name);

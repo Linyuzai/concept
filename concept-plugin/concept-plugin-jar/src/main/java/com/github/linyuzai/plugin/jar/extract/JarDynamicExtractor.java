@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.extract;
 
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.extract.DynamicExtractor;
 import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
 import com.github.linyuzai.plugin.jar.match.PluginClass;
@@ -93,7 +94,7 @@ public class JarDynamicExtractor extends DynamicExtractor {
                 }
 
                 @Override
-                public void onExtract(Void plugin) {
+                public void onExtract(Void plugin, PluginContext context) {
 
                 }
             }.getInvoker();

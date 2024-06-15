@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.bean;
 
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
 import lombok.Getter;
 import org.springframework.context.ApplicationContext;
@@ -47,7 +48,7 @@ public class BeanDynamicExtractor extends JarDynamicExtractor {
                 }
 
                 @Override
-                public void onExtract(Void plugin) {
+                public void onExtract(Void plugin, PluginContext context) {
 
                 }
             }.getInvoker();

@@ -20,6 +20,4 @@ public interface PluginAutoLoader {
     void addGroup(String group);
 
     Boolean getGroupState(String group);
-
-    Plugin getPlugin(String group, String name);
 }

@@ -92,6 +92,46 @@ public class LocalPluginLocation implements PluginLocation {
         return getPluginPath(group, name, DELETED);
     }
 
+    @Override
+    public void load(String group, String name) {
+        move(group, name, UNLOADED, LOADED);
+    }
+
+    @Override
+    public void unload(String group, String name) {
+        move(group, name, LOADED, UNLOADED);
+    }
+
+    @Override
+    public void delete(String group, String name) {
+        move(group, name, UNLOADED, DELETED);
+    }
+
+    protected boolean move(String group, String name, String from, String to) {
+        String fromPath = getPluginPath(group, name, from);
+        if (fromPath == null) {
+            throw new IllegalArgumentException(name + " is not a Plugin");
+        }
+        File fromFile = new File(fromPath);
+        if (!fromFile.exists()) {
+            throw new IllegalArgumentException(name + " not existed");
+        }
+        String toPath = getPluginPath(group, name, to);
+        File toFile = new File(toPath);
+        int i = 1;
+        while (toFile.exists()) {
+            String path = toFile.getAbsolutePath();
+            int index = path.lastIndexOf(".");
+            if (index == -1) {
+                toFile = new File(path + i);
+            } else {
+                toFile = new File(path.substring(0, index) + "(" + i + ")" + path.substring(index));
+            }
+            i++;
+        }
+        return fromFile.renameTo(toFile);
+    }
+
     protected File getGroupDirectory(String group) {
         return check(new File(basePath, group));
     }

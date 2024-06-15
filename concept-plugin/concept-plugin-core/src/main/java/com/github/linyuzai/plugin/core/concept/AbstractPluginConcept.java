@@ -5,20 +5,22 @@ import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.exception.PluginLoadException;
+import com.github.linyuzai.plugin.core.exception.PluginUnloadException;
 import com.github.linyuzai.plugin.core.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 
 import java.util.*;
 
@@ -34,18 +36,20 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      */
     protected PluginContextFactory contextFactory;
 
+    protected PluginTreeFactory treeFactory;
+
+    protected PluginHandlerChainFactory handlerChainFactory;
+
+    protected PluginRepository repository;
+
+    protected PluginLock lock;
+
     /**
      * 事件发布者
      */
     protected PluginEventPublisher eventPublisher;
 
     protected PluginLogger logger;
-
-    protected PluginTreeFactory treeFactory;
-
-    protected PluginHandlerChainFactory handlerChainFactory;
-
-    protected PluginRepository repository;
 
     protected Collection<PluginHandler> handlers;
 
@@ -74,27 +78,26 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public void addExtractors(PluginExtractor... extractors) {
         addExtractors(Arrays.asList(extractors));
-        resetHandlerChain();
     }
 
     @Override
     public void addExtractors(Collection<? extends PluginExtractor> extractors) {
         this.extractors.addAll(extractors);
-
+        resetHandlerChain();
     }
 
     @Override
     public void removeExtractors(PluginExtractor... extractors) {
         removeExtractors(Arrays.asList(extractors));
-        resetHandlerChain();
     }
 
     @Override
     public void removeExtractors(Collection<? extends PluginExtractor> extractors) {
         this.extractors.removeAll(extractors);
+        resetHandlerChain();
     }
 
-    protected PluginHandlerChain getHandlerChain() {
+    protected PluginHandlerChain obtainHandlerChain() {
         if (handlerChain == null) {
             synchronized (this) {
                 if (handlerChain == null) {
@@ -142,7 +145,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin load(Object o) {
+    public Plugin load(@NonNull Object o) {
+        lock.lock(o, PluginLock.LOADING);
+        if (repository.contains(o)) {
+            throw new IllegalArgumentException("Plugin is already loaded: " + o);
+        }
         //创建上下文
         PluginContext context = contextFactory.create(this);
         try {
@@ -168,7 +175,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             eventPublisher.publish(new PluginPreparedEvent(context));
 
             //解析插件
-            getHandlerChain().next(context);
+            obtainHandlerChain().next(context);
             //提取插件
             for (PluginExtractor extractor : extractors) {
                 extractor.extract(context);
@@ -179,12 +186,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
             //销毁上下文
             context.destroy();
-            repository.add(plugin);
+            repository.add(o, plugin);
             eventPublisher.publish(new PluginLoadedEvent(plugin));
 
             return plugin;
         } catch (Throwable e) {
             throw new PluginLoadException(context, e);
+        } finally {
+            lock.unlock(o, PluginLock.LOADING);
         }
     }
 
@@ -195,13 +204,35 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin unload(Object o) {
-        Plugin removed = repository.remove(o);
-        if (removed != null) {
-            removed.destroy();
-            eventPublisher.publish(new PluginUnloadedEvent(removed));
+    public Plugin unload(@NonNull Object o) {
+        lock.lock(o, PluginLock.UNLOADING);
+        try {
+            Plugin removed = repository.remove(o);
+            if (removed != null) {
+                removed.destroy();
+                eventPublisher.publish(new PluginUnloadedEvent(removed));
+            }
+            return removed;
+        } catch (Throwable e) {
+            throw new PluginUnloadException(o, e);
+        } finally {
+            lock.unlock(o, PluginLock.UNLOADING);
         }
-        return removed;
+    }
+
+    @Override
+    public boolean isLoaded(Object o) {
+        return repository.contains(o);
+    }
+
+    @Override
+    public boolean isLoading(Object o) {
+        return PluginLock.LOADING.equals(lock.getLockArg(o));
+    }
+
+    @Override
+    public boolean isUnloading(Object o) {
+        return PluginLock.UNLOADING.equals(lock.getLockArg(o));
     }
 
     @SuppressWarnings("unchecked")
@@ -209,11 +240,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected PluginContextFactory contextFactory;
 
-        protected PluginHandlerChainFactory handlerChainFactory;
-
         protected PluginTreeFactory treeFactory;
 
+        protected PluginHandlerChainFactory handlerChainFactory;
+
         protected PluginRepository repository;
+
+        protected PluginLock lock;
 
         protected PluginEventPublisher eventPublisher;
 
@@ -238,18 +271,23 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (B) this;
         }
 
-        public B handlerChainFactory(PluginHandlerChainFactory handlerChainFactory) {
-            this.handlerChainFactory = handlerChainFactory;
-            return (B) this;
-        }
-
         public B treeFactory(PluginTreeFactory treeFactory) {
             this.treeFactory = treeFactory;
             return (B) this;
         }
 
+        public B handlerChainFactory(PluginHandlerChainFactory handlerChainFactory) {
+            this.handlerChainFactory = handlerChainFactory;
+            return (B) this;
+        }
+
         public B repository(PluginRepository repository) {
             this.repository = repository;
+            return (B) this;
+        }
+
+        public B lock(PluginLock lock) {
+            this.lock = lock;
             return (B) this;
         }
 
@@ -378,10 +416,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             T concept = create();
             eventPublisher.register(eventListeners);
             concept.setContextFactory(contextFactory);
-            concept.setHandlerChainFactory(handlerChainFactory);
             concept.setTreeFactory(treeFactory);
+            concept.setHandlerChainFactory(handlerChainFactory);
             concept.setRepository(repository);
+            concept.setLock(lock);
             concept.setEventPublisher(eventPublisher);
+            concept.setLogger(logger);
             concept.setFactories(factories);
             concept.setHandlers(handlers);
             concept.setExtractors(extractors);
@@ -389,88 +429,5 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         }
 
         protected abstract T create();
-
-        /**
-         * 遍历插件提取器，添加插件提取器依赖的插件解析器
-         *
-         * @param extractors 插件提取器
-         */
-        @Deprecated
-        @SneakyThrows
-        private void addResolversDependOnExtractors(Collection<? extends PluginExtractor> extractors) {
-            for (PluginExtractor extractor : extractors) {
-                //插件提取器依赖的插件解析器
-                Class<? extends PluginHandler>[] dependencies = extractor.getDependencies();
-                for (Class<? extends PluginHandler> dependency : dependencies) {
-                    //已经存在
-                    if (containsResolver(dependency)) {
-                        continue;
-                    }
-                    //获得对应的实现类
-                    /*Class<? extends PluginResolver> implOrDefault =
-                            resolverDefaultImpl.getOrDefault(dependency, dependency);*/
-                    //实例化
-                    PluginResolver resolver = (PluginResolver) dependency.newInstance();
-                    //添加该插件解析器依赖的解析器
-                    addResolversWithDependencies(Collections.singletonList(resolver));
-                }
-            }
-        }
-
-        /**
-         * 遍历插件解析器，添加插件解析器依赖的插件解析器。
-         *
-         * @param resolvers 插件解析器
-         */
-        @Deprecated
-        @SneakyThrows
-        private void addResolversWithDependencies(Collection<? extends PluginResolver> resolvers) {
-            if (resolvers.isEmpty()) {
-                return;
-            }
-            for (PluginResolver resolver : resolvers) {
-                this.handlers.add(0, resolver);
-            }
-
-            Set<Class<? extends PluginHandler>> unfounded = new HashSet<>();
-            for (PluginResolver resolver : resolvers) {
-                //插件解析器依赖的插件解析器
-                Class<? extends PluginHandler>[] dependencies = resolver.getDependencies();
-                for (Class<? extends PluginHandler> dependency : dependencies) {
-                    //已经存在
-                    if (containsResolver(dependency)) {
-                        continue;
-                    }
-                    unfounded.add(dependency);
-                }
-            }
-            List<PluginResolver> unfoundedPluginResolvers = new ArrayList<>();
-            if (!unfounded.isEmpty()) {
-                //遍历需要但是还没有的插件解析器类
-                for (Class<? extends PluginHandler> dependency : unfounded) {
-                    //获得对应的实现类
-                    //实例化
-                    PluginResolver instance = (PluginResolver) dependency.newInstance();
-                    unfoundedPluginResolvers.add(instance);
-                }
-                //添加这些新实例化的插件解析器依赖的插件解析器
-                addResolversWithDependencies(unfoundedPluginResolvers);
-            }
-        }
-
-        /**
-         * 目标插件解析器类是否已经存在
-         *
-         * @param target 目标插件解析器类
-         * @return 如果已经存在返回 true 否则返回 false
-         */
-        private boolean containsResolver(Class<? extends PluginHandler> target) {
-            for (PluginHandler resolver : handlers) {
-                if (target.isInstance(resolver)) {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 }
