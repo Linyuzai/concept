@@ -63,19 +63,16 @@
 <body>
 <div id="concept-plugin-app">
     <el-container style="height: 100vh">
-        <el-header style="height: 100px;padding-bottom: 15px;border-bottom: 1px solid #eee;">
+        <el-header style="height: 80px;padding-bottom: 20px;border-bottom: 1px solid #eee;">
             <h1 style="margin-top: 15px;"
                 v-cloak>
-                <span style="color: #333333;font-weight: normal;font-size:50px;">
+                <span style="color: #333333;font-weight: normal;font-size:30px;">
                     {{settings.title}}
-                </span>
-                <span style="color: #909399;font-weight: lighter;font-size:14px">
-                    {{settings.version}}
                 </span>
             </h1>
             <a href="https://github.com/Linyuzai/concept" target="_blank" class="github-corner"
                aria-label="View source on GitHub">
-                <svg width="70" height="70" viewBox="0 0 250 250"
+                <svg width="80" height="80" viewBox="0 0 250 250"
                      style="fill:#333333; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
                      aria-hidden="true">
                     <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
@@ -88,20 +85,31 @@
         </el-header>
         <el-container>
             <el-aside>
-                <el-menu style="height: 100%;"
-                         :default-active="group"
-                         @select="selectGroup">
-                    <el-menu-item :index="group.name"
-                                  v-for="group in groups">
-                        <i v-if="group.state" class="el-icon-folder-checked"></i>
-                        <i v-else class="el-icon-folder-delete"></i>
-                        <span slot="title">{{group.name}}</span>
-                    </el-menu-item>
-                </el-menu>
+                <el-container>
+                    <el-header style="border-right: solid 1px #e6e6e6;">
+                        <el-button-group style="margin-top: 20px">
+                            <el-button @click="" icon="el-icon-plus"></el-button>
+                            <el-button @click="refreshGroups()" icon="el-icon-refresh"></el-button>
+                            <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
+                        </el-button-group>
+                    </el-header>
+                    <el-main style="padding: 0">
+                        <el-menu style="height: 100%;padding-top: 20px"
+                                 :default-active="group"
+                                 @select="selectGroup">
+                            <el-menu-item :index="group.name"
+                                          v-for="group in groups">
+                                <i v-if="group.state" class="el-icon-folder-checked"></i>
+                                <i v-else class="el-icon-folder-delete"></i>
+                                <span slot="title">{{group.name}}</span>
+                            </el-menu-item>
+                        </el-menu>
+                    </el-main>
+                </el-container>
             </el-aside>
-            <el-main style="height: 100%;">
+            <el-main style="height: 100%;padding-bottom: 0">
                 <el-container style="height: 100%;">
-                    <el-header style="text-align: left; font-size: 12px;padding-top: 20px;">
+                    <el-header style="text-align: left; font-size: 12px;">
                         <el-input placeholder="搜索插件"
                                   v-model="pluginSearch"
                                   clearable
@@ -110,27 +118,23 @@
                             <i slot="prefix" class="el-input__icon el-icon-search"></i>
                         </el-input>
                         <el-upload action="/concept-plugin/management/upload"
+                                   :show-file-list="false"
                                    :on-success="refreshPlugins"
                                    :on-error="uploadError"
                                    :data="{group: this.group}">
-                            <!--:file-list="[]"-->
                             <el-button type="primary" icon="el-icon-upload2" style="margin-left: 20px"></el-button>
                         </el-upload>
                     </el-header>
-                    <el-main ref="tableMain" style="height:100%;padding-bottom: 0">
+                    <el-main ref="tableMain" style="height:100%;padding: 0">
                         <el-table
                                 :data="plugins.filter(data => !pluginSearch||data.plugin.toLowerCase().includes(pluginSearch.toLowerCase()) || data.name.toLowerCase().includes(pluginSearch.toLowerCase()))"
                                 style="width: 100%;border-bottom-width: 0"
                                 height="100%">
-                            <el-table-column align="center" label="序号" type="index" fixed>
+                            <el-table-column label="序号" type="index" fixed>
                             </el-table-column>
-                            <el-table-column align="center" prop="plugin" label="插件包" sortable fixed>
-                                <!--<template slot="header">插件包</template>
-                                <template slot-scope="scope">
-                                    {{ scope.row.plugin }}
-                                </template>-->
+                            <el-table-column prop="plugin" label="插件包" sortable fixed>
                             </el-table-column>
-                            <el-table-column align="center" prop="name" label="插件名称" sortable>
+                            <el-table-column prop="name" label="插件名称" sortable>
                                 <template slot="header">
                                 <span>插件名称
                                     <el-tooltip class="item" effect="dark" placement="right">
@@ -146,27 +150,57 @@
                                     {{ scope.row.name }}
                                 </template>
                             </el-table-column>
-                            <el-table-column align="center" prop="timestamp" label="上传时间" sortable>
+                            <el-table-column prop="timestamp" label="上传时间" sortable>
                                 <template slot="header">上传时间</template>
                                 <template slot-scope="scope">
                                     {{ scope.row.timestamp }}
                                 </template>
                             </el-table-column>
-                            <el-table-column align="center" prop="state" label="插件状态" sortable fixed="right">
+                            <el-table-column prop="state" label="插件状态" sortable fixed="right">
                                 <template slot="header">插件状态</template>
                                 <template slot-scope="scope">
-                                    {{ scope.row.state }}
+                                    <el-tag :type="getStateType(scope.row.state)">
+                                        <!--size="small"-->
+                                        <i :class="getStateIcon(scope.row.state)"></i>
+                                        {{ formatState(scope.row.state) }}
+                                    </el-tag>
                                 </template>
                             </el-table-column>
-                            <el-table-column align="center" label="操作" prop="url" fixed="right" width="250">
+                            <el-table-column label="操作" prop="url" fixed="right" width="250">
                                 <template slot-scope="scope">
-                                    <el-button v-if="scope.row.state==='loaded'" @click="unloadPlugin(scope.row.plugin)" type="text">卸载</el-button>
-                                    <el-button v-if="scope.row.state==='loaded'" @click="" type="text">重新加载</el-button>
-                                    <el-button v-if="scope.row.state==='loaded'" @click="" type="text">查看配置</el-button>
-                                    <el-button v-if="scope.row.state==='unloaded'" @click="loadPlugin(scope.row.plugin)" type="text">加载</el-button>
-                                    <el-button v-if="scope.row.state==='unloaded'" @click="" type="text">重命名</el-button>
-                                    <el-button v-if="scope.row.state==='unloaded'" @click="deletePlugin(scope.row.plugin)" type="text">删除</el-button>
-                                    <el-button @click="" type="text">下载</el-button>
+                                    <el-button v-if="showLoad(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click="loadPlugin(scope.row.plugin)"
+                                               type="text">加载
+                                    </el-button>
+                                    <el-button v-if="showUnload(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click="unloadPlugin(scope.row.plugin)"
+                                               type="text">卸载
+                                    </el-button>
+                                    <el-button v-if="showReload(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click="" type="text">重新加载
+                                    </el-button>
+                                    <el-button v-if="showProperties(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click=""
+                                               type="text">查看配置
+                                    </el-button>
+                                    </el-button>
+                                    <el-button v-if="showRename(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click="" type="text">重命名
+                                    </el-button>
+                                    <el-button v-if="showDelete(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click="deletePlugin(scope.row.plugin)"
+                                               type="text">删除
+                                    </el-button>
+                                    <el-button :disabled="isIngState(scope.row.state)"
+                                               @click=""
+                                               type="text">下载
+                                    </el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -194,6 +228,7 @@
             },
             group: '',
             groups: [],
+            pluginAutoRefresh: false,
             pluginSearch: '',
             plugins: [],
 
@@ -267,6 +302,18 @@
                         let body = response.body;
                         if (body.success) {
                             this.plugins = body.data;
+                            let array = this.plugins;
+                            let refresh = false;
+                            for (let i = 0; i < array.length; i++) {
+                                let state = array[i].state;
+                                if ('LOADING' === state || 'UNLOADING' === state) {
+                                    refresh = true;
+                                    break;
+                                }
+                            }
+                            if (refresh) {
+                                setTimeout(this.refreshPlugins);
+                            }
                         } else {
                             this.plugins = [];
                             console.log(response);
@@ -314,7 +361,79 @@
                         }
                     });
             },
-
+            showLoad(state) {
+                return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
+            },
+            showUnload(state) {
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+            },
+            showReload(state) {
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+            },
+            showProperties(state) {
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+            },
+            showRename(state) {
+                return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
+            },
+            showDelete(state) {
+                return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
+            },
+            isIngState(state) {
+                return 'LOADING' === state || 'UNLOADING' === state;
+            },
+            isErrorState(state) {
+                return 'LOAD_ERROR' === state || 'UNLOAD_ERROR' === state;
+            },
+            getStateIcon(state) {
+                switch (state) {
+                    case 'LOADED':
+                        return 'el-icon-circle-check';
+                    case 'UNLOADED':
+                        return 'el-icon-remove-outline';
+                    case 'LOADING':
+                    case 'UNLOADING':
+                        return 'el-icon-loading';
+                    case 'LOAD_ERROR':
+                    case 'UNLOAD_ERROR':
+                        return 'el-icon-circle-close';
+                    default:
+                        return 'el-icon-warning-outline';
+                }
+            },
+            getStateType(state) {
+                switch (state) {
+                    case 'LOADED':
+                    case 'LOADING':
+                        return 'primary';
+                    case 'UNLOADED':
+                    case 'UNLOADING':
+                        return 'info';
+                    case 'LOAD_ERROR':
+                    case 'UNLOAD_ERROR':
+                        return 'danger';
+                    default:
+                        return 'warning';
+                }
+            },
+            formatState(state) {
+                switch (state) {
+                    case 'LOADED':
+                        return '已加载';
+                    case 'LOADING':
+                        return '加载中';
+                    case 'LOAD_ERROR':
+                        return '加载失败';
+                    case 'UNLOADED':
+                        return '已卸载';
+                    case 'UNLOADING':
+                        return '卸载中';
+                    case 'UNLOAD_ERROR':
+                        return '卸载失败';
+                    default:
+                        return '未知';
+                }
+            },
             explain() {
                 let content =
                     "本产品主要用于多人开发时提高接口调试效率<br/>" +

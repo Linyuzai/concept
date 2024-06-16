@@ -14,7 +14,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.Properties;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -36,15 +38,14 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
     @Override
     protected Plugin.Metadata createMetadata(File file, PluginContext context) {
         try (ZipFile zipFile = new ZipFile(file)) {
+            Properties properties = new Properties();
             ZipEntry entry = zipFile.getEntry("plugin.properties");
-            if (entry == null) {
-                return Plugin.Metadata.EMPTY;
+            if (entry != null) {
+                try (InputStream is = zipFile.getInputStream(entry)) {
+                    properties.load(is);
+                }
             }
-            try (InputStream is = zipFile.getInputStream(entry)) {
-                Properties properties = new Properties();
-                properties.load(is);
-                return new PropertiesMetadata(properties);
-            }
+            return new PropertiesMetadata(properties);
         } catch (Throwable e) {
             return null;
         }
@@ -132,6 +133,16 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
         @Override
         public String get(String key, String defaultValue) {
             return properties.getProperty(key, defaultValue);
+        }
+
+        @Override
+        public Set<String> keys() {
+            return properties.stringPropertyNames();
+        }
+
+        @Override
+        public <T> T bind(String key, Class<T> type) {
+            throw new UnsupportedOperationException();
         }
 
         @Override

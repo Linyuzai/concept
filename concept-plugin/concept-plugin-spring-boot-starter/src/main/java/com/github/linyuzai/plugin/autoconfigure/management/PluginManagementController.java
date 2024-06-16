@@ -1,9 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
-import com.github.linyuzai.plugin.core.autoload.PluginAutoLoadEvent;
-import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.PluginAutoReloadEvent;
-import com.github.linyuzai.plugin.core.autoload.PluginAutoUnloadEvent;
+import com.github.linyuzai.plugin.core.autoload.*;
+import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -16,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -42,12 +41,23 @@ public class PluginManagementController {
         concept.getEventPublisher().register(new PluginAutoLoadListener());
     }
 
+    protected File getFinalFile(String group, String name) {
+        String loadedPath = location.getLoadedPluginPath(group, name);
+        File file = LocalPluginLocation.getFileAutoName(new File(loadedPath));
+        String unloadedPath = location.getUnloadedPluginPath(group, file.getName());
+        return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
+    }
+
     @GetMapping("load")
     public Response load(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             loadingSet.add(path);
-            location.load(group, name);
+            try {
+                location.load(group, name);
+            } catch (Throwable e) {
+                loadingSet.remove(path);
+            }
             return null;
         }, () -> "加载失败");
     }
@@ -57,7 +67,12 @@ public class PluginManagementController {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             unloadingSet.add(path);
-            location.unload(group, name);
+            try {
+                location.unload(group, name);
+            } catch (Throwable e) {
+                concept.unload(path);
+                unloadingSet.remove(path);
+            }
             return null;
         }, () -> "卸载失败");
     }
@@ -65,7 +80,10 @@ public class PluginManagementController {
     @GetMapping("delete")
     public Response delete(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
-            location.delete(group, name);
+            try {
+                location.delete(group, name);
+            } catch (Throwable ignore) {
+            }
             return null;
         }, () -> "删除失败");
     }
@@ -112,28 +130,34 @@ public class PluginManagementController {
 
     public ManagedPlugin loadedPlugin(String group, String plugin) {
         String path = location.getLoadedPluginPath(group, plugin);
+        if (loadingSet.contains(path)) {
+            return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOADING);
+        }
         Plugin get = concept.getRepository().get(path);
         if (get == null) {
-            if (loadingSet.contains(path)) {
-                return new ManagedPlugin(plugin, "", "loading");
-            }
-            return new ManagedPlugin(plugin, "", "error");
+            return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOAD_ERROR);
         } else {
             String name = get.getMetadata().get(Plugin.Metadata.KEY_NAME, "");
-            return new ManagedPlugin(plugin, name, "loaded");
+            return new ManagedPlugin(plugin, name, ManagedPlugin.State.LOADED);
         }
     }
 
     public ManagedPlugin unloadedPlugin(String group, String plugin) {
         String path = location.getLoadedPluginPath(group, plugin);
         if (unloadingSet.contains(path)) {
-            return new ManagedPlugin(plugin, "", "unloading");
+            return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADING);
         }
-        return new ManagedPlugin(plugin, "", "unloaded");
+        Plugin get = concept.getRepository().get(path);
+        if (get == null) {
+            return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADED);
+        } else {
+            String name = get.getMetadata().get(Plugin.Metadata.KEY_NAME, "");
+            return new ManagedPlugin(plugin, name, ManagedPlugin.State.UNLOAD_ERROR);
+        }
     }
 
     public ManagedPlugin deletedPlugin(String group, String plugin) {
-        return new ManagedPlugin(plugin, "", "deleted");
+        return new ManagedPlugin(plugin, "", ManagedPlugin.State.DELETED);
     }
 
     public Response success(Object data) {
@@ -148,14 +172,15 @@ public class PluginManagementController {
 
         @Override
         public void onEvent(Object event) {
-            if (event instanceof PluginAutoLoadEvent) {
-                loadingSet.remove(((PluginAutoLoadEvent) event).getPath());
-            } else if (event instanceof PluginAutoReloadEvent) {
-
-            } else if (event instanceof PluginAutoUnloadEvent) {
-                unloadingSet.remove(((PluginAutoUnloadEvent) event).getPath());
-            } else {
-
+            if (event instanceof PluginAutoEvent) {
+                String path = ((PluginAutoEvent) event).getPath();
+                if (event instanceof PluginAutoLoadEvent ||
+                        event instanceof PluginAutoLoadErrorEvent) {
+                    loadingSet.remove(path);
+                } else if (event instanceof PluginAutoUnloadEvent ||
+                        event instanceof PluginAutoUnloadErrorEvent) {
+                    unloadingSet.remove(path);
+                }
             }
         }
     }
@@ -177,7 +202,12 @@ public class PluginManagementController {
 
         private final String name;
 
-        private final String state;
+        private final State state;
+
+        public enum State {
+
+            LOADED, LOADING, LOAD_ERROR, UNLOADED, UNLOADING, UNLOAD_ERROR, DELETED
+        }
     }
 
     @Data

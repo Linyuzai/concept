@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
+import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
@@ -53,8 +54,8 @@ public class PluginConceptConfiguration {
     public static class JarConfiguration {
 
         @Bean
-        public JarPluginFactory jarPluginFactory() {
-            return new JarPluginFactory();
+        public PluginFactory jarPluginFactory() {
+            return new BinderMetadataPluginFactory(new JarPluginFactory());
         }
 
         @Bean

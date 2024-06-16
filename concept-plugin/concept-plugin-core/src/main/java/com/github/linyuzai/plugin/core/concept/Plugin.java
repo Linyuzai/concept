@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.read.PluginReader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 
 /**
  * 插件抽象
@@ -51,26 +52,13 @@ public interface Plugin {
 
         String KEY_DEPENDENCIES = "concept.plugin.dependencies";
 
-        Metadata EMPTY = new Metadata() {
-            @Override
-            public String get(String key) {
-                return null;
-            }
-
-            @Override
-            public String get(String key, String defaultValue) {
-                return defaultValue;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return true;
-            }
-        };
-
         String get(String key);
 
         String get(String key, String defaultValue);
+
+        Set<String> keys();
+
+        <T> T bind(String key, Class<T> type);
 
         boolean isEmpty();
     }

@@ -165,8 +165,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      * @param path 监听到的事件
      */
     public void onFileCreated(String path) {
-        Plugin plugin = load(path);
-        concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
+        load(path);
     }
 
     /**
@@ -175,8 +174,8 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      * @param path 监听到的事件
      */
     public void onFileModified(String path) {
-        Plugin plugin = reload(path);
-        concept.getEventPublisher().publish(new PluginAutoReloadEvent(plugin, path));
+        unload(path);
+        load(path);
     }
 
     /**
@@ -185,18 +184,20 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      * @param path 监听到的事件
      */
     public void onFileDeleted(String path) {
-        Plugin plugin = unload(path);
-        if (plugin != null) {
-            concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin, path));
-        }
+        unload(path);
     }
 
     public void onError(Throwable e) {
         concept.getEventPublisher().publish(new PluginLoadErrorEvent(e));
     }
 
-    public Plugin load(String path) {
-        return concept.load(path);
+    public void load(String path) {
+        try {
+            Plugin plugin = concept.load(path);
+            concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
+        } catch (Throwable e) {
+            concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
+        }
     }
 
     /**
@@ -204,17 +205,14 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      *
      * @param path 文件路径
      */
-    public Plugin unload(String path) {
-        return concept.unload(path);
-    }
-
-    /**
-     * 重新加载
-     *
-     * @param path 插件源
-     */
-    public Plugin reload(String path) {
-        unload(path);
-        return load(path);
+    public void unload(String path) {
+        try {
+            Plugin plugin = concept.unload(path);
+            if (plugin != null) {
+                concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin, path));
+            }
+        } catch (Throwable e) {
+            concept.getEventPublisher().publish(new PluginAutoUnloadErrorEvent(path, e));
+        }
     }
 }

@@ -117,18 +117,7 @@ public class LocalPluginLocation implements PluginLocation {
             throw new IllegalArgumentException(name + " not existed");
         }
         String toPath = getPluginPath(group, name, to);
-        File toFile = new File(toPath);
-        int i = 1;
-        while (toFile.exists()) {
-            String path = toFile.getAbsolutePath();
-            int index = path.lastIndexOf(".");
-            if (index == -1) {
-                toFile = new File(path + i);
-            } else {
-                toFile = new File(path.substring(0, index) + "(" + i + ")" + path.substring(index));
-            }
-            i++;
-        }
+        File toFile = getFileAutoName(new File(toPath));
         return fromFile.renameTo(toFile);
     }
 
@@ -165,6 +154,21 @@ public class LocalPluginLocation implements PluginLocation {
     protected File check(File file) {
         if (!file.exists()) {
             boolean mkdirs = file.mkdirs();
+        }
+        return file;
+    }
+
+    public static File getFileAutoName(File file) {
+        int i = 1;
+        while (file.exists()) {
+            String path = file.getAbsolutePath();
+            int index = path.lastIndexOf(".");
+            if (index == -1) {
+                file = new File(path + i);
+            } else {
+                file = new File(path.substring(0, index) + "(" + i + ")" + path.substring(index));
+            }
+            i++;
         }
         return file;
     }

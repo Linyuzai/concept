@@ -106,6 +106,10 @@ public class DynamicExtractor implements PluginExtractor {
         if (pluginObjectInvoker != null) {
             return pluginObjectInvoker;
         }
+        Invoker pluginMetadataInvoker = getPluginMetadataInvoker(parameter);
+        if (pluginMetadataInvoker != null) {
+            return pluginMetadataInvoker;
+        }
         Invoker propertiesInvoker = getPropertiesInvoker(parameter);
         if (propertiesInvoker != null) {
             return propertiesInvoker;
@@ -185,6 +189,30 @@ public class DynamicExtractor implements PluginExtractor {
 
                 @Override
                 public void onExtract(Plugin plugin, PluginContext context) {
+
+                }
+            }.getInvoker();
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    public Invoker getPluginMetadataInvoker(Parameter parameter) {
+        try {
+            return new PluginMetadataExtractor<Plugin.Metadata>() {
+
+                @Override
+                public Type getGenericType() {
+                    return parameter.getParameterizedType();
+                }
+
+                @Override
+                public Annotation[] getAnnotations() {
+                    return parameter.getAnnotations();
+                }
+
+                @Override
+                public void onExtract(Plugin.Metadata plugin, PluginContext context) {
 
                 }
             }.getInvoker();

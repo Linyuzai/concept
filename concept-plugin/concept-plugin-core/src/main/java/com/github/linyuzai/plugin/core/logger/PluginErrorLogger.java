@@ -19,12 +19,11 @@ public class PluginErrorLogger implements PluginEventListener {
             Throwable error = ((PluginErrorEvent) event).getError();
             if (error instanceof PluginLoadException) {
                 Plugin plugin = ((PluginLoadException) error).getContext().getPlugin();
-                if (plugin != null) {
-                    logger.error(plugin.toString(), error);
-                    return;
-                }
+                String message = plugin == null ? "Load error" : "Load error: " + plugin;
+                logger.error(message, error);
+            } else {
+                logger.error("Plugin error", error);
             }
-            logger.error("Plugin load error", error);
         }
     }
 }
