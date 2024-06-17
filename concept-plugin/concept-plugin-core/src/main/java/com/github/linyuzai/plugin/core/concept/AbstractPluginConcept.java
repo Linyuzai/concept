@@ -268,8 +268,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
 
-        protected List<PluginExtractor> extractors = new ArrayList<>();
-
         /**
          * 设置上下文工厂
          *

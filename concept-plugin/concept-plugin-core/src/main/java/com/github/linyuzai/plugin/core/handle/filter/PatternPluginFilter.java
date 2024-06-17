@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.handle.filter;
 
-import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.Collection;
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class PatternPluginFilter<T> extends AbstractPluginFilter<T> implements PluginHandler.Property {
+public abstract class PatternPluginFilter<T> extends AbstractPluginFilter<T> {
 
     /**
      * 名称模式

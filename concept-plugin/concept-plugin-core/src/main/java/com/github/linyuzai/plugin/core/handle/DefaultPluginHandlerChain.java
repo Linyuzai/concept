@@ -32,7 +32,6 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                 extractors.add(handler);
             }
         }
-        //TODO 根据 提取器筛选解析器
         List<PluginHandler> sorted = resolveDependency(resolvers);
         for (PluginHandler handler : sorted) {
             List<PluginHandler> filtered = filters.stream().filter(it -> {
@@ -55,8 +54,22 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
 
     protected List<PluginHandler> resolveDependency(List<PluginHandler> unsorted) {
         List<PluginHandler> container = new ArrayList<>();
-        for (PluginHandler handler : unsorted) {
-            resolveDependency(handler, unsorted, container);
+        //根据提取器筛选解析器
+        for (PluginHandler extractor : this.extractors) {
+            if (extractor instanceof PluginHandler.Dependency) {
+                Class<? extends PluginHandler>[] dependencies =
+                        ((PluginHandler.Dependency) extractor).getDependencies();
+                if (dependencies.length == 0) {
+                    continue;
+                }
+                for (Class<? extends PluginHandler> dependency : dependencies) {
+                    PluginHandler dependence = findDependency(dependency, unsorted);
+                    if (dependence == null) {
+                        throwDependencyNotFound(dependency);
+                    }
+                    resolveDependency(dependence, unsorted, container);
+                }
+            }
         }
         return container;
     }
@@ -78,7 +91,7 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                     }
                     PluginHandler dependence = findDependency(dependency, handlers);
                     if (dependence == null) {
-                        throw new IllegalArgumentException("Dependency not found: " + dependency);
+                        throwDependencyNotFound(dependency);
                     }
                     resolveDependency(dependence, handlers, container);
                 }
@@ -114,6 +127,10 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
             return;
         }
         container.add(handler);
+    }
+
+    protected void throwDependencyNotFound(Class<? extends PluginHandler> dependency) {
+        throw new IllegalArgumentException("Dependency not found: " + dependency);
     }
 
     @Override

@@ -21,6 +21,7 @@ public interface PluginHandler {
         }
     }
 
+    @Deprecated
     interface Property {
 
         default String getProperty() {

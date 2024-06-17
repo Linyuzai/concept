@@ -21,6 +21,7 @@ import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.handle.filter.EntryFilterFactory;
 import com.github.linyuzai.plugin.core.lock.DefaultPluginLock;
 import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
@@ -36,6 +37,7 @@ import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
+import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilterFactory;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassNameResolver;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -149,6 +151,16 @@ public class PluginConceptConfiguration {
     @Bean
     public PropertiesResolver pluginPropertiesResolver() {
         return new PropertiesResolver();
+    }
+
+    @Bean
+    public EntryFilterFactory entryFilterFactory() {
+        return new EntryFilterFactory();
+    }
+
+    @Bean
+    public ClassNameFilterFactory classNameFilterFactory() {
+        return new ClassNameFilterFactory();
     }
 
     @Bean(initMethod = "initialize", destroyMethod = "destroy")
