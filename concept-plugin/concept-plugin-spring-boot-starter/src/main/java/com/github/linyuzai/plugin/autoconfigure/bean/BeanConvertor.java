@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.bean;
 
-import com.github.linyuzai.plugin.core.convert.AbstractPluginConvertor;
+import com.github.linyuzai.plugin.core.handle.extract.convert.AbstractPluginConvertor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;

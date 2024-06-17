@@ -8,16 +8,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.*;
 
 import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
-public class BinderMetadataPluginFactory implements PluginFactory {
+public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAware {
 
     private final PluginFactory delegate;
+
+    private Environment environment;
 
     @Override
     public Plugin create(Object o, PluginContext context) {
@@ -29,8 +31,13 @@ public class BinderMetadataPluginFactory implements PluginFactory {
         return plugin;
     }
 
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
     @Getter
-    public static class BinderMetadata implements Plugin.Metadata {
+    public class BinderMetadata implements Plugin.Metadata {
 
         private final Plugin.Metadata delegate;
 
@@ -38,7 +45,7 @@ public class BinderMetadataPluginFactory implements PluginFactory {
 
         public BinderMetadata(Plugin.Metadata delegate) {
             this.delegate = delegate;
-            this.binder = Binder.get(new MetadataEnvironment(delegate));
+            this.binder = Binder.get(new MetadataEnvironment(delegate, environment));
         }
 
         @Override
@@ -71,8 +78,12 @@ public class BinderMetadataPluginFactory implements PluginFactory {
 
     public static class MetadataEnvironment extends AbstractEnvironment {
 
-        public MetadataEnvironment(Plugin.Metadata metadata) {
+        public MetadataEnvironment(Plugin.Metadata metadata, Environment environment) {
             getPropertySources().addLast(new MetadataPropertySource("PluginMetadata", metadata));
+            if (environment instanceof ConfigurableEnvironment) {
+                MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
+                sources.stream().forEach(it -> getPropertySources().addLast(it));
+            }
         }
     }
 

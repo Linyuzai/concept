@@ -44,13 +44,12 @@ public class DefaultTypeMetadataFactory implements TypeMetadataFactory {
             }
         } else if (type instanceof WildcardType) {
             // ? extends A
-            // ? super A
             WildcardType wildcardType = (WildcardType) type;
             Type[] upperBounds = wildcardType.getUpperBounds();
             if (upperBounds.length > 0) {
                 return create(upperBounds[0]);
             }
-            //TODO ? super xxx 好像没有必要
+            //TODO ? super xxx
         } else if (type instanceof GenericArrayType) {
             // A<?>[] A<B>[]
             Type componentType = ((GenericArrayType) type).getGenericComponentType();

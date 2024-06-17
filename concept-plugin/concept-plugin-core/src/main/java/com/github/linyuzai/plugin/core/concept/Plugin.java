@@ -48,9 +48,11 @@ public interface Plugin {
 
     interface Metadata {
 
-        String KEY_NAME = "concept.plugin.name";
+        String PREFIX = "concept.plugin.";
 
-        String KEY_DEPENDENCIES = "concept.plugin.dependencies";
+        String NAME = PREFIX + "name";
+
+        String DEPENDENCIES = PREFIX + "dependencies";
 
         String get(String key);
 

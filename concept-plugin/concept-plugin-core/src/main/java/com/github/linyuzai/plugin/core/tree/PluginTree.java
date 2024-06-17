@@ -1,7 +1,5 @@
 package com.github.linyuzai.plugin.core.tree;
 
-import com.github.linyuzai.plugin.core.handle.PluginHandler;
-
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -50,7 +48,7 @@ public interface PluginTree {
 
     interface Transformer {
 
-        InboundStage create(PluginHandler handler);
+        InboundStage create(Object handler);
 
         interface InboundStage {
 
@@ -82,7 +80,7 @@ public interface PluginTree {
 
             PluginTree.Node getNode();
 
-            PluginHandler getHandler();
+            Object getHandler();
 
             HandleStage next();
         }

@@ -20,4 +20,15 @@ public interface PluginHandler {
             return annotation.value();
         }
     }
+
+    interface Property {
+
+        default String getProperty() {
+            HandlerProperty annotation = ReflectionUtils.findAnnotation(getClass(), HandlerProperty.class);
+            if (annotation == null) {
+                return "";
+            }
+            return annotation.value();
+        }
+    }
 }

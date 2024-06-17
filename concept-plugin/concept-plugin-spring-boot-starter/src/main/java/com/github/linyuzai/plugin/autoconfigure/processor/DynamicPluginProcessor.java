@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.autoconfigure.processor;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanDynamicExtractor;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.core.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
+import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -73,7 +73,7 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
         for (PluginMethods pms : pluginMethods) {
             extractors.add(new BeanDynamicExtractor(applicationContext, pms.target, pms.methods));
         }
-        concept.addExtractors(extractors);
+        concept.addHandlers(extractors);
         pluginMethods.clear();
     }
 

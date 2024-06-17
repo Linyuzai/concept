@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.autoconfigure.bean;
 
-import com.github.linyuzai.plugin.core.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.extract.TypeMetadataPluginExtractor;
-import com.github.linyuzai.plugin.core.match.PluginMatcher;
+import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
+import com.github.linyuzai.plugin.core.handle.extract.TypeMetadataPluginExtractor;
+import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

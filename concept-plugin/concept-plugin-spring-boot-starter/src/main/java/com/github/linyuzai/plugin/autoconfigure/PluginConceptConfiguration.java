@@ -16,9 +16,9 @@ import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
-import com.github.linyuzai.plugin.core.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
-import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.lock.DefaultPluginLock;
@@ -28,17 +28,16 @@ import com.github.linyuzai.plugin.core.logger.PluginLoadLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
-import com.github.linyuzai.plugin.core.resolve.ContentResolver;
-import com.github.linyuzai.plugin.core.resolve.EntryResolver;
-import com.github.linyuzai.plugin.core.resolve.PluginResolver;
-import com.github.linyuzai.plugin.core.resolve.PropertiesResolver;
+import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
+import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
+import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
-import com.github.linyuzai.plugin.jar.resolve.JarClassNameResolver;
-import com.github.linyuzai.plugin.jar.resolve.JarClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.JarClassNameResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -162,9 +161,8 @@ public class PluginConceptConfiguration {
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
                                        List<PluginFactory> factories,
-                                       List<PluginResolver> resolvers,
-                                       List<PluginFilter> filters,
-                                       List<PluginExtractor> extractors,
+                                       List<PluginHandler> handlers,
+                                       List<PluginHandlerFactory> handlerFactories,
                                        List<PluginEventListener> eventListeners) {
         return new DefaultPluginConcept.Builder()
                 .contextFactory(contextFactory)
@@ -175,9 +173,8 @@ public class PluginConceptConfiguration {
                 .eventPublisher(eventPublisher)
                 .logger(logger)
                 .addFactories(factories)
-                .addResolvers(resolvers)
-                .addFilters(filters)
-                .addExtractors(extractors)
+                .addHandlers(handlers)
+                .addHandlerFactories(handlerFactories)
                 .addEventListeners(eventListeners)
                 .build();
     }

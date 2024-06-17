@@ -1,8 +1,9 @@
 package com.github.linyuzai.plugin.core.handle;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.filter.PluginFilter;
-import com.github.linyuzai.plugin.core.resolve.PluginResolver;
+import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
+import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +16,8 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
 
     private final List<Entry> entries = new ArrayList<>();
 
+    private final List<PluginHandler> extractors = new ArrayList<>();
+
     public DefaultPluginHandlerChain(Collection<? extends PluginHandler> handlers) {
         List<PluginHandler> resolvers = new ArrayList<>();
         List<PluginHandler> filters = new ArrayList<>();
@@ -25,7 +28,11 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
             if (handler instanceof PluginFilter) {
                 filters.add(handler);
             }
+            if (handler instanceof PluginExtractor) {
+                extractors.add(handler);
+            }
         }
+        //TODO 根据 提取器筛选解析器
         List<PluginHandler> sorted = resolveDependency(resolvers);
         for (PluginHandler handler : sorted) {
             List<PluginHandler> filtered = filters.stream().filter(it -> {
@@ -116,6 +123,9 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
 
     protected void doNext(PluginContext context, int index) {
         if (index >= entries.size()) {
+            for (PluginHandler extractor : extractors) {
+                ((PluginExtractor) extractor).extract(context);
+            }
             return;
         }
         Entry entry = entries.get(index);

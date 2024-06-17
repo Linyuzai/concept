@@ -3,17 +3,13 @@ package com.github.linyuzai.concept.sample.plugin;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.core.match.PluginName;
-import com.github.linyuzai.plugin.core.logger.PluginLoadLogger;
+import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
-import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
-import com.github.linyuzai.plugin.jar.filter.ModifierFilter;
-import com.github.linyuzai.plugin.jar.filter.PackageFilter;
-import com.github.linyuzai.plugin.jar.match.PluginAnnotation;
-import com.github.linyuzai.plugin.jar.match.PluginClass;
-import com.github.linyuzai.plugin.jar.match.PluginClassName;
-import com.github.linyuzai.plugin.jar.match.PluginPackage;
+import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
+import com.github.linyuzai.plugin.jar.handle.filter.ModifierFilter;
+import com.github.linyuzai.plugin.jar.handle.extract.match.PluginAnnotation;
+import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClass;
+import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassName;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +45,7 @@ public class ConceptPluginController {
     private final PluginConcept concept = new DefaultPluginConcept.Builder()
             //.addFilter(new PathFilter("plugin"))
             //.addFilter(new NameFilter("*.json"))
-            .addFilters(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
+            //.addFilters(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
             .addFilters(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter(CustomPluginAnnotation.class))
             /*.addExtractor(new PluginContextExtractor<PluginContext>() {
@@ -691,7 +687,7 @@ public class ConceptPluginController {
             List<Class<? extends CustomPlugin>> p0, Properties p1,
 
             //包下所有的 CustomPlugin 实例
-            @PluginPackage("com.github.linyuzai.concept.sample.plugin") Collection<? extends CustomPlugin> p2,
+            //@PluginPackage("com.github.linyuzai.concept.sample.plugin") Collection<? extends CustomPlugin> p2,
 
             //所有的 com.github.linyuzai.concept.sample.plugin.CustomPlugin 类
             @PluginClassName("com.github.linyuzai.concept.sample.plugin.CustomPlugin") Set<Class<?>> p3,
@@ -702,7 +698,7 @@ public class ConceptPluginController {
             Class<? extends CustomPlugin> p4_1,
 
             //所有标注了 CustomPluginAnnotation 注解的类
-            @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5,
+            @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5
 
             //properties 文件通过 Map 接收
             //@PluginProperties("plugin.map.**") Map<String, String> p6,
@@ -714,16 +710,17 @@ public class ConceptPluginController {
             //@PluginProperties("plugin.b") String p8,
 
             //一个指定目录下的 properties 文件
-            @com.github.linyuzai.plugin.core.match.PluginPath("plugin") Properties p9,
+            //@PluginPath("plugin") Properties p9,
 
             //名称为 config.json 的文件内容
-            @PluginName("plugin.json") String p10) {
+            //@PluginName("plugin.json") String p10
+        ) {
 
         System.out.println("onPluginExtract: " + plugin);
         System.out.println("onPluginExtract: " + context);
         System.out.println("List<Class<? extends CustomPlugin>>: " + p0);
         System.out.println("Properties: " + p1);
-        System.out.println("@PluginPackage(\"com.github.linyuzai.concept.sample.plugin\") Collection<? extends CustomPlugin>: " + p2);
+        //System.out.println("@PluginPackage(\"com.github.linyuzai.concept.sample.plugin\") Collection<? extends CustomPlugin>: " + p2);
         System.out.println("@PluginClassName(\"com.github.linyuzai.concept.sample.plugin.CustomPlugin\") Set<Class<?>>: " + p3);
         System.out.println("@PluginClass(CustomPluginImpl.class) CustomPlugin: " + p4);
         System.out.println("Class<? extends CustomPlugin>: " + p4_1);
@@ -731,8 +728,8 @@ public class ConceptPluginController {
         //System.out.println("@PluginProperties(\"plugin.map.**\") Map<String, String>: " + p6);
         //System.out.println("@PluginProperties(\"plugin.a\") String: " + p7);
         //System.out.println("@PluginProperties(\"plugin.b\") String: " + p8);
-        System.out.println("@PluginPath(\"plugin\") Properties: " + p9);
-        System.out.println("@PluginName(\"plugin.json\") String: " + p10);
+        //System.out.println("@PluginPath(\"plugin\") Properties: " + p9);
+        //System.out.println("@PluginName(\"plugin.json\") String: " + p10);
     }
 
     @GetMapping("/run")

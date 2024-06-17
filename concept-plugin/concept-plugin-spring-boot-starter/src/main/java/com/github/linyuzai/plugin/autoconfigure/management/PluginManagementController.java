@@ -137,7 +137,7 @@ public class PluginManagementController {
         if (get == null) {
             return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOAD_ERROR);
         } else {
-            String name = get.getMetadata().get(Plugin.Metadata.KEY_NAME, "");
+            String name = get.getMetadata().get(Plugin.Metadata.NAME, "");
             return new ManagedPlugin(plugin, name, ManagedPlugin.State.LOADED);
         }
     }
@@ -151,7 +151,7 @@ public class PluginManagementController {
         if (get == null) {
             return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADED);
         } else {
-            String name = get.getMetadata().get(Plugin.Metadata.KEY_NAME, "");
+            String name = get.getMetadata().get(Plugin.Metadata.NAME, "");
             return new ManagedPlugin(plugin, name, ManagedPlugin.State.UNLOAD_ERROR);
         }
     }

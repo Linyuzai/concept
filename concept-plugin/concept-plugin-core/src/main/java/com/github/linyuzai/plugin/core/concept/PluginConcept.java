@@ -2,7 +2,8 @@ package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
-import com.github.linyuzai.plugin.core.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
@@ -17,13 +18,13 @@ public interface PluginConcept {
 
     void destroy();
 
-    void addExtractors(PluginExtractor... extractors);
+    void addHandlers(PluginHandler... handlers);
 
-    void addExtractors(Collection<? extends PluginExtractor> extractors);
+    void addHandlers(Collection<? extends PluginHandler> handlers);
 
-    void removeExtractors(PluginExtractor... extractors);
+    void removeHandlers(PluginHandler... handlers);
 
-    void removeExtractors(Collection<? extends PluginExtractor> extractors);
+    void removeHandlers(Collection<? extends PluginHandler> handlers);
 
     /**
      * 创建插件

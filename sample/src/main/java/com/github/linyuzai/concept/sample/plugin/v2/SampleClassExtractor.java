@@ -1,7 +1,7 @@
 package com.github.linyuzai.concept.sample.plugin.v2;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.jar.extract.ClassExtractor;
+import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

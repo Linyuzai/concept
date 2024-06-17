@@ -1,18 +1,13 @@
 package com.github.linyuzai.concept.sample.plugin;
 
-import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
+import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
+import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 
 @Slf4j
 public class ConceptPluginSample {

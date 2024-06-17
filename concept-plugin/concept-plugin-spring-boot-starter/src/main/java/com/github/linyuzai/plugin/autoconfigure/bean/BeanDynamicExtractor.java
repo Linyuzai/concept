@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.bean;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.jar.extract.JarDynamicExtractor;
+import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
 import lombok.Getter;
 import org.springframework.context.ApplicationContext;
 

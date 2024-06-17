@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.tree;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -40,7 +39,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
     }
 
     @Override
-    public InboundStage create(PluginHandler handler) {
+    public InboundStage create(Object handler) {
         return new TransformerStages(handler);
     }
 
@@ -161,7 +160,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
     @RequiredArgsConstructor
     public class TransformerStages implements InboundStage, TransformStage, OutboundStage {
 
-        private final PluginHandler handler;
+        private final Object handler;
 
         private Node inbound;
 
@@ -206,7 +205,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         private final Node node;
 
-        private final PluginHandler handler;
+        private final Object handler;
 
         private final HandleStage next;
 

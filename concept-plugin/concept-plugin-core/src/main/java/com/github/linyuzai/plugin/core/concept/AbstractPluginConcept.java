@@ -6,16 +6,17 @@ import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.exception.PluginLoadException;
 import com.github.linyuzai.plugin.core.exception.PluginUnloadException;
-import com.github.linyuzai.plugin.core.extract.PluginExtractor;
-import com.github.linyuzai.plugin.core.factory.PluginFactory;
-import com.github.linyuzai.plugin.core.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
+import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.factory.PluginFactory;
+import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
-import com.github.linyuzai.plugin.core.resolve.PluginResolver;
+import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
@@ -51,17 +52,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginLogger logger;
 
-    protected Collection<PluginHandler> handlers;
-
     /**
      * 插件工厂
      */
     protected Collection<PluginFactory> factories;
 
-    /**
-     * 插件提取器
-     */
-    protected Collection<PluginExtractor> extractors;
+    protected Collection<PluginHandler> handlers;
+
+    protected Collection<PluginHandlerFactory> handlerFactories;
 
     protected volatile PluginHandlerChain handlerChain;
 
@@ -76,38 +74,52 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public void addExtractors(PluginExtractor... extractors) {
-        addExtractors(Arrays.asList(extractors));
+    public void addHandlers(PluginHandler... handlers) {
+        addHandlers(Arrays.asList(handlers));
     }
 
     @Override
-    public void addExtractors(Collection<? extends PluginExtractor> extractors) {
-        this.extractors.addAll(extractors);
+    public void addHandlers(Collection<? extends PluginHandler> handlers) {
+        this.handlers.addAll(handlers);
         resetHandlerChain();
     }
 
     @Override
-    public void removeExtractors(PluginExtractor... extractors) {
-        removeExtractors(Arrays.asList(extractors));
+    public void removeHandlers(PluginHandler... handlers) {
+        removeHandlers(Arrays.asList(handlers));
     }
 
     @Override
-    public void removeExtractors(Collection<? extends PluginExtractor> extractors) {
-        this.extractors.removeAll(extractors);
+    public void removeHandlers(Collection<? extends PluginHandler> handlers) {
+        this.handlers.removeAll(handlers);
         resetHandlerChain();
     }
 
-    protected PluginHandlerChain obtainHandlerChain() {
+    protected PluginHandlerChain obtainHandlerChain(PluginContext context) {
+        List<PluginHandler> dynamicHandlers = new ArrayList<>();
+        for (PluginHandlerFactory factory : handlerFactories) {
+            PluginHandler handler = factory.create(context);
+            if (handler != null) {
+                dynamicHandlers.add(handler);
+            }
+        }
+        if (!dynamicHandlers.isEmpty()) {
+            List<PluginHandler> combineHandlers = new ArrayList<>();
+            combineHandlers.addAll(this.handlers);
+            combineHandlers.addAll(dynamicHandlers);
+            return handlerChainFactory.create(combineHandlers);
+        }
         if (handlerChain == null) {
             synchronized (this) {
                 if (handlerChain == null) {
-                    //TODO 根据 提取器筛选解析器
                     handlerChain = handlerChainFactory.create(handlers);
                 }
             }
         }
         return handlerChain;
     }
+
+
 
     protected void resetHandlerChain() {
         handlerChain = null;
@@ -175,11 +187,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             eventPublisher.publish(new PluginPreparedEvent(context));
 
             //解析插件
-            obtainHandlerChain().next(context);
-            //提取插件
-            for (PluginExtractor extractor : extractors) {
-                extractor.extract(context);
-            }
+            obtainHandlerChain(context).next(context);
 
             plugin.release(context);
             eventPublisher.publish(new PluginReleasedEvent(context));
@@ -257,6 +265,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected List<PluginFactory> factories = new ArrayList<>();
 
         protected List<PluginHandler> handlers = new ArrayList<>();
+
+        protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
 
         protected List<PluginExtractor> extractors = new ArrayList<>();
 
@@ -356,7 +366,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addResolvers(PluginResolver... resolvers) {
-            return addResolvers(Arrays.asList(resolvers));
+            return addHandlers(resolvers);
         }
 
         /**
@@ -366,8 +376,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addResolvers(Collection<? extends PluginResolver> resolvers) {
-            this.handlers.addAll(resolvers);
-            return (B) this;
+            return addHandlers(resolvers);
         }
 
         /**
@@ -377,7 +386,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addFilters(PluginFilter... filters) {
-            return addFilters(Arrays.asList(filters));
+            return addHandlers(filters);
         }
 
         /**
@@ -387,8 +396,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addFilters(Collection<? extends PluginFilter> filters) {
-            this.handlers.addAll(filters);
-            return (B) this;
+            return addHandlers(filters);
         }
 
         /**
@@ -398,7 +406,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addExtractors(PluginExtractor... extractors) {
-            return addExtractors(Arrays.asList(extractors));
+            return addHandlers(extractors);
         }
 
         /**
@@ -408,7 +416,24 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          * @return {@link B}
          */
         public B addExtractors(Collection<? extends PluginExtractor> extractors) {
-            this.extractors.addAll(extractors);
+            return addHandlers(extractors);
+        }
+
+        public B addHandlers(PluginHandler... handlers) {
+            return addHandlers(Arrays.asList(handlers));
+        }
+
+        public B addHandlers(Collection<? extends PluginHandler> handlers) {
+            this.handlers.addAll(handlers);
+            return (B) this;
+        }
+
+        public B addHandlerFactories(PluginHandlerFactory... factories) {
+            return addHandlerFactories(Arrays.asList(factories));
+        }
+
+        public B addHandlerFactories(Collection<? extends PluginHandlerFactory> factories) {
+            this.handlerFactories.addAll(factories);
             return (B) this;
         }
 
@@ -424,7 +449,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setLogger(logger);
             concept.setFactories(factories);
             concept.setHandlers(handlers);
-            concept.setExtractors(extractors);
+            concept.setHandlerFactories(handlerFactories);
             return concept;
         }
 
