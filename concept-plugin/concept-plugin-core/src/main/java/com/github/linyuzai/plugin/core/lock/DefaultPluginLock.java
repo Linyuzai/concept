@@ -31,7 +31,6 @@ public class DefaultPluginLock implements PluginLock {
 
     @Override
     public Object getLockArg(Object o) {
-        System.out.println(lockMap);
         LockObject lock = lockMap.get(o);
         if (lock == null) {
             return null;

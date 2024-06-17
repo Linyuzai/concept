@@ -128,9 +128,16 @@
                     <el-main ref="tableMain" style="height:100%;padding: 0">
                         <el-table
                                 :data="plugins.filter(data => !pluginSearch||data.plugin.toLowerCase().includes(pluginSearch.toLowerCase()) || data.name.toLowerCase().includes(pluginSearch.toLowerCase()))"
+                                @selection-change=""
                                 style="width: 100%;border-bottom-width: 0"
                                 height="100%">
-                            <el-table-column label="序号" type="index" fixed>
+                            <!--<el-table-column type="selection" fixed width="25">
+                            </el-table-column>-->
+                            <el-table-column label="序号" type="index" fixed width="80">
+                                <template slot="header">
+                                    序号
+                                    <span class="caret-wrapper"></span>
+                                </template>
                             </el-table-column>
                             <el-table-column prop="plugin" label="插件包" sortable fixed>
                             </el-table-column>
@@ -315,7 +322,7 @@
                                 }
                             }
                             if (refresh) {
-                                setTimeout(this.refreshPlugins);
+                                setTimeout(this.refreshPlugins, 1000);
                             }
                         } else {
                             this.plugins = [];
@@ -352,14 +359,26 @@
             deletePlugin(name) {
                 this.$http.get('/concept-plugin/management/plugin/delete?group=' + this.group + '&name=' + name)
                     .then((response) => {
-                        this.afterOperation(response);
+                        this.afterOperation(response, true);
                     });
             },
-            afterOperation(response) {
+            afterOperation(response, notify) {
                 let body = response.body;
                 if (body.success) {
+                    if (notify !== undefined) {
+                        this.$notify({
+                            title: '成功',
+                            message: body.message,
+                            type: 'success'
+                        });
+                    }
                     this.refreshPlugins();
                 } else {
+                    this.$notify({
+                        title: '失败',
+                        message: body.message,
+                        type: 'error'
+                    });
                     console.log(response);
                 }
             },

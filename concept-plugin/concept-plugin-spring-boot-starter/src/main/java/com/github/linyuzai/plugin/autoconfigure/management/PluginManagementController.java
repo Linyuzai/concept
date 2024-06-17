@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,23 +38,15 @@ public class PluginManagementController {
     @Autowired
     protected PluginAutoLoader loader;
 
-    public void init() {
-        concept.getEventPublisher().register(new PluginAutoLoadListener());
-    }
-
-    protected File getFinalFile(String group, String name) {
-        String loadedPath = location.getLoadedPluginPath(group, name);
-        File file = LocalPluginLocation.getFileAutoName(new File(loadedPath));
-        String unloadedPath = location.getUnloadedPluginPath(group, file.getName());
-        return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
-    }
+    @Autowired
+    protected PluginExecutor executor;
 
     @GetMapping("group/add")
     public Response addGroup(@RequestParam("group") String group) {
         return manage(() -> {
             loader.addGroup(group);
             return null;
-        }, () -> "添加插件分组失败");
+        }, () -> "插件分组添加");
     }
 
     @GetMapping("group/list")
@@ -63,7 +56,7 @@ public class PluginManagementController {
             return Arrays.stream(groups)
                     .map(this::group)
                     .collect(Collectors.toList());
-        }, () -> "获取插件分组失败");
+        }, () -> "插件分组获取");
     }
 
     @GetMapping("/plugin/load")
@@ -74,10 +67,17 @@ public class PluginManagementController {
             try {
                 location.load(group, name);
             } catch (Throwable e) {
-                loadingSet.remove(path);
+                executor.execute(() -> {
+                    try {
+                        concept.load(path);
+                    } catch (Throwable e1) {
+                        loadingSet.remove(path);
+                        log.error("Load plugin error: " + path, e1);
+                    }
+                });
             }
             return null;
-        }, () -> "加载失败");
+        }, () -> "插件加载");
     }
 
     @GetMapping("/plugin/unload")
@@ -88,21 +88,33 @@ public class PluginManagementController {
             try {
                 location.unload(group, name);
             } catch (Throwable e) {
-                concept.unload(path);
-                unloadingSet.remove(path);
+                executor.execute(() -> {
+                    try {
+                        concept.unload(path);
+                    } catch (Throwable e1) {
+                        unloadingSet.remove(path);
+                        log.error("Unload plugin error: " + path, e1);
+                    }
+                });
             }
             return null;
-        }, () -> "卸载失败");
+        }, () -> "插件卸载");
     }
 
     @GetMapping("/plugin/reload")
     public Response reloadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
-            concept.unload(path);
-            concept.load(path);
+            executor.execute(() -> {
+                try {
+                    concept.unload(path);
+                    concept.load(path);
+                } catch (Throwable e) {
+                    log.error("Reload plugin error: " + path, e);
+                }
+            });
             return null;
-        }, () -> "重新加载失败");
+        }, () -> "插件重新加载");
     }
 
     @GetMapping("/plugin/delete")
@@ -113,7 +125,7 @@ public class PluginManagementController {
             } catch (Throwable ignore) {
             }
             return null;
-        }, () -> "删除失败");
+        }, () -> "插件删除");
     }
 
     @GetMapping("/plugin/list")
@@ -129,16 +141,15 @@ public class PluginManagementController {
                 list.add(unloadedPlugin(group, unload));
             }
             return list;
-        }, () -> "获取插件列表失败");
+        }, () -> "插件列表获取");
     }
 
-    public Response manage(Supplier<Object> success, Supplier<String> failure) {
+    public Response manage(Supplier<Object> success, Supplier<String> message) {
         try {
-            return success(success.get());
+            return success(message.get() + "成功", success.get());
         } catch (Throwable e) {
-            String message = failure.get();
-            log.error(message, e);
-            return failure(message);
+            log.error(message.get(), e);
+            return failure(message.get() + "失败", e);
         }
     }
 
@@ -148,7 +159,7 @@ public class PluginManagementController {
 
     public ManagedPlugin loadedPlugin(String group, String plugin) {
         String path = location.getLoadedPluginPath(group, plugin);
-        if (loadingSet.contains(path)) {
+        if (loadingSet.contains(path) || concept.isLoading(path)) {
             return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOADING);
         }
         Plugin get = concept.getRepository().get(path);
@@ -162,7 +173,7 @@ public class PluginManagementController {
 
     public ManagedPlugin unloadedPlugin(String group, String plugin) {
         String path = location.getLoadedPluginPath(group, plugin);
-        if (unloadingSet.contains(path)) {
+        if (unloadingSet.contains(path) || concept.isUnloading(path)) {
             return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADING);
         }
         Plugin get = concept.getRepository().get(path);
@@ -178,12 +189,23 @@ public class PluginManagementController {
         return new ManagedPlugin(plugin, "", ManagedPlugin.State.DELETED);
     }
 
-    public Response success(Object data) {
-        return new Response(true, data);
+    public Response success(String message, Object data) {
+        return new Response(true, message, data);
     }
 
-    public Response failure(String message) {
-        return new Response(false, message);
+    public Response failure(String message, Throwable e) {
+        return new Response(false, message, e);
+    }
+
+    public void init() {
+        concept.getEventPublisher().register(new PluginAutoLoadListener());
+    }
+
+    protected File getFinalFile(String group, String name) {
+        String loadedPath = location.getLoadedPluginPath(group, name);
+        File file = LocalPluginLocation.getFileAutoName(new File(loadedPath));
+        String unloadedPath = location.getUnloadedPluginPath(group, file.getName());
+        return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
     }
 
     public class PluginAutoLoadListener implements PluginEventListener {
@@ -233,6 +255,8 @@ public class PluginManagementController {
     public static class Response {
 
         private final boolean success;
+
+        private final String message;
 
         private final Object data;
     }

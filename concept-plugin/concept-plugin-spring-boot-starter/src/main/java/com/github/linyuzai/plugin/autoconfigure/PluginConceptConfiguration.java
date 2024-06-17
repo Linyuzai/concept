@@ -6,7 +6,8 @@ import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.PluginExecutorProvider;
+import com.github.linyuzai.plugin.core.executer.DefaultPluginExecutor;
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
@@ -200,8 +201,8 @@ public class PluginConceptConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public PluginExecutorProvider pluginExecutorProvider() {
-            return PluginExecutorProvider.NO_EXECUTOR;
+        public PluginExecutor pluginExecutor() {
+            return new DefaultPluginExecutor();
         }
 
         @Bean
@@ -215,9 +216,9 @@ public class PluginConceptConfiguration {
         @Bean(initMethod = "start", destroyMethod = "stop")
         @ConditionalOnMissingBean
         public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
-                                                 PluginExecutorProvider executorProvider,
+                                                 PluginExecutor executor,
                                                  PluginLocation location) {
-            return new WatchServicePluginAutoLoader(concept, executorProvider.get(), location);
+            return new WatchServicePluginAutoLoader(concept, executor, location);
         }
     }
 }

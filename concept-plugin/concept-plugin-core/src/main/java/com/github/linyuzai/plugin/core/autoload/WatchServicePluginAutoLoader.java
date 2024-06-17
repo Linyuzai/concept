@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginLoadErrorEvent;
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,7 +12,6 @@ import lombok.SneakyThrows;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -26,7 +26,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     /**
      * 执行线程池
      */
-    private final Executor executor;
+    private final PluginExecutor executor;
 
     /**
      * 插件位置
@@ -50,14 +50,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
         running = true;
 
-        //如果没有指定执行器，直接新建一个线程
-        if (executor == null) {
-            Thread thread = new Thread(this::listen);
-            thread.setName("concept-plugin-autoload");
-            thread.start();
-        } else {
-            executor.execute(this::listen);
-        }
+        executor.execute(this::listen);
 
         for (String group : location.getGroups()) {
             //开始就执行一次回调
