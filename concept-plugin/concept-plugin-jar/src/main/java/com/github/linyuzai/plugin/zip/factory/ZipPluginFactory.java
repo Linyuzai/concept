@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipEntry;

@@ -141,14 +141,14 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
     protected void doNext(PluginContext context, int index) {
         if (index >= entries.size()) {
             for (PluginHandler extractor : extractors) {
-                ((PluginExtractor) extractor).extract(context);
+                extractor.handle(context);
             }
             return;
         }
         Entry entry = entries.get(index);
-        ((PluginResolver) entry.resolver).resolve(context);
+        entry.resolver.handle(context);
         for (PluginHandler filter : entry.filters) {
-            ((PluginFilter) filter).filter(context);
+            filter.handle(context);
         }
         doNext(context, index + 1);
     }

@@ -9,7 +9,15 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
  */
 public interface PluginFilter extends PluginHandler, PluginHandler.Dependency {
 
-    String PREFIX = Plugin.Metadata.PREFIX + "filter.";
+    interface PropertyKey {
+
+        String PREFIX = Plugin.Metadata.PropertyKey.PREFIX + "filter.";
+    }
+
+    @Override
+    default void handle(PluginContext context) {
+        filter(context);
+    }
 
     /**
      * 过滤插件

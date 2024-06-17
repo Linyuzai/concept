@@ -9,6 +9,8 @@ import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipPluginFactory;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -16,7 +18,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.ZipInputStream;
 
+@Getter
+@Setter
 public class JarPluginFactory extends ZipPluginFactory {
+
+    private String defaultMode = JarPlugin.Mode.STREAM;
 
     @SneakyThrows
     @Override
@@ -33,7 +39,7 @@ public class JarPluginFactory extends ZipPluginFactory {
     }
 
     public String getMode(File file, Plugin.Metadata metadata, PluginContext context) {
-        return metadata.get("concept.plugin.jar.mode", JarPlugin.Mode.STREAM);
+        return metadata.get(JarPlugin.Mode.PropertyKey.MODE, defaultMode);
     }
 
     @Override

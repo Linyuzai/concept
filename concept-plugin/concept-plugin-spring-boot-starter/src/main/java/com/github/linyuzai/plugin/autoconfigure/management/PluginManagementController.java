@@ -48,8 +48,26 @@ public class PluginManagementController {
         return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
     }
 
-    @GetMapping("load")
-    public Response load(@RequestParam("group") String group, @RequestParam("name") String name) {
+    @GetMapping("group/add")
+    public Response addGroup(@RequestParam("group") String group) {
+        return manage(() -> {
+            loader.addGroup(group);
+            return null;
+        }, () -> "添加插件分组失败");
+    }
+
+    @GetMapping("group/list")
+    public Response listGroup() {
+        return manage(() -> {
+            String[] groups = location.getGroups();
+            return Arrays.stream(groups)
+                    .map(this::group)
+                    .collect(Collectors.toList());
+        }, () -> "获取插件分组失败");
+    }
+
+    @GetMapping("/plugin/load")
+    public Response loadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             loadingSet.add(path);
@@ -62,8 +80,8 @@ public class PluginManagementController {
         }, () -> "加载失败");
     }
 
-    @GetMapping("unload")
-    public Response unload(@RequestParam("group") String group, @RequestParam("name") String name) {
+    @GetMapping("/plugin/unload")
+    public Response unloadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             unloadingSet.add(path);
@@ -77,8 +95,18 @@ public class PluginManagementController {
         }, () -> "卸载失败");
     }
 
-    @GetMapping("delete")
-    public Response delete(@RequestParam("group") String group, @RequestParam("name") String name) {
+    @GetMapping("/plugin/reload")
+    public Response reloadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
+        return manage(() -> {
+            String path = location.getLoadedPluginPath(group, name);
+            concept.unload(path);
+            concept.load(path);
+            return null;
+        }, () -> "重新加载失败");
+    }
+
+    @GetMapping("/plugin/delete")
+    public Response deletePlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
             try {
                 location.delete(group, name);
@@ -88,18 +116,8 @@ public class PluginManagementController {
         }, () -> "删除失败");
     }
 
-    @GetMapping("groups")
-    public Response groups() {
-        return manage(() -> {
-            String[] groups = location.getGroups();
-            return Arrays.stream(groups)
-                    .map(this::group)
-                    .collect(Collectors.toList());
-        }, () -> "获取插件分组失败");
-    }
-
-    @GetMapping("plugins")
-    public Response plugins(@RequestParam("group") String group) {
+    @GetMapping("/plugin/list")
+    public Response listPlugin(@RequestParam("group") String group) {
         return manage(() -> {
             List<ManagedPlugin> list = new ArrayList<>();
             String[] loaded = location.getLoadedPlugins(group);
@@ -137,7 +155,7 @@ public class PluginManagementController {
         if (get == null) {
             return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOAD_ERROR);
         } else {
-            String name = get.getMetadata().get(Plugin.Metadata.NAME, "");
+            String name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
             return new ManagedPlugin(plugin, name, ManagedPlugin.State.LOADED);
         }
     }
@@ -151,7 +169,7 @@ public class PluginManagementController {
         if (get == null) {
             return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADED);
         } else {
-            String name = get.getMetadata().get(Plugin.Metadata.NAME, "");
+            String name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
             return new ManagedPlugin(plugin, name, ManagedPlugin.State.UNLOAD_ERROR);
         }
     }

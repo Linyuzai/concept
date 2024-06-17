@@ -152,7 +152,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String toString() {
-        String name = metadata.get(Metadata.NAME, getId().toString());
+        String name = metadata.get(Metadata.PropertyKey.NAME, getId().toString());
         return getClass().getSimpleName() + "(" + name + ")";
     }
 }

@@ -12,7 +12,7 @@ import java.io.IOException;
 @RequestMapping("/concept-plugin/management")
 public class ServletPluginManagementController extends PluginManagementController {
 
-    @PostMapping("upload")
+    @PostMapping("/plugin/upload")
     public void upload(@RequestParam("file") MultipartFile file, @RequestParam("group") String group) throws IOException {
         file.transferTo(getFinalFile(group, file.getOriginalFilename()));
     }

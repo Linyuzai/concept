@@ -8,7 +8,7 @@ public class ClassNameFilterFactory extends PropertyPluginHandlerFactory {
 
     @Override
     public String getPropertyName() {
-        return PluginFilter.PREFIX + "class";
+        return PluginFilter.PropertyKey.PREFIX + "class";
     }
 
     @Override

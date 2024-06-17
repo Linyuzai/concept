@@ -12,6 +12,11 @@ import java.util.zip.ZipInputStream;
 
 public class JarPlugin extends ZipPlugin {
 
+    public interface PropertyKey {
+
+        String PREFIX = Metadata.PropertyKey.PREFIX + "jar.";
+    }
+
     public JarPlugin(ZipInputStream inputStream, URL url, Entry parent) {
         super(inputStream, url, parent);
     }
@@ -65,6 +70,11 @@ public class JarPlugin extends ZipPlugin {
     }
 
     public static class Mode {
+
+        public interface PropertyKey {
+
+            String MODE = JarPlugin.PropertyKey.PREFIX + "mode";
+        }
 
         public static final String FILE = "FILE";
 

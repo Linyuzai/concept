@@ -117,7 +117,7 @@
                                   style="width: 300px;float: left">
                             <i slot="prefix" class="el-input__icon el-icon-search"></i>
                         </el-input>
-                        <el-upload action="/concept-plugin/management/upload"
+                        <el-upload action="/concept-plugin/management/plugin/upload"
                                    :show-file-list="false"
                                    :on-success="refreshPlugins"
                                    :on-error="uploadError"
@@ -180,7 +180,7 @@
                                     </el-button>
                                     <el-button v-if="showReload(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
-                                               @click="" type="text">重新加载
+                                               @click="reloadPlugin(scope.row.plugin)" type="text">重新加载
                                     </el-button>
                                     <el-button v-if="showProperties(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
@@ -281,7 +281,7 @@
                 this.refreshPlugins();
             },
             refreshGroups() {
-                this.$http.get('/concept-plugin/management/groups')
+                this.$http.get('/concept-plugin/management/group/list')
                     .then((response) => {
                         let body = response.body;
                         if (body.success) {
@@ -296,8 +296,11 @@
                         }
                     });
             },
+            addGroup() {
+
+            },
             refreshPlugins() {
-                this.$http.get('/concept-plugin/management/plugins?group=' + this.group)
+                this.$http.get('/concept-plugin/management/plugin/list?group=' + this.group)
                     .then((response) => {
                         let body = response.body;
                         if (body.success) {
@@ -329,37 +332,36 @@
                 console.log(err);
             },
             loadPlugin(name) {
-                this.$http.get('/concept-plugin/management/load?group=' + this.group + '&name=' + name)
+                this.$http.get('/concept-plugin/management/plugin/load?group=' + this.group + '&name=' + name)
                     .then((response) => {
-                        let body = response.body;
-                        if (body.success) {
-                            this.refreshPlugins();
-                        } else {
-                            console.log(response);
-                        }
+                        this.afterOperation(response);
                     });
             },
             unloadPlugin(name) {
-                this.$http.get('/concept-plugin/management/unload?group=' + this.group + '&name=' + name)
+                this.$http.get('/concept-plugin/management/plugin/unload?group=' + this.group + '&name=' + name)
                     .then((response) => {
-                        let body = response.body;
-                        if (body.success) {
-                            this.refreshPlugins();
-                        } else {
-                            console.log(response);
-                        }
+                        this.afterOperation(response);
+                    });
+            },
+            reloadPlugin(name) {
+                this.$http.get('/concept-plugin/management/plugin/reload?group=' + this.group + '&name=' + name)
+                    .then((response) => {
+                        this.afterOperation(response);
                     });
             },
             deletePlugin(name) {
-                this.$http.get('/concept-plugin/management/delete?group=' + this.group + '&name=' + name)
+                this.$http.get('/concept-plugin/management/plugin/delete?group=' + this.group + '&name=' + name)
                     .then((response) => {
-                        let body = response.body;
-                        if (body.success) {
-                            this.refreshPlugins();
-                        } else {
-                            console.log(response);
-                        }
+                        this.afterOperation(response);
                     });
+            },
+            afterOperation(response) {
+                let body = response.body;
+                if (body.success) {
+                    this.refreshPlugins();
+                } else {
+                    console.log(response);
+                }
             },
             showLoad(state) {
                 return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;

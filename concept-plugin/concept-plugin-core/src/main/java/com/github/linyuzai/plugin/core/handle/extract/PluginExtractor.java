@@ -13,6 +13,11 @@ import lombok.RequiredArgsConstructor;
  */
 public interface PluginExtractor extends PluginHandler, PluginHandler.Dependency {
 
+    @Override
+    default void handle(PluginContext context) {
+        extract(context);
+    }
+
     /**
      * 提取插件
      *

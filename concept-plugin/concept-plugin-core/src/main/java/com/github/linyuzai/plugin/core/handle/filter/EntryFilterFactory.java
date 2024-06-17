@@ -7,7 +7,7 @@ public class EntryFilterFactory extends PropertyPluginHandlerFactory {
 
     @Override
     public String getPropertyName() {
-        return PluginFilter.PREFIX + "entry";
+        return PluginFilter.PropertyKey.PREFIX + "entry";
     }
 
     @Override

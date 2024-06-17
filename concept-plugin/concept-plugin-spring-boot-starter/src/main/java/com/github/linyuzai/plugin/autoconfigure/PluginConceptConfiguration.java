@@ -55,8 +55,11 @@ public class PluginConceptConfiguration {
     public static class JarConfiguration {
 
         @Bean
-        public PluginFactory jarPluginFactory() {
-            return new BinderMetadataPluginFactory(new JarPluginFactory());
+        public PluginFactory jarPluginFactory(PluginConceptProperties properties) {
+            String mode = properties.getJar().getMode();
+            JarPluginFactory factory = new JarPluginFactory();
+            factory.setDefaultMode(mode);
+            return new BinderMetadataPluginFactory(factory);
         }
 
         @Bean

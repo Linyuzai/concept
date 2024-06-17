@@ -8,6 +8,11 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
  */
 public interface PluginResolver extends PluginHandler, PluginHandler.Dependency {
 
+    @Override
+    default void handle(PluginContext context) {
+        resolve(context);
+    }
+
     /**
      * 解析
      *

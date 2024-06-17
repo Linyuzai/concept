@@ -27,7 +27,7 @@ public abstract class DependencyReader implements PluginReader {
                 .collect(Collectors.toList());
         for (Plugin plugin : plugins) {
             Plugin.Metadata metadata = plugin.getMetadata();
-            String name = metadata.get(Plugin.Metadata.NAME);
+            String name = metadata.get(Plugin.Metadata.PropertyKey.NAME);
             if (name == null || name.isEmpty()) {
                 continue;
             }
@@ -47,7 +47,7 @@ public abstract class DependencyReader implements PluginReader {
 
     public List<String> getDependencies(Plugin plugin) {
         Plugin.Metadata metadata = plugin.getMetadata();
-        String dependencies = metadata.get(Plugin.Metadata.DEPENDENCIES);
+        String dependencies = metadata.get(Plugin.Metadata.PropertyKey.DEPENDENCIES);
         if (dependencies == null) {
             return Collections.emptyList();
         }

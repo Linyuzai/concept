@@ -1,8 +1,11 @@
 package com.github.linyuzai.plugin.core.handle;
 
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 
 public interface PluginHandler {
+
+    void handle(PluginContext context);
 
     interface Dependency {
 
@@ -16,18 +19,6 @@ public interface PluginHandler {
             HandlerDependency annotation = ReflectionUtils.findAnnotation(getClass(), HandlerDependency.class);
             if (annotation == null) {
                 return new Class[0];
-            }
-            return annotation.value();
-        }
-    }
-
-    @Deprecated
-    interface Property {
-
-        default String getProperty() {
-            HandlerProperty annotation = ReflectionUtils.findAnnotation(getClass(), HandlerProperty.class);
-            if (annotation == null) {
-                return "";
             }
             return annotation.value();
         }

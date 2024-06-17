@@ -48,11 +48,14 @@ public interface Plugin {
 
     interface Metadata {
 
-        String PREFIX = "concept.plugin.";
+        interface PropertyKey {
 
-        String NAME = PREFIX + "name";
+            String PREFIX = "concept.plugin.";
 
-        String DEPENDENCIES = PREFIX + "dependencies";
+            String NAME = PREFIX + "name";
+
+            String DEPENDENCIES = PREFIX + "dependencies";
+        }
 
         String get(String key);
 

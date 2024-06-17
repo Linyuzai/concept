@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/concept-plugin/management")
 public class ReactivePluginManagementController extends PluginManagementController {
 
-    @PostMapping("upload")
+    @PostMapping("/plugin/upload")
     public Mono<Void> upload(@RequestPart("file") Mono<FilePart> file, @RequestPart("group") String group) {
         return file.flatMap(it -> it.transferTo(getFinalFile(group, it.filename()))).then();
     }
