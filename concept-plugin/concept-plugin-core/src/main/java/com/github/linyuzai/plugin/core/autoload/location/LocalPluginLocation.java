@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 @Getter
@@ -93,6 +97,25 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     @Override
+    public long getSize(String path) {
+        try {
+            return new File(path).length();
+        } catch (Throwable e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public long getCreationTimestamp(String path) {
+        try {
+            BasicFileAttributes attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
+            return attr.creationTime().toMillis();
+        } catch (Throwable e) {
+            return -1;
+        }
+    }
+
+    @Override
     public void load(String group, String name) {
         move(group, name, UNLOADED, LOADED);
     }
@@ -104,13 +127,17 @@ public class LocalPluginLocation implements PluginLocation {
 
     @Override
     public void delete(String group, String name) {
-        move(group, name, UNLOADED, DELETED);
+        try {
+            move(group, name, UNLOADED, DELETED);
+        } catch (Throwable e) {
+            move(group, name, LOADED, DELETED);
+        }
     }
 
     protected boolean move(String group, String name, String from, String to) {
         String fromPath = getPluginPath(group, name, from);
         if (fromPath == null) {
-            throw new IllegalArgumentException(name + " is not a Plugin");
+            throw new IllegalArgumentException(name + " not existed");
         }
         File fromFile = new File(fromPath);
         if (!fromFile.exists()) {

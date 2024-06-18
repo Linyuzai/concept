@@ -16,8 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,7 +46,9 @@ public class PluginManagementController {
     @Autowired
     protected PluginExecutor executor;
 
-    @GetMapping("group/add")
+    protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @GetMapping("/group/add")
     public Response addGroup(@RequestParam("group") String group) {
         return manage(() -> {
             loader.addGroup(group);
@@ -49,7 +56,7 @@ public class PluginManagementController {
         }, () -> "插件分组添加");
     }
 
-    @GetMapping("group/list")
+    @GetMapping("/group/list")
     public Response listGroup() {
         return manage(() -> {
             String[] groups = location.getGroups();
@@ -71,10 +78,11 @@ public class PluginManagementController {
                     try {
                         concept.load(path);
                     } catch (Throwable e1) {
-                        loadingSet.remove(path);
                         log.error("Load plugin error: " + path, e1);
+                    } finally {
+                        loadingSet.remove(path);
                     }
-                });
+                }, 1000, TimeUnit.MILLISECONDS);
             }
             return null;
         }, () -> "插件加载");
@@ -92,10 +100,11 @@ public class PluginManagementController {
                     try {
                         concept.unload(path);
                     } catch (Throwable e1) {
-                        unloadingSet.remove(path);
                         log.error("Unload plugin error: " + path, e1);
+                    } finally {
+                        unloadingSet.remove(path);
                     }
-                });
+                }, 1000, TimeUnit.MILLISECONDS);
             }
             return null;
         }, () -> "插件卸载");
@@ -105,14 +114,22 @@ public class PluginManagementController {
     public Response reloadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
+            loadingSet.add(path);
+            try {
+                concept.unload(path);
+            } catch (Throwable e) {
+                loadingSet.remove(path);
+                throw e;
+            }
             executor.execute(() -> {
                 try {
-                    concept.unload(path);
                     concept.load(path);
                 } catch (Throwable e) {
                     log.error("Reload plugin error: " + path, e);
+                } finally {
+                    loadingSet.remove(path);
                 }
-            });
+            }, 1000, TimeUnit.MILLISECONDS);
             return null;
         }, () -> "插件重新加载");
     }
@@ -140,6 +157,7 @@ public class PluginManagementController {
             for (String unload : unloaded) {
                 list.add(unloadedPlugin(group, unload));
             }
+            list.sort((o1, o2) -> Long.compare(o2.sort, o1.sort));
             return list;
         }, () -> "插件列表获取");
     }
@@ -159,34 +177,47 @@ public class PluginManagementController {
 
     public ManagedPlugin loadedPlugin(String group, String plugin) {
         String path = location.getLoadedPluginPath(group, plugin);
+        long timestamp = location.getCreationTimestamp(path);
+        long size = location.getSize(path);
+        String name;
+        ManagedPlugin.State state;
         if (loadingSet.contains(path) || concept.isLoading(path)) {
-            return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOADING);
-        }
-        Plugin get = concept.getRepository().get(path);
-        if (get == null) {
-            return new ManagedPlugin(plugin, "", ManagedPlugin.State.LOAD_ERROR);
+            name = null;
+            state = ManagedPlugin.State.LOADING;
         } else {
-            String name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
-            return new ManagedPlugin(plugin, name, ManagedPlugin.State.LOADED);
+            Plugin get = concept.getRepository().get(path);
+            if (get == null) {
+                name = null;
+                state = ManagedPlugin.State.LOAD_ERROR;
+            } else {
+                name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
+                state = ManagedPlugin.State.LOADED;
+            }
         }
+        return new ManagedPlugin(plugin, name, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
     public ManagedPlugin unloadedPlugin(String group, String plugin) {
+        String unloadPath = location.getUnloadedPluginPath(group, plugin);
+        long timestamp = location.getCreationTimestamp(unloadPath);
+        long size = location.getSize(unloadPath);
+        String name;
+        ManagedPlugin.State state;
         String path = location.getLoadedPluginPath(group, plugin);
         if (unloadingSet.contains(path) || concept.isUnloading(path)) {
-            return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADING);
-        }
-        Plugin get = concept.getRepository().get(path);
-        if (get == null) {
-            return new ManagedPlugin(plugin, "", ManagedPlugin.State.UNLOADED);
+            name = null;
+            state = ManagedPlugin.State.UNLOADING;
         } else {
-            String name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
-            return new ManagedPlugin(plugin, name, ManagedPlugin.State.UNLOAD_ERROR);
+            Plugin get = concept.getRepository().get(path);
+            if (get == null) {
+                name = null;
+                state = ManagedPlugin.State.UNLOADED;
+            } else {
+                name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
+                state = ManagedPlugin.State.UNLOAD_ERROR;
+            }
         }
-    }
-
-    public ManagedPlugin deletedPlugin(String group, String plugin) {
-        return new ManagedPlugin(plugin, "", ManagedPlugin.State.DELETED);
+        return new ManagedPlugin(plugin, name, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
     public Response success(String message, Object data) {
@@ -206,6 +237,32 @@ public class PluginManagementController {
         File file = LocalPluginLocation.getFileAutoName(new File(loadedPath));
         String unloadedPath = location.getUnloadedPluginPath(group, file.getName());
         return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
+    }
+
+    protected String formatSize(long size) {
+        if (size < 0) {
+            return null;
+        }
+        if (size >= 1024) {
+            double k = size / 1024.0;
+            if (k >= 1024) {
+                double m = k / 1024;
+                return String.format("%.2f", m) + "M";
+            } else {
+                return String.format("%.2f", k) + "K";
+            }
+        } else {
+            return size + "B";
+        }
+    }
+
+    protected String formatTime(long time) {
+        if (time < 0) {
+            return null;
+        }
+        Instant instant = Instant.ofEpochMilli(time);
+        LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return formatter.format(dateTime);
     }
 
     public class PluginAutoLoadListener implements PluginEventListener {
@@ -242,7 +299,13 @@ public class PluginManagementController {
 
         private final String name;
 
+        private final String size;
+
+        private final String creationTime;
+
         private final State state;
+
+        private final long sort;
 
         public enum State {
 

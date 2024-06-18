@@ -33,6 +33,10 @@ public interface PluginLocation {
 
     String getDeletedPluginPath(String group, String name);
 
+    long getSize(String path);
+
+    long getCreationTimestamp(String path);
+
     void load(String group, String name);
 
     void unload(String group, String name);

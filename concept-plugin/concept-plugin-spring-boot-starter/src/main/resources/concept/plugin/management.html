@@ -64,9 +64,8 @@
 <div id="concept-plugin-app">
     <el-container style="height: 100vh">
         <el-header style="height: 80px;padding-bottom: 20px;border-bottom: 1px solid #eee;">
-            <h1 style="margin-top: 15px;"
-                v-cloak>
-                <span style="color: #333333;font-weight: normal;font-size:30px;">
+            <h1 style="margin-top: 15px;" v-cloak>
+                <span style="color: #333333;font-weight: normal;font-size:30px;" v-cloak>
                     {{settings.title}}
                 </span>
             </h1>
@@ -88,9 +87,9 @@
                 <el-container>
                     <el-header style="border-right: solid 1px #e6e6e6;">
                         <el-button-group style="margin-top: 20px">
-                            <el-button @click="" icon="el-icon-plus"></el-button>
-                            <el-button @click="refreshGroups()" icon="el-icon-refresh"></el-button>
-                            <el-button @click="explain()" icon="el-icon-warning-outline"></el-button>
+                            <el-button @click="openGroupDialog" icon="el-icon-plus"></el-button>
+                            <el-button @click="refreshGroups" icon="el-icon-refresh"></el-button>
+                            <el-button @click="explain" icon="el-icon-warning-outline"></el-button>
                         </el-button-group>
                     </el-header>
                     <el-main style="padding: 0">
@@ -106,6 +105,27 @@
                         </el-menu>
                     </el-main>
                 </el-container>
+                <el-dialog title="添加分组"
+                           :visible.sync="dialog.group.visible">
+                    <el-form :model="dialog.group.form" :rules="dialog.group.rules"
+                             ref="dialog.group.form">
+                        <el-form-item label="分组名称" prop="name">
+                            <el-tooltip class="item" effect="dark" placement="right">
+                                <div slot="content" v-cloak>
+                                    分组名称
+                                </div>
+                                <i class="el-icon-warning-outline" v-cloak></i>
+                            </el-tooltip>
+                            <el-input v-model="dialog.group.form.name"
+                                      name="name"
+                                      autocomplete></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div class="dialog-footer" slot="footer">
+                        <el-button @click="dialog.group.visible = false" v-cloak>取 消</el-button>
+                        <el-button @click="addGroup" type="primary" v-cloak>添 加</el-button>
+                    </div>
+                </el-dialog>
             </el-aside>
             <el-main style="height: 100%;padding-bottom: 0">
                 <el-container style="height: 100%;">
@@ -113,17 +133,32 @@
                         <el-input placeholder="搜索插件"
                                   v-model="pluginSearch"
                                   clearable
-                                  autocomplete="on"
                                   style="width: 300px;float: left">
                             <i slot="prefix" class="el-input__icon el-icon-search"></i>
                         </el-input>
-                        <el-upload action="/concept-plugin/management/plugin/upload"
-                                   :show-file-list="false"
-                                   :on-success="refreshPlugins"
-                                   :on-error="uploadError"
-                                   :data="{group: this.group}">
-                            <el-button type="primary" icon="el-icon-upload2" style="margin-left: 20px"></el-button>
-                        </el-upload>
+                        <el-button type="primary"
+                                   icon="el-icon-upload2"
+                                   @click="openUploadDialog"
+                                   style="margin-left: 20px">
+                            上传
+                        </el-button>
+                        <el-dialog title="上传插件"
+                                   width="420px"
+                                   :close-on-click-modal="false"
+                                   :visible.sync="dialog.upload.visible">
+                            <el-upload action="/concept-plugin/management/plugin/upload"
+                                       style="margin: 0 10px"
+                                       :disabled="dialog.upload.disabled"
+                                       :before-upload="beforeUpload"
+                                       :on-change="uploadChange"
+                                       :on-success="uploadSuccess"
+                                       :on-error="uploadError"
+                                       :data="{group: this.group}"
+                                       drag>
+                                <i class="el-icon-upload"></i>
+                                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                            </el-upload>
+                        </el-dialog>
                     </el-header>
                     <el-main ref="tableMain" style="height:100%;padding: 0">
                         <el-table
@@ -133,35 +168,19 @@
                                 height="100%">
                             <!--<el-table-column type="selection" fixed width="25">
                             </el-table-column>-->
-                            <el-table-column label="序号" type="index" fixed width="80">
-                                <template slot="header">
-                                    序号
-                                    <span class="caret-wrapper"></span>
+                            <!--align="center"-->
+                            <el-table-column label="序号" type="index" fixed width="60">
+                                <template slot="header">序号
+                                    <span class="caret-wrapper" style="width: 0"></span>
                                 </template>
                             </el-table-column>
                             <el-table-column prop="plugin" label="插件包" sortable fixed>
                             </el-table-column>
-                            <el-table-column prop="name" label="插件名称" sortable>
-                                <template slot="header">
-                                <span>插件名称
-                                    <el-tooltip class="item" effect="dark" placement="right">
-                                        <div slot="content" v-cloak>
-                                            插件配置 'plugin.properties' 中定义的名称<br/>
-                                            即 'concept.plugin.name' 属性值
-                                        </div>
-                                        <i class="el-icon-warning-outline" v-cloak></i>
-                                    </el-tooltip>
-                                </span>
-                                </template>
-                                <template slot-scope="scope">
-                                    {{ scope.row.name }}
-                                </template>
+                            <!--<el-table-column prop="name" label="插件名称" sortable width="150">
+                            </el-table-column>-->
+                            <el-table-column prop="size" label="插件大小" sortable>
                             </el-table-column>
-                            <el-table-column prop="timestamp" label="上传时间" sortable>
-                                <template slot="header">上传时间</template>
-                                <template slot-scope="scope">
-                                    {{ scope.row.timestamp }}
-                                </template>
+                            <el-table-column prop="creationTime" label="上传时间" sortable>
                             </el-table-column>
                             <el-table-column prop="state" label="插件状态" sortable fixed="right">
                                 <template slot="header">插件状态</template>
@@ -174,6 +193,18 @@
                                 </template>
                             </el-table-column>
                             <el-table-column label="操作" prop="url" fixed="right" width="250">
+                                <template slot="header">
+                                    <span>操作
+                                        <el-tooltip class="item" effect="dark" placement="right">
+                                            <div slot="content" v-cloak>
+                                            插件配置 'plugin.properties' 中定义的名称<br/>
+                                            即 'concept.plugin.name' 属性值
+                                            </div>
+                                            <i class="el-icon-warning-outline" v-cloak></i>
+                                        </el-tooltip>
+                                        <span class="caret-wrapper" style="width: 0"></span>
+                                    </span>
+                                </template>
                                 <template slot-scope="scope">
                                     <el-button v-if="showLoad(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
@@ -185,9 +216,15 @@
                                                @click="unloadPlugin(scope.row.plugin)"
                                                type="text">卸载
                                     </el-button>
-                                    <el-button v-if="showReload(scope.row.state)"
+                                    <!--<el-button v-if="showReload(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
-                                               @click="reloadPlugin(scope.row.plugin)" type="text">重新加载
+                                               @click="reloadPlugin(scope.row.plugin)"
+                                               type="text">重新加载
+                                    </el-button>-->
+                                    <el-button v-if="showUpdate(scope.row.state)"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click=""
+                                               type="text">更新
                                     </el-button>
                                     <el-button v-if="showProperties(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
@@ -197,7 +234,8 @@
                                     </el-button>
                                     <el-button v-if="showRename(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
-                                               @click="" type="text">重命名
+                                               @click=""
+                                               type="text">重命名
                                     </el-button>
                                     <el-button v-if="showDelete(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
@@ -226,12 +264,12 @@
 <script src="/webjars/vue-resource/1.5.1/dist/vue-resource.min.js" type="text/javascript"></script>
 <script src="/webjars/element-ui/2.15.1/lib/index.js" type="text/javascript"></script>
 <script>
+    var uploadLoading = null;
     let app = new Vue({
         el: "#concept-plugin-app",
         data: {
             settings: {
-                title: "Concept Plugin",
-                version: "v2"
+                title: "Concept Plugin"
             },
             group: '',
             groups: [],
@@ -245,6 +283,21 @@
             routerList: [],
             routerSearch: '',
             dialog: {
+                upload: {
+                    visible: false,
+                    disabled: false
+                },
+                group: {
+                    visible: false,
+                    rules: {
+                        name: [
+                            {required: true, message: '匹配服务不能为空', trigger: 'blur'}
+                        ]
+                    },
+                    form: {
+                        name: ''
+                    }
+                },
                 router: {
                     visible: false,
                     add: true,
@@ -303,8 +356,59 @@
                         }
                     });
             },
+            openGroupDialog() {
+                let form = this.$refs['dialog.group.form'];
+                if (form !== undefined) {
+                    form.resetFields();
+                }
+                this.dialog.group.visible = true;
+            },
             addGroup() {
-
+                this.dialog.group.visible = false;
+                this.$http.get('/concept-plugin/management/group/add?group=' + this.dialog.group.form.name)
+                    .then((response) => {
+                        let body = response.body;
+                        if (body.success) {
+                            this.refreshGroups();
+                        } else {
+                            this.$notify({
+                                title: '失败',
+                                message: body.message,
+                                type: 'error'
+                            });
+                            console.log(response);
+                        }
+                    });
+            },
+            openUploadDialog() {
+                if (uploadLoading != null) {
+                    uploadLoading.close();
+                    uploadLoading = null;
+                }
+                this.dialog.upload.disabled = false;
+                this.dialog.upload.visible = true
+            },
+            beforeUpload() {
+                if (uploadLoading != null) {
+                    uploadLoading.close();
+                }
+                uploadLoading = this.$loading({
+                    target: '.el-upload-dragger'
+                });
+            },
+            uploadChange() {
+            },
+            uploadSuccess() {
+                this.dialog.upload.visible = false;
+                this.refreshPlugins();
+            },
+            uploadError(err) {
+                this.$notify.error({
+                    title: '插件上传',
+                    message: '上传失败',
+                    position: 'bottom-right'
+                });
+                console.log(err);
             },
             refreshPlugins() {
                 this.$http.get('/concept-plugin/management/plugin/list?group=' + this.group)
@@ -330,27 +434,31 @@
                         }
                     });
             },
-            uploadError(err, file, fileList) {
-                this.$notify.error({
-                    title: '插件上传',
-                    message: '上传失败',
-                    position: 'bottom-right'
-                });
-                console.log(err);
-            },
             loadPlugin(name) {
+                /*this.$notify({
+                    title: '插件',
+                    message: '开始加载 ' + name
+                });*/
                 this.$http.get('/concept-plugin/management/plugin/load?group=' + this.group + '&name=' + name)
                     .then((response) => {
                         this.afterOperation(response);
                     });
             },
             unloadPlugin(name) {
+                /*this.$notify({
+                    title: '插件',
+                    message: '开始卸载 ' + name
+                });*/
                 this.$http.get('/concept-plugin/management/plugin/unload?group=' + this.group + '&name=' + name)
                     .then((response) => {
                         this.afterOperation(response);
                     });
             },
             reloadPlugin(name) {
+                /*this.$notify({
+                    title: '插件',
+                    message: '开始重新加载 ' + name
+                });*/
                 this.$http.get('/concept-plugin/management/plugin/reload?group=' + this.group + '&name=' + name)
                     .then((response) => {
                         this.afterOperation(response);
@@ -359,13 +467,13 @@
             deletePlugin(name) {
                 this.$http.get('/concept-plugin/management/plugin/delete?group=' + this.group + '&name=' + name)
                     .then((response) => {
-                        this.afterOperation(response, true);
+                        this.afterOperation(response);
                     });
             },
             afterOperation(response, notify) {
                 let body = response.body;
                 if (body.success) {
-                    if (notify !== undefined) {
+                    if (notify) {
                         this.$notify({
                             title: '成功',
                             message: body.message,
@@ -389,6 +497,9 @@
                 return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
             },
             showReload(state) {
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+            },
+            showUpdate(state) {
                 return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
             },
             showProperties(state) {
@@ -446,7 +557,7 @@
                     case 'LOAD_ERROR':
                         return '加载失败';
                     case 'UNLOADED':
-                        return '已卸载';
+                        return '未加载';
                     case 'UNLOADING':
                         return '卸载中';
                     case 'UNLOAD_ERROR':
