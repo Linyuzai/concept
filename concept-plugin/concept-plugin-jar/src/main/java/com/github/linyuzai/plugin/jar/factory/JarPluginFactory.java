@@ -4,10 +4,11 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
+import com.github.linyuzai.plugin.jar.concept.JarFilePlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
-import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipPluginFactory;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,6 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.zip.ZipInputStream;
 
 @Getter
 @Setter
@@ -43,8 +43,8 @@ public class JarPluginFactory extends ZipPluginFactory {
     }
 
     @Override
-    protected ZipPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
-        return new JarPlugin(zis, url, parent);
+    protected JarFilePlugin createZipPlugin(File file, URL url) {
+        return new JarFilePlugin(file, url);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.autoload.location;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 
 public interface PluginLocation {
 
@@ -42,6 +43,8 @@ public interface PluginLocation {
     void unload(String group, String name);
 
     void delete(String group, String name);
+
+    void rename(String group, String name, String rename) throws FileAlreadyExistsException;
 
     interface Filter {
 

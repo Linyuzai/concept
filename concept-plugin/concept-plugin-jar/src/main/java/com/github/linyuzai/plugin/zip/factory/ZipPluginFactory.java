@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.zip.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.MetadataPluginFactory;
-import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,20 +18,18 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 public class ZipPluginFactory extends MetadataPluginFactory<File> {
 
     @SneakyThrows
     @Override
     public Plugin doCreate(File file, Plugin.Metadata metadata, PluginContext context) {
-        ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()));
-        URL url = getURL(file);
-        return createZipPlugin(zis, url, new RootFileEntry(url, file));
+        //ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()));
+        return createZipPlugin(file, getURL(file));
     }
 
-    protected ZipPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
-        return new ZipPlugin(zis, url, parent);
+    protected ZipFilePlugin createZipPlugin(File file, URL url) {
+        return new ZipFilePlugin(file, url);
     }
 
     @Override
@@ -82,6 +80,7 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
         return file.toURI().toURL();
     }
 
+    @Deprecated
     @Getter
     @RequiredArgsConstructor
     public static class RootFileEntry implements Plugin.Entry {
@@ -106,6 +105,7 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
         }
     }
 
+    @Deprecated
     @Getter
     @RequiredArgsConstructor
     public static class RootContent implements Plugin.Content {

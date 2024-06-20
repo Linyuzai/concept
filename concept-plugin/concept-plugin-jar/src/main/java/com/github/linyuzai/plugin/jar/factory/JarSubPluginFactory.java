@@ -2,10 +2,10 @@ package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarStreamPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPluginEntry;
-import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipSubPluginFactory;
 
 import java.net.URL;
@@ -26,8 +26,8 @@ public class JarSubPluginFactory extends ZipSubPluginFactory {
     }
 
     @Override
-    protected ZipPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
-        return new JarPlugin(zis, url, parent);
+    protected JarStreamPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
+        return new JarStreamPlugin(zis, url, parent);
     }
 
     @Override

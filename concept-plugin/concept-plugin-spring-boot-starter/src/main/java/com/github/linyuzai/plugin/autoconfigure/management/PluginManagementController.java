@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,7 +68,8 @@ public class PluginManagementController {
     }
 
     @GetMapping("/plugin/load")
-    public Response loadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
+    public Response loadPlugin(@RequestParam("group") String group,
+                               @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             loadingSet.add(path);
@@ -89,7 +91,8 @@ public class PluginManagementController {
     }
 
     @GetMapping("/plugin/unload")
-    public Response unloadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
+    public Response unloadPlugin(@RequestParam("group") String group,
+                                 @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             unloadingSet.add(path);
@@ -111,7 +114,8 @@ public class PluginManagementController {
     }
 
     @GetMapping("/plugin/reload")
-    public Response reloadPlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
+    public Response reloadPlugin(@RequestParam("group") String group,
+                                 @RequestParam("name") String name) {
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             loadingSet.add(path);
@@ -134,8 +138,24 @@ public class PluginManagementController {
         }, () -> "插件重新加载");
     }
 
+    @GetMapping("/plugin/rename")
+    public Response renamePlugin(@RequestParam("group") String group,
+                                 @RequestParam("name") String name,
+                                 @RequestParam("rename") String rename) {
+        return manage(() -> {
+            try {
+                location.rename(group, name, rename);
+            } catch (FileAlreadyExistsException e) {
+                return failure("名称已存在", null);
+            } catch (Throwable ignore) {
+            }
+            return null;
+        }, () -> "插件包重命名");
+    }
+
     @GetMapping("/plugin/delete")
-    public Response deletePlugin(@RequestParam("group") String group, @RequestParam("name") String name) {
+    public Response deletePlugin(@RequestParam("group") String group,
+                                 @RequestParam("name") String name) {
         return manage(() -> {
             try {
                 location.delete(group, name);
@@ -164,7 +184,11 @@ public class PluginManagementController {
 
     public Response manage(Supplier<Object> success, Supplier<String> message) {
         try {
-            return success(message.get() + "成功", success.get());
+            Object object = success.get();
+            if (object instanceof Response) {
+                return (Response) object;
+            }
+            return success(message.get() + "成功", object);
         } catch (Throwable e) {
             log.error(message.get(), e);
             return failure(message.get() + "失败", e);

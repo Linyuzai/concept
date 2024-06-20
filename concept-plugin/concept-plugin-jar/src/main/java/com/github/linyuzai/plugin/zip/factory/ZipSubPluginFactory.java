@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.zip.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.SubPluginFactory;
-import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import lombok.SneakyThrows;
 
 import java.net.URL;
@@ -32,8 +32,8 @@ public class ZipSubPluginFactory extends SubPluginFactory {
         return createZipPlugin(zis, url, entry);
     }
 
-    protected ZipPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
-        return new ZipPlugin(zis, url, parent);
+    protected ZipStreamPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
+        return new ZipStreamPlugin(zis, url, parent);
     }
 
     protected boolean supportEntry(Plugin.Entry entry, PluginContext context) {

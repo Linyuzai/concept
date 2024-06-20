@@ -2,8 +2,10 @@ package com.github.linyuzai.plugin.core.autoload.location;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -134,12 +136,30 @@ public class LocalPluginLocation implements PluginLocation {
         }
     }
 
-    protected boolean move(String group, String name, String from, String to) {
-        String fromPath = getPluginPath(group, name, from);
-        if (fromPath == null) {
-            throw new IllegalArgumentException(name + " not existed");
+    @Override
+    public void rename(String group, String name, String rename) throws FileAlreadyExistsException {
+        String renamePath = getUnloadedPluginPath(group, rename);
+        File renameFile = new File(renamePath);
+        if (renameFile.exists()) {
+            throw new FileAlreadyExistsException(renamePath);
         }
-        File fromFile = new File(fromPath);
+        File from;
+        File fromUnloaded = new File(getUnloadedPluginPath(group, name));
+        if (fromUnloaded.exists()) {
+            from = fromUnloaded;
+        } else {
+            File fromLoaded = new File(getLoadedPluginPath(group, name));
+            if (fromLoaded.exists()) {
+                from = fromLoaded;
+            } else {
+                return;
+            }
+        }
+        boolean renameTo = from.renameTo(renameFile);
+    }
+
+    protected boolean move(String group, String name, String from, String to) {
+        File fromFile = new File(getPluginPath(group, name, from));
         if (!fromFile.exists()) {
             throw new IllegalArgumentException(name + " not existed");
         }
@@ -157,11 +177,7 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     protected String getPluginPath(String group, String name, String type) {
-        if (filter.filter(group, name)) {
-            return new File(getPluginDirectory(group, type), name).getAbsolutePath();
-        } else {
-            return null;
-        }
+        return new File(getPluginDirectory(group, type), name).getAbsolutePath();
     }
 
     protected String[] getPlugins(String group, String type) {
