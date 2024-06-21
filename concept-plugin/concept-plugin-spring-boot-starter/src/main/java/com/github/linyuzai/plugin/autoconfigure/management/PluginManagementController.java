@@ -13,10 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
-import java.nio.file.FileAlreadyExistsException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,6 +38,8 @@ public class PluginManagementController {
     protected final Set<String> loadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     protected final Set<String> unloadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    protected final Set<String> updatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Autowired
     protected PluginConcept concept;
@@ -138,17 +144,18 @@ public class PluginManagementController {
         }, () -> "插件重新加载");
     }
 
+    @GetMapping("/plugin/exist")
+    public Response existPlugin(@RequestParam("group") String group,
+                                @RequestParam("name") String name) {
+        return manage(() -> location.exist(group, name), () -> "插件包重名判断");
+    }
+
     @GetMapping("/plugin/rename")
     public Response renamePlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name,
                                  @RequestParam("rename") String rename) {
         return manage(() -> {
-            try {
-                location.rename(group, name, rename);
-            } catch (FileAlreadyExistsException e) {
-                return failure("名称已存在", null);
-            } catch (Throwable ignore) {
-            }
+            location.rename(group, name, rename);
             return null;
         }, () -> "插件包重命名");
     }
@@ -157,10 +164,7 @@ public class PluginManagementController {
     public Response deletePlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
         return manage(() -> {
-            try {
-                location.delete(group, name);
-            } catch (Throwable ignore) {
-            }
+            location.delete(group, name);
             return null;
         }, () -> "插件删除");
     }
@@ -180,6 +184,50 @@ public class PluginManagementController {
             list.sort((o1, o2) -> Long.compare(o2.sort, o1.sort));
             return list;
         }, () -> "插件列表获取");
+    }
+
+    public void autoload(String group, String name, File file) {
+        if (name == null || name.trim().isEmpty()) {
+            return;
+        }
+        String newPath = location.getLoadedPluginPath(group, file.getName());
+        loadingSet.add(newPath);
+        String oldPath = location.getLoadedPluginPath(group, name);
+        updatingSet.add(oldPath);
+        PluginEventListener listener = event -> {
+            if (event instanceof PluginAutoEvent) {
+                String path = ((PluginAutoEvent) event).getPath();
+                if (Objects.equals(newPath, path)) {
+                    updatingSet.remove(oldPath);
+                    if (event instanceof PluginAutoLoadEvent) {
+                        unloadPlugin(group, name);
+                    }
+                }
+            }
+        };
+        concept.getEventPublisher().register(listener);
+        try {
+            location.load(group, file.getName());
+        } catch (Throwable e) {
+            log.error("Load plugin error: " + newPath, e);
+            concept.getEventPublisher().unregister(listener);
+            loadingSet.remove(newPath);
+            updatingSet.remove(oldPath);
+        }
+    }
+
+    public InputStream downloadPlugin(String group, String name, Boolean deleted, HttpHeaders headers) throws IOException {
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + URLEncoder.encode(name, "UTF-8"));
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        if (deleted == Boolean.TRUE) {
+            return location.getDeletedPluginInputStream(group, name);
+        } else {
+            try {
+                return location.getLoadedPluginInputStream(group, name);
+            } catch (Throwable e) {
+                return location.getUnloadedPluginInputStream(group, name);
+            }
+        }
     }
 
     public Response manage(Supplier<Object> success, Supplier<String> message) {
@@ -215,7 +263,11 @@ public class PluginManagementController {
                 state = ManagedPlugin.State.LOAD_ERROR;
             } else {
                 name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
-                state = ManagedPlugin.State.LOADED;
+                if (updatingSet.contains(path)) {
+                    state = ManagedPlugin.State.UPDATING;
+                } else {
+                    state = ManagedPlugin.State.LOADED;
+                }
             }
         }
         return new ManagedPlugin(plugin, name, formatSize(size), formatTime(timestamp), state, timestamp);
@@ -333,7 +385,7 @@ public class PluginManagementController {
 
         public enum State {
 
-            LOADED, LOADING, LOAD_ERROR, UNLOADED, UNLOADING, UNLOAD_ERROR, DELETED
+            LOADED, LOADING, LOAD_ERROR, UNLOADED, UNLOADING, UNLOAD_ERROR, DELETED, UPDATING
         }
     }
 

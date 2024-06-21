@@ -1,7 +1,8 @@
 package com.github.linyuzai.plugin.core.autoload.location;
 
 import java.io.File;
-import java.nio.file.FileAlreadyExistsException;
+import java.io.IOException;
+import java.io.InputStream;
 
 public interface PluginLocation {
 
@@ -22,17 +23,23 @@ public interface PluginLocation {
 
     String getLoadedPluginPath(String group, String name);
 
+    InputStream getLoadedPluginInputStream(String group, String name) throws IOException;
+
     String getUnloadedPath(String group);
 
     String[] getUnloadedPlugins(String group);
 
     String getUnloadedPluginPath(String group, String name);
 
+    InputStream getUnloadedPluginInputStream(String group, String name) throws IOException;
+
     String getDeletedPath(String group);
 
     String[] getDeletedPlugins(String group);
 
     String getDeletedPluginPath(String group, String name);
+
+    InputStream getDeletedPluginInputStream(String group, String name) throws IOException;
 
     long getSize(String path);
 
@@ -44,7 +51,9 @@ public interface PluginLocation {
 
     void delete(String group, String name);
 
-    void rename(String group, String name, String rename) throws FileAlreadyExistsException;
+    boolean exist(String group, String name);
+
+    void rename(String group, String name, String rename);
 
     interface Filter {
 

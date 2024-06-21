@@ -30,4 +30,12 @@ public interface PluginEventPublisher {
      * @param listeners 事件监听器 {@link PluginEventListener}
      */
     void register(Collection<? extends PluginEventListener> listeners);
+
+    default void unregister(PluginEventListener... listeners) {
+        unregister(Arrays.asList(listeners));
+    }
+
+    void unregister(Collection<? extends PluginEventListener> listeners);
+
+
 }

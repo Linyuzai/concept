@@ -15,7 +15,8 @@ var app = new Vue({
             app.refreshPlatformInstances();
         },
         refreshPlatformInstances() {
-            this.$http.get(urlPrefix + '/platform-management/instance/list').then((response) => {
+            this.$http.get(urlPrefix + '/platform-management/instance/list')
+                .then((response) => {
                 this.$notify.success({
                     title: '数据拉取成功',
                     message: '平台实例已刷新',

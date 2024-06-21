@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Concept Router</title>
+    <title></title>
     <link rel="stylesheet" type="text/css" href="/webjars/element-ui/2.15.1/lib/theme-chalk/index.css">
-    <!--<link rel="stylesheet" type="text/css" href="/concept-router/elementui/index-v2.15.0.css">-->
     <style>
 
         body {
@@ -85,18 +84,28 @@
             <el-aside>
                 <el-container>
                     <el-header style="border-right: solid 1px #e6e6e6;">
-                        <el-button-group style="margin-top: 20px">
+                        <!--<el-input placeholder="搜索分组"
+                                  v-model="group.search"
+                                  clearable>
+                            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                        </el-input>-->
+                        <el-switch
+                                style="margin-top: 30px"
+                                v-model="group.badge"
+                                active-text="动态标记">
+                        </el-switch>
+                        <el-button-group style="margin-top: 20px; float: right">
                             <el-button @click="openGroupDialog" icon="el-icon-plus"></el-button>
                             <el-button @click="refreshGroups" icon="el-icon-refresh"></el-button>
-                            <el-button @click="explain" icon="el-icon-warning-outline"></el-button>
+                            <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
                         </el-button-group>
                     </el-header>
                     <el-main style="padding: 0">
                         <el-menu style="height: 100%;padding-top: 20px"
-                                 :default-active="group"
+                                 :default-active="group.select"
                                  @select="selectGroup" v-cloak>
                             <el-menu-item :index="group.name"
-                                          v-for="group in groups">
+                                          v-for="group in group.list">
                                 <i v-if="group.state" class="el-icon-folder-checked"></i>
                                 <i v-else class="el-icon-folder-delete"></i>
                                 <span slot="title">{{group.name}}</span>
@@ -105,9 +114,11 @@
                     </el-main>
                 </el-container>
                 <el-dialog title="添加分组"
-                           :visible.sync="dialog.group.visible">
-                    <el-form :model="dialog.group.form" :rules="dialog.group.rules"
-                             ref="dialog.group.form">
+                           :close-on-click-modal="false"
+                           :visible.sync="group.add.visible">
+                    <el-form :model="group.add.form" :rules="group.add.rules"
+                             @submit.native.prevent=""
+                             ref="group.add.form">
                         <el-form-item label="分组名称" prop="name">
                             <el-tooltip class="item" effect="dark" placement="right">
                                 <div slot="content" v-cloak>
@@ -115,13 +126,14 @@
                                 </div>
                                 <i class="el-icon-warning-outline" v-cloak></i>
                             </el-tooltip>
-                            <el-input v-model="dialog.group.form.name"
+                            <el-input v-model="group.add.form.name"
+                                      @keyup.enter.native="addGroup"
                                       name="name"
                                       autocomplete></el-input>
                         </el-form-item>
                     </el-form>
                     <div class="dialog-footer" slot="footer">
-                        <el-button @click="dialog.group.visible = false" v-cloak>取 消</el-button>
+                        <el-button @click="group.add.visible = false" v-cloak>取 消</el-button>
                         <el-button @click="addGroup" type="primary" v-cloak>添 加</el-button>
                     </div>
                 </el-dialog>
@@ -130,14 +142,14 @@
                 <el-container style="height: 100%;">
                     <el-header style="padding: 0;text-align: left; font-size: 12px;" v-cloak>
                         <el-input placeholder="搜索插件"
-                                  v-model="pluginSearch"
+                                  v-model="plugin.search"
                                   clearable
                                   style="width: 300px;float: left">
                             <i slot="prefix" class="el-input__icon el-icon-search"></i>
                         </el-input>
                         <el-button type="primary" plain
                                    icon="el-icon-upload2"
-                                   @click="openUploadDialog"
+                                   @click="openUploadDialog('')"
                                    style="width: 110px;margin-left: 20px">
                             上传
                         </el-button>
@@ -150,15 +162,15 @@
                         <el-dialog title="上传插件"
                                    width="420px"
                                    :close-on-click-modal="false"
-                                   :visible.sync="dialog.upload.visible">
+                                   :visible.sync="plugin.upload.visible">
                             <el-upload action="/concept-plugin/management/plugin/upload"
                                        style="margin: 0 10px"
-                                       :disabled="dialog.upload.disabled"
+                                       :disabled="plugin.upload.disabled"
                                        :before-upload="beforeUpload"
                                        :on-change="uploadChange"
                                        :on-success="uploadSuccess"
                                        :on-error="uploadError"
-                                       :data="{group: this.group}"
+                                       :data="{group: this.group.select, name: this.plugin.upload.name}"
                                        drag>
                                 <i class="el-icon-upload"></i>
                                 <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -167,7 +179,7 @@
                     </el-header>
                     <el-main ref="tableMain" style="height:100%;padding: 0">
                         <el-table
-                                :data="plugins.filter(data => !pluginSearch||data.plugin.toLowerCase().includes(pluginSearch.toLowerCase()) || data.name.toLowerCase().includes(pluginSearch.toLowerCase()))"
+                                :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
                                 @selection-change=""
                                 style="width: 100%;border-bottom-width: 0"
                                 height="100%">
@@ -228,7 +240,7 @@
                                     </el-button>-->
                                     <el-button v-if="showUpdate(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
-                                               @click=""
+                                               @click="openUpdateDialog(scope.row.plugin)"
                                                type="text">更新
                                     </el-button>
                                     <el-button v-if="showProperties(scope.row.state)"
@@ -239,7 +251,7 @@
                                     </el-button>
                                     <el-button v-if="showRename(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
-                                               @click=""
+                                               @click="openRenameDialog(scope.row.plugin)"
                                                type="text">重命名
                                     </el-button>
                                     <el-button v-if="showDelete(scope.row.state)"
@@ -248,12 +260,33 @@
                                                type="text">删除
                                     </el-button>
                                     <el-button :disabled="isIngState(scope.row.state)"
-                                               @click=""
+                                               @click="downloadPlugin(scope.row.plugin)"
                                                type="text">下载
                                     </el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
+                        <el-dialog title="重命名"
+                                   :close-on-click-modal="false"
+                                   :visible.sync="plugin.rename.visible">
+                            <el-form :model="plugin.rename.form" :rules="plugin.rename.rules"
+                                     @submit.native.prevent=""
+                                     ref="plugin.rename.form">
+                                <el-form-item label="名称" prop="rename">
+                                    <el-input v-model="plugin.rename.form.rename"
+                                              @keyup.enter.native="renamePlugin"
+                                              name="rename"
+                                              autocomplete></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <div class="dialog-footer" slot="footer">
+                                <el-button @click="plugin.rename.visible = false" v-cloak>取 消</el-button>
+                                <el-button @click="renamePlugin"
+                                           :disabled="plugin.rename.form.name === plugin.rename.form.rename"
+                                           type="primary" v-cloak>确 定
+                                </el-button>
+                            </div>
+                        </el-dialog>
                     </el-main>
                 </el-container>
             </el-main>
@@ -269,129 +302,175 @@
 <script src="/webjars/vue-resource/1.5.1/dist/vue-resource.min.js" type="text/javascript"></script>
 <script src="/webjars/element-ui/2.15.1/lib/index.js" type="text/javascript"></script>
 <script>
-    var uploadLoading = null;
+    const urlPrefix = '/concept-plugin/management/';
+    const groupPrefix = urlPrefix + 'group/';
+    const pluginPrefix = urlPrefix + 'plugin/';
+    let uploadLoading = null;
+
+    function formatParams(params) {
+        let keys = Object.keys(params);
+        let array = [];
+        keys.forEach(key => {
+            array.push(key + '=' + params[key]);
+        });
+        return array.join('&');
+    }
+
+    function getGroupUrl(path, params) {
+        return getUrl(groupPrefix, path, params);
+    }
+
+    function getPluginUrl(path, params) {
+        return getUrl(pluginPrefix, path, params);
+    }
+
+    function getUrl(prefix, path, params) {
+        if (params === undefined) {
+            return prefix + path;
+        } else {
+            return prefix + path + '?' + formatParams(params);
+        }
+    }
+
+    const validateRename = (rule, value, callback) => {
+        if (value === '') {
+            callback();
+            return;
+        }
+        if (value.endsWith('/')) {
+            callback(new Error('名称不能以\'/\'结尾'));
+            return;
+        }
+        let params = {group: app.group.select, name: value};
+        app.$http.get(getPluginUrl('exist', params))
+            .then((response) => {
+                let body = response.body;
+                if (body.success) {
+                    if (body.data) {
+                        callback(new Error('名称已存在'));
+                    } else {
+                        callback();
+                    }
+                } else {
+                    callback(new Error(body.message));
+                    console.log(response);
+                }
+            }, (response) => {
+                callback(new Error('服务异常'));
+                console.log(response);
+            });
+    };
     let app = new Vue({
         el: "#concept-plugin-app",
         data: {
             settings: {
                 title: "Concept Plugin"
             },
-            group: '',
-            groups: [],
-            pluginAutoRefresh: false,
-            pluginSearch: '',
-            plugins: [],
-
-            prefix: '',
-            version: '',
-            services: ['*'],
-            routerList: [],
-            routerSearch: '',
-            dialog: {
-                upload: {
-                    visible: false,
-                    disabled: false
-                },
-                group: {
+            group: {
+                select: null,
+                badge: true,
+                list: [],
+                add: {
                     visible: false,
                     rules: {
                         name: [
-                            {required: true, message: '匹配服务不能为空', trigger: 'blur'}
+                            {required: true, message: '分组名称不能为空', trigger: 'blur'}
                         ]
                     },
                     form: {
                         name: ''
                     }
-                },
-                router: {
+                }
+            },
+            plugin: {
+                search: '',
+                list: [],
+                upload: {
                     visible: false,
-                    add: true,
-                    title: "添加路由",
+                    disabled: false,
+                    name: ''
+                },
+                rename: {
+                    visible: false,
                     rules: {
-                        serviceId: [
-                            {required: true, message: '匹配服务不能为空', trigger: 'blur'}
-                        ],
-                        pathPattern: [
-                            {required: true, message: '匹配路径不能为空', trigger: 'blur'}
-                        ],
-                        serverAddress: [
-                            {required: true, message: '服务地址不能为空', trigger: 'blur'}
-                        ],
-                        forced: [
-                            {required: true, message: 'forced is null', trigger: 'change'}
-                        ],
-                        enabled: [
-                            {required: true, message: 'enabled is null', trigger: 'change'}
+                        rename: [
+                            {required: true, message: '名称不能为空', trigger: 'blur'},
+                            {validator: validateRename, trigger: 'blur'}
                         ]
                     },
-                    form: {},
-                    init: {
-                        id: '',
-                        serviceId: '*',
-                        pathPattern: '',
-                        serverAddress: '',
-                        forced: false,
-                        enabled: true
-                    },
-                    row: {}
+                    form: {
+                        name: '',
+                        rename: ''
+                    }
                 }
             }
         },
         methods: {
             initSettings() {
-
+                document.title = this.settings.title;
             },
             selectGroup(index) {
-                this.group = index;
+                this.group.select = index;
                 this.refreshPlugins();
             },
             refreshGroups() {
-                this.$http.get('/concept-plugin/management/group/list')
+                this.$http.get(getGroupUrl('list'))
                     .then((response) => {
                         let body = response.body;
                         if (body.success) {
-                            this.groups = body.data;
-                            if (!this.group && this.groups.length > 0) {
-                                this.group = this.groups[0].name;
+                            this.group.list = body.data;
+                            if (!this.group.select && this.group.list.length > 0) {
+                                this.group.select = this.group.list[0].name;
                             }
                             this.refreshPlugins();
                         } else {
-                            this.groups = [];
+                            this.group.list = [];
                             console.log(response);
                         }
+                    }, (response) => {
+                        this.onError(response);
                     });
             },
             openGroupDialog() {
-                let form = this.$refs['dialog.group.form'];
+                let form = this.$refs['dialog.group.add.form'];
                 if (form !== undefined) {
                     form.resetFields();
                 }
-                this.dialog.group.visible = true;
+                this.group.add.visible = true;
             },
             addGroup() {
-                this.dialog.group.visible = false;
-                this.$http.get('/concept-plugin/management/group/add?group=' + this.dialog.group.form.name)
-                    .then((response) => {
-                        let body = response.body;
-                        if (body.success) {
-                            this.refreshGroups();
-                        } else {
-                            this.$notify({
-                                title: '失败',
-                                message: body.message,
-                                type: 'error'
+                this.$refs['group.add.form'].validate((valid) => {
+                    if (valid) {
+                        let params = {group: this.group.add.form.name};
+                        this.$http.get(getGroupUrl('add', params))
+                            .then((response) => {
+                                let body = response.body;
+                                if (body.success) {
+                                    this.group.add.visible = false;
+                                    this.refreshGroups();
+                                } else {
+                                    this.$notify({
+                                        title: '失败',
+                                        message: body.message,
+                                        type: 'error'
+                                    });
+                                    console.log(response);
+                                }
+                            }, (response) => {
+                                this.onError(response);
                             });
-                            console.log(response);
-                        }
-                    });
+                    }
+                    return valid;
+                });
             },
-            openUploadDialog() {
+            openUploadDialog(name) {
                 if (uploadLoading != null) {
                     uploadLoading.close();
                     uploadLoading = null;
                 }
-                this.dialog.upload.disabled = false;
-                this.dialog.upload.visible = true
+                this.plugin.upload.name = name;
+                this.plugin.upload.disabled = false;
+                this.plugin.upload.visible = true;
             },
             beforeUpload() {
                 if (uploadLoading != null) {
@@ -404,7 +483,7 @@
             uploadChange() {
             },
             uploadSuccess() {
-                this.dialog.upload.visible = false;
+                this.plugin.upload.visible = false;
                 this.refreshPlugins();
             },
             uploadError(err) {
@@ -416,12 +495,13 @@
                 console.log(err);
             },
             refreshPlugins() {
-                this.$http.get('/concept-plugin/management/plugin/list?group=' + this.group)
+                let params = {group: this.group.select};
+                this.$http.get(getPluginUrl('list', params))
                     .then((response) => {
                         let body = response.body;
                         if (body.success) {
-                            this.plugins = body.data;
-                            let array = this.plugins;
+                            this.plugin.list = body.data;
+                            let array = this.plugin.list;
                             let refresh = false;
                             for (let i = 0; i < array.length; i++) {
                                 let state = array[i].state;
@@ -434,50 +514,68 @@
                                 setTimeout(this.refreshPlugins, 1000);
                             }
                         } else {
-                            this.plugins = [];
+                            this.plugin.list = [];
                             console.log(response);
                         }
+                    }, (response) => {
+                        this.onError(response);
                     });
             },
             loadPlugin(name) {
-                /*this.$notify({
-                    title: '插件',
-                    message: '开始加载 ' + name
-                });*/
-                this.$http.get('/concept-plugin/management/plugin/load?group=' + this.group + '&name=' + name)
-                    .then((response) => {
-                        this.afterOperation(response);
-                    });
+                let params = {group: this.group.select, name: name};
+                this.onHttp(this.$http.get(getPluginUrl('load', params)));
             },
             unloadPlugin(name) {
-                /*this.$notify({
-                    title: '插件',
-                    message: '开始卸载 ' + name
-                });*/
-                this.$http.get('/concept-plugin/management/plugin/unload?group=' + this.group + '&name=' + name)
-                    .then((response) => {
-                        this.afterOperation(response);
-                    });
+                let params = {group: this.group.select, name: name};
+                this.onHttp(this.$http.get(getPluginUrl('unload', params)));
             },
             reloadPlugin(name) {
-                /*this.$notify({
-                    title: '插件',
-                    message: '开始重新加载 ' + name
-                });*/
-                this.$http.get('/concept-plugin/management/plugin/reload?group=' + this.group + '&name=' + name)
-                    .then((response) => {
-                        this.afterOperation(response);
-                    });
+                let params = {group: this.group.select, name: name};
+                this.onHttp(this.$http.get(getPluginUrl('reload', params)));
+            },
+            openUpdateDialog(name) {
+                this.openUploadDialog(name);
+            },
+            openRenameDialog(name) {
+                let form = this.$refs['plugin.rename.form'];
+                if (form !== undefined) {
+                    form.resetFields();
+                }
+                this.plugin.rename.form.name = name;
+                this.plugin.rename.form.rename = name;
+                this.plugin.rename.visible = true;
+            },
+            renamePlugin() {
+                let name = this.plugin.rename.form.name;
+                let rename = this.plugin.rename.form.rename;
+                let params = {group: this.group.select, name: name, rename: rename};
+                this.onHttp(this.$http.get(getPluginUrl('rename', params)), () =>
+                    this.plugin.rename.visible = false);
             },
             deletePlugin(name) {
-                this.$http.get('/concept-plugin/management/plugin/delete?group=' + this.group + '&name=' + name)
-                    .then((response) => {
-                        this.afterOperation(response);
-                    });
+                let params = {group: this.group.select, name: name};
+                this.onHttp(this.$http.get(getPluginUrl('delete', params)));
             },
-            afterOperation(response, notify) {
+            downloadPlugin(name) {
+                let params = {group: this.group.select, name: name, deleted: false};
+                const link = document.createElement('a');
+                link.href = getPluginUrl('download', params);
+                link.download = name;
+                link.click();
+            },
+            onHttp(promise, success) {
+                promise.then((response) => {
+                    this.onResponse(response, success);
+                }, (response) => {
+                    this.onError(response);
+                });
+            },
+            onResponse(response, success, notify) {
                 let body = response.body;
                 if (body.success) {
+                    if (success !== undefined) {
+                        success();
+                    }
                     if (notify) {
                         this.$notify({
                             title: '成功',
@@ -495,20 +593,28 @@
                     console.log(response);
                 }
             },
+            onError(response) {
+                this.$notify({
+                    title: '失败',
+                    message: '服务异常',
+                    type: 'error'
+                });
+                console.log(response);
+            },
             showLoad(state) {
                 return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
             },
             showUnload(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
             },
             showReload(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
             },
             showUpdate(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
             },
             showProperties(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state;
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
             },
             showRename(state) {
                 return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
@@ -517,7 +623,7 @@
                 return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
             },
             isIngState(state) {
-                return 'LOADING' === state || 'UNLOADING' === state;
+                return 'LOADING' === state || 'UNLOADING' === state || 'UPDATING' === state;
             },
             isErrorState(state) {
                 return 'LOAD_ERROR' === state || 'UNLOAD_ERROR' === state;
@@ -530,6 +636,7 @@
                         return 'el-icon-remove-outline';
                     case 'LOADING':
                     case 'UNLOADING':
+                    case 'UPDATING':
                         return 'el-icon-loading';
                     case 'LOAD_ERROR':
                     case 'UNLOAD_ERROR':
@@ -542,6 +649,7 @@
                 switch (state) {
                     case 'LOADED':
                     case 'LOADING':
+                    case 'UPDATING':
                         return 'primary';
                     case 'UNLOADED':
                     case 'UNLOADING':
@@ -567,273 +675,17 @@
                         return '卸载中';
                     case 'UNLOAD_ERROR':
                         return '卸载失败';
+                    case 'UPDATING':
+                        return '更新中';
                     default:
                         return '未知';
                 }
             },
             explain() {
-                let content =
-                    "本产品主要用于多人开发时提高接口调试效率<br/>" +
-                    "正式服务请在打包时排除该库<br/>" +
-                    "或使用 'concept.router.enabled=false' 禁用该功能"
+                let content = '';
                 this.$alert(content, '说明', {dangerouslyUseHTMLString: true});
             },
-            buildUrl(path) {
-                let p = this.prefix;
-                if (!p.startsWith('/')) {
-                    p = '/' + p;
-                }
-                if (p.endsWith('/')) {
-                    p = p.substring(0, p.length - 1)
-                }
-                return p + path;
-            },
-            getVersion() {
-                this.version = 'v'
-                /*this.$http.get(this.buildUrl('/concept-router/management/version'))
-                    .then((response) => {
-                        if (response.body.success) {
-                            this.version = response.body.object;
-                        } else {
-                            console.log(response);
-                        }
-                    });*/
-            },
-            refreshServices(visible, row) {
-                if (visible) {
-                    /*this.$http.get(this.buildUrl('/concept-router/management/services'))
-                        .then((response) => {
-                            if (response.body.success) {
-                                this.services = response.body.object;
-                            } else {
-                                console.log(response);
-                            }
-                        });*/
-                } else {
-                    if (row !== undefined) {
-                        row.serviceIdInEdit = false;
-                        this.$forceUpdate();
-                    }
-                }
-            },
-            refreshRouters() {
-                /*this.$http.get(this.buildUrl('/concept-router/management/list'))
-                    .then((response) => {
-                        if (response.body.success) {
-                            this.routerList = response.body.object;
-                        } else {
-                            this.$notify.error({
-                                title: '查询失败',
-                                message: response.body.message,
-                                position: 'bottom-right'
-                            });
-                            this.routerList = [];
-                            console.log(response);
-                        }
-                    }, (response) => {
-                        this.$notify.error({
-                            title: '查询失败',
-                            message: '路由刷新失败',
-                            position: 'bottom-right'
-                        });
-                        this.routerList = [];
-                        console.log(response);
-                    });*/
-            },
-            openRouterDialog(row) {
-                let form = this.$refs['dialog.router.form'];
-                if (form !== undefined) {
-                    form.resetFields();
-                }
-                if (row === undefined) {
-                    this.dialog.router.add = true;
-                    this.dialog.router.title = '添加路由';
-                    this.dialog.router.form = JSON.parse(JSON.stringify(this.dialog.router.init));
-                    this.dialog.router.visible = true;
-                } else {
-                    this.dialog.router.add = false;
-                    this.dialog.router.title = '编辑路由';
-                    this.dialog.router.form = JSON.parse(JSON.stringify(row));
-                    this.dialog.router.visible = true;
-                }
-            },
-            addRouter() {
-                this.$refs['dialog.router.form'].validate((valid) => {
-                    if (valid) {
-                        this.$http.post(this.buildUrl("/concept-router/management/add"), this.dialog.router.form)
-                            .then((response) => {
-                                if (response.body.success) {
-                                    this.$notify.success({
-                                        title: '提交成功',
-                                        message: '路由已添加',
-                                        position: 'bottom-right'
-                                    });
-                                    this.dialog.router.visible = false;
-                                    this.refreshRouters();
-                                } else {
-                                    this.$notify.error({
-                                        title: '提交失败',
-                                        message: response.body.message,
-                                        position: 'bottom-right'
-                                    });
-                                    console.log(response);
-                                }
-                            }, (response) => {
-                                this.$notify.error({
-                                    title: '提交失败',
-                                    message: '路由添加失败',
-                                    position: 'bottom-right'
-                                });
-                                console.log(response);
-                            });
-                    }
-                    return valid;
-                });
-            },
-            updateRouter() {
-                this.$refs['dialog.router.form'].validate((valid) => {
-                    if (valid) {
-                        this.updateRouterShortcut(this.dialog.router.form);
-                        this.dialog.router.visible = false;
-                        this.refreshRouters();
-                    }
-                    return valid;
-                });
-            },
-            updateRouterShortcut(row, old) {
-                this.$http.put(this.buildUrl("/concept-router/management/update"), row)
-                    .then((response) => {
-                        if (response.body.success) {
-                            this.$notify.success({
-                                title: '提交成功',
-                                message: '路由已更新',
-                                position: 'bottom-right'
-                            });
-                        } else {
-                            if (old !== undefined) {
-                                this.refreshRouters();
-                            }
-                            this.$notify.error({
-                                title: '提交失败',
-                                message: response.body.message,
-                                position: 'bottom-right'
-                            });
-                            console.log(response);
-                        }
-                    }, (response) => {
-                        if (old !== undefined) {
-                            this.refreshRouters();
-                        }
-                        this.$notify.error({
-                            title: '提交失败',
-                            message: '路由修改失败',
-                            position: 'bottom-right'
-                        });
-                        console.log(response);
-                    });
-            },
-            deleteRouter(row) {
-                console.log(row);
-                let param = {id: row.id};
-                this.$http.delete(this.buildUrl('/concept-router/management/delete'), {params: param})
-                    .then((response) => {
-                        if (response.body.success) {
-                            this.$notify.success({
-                                title: '提交成功',
-                                message: '路由已删除',
-                                position: 'bottom-right'
-                            });
-                            this.refreshRouters();
-                        } else {
-                            this.$notify.error({
-                                title: '提交失败',
-                                message: response.body.message,
-                                position: 'bottom-right'
-                            });
-                            console.log(response);
-                        }
-                    }, (response) => {
-                        this.$notify.error({
-                            title: '提交失败',
-                            message: '路由删除失败',
-                            position: 'bottom-right'
-                        });
-                        console.log(response);
-                    });
-            },
-            routerCellDblClick(row, column, cell, event) {
-                this.dialog.router.row = JSON.parse(JSON.stringify(row));
-                if (column.property === 'serviceId') {
-                    row.serviceIdInEdit = true;
-                    //this.$set(row, "serviceIdInEdit", true);
-                }
-                if (column.property === 'pathPattern') {
-                    row.pathPatternInEdit = true;
-                    //this.$set(row, "pathPatternInEdit", true);
-                }
-                if (column.property === 'serverAddress') {
-                    row.serverAddressInEdit = true;
-                    //this.$set(row, "serverAddressInEdit", true);
-                }
-                this.$forceUpdate();
-            },
-            onRouterConfirm(row) {
-                let update = row.serviceIdInEdit || row.pathPatternInEdit || row.serverAddressInEdit;
-                row.serviceIdInEdit = false;
-                row.pathPatternInEdit = false;
-                row.serverAddressInEdit = false;
-                if (update) {
-                    let old = this.dialog.router.row;
-                    if (row.id === old.id) {
-                        if (row.serviceId === '') {
-                            row.serviceId = old.serviceId;
-                            this.$notify.error({
-                                title: '提交失败',
-                                message: '匹配服务不能为空',
-                                position: 'bottom-right'
-                            });
-                            return;
-                        }
-                        if (row.pathPattern === '') {
-                            row.pathPattern = old.pathPattern;
-                            this.$notify.error({
-                                title: '提交失败',
-                                message: '匹配路径不能为空',
-                                position: 'bottom-right'
-                            });
-                            return;
-                        }
-                        if (row.serverAddress === '') {
-                            row.serverAddress = old.serverAddress;
-                            this.$notify.error({
-                                title: '提交失败',
-                                message: '服务地址不能为空',
-                                position: 'bottom-right'
-                            });
-                            return;
-                        }
-                        if (row.serviceId !== old.serviceId ||
-                            row.pathPattern !== old.pathPattern ||
-                            row.serverAddress !== old.serverAddress) {
-                            this.updateRouterShortcut(row, old);
-                        }
-                    }
-                    this.$forceUpdate();
-                }
-            }
         },
-        directives: {
-            focus: {
-                inserted: function (el) {
-                    if (el.childNodes[1].childNodes[1] === undefined) {
-                        el.childNodes[1].focus();
-                    } else {
-                        el.childNodes[1].childNodes[1].focus();
-                    }
-                }
-            }
-        },
-        computed: {},
         mounted: function () {
             this.initSettings();
             this.refreshGroups();

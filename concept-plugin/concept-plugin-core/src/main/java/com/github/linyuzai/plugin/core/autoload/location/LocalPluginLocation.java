@@ -2,12 +2,9 @@ package com.github.linyuzai.plugin.core.autoload.location;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
-import java.io.File;
-import java.nio.file.FileAlreadyExistsException;
+import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
@@ -69,6 +66,12 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     @Override
+    public InputStream getLoadedPluginInputStream(String group, String name) throws IOException {
+        File file = new File(getLoadedPluginPath(group, name));
+        return Files.newInputStream(file.toPath());
+    }
+
+    @Override
     public String getUnloadedPath(String group) {
         return getPluginDirectory(group, UNLOADED).getAbsolutePath();
     }
@@ -84,6 +87,12 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     @Override
+    public InputStream getUnloadedPluginInputStream(String group, String name) throws IOException {
+        File file = new File(getUnloadedPluginPath(group, name));
+        return Files.newInputStream(file.toPath());
+    }
+
+    @Override
     public String getDeletedPath(String group) {
         return getPluginDirectory(group, DELETED).getAbsolutePath();
     }
@@ -96,6 +105,12 @@ public class LocalPluginLocation implements PluginLocation {
     @Override
     public String getDeletedPluginPath(String group, String name) {
         return getPluginPath(group, name, DELETED);
+    }
+
+    @Override
+    public InputStream getDeletedPluginInputStream(String group, String name) throws IOException {
+        File file = new File(getDeletedPluginPath(group, name));
+        return Files.newInputStream(file.toPath());
     }
 
     @Override
@@ -136,13 +151,32 @@ public class LocalPluginLocation implements PluginLocation {
         }
     }
 
+    protected File getExistFile(String group, String name) {
+        String loadPath = getLoadedPluginPath(group, name);
+        File loadFile = new File(loadPath);
+        if (loadFile.exists()) {
+            return loadFile;
+        }
+        String unloadPath = getUnloadedPluginPath(group, name);
+        File unloadFile = new File(unloadPath);
+        if (unloadFile.exists()) {
+            return unloadFile;
+        }
+        return null;
+    }
+
     @Override
-    public void rename(String group, String name, String rename) throws FileAlreadyExistsException {
+    public boolean exist(String group, String name) {
+        return getExistFile(group, name) != null;
+    }
+
+    @Override
+    public void rename(String group, String name, String rename) {
+        if (exist(group, rename)) {
+            throw new IllegalArgumentException("File existed");
+        }
         String renamePath = getUnloadedPluginPath(group, rename);
         File renameFile = new File(renamePath);
-        if (renameFile.exists()) {
-            throw new FileAlreadyExistsException(renamePath);
-        }
         File from;
         File fromUnloaded = new File(getUnloadedPluginPath(group, name));
         if (fromUnloaded.exists()) {
@@ -169,7 +203,7 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     protected File getGroupDirectory(String group) {
-        return check(new File(basePath, group));
+        return check(new File(basePath, group.trim()));
     }
 
     protected File getPluginDirectory(String group, String type) {
@@ -177,7 +211,7 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     protected String getPluginPath(String group, String name, String type) {
-        return new File(getPluginDirectory(group, type), name).getAbsolutePath();
+        return new File(getPluginDirectory(group, type), name.trim()).getAbsolutePath();
     }
 
     protected String[] getPlugins(String group, String type) {

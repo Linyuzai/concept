@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.core.event;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * {@link PluginEventPublisher} 默认实现
@@ -12,7 +12,7 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     /**
      * 所有的监听器
      */
-    private final Collection<PluginEventListener> listeners = new ArrayList<>();
+    private final Collection<PluginEventListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
      * 发布事件。
@@ -30,6 +30,11 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     @Override
     public void register(Collection<? extends PluginEventListener> listeners) {
         this.listeners.addAll(listeners);
+    }
+
+    @Override
+    public void unregister(Collection<? extends PluginEventListener> listeners) {
+        this.listeners.removeAll(listeners);
     }
 
     /**
