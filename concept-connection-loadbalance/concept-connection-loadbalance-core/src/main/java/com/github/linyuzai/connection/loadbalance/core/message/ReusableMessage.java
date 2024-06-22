@@ -8,27 +8,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface PooledMessage extends Message {
+public interface ReusableMessage extends Message {
 
-    static PooledMessage wrap(Message message) {
+    static ReusableMessage create(Message message) {
         return new Impl(message);
     }
 
-    Object pooled(Connection connection, Function<Message, Object> encode);
+    Object reuse(Connection connection, Function<Message, Object> encode);
 
     @Getter
     @RequiredArgsConstructor
-    class Impl implements PooledMessage {
+    class Impl implements ReusableMessage {
 
-        private final Map<String, Map<Class<? extends Connection>, Object>> pooled = new HashMap<>();
+        private final Map<String, Map<Class<? extends Connection>, Object>> reused = new HashMap<>();
 
         private final Message message;
 
         @Override
-        public Object pooled(Connection connection, Function<Message, Object> encode) {
-            return pooled.computeIfAbsent(connection.getType(), t -> new HashMap<>())
+        public Object reuse(Connection connection, Function<Message, Object> encode) {
+            return reused.computeIfAbsent(connection.getType(), t -> new HashMap<>())
                     .computeIfAbsent(connection.getClass(), c -> {
-                        message.getHeaders().put(Message.POOLED, Boolean.TRUE.toString());
+                        message.getHeaders().put(Message.REUSABLE, Boolean.TRUE.toString());
                         return encode.apply(message);
                     });
         }

@@ -45,11 +45,11 @@ public interface Message {
     String BINARY = "_lb:binary";
 
     /**
-     * 标记该消息转发需要缓存。
+     * 标记该消息可复用。
      * <p>
-     * Key of message header for message pooled.
+     * Key of message header for message reusing.
      */
-    String POOLED = "_lb:pooled";
+    String REUSABLE = "_lb:reusable";
 
     /**
      * 标记该消息转发需要反序列化的类型。
@@ -144,5 +144,9 @@ public interface Message {
      */
     default void setFrom(String from) {
         getHeaders().put(FROM, from);
+    }
+
+    default Message toReusableMessage() {
+        return ReusableMessage.create(this);
     }
 }

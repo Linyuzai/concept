@@ -32,7 +32,6 @@ public class ThreadPoolScheduledExecutor implements ScheduledExecutor {
     @Override
     public void scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit unit, ConnectionLoadBalanceConcept concept) {
         service.scheduleWithFixedDelay(runnable, initialDelay, delay, unit);
-        service.shutdown();
     }
 
     @Override

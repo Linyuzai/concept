@@ -20,10 +20,10 @@ public class MessageForwardHandler implements MessageReceiveEventListener {
     @Override
     public void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept) {
         try {
-            String pooled = message.getHeaders()
-                    .getOrDefault(Message.POOLED, Boolean.FALSE.toString());
-            if (Boolean.parseBoolean(pooled)){
-                concept.send(PooledMessage.wrap(message));
+            String reused = message.getHeaders()
+                    .getOrDefault(Message.REUSABLE, Boolean.FALSE.toString());
+            if (Boolean.parseBoolean(reused)){
+                concept.send(message.toReusableMessage());
             } else {
                 concept.send(message);
             }
