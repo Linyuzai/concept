@@ -194,13 +194,18 @@ public class PluginManagementController {
         loadingSet.add(newPath);
         String oldPath = location.getLoadedPluginPath(group, name);
         updatingSet.add(oldPath);
-        PluginEventListener listener = event -> {
-            if (event instanceof PluginAutoEvent) {
-                String path = ((PluginAutoEvent) event).getPath();
-                if (Objects.equals(newPath, path)) {
-                    updatingSet.remove(oldPath);
-                    if (event instanceof PluginAutoLoadEvent) {
-                        unloadPlugin(group, name);
+        PluginEventListener listener = new PluginEventListener() {
+
+            @Override
+            public void onEvent(Object event) {
+                if (event instanceof PluginAutoEvent) {
+                    String path = ((PluginAutoEvent) event).getPath();
+                    if (Objects.equals(newPath, path)) {
+                        updatingSet.remove(oldPath);
+                        if (event instanceof PluginAutoLoadEvent) {
+                            location.delete(group, name);
+                            concept.getEventPublisher().unregister(this);
+                        }
                     }
                 }
             }
@@ -210,9 +215,9 @@ public class PluginManagementController {
             location.load(group, file.getName());
         } catch (Throwable e) {
             log.error("Load plugin error: " + newPath, e);
-            concept.getEventPublisher().unregister(listener);
             loadingSet.remove(newPath);
             updatingSet.remove(oldPath);
+            concept.getEventPublisher().unregister(listener);
         }
     }
 

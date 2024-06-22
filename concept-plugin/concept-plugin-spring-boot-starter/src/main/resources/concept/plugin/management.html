@@ -23,6 +23,30 @@
             height: 0;
         }
 
+        .plugin-btn {
+            padding: 0;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 75px;
+            right: -50px;
+            width: 100px;
+            height: 60px;
+            /*background-color: #13ce66;*/
+            /*border-radius: 50%;*/
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+            /*color: #fff;*/
+            /*text-align: center;
+            line-height: 50px;*/
+            z-index: 9999;
+            /*cursor: pointer;*/
+        }
+
+        .floating-button:hover {
+            transform: translateX(-50px);
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -57,6 +81,12 @@
 </head>
 <body>
 <div id="concept-plugin-app">
+    <!--:style="{top: buttonTop + 'px',left: buttonLeft + 'px'}"-->
+    <el-button class="floating-button"
+               @click="">
+        <i class="el-icon-question el-icon--left" style="margin-right: 10px"></i>
+        帮助
+    </el-button>
     <el-container style="height: 100vh">
         <el-header style="height: 80px;padding-bottom: 20px;border-bottom: 1px solid #eee;">
             <h1 style="margin-top: 15px;" v-cloak>
@@ -91,11 +121,12 @@
                         </el-input>-->
                         <el-switch
                                 style="margin-top: 30px"
-                                v-model="group.badge"
-                                active-text="动态标记">
+                                @change="lock"
+                                v-model="auth.lock"
+                                active-text="锁定">
                         </el-switch>
                         <el-button-group style="margin-top: 20px; float: right">
-                            <el-button @click="openGroupDialog" icon="el-icon-plus"></el-button>
+                            <el-button v-if="!auth.lock" @click="openGroupDialog" icon="el-icon-plus"></el-button>
                             <el-button @click="refreshGroups" icon="el-icon-refresh"></el-button>
                             <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
                         </el-button-group>
@@ -147,17 +178,18 @@
                                   style="width: 300px;float: left">
                             <i slot="prefix" class="el-input__icon el-icon-search"></i>
                         </el-input>
-                        <el-button type="primary" plain
+                        <el-button v-if="!auth.lock"
+                                   type="primary"
+                                   plain
                                    icon="el-icon-upload2"
                                    @click="openUploadDialog('')"
-                                   style="width: 110px;margin-left: 20px">
-                            上传
+                                   style="width: 110px;margin-left: 20px">上传
                         </el-button>
-                        <el-button type="" plain
+                        <el-button type=""
+                                   plain
                                    icon="el-icon-delete"
                                    @click=""
-                                   style="width: 110px;margin-left: 10px;float: right">
-                            回收站
+                                   style="width: 110px;margin-left: 10px;float: right">回收站
                         </el-button>
                         <el-dialog title="上传插件"
                                    width="420px"
@@ -210,25 +242,18 @@
                                 </template>
                             </el-table-column>
                             <el-table-column label="操作" prop="url" fixed="right" width="250">
-                                <template slot="header">
-                                    <span>操作
-                                        <el-tooltip class="item" effect="dark" placement="right">
-                                            <div slot="content" v-cloak>
-                                            插件配置 'plugin.properties' 中定义的名称<br/>
-                                            即 'concept.plugin.name' 属性值
-                                            </div>
-                                            <i class="el-icon-warning-outline" v-cloak></i>
-                                        </el-tooltip>
-                                        <span class="caret-wrapper" style="width: 0"></span>
-                                    </span>
+                                <template slot="header">操作
+                                    <span class="caret-wrapper" style="width: 0"></span>
                                 </template>
                                 <template slot-scope="scope">
                                     <el-button v-if="showLoad(scope.row.state)"
+                                               class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
                                                @click="loadPlugin(scope.row.plugin)"
                                                type="text">加载
                                     </el-button>
                                     <el-button v-if="showUnload(scope.row.state)"
+                                               class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
                                                @click="unloadPlugin(scope.row.plugin)"
                                                type="text">卸载
@@ -239,27 +264,32 @@
                                                type="text">重新加载
                                     </el-button>-->
                                     <el-button v-if="showUpdate(scope.row.state)"
+                                               class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
                                                @click="openUpdateDialog(scope.row.plugin)"
                                                type="text">更新
                                     </el-button>
                                     <el-button v-if="showProperties(scope.row.state)"
+                                               class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
                                                @click=""
                                                type="text">查看配置
                                     </el-button>
                                     </el-button>
                                     <el-button v-if="showRename(scope.row.state)"
+                                               class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
                                                @click="openRenameDialog(scope.row.plugin)"
                                                type="text">重命名
                                     </el-button>
                                     <el-button v-if="showDelete(scope.row.state)"
+                                               class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
                                                @click="deletePlugin(scope.row.plugin)"
                                                type="text">删除
                                     </el-button>
                                     <el-button :disabled="isIngState(scope.row.state)"
+                                               class="plugin-btn"
                                                @click="downloadPlugin(scope.row.plugin)"
                                                type="text">下载
                                     </el-button>
@@ -293,7 +323,7 @@
         </el-container>
         <el-footer style="text-align: center;color: #606266;height: 55px;padding-top: 15px;border-top: 1px solid #eee;"
                    v-cloak>
-            ©2024 Linyuzai
+            ©2024 黑白法师
         </el-footer>
     </el-container>
 </div>
@@ -363,8 +393,14 @@
     let app = new Vue({
         el: "#concept-plugin-app",
         data: {
+            auth: {
+                lock: true
+            },
             settings: {
                 title: "Concept Plugin"
+            },
+            help: {
+
             },
             group: {
                 select: null,
@@ -408,6 +444,9 @@
         methods: {
             initSettings() {
                 document.title = this.settings.title;
+            },
+            lock(lock) {
+                //openUnlockDialog
             },
             selectGroup(index) {
                 this.group.select = index;
@@ -602,24 +641,30 @@
                 console.log(response);
             },
             showLoad(state) {
-                return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
+                return this.isUnloadState(state) && !this.auth.lock;
             },
             showUnload(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
+                return this.isLoadState(state) && !this.auth.lock;
             },
             showReload(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
+                return this.isLoadState(state) && !this.auth.lock;
             },
             showUpdate(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
+                return this.isLoadState(state) && !this.auth.lock;
             },
             showProperties(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
+                return this.isLoadState(state);
             },
             showRename(state) {
-                return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
+                return this.isUnloadState(state) && !this.auth.lock;
             },
             showDelete(state) {
+                return this.isUnloadState(state) && !this.auth.lock;
+            },
+            isLoadState(state) {
+                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
+            },
+            isUnloadState(state) {
                 return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
             },
             isIngState(state) {

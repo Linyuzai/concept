@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,16 +62,20 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     @Override
     public void addGroup(String group) {
-        final Path path = Paths.get(location.getLoadedPath(group));
         try {
-            path.register(watchService,
-                    StandardWatchEventKinds.ENTRY_CREATE,
-                    StandardWatchEventKinds.ENTRY_MODIFY,
-                    StandardWatchEventKinds.ENTRY_DELETE);
+            String path = location.getLoadedPath(group);
+            registerPath(path);
             watchStates.put(group, true);
         } catch (Throwable e) {
             watchStates.put(group, true);
         }
+    }
+
+    protected void registerPath(String path) throws IOException {
+        Paths.get(path).register(watchService,
+                StandardWatchEventKinds.ENTRY_CREATE,
+                StandardWatchEventKinds.ENTRY_MODIFY,
+                StandardWatchEventKinds.ENTRY_DELETE);
     }
 
     @Override
