@@ -25,7 +25,7 @@ public class ZipStreamPluginEntry implements ZipPluginEntry {
 
     protected final Plugin.Entry parent;
 
-    protected Reference<byte[]> reference;
+    protected volatile Reference<byte[]> reference;
 
     public ZipStreamPluginEntry(Object id,
                                 String name,
@@ -61,22 +61,29 @@ public class ZipStreamPluginEntry implements ZipPluginEntry {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            byte[] bytes = reference.get();
+            byte[] bytes;
+            bytes = reference.get();
             if (bytes != null) {
                 return new ByteArrayInputStream(bytes);
             }
-            try (InputStream is = parent.getContent().getInputStream();
-                 ZipInputStream zis = new ZipInputStream(is)) {
-                ZipEntry entry;
-                while ((entry = zis.getNextEntry()) != null) {
-                    if (Objects.equals(name, entry.getName())) {
-                        byte[] read = PluginUtils.read(zis);
-                        reference = new SoftReference<>(read);
-                        return new ByteArrayInputStream(read);
+            synchronized (ZipStreamPluginEntry.this) {
+                bytes = reference.get();
+                if (bytes != null) {
+                    return new ByteArrayInputStream(bytes);
+                }
+                try (InputStream is = parent.getContent().getInputStream();
+                     ZipInputStream zis = new ZipInputStream(is)) {
+                    ZipEntry entry;
+                    while ((entry = zis.getNextEntry()) != null) {
+                        if (Objects.equals(name, entry.getName())) {
+                            byte[] read = PluginUtils.read(zis);
+                            reference = createReference(read);
+                            return new ByteArrayInputStream(read);
+                        }
                     }
                 }
+                throw new PluginException("Plugin entry not found");
             }
-            throw new PluginException("Plugin entry not found");
         }
     }
 }

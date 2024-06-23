@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.jar.handle.filter;
 
 import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
+import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.Collection;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(JarClassResolver.class)
-public class ClassFilter extends AbstractPluginFilter<Class<?>> {
+public class ClassFilter extends AbstractPluginFilter<JarClass> {
 
     /**
      * 类
@@ -27,13 +28,13 @@ public class ClassFilter extends AbstractPluginFilter<Class<?>> {
     }
 
     @Override
-    public boolean doFilter(Class<?> clazz) {
-        return filterClass(clazz);
+    public boolean doFilter(JarClass jarClass) {
+        return filterClass(jarClass.get());
     }
 
     @Override
     public Object getKey() {
-        return Class.class;
+        return JarClass.class;
     }
 
     /**

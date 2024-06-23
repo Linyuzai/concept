@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.jar.handle.filter.AnnotationFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilter;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
 
 import java.lang.annotation.Annotation;
 
@@ -14,7 +15,7 @@ import java.lang.annotation.Annotation;
  * 类匹配器
  */
 @HandlerDependency(JarClassResolver.class)
-public class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
+public class ClassMatcher extends AbstractPluginMatcher<JarClass> {
 
     /**
      * 类型
@@ -61,7 +62,7 @@ public class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
 
     @Override
     public Object getKey() {
-        return Class.class;
+        return JarClass.class;
     }
 
     /**
@@ -71,8 +72,8 @@ public class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
      * @return 匹配之后的类
      */
     @Override
-    public boolean doFilter(Class<?> clazz, PluginContext context) {
-        return target.isAssignableFrom(clazz) && applyFilters(clazz);
+    public boolean doFilter(JarClass clazz, PluginContext context) {
+        return applyFilters(clazz) && target.isAssignableFrom(clazz.get());
     }
 
     /**
@@ -81,14 +82,14 @@ public class ClassMatcher extends AbstractPluginMatcher<Class<?>> {
      * @param clazz 类
      * @return 是否匹配
      */
-    public boolean applyFilters(Class<?> clazz) {
+    public boolean applyFilters(JarClass clazz) {
         if (classNameFilter != null && !classNameFilter.matchPattern(clazz.getName())) {
             return false;
         }
-        if (classFilter != null && !classFilter.filterClass(clazz)) {
+        if (classFilter != null && !classFilter.filterClass(clazz.get())) {
             return false;
         }
-        if (annotationFilter != null && !annotationFilter.hasAnnotation(clazz)) {
+        if (annotationFilter != null && !annotationFilter.hasAnnotation(clazz.get())) {
             return false;
         }
         return true;

@@ -1,12 +1,14 @@
 package com.github.linyuzai.plugin.jar.handle.extract;
 
 import com.github.linyuzai.plugin.core.handle.extract.TypeMetadataPluginExtractor;
+import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.DefaultTypeMetadataFactory;
 import com.github.linyuzai.plugin.core.type.ObjectTypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadataFactory;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
+import com.github.linyuzai.plugin.jar.handle.extract.convert.ClassConvertor;
 import com.github.linyuzai.plugin.jar.handle.extract.match.ClassMatcher;
 
 import java.lang.annotation.Annotation;
@@ -37,6 +39,11 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
         }
         Class<?> elementClass = metadata.getElementClass();
         return new ClassMatcher(elementClass, annotations);
+    }
+
+    @Override
+    public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
+        return new ClassConvertor();
     }
 
     /**

@@ -39,7 +39,6 @@ import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilterFactory;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClassNameResolver;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -66,11 +65,6 @@ public class PluginConceptConfiguration {
         @Bean
         public JarSubPluginFactory jarSubPluginFactory() {
             return new JarSubPluginFactory();
-        }
-
-        @Bean
-        public JarClassNameResolver jarClassNameResolver() {
-            return new JarClassNameResolver();
         }
 
         @Bean

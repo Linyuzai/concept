@@ -4,10 +4,6 @@ import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 
 public interface JarPlugin extends ZipPlugin {
 
-    interface ClassName {
-
-    }
-
     interface PropertyKey {
 
         String PREFIX = Metadata.PropertyKey.PREFIX + "jar.";

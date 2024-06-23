@@ -188,7 +188,7 @@
                         <el-button type=""
                                    plain
                                    icon="el-icon-delete"
-                                   @click=""
+                                   @click="openDeletedPluginsDialog"
                                    style="width: 110px;margin-left: 10px;float: right">回收站
                         </el-button>
                         <el-dialog title="上传插件"
@@ -207,6 +207,42 @@
                                 <i class="el-icon-upload"></i>
                                 <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                             </el-upload>
+                        </el-dialog>
+                        <el-dialog title="回收站"
+                                   :visible.sync="plugin.deleted.visible">
+                            <el-input placeholder="搜索插件"
+                                      v-model="plugin.deleted.search"
+                                      clearable>
+                                <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                            </el-input>
+                            <el-table
+                                    :data="plugin.deleted.list.filter(data => !plugin.deleted.search||data.plugin.toLowerCase().includes(plugin.deleted.search.toLowerCase()))"
+                                    @selection-change=""
+                                    style="width: 100%;border-bottom-width: 0"
+                                    height="350px">
+                                <el-table-column label="序号" type="index" fixed width="60">
+                                    <template slot="header">序号
+                                        <span class="caret-wrapper" style="width: 0"></span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="plugin" label="插件包" sortable fixed>
+                                </el-table-column>
+                                <el-table-column prop="size" label="插件大小" sortable>
+                                </el-table-column>
+                                <el-table-column prop="creationTime" label="上传时间" sortable>
+                                </el-table-column>
+                                <el-table-column label="操作" prop="url" fixed="right">
+                                    <template slot="header">操作
+                                        <span class="caret-wrapper" style="width: 0"></span>
+                                    </template>
+                                    <template slot-scope="scope">
+                                        <el-button class="plugin-btn"
+                                                   @click="downloadPlugin(scope.row.plugin, true)"
+                                                   type="text">下载
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
                         </el-dialog>
                     </el-header>
                     <el-main ref="tableMain" style="height:100%;padding: 0">
@@ -290,7 +326,7 @@
                                     </el-button>
                                     <el-button :disabled="isIngState(scope.row.state)"
                                                class="plugin-btn"
-                                               @click="downloadPlugin(scope.row.plugin)"
+                                               @click="downloadPlugin(scope.row.plugin, false)"
                                                type="text">下载
                                     </el-button>
                                 </template>
@@ -399,9 +435,7 @@
             settings: {
                 title: "Concept Plugin"
             },
-            help: {
-
-            },
+            help: {},
             group: {
                 select: null,
                 badge: true,
@@ -419,6 +453,7 @@
                 }
             },
             plugin: {
+                refresh: 0,
                 search: '',
                 list: [],
                 upload: {
@@ -438,6 +473,11 @@
                         name: '',
                         rename: ''
                     }
+                },
+                deleted: {
+                    visible: false,
+                    search: '',
+                    list: []
                 }
             }
         },
@@ -533,13 +573,36 @@
                 });
                 console.log(err);
             },
-            refreshPlugins() {
-                let params = {group: this.group.select};
+            openDeletedPluginsDialog() {
+                let params = {group: this.group.select, deleted: true};
                 this.$http.get(getPluginUrl('list', params))
                     .then((response) => {
                         let body = response.body;
                         if (body.success) {
+                            this.plugin.deleted.list = body.data;
+                        } else {
+                            this.plugin.deleted.list = [];
+                            console.log(response);
+                        }
+                        this.plugin.deleted.visible = true;
+                    }, (response) => {
+                        this.plugin.deleted.visible = true;
+                        this.onError(response);
+                    });
+            },
+            refreshPlugins() {
+                this.plugin.refresh++;
+                this.refreshPlugins0();
+            },
+            refreshPlugins0() {
+                let params = {group: this.group.select, deleted: false};
+                this.$http.get(getPluginUrl('list', params))
+                    .then((response) => {
+                        this.plugin.refresh--;
+                        let body = response.body;
+                        if (body.success) {
                             this.plugin.list = body.data;
+
                             let array = this.plugin.list;
                             let refresh = false;
                             for (let i = 0; i < array.length; i++) {
@@ -550,13 +613,17 @@
                                 }
                             }
                             if (refresh) {
-                                setTimeout(this.refreshPlugins, 1000);
+                                if (this.plugin.refresh <= 0) {
+                                    this.plugin.refresh = 1;
+                                    setTimeout(this.refreshPlugins0, 1000);
+                                }
                             }
                         } else {
                             this.plugin.list = [];
                             console.log(response);
                         }
                     }, (response) => {
+                        this.plugin.refresh--;
                         this.onError(response);
                     });
             },
@@ -595,8 +662,8 @@
                 let params = {group: this.group.select, name: name};
                 this.onHttp(this.$http.get(getPluginUrl('delete', params)));
             },
-            downloadPlugin(name) {
-                let params = {group: this.group.select, name: name, deleted: false};
+            downloadPlugin(name, deleted) {
+                let params = {group: this.group.select, name: name, deleted: deleted};
                 const link = document.createElement('a');
                 link.href = getPluginUrl('download', params);
                 link.download = name;

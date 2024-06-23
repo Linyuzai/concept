@@ -170,16 +170,24 @@ public class PluginManagementController {
     }
 
     @GetMapping("/plugin/list")
-    public Response listPlugin(@RequestParam("group") String group) {
+    public Response listPlugin(@RequestParam("group") String group,
+                               @RequestParam("deleted") Boolean deleted) {
         return manage(() -> {
             List<ManagedPlugin> list = new ArrayList<>();
-            String[] loaded = location.getLoadedPlugins(group);
-            for (String load : loaded) {
-                list.add(loadedPlugin(group, load));
-            }
-            String[] unloaded = location.getUnloadedPlugins(group);
-            for (String unload : unloaded) {
-                list.add(unloadedPlugin(group, unload));
+            if (deleted == Boolean.TRUE) {
+                String[] plugins = location.getDeletedPlugins(group);
+                for (String plugin : plugins) {
+                    list.add(deletedPlugin(group, plugin));
+                }
+            } else {
+                String[] loaded = location.getLoadedPlugins(group);
+                for (String load : loaded) {
+                    list.add(loadedPlugin(group, load));
+                }
+                String[] unloaded = location.getUnloadedPlugins(group);
+                for (String unload : unloaded) {
+                    list.add(unloadedPlugin(group, unload));
+                }
             }
             list.sort((o1, o2) -> Long.compare(o2.sort, o1.sort));
             return list;
@@ -299,6 +307,14 @@ public class PluginManagementController {
             }
         }
         return new ManagedPlugin(plugin, name, formatSize(size), formatTime(timestamp), state, timestamp);
+    }
+
+    public ManagedPlugin deletedPlugin(String group, String plugin) {
+        String deletePath = location.getDeletedPluginPath(group, plugin);
+        long timestamp = location.getCreationTimestamp(deletePath);
+        long size = location.getSize(deletePath);
+        ManagedPlugin.State state = ManagedPlugin.State.DELETED;
+        return new ManagedPlugin(plugin, null, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
     public Response success(String message, Object data) {
