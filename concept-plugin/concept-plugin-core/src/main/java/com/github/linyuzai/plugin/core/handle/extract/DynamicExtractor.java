@@ -52,7 +52,7 @@ public class DynamicExtractor implements PluginExtractor {
             }
             Parameter[] parameters = method.getParameters();
             for (int i = 0; i < parameters.length; i++) {
-                Invoker invoker = getInvoker(parameters[i]);
+                Invoker invoker = getInvoker(method, parameters[i]);
                 if (invoker == null) {
                     throw new PluginException("Can not invoke " + parameters[i]);
                 }
@@ -90,27 +90,27 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter 方法参数 {@link Parameter}
      * @return 插件提取执行器
      */
-    public Invoker getInvoker(Parameter parameter) {
+    public Invoker getInvoker(Method method, Parameter parameter) {
         Annotation[] annotations = parameter.getAnnotations();
         for (Annotation annotation : annotations) {
-            Invoker invoker = getAnnotationInvoker(annotation, parameter);
+            Invoker invoker = getAnnotationInvoker(method, parameter, annotation);
             if (invoker != null) {
                 return invoker;
             }
         }
-        Invoker pluginContextInvoker = getPluginContextInvoker(parameter);
+        Invoker pluginContextInvoker = getPluginContextInvoker(method, parameter);
         if (pluginContextInvoker != null) {
             return pluginContextInvoker;
         }
-        Invoker pluginObjectInvoker = getPluginObjectInvoker(parameter);
+        Invoker pluginObjectInvoker = getPluginObjectInvoker(method, parameter);
         if (pluginObjectInvoker != null) {
             return pluginObjectInvoker;
         }
-        Invoker propertiesInvoker = getPropertiesInvoker(parameter);
+        Invoker propertiesInvoker = getPropertiesInvoker(method, parameter);
         if (propertiesInvoker != null) {
             return propertiesInvoker;
         }
-        Invoker contentInvoker = getContentInvoker(parameter, null);
+        Invoker contentInvoker = getContentInvoker(method, parameter, null);
         if (contentInvoker != null) {
             return contentInvoker;
         }
@@ -125,10 +125,10 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter  参数 {@link Parameter}
      * @return 插件提取执行器
      */
-    public Invoker getAnnotationInvoker(Annotation annotation, Parameter parameter) {
+    public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
         if (annotation.annotationType() == PluginText.class) {
             String charset = ((PluginText) annotation).charset();
-            return getContentInvoker(parameter, charset.isEmpty() ? null : Charset.forName(charset));
+            return getContentInvoker(method, parameter, charset.isEmpty() ? null : Charset.forName(charset));
         }
         return null;
     }
@@ -139,25 +139,15 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter 参数 {@link Parameter}
      * @return {@link PluginContextExtractor} 对应的执行器或 null
      */
-    public Invoker getPluginContextInvoker(Parameter parameter) {
+    public Invoker getPluginContextInvoker(Method method, Parameter parameter) {
         try {
             return new PluginContextExtractor<PluginContext>() {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
 
                 @Override
                 public void onExtract(PluginContext context) {
 
                 }
-            }.getInvoker();
+            }.createInvoker(method, parameter);
         } catch (Throwable e) {
             return null;
         }
@@ -169,25 +159,15 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter 参数 {@link Parameter}
      * @return {@link PluginObjectExtractor} 对应的执行器或 null
      */
-    public Invoker getPluginObjectInvoker(Parameter parameter) {
+    public Invoker getPluginObjectInvoker(Method method, Parameter parameter) {
         try {
             return new PluginObjectExtractor<Plugin>() {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
 
                 @Override
                 public void onExtract(Plugin plugin, PluginContext context) {
 
                 }
-            }.getInvoker();
+            }.createInvoker(method, parameter);
         } catch (Throwable e) {
             return null;
         }
@@ -199,25 +179,15 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter 参数 {@link Parameter}
      * @return {@link PropertiesExtractor} 对应的执行器或 null
      */
-    public Invoker getPropertiesInvoker(Parameter parameter) {
+    public Invoker getPropertiesInvoker(Method method, Parameter parameter) {
         try {
             return new PropertiesExtractor<Void>() {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
 
                 @Override
                 public void onExtract(Void plugin, PluginContext context) {
 
                 }
-            }.getInvoker();
+            }.createInvoker(method, parameter);
         } catch (Throwable e) {
             return null;
         }
@@ -229,25 +199,15 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter 参数 {@link Parameter}
      * @return {@link ContentExtractor} 对应的执行器或 null
      */
-    public Invoker getContentInvoker(Parameter parameter, Charset charset) {
+    public Invoker getContentInvoker(Method method, Parameter parameter, Charset charset) {
         try {
             return new ContentExtractor<Void>(charset) {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
 
                 @Override
                 public void onExtract(Void plugin, PluginContext context) {
 
                 }
-            }.getInvoker();
+            }.createInvoker(method, parameter);
         } catch (Throwable e) {
             return null;
         }
@@ -266,12 +226,12 @@ public class DynamicExtractor implements PluginExtractor {
     public void extract(PluginContext context) {
         for (Map.Entry<Method, Map<Integer, Invoker>> entry : methodInvokersMap.entrySet()) {
             Method method = entry.getKey();
-            Map<Integer, Invoker> matcherMap = entry.getValue();
-            Object[] values = new Object[matcherMap.size()];
+            Map<Integer, Invoker> invokerMap = entry.getValue();
+            Object[] values = new Object[invokerMap.size()];
             boolean matched = false;
-            for (Map.Entry<Integer, Invoker> methodEntry : matcherMap.entrySet()) {
-                Integer index = methodEntry.getKey();
-                Invoker invoker = methodEntry.getValue();
+            for (Map.Entry<Integer, Invoker> invokerEntry : invokerMap.entrySet()) {
+                Integer index = invokerEntry.getKey();
+                Invoker invoker = invokerEntry.getValue();
                 Object invoked;
                 try {
                     invoked = invoker.invoke(context);
@@ -306,7 +266,7 @@ public class DynamicExtractor implements PluginExtractor {
     public Class<? extends PluginHandler>[] getDependencies() {
         return methodInvokersMap.values().stream()
                 .flatMap(it -> it.values().stream())
-                .flatMap(it -> Arrays.stream(it.getMatcher().getDependencies()))
+                .flatMap(it -> Arrays.stream(it.getDependencies()))
                 .distinct()
                 .toArray(Class[]::new);
     }

@@ -9,7 +9,8 @@ import com.github.linyuzai.plugin.core.handle.extract.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;

@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.handle.resolve;
 
-import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
 
 /**
  * 插件解析器

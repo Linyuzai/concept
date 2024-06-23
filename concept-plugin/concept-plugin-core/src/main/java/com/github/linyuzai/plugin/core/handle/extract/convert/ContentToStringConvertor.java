@@ -2,7 +2,9 @@ package com.github.linyuzai.plugin.core.handle.extract.convert;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.nio.charset.Charset;
 import java.util.Map;

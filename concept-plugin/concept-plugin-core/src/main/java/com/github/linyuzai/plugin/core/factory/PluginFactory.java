@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
 /**

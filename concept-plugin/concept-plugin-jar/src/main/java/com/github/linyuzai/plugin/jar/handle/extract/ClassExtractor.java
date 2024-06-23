@@ -52,42 +52,41 @@ public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
      * @return {@link TypeMetadataFactory}
      */
     @Override
-    public TypeMetadataFactory getTypeMetadataFactory() {
-        if (typeMetadataFactory == null) {
-            typeMetadataFactory = new DefaultTypeMetadataFactory() {
+    protected TypeMetadataFactory createTypeMetadataFactory() {
+        return new ClassTypeMetadataFactory();
+    }
 
-                @Override
-                public Class<?> getElementClass(Type type) {
-                    if (type instanceof Class) {
-                        //Class
-                        if (type == Class.class) {
-                            return Object.class;
-                        }
-                    } else if (type instanceof ParameterizedType) {
-                        //Class<A>
-                        Type rawType = ((ParameterizedType) type).getRawType();
-                        if (rawType instanceof Class) {
-                            if (rawType == Class.class) {
-                                Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
-                                //获得A
-                                return ReflectionUtils.toClass(arguments[0]);
-                            }
-                        }
-                    } else if (type instanceof WildcardType) {
-                        //? extends Class<B>
-                        Type[] upperBounds = ((WildcardType) type).getUpperBounds();
-                        if (upperBounds.length > 0) {
-                            Type upperBound = upperBounds[0];
-                            if (upperBound instanceof Class || upperBound instanceof ParameterizedType) {
-                                //获得Class<B>
-                                return getElementClass(upperBound);
-                            }
-                        }
-                    }
-                    return null;
+    public static class ClassTypeMetadataFactory extends DefaultTypeMetadataFactory {
+
+        @Override
+        public Class<?> getElementClass(Type type) {
+            if (type instanceof Class) {
+                //Class
+                if (type == Class.class) {
+                    return Object.class;
                 }
-            };
+            } else if (type instanceof ParameterizedType) {
+                //Class<A>
+                Type rawType = ((ParameterizedType) type).getRawType();
+                if (rawType instanceof Class) {
+                    if (rawType == Class.class) {
+                        Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
+                        //获得A
+                        return ReflectionUtils.toClass(arguments[0]);
+                    }
+                }
+            } else if (type instanceof WildcardType) {
+                //? extends Class<B>
+                Type[] upperBounds = ((WildcardType) type).getUpperBounds();
+                if (upperBounds.length > 0) {
+                    Type upperBound = upperBounds[0];
+                    if (upperBound instanceof Class || upperBound instanceof ParameterizedType) {
+                        //获得Class<B>
+                        return getElementClass(upperBound);
+                    }
+                }
+            }
+            return null;
         }
-        return typeMetadataFactory;
     }
 }

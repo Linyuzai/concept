@@ -6,8 +6,8 @@ import com.github.linyuzai.plugin.core.handle.extract.match.AbstractPluginMatche
 import com.github.linyuzai.plugin.jar.handle.filter.AnnotationFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilter;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
+import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 
 import java.lang.annotation.Annotation;
 

@@ -1,11 +1,19 @@
 package com.github.linyuzai.plugin.core.handle;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 
 public interface PluginHandler {
 
     void handle(PluginContext context);
+
+    interface PropertyKey {
+
+        String PREFIX = Plugin.Metadata.PropertyKey.PREFIX + "handler.";
+
+        String ENABLED = PREFIX + "enabled";
+    }
 
     interface Dependency {
 

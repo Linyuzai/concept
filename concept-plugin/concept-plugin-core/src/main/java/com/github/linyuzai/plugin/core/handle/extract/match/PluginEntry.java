@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 用于匹配插件路径
  */
-@Target(ElementType.PARAMETER)
+@Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PluginEntry {
 

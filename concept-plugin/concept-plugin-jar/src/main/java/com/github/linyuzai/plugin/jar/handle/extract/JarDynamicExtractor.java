@@ -9,7 +9,6 @@ import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassName;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 
 /**
  * 基于 jar 的动态插件提取器
@@ -31,12 +30,12 @@ public class JarDynamicExtractor extends DynamicExtractor {
      * @return 插件提取执行器
      */
     @Override
-    public Invoker getInvoker(Parameter parameter) {
-        Invoker invoker = super.getInvoker(parameter);
+    public Invoker getInvoker(Method method, Parameter parameter) {
+        Invoker invoker = super.getInvoker(method, parameter);
         if (invoker != null) {
             return invoker;
         }
-        return getJarInvoker(parameter);
+        return getJarInvoker(method, parameter);
     }
 
     /**
@@ -45,8 +44,8 @@ public class JarDynamicExtractor extends DynamicExtractor {
      * @param parameter 方法参数
      * @return 插件提取执行器或 null
      */
-    protected Invoker getJarInvoker(Parameter parameter) {
-        Invoker classInvoker = getClassInvoker(parameter);
+    protected Invoker getJarInvoker(Method method, Parameter parameter) {
+        Invoker classInvoker = getClassInvoker(method, parameter);
         if (classInvoker != null) {
             return classInvoker;
         }
@@ -62,13 +61,13 @@ public class JarDynamicExtractor extends DynamicExtractor {
      * @return 插件提取执行器
      */
     @Override
-    public Invoker getAnnotationInvoker(Annotation annotation, Parameter parameter) {
+    public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
         if (annotation.annotationType() == PluginAnnotation.class ||
                 annotation.annotationType() == PluginClass.class ||
                 annotation.annotationType() == PluginClassName.class) {
-            return getJarInvoker(parameter);
+            return getJarInvoker(method, parameter);
         }
-        return super.getAnnotationInvoker(annotation, parameter);
+        return super.getAnnotationInvoker(method, parameter, annotation);
     }
 
     /**
@@ -77,25 +76,15 @@ public class JarDynamicExtractor extends DynamicExtractor {
      * @param parameter 方法参数
      * @return 类提取器 {@link ClassExtractor} 对应的执行器或 null
      */
-    public Invoker getClassInvoker(Parameter parameter) {
+    public Invoker getClassInvoker(Method method, Parameter parameter) {
         try {
             return new ClassExtractor<Void>() {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
 
                 @Override
                 public void onExtract(Void plugin, PluginContext context) {
 
                 }
-            }.getInvoker();
+            }.createInvoker(method, parameter);
         } catch (Throwable e) {
             return null;
         }

@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.context;
 
-import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

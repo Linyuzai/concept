@@ -20,7 +20,7 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
     /**
      * {@link TypeMetadata} 工厂
      */
-    protected TypeMetadataFactory typeMetadataFactory;
+    protected volatile TypeMetadataFactory typeMetadataFactory;
 
     /**
      * 尝试根据可用的 {@link TypeMetadata} 获得 {@link PluginMatcher}
@@ -99,9 +99,17 @@ public abstract class TypeMetadataPluginExtractor<T> extends AbstractPluginExtra
 
     public TypeMetadataFactory getTypeMetadataFactory() {
         if (typeMetadataFactory == null) {
-            typeMetadataFactory = new DefaultTypeMetadataFactory();
+            synchronized (this) {
+                if (typeMetadataFactory == null) {
+                    typeMetadataFactory = createTypeMetadataFactory();
+                }
+            }
         }
         return typeMetadataFactory;
+    }
+
+    protected TypeMetadataFactory createTypeMetadataFactory() {
+        return new DefaultTypeMetadataFactory();
     }
 
     /**

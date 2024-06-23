@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.jar.handle.filter;
 
-import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
+import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import lombok.Getter;

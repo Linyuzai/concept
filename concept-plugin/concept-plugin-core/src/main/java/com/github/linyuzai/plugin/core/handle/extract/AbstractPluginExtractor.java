@@ -1,16 +1,21 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * {@link PluginExtractor} 的抽象类
@@ -22,13 +27,49 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     /**
      * 插件提取执行器
      */
-    protected Invoker invoker;
+    protected volatile Invoker invoker;
 
     public Invoker getInvoker() {
         if (invoker == null) {
-            invoker = getInvoker(getGenericType(), getAnnotations());
+            synchronized (this) {
+                if (invoker == null) {
+                    invoker = createInvoker();
+                }
+            }
         }
         return invoker;
+    }
+
+    protected Invoker createInvoker() {
+        Method[] methods = getClass().getMethods();
+        for (Method method : methods) {
+            if ("onExtract".equals(method.getName()) && !method.isBridge()) {
+                Parameter[] parameters = method.getParameters();
+                if (parameters.length != 2) {
+                    continue;
+                }
+                if (!PluginContext.class.isAssignableFrom(parameters[1].getType())) {
+                    continue;
+                }
+                return createInvoker(method, parameters[0]);
+            }
+        }
+        return null;
+    }
+
+    public Invoker createInvoker(Method method, Parameter parameter) {
+        Map<Class<? extends Annotation>, Annotation> annotationMap = new LinkedHashMap<>();
+        putAnnotations(method.getAnnotations(), annotationMap);
+        putAnnotations(parameter.getAnnotations(), annotationMap);
+        Annotation[] annotations = annotationMap.values().toArray(new Annotation[0]);
+        return createInvoker(parameter.getParameterizedType(), annotations);
+    }
+
+    protected void putAnnotations(Annotation[] annotations,
+                                  Map<Class<? extends Annotation>, Annotation> annotationMap) {
+        for (Annotation annotation : annotations) {
+            annotationMap.put(annotation.annotationType(), annotation);
+        }
     }
 
     /**
@@ -38,39 +79,14 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @param annotations 注解
      * @return 插件提取执行器
      */
-    public Invoker getInvoker(Type type, Annotation[] annotations) {
+    public Invoker createInvoker(Type type, Annotation[] annotations) {
         PluginMatcher matcher = getMatcher(type, annotations);
         if (matcher == null) {
             throw new PluginException("Can not match " + type);
         }
         PluginConvertor convertor = getConvertor(type, annotations);
         PluginFormatter formatter = getFormatter(type, annotations);
-        return new Invoker(matcher, convertor, formatter);
-    }
-
-    /**
-     * 获得插件类型 {@link Type}，用于做插件匹配
-     *
-     * @return 插件类型的 {@link Type}
-     */
-    public Type getGenericType() {
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {
-            Type[] types = ((ParameterizedType) type).getActualTypeArguments();
-            if (types.length == 1) {
-                return types[0];
-            }
-        }
-        throw new PluginException("U may need to try override this method");
-    }
-
-    /**
-     * 获得注解，用于做插件匹配
-     *
-     * @return 注解
-     */
-    public Annotation[] getAnnotations() {
-        return new Annotation[0];
+        return new InvokerImpl(matcher, convertor, formatter);
     }
 
     /**
@@ -135,6 +151,54 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      */
     @Override
     public Class<? extends PluginHandler>[] getDependencies() {
-        return getInvoker().getMatcher().getDependencies();
+        return getInvoker().getDependencies();
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class InvokerImpl implements Invoker {
+
+        /**
+         * 插件匹配器
+         */
+        private final PluginMatcher matcher;
+
+        /**
+         * 插件转换器
+         */
+        private final PluginConvertor convertor;
+
+        /**
+         * 插件格式器
+         */
+        private final PluginFormatter formatter;
+
+        /**
+         * 执行插件提取。
+         * 包括匹配，转换，格式化三个步骤。
+         *
+         * @param context 上下文 {@link PluginContext}
+         * @return 插件对象
+         */
+        @Override
+        public Object invoke(PluginContext context) {
+            //匹配插件
+            Object matched = matcher.match(context);
+            if (matched == null) {
+                return null;
+            }
+            //转换插件
+            Object converted = convertor == null ? matched : convertor.convert(matched, context);
+            if (converted == null) {
+                return null;
+            }
+            //格式化插件
+            return formatter == null ? converted : formatter.format(converted, context);
+        }
+
+        @Override
+        public Class<? extends PluginHandler>[] getDependencies() {
+            return matcher.getDependencies();
+        }
     }
 }

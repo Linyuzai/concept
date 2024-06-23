@@ -47,7 +47,7 @@ public abstract class DependencyReader implements PluginReader {
 
     public List<String> getDependencies(Plugin plugin) {
         Plugin.Metadata metadata = plugin.getMetadata();
-        String dependencies = metadata.get(Plugin.Metadata.PropertyKey.DEPENDENCIES);
+        String dependencies = metadata.get(Plugin.Metadata.PropertyKey.DEPENDENCY_NAMES);
         if (dependencies == null) {
             return Collections.emptyList();
         }

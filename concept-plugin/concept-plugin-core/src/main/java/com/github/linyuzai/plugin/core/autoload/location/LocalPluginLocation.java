@@ -3,7 +3,9 @@ package com.github.linyuzai.plugin.core.autoload.location;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;

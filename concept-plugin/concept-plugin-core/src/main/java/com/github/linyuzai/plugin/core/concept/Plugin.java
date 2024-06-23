@@ -54,7 +54,7 @@ public interface Plugin {
 
             String NAME = PREFIX + "name";
 
-            String DEPENDENCIES = PREFIX + "dependencies";
+            String DEPENDENCY_NAMES = PREFIX + "dependency.names";
         }
 
         String get(String key);

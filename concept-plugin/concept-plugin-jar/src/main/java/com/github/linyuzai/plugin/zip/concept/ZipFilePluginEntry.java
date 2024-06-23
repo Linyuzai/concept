@@ -5,7 +5,10 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 

@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 
 @Getter
 public class BeanDynamicExtractor extends JarDynamicExtractor {
@@ -26,32 +25,22 @@ public class BeanDynamicExtractor extends JarDynamicExtractor {
     }
 
     @Override
-    public Invoker getAnnotationInvoker(Annotation annotation, Parameter parameter) {
+    public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
         if (annotation.annotationType() == PluginBean.class) {
-            return getBeanInvoker(parameter);
+            return getBeanInvoker(method, parameter);
         }
-        return super.getAnnotationInvoker(annotation, parameter);
+        return super.getAnnotationInvoker(method, parameter, annotation);
     }
 
-    public Invoker getBeanInvoker(Parameter parameter) {
+    public Invoker getBeanInvoker(Method method, Parameter parameter) {
         try {
             return new BeanExtractor<Void>(applicationContext) {
-
-                @Override
-                public Type getGenericType() {
-                    return parameter.getParameterizedType();
-                }
-
-                @Override
-                public Annotation[] getAnnotations() {
-                    return parameter.getAnnotations();
-                }
 
                 @Override
                 public void onExtract(Void plugin, PluginContext context) {
 
                 }
-            }.getInvoker();
+            }.createInvoker(method, parameter);
         } catch (Throwable e) {
             return null;
         }

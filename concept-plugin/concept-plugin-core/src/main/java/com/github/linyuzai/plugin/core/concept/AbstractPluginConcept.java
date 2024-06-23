@@ -6,24 +6,27 @@ import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.exception.PluginLoadException;
 import com.github.linyuzai.plugin.core.exception.PluginUnloadException;
-import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
-import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
-import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
+import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
+import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
+import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
+import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
-import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * {@link PluginConcept} 抽象类
@@ -120,7 +123,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
 
-
     protected void resetHandlerChain() {
         handlerChain = null;
     }
@@ -186,8 +188,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             plugin.prepare(context);
             eventPublisher.publish(new PluginPreparedEvent(context));
 
-            //解析插件
-            obtainHandlerChain(context).next(context);
+            String handlerEnabled = plugin.getMetadata()
+                    .get(PluginHandler.PropertyKey.ENABLED, Boolean.TRUE.toString());
+            if (Boolean.parseBoolean(handlerEnabled)) {
+                //解析插件
+                obtainHandlerChain(context).next(context);
+            }
 
             plugin.release(context);
             eventPublisher.publish(new PluginReleasedEvent(context));

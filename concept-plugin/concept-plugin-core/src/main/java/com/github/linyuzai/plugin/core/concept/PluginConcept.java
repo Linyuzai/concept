@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.core.concept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
