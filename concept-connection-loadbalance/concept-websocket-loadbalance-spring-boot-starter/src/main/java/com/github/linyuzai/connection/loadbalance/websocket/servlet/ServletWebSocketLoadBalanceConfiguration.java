@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndp
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketHandshakeInterceptor;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,6 +14,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
+
+import java.util.List;
 
 /**
  * Servlet WebSocket 负载均衡配置。
@@ -63,10 +66,11 @@ public class ServletWebSocketLoadBalanceConfiguration {
         public ServletWebSocketServerConfigurer servletWebSocketServerConfigurer(
                 WebSocketLoadBalanceConcept concept,
                 WebSocketLoadBalanceProperties properties,
-                @Autowired(required = false) DefaultEndpointCustomizer customizer) {
+                List<WebSocketHandshakeInterceptor> interceptors,
+                List<DefaultEndpointCustomizer> customizers) {
             String prefix = ConnectionLoadBalanceConcept
                     .formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
-            return new ServletWebSocketServerConfigurer(concept, prefix, customizer);
+            return new ServletWebSocketServerConfigurer(concept, prefix, interceptors, customizers);
         }
     }
 }

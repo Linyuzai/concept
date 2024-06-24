@@ -7,6 +7,7 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,12 +19,12 @@ public class ReactiveWebSocketServerHandlerMapping extends SimpleUrlHandlerMappi
 
     public ReactiveWebSocketServerHandlerMapping(WebSocketLoadBalanceConcept concept,
                                                  String prefix,
-                                                 DefaultEndpointCustomizer customizer) {
+                                                 List<DefaultEndpointCustomizer> customizers) {
         Map<String, WebSocketHandler> map = new HashMap<>();
         map.put(prefix + "**", new ReactiveWebSocketServerHandler(concept));
         setUrlMap(map);
         setOrder(100);
-        if (customizer != null) {
+        for (DefaultEndpointCustomizer customizer : customizers) {
             customizer.customize(this);
         }
     }

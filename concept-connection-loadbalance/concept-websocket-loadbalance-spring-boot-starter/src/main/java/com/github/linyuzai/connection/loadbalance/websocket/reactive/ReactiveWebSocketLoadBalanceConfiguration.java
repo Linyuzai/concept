@@ -5,6 +5,7 @@ import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndp
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketHandshakeInterceptor;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
+import java.util.List;
+
 /**
  * Reactive WebSocket 负载均衡配置。
  * <p>
@@ -22,6 +25,11 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 public class ReactiveWebSocketLoadBalanceConfiguration {
+
+    @Bean
+    public ReactiveWebSocketHandshakeFilter reactiveWebSocketHandshakeFilter(List<WebSocketHandshakeInterceptor> interceptors) {
+        return new ReactiveWebSocketHandshakeFilter(interceptors);
+    }
 
     @Bean
     public ReactiveWebSocketConnectionFactory reactiveWebSocketConnectionFactory() {
@@ -68,10 +76,10 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
         public ReactiveWebSocketServerHandlerMapping reactiveWebSocketServerHandlerMapping(
                 WebSocketLoadBalanceConcept concept,
                 WebSocketLoadBalanceProperties properties,
-                @Autowired(required = false) DefaultEndpointCustomizer customizer) {
+                List<DefaultEndpointCustomizer> customizers) {
             String prefix = ConnectionLoadBalanceConcept
                     .formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());
-            return new ReactiveWebSocketServerHandlerMapping(concept, prefix, customizer);
+            return new ReactiveWebSocketServerHandlerMapping(concept, prefix, customizers);
         }
     }
 }
