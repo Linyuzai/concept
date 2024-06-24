@@ -9,7 +9,8 @@ import com.github.linyuzai.connection.loadbalance.core.logger.LoggedErrorHandler
 import com.github.linyuzai.connection.loadbalance.core.repository.ConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.repository.TypeGroupedConnectionRepositoryFactory;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.server.SimpleConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.core.server.LocalConnectionServerManagerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -23,9 +24,9 @@ import org.springframework.core.annotation.Order;
 import java.util.List;
 
 /**
- * 连接负载均衡配置
+ * 连接负载均衡配置。
  * <p>
- * Configuration of connection's load-balance
+ * Configuration of connection's load-balance.
  */
 @Configuration(proxyBeanMethods = false)
 public class ConnectionLoadBalanceConfiguration {
@@ -36,12 +37,16 @@ public class ConnectionLoadBalanceConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public ConnectionServerManagerFactory connectionServerManagerFactory(DiscoveryClient client,
-                                                                             Registration registration) {
-            DiscoveryConnectionServerManagerFactory factory = new DiscoveryConnectionServerManagerFactory();
-            factory.setDiscoveryClient(client);
-            factory.setRegistration(registration);
-            return factory;
+        public ConnectionServerManagerFactory connectionServerManagerFactory(@Autowired(required = false) DiscoveryClient client,
+                                                                             @Autowired(required = false) Registration registration) {
+            if (client == null || registration == null) {
+                return new LocalConnectionServerManagerFactory();
+            } else {
+                DiscoveryConnectionServerManagerFactory factory = new DiscoveryConnectionServerManagerFactory();
+                factory.setDiscoveryClient(client);
+                factory.setRegistration(registration);
+                return factory;
+            }
         }
     }
 
@@ -49,12 +54,12 @@ public class ConnectionLoadBalanceConfiguration {
             "org.springframework.cloud.client.discovery.DiscoveryClient",
             "org.springframework.cloud.client.serviceregistry.Registration"})
     @Configuration(proxyBeanMethods = false)
-    public static class ImplConnectionServerManagerConfiguration {
+    public static class SimpleConnectionServerManagerConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
         public ConnectionServerManagerFactory connectionServerManagerFactory() {
-            return new SimpleConnectionServerManagerFactory();
+            return new LocalConnectionServerManagerFactory();
         }
     }
 

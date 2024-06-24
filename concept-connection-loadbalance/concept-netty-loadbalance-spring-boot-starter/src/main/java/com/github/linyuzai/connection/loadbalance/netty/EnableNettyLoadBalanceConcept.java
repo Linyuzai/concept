@@ -14,7 +14,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Inherited
 @EnableConnectionLoadBalanceConfiguration
 @EnableConfigurationProperties(NettyLoadBalanceProperties.class)
 @Import(NettyLoadBalanceConfiguration.class)

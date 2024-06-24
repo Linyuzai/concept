@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Kafka Topic 监听连接。
  * <p>
- * The connection to listen message form Kafka.
+ * The connection to listen message from Kafka.
  */
 @Setter
 @Getter

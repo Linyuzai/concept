@@ -14,13 +14,13 @@ public class ServletWebSocketResponse implements WebSocketResponse {
     private final ServerHttpResponse response;
 
     @Override
-    public HttpHeaders getHeaders() {
-        return response.getHeaders();
-    }
-
-    @Override
     public boolean setStatusCode(HttpStatus status) {
         response.setStatusCode(status);
         return true;
+    }
+
+    @Override
+    public HttpHeaders getHeaders() {
+        return response.getHeaders();
     }
 }

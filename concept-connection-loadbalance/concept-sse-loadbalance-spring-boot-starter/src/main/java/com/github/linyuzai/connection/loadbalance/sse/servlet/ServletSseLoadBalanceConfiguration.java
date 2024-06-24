@@ -1,14 +1,18 @@
 package com.github.linyuzai.connection.loadbalance.sse.servlet;
 
 import com.github.linyuzai.connection.loadbalance.sse.SseDefaultEndpointConfiguration;
+import com.github.linyuzai.connection.loadbalance.sse.SseLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.sse.SseSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseRequestInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * Servlet SSE 负载均衡配置。
@@ -17,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class ServletSseLoadBalanceConfiguration {
+public class ServletSseLoadBalanceConfiguration extends SseLoadBalanceConfiguration {
 
     @Bean
     public ServletSseConnectionFactory servletSseConnectionFactory() {
@@ -86,8 +90,9 @@ public class ServletSseLoadBalanceConfiguration {
         public ServletSseServerEndpoint servletSseServerEndpoint(
                 SseIdGenerator idGenerator,
                 SseEmitterFactory factory,
-                SseLoadBalanceConcept concept) {
-            return new ServletSseServerEndpoint(idGenerator, factory, concept);
+                SseLoadBalanceConcept concept,
+                List<SseRequestInterceptor> interceptors) {
+            return new ServletSseServerEndpoint(idGenerator, factory, concept, interceptors);
         }
     }
 }

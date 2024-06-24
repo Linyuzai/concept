@@ -4,10 +4,10 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnection;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnectionFactory;
 
-public class ReactiveSseConnectionFactory extends SseConnectionFactory<ReactiveSseConnection, ReactiveSseCreateRequest> {
+public class ReactiveSseConnectionFactory extends SseConnectionFactory<ReactiveSseConnection, ReactiveSseCreation> {
 
     @Override
-    protected SseConnection doCreate(ReactiveSseCreateRequest request, ConnectionLoadBalanceConcept concept) {
+    protected SseConnection doCreate(ReactiveSseCreation request, ConnectionLoadBalanceConcept concept) {
         return new ReactiveSseConnection(request.getFluxSink());
     }
 }

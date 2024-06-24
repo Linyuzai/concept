@@ -3,7 +3,7 @@ package com.github.linyuzai.connection.loadbalance.sse.servlet;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
-import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseCreateRequest;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseCreation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ public class ServletSseConnectionSubscriber extends SseConnectionSubscriber<Serv
         try {
             ServletSubscriberSseConnection connection = new ServletSubscriberSseConnection();
             Object id = sseIdGenerator.generateId(null);
-            connection.setCreateRequest(new SubscriberSseCreateRequest(id, getEndpoint()));
+            connection.setCreation(new SubscriberSseCreation(id, getEndpoint()));
             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
             http.setRequestMethod("GET");
             http.connect();

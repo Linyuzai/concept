@@ -2,14 +2,18 @@ package com.github.linyuzai.connection.loadbalance.sse.reactive;
 
 
 import com.github.linyuzai.connection.loadbalance.sse.SseDefaultEndpointConfiguration;
+import com.github.linyuzai.connection.loadbalance.sse.SseLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.sse.SseSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseRequestInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * Reactive SSE 负载均衡配置。
@@ -18,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-public class ReactiveSseLoadBalanceConfiguration {
+public class ReactiveSseLoadBalanceConfiguration extends SseLoadBalanceConfiguration {
 
     @Bean
     public ReactiveSseConnectionFactory reactiveSseConnectionFactory() {
@@ -65,8 +69,9 @@ public class ReactiveSseLoadBalanceConfiguration {
         public ReactiveSseServerEndpoint reactiveSseServerEndpoint(
                 SseIdGenerator idGenerator,
                 SseFluxFactory factory,
-                SseLoadBalanceConcept concept) {
-            return new ReactiveSseServerEndpoint(idGenerator, factory, concept);
+                SseLoadBalanceConcept concept,
+                List<SseRequestInterceptor> interceptors) {
+            return new ReactiveSseServerEndpoint(idGenerator, factory, concept, interceptors);
         }
     }
 }

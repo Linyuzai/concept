@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Redis 监听连接。
  * <p>
- * The connection to listen message form Redis.
+ * The connection to listen message from Redis.
  */
 @Getter
 @Setter

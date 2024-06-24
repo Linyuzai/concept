@@ -2,13 +2,12 @@ package com.github.linyuzai.connection.loadbalance.websocket.reactive;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
+import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketHandshakeInterceptor;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketRequestInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,12 +23,7 @@ import java.util.List;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-public class ReactiveWebSocketLoadBalanceConfiguration {
-
-    @Bean
-    public ReactiveWebSocketHandshakeFilter reactiveWebSocketHandshakeFilter(List<WebSocketHandshakeInterceptor> interceptors) {
-        return new ReactiveWebSocketHandshakeFilter(interceptors);
-    }
+public class ReactiveWebSocketLoadBalanceConfiguration extends WebSocketLoadBalanceConfiguration {
 
     @Bean
     public ReactiveWebSocketConnectionFactory reactiveWebSocketConnectionFactory() {
@@ -66,13 +60,11 @@ public class ReactiveWebSocketLoadBalanceConfiguration {
     public static class DefaultEndpointConfiguration extends WebSocketDefaultEndpointConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
-        public WebSocketHandlerAdapter webSocketHandlerAdapter() {
-            return new WebSocketHandlerAdapter();
+        public WebSocketHandlerAdapter webSocketHandlerAdapter(List<WebSocketRequestInterceptor> interceptors) {
+            return new WebSocketHandlerAdapter(new ReactiveWebSocketHandshakeService(interceptors));
         }
 
         @Bean
-        @ConditionalOnMissingBean
         public ReactiveWebSocketServerHandlerMapping reactiveWebSocketServerHandlerMapping(
                 WebSocketLoadBalanceConcept concept,
                 WebSocketLoadBalanceProperties properties,

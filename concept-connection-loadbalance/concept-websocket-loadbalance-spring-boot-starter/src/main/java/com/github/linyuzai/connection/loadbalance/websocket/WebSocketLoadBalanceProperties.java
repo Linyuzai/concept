@@ -18,6 +18,7 @@ public class WebSocketLoadBalanceProperties {
      * <p>
      * Type.
      */
+    @Deprecated
     private WebSocketType type = WebSocketType.AUTO;
 
     /**

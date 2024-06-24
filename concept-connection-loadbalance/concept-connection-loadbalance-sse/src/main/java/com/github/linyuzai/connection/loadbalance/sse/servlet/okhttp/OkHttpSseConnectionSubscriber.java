@@ -3,7 +3,7 @@ package com.github.linyuzai.connection.loadbalance.sse.servlet.okhttp;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
-import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseCreateRequest;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseCreation;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class OkHttpSseConnectionSubscriber extends SseConnectionSubscriber<OkHtt
         try {
             OkHttpSseConnection connection = new OkHttpSseConnection();
             Object id = sseIdGenerator.generateId(null);
-            connection.setCreateRequest(new SubscriberSseCreateRequest(id, getEndpoint()));
+            connection.setCreation(new SubscriberSseCreation(id, getEndpoint()));
             OkHttpClient client = sseClientFactory.create();
             Request request = new Request.Builder()
                     .url(uri.toURL())

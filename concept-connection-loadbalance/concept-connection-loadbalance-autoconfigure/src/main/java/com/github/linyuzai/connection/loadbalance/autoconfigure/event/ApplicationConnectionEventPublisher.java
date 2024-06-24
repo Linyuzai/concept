@@ -2,16 +2,15 @@ package com.github.linyuzai.connection.loadbalance.autoconfigure.event;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.core.event.AbstractConnectionEventPublisher;
-import com.github.linyuzai.connection.loadbalance.core.event.ConnectionEventPublisher;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 
 /**
- * 支持 {@link EventListener} 的事件发布器。
+ * 兼容 Spring Events 的事件发布器。
+ * 可以使用 @EventListener 来监听发布的事件。
  * <p>
- * {@link ConnectionEventPublisher} supported {@link EventListener}.
+ * Support Spring Events.
  */
 @Getter
 @RequiredArgsConstructor

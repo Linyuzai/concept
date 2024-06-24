@@ -15,6 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
  * Deduce server type.
  */
 @Getter
+@Deprecated
 public class ConnectionLoadBalanceEnvironment implements EnvironmentAware {
 
     private Environment environment;

@@ -1,11 +1,11 @@
-package com.github.linyuzai.connection.loadbalance.websocket.concept;
+package com.github.linyuzai.connection.loadbalance.sse.concept;
 
 import com.github.linyuzai.connection.loadbalance.core.intercept.ConnectionRequest;
 import org.springframework.http.HttpRequest;
 
 import java.net.InetSocketAddress;
 
-public interface WebSocketRequest extends ConnectionRequest, HttpRequest {
+public interface SseRequest extends ConnectionRequest, HttpRequest {
 
     /**
      * Return the address on which the request was received.

@@ -2,13 +2,12 @@ package com.github.linyuzai.connection.loadbalance.websocket.servlet;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketDefaultEndpointConfiguration;
+import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketLoadBalanceProperties;
 import com.github.linyuzai.connection.loadbalance.websocket.WebSocketSubscriberConfiguration;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.DefaultEndpointCustomizer;
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketHandshakeInterceptor;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketRequestInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +23,7 @@ import java.util.List;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class ServletWebSocketLoadBalanceConfiguration {
+public class ServletWebSocketLoadBalanceConfiguration extends WebSocketLoadBalanceConfiguration {
 
     @Bean
     public ServletWebSocketConnectionFactory servletWebSocketConnectionFactory() {
@@ -62,11 +61,10 @@ public class ServletWebSocketLoadBalanceConfiguration {
     public static class DefaultEndpointConfiguration extends WebSocketDefaultEndpointConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
         public ServletWebSocketServerConfigurer servletWebSocketServerConfigurer(
                 WebSocketLoadBalanceConcept concept,
                 WebSocketLoadBalanceProperties properties,
-                List<WebSocketHandshakeInterceptor> interceptors,
+                List<WebSocketRequestInterceptor> interceptors,
                 List<DefaultEndpointCustomizer> customizers) {
             String prefix = ConnectionLoadBalanceConcept
                     .formatPrefix(properties.getServer().getDefaultEndpoint().getPrefix());

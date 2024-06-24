@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * RabbitMQ 监听连接。
  * <p>
- * The connection to listen message form RabbitMQ.
+ * The connection to listen message from RabbitMQ.
  */
 @Setter
 @Getter

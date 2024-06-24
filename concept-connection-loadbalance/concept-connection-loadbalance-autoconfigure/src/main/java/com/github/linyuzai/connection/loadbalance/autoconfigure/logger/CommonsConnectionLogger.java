@@ -8,9 +8,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 日志实现。
+ * Commons 日志实现。
  * <p>
- * Impl of {@link ConnectionLogger}.
+ * Commons logger for connection log.
+ *
+ * @see ConnectionLogger
  */
 @Getter
 @RequiredArgsConstructor

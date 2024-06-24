@@ -4,10 +4,10 @@ import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBal
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnection;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnectionFactory;
 
-public class ServletSseConnectionFactory extends SseConnectionFactory<ServletSseConnection, ServletSseCreateRequest> {
+public class ServletSseConnectionFactory extends SseConnectionFactory<ServletSseConnection, ServletSseCreation> {
 
     @Override
-    protected SseConnection doCreate(ServletSseCreateRequest request, ConnectionLoadBalanceConcept concept) {
+    protected SseConnection doCreate(ServletSseCreation request, ConnectionLoadBalanceConcept concept) {
         return new ServletSseConnection(request.getSseEmitter());
     }
 }

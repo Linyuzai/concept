@@ -1,6 +1,6 @@
-package com.github.linyuzai.connection.loadbalance.websocket.reactive;
+package com.github.linyuzai.connection.loadbalance.sse.reactive;
 
-import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketResponse;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +9,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 
 @Getter
 @RequiredArgsConstructor
-public class ReactiveWebSocketResponse implements WebSocketResponse {
+public class ReactiveSseResponse implements SseResponse {
 
     private final ServerHttpResponse response;
 

@@ -36,9 +36,9 @@ public class ReactiveSseLoadBalanceEndpoint {
     public Flux<ServerSentEvent<Object>> loadBalanceEndpoint(@RequestParam Map<Object, Object> params) {
         Object id = sseIdGenerator.generateId(params);
         return sseFluxFactory.create(Flux.create((FluxSink<ServerSentEvent<Object>> fluxSink) -> {
-                    ReactiveSseCreateRequest request = new ReactiveSseCreateRequest(id, endpoint, fluxSink);
+                    ReactiveSseCreation request = new ReactiveSseCreation(id, endpoint, fluxSink);
                     ReactiveSseConnection connection = new ReactiveSseConnection(fluxSink);
-                    connection.setCreateRequest(request);
+                    connection.setCreation(request);
                     connection.setType(Connection.Type.OBSERVABLE);
                     connection.getMetadata().putAll(params);
                     concept.onEstablish(connection);

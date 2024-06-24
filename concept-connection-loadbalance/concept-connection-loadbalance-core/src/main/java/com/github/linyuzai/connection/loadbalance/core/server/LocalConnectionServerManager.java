@@ -1,6 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.core.server;
 
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,9 +13,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <p>
  * Simple impl of server manager.
  */
-public class SimpleConnectionServerManager implements ConnectionServerManager {
+@Getter
+@RequiredArgsConstructor
+public class LocalConnectionServerManager implements ConnectionServerManager {
 
     private final List<ConnectionServer> connectionServers = new CopyOnWriteArrayList<>();
+
+    private final ConnectionServer local;
 
     @Override
     public void add(ConnectionServer server, ConnectionLoadBalanceConcept concept) {
@@ -32,7 +38,7 @@ public class SimpleConnectionServerManager implements ConnectionServerManager {
 
     @Override
     public ConnectionServer getLocal(ConnectionLoadBalanceConcept concept) {
-        return null;
+        return local;
     }
 
     @Override

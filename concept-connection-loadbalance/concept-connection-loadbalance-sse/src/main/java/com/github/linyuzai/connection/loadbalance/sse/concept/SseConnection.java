@@ -18,15 +18,15 @@ import static com.github.linyuzai.connection.loadbalance.core.server.ConnectionS
 @Setter
 public abstract class SseConnection extends AbstractConnection {
 
-    private SseCreateRequest createRequest;
+    private SseCreation creation;
 
     @Override
     public Object getId() {
-        return createRequest.getId();
+        return creation.getId();
     }
 
     public String getPath() {
-        return createRequest.getPath();
+        return creation.getPath();
     }
 
     @Override

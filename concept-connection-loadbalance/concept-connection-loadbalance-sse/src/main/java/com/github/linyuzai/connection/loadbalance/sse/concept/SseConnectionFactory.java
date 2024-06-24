@@ -11,7 +11,7 @@ import java.util.Map;
  * <p>
  * Abstract class of SSE connection factory.
  */
-public abstract class SseConnectionFactory<T extends SseConnection, R extends SseCreateRequest>
+public abstract class SseConnectionFactory<T extends SseConnection, R extends SseCreation>
         extends AbstractConnectionFactory<T> {
 
     public SseConnectionFactory() {
@@ -20,7 +20,7 @@ public abstract class SseConnectionFactory<T extends SseConnection, R extends Ss
 
     @Override
     public boolean support(Object o, Map<Object, Object> metadata, ConnectionLoadBalanceConcept concept) {
-        return o instanceof SseCreateRequest;
+        return o instanceof SseCreation;
     }
 
     @SuppressWarnings("unchecked")
@@ -28,7 +28,7 @@ public abstract class SseConnectionFactory<T extends SseConnection, R extends Ss
     protected AbstractConnection doCreate(Object o, ConnectionLoadBalanceConcept concept) {
         R request = (R) o;
         SseConnection connection = doCreate(request, concept);
-        connection.setCreateRequest(request);
+        connection.setCreation(request);
         return connection;
     }
 

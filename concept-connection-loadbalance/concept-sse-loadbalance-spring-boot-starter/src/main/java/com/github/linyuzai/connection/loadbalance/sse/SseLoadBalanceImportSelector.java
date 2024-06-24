@@ -12,6 +12,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * <p>
  * Import selector for SSE load balancing.
  */
+@Deprecated
 public class SseLoadBalanceImportSelector extends ConnectionLoadBalanceEnvironment implements ImportSelector {
 
     @Override

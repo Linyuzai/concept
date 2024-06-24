@@ -29,7 +29,7 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
 
     private final String prefix;
 
-    private final List<WebSocketHandshakeInterceptor> handshakeInterceptors;
+    private final List<WebSocketRequestInterceptor> interceptors;
 
     private final List<DefaultEndpointCustomizer> customizers;
 
@@ -54,8 +54,8 @@ public class ServletWebSocketServerConfigurer implements WebSocketConfigurer {
         public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
             WebSocketRequest req = new ServletWebSocketRequest(request);
             WebSocketResponse resp = new ServletWebSocketResponse(response);
-            for (WebSocketHandshakeInterceptor interceptor : handshakeInterceptors) {
-                if (!interceptor.onHandshake(req, resp, attributes)) {
+            for (WebSocketRequestInterceptor interceptor : interceptors) {
+                if (interceptor.intercept(req, resp)) {
                     return false;
                 }
             }

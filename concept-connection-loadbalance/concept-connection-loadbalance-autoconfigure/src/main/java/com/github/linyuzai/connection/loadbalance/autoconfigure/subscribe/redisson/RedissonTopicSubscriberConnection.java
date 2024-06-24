@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Redisson 监听连接。
  * <p>
- * The connection to listen message form Redisson.
+ * The connection to listen message from Redisson.
  */
 @Getter
 @Setter

@@ -1,6 +1,8 @@
 package com.github.linyuzai.connection.loadbalance.websocket;
 
 import com.github.linyuzai.connection.loadbalance.autoconfigure.EnableConnectionLoadBalanceConfiguration;
+import com.github.linyuzai.connection.loadbalance.websocket.reactive.ReactiveWebSocketLoadBalanceConfiguration;
+import com.github.linyuzai.connection.loadbalance.websocket.servlet.ServletWebSocketLoadBalanceConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 
@@ -14,9 +16,9 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Inherited
 @EnableConnectionLoadBalanceConfiguration
 @EnableConfigurationProperties(WebSocketLoadBalanceProperties.class)
-@Import({WebSocketLoadBalanceImportSelector.class, WebSocketLoadBalanceConfiguration.class})
+@Import({ServletWebSocketLoadBalanceConfiguration.class,
+        ReactiveWebSocketLoadBalanceConfiguration.class})
 public @interface EnableWebSocketLoadBalanceConcept {
 }

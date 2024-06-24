@@ -35,9 +35,9 @@ public class ServletSseLoadBalanceEndpoint {
     public SseEmitter loadBalanceEndpoint(@RequestParam Map<Object, Object> params) {
         Object id = sseIdGenerator.generateId(params);
         SseEmitter emitter = sseEmitterFactory.create();
-        ServletSseCreateRequest request = new ServletSseCreateRequest(id, endpoint, emitter);
+        ServletSseCreation request = new ServletSseCreation(id, endpoint, emitter);
         ServletSseConnection connection = new ServletSseConnection(emitter);
-        connection.setCreateRequest(request);
+        connection.setCreation(request);
         connection.setType(Connection.Type.OBSERVABLE);
         connection.getMetadata().putAll(params);
         emitter.onError(e -> concept.onError(connection, e));

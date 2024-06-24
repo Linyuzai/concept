@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.sse.concept;
 
-public interface SseCreateRequest {
+public interface SseCreation {
 
     Object getId();
 

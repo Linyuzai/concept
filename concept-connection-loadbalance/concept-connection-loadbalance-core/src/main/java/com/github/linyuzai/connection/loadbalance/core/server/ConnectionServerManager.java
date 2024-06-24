@@ -7,9 +7,10 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 /**
- * 连接服务管理器。
+ * 服务管理器。
+ * 用于管理同步消息的服务。
  * <p>
- * Management of connectable server.
+ * Management of connectable server which need sync message.
  */
 public interface ConnectionServerManager {
 
@@ -103,15 +104,16 @@ public interface ConnectionServerManager {
 
     /**
      * 获得需要连接的服务。
+     * 当使用服务间连接来转发消息的时被调用。
      * <p>
-     * Get servers need connect.
+     * Get servers need connect when using bidirectional-connection to forward message.
      */
     List<ConnectionServer> getConnectionServers(ConnectionLoadBalanceConcept concept);
 
     /**
      * 获得需要连接的服务。
      * <p>
-     * Get servers need connect.
+     * Get servers need connect when using bidirectional-connection to forward message.
      */
     default List<ConnectionServer> getConnectionServers() {
         return getConnectionServers(null);

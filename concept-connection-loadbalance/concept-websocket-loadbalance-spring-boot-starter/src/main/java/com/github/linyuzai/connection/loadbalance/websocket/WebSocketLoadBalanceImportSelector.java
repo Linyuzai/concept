@@ -12,6 +12,7 @@ import java.util.Arrays;
  * <p>
  * Import selector for ws load balancing.
  */
+@Deprecated
 public class WebSocketLoadBalanceImportSelector extends ConnectionLoadBalanceEnvironment implements ImportSelector {
 
     @Override

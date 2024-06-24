@@ -3,7 +3,7 @@ package com.github.linyuzai.connection.loadbalance.sse.reactive;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseConnectionSubscriber;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseIdGenerator;
-import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseCreateRequest;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SubscriberSseCreation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,7 +25,7 @@ public class ReactiveSseConnectionSubscriber extends SseConnectionSubscriber<Rea
         WebClient client = sseClientFactory.create();
         ReactiveSubscriberSseConnection connection = new ReactiveSubscriberSseConnection();
         Object id = sseIdGenerator.generateId(null);
-        connection.setCreateRequest(new SubscriberSseCreateRequest(id, getEndpoint()));
+        connection.setCreation(new SubscriberSseCreation(id, getEndpoint()));
         Disposable disposable = client.get()
                 .uri(uri)
                 .retrieve()

@@ -7,9 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 日志工厂。
+ * Commons日志工厂。
  * <p>
- * Factory of {@link CommonsConnectionLogger}.
+ * Factory of commons logger.
  */
 @Getter
 @Setter

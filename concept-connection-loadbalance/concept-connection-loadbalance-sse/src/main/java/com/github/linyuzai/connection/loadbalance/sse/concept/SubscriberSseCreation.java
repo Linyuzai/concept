@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class SubscriberSseCreateRequest implements SseCreateRequest {
+public class SubscriberSseCreation implements SseCreation {
     
     private final Object id;
 

@@ -11,6 +11,7 @@ import lombok.Getter;
  * WebSocket type.
  */
 @Getter
+@Deprecated
 public enum WebSocketType {
 
     /**

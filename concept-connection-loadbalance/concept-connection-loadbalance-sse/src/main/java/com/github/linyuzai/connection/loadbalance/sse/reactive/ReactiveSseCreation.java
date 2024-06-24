@@ -1,6 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.sse.reactive;
 
-import com.github.linyuzai.connection.loadbalance.sse.concept.SseCreateRequest;
+import com.github.linyuzai.connection.loadbalance.sse.concept.SseCreation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.codec.ServerSentEvent;
@@ -8,7 +8,7 @@ import reactor.core.publisher.FluxSink;
 
 @Getter
 @RequiredArgsConstructor
-public class ReactiveSseCreateRequest implements SseCreateRequest {
+public class ReactiveSseCreation implements SseCreation {
 
     private final Object id;
 

@@ -36,7 +36,9 @@ import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -80,6 +82,10 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
     protected ConnectionLogger logger;
 
     protected ConnectionEventPublisher eventPublisher;
+
+    protected boolean closeParallel = true;
+
+    protected long closeTimeout = -1;
 
     private boolean initialized;
 
@@ -126,12 +132,38 @@ public abstract class AbstractConnectionLoadBalanceConcept implements Connection
             destroyed = true;
             onDestroy();
             scheduledExecutor.shutdown();
+            closeConnections();
+            eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
+        }
+    }
+
+    protected void closeConnections() {
+        if (closeParallel) {
+            List<CompletableFuture<?>> list = new ArrayList<>();
+            for (String type : connectionRepository.types()) {
+                for (Connection connection : connectionRepository.select(type)) {
+                    CompletableFuture<Void> future = CompletableFuture.runAsync(() ->
+                            connection.close(Connection.Close.SERVER_STOP));
+                    list.add(future);
+                }
+            }
+            CompletableFuture<?>[] futures = list.toArray(new CompletableFuture[0]);
+            CompletableFuture<Void> all = CompletableFuture.allOf(futures);
+            try {
+                if (closeTimeout > 0) {
+                    all.get(closeTimeout, TimeUnit.MILLISECONDS);
+                } else {
+                    all.get();
+                }
+            } catch (Throwable e) {
+                logger.error("Error when connection closing", e);
+            }
+        } else {
             for (String type : connectionRepository.types()) {
                 for (Connection connection : connectionRepository.select(type)) {
                     connection.close(Connection.Close.SERVER_STOP);
                 }
             }
-            eventPublisher.publish(new ConnectionLoadBalanceConceptDestroyEvent(this));
         }
     }
 

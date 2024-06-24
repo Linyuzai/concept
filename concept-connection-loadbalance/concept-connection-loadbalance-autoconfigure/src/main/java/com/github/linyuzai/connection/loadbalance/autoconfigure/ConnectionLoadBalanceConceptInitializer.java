@@ -10,9 +10,14 @@ import org.springframework.core.Ordered;
 import java.util.List;
 
 /**
- * {@link ConnectionLoadBalanceConcept} 初始化器。
+ * Concept 初始化器。
+ * 在服务启动后初始化。
  * <p>
- * Initializer of {@link ConnectionLoadBalanceConcept}.
+ * Initializer of concept.
+ * Init concept after server startup.
+ *
+ * @see ConnectionLoadBalanceConcept
+ * @see ApplicationRunner
  */
 @Getter
 @RequiredArgsConstructor
