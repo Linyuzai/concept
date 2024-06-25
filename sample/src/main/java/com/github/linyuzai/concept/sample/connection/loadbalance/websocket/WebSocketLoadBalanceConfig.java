@@ -8,7 +8,7 @@ import com.github.linyuzai.connection.loadbalance.core.message.MessageHandler;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServer;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManager;
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
-import com.github.linyuzai.connection.loadbalance.core.server.SimpleConnectionServerManagerFactory;
+import com.github.linyuzai.connection.loadbalance.core.server.LocalConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.EnableWebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketEventListener;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageHandler;
@@ -26,7 +26,7 @@ public class WebSocketLoadBalanceConfig {
 
     //@Bean
     public ConnectionServerManagerFactory sampleConnectionServerManagerFactory() {
-        return new SimpleConnectionServerManagerFactory();
+        return new LocalConnectionServerManagerFactory();
     }
 
     @Bean
