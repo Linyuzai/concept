@@ -15,13 +15,6 @@ import java.io.IOException;
 public interface SourceCompressor {
 
     /**
-     * 获得压缩格式。
-     *
-     * @return 压缩格式
-     */
-    String[] getFormats();
-
-    /**
      * 判断是否支持对应的压缩格式。
      *
      * @param format  压缩格式

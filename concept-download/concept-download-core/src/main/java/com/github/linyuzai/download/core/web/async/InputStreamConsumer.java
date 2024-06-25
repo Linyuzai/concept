@@ -15,9 +15,16 @@ public interface InputStreamConsumer extends Consumer<DownloadContext> {
     default void accept(DownloadContext context) {
         Compression compression = context.get(Compression.class);
         for (Part part : compression.getParts()) {
-            consumer(part.getInputStream());
+            consume(part.getInputStream());
         }
     }
 
-    void consumer(InputStream is);
+    default void consume(InputStream is) {
+        consumer(is);
+    }
+
+    @Deprecated
+    default void consumer(InputStream is) {
+
+    }
 }

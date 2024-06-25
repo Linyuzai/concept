@@ -70,9 +70,9 @@ public abstract class AbstractLoadableSource extends AbstractSource {
                 throw new DownloadException("Cache path is null");
             }
             File dir = new File(cachePath);
-            if (!dir.exists()) {
+            /*if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
-            }
+            }*/
             CacheNameGenerator generator = context.get(CacheNameGenerator.class);
             String nameToUse = generator.generate(this, context);
             if (nameToUse == null || nameToUse.isEmpty()) {
@@ -80,6 +80,12 @@ public abstract class AbstractLoadableSource extends AbstractSource {
             }
 
             File cache = new File(dir, nameToUse);
+
+            File parent = cache.getParentFile();
+            if (parent != null && !parent.exists()) {
+                boolean mkdirs = parent.mkdirs();
+            }
+
             //缓存存在
             if (cache.exists()) {
                 publisher.publish(new SourceLoadedUsingCacheEvent(context, this, cache.getAbsolutePath()));

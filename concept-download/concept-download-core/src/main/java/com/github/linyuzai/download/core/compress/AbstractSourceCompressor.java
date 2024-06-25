@@ -37,6 +37,13 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
     }
 
     /**
+     * 获得压缩格式。
+     *
+     * @return 压缩格式
+     */
+    public abstract String[] getFormats();
+
+    /**
      * 如果没有启用缓存，使用内存压缩；
      * 如果启用缓存并且缓存存在，直接使用缓存；
      * 如果启用缓存并且缓存不存在，压缩到本地缓存文件。
@@ -57,10 +64,16 @@ public abstract class AbstractSourceCompressor<OS extends OutputStream> implemen
         //是否启用缓存
         if (cacheEnable) {
             File dir = new File(cachePath);
-            if (!dir.exists()) {
+            /*if (!dir.exists()) {
                 boolean mkdirs = dir.mkdirs();
-            }
+            }*/
             File cache = new File(dir, cacheName);
+
+            File parent = cache.getParentFile();
+            if (parent != null && !parent.exists()) {
+                boolean mkdirs = parent.mkdirs();
+            }
+
             //缓存是否存在
             if (cache.exists()) {
                 publisher.publish(new SourceCompressedUsingCacheEvent(context, source, cache.getAbsolutePath()));

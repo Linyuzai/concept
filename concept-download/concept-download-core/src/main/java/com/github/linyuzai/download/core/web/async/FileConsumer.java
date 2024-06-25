@@ -18,17 +18,17 @@ public interface FileConsumer extends Consumer<DownloadContext> {
     default void accept(DownloadContext context) {
         Compression compression = context.get(Compression.class);
         if (compression instanceof FileCompression) {
-            consumer(((FileCompression) compression).getFile());
+            consume(((FileCompression) compression).getFile());
             return;
         }
         if (compression instanceof NoCompression) {
             Source source = ((NoCompression) compression).getSource();
             if (source instanceof FileSource) {
-                consumer(((FileSource) source).getFile());
+                consume(((FileSource) source).getFile());
                 return;
             } else {
                 if (source.isCacheEnabled() && source.isCacheExisted()) {
-                    consumer(new File(source.getCachePath()));
+                    consume(new File(source.getCachePath()));
                     return;
                 }
             }
@@ -36,5 +36,12 @@ public interface FileConsumer extends Consumer<DownloadContext> {
         throw new IllegalArgumentException("Can not get file");
     }
 
-    void consumer(File file);
+    default void consume(File file) {
+        consumer(file);
+    }
+
+    @Deprecated
+    default void consumer(File file) {
+
+    }
 }
