@@ -6,8 +6,15 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+/**
+ * 可复用的消息。
+ * 减少编码消息的次数。
+ * <p>
+ * Reusable message for reducing the number of times encoding messages.
+ */
 public interface ReusableMessage extends Message {
 
     static ReusableMessage create(Message message) {
@@ -20,13 +27,13 @@ public interface ReusableMessage extends Message {
     @RequiredArgsConstructor
     class Impl implements ReusableMessage {
 
-        private final Map<String, Map<Class<? extends Connection>, Object>> reused = new HashMap<>();
+        private final Map<String, Map<Class<? extends Connection>, Object>> reused = new ConcurrentHashMap<>();
 
         private final Message message;
 
         @Override
         public Object reuse(Connection connection, Function<Message, Object> encode) {
-            return reused.computeIfAbsent(connection.getType(), t -> new HashMap<>())
+            return reused.computeIfAbsent(connection.getType(), t -> new ConcurrentHashMap<>())
                     .computeIfAbsent(connection.getClass(), c -> {
                         message.getHeaders().put(Message.REUSABLE, Boolean.TRUE.toString());
                         return encode.apply(message);

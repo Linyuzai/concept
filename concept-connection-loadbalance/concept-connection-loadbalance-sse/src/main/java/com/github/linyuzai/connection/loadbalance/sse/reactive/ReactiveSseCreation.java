@@ -14,5 +14,8 @@ public class ReactiveSseCreation implements SseCreation {
 
     private final String path;
 
+    /**
+     * 发送事件的 sink
+     */
     private final FluxSink<ServerSentEvent<Object>> fluxSink;
 }

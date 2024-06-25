@@ -13,6 +13,11 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Netty WebSocket 消息编解码适配器。
+ * <p>
+ * Netty WebSocket message codec adapter.
+ */
 public class WebSocketFrameNettyMessageCodecAdapter extends NettyMessageCodecAdapter {
 
     @Override

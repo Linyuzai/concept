@@ -12,10 +12,9 @@ import com.github.linyuzai.connection.loadbalance.core.scope.Scoped;
 public interface ConnectionRequestInterceptor<Req extends ConnectionRequest, Resp extends ConnectionResponse> extends Scoped {
 
     /**
+     * 拦截
      *
-     * @param request
-     * @param response
-     * @return 拦截并返回 true，不拦截 false
+     * @return 返回 true 拦截/不继续，返回 false 不拦截/继续
      */
     boolean intercept(Req request, Resp response);
 }

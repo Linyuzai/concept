@@ -5,6 +5,13 @@ import org.springframework.http.HttpRequest;
 
 import java.net.InetSocketAddress;
 
+/**
+ * WebSocket 连接请求。
+ * <p>
+ * WebSocket request.
+ *
+ * @since 2.7.0
+ */
 public interface WebSocketRequest extends ConnectionRequest, HttpRequest {
 
     /**

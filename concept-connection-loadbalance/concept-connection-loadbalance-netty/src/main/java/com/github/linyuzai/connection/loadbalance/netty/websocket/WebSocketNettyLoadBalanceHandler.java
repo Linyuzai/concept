@@ -8,6 +8,11 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Map;
 
+/**
+ * Netty WebSocket 负载均衡处理器。
+ * <p>
+ * Netty WebSocket load balance handler.
+ */
 public class WebSocketNettyLoadBalanceHandler extends NettyLoadBalanceHandler {
 
     public WebSocketNettyLoadBalanceHandler(NettyLoadBalanceConcept concept, Map<Object, Object> metadata) {

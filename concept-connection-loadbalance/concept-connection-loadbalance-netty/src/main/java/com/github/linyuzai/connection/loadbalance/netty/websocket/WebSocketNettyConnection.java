@@ -10,6 +10,11 @@ import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 
 import java.util.function.Consumer;
 
+/**
+ * Netty WebSocket 连接。
+ * <p>
+ * Netty WebSocket connection.
+ */
 public class WebSocketNettyConnection extends NettyConnection {
 
     public WebSocketNettyConnection(NettyConnection connection) {

@@ -54,7 +54,7 @@ public class ConnectionLoadBalanceConfiguration {
             "org.springframework.cloud.client.discovery.DiscoveryClient",
             "org.springframework.cloud.client.serviceregistry.Registration"})
     @Configuration(proxyBeanMethods = false)
-    public static class SimpleConnectionServerManagerConfiguration {
+    public static class LocalConnectionServerManagerConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
