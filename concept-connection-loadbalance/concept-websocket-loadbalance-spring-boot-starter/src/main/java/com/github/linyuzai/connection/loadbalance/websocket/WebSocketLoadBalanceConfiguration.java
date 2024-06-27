@@ -22,6 +22,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.EmptyConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketScoped;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -39,6 +40,18 @@ import java.util.List;
  */
 @Configuration(proxyBeanMethods = false)
 public class WebSocketLoadBalanceConfiguration {
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master",
+            havingValue = "NONE")
+    public static class NoneSubscriberConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "wsEmptyConnectionSubscriberFactory")
+        public EmptyConnectionSubscriberFactory wsEmptyConnectionSubscriberFactory() {
+            return new EmptyConnectionSubscriberFactory().addScopes(WebSocketScoped.NAME);
+        }
+    }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.websocket.load-balance.subscriber-master",

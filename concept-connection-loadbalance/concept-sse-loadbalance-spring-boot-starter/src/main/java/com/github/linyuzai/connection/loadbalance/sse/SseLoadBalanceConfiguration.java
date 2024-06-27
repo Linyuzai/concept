@@ -20,6 +20,7 @@ import com.github.linyuzai.connection.loadbalance.core.select.ConnectionSelector
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscribeLogger;
 import com.github.linyuzai.connection.loadbalance.core.subscribe.ConnectionSubscriberFactory;
+import com.github.linyuzai.connection.loadbalance.core.subscribe.EmptyConnectionSubscriberFactory;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseLoadBalanceConcept;
 import com.github.linyuzai.connection.loadbalance.sse.concept.SseScoped;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -37,6 +38,18 @@ import java.util.List;
  */
 @Configuration(proxyBeanMethods = false)
 public class SseLoadBalanceConfiguration {
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",
+            havingValue = "NONE")
+    public static class NoneSubscriberConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "sseEmptyConnectionSubscriberFactory")
+        public EmptyConnectionSubscriberFactory sseEmptyConnectionSubscriberFactory() {
+            return new EmptyConnectionSubscriberFactory().addScopes(SseScoped.NAME);
+        }
+    }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(value = "concept.sse.load-balance.subscriber-master",

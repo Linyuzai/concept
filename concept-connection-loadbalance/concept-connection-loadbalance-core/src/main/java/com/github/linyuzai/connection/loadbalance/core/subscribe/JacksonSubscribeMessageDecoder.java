@@ -1,5 +1,6 @@
 package com.github.linyuzai.connection.loadbalance.core.subscribe;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.linyuzai.connection.loadbalance.core.concept.Connection;
 import com.github.linyuzai.connection.loadbalance.core.concept.ConnectionLoadBalanceConcept;
@@ -29,7 +30,7 @@ public class JacksonSubscribeMessageDecoder implements MessageDecoder {
         /*this(new ObjectMapper()
                 .registerModule(new SimpleModule()
                         .addAbstractTypeMapping(ConnectionServer.class, ConnectionServerImpl.class)));*/
-        this(new ObjectMapper());
+        this(new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
     }
 
     @Override

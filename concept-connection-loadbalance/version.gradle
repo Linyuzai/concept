@@ -1,8 +1,5 @@
-ext.'ConceptConnectionLoadbalanceVersion' = '2.7.0'
-ext.'ConceptWebSocketLoadbalanceVersion' = '2.7.0'
-ext.'ConceptNettyLoadbalanceVersion' = '2.7.0'
-ext.'ConceptSseLoadbalanceVersion' = '2.7.0'
-//ext.'ConceptConnectionLoadbalanceVersion' = 'local'
-//ext.'ConceptWebSocketLoadbalanceVersion' = 'local'
-//ext.'ConceptNettyLoadbalanceVersion' = 'local'
-//ext.'ConceptSseLoadbalanceVersion' = 'local'
+def version = '2.7.1'
+ext.'ConceptConnectionLoadbalanceVersion' = version
+ext.'ConceptWebSocketLoadbalanceVersion' = version
+ext.'ConceptNettyLoadbalanceVersion' = version
+ext.'ConceptSseLoadbalanceVersion' = version

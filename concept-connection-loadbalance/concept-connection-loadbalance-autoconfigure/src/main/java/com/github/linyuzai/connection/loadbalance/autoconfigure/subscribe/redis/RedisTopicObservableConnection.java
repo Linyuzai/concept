@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.function.Consumer;
 
@@ -33,7 +34,11 @@ public class RedisTopicObservableConnection extends AliveForeverConnection {
     @Override
     public void doSend(Object message, Runnable onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
         try {
-            redisTemplate.convertAndSend(topic, message);
+            byte[] rawChannel = rawString(topic);
+            byte[] rawMessage = rawValue(message);
+            redisTemplate.execute((connection) ->
+                    connection.publish(rawChannel, rawMessage), true);
+            //redisTemplate.convertAndSend(topic, message);
             onSuccess.run();
         } catch (DataAccessException e) {
             onError.accept(new MessageTransportException(e));
@@ -41,6 +46,19 @@ public class RedisTopicObservableConnection extends AliveForeverConnection {
             onError.accept(e);
         } finally {
             onComplete.run();
+        }
+    }
+
+    protected byte[] rawString(String key) {
+        return redisTemplate.getStringSerializer().serialize(key);
+    }
+
+    @SuppressWarnings("all")
+    protected byte[] rawValue(Object value) {
+        if (redisTemplate.getValueSerializer() == null && value instanceof byte[]) {
+            return (byte[]) value;
+        } else {
+            return ((RedisSerializer) this.redisTemplate.getValueSerializer()).serialize(value);
         }
     }
 
