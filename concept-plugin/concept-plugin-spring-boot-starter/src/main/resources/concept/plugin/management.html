@@ -19,6 +19,25 @@
             height: 100%;
         }
 
+        .header {
+            display: flex;
+            align-items: center;
+            /*height: 80px;*/
+            /*padding-bottom: 20px;*/
+            border-bottom: 1px solid #eee;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /*text-align: center;*/
+            /*color: #606266;*/
+            /*height: 55px;*/
+            /*padding-top: 20px;*/
+            border-top: 1px solid #eee;
+        }
+
         .el-table::before, .el-table__fixed-right::before, .el-table__fixed::before {
             height: 0;
         }
@@ -29,7 +48,7 @@
 
         .floating-button {
             position: fixed;
-            bottom: 75px;
+            bottom: 30px;
             right: -50px;
             width: 100px;
             height: 60px;
@@ -88,16 +107,18 @@
         帮助
     </el-button>
     <el-container style="height: 100vh">
-        <el-header style="height: 80px;padding-bottom: 20px;border-bottom: 1px solid #eee;">
-            <h1 style="margin-top: 15px;" v-cloak>
+        <el-header v-if="setting.header.display" class="header">
+            <h1>
                 <!--#409EFF-->
                 <!--#303133-->
                 <!--#1989FA-->
-                <span style="color: #303133;font-weight: normal;font-size:35px;" v-cloak>
-                    {{setting.title}}
+                <!--font-weight: normal;font-size:35px;-->
+                <span v-if="setting.header.title.display" style="color: #303133;" v-cloak>
+                    {{setting.header.title.text}}
                 </span>
             </h1>
-            <a href="https://github.com/Linyuzai/concept" target="_blank" class="github-corner"
+            <a v-if="setting.header.githubCorner.display" href="https://github.com/Linyuzai/concept" target="_blank"
+               class="github-corner"
                aria-label="View source on GitHub">
                 <svg width="80" height="80" viewBox="0 0 250 250"
                      style="fill:#303133; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
@@ -379,9 +400,12 @@
                 </el-container>
             </el-main>
         </el-container>
-        <el-footer style="text-align: center;color: #606266;height: 55px;padding-top: 15px;border-top: 1px solid #eee;"
+        <el-footer v-if="setting.footer.display"
+                   class="footer"
                    v-cloak>
-            ©2024 黑白法师
+            <!--#606266-->
+            <!--#303133-->
+            <span style="color: #606266;">©2024 黑白法师</span>
         </el-footer>
     </el-container>
 </div>
@@ -405,6 +429,10 @@
             array.push(key + '=' + params[key]);
         });
         return array.join('&');
+    }
+
+    function getSettingUrl() {
+        return getUrl(urlPrefix, 'setting');
     }
 
     function getAuthUrl(path, params) {
@@ -479,7 +507,19 @@
         el: "#concept-plugin-app",
         data: {
             setting: {
-                title: "Concept Plugin"
+                header: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Concept Plugin'
+                    },
+                    githubCorner: {
+                        display: true
+                    }
+                },
+                footer: {
+                    display: true
+                }
                 /*script: {
                     list: ['/concept-plugin/concept-plugin.js']
                 }*/
@@ -545,7 +585,20 @@
         },
         methods: {
             initSettings() {
-                document.title = this.setting.title;
+                this._get(getSettingUrl(), response => {
+                    let body = response;
+                    if (body.success) {
+                        this.setting = body.data;
+                        document.title = this.setting.header.title.text;
+                    } else {
+                        this.$notify({
+                            title: '失败',
+                            message: body.message,
+                            type: 'error'
+                        });
+                        console.log(response);
+                    }
+                });
                 /*this.setting.script.list.forEach(script => {
                     import(script);
                 });*/

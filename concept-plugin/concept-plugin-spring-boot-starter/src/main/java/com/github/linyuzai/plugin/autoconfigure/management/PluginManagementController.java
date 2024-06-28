@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
+import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.autoload.*;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
@@ -44,6 +45,9 @@ public class PluginManagementController {
     protected final Set<String> updatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Autowired
+    protected PluginConceptProperties properties;
+
+    @Autowired
     protected PluginConcept concept;
 
     @Autowired
@@ -56,6 +60,12 @@ public class PluginManagementController {
     protected PluginExecutor executor;
 
     protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @GetMapping("/setting")
+    public Response setting() {
+        return manage(() -> new Setting(properties.getManagement().getHeader(),
+                properties.getManagement().getFooter()), () -> "获取配置");
+    }
 
     @PostMapping("/auth/unlock")
     public Response unlock(@RequestParam("password") String password) {
@@ -386,6 +396,15 @@ public class PluginManagementController {
                 }
             }
         }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class Setting {
+
+        private final PluginConceptProperties.ManagementProperties.HeaderProperties header;
+
+        private final PluginConceptProperties.ManagementProperties.FooterProperties footer;
     }
 
     @Getter

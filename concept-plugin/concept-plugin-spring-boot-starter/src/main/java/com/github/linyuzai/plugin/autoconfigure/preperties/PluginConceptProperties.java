@@ -13,6 +13,8 @@ public class PluginConceptProperties {
 
     private JarProperties jar = new JarProperties();
 
+    private ManagementProperties management = new ManagementProperties();
+
     @Data
     public static class AutoloadProperties {
 
@@ -31,5 +33,51 @@ public class PluginConceptProperties {
     public static class JarProperties {
 
         private String mode = JarPlugin.Mode.STREAM;
+    }
+
+    @Data
+    public static class ManagementProperties {
+
+        private AuthorizationProperties authorization = new AuthorizationProperties();
+
+        private HeaderProperties header = new HeaderProperties();
+
+        private FooterProperties footer = new FooterProperties();
+
+        @Data
+        public static class AuthorizationProperties {
+
+            private String password;
+        }
+
+        @Data
+        public static class HeaderProperties {
+
+            private boolean display = true;
+
+            private TitleProperties title = new TitleProperties();
+
+            private GithubCornerProperties githubCorner = new GithubCornerProperties();
+
+            @Data
+            public static class TitleProperties {
+
+                private boolean display = true;
+
+                private String text = "Concept Plugin";
+            }
+
+            @Data
+            public static class GithubCornerProperties {
+
+                private boolean display = true;
+            }
+        }
+
+        @Data
+        public static class FooterProperties {
+
+            private boolean display = true;
+        }
     }
 }
