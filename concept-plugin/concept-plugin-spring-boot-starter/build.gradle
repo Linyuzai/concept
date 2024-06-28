@@ -19,7 +19,8 @@ dependencies {
     compileOnly project(':concept-plugin:concept-plugin-jar')
 
     api "org.webjars:vue:${VueVersion}"
-    api "org.webjars.npm:vue-resource:${VueResourceVersion}"
+    //api "org.webjars.npm:vue-resource:${VueResourceVersion}"
+    api "org.webjars.npm:axios:${AxiosVersion}"
     api "org.webjars.npm:element-ui:${ElementUIVersion}"
 }
 

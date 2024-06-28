@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
@@ -56,7 +57,14 @@ public class PluginManagementController {
 
     protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @GetMapping("/group/add")
+    @PostMapping("/auth/unlock")
+    public Response unlock(@RequestParam("password") String password) {
+        return manage(() -> {
+            return true;
+        }, () -> "解锁");
+    }
+
+    @PostMapping("/group/add")
     public Response addGroup(@RequestParam("group") String group) {
         return manage(() -> {
             loader.addGroup(group);
@@ -74,7 +82,7 @@ public class PluginManagementController {
         }, () -> "插件分组获取");
     }
 
-    @GetMapping("/plugin/load")
+    @PostMapping("/plugin/load")
     public Response loadPlugin(@RequestParam("group") String group,
                                @RequestParam("name") String name) {
         return manage(() -> {
@@ -97,7 +105,7 @@ public class PluginManagementController {
         }, () -> "插件加载");
     }
 
-    @GetMapping("/plugin/unload")
+    @PostMapping("/plugin/unload")
     public Response unloadPlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
         return manage(() -> {
@@ -120,7 +128,7 @@ public class PluginManagementController {
         }, () -> "插件卸载");
     }
 
-    @GetMapping("/plugin/reload")
+    @PostMapping("/plugin/reload")
     public Response reloadPlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
         return manage(() -> {
@@ -151,7 +159,7 @@ public class PluginManagementController {
         return manage(() -> location.exist(group, name), () -> "插件包重名判断");
     }
 
-    @GetMapping("/plugin/rename")
+    @PostMapping("/plugin/rename")
     public Response renamePlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name,
                                  @RequestParam("rename") String rename) {
@@ -161,7 +169,7 @@ public class PluginManagementController {
         }, () -> "插件包重命名");
     }
 
-    @GetMapping("/plugin/delete")
+    @PostMapping("/plugin/delete")
     public Response deletePlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
         return manage(() -> {

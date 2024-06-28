@@ -22,6 +22,7 @@ allprojects {
         set('XnioVersion', '3.8.6.Final')
         set('VueVersion', '2.6.11')
         set('VueResourceVersion', '1.5.1')
+        set('AxiosVersion', '1.7.2')
         set('ElementUIVersion', '2.15.1')
     }
 
