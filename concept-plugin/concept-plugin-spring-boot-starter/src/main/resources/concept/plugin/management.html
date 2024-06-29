@@ -200,8 +200,7 @@
                             <el-input v-model="auth.unlock.form.password"
                                       @keyup.enter.native="unlock"
                                       name="password"
-                                      password
-                                      autocomplete></el-input>
+                                      show-password></el-input>
                         </el-form-item>
                     </el-form>
                     <div class="dialog-footer" slot="footer">
@@ -611,33 +610,45 @@
                 }
             },
             openUnlockDialog() {
+                let form = this.$refs['auth.unlock.form'];
+                if (form !== undefined) {
+                    form.resetFields();
+                }
                 this.auth.unlock.visible = true;
             },
             unlock() {
                 let pwd = this.auth.unlock.form.password;
                 if (typeof encodePassword == 'function') {
                     pwd = encodePassword(pwd);
-                    console.log(pwd);
+                } else {
+                    pwd = btoa(pwd);
                 }
                 let params = {password: pwd};
                 this._post(getAuthUrl('unlock'), params, (response) => {
                     let body = response;
-                    if (body.success && body.data) {
-                        this.auth.unlock.visible = false;
-                        this.auth.lock = false;
+                    if (body.success) {
+                        if (body.data) {
+                            this.auth.unlock.visible = false;
+                            this.auth.lock = false;
+                        } else {
+                            this.auth.lock = true;
+                            this.$notify({
+                                title: '失败',
+                                message: '密码错误',
+                                type: 'error'
+                            });
+                        }
                     } else {
                         this.auth.lock = true;
-                        //this.auth.switch = true;
                         this.$notify({
                             title: '失败',
-                            message: body.message,
+                            message: '解锁异常',
                             type: 'error'
                         });
                         console.log(response);
                     }
                 }, () => {
                     this.auth.lock = true;
-                    //this.auth.switch = true;
                 });
             },
             selectGroup(index) {
@@ -660,7 +671,7 @@
                 });
             },
             openGroupDialog() {
-                let form = this.$refs['dialog.group.add.form'];
+                let form = this.$refs['group.add.form'];
                 if (form !== undefined) {
                     form.resetFields();
                 }

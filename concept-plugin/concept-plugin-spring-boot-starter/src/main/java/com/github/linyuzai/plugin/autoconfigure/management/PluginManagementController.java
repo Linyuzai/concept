@@ -59,6 +59,9 @@ public class PluginManagementController {
     @Autowired
     protected PluginExecutor executor;
 
+    @Autowired
+    protected PluginManagementAuthorizer authorizer;
+
     protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping("/setting")
@@ -69,9 +72,7 @@ public class PluginManagementController {
 
     @PostMapping("/auth/unlock")
     public Response unlock(@RequestParam("password") String password) {
-        return manage(() -> {
-            return true;
-        }, () -> "解锁");
+        return manage(() -> authorizer.unlock(password), () -> null);
     }
 
     @PostMapping("/group/add")
@@ -263,15 +264,16 @@ public class PluginManagementController {
     }
 
     public Response manage(Supplier<Object> success, Supplier<String> message) {
+        String msg = message.get();
         try {
             Object object = success.get();
             if (object instanceof Response) {
                 return (Response) object;
             }
-            return success(message.get() + "成功", object);
+            return success(msg == null ? null : msg + "成功", object);
         } catch (Throwable e) {
             log.error(message.get(), e);
-            return failure(message.get() + "失败", e);
+            return failure(msg == null ? null : msg + "失败", e);
         }
     }
 

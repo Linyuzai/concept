@@ -1,4 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
-public class PluginManagementAuthorizer {
+public interface PluginManagementAuthorizer {
+
+    boolean unlock(String password);
 }

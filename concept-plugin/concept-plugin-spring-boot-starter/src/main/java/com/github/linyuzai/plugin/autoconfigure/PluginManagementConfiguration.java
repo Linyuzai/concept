@@ -1,8 +1,8 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
-import com.github.linyuzai.plugin.autoconfigure.management.ConditionalOnPluginManagementEnabled;
-import com.github.linyuzai.plugin.autoconfigure.management.ReactivePluginManagementController;
-import com.github.linyuzai.plugin.autoconfigure.management.ServletPluginManagementController;
+import com.github.linyuzai.plugin.autoconfigure.management.*;
+import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +12,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ConditionalOnPluginManagementEnabled
 @Configuration(proxyBeanMethods = false)
 public class PluginManagementConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PluginManagementAuthorizer pluginManagementAuthorizer(PluginConceptProperties properties) {
+        return new Base64PluginManagementAuthorizer(properties.getManagement().getAuthorization().getPassword());
+    }
 
     @ConditionalOnPluginManagementEnabled
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
