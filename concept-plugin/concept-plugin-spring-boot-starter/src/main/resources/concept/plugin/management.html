@@ -775,7 +775,7 @@
                         let refresh = false;
                         for (let i = 0; i < array.length; i++) {
                             let state = array[i].state;
-                            if ('LOADING' === state || 'UNLOADING' === state) {
+                            if (this.isIngState(state)) {
                                 refresh = true;
                                 break;
                             }

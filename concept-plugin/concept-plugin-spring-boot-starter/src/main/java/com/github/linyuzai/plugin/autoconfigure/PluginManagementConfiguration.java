@@ -2,6 +2,8 @@ package com.github.linyuzai.plugin.autoconfigure;
 
 import com.github.linyuzai.plugin.autoconfigure.management.*;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
+import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +19,12 @@ public class PluginManagementConfiguration {
     @ConditionalOnMissingBean
     public PluginManagementAuthorizer pluginManagementAuthorizer(PluginConceptProperties properties) {
         return new Base64PluginManagementAuthorizer(properties.getManagement().getAuthorization().getPassword());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PluginPropertiesProvider pluginPropertiesProvider(PluginLocation location, PluginConcept concept) {
+        return new DefaultPluginPropertiesProvider(location, concept);
     }
 
     @ConditionalOnPluginManagementEnabled

@@ -9,6 +9,7 @@ import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,15 +32,8 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
 
     @Override
     protected PluginMetadata createMetadata(File file, PluginContext context) {
-        try (ZipFile zipFile = new ZipFile(file)) {
-            Properties properties = new Properties();
-            ZipEntry entry = zipFile.getEntry(PluginMetadata.NAME);
-            if (entry != null) {
-                try (InputStream is = zipFile.getInputStream(entry)) {
-                    properties.load(is);
-                }
-            }
-            return new PropertiesPluginMetadata(properties);
+        try {
+            return createMetadata(file);
         } catch (Throwable e) {
             return null;
         }
@@ -75,5 +69,18 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
 
     protected URL getURL(File file) throws MalformedURLException {
         return file.toURI().toURL();
+    }
+
+    public static PluginMetadata createMetadata(File file) throws IOException {
+        try (ZipFile zipFile = new ZipFile(file)) {
+            Properties properties = new Properties();
+            ZipEntry entry = zipFile.getEntry(PluginMetadata.NAME);
+            if (entry != null) {
+                try (InputStream is = zipFile.getInputStream(entry)) {
+                    properties.load(is);
+                }
+            }
+            return new PropertiesPluginMetadata(properties);
+        }
     }
 }

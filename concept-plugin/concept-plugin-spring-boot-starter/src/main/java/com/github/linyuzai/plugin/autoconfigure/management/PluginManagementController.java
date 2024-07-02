@@ -63,6 +63,9 @@ public class PluginManagementController {
     @Autowired
     protected PluginManagementAuthorizer authorizer;
 
+    @Autowired
+    protected PluginPropertiesProvider propertiesProvider;
+
     protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping("/setting")
@@ -193,31 +196,7 @@ public class PluginManagementController {
     @GetMapping("/plugin/properties")
     public Response getProperties(@RequestParam("group") String group,
                                   @RequestParam("name") String name) {
-        return manage(() -> {
-            String path = location.getLoadedPluginPath(group, name);
-            Plugin plugin = concept.getRepository().get(path);
-            if (plugin == null) {
-                List<Map<String, String>> properties = new ArrayList<>();
-                Map<String, String> property = new LinkedHashMap<>();
-                property.put("name", "concept.plugin.name");
-                property.put("value", name);
-                properties.add(property);
-                return properties;
-                //return Collections.emptyList();
-            } else {
-                List<Map<String, String>> properties = new ArrayList<>();
-                PluginMetadata metadata = plugin.getMetadata();
-                Set<String> names = metadata.names();
-                for (String n : names) {
-                    String v = metadata.get(n);
-                    Map<String, String> property = new LinkedHashMap<>();
-                    property.put("name", n);
-                    property.put("value", v);
-                    properties.add(property);
-                }
-                return properties;
-            }
-        }, () -> "查询配置");
+        return manage(() -> propertiesProvider.getProperties(group, name), () -> "查询配置");
     }
 
     @GetMapping("/plugin/list")
