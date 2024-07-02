@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
     public Plugin create(Object o, PluginContext context) {
         Plugin plugin = delegate.create(o, context);
         if (plugin != null) {
-            Plugin.Metadata metadata = new BinderMetadata(plugin.getMetadata());
+            PluginMetadata metadata = new BinderPluginMetadata(plugin.getMetadata());
             plugin.setMetadata(metadata);
         }
         return plugin;
@@ -37,36 +38,36 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
     }
 
     @Getter
-    public class BinderMetadata implements Plugin.Metadata {
+    public class BinderPluginMetadata implements PluginMetadata {
 
-        private final Plugin.Metadata delegate;
+        private final PluginMetadata delegate;
 
         private final Binder binder;
 
-        public BinderMetadata(Plugin.Metadata delegate) {
+        public BinderPluginMetadata(PluginMetadata delegate) {
             this.delegate = delegate;
             this.binder = Binder.get(new MetadataEnvironment(delegate, environment));
         }
 
         @Override
-        public String get(String key) {
-            return bind(key, String.class);
+        public String get(String name) {
+            return bind(name, String.class);
         }
 
         @Override
-        public String get(String key, String defaultValue) {
-            String value = get(key);
+        public String get(String name, String defaultValue) {
+            String value = get(name);
             return value == null ? defaultValue : value;
         }
 
         @Override
-        public Set<String> keys() {
-            return delegate.keys();
+        public Set<String> names() {
+            return delegate.names();
         }
 
         @Override
-        public <T> T bind(String key, Class<T> type) {
-            BindResult<T> bind = binder.bind(key, Bindable.of(type));
+        public <T> T bind(String name, Class<T> type) {
+            BindResult<T> bind = binder.bind(name, Bindable.of(type));
             return bind.orElse(null);
         }
 
@@ -78,7 +79,7 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
 
     public static class MetadataEnvironment extends AbstractEnvironment {
 
-        public MetadataEnvironment(Plugin.Metadata metadata, Environment environment) {
+        public MetadataEnvironment(PluginMetadata metadata, Environment environment) {
             getPropertySources().addLast(new MetadataPropertySource("PluginMetadata", metadata));
             if (environment instanceof ConfigurableEnvironment) {
                 MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
@@ -87,15 +88,15 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
         }
     }
 
-    public static class MetadataPropertySource extends EnumerablePropertySource<Plugin.Metadata> {
+    public static class MetadataPropertySource extends EnumerablePropertySource<PluginMetadata> {
 
-        public MetadataPropertySource(String name, Plugin.Metadata source) {
+        public MetadataPropertySource(String name, PluginMetadata source) {
             super(name, source);
         }
 
         @Override
         public String[] getPropertyNames() {
-            return source.keys().toArray(new String[0]);
+            return source.names().toArray(new String[0]);
         }
 
         @Override

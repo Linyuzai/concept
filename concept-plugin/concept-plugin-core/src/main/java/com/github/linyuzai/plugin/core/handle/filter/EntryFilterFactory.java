@@ -1,13 +1,15 @@
 package com.github.linyuzai.plugin.core.handle.filter;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.handle.PropertyPluginHandlerFactory;
+import com.github.linyuzai.plugin.core.handle.StringArrayPropertyPluginHandlerFactory;
+import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
 
-public class EntryFilterFactory extends PropertyPluginHandlerFactory {
+public class EntryFilterFactory extends StringArrayPropertyPluginHandlerFactory {
 
     @Override
-    public String getPropertyName() {
-        return PluginFilter.PropertyKey.PREFIX + "entry";
+    public MetadataProperty<String[]> getProperty() {
+        return Plugin.MetadataProperties.FILTER_ENTRY_PATTERNS;
     }
 
     @Override

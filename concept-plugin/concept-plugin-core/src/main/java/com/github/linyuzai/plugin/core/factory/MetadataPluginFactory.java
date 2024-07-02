@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
 public abstract class MetadataPluginFactory<T> implements PluginFactory {
@@ -11,7 +12,7 @@ public abstract class MetadataPluginFactory<T> implements PluginFactory {
         if (source == null) {
             return null;
         }
-        Plugin.Metadata metadata = createMetadata(source, context);
+        PluginMetadata metadata = createMetadata(source, context);
         if (metadata == null) {
             return null;
         }
@@ -20,9 +21,9 @@ public abstract class MetadataPluginFactory<T> implements PluginFactory {
         return plugin;
     }
 
-    public abstract Plugin doCreate(T o, Plugin.Metadata metadata, PluginContext context);
+    public abstract Plugin doCreate(T o, PluginMetadata metadata, PluginContext context);
 
     protected abstract T getSource(Object o, PluginContext context);
 
-    protected abstract Plugin.Metadata createMetadata(T o, PluginContext context);
+    protected abstract PluginMetadata createMetadata(T o, PluginContext context);
 }

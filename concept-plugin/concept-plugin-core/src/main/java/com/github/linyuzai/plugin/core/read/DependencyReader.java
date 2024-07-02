@@ -1,22 +1,32 @@
 package com.github.linyuzai.plugin.core.read;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Getter
 public abstract class DependencyReader implements PluginReader {
+
+    private final Plugin plugin;
 
     //TODO 正则匹配
     private final Set<String> dependencies = new LinkedHashSet<>();
 
     public DependencyReader(Plugin plugin) {
-        dependencies.addAll(getDependencies(plugin));
+        this.plugin = plugin;
+        dependencies.addAll(Arrays.asList(getDependencies(plugin)));
     }
 
     @Override
     public Object read(Object key, PluginContext context) {
+        if (context.contains(getPlugin())) {
+            return null;
+        }
+        context.set(getPlugin(), Boolean.TRUE);
         Object doRead = doRead(key);
         if (doRead != null) {
             return doRead;
@@ -26,8 +36,8 @@ public abstract class DependencyReader implements PluginReader {
                 .stream()
                 .collect(Collectors.toList());
         for (Plugin plugin : plugins) {
-            Plugin.Metadata metadata = plugin.getMetadata();
-            String name = metadata.get(Plugin.Metadata.PropertyKey.NAME);
+            PluginMetadata metadata = plugin.getMetadata();
+            String name = metadata.property(Plugin.MetadataProperties.NAME);
             if (name == null || name.isEmpty()) {
                 continue;
             }
@@ -45,14 +55,9 @@ public abstract class DependencyReader implements PluginReader {
 
     public abstract Class<?> getReadableType();
 
-    public List<String> getDependencies(Plugin plugin) {
-        Plugin.Metadata metadata = plugin.getMetadata();
-        String dependencies = metadata.get(Plugin.Metadata.PropertyKey.DEPENDENCY_NAMES);
-        if (dependencies == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(dependencies.split(","))
-                .collect(Collectors.toList());
+    public String[] getDependencies(Plugin plugin) {
+        PluginMetadata metadata = plugin.getMetadata();
+        return metadata.property(Plugin.MetadataProperties.DEPENDENCY_NAMES);
     }
 
     @Override

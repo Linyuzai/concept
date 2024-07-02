@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.handle.filter;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 
@@ -8,11 +7,6 @@ import com.github.linyuzai.plugin.core.handle.PluginHandler;
  * 插件过滤器
  */
 public interface PluginFilter extends PluginHandler, PluginHandler.Dependency {
-
-    interface PropertyKey {
-
-        String PREFIX = Plugin.Metadata.PropertyKey.PREFIX + "filter.";
-    }
 
     @Override
     default void handle(PluginContext context) {

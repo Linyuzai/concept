@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
@@ -25,7 +26,7 @@ public class JarPluginFactory extends ZipPluginFactory {
 
     @SneakyThrows
     @Override
-    public Plugin doCreate(File file, Plugin.Metadata metadata, PluginContext context) {
+    public Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
         String mode = getMode(file, metadata, context);
         switch (mode.toUpperCase()) {
             case JarPlugin.Mode.FILE:
@@ -37,8 +38,8 @@ public class JarPluginFactory extends ZipPluginFactory {
         }
     }
 
-    public String getMode(File file, Plugin.Metadata metadata, PluginContext context) {
-        return metadata.get(JarPlugin.Mode.PropertyKey.MODE, defaultMode);
+    public String getMode(File file, PluginMetadata metadata, PluginContext context) {
+        return metadata.property(JarPlugin.MetadataProperties.MODE, defaultMode);
     }
 
     @Override

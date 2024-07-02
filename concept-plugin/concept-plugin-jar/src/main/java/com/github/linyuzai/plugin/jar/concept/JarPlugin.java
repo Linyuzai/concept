@@ -1,20 +1,25 @@
 package com.github.linyuzai.plugin.jar.concept;
 
+import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.PrefixMetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.StringArrayValueMetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.StringValueMetadataProperty;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 
 public interface JarPlugin extends ZipPlugin {
 
-    interface PropertyKey {
+    interface MetadataProperties extends ZipPlugin.MetadataProperties {
 
-        String PREFIX = Metadata.PropertyKey.PREFIX + "jar.";
+        MetadataProperty<?> JAR = new PrefixMetadataProperty("jar");
+
+        MetadataProperty<String> MODE = new StringValueMetadataProperty("mode", JAR);
+
+        MetadataProperty<?> FILTER_CLASS = new PrefixMetadataProperty("class", FILTER);
+
+        MetadataProperty<String[]> FILTER_CLASS_PATTERNS = new StringArrayValueMetadataProperty("patterns", FILTER_CLASS);
     }
 
     class Mode {
-
-        public interface PropertyKey {
-
-            String MODE = JarPlugin.PropertyKey.PREFIX + "mode";
-        }
 
         public static final String FILE = "FILE";
 

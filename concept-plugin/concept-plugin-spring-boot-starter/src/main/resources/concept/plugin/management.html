@@ -319,7 +319,7 @@
                                     </el-tag>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="操作" prop="url" fixed="right" width="250">
+                            <el-table-column label="操作" prop="url" fixed="right" width="280">
                                 <template slot="header">操作
                                     <span class="caret-wrapper" style="width: 0"></span>
                                 </template>
@@ -347,10 +347,10 @@
                                                @click="openUpdateDialog(scope.row.plugin)"
                                                type="text">更新
                                     </el-button>
-                                    <el-button v-if="showProperties(scope.row.state)"
-                                               class="plugin-btn"
+                                    <!--v-if="showProperties(scope.row.state)"-->
+                                    <el-button class="plugin-btn"
                                                :disabled="isIngState(scope.row.state)"
-                                               @click=""
+                                               @click="getProperties(scope.row.plugin)"
                                                type="text">查看配置
                                     </el-button>
                                     </el-button>
@@ -374,6 +374,16 @@
                                 </template>
                             </el-table-column>
                         </el-table>
+                        <el-dialog title="插件配置"
+                                   :visible.sync="plugin.property.visible">
+                            <el-form v-cloak>
+                                <el-form-item v-for="property in plugin.property.list" :label="property.name + ':'">
+                                    <!--<el-input v-model="plugin.rename.form.rename"
+                                              name="rename"></el-input>-->
+                                    {{property.value}}
+                                </el-form-item>
+                            </el-form>
+                        </el-dialog>
                         <el-dialog title="重命名"
                                    :close-on-click-modal="false"
                                    :visible.sync="plugin.rename.visible">
@@ -557,6 +567,10 @@
                 refresh: 0,
                 search: '',
                 list: [],
+                property: {
+                    visible: false,
+                    list: []
+                },
                 upload: {
                     visible: false,
                     disabled: false,
@@ -795,6 +809,23 @@
             openUpdateDialog(name) {
                 this.openUploadDialog(name);
             },
+            getProperties(name) {
+                let params = {group: this.group.select, name: name};
+                this._get(getPluginUrl('properties', params), response => {
+                    let body = response;
+                    if (body.success) {
+                        this.plugin.property.list = body.data;
+                        this.plugin.property.visible = true;
+                    } else {
+                        this.$notify({
+                            title: '失败',
+                            message: body.message,
+                            type: 'error'
+                        });
+                        console.log(response);
+                    }
+                })
+            },
             openRenameDialog(name) {
                 let form = this.$refs['plugin.rename.form'];
                 if (form !== undefined) {
@@ -805,11 +836,16 @@
                 this.plugin.rename.visible = true;
             },
             renamePlugin() {
-                let name = this.plugin.rename.form.name;
-                let rename = this.plugin.rename.form.rename;
-                let params = {group: this.group.select, name: name, rename: rename};
-                this._plugin(getPluginUrl('rename'), params, () =>
-                    this.plugin.rename.visible = false);
+                this.$refs['plugin.rename.form'].validate((valid) => {
+                    if (valid) {
+                        let name = this.plugin.rename.form.name;
+                        let rename = this.plugin.rename.form.rename;
+                        let params = {group: this.group.select, name: name, rename: rename};
+                        this._plugin(getPluginUrl('rename'), params, () =>
+                            this.plugin.rename.visible = false);
+                    }
+                    return valid;
+                });
             },
             deletePlugin(name) {
                 let params = {group: this.group.select, name: name};
@@ -908,10 +944,10 @@
                         return '未知';
                 }
             },
-            explain() {
+            /*explain() {
                 let content = '';
                 this.$alert(content, '说明', {dangerouslyUseHTMLString: true});
-            },
+            },*/
             _get(url, success, error) {
                 httpGet(url, success, e => {
                     if (error) {

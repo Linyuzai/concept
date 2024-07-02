@@ -1,11 +1,15 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.PrefixMetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.StringArrayValueMetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.StringValueMetadataProperty;
 import com.github.linyuzai.plugin.core.read.PluginReader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 
 /**
  * 插件抽象
@@ -14,9 +18,9 @@ public interface Plugin {
 
     Object getId();
 
-    Metadata getMetadata();
+    PluginMetadata getMetadata();
 
-    void setMetadata(Metadata metadata);
+    void setMetadata(PluginMetadata metadata);
 
     PluginConcept getConcept();
 
@@ -46,26 +50,19 @@ public interface Plugin {
      */
     void release(PluginContext context);
 
-    interface Metadata {
+    interface MetadataProperties {
 
-        interface PropertyKey {
+        MetadataProperty<String> NAME = new StringValueMetadataProperty("name");
 
-            String PREFIX = "concept.plugin.";
+        MetadataProperty<?> DEPENDENCY = new PrefixMetadataProperty("dependency");
 
-            String NAME = PREFIX + "name";
+        MetadataProperty<String[]> DEPENDENCY_NAMES = new StringArrayValueMetadataProperty("names", DEPENDENCY);
 
-            String DEPENDENCY_NAMES = PREFIX + "dependency.names";
-        }
+        MetadataProperty<?> FILTER = new PrefixMetadataProperty("filter");
 
-        String get(String key);
+        MetadataProperty<?> FILTER_ENTRY = new PrefixMetadataProperty("entry", FILTER);
 
-        String get(String key, String defaultValue);
-
-        Set<String> keys();
-
-        <T> T bind(String key, Class<T> type);
-
-        boolean isEmpty();
+        MetadataProperty<String[]> FILTER_ENTRY_PATTERNS = new StringArrayValueMetadataProperty("patterns", FILTER_ENTRY);
     }
 
     interface Entry {

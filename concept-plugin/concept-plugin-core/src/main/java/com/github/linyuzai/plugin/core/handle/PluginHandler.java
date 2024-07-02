@@ -1,18 +1,17 @@
 package com.github.linyuzai.plugin.core.handle;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.metadata.property.BooleanValueMetadataProperty;
+import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 
 public interface PluginHandler {
 
     void handle(PluginContext context);
 
-    interface PropertyKey {
+    interface PropertyKeys {
 
-        String PREFIX = Plugin.Metadata.PropertyKey.PREFIX + "handler.";
-
-        String ENABLED = PREFIX + "enabled";
+        MetadataProperty<Boolean> ENABLED = new BooleanValueMetadataProperty("handler.enabled");
     }
 
     interface Dependency {

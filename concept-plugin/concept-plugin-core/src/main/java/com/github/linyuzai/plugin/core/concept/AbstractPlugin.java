@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.DefaultPluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.read.PluginReader;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     private final Collection<DestroyListener> destroyListeners = new CopyOnWriteArrayList<>();
 
-    private Metadata metadata;
+    private PluginMetadata metadata;
 
     private PluginConcept concept;
 
@@ -152,7 +153,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String toString() {
-        String name = metadata.get(Metadata.PropertyKey.NAME, getId().toString());
+        String name = metadata.property(MetadataProperties.NAME, getId().toString());
         return getClass().getSimpleName() + "(" + name + ")";
     }
 }

@@ -8,6 +8,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -189,6 +190,36 @@ public class PluginManagementController {
         }, () -> "插件删除");
     }
 
+    @GetMapping("/plugin/properties")
+    public Response getProperties(@RequestParam("group") String group,
+                                  @RequestParam("name") String name) {
+        return manage(() -> {
+            String path = location.getLoadedPluginPath(group, name);
+            Plugin plugin = concept.getRepository().get(path);
+            if (plugin == null) {
+                List<Map<String, String>> properties = new ArrayList<>();
+                Map<String, String> property = new LinkedHashMap<>();
+                property.put("name", "concept.plugin.name");
+                property.put("value", name);
+                properties.add(property);
+                return properties;
+                //return Collections.emptyList();
+            } else {
+                List<Map<String, String>> properties = new ArrayList<>();
+                PluginMetadata metadata = plugin.getMetadata();
+                Set<String> names = metadata.names();
+                for (String n : names) {
+                    String v = metadata.get(n);
+                    Map<String, String> property = new LinkedHashMap<>();
+                    property.put("name", n);
+                    property.put("value", v);
+                    properties.add(property);
+                }
+                return properties;
+            }
+        }, () -> "查询配置");
+    }
+
     @GetMapping("/plugin/list")
     public Response listPlugin(@RequestParam("group") String group,
                                @RequestParam("deleted") Boolean deleted) {
@@ -285,18 +316,14 @@ public class PluginManagementController {
         String path = location.getLoadedPluginPath(group, plugin);
         long timestamp = location.getCreationTimestamp(path);
         long size = location.getSize(path);
-        String name;
         ManagedPlugin.State state;
         if (loadingSet.contains(path) || concept.isLoading(path)) {
-            name = null;
             state = ManagedPlugin.State.LOADING;
         } else {
             Plugin get = concept.getRepository().get(path);
             if (get == null) {
-                name = null;
                 state = ManagedPlugin.State.LOAD_ERROR;
             } else {
-                name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
                 if (updatingSet.contains(path)) {
                     state = ManagedPlugin.State.UPDATING;
                 } else {
@@ -304,30 +331,26 @@ public class PluginManagementController {
                 }
             }
         }
-        return new ManagedPlugin(plugin, name, formatSize(size), formatTime(timestamp), state, timestamp);
+        return new ManagedPlugin(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
     public ManagedPlugin unloadedPlugin(String group, String plugin) {
         String unloadPath = location.getUnloadedPluginPath(group, plugin);
         long timestamp = location.getCreationTimestamp(unloadPath);
         long size = location.getSize(unloadPath);
-        String name;
         ManagedPlugin.State state;
         String path = location.getLoadedPluginPath(group, plugin);
         if (unloadingSet.contains(path) || concept.isUnloading(path)) {
-            name = null;
             state = ManagedPlugin.State.UNLOADING;
         } else {
             Plugin get = concept.getRepository().get(path);
             if (get == null) {
-                name = null;
                 state = ManagedPlugin.State.UNLOADED;
             } else {
-                name = get.getMetadata().get(Plugin.Metadata.PropertyKey.NAME, "");
                 state = ManagedPlugin.State.UNLOAD_ERROR;
             }
         }
-        return new ManagedPlugin(plugin, name, formatSize(size), formatTime(timestamp), state, timestamp);
+        return new ManagedPlugin(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
     public ManagedPlugin deletedPlugin(String group, String plugin) {
@@ -335,7 +358,7 @@ public class PluginManagementController {
         long timestamp = location.getCreationTimestamp(deletePath);
         long size = location.getSize(deletePath);
         ManagedPlugin.State state = ManagedPlugin.State.DELETED;
-        return new ManagedPlugin(plugin, null, formatSize(size), formatTime(timestamp), state, timestamp);
+        return new ManagedPlugin(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
     public Response success(String message, Object data) {
@@ -423,8 +446,6 @@ public class PluginManagementController {
     public static class ManagedPlugin {
 
         private final String plugin;
-
-        private final String name;
 
         private final String size;
 

@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.read;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.read.PluginReader;
 
@@ -12,4 +13,6 @@ public interface ClassReader extends PluginReader {
     default boolean support(Class<?> readable) {
         return readable == Class.class;
     }
+
+    Plugin getPlugin();
 }
