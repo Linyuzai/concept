@@ -31,7 +31,12 @@ public abstract class DependencyReader implements PluginReader {
         if (doRead != null) {
             return doRead;
         }
-        List<Plugin> plugins = context.getConcept()
+        return readDependency(key, context);
+    }
+
+    protected Object readDependency(Object key, PluginContext context) {
+        List<Plugin> plugins = context.getRoot()
+                .getConcept()
                 .getRepository()
                 .stream()
                 .collect(Collectors.toList());
@@ -42,7 +47,7 @@ public abstract class DependencyReader implements PluginReader {
                 continue;
             }
             if (dependencies.contains(name)) {
-                Object read = plugin.read(getReadableType(), key);
+                Object read = plugin.read(getReadableType(), key, context);
                 if (read != null) {
                     return read;
                 }

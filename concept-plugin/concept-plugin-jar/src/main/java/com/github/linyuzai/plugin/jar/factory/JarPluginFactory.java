@@ -30,7 +30,7 @@ public class JarPluginFactory extends ZipPluginFactory {
         String mode = getMode(file, metadata, context);
         switch (mode.toUpperCase()) {
             case JarPlugin.Mode.FILE:
-                return new ExJarPlugin(new ExJarFile(file));
+                return new ExJarPlugin(new ExJarFile(file), file.getAbsolutePath());
             case JarPlugin.Mode.STREAM:
                 return super.doCreate(file, metadata, context);
             default:
@@ -44,7 +44,7 @@ public class JarPluginFactory extends ZipPluginFactory {
 
     @Override
     protected JarFilePlugin createZipPlugin(File file, URL url) {
-        return new JarFilePlugin(file, url);
+        return new JarFilePlugin(file.getAbsolutePath(), url);
     }
 
     @Override

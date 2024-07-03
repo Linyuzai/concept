@@ -52,11 +52,17 @@ public abstract class AbstractPlugin implements Plugin {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public <T> T read(Class<T> readable, Object key) {
+        return read(readable, key, createReadContent());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T read(Class<T> type, Object key) {
-        for (PluginReader reader : getReaders(type)) {
-            Object read = reader.read(key, createReadContent());
+    public <T> T read(Class<T> readable, Object key, PluginContext context) {
+        for (PluginReader reader : getReaders(readable)) {
+            Object read = reader.read(key, context.createSubContext(false));
             if (read != null) {
                 return (T) read;
             }

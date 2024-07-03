@@ -12,7 +12,7 @@ import java.util.Collection;
  * 类名过滤器
  */
 @HandlerDependency(JarClassResolver.class)
-public class ClassNameFilter extends PatternPluginFilter<String> {
+public class ClassNameFilter extends PatternPluginFilter<JarClass> {
 
     public ClassNameFilter(String... patterns) {
         this(Arrays.asList(patterns));
@@ -23,8 +23,8 @@ public class ClassNameFilter extends PatternPluginFilter<String> {
     }
 
     @Override
-    protected String getMatchable(String className) {
-        return className;
+    protected String getMatchable(JarClass jarClass) {
+        return jarClass.getName();
     }
 
     @Override

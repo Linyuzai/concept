@@ -20,13 +20,15 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
 
     private final PluginFactory delegate;
 
+    private final Class<? extends Plugin.StandardMetadata> standardMetadataType;
+
     private Environment environment;
 
     @Override
     public Plugin create(Object o, PluginContext context) {
         Plugin plugin = delegate.create(o, context);
         if (plugin != null) {
-            PluginMetadata metadata = new BinderPluginMetadata(plugin.getMetadata());
+            PluginMetadata metadata = new BinderMetadata(plugin.getMetadata());
             plugin.setMetadata(metadata);
         }
         return plugin;
@@ -38,15 +40,18 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
     }
 
     @Getter
-    public class BinderPluginMetadata implements PluginMetadata {
+    public class BinderMetadata implements PluginMetadata {
 
         private final PluginMetadata delegate;
 
         private final Binder binder;
 
-        public BinderPluginMetadata(PluginMetadata delegate) {
+        private final Plugin.StandardMetadata standard;
+
+        public BinderMetadata(PluginMetadata delegate) {
             this.delegate = delegate;
             this.binder = Binder.get(new MetadataEnvironment(delegate, environment));
+            this.standard = bind("concept.plugin", standardMetadataType);
         }
 
         @Override
@@ -69,6 +74,12 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
         public <T> T bind(String name, Class<T> type) {
             BindResult<T> bind = binder.bind(name, Bindable.of(type));
             return bind.orElse(null);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> T standard() {
+            return (T) standard;
         }
 
         @Override

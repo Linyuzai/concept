@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.MetadataPluginFactory;
-import com.github.linyuzai.plugin.core.metadata.PropertiesPluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import lombok.SneakyThrows;
 
@@ -27,7 +27,7 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
     }
 
     protected ZipFilePlugin createZipPlugin(File file, URL url) {
-        return new ZipFilePlugin(file, url);
+        return new ZipFilePlugin(file.getAbsolutePath(), url);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
                     properties.load(is);
                 }
             }
-            return new PropertiesPluginMetadata(properties);
+            return new PropertiesMetadata(properties);
         }
     }
 }

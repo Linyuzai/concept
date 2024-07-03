@@ -1,15 +1,12 @@
 package com.github.linyuzai.plugin.core.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-
-import java.util.Collections;
-import java.util.Set;
+import com.github.linyuzai.plugin.core.metadata.EmptyMetadata;
 
 public abstract class SubPluginFactory implements PluginFactory {
 
-    private final SubPluginMetadata metadata = new SubPluginMetadata();
+    private final EmptyMetadata metadata = new EmptyMetadata();
 
     @Override
     public Plugin create(Object o, PluginContext context) {
@@ -25,31 +22,4 @@ public abstract class SubPluginFactory implements PluginFactory {
 
     public abstract Plugin doCreate(Plugin.Entry entry, PluginContext context);
 
-    public static class SubPluginMetadata implements PluginMetadata {
-
-        @Override
-        public String get(String name) {
-            return null;
-        }
-
-        @Override
-        public String get(String name, String defaultValue) {
-            return defaultValue;
-        }
-
-        @Override
-        public Set<String> names() {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public <T> T bind(String name, Class<T> type) {
-            return null;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return true;
-        }
-    }
 }

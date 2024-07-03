@@ -7,9 +7,12 @@ import com.github.linyuzai.plugin.core.metadata.property.PrefixMetadataProperty;
 import com.github.linyuzai.plugin.core.metadata.property.StringArrayValueMetadataProperty;
 import com.github.linyuzai.plugin.core.metadata.property.StringValueMetadataProperty;
 import com.github.linyuzai.plugin.core.read.PluginReader;
+import lombok.Data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Set;
 
 /**
  * 插件抽象
@@ -17,6 +20,10 @@ import java.io.InputStream;
 public interface Plugin {
 
     Object getId();
+
+    Object getSource();
+
+    URL getURL();
 
     PluginMetadata getMetadata();
 
@@ -36,6 +43,8 @@ public interface Plugin {
 
     <T> T read(Class<T> readable, Object key);
 
+    <T> T read(Class<T> readable, Object key, PluginContext context);
+
     void initialize();
 
     void destroy();
@@ -50,6 +59,35 @@ public interface Plugin {
      */
     void release(PluginContext context);
 
+    @Data
+    class StandardMetadata {
+
+        private String name;
+
+        private DependencyMetadata dependency = new DependencyMetadata();
+
+        private FilterMetadata filter = new FilterMetadata();
+
+        @Data
+        public static class DependencyMetadata {
+
+            private Set<String> names;
+        }
+
+        @Data
+        public static class FilterMetadata {
+
+            private EntryMetadata entry = new EntryMetadata();
+
+            @Data
+            public static class EntryMetadata {
+
+                private Set<String> patterns;
+            }
+        }
+    }
+
+    //TODO 用 bind 绑定 concept.plugin
     interface MetadataProperties {
 
         MetadataProperty<String> NAME = new StringValueMetadataProperty("name");

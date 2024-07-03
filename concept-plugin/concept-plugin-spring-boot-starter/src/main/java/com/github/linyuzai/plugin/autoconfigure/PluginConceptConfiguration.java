@@ -36,6 +36,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilterFactory;
@@ -59,7 +60,7 @@ public class PluginConceptConfiguration {
             String mode = properties.getJar().getMode();
             JarPluginFactory factory = new JarPluginFactory();
             factory.setDefaultMode(mode);
-            return new BinderMetadataPluginFactory(factory);
+            return new BinderMetadataPluginFactory(factory, JarPlugin.StandardMetadata.class);
         }
 
         @Bean

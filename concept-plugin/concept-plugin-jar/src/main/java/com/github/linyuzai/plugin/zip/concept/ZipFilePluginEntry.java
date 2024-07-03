@@ -22,7 +22,7 @@ public class ZipFilePluginEntry implements ZipPluginEntry {
 
     protected final Plugin plugin;
 
-    protected final File file;
+    protected final String path;
 
     @Override
     public Plugin.Content getContent() {
@@ -40,7 +40,7 @@ public class ZipFilePluginEntry implements ZipPluginEntry {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            ZipFile zf = new ZipFile(file);
+            ZipFile zf = new ZipFile(path);
             ZipEntry entry = zf.getEntry(name);
             if (entry == null) {
                 throw new PluginException("Plugin entry not found");

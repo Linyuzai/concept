@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.jar.extension;
 import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -17,20 +18,29 @@ import java.util.function.Consumer;
  * 基于 jar 的插件
  */
 @Getter
-public class ExJarPlugin extends AbstractPlugin {
-
-    private final URL url;
+public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
 
     private final ExJarFile jarFile;
 
+    private final Object source;
+
+    private final URL url;
+
     @SneakyThrows
-    public ExJarPlugin(ExJarFile jarFile) {
+    public ExJarPlugin(ExJarFile jarFile, Object source) {
         this.jarFile = jarFile;
+        this.source = source;
         this.url = jarFile.getURL();
+
     }
 
     @Override
     public Object getId() {
+        return url;
+    }
+
+    @Override
+    public URL getURL() {
         return url;
     }
 

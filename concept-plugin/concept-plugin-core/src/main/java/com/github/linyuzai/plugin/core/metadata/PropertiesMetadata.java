@@ -3,12 +3,13 @@ package com.github.linyuzai.plugin.core.metadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
-public class PropertiesPluginMetadata implements PluginMetadata {
+public class PropertiesMetadata implements PluginMetadata {
 
     private final Properties properties;
 
@@ -33,7 +34,13 @@ public class PropertiesPluginMetadata implements PluginMetadata {
     }
 
     @Override
+    public <T> T standard() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isEmpty() {
         return properties.isEmpty();
     }
+
 }

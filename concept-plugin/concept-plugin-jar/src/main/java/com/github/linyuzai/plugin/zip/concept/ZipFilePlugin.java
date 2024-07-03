@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -18,12 +17,22 @@ import java.util.zip.ZipFile;
 @RequiredArgsConstructor
 public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
 
-    protected final File file;
+    protected final String path;
 
     protected final URL url;
 
     @Override
     public Object getId() {
+        return url;
+    }
+
+    @Override
+    public Object getSource() {
+        return path;
+    }
+
+    @Override
+    public URL getURL() {
         return url;
     }
 
@@ -42,10 +51,10 @@ public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
     }
 
     protected ZipFile createZipFile() throws IOException {
-        return new ZipFile(file);
+        return new ZipFile(path);
     }
 
     protected ZipPluginEntry createZipPluginEntry(Object id, String name) {
-        return new ZipFilePluginEntry(id, name, this, file);
+        return new ZipFilePluginEntry(id, name, this, path);
     }
 }

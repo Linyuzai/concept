@@ -8,7 +8,7 @@ public interface PluginRepository {
 
     Plugin get(Object o);
 
-    void add(Object o, Plugin plugin);
+    void add(Plugin plugin);
 
     Plugin remove(Object o);
 

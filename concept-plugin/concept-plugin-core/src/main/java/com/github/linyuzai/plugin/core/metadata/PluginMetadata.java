@@ -26,5 +26,7 @@ public interface PluginMetadata {
 
     <T> T bind(String name, Class<T> type);
 
+    <T> T standard();
+
     boolean isEmpty();
 }

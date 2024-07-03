@@ -52,7 +52,7 @@ public class DefaultPluginPropertiesProvider implements PluginPropertiesProvider
         Set<String> names = metadata.names();
         for (String n : names) {
             String v = metadata.get(n);
-            PluginPropertyEntry property = new PluginPropertyEntry<>();
+            PluginPropertyEntry property = new PluginPropertyEntry();
             property.setName(n);
             property.setValue(v);
             properties.add(property);

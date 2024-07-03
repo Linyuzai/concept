@@ -10,9 +10,9 @@ public interface PluginLifecycleListener extends PluginEventListener {
         if (event instanceof PluginCreatedEvent) {
             onCreate(((PluginCreatedEvent) event).getPlugin());
         } else if (event instanceof PluginPreparedEvent) {
-            onPrepare(((PluginPreparedEvent) event).getContext());
+            onPrepare(((PluginPreparedEvent) event).getPlugin(), ((PluginPreparedEvent) event).getContext());
         } else if (event instanceof PluginReleasedEvent) {
-            onRelease(((PluginReleasedEvent) event).getContext());
+            onRelease(((PluginReleasedEvent) event).getPlugin(), ((PluginReleasedEvent) event).getContext());
         } else if (event instanceof PluginLoadedEvent) {
             onLoaded(((PluginLoadedEvent) event).getPlugin());
         } else if (event instanceof PluginUnloadedEvent) {
@@ -22,9 +22,9 @@ public interface PluginLifecycleListener extends PluginEventListener {
 
     void onCreate(Plugin plugin);
 
-    void onPrepare(PluginContext context);
+    void onPrepare(Plugin plugin, PluginContext context);
 
-    void onRelease(PluginContext context);
+    void onRelease(Plugin plugin, PluginContext context);
 
     void onLoaded(Plugin plugin);
 

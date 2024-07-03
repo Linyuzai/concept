@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * 插件概念
@@ -40,6 +41,22 @@ public interface PluginConcept {
      * @return 插件 {@link Plugin}
      */
     Plugin load(Object o);
+
+    /**
+     * 加载插件
+     *
+     * @param o 插件源
+     * @return 插件 {@link Plugin}
+     */
+    Plugin load(Object o, boolean reloadIfExist);
+
+    /**
+     * 加载插件
+     *
+     * @param o 插件源
+     * @return 插件 {@link Plugin}
+     */
+    Plugin load(Object o, PluginContext context, Consumer<Plugin> onSuccess, Consumer<Throwable> onError, Runnable onComplete);
 
     /**
      * 卸载插件

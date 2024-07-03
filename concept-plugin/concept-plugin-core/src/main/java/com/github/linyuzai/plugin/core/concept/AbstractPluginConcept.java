@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * {@link PluginConcept} 抽象类
@@ -147,6 +148,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         return null;
     }
 
+    @Override
+    public Plugin load(Object o) {
+        return load(o, false);
+    }
+
     /**
      * 加载插件。
      * 通过 {@link PluginFactory} 创建插件，
@@ -159,13 +165,36 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param o 插件源
      */
     @Override
-    public Plugin load(@NonNull Object o) {
-        lock.lock(o, PluginLock.LOADING);
-        if (repository.contains(o)) {
+    public Plugin load(@NonNull Object o, boolean reloadIfExist) {
+        Plugin exist = repository.get(o);
+        if (exist != null && !reloadIfExist) {
             throw new IllegalArgumentException("Plugin is already loaded: " + o);
         }
         //创建上下文
         PluginContext context = contextFactory.create(this);
+
+        return load(o, context, plugin -> {
+            repository.add(plugin);
+            if (exist != null) {
+                try {
+                    exist.destroy();
+                } catch (Throwable e) {
+                    logger.error("Plugin destroy", e);
+                }
+            }
+        }, e -> {
+            if (e instanceof PluginLoadException) {
+                throw (PluginLoadException) e;
+            } else {
+                throw new PluginLoadException(context, e);
+            }
+        }, () -> {
+        });
+    }
+
+    @Override
+    public Plugin load(Object o, PluginContext context, Consumer<Plugin> onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
+        lock.lock(o, PluginLock.LOADING);
         try {
             //初始化上下文
             context.set(PluginConcept.class, this);
@@ -190,6 +219,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
             Boolean handlerEnabled = plugin.getMetadata()
                     .property(PluginHandler.PropertyKeys.ENABLED, Boolean.TRUE.toString());
+
             if (handlerEnabled) {
                 //解析插件
                 obtainHandlerChain(context).next(context);
@@ -200,16 +230,21 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
             //销毁上下文
             context.destroy();
-            repository.add(o, plugin);
+
+            onSuccess.accept(plugin);
+
             eventPublisher.publish(new PluginLoadedEvent(plugin));
 
             return plugin;
         } catch (Throwable e) {
-            throw new PluginLoadException(context, e);
+            onError.accept(e);
+            return null;
         } finally {
+            onComplete.run();
             lock.unlock(o, PluginLock.LOADING);
         }
     }
+
 
     /**
      * 卸载插件。

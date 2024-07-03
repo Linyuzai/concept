@@ -14,18 +14,18 @@ import java.util.jar.JarFile;
 
 public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
 
-    public JarFilePlugin(File file, URL url) {
-        super(file, url);
+    public JarFilePlugin(String path, URL url) {
+        super(path, url);
     }
 
     @Override
     protected JarFile createZipFile() throws IOException {
-        return new JarFile(file);
+        return new JarFile(path);
     }
 
     @Override
     protected JarPluginEntry createZipPluginEntry(Object id, String name) {
-        return new JarFilePluginEntry(id, name, this, file);
+        return new JarFilePluginEntry(id, name, this, path);
     }
 
     @Override
