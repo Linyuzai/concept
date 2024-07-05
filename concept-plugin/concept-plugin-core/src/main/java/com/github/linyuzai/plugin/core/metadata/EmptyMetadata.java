@@ -1,11 +1,17 @@
 package com.github.linyuzai.plugin.core.metadata;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.Set;
 
+@Getter
+@RequiredArgsConstructor
 public class EmptyMetadata implements PluginMetadata {
+
+    private final Plugin.StandardMetadata standard;
 
     @Override
     public String get(String name) {

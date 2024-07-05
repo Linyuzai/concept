@@ -4,9 +4,9 @@ import com.github.linyuzai.plugin.core.handle.extract.TypeMetadataPluginExtracto
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.lang.annotation.Annotation;
 
@@ -16,10 +16,12 @@ import java.lang.annotation.Annotation;
  * @param <T> 实例类型
  */
 @Getter
-@RequiredArgsConstructor
-public abstract class BeanExtractor<T> extends TypeMetadataPluginExtractor<T> {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class BeanExtractor<T> extends TypeMetadataPluginExtractor<T> implements ApplicationContextAware {
 
-    private final ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     /**
      * 返回一个 {@link BeanMatcher}

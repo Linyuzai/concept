@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.preperties;
 
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,11 +10,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "concept.plugin")
 public class PluginConceptProperties {
 
+    private MetadataProperties metadata = new MetadataProperties();
+
     private AutoloadProperties autoload = new AutoloadProperties();
 
     private JarProperties jar = new JarProperties();
 
     private ManagementProperties management = new ManagementProperties();
+
+    @Data
+    public static class MetadataProperties {
+
+        private Class<? extends Plugin.StandardMetadata> standardType = JarPlugin.StandardMetadata.class;
+    }
 
     @Data
     public static class AutoloadProperties {

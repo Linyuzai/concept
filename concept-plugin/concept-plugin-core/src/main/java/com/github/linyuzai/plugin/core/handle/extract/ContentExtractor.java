@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
+import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToByteArrayConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToInputStreamConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToStringConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
@@ -9,8 +10,10 @@ import com.github.linyuzai.plugin.core.handle.extract.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -23,17 +26,15 @@ import java.nio.charset.Charset;
  * @param <T> 插件类型
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T> {
 
     /**
      * 提取成 {@link String} 时的编码
      */
-    private final Charset charset;
-
-    public ContentExtractor() {
-        charset = null;
-    }
+    private Charset charset;
 
     public ContentExtractor(String charset) {
         this.charset = Charset.forName(charset);
@@ -77,6 +78,9 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
         }
         if (String.class == elementClass) {
             return new ContentToStringConvertor(charset);
+        }
+        if (byte[].class == elementClass) {
+            return new ContentToByteArrayConvertor();
         }
         return super.getConvertor(metadata, annotations);
     }

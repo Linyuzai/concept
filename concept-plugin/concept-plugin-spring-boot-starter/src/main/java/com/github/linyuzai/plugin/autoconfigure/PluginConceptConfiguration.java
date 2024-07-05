@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
-import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataPluginFactory;
+import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataJarPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
@@ -10,6 +10,7 @@ import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
@@ -22,7 +23,6 @@ import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
-import com.github.linyuzai.plugin.core.handle.filter.EntryFilterFactory;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
@@ -36,10 +36,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
-import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
-import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilterFactory;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,9 +55,11 @@ public class PluginConceptConfiguration {
         @Bean
         public PluginFactory jarPluginFactory(PluginConceptProperties properties) {
             String mode = properties.getJar().getMode();
-            JarPluginFactory factory = new JarPluginFactory();
+            Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
+            BinderMetadataJarPluginFactory factory = new BinderMetadataJarPluginFactory();
             factory.setDefaultMode(mode);
-            return new BinderMetadataPluginFactory(factory, JarPlugin.StandardMetadata.class);
+            factory.setStandardMetadataType(standardType);
+            return factory;
         }
 
         @Bean
@@ -150,16 +149,6 @@ public class PluginConceptConfiguration {
     @Bean
     public PropertiesResolver pluginPropertiesResolver() {
         return new PropertiesResolver();
-    }
-
-    @Bean
-    public EntryFilterFactory entryFilterFactory() {
-        return new EntryFilterFactory();
-    }
-
-    @Bean
-    public ClassNameFilterFactory classNameFilterFactory() {
-        return new ClassNameFilterFactory();
     }
 
     @Bean(initMethod = "initialize", destroyMethod = "destroy")

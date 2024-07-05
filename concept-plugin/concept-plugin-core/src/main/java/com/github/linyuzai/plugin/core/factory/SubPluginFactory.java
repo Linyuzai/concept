@@ -6,7 +6,7 @@ import com.github.linyuzai.plugin.core.metadata.EmptyMetadata;
 
 public abstract class SubPluginFactory implements PluginFactory {
 
-    private final EmptyMetadata metadata = new EmptyMetadata();
+    private final EmptyMetadata metadata = new EmptyMetadata(new Plugin.StandardMetadata());
 
     @Override
     public Plugin create(Object o, PluginContext context) {

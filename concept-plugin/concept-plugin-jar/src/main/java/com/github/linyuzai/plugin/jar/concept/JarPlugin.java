@@ -14,7 +14,7 @@ public interface JarPlugin extends ZipPlugin {
 
         private JarMetadata jar = new JarMetadata();
 
-        private FilterMetadata filter = new FilterMetadata();
+        //private FilterMetadata filter = new FilterMetadata();
 
         @Data
         public static class JarMetadata {
@@ -22,7 +22,7 @@ public interface JarPlugin extends ZipPlugin {
             private String mode;
         }
 
-        @Data
+        /*@Data
         @EqualsAndHashCode(callSuper = true)
         public static class FilterMetadata extends ZipPlugin.StandardMetadata.FilterMetadata {
 
@@ -33,7 +33,7 @@ public interface JarPlugin extends ZipPlugin {
 
                 private Set<String> patterns;
             }
-        }
+        }*/
     }
 
     /*interface MetadataProperties extends ZipPlugin.MetadataProperties {

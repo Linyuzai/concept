@@ -6,14 +6,16 @@ import com.github.linyuzai.plugin.core.handle.StandardMetadataPluginHandlerFacto
 
 import java.util.Set;
 
+@Deprecated
 public class EntryFilterFactory extends StandardMetadataPluginHandlerFactory<Plugin.StandardMetadata> {
 
     @Override
     public PluginHandler doCreate(Plugin.StandardMetadata metadata) {
-        Set<String> patterns = metadata.getFilter().getEntry().getPatterns();
+        /*Set<String> patterns = metadata.getFilter().getEntry().getPatterns();
         if (patterns == null || patterns.isEmpty()) {
             return null;
         }
-        return new EntryFilter(patterns);
+        return new EntryFilter(patterns);*/
+        return null;
     }
 }

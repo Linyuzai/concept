@@ -10,11 +10,11 @@ public interface ZipPlugin extends Plugin {
     @EqualsAndHashCode(callSuper = true)
     class StandardMetadata extends Plugin.StandardMetadata {
 
-        private FilterMetadata filter = new FilterMetadata();
+        /*private FilterMetadata filter = new FilterMetadata();
 
         public static class FilterMetadata extends Plugin.StandardMetadata.FilterMetadata {
 
-        }
+        }*/
     }
 
     /*interface MetadataProperties extends Plugin.MetadataProperties {

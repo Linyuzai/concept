@@ -73,7 +73,9 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
         for (PluginMethods pms : pluginMethods) {
             extractors.add(new BeanDynamicExtractor(applicationContext, pms.target, pms.methods));
         }
-        concept.addHandlers(extractors);
+        if (!extractors.isEmpty()) {
+            concept.addHandlers(extractors);
+        }
         pluginMethods.clear();
     }
 

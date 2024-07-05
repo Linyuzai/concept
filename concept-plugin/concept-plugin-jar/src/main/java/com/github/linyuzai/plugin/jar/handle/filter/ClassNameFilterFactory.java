@@ -6,14 +6,16 @@ import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
 import java.util.Set;
 
+@Deprecated
 public class ClassNameFilterFactory extends StandardMetadataPluginHandlerFactory<JarPlugin.StandardMetadata> {
 
     @Override
     public PluginHandler doCreate(JarPlugin.StandardMetadata metadata) {
-        Set<String> patterns = metadata.getFilter().getClassName().getPatterns();
+        /*Set<String> patterns = metadata.getFilter().getClassName().getPatterns();
         if (patterns == null || patterns.isEmpty()) {
             return null;
         }
-        return new ClassNameFilter(patterns);
+        return new ClassNameFilter(patterns);*/
+        return null;
     }
 }

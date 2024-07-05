@@ -8,6 +8,7 @@ import lombok.Data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -60,17 +61,25 @@ public interface Plugin {
 
         private String name;
 
+        private HandlerMetadata handler = new HandlerMetadata();
+
         private DependencyMetadata dependency = new DependencyMetadata();
 
-        private FilterMetadata filter = new FilterMetadata();
+        //private FilterMetadata filter = new FilterMetadata();
+
+        @Data
+        public static class HandlerMetadata {
+
+            private boolean enabled = true;
+        }
 
         @Data
         public static class DependencyMetadata {
 
-            private Set<String> names;
+            private Set<String> names = Collections.emptySet();
         }
 
-        @Data
+        /*@Data
         public static class FilterMetadata {
 
             private EntryMetadata entry = new EntryMetadata();
@@ -80,7 +89,7 @@ public interface Plugin {
 
                 private Set<String> patterns;
             }
-        }
+        }*/
     }
 
     /*interface MetadataProperties {

@@ -217,8 +217,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             plugin.prepare(context);
             eventPublisher.publish(new PluginPreparedEvent(context));
 
-            Boolean handlerEnabled = plugin.getMetadata()
-                    .property(PluginHandler.PropertyKeys.ENABLED, Boolean.TRUE.toString());
+            boolean handlerEnabled = plugin.getMetadata().standard().getHandler().isEnabled();
 
             if (handlerEnabled) {
                 //解析插件

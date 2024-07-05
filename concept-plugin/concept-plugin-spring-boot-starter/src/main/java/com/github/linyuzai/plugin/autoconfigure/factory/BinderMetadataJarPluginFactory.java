@@ -3,35 +3,33 @@ package com.github.linyuzai.plugin.autoconfigure.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.factory.PluginFactory;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.bind.BindResult;
+import lombok.Setter;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.*;
 
+import java.io.File;
 import java.util.Set;
 
 @Getter
-@RequiredArgsConstructor
-public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAware {
+@Setter
+public class BinderMetadataJarPluginFactory extends JarPluginFactory implements EnvironmentAware {
 
-    private final PluginFactory delegate;
-
-    private final Class<? extends Plugin.StandardMetadata> standardMetadataType;
+    private Class<? extends Plugin.StandardMetadata> standardMetadataType = JarPlugin.StandardMetadata.class;
 
     private Environment environment;
 
     @Override
-    public Plugin create(Object o, PluginContext context) {
-        Plugin plugin = delegate.create(o, context);
-        if (plugin != null) {
-            PluginMetadata metadata = new BinderMetadata(plugin.getMetadata());
-            plugin.setMetadata(metadata);
+    protected PluginMetadata createMetadata(File file, PluginContext context) {
+        PluginMetadata metadata = super.createMetadata(file, context);
+        if (metadata == null) {
+            return null;
         }
-        return plugin;
+        return new BinderMetadata(metadata);
     }
 
     @Override
@@ -56,13 +54,12 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
 
         @Override
         public String get(String name) {
-            return bind(name, String.class);
+            return get(name, null);
         }
 
         @Override
         public String get(String name, String defaultValue) {
-            String value = get(name);
-            return value == null ? defaultValue : value;
+            return binder.bind(name, String.class).orElse(defaultValue);
         }
 
         @Override
@@ -72,13 +69,12 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
 
         @Override
         public <T> T bind(String name, Class<T> type) {
-            BindResult<T> bind = binder.bind(name, Bindable.of(type));
-            return bind.orElse(null);
+            return binder.bindOrCreate(name, Bindable.of(type));
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T  extends Plugin.StandardMetadata> T standard() {
+        public <T extends Plugin.StandardMetadata> T standard() {
             return (T) standard;
         }
 

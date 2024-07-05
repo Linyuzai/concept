@@ -75,7 +75,7 @@ public class ClassMatcher extends AbstractPluginMatcher<JarClass> {
      */
     public boolean applyFilters(JarClass jarClass) {
         for (AbstractPluginFilter<JarClass> filter : filters) {
-            if (!filter.doFilter(jarClass)) {
+            if (!filter.applyNegation(filter.doFilter(jarClass))) {
                 return false;
             }
         }
