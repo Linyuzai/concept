@@ -12,16 +12,20 @@ import java.lang.reflect.Parameter;
 @Getter
 public class BeanDynamicExtractor extends JarDynamicExtractor {
 
-    private final ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
+
+    protected BeanDynamicExtractor() {
+    }
 
     public BeanDynamicExtractor(ApplicationContext applicationContext, Object target) {
-        super(target);
-        this.applicationContext = applicationContext;
+        this(applicationContext, target, getPluginMethod(target));
     }
 
     public BeanDynamicExtractor(ApplicationContext applicationContext, Object target, Method... methods) {
-        super(target, methods);
+        this.target = target;
+        this.methods = methods;
         this.applicationContext = applicationContext;
+        createInvokers();
     }
 
     @Override

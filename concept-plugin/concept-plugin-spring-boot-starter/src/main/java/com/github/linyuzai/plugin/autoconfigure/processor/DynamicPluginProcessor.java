@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.processor;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanDynamicExtractor;
+import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
@@ -77,6 +78,8 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
             concept.addHandlers(extractors);
         }
         pluginMethods.clear();
+        PluginAutoLoader loader = applicationContext.getBean(PluginAutoLoader.class);
+        loader.start();
     }
 
     @Override

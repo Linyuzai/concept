@@ -31,7 +31,13 @@ public class DynamicExtractor implements PluginExtractor {
      * 方法执行对象
      */
     @Getter
-    protected final Object target;
+    protected Object target;
+
+    @Getter
+    protected Method[] methods;
+
+    protected DynamicExtractor() {
+    }
 
     /**
      * 遍历所有的方法，
@@ -46,23 +52,11 @@ public class DynamicExtractor implements PluginExtractor {
 
     public DynamicExtractor(Object target, Method... methods) {
         this.target = target;
-        for (Method method : methods) {
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            Parameter[] parameters = method.getParameters();
-            for (int i = 0; i < parameters.length; i++) {
-                Invoker invoker = getInvoker(method, parameters[i]);
-                if (invoker == null) {
-                    throw new PluginException("Can not invoke " + parameters[i]);
-                }
-                methodInvokersMap.computeIfAbsent(method, m ->
-                        new LinkedHashMap<>()).put(i, invoker);
-            }
-        }
+        this.methods = methods;
+        createInvokers();
     }
 
-    private static Method[] getPluginMethod(Object target) {
+    protected static Method[] getPluginMethod(Object target) {
         Class<?> clazz = target.getClass();
         List<Method> annotated = new ArrayList<>();
         while (clazz != null && clazz != Object.class) {
@@ -78,6 +72,23 @@ public class DynamicExtractor implements PluginExtractor {
             throw new PluginException("No method has @OnPluginExtract");
         }
         return annotated.toArray(new Method[0]);
+    }
+
+    protected void createInvokers() {
+        for (Method method : methods) {
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+            Parameter[] parameters = method.getParameters();
+            for (int i = 0; i < parameters.length; i++) {
+                Invoker invoker = getInvoker(method, parameters[i]);
+                if (invoker == null) {
+                    throw new PluginException("Can not invoke " + parameters[i]);
+                }
+                methodInvokersMap.computeIfAbsent(method, m ->
+                        new LinkedHashMap<>()).put(i, invoker);
+            }
+        }
     }
 
     /**

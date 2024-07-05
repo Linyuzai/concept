@@ -15,6 +15,10 @@ import java.lang.reflect.Parameter;
  */
 public class JarDynamicExtractor extends DynamicExtractor {
 
+    protected JarDynamicExtractor() {
+        super();
+    }
+
     public JarDynamicExtractor(Object target) {
         super(target);
     }
