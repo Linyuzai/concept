@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.repository.LinkedPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Deprecated
@@ -17,7 +18,7 @@ public class DependencyInterceptor implements PluginInterceptor {
         if (plugin.getSource() instanceof Plugin.Entry) {
             return;
         }
-        String name = plugin.getMetadata().property(Plugin.MetadataProperties.NAME);
+        String name = plugin.getMetadata().standard().getName();
         if (name == null || name.isEmpty()) {
             return;
         }
@@ -28,7 +29,10 @@ public class DependencyInterceptor implements PluginInterceptor {
                 .collect(Collectors.toList());
         PluginContext subContext = context.createSubContext(false);
         for (Plugin p : plugins) {
-            String[] names = p.getMetadata().property(Plugin.MetadataProperties.DEPENDENCY_NAMES);
+            Set<String> names = p.getMetadata().standard().getDependency().getNames();
+            if (names == null) {
+                continue;
+            }
             for (String n : names) {
                 if (name.equals(n)) {
                     plugin.getConcept().load(n, subContext, repository::add, e -> {

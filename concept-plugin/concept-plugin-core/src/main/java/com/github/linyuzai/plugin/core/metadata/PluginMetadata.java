@@ -1,10 +1,13 @@
 package com.github.linyuzai.plugin.core.metadata;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
 
 import java.util.Set;
 
 public interface PluginMetadata {
+
+    String PREFIX = "concept.plugin";
 
     String NAME = "plugin.properties";
 
@@ -26,7 +29,7 @@ public interface PluginMetadata {
 
     <T> T bind(String name, Class<T> type);
 
-    <T> T standard();
+    <T extends Plugin.StandardMetadata> T standard();
 
-    boolean isEmpty();
+    void set(String name, String value);
 }

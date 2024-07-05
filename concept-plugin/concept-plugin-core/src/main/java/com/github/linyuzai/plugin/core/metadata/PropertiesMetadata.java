@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.metadata;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -34,13 +35,12 @@ public class PropertiesMetadata implements PluginMetadata {
     }
 
     @Override
-    public <T> T standard() {
+    public <T extends Plugin.StandardMetadata> T standard() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isEmpty() {
-        return properties.isEmpty();
+    public void set(String name, String value) {
+        properties.setProperty(name, value);
     }
-
 }

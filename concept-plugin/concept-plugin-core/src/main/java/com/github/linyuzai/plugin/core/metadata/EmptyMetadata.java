@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.core.metadata;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -26,12 +28,12 @@ public class EmptyMetadata implements PluginMetadata {
     }
 
     @Override
-    public <T> T standard() {
+    public <T extends Plugin.StandardMetadata> T standard() {
         return null;
     }
 
     @Override
-    public boolean isEmpty() {
-        return true;
+    public void set(String name, String value) {
+
     }
 }

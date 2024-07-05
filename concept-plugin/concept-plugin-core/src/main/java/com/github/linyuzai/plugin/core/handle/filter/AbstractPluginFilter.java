@@ -20,7 +20,7 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
      * @return {@link PluginFilter} 本身
      */
     @Override
-    public PluginFilter negate() {
+    public AbstractPluginFilter<T> negate() {
         this.negate = !this.negate;
         return this;
     }

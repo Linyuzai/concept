@@ -17,6 +17,6 @@ public interface ZipPlugin extends Plugin {
         }
     }
 
-    interface MetadataProperties extends Plugin.MetadataProperties {
-    }
+    /*interface MetadataProperties extends Plugin.MetadataProperties {
+    }*/
 }

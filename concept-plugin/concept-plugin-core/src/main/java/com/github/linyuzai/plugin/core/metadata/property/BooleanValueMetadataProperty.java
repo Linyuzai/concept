@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.metadata.property;
 
+@Deprecated
 public class BooleanValueMetadataProperty extends AbstractMetadataProperty<Boolean> {
 
     public BooleanValueMetadataProperty(String name) {

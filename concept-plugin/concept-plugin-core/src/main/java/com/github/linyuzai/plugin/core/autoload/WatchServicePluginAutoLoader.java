@@ -172,8 +172,9 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      * @param path 监听到的事件
      */
     public void onFileModified(String path) {
-        unload(path);
-        load(path);
+        //unload(path);
+        //load(path);
+        reload(path);
     }
 
     /**
@@ -192,6 +193,15 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     public void load(String path) {
         try {
             Plugin plugin = concept.load(path);
+            concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
+        } catch (Throwable e) {
+            concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
+        }
+    }
+
+    public void reload(String path) {
+        try {
+            Plugin plugin = concept.load(path, true);
             concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
         } catch (Throwable e) {
             concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));

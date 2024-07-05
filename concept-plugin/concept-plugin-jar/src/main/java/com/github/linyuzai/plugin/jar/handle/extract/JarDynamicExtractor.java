@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.jar.handle.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.DynamicExtractor;
-import com.github.linyuzai.plugin.jar.handle.extract.match.PluginAnnotation;
+import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClass;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassName;
 
@@ -62,9 +62,9 @@ public class JarDynamicExtractor extends DynamicExtractor {
      */
     @Override
     public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
-        if (annotation.annotationType() == PluginAnnotation.class ||
-                annotation.annotationType() == PluginClass.class ||
-                annotation.annotationType() == PluginClassName.class) {
+        if (annotation.annotationType() == PluginClass.class ||
+                annotation.annotationType() == PluginClassName.class ||
+                annotation.annotationType() == PluginClassAnnotation.class) {
             return getJarInvoker(method, parameter);
         }
         return super.getAnnotationInvoker(method, parameter, annotation);

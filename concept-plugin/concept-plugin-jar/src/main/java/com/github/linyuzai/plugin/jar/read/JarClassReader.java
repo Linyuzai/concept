@@ -24,7 +24,6 @@ public class JarClassReader extends DependencyReader implements ClassReader {
         return (Class<?>) super.read(key, context);
     }
 
-    //TODO 自动创建新的类加载器重新加载
     @SneakyThrows
     @Override
     public Class<?> doRead(Object key) {

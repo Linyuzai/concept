@@ -336,6 +336,12 @@
                                                @click="unloadPlugin(scope.row.plugin)"
                                                type="text">卸载
                                     </el-button>
+                                    <!--v-if="showProperties(scope.row.state)"-->
+                                    <el-button class="plugin-btn"
+                                               :disabled="isIngState(scope.row.state)"
+                                               @click="getProperties(scope.row.plugin)"
+                                               type="text">查看配置
+                                    </el-button>
                                     <!--<el-button v-if="showReload(scope.row.state)"
                                                :disabled="isIngState(scope.row.state)"
                                                @click="reloadPlugin(scope.row.plugin)"
@@ -346,13 +352,6 @@
                                                :disabled="isIngState(scope.row.state)"
                                                @click="openUpdateDialog(scope.row.plugin)"
                                                type="text">更新
-                                    </el-button>
-                                    <!--v-if="showProperties(scope.row.state)"-->
-                                    <el-button class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="getProperties(scope.row.plugin)"
-                                               type="text">查看配置
-                                    </el-button>
                                     </el-button>
                                     <el-button v-if="showRename(scope.row.state)"
                                                class="plugin-btn"

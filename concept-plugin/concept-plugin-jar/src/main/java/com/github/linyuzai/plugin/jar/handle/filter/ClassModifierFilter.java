@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(JarClassResolver.class)
-public class ModifierFilter extends AbstractPluginFilter<JarClass> {
+public class ClassModifierFilter extends AbstractPluginFilter<JarClass> {
 
     /**
      * {@link java.lang.reflect.Modifier} 对应的 {@link Function}
@@ -25,7 +25,7 @@ public class ModifierFilter extends AbstractPluginFilter<JarClass> {
     private final Collection<Function<Integer, Boolean>> functions;
 
     @SafeVarargs
-    public ModifierFilter(Function<Integer, Boolean>... functions) {
+    public ClassModifierFilter(Function<Integer, Boolean>... functions) {
         this(Arrays.asList(functions));
     }
 
@@ -42,11 +42,11 @@ public class ModifierFilter extends AbstractPluginFilter<JarClass> {
     /**
      * 类的 {@link java.lang.reflect.Modifier} 是否匹配
      *
-     * @param c 类
+     * @param cls 类
      * @return 如果 {@link java.lang.reflect.Modifier} 匹配返回 true 否则返回 false
      */
-    private boolean filterModifier(Class<?> c) {
-        int modifiers = c.getModifiers();
+    private boolean filterModifier(Class<?> cls) {
+        int modifiers = cls.getModifiers();
         for (Function<Integer, Boolean> function : functions) {
             if (function.apply(modifiers)) {
                 return true;

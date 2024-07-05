@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.metadata.property;
 
+@Deprecated
 public class StringValueMetadataProperty extends AbstractMetadataProperty<String> {
 
     public StringValueMetadataProperty(String name) {

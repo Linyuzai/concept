@@ -40,12 +40,12 @@ public class ClassFilter extends AbstractPluginFilter<JarClass> {
     /**
      * 是否是对应的类或其子类
      *
-     * @param c 类
+     * @param cls 类
      * @return 如果是是对应的类或其子类返回 true 否则返回 false
      */
-    public boolean filterClass(Class<?> c) {
-        for (Class<?> clazz : classes) {
-            if (clazz.isAssignableFrom(c)) {
+    public boolean filterClass(Class<?> cls) {
+        for (Class<?> c : classes) {
+            if (c.isAssignableFrom(cls)) {
                 return true;
             }
         }

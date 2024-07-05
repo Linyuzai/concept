@@ -46,12 +46,12 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
 
         private final Binder binder;
 
-        private final Plugin.StandardMetadata standard;
+        private Plugin.StandardMetadata standard;
 
         public BinderMetadata(PluginMetadata delegate) {
             this.delegate = delegate;
             this.binder = Binder.get(new MetadataEnvironment(delegate, environment));
-            this.standard = bind("concept.plugin", standardMetadataType);
+            bind();
         }
 
         @Override
@@ -78,20 +78,27 @@ public class BinderMetadataPluginFactory implements PluginFactory, EnvironmentAw
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T> T standard() {
+        public <T  extends Plugin.StandardMetadata> T standard() {
             return (T) standard;
         }
 
         @Override
-        public boolean isEmpty() {
-            return delegate.isEmpty();
+        public void set(String name, String value) {
+            delegate.set(name, value);
+            if (name != null && name.startsWith(PluginMetadata.PREFIX)) {
+                bind();
+            }
+        }
+
+        protected void bind() {
+            this.standard = bind(PluginMetadata.PREFIX, standardMetadataType);
         }
     }
 
     public static class MetadataEnvironment extends AbstractEnvironment {
 
         public MetadataEnvironment(PluginMetadata metadata, Environment environment) {
-            getPropertySources().addLast(new MetadataPropertySource("PluginMetadata", metadata));
+            getPropertySources().addLast(new MetadataPropertySource(PluginMetadata.class.getSimpleName(), metadata));
             if (environment instanceof ConfigurableEnvironment) {
                 MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
                 sources.stream().forEach(it -> getPropertySources().addLast(it));

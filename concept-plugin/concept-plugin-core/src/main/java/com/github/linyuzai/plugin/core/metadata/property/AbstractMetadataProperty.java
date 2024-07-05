@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.metadata.property;
 
 import lombok.Getter;
 
+@Deprecated
 @Getter
 public abstract class AbstractMetadataProperty<T> implements MetadataProperty<T> {
 

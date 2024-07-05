@@ -2,10 +2,6 @@ package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
-import com.github.linyuzai.plugin.core.metadata.property.PrefixMetadataProperty;
-import com.github.linyuzai.plugin.core.metadata.property.StringArrayValueMetadataProperty;
-import com.github.linyuzai.plugin.core.metadata.property.StringValueMetadataProperty;
 import com.github.linyuzai.plugin.core.read.PluginReader;
 import lombok.Data;
 
@@ -87,8 +83,7 @@ public interface Plugin {
         }
     }
 
-    //TODO 用 bind 绑定 concept.plugin
-    interface MetadataProperties {
+    /*interface MetadataProperties {
 
         MetadataProperty<String> NAME = new StringValueMetadataProperty("name");
 
@@ -101,7 +96,7 @@ public interface Plugin {
         MetadataProperty<?> FILTER_ENTRY = new PrefixMetadataProperty("entry", FILTER);
 
         MetadataProperty<String[]> FILTER_ENTRY_PATTERNS = new StringArrayValueMetadataProperty("patterns", FILTER_ENTRY);
-    }
+    }*/
 
     interface Entry {
 

@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.read;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.Getter;
 
@@ -13,12 +12,8 @@ public abstract class DependencyReader implements PluginReader {
 
     private final Plugin plugin;
 
-    //TODO 正则匹配
-    private final Set<String> dependencies = new LinkedHashSet<>();
-
     public DependencyReader(Plugin plugin) {
         this.plugin = plugin;
-        dependencies.addAll(Arrays.asList(getDependencies(plugin)));
     }
 
     @Override
@@ -40,9 +35,10 @@ public abstract class DependencyReader implements PluginReader {
                 .getRepository()
                 .stream()
                 .collect(Collectors.toList());
+        Set<String> dependencies = getDependencies();
         for (Plugin plugin : plugins) {
-            PluginMetadata metadata = plugin.getMetadata();
-            String name = metadata.property(Plugin.MetadataProperties.NAME);
+            Plugin.StandardMetadata metadata = plugin.getMetadata().standard();
+            String name = metadata.getName();
             if (name == null || name.isEmpty()) {
                 continue;
             }
@@ -60,9 +56,10 @@ public abstract class DependencyReader implements PluginReader {
 
     public abstract Class<?> getReadableType();
 
-    public String[] getDependencies(Plugin plugin) {
-        PluginMetadata metadata = plugin.getMetadata();
-        return metadata.property(Plugin.MetadataProperties.DEPENDENCY_NAMES);
+    public Set<String> getDependencies() {
+        Plugin.StandardMetadata metadata = plugin.getMetadata().standard();
+        Set<String> names = metadata.getDependency().getNames();
+        return names == null ? Collections.emptySet() : names;
     }
 
     @Override

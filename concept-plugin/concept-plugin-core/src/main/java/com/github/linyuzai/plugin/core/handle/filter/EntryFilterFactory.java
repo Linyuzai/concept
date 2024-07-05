@@ -2,18 +2,18 @@ package com.github.linyuzai.plugin.core.handle.filter;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.handle.StringArrayPropertyPluginHandlerFactory;
-import com.github.linyuzai.plugin.core.metadata.property.MetadataProperty;
+import com.github.linyuzai.plugin.core.handle.StandardMetadataPluginHandlerFactory;
 
-public class EntryFilterFactory extends StringArrayPropertyPluginHandlerFactory {
+import java.util.Set;
 
-    @Override
-    public MetadataProperty<String[]> getProperty() {
-        return Plugin.MetadataProperties.FILTER_ENTRY_PATTERNS;
-    }
+public class EntryFilterFactory extends StandardMetadataPluginHandlerFactory<Plugin.StandardMetadata> {
 
     @Override
-    public PluginHandler doCreate(String[] patterns) {
+    public PluginHandler doCreate(Plugin.StandardMetadata metadata) {
+        Set<String> patterns = metadata.getFilter().getEntry().getPatterns();
+        if (patterns == null || patterns.isEmpty()) {
+            return null;
+        }
         return new EntryFilter(patterns);
     }
 }

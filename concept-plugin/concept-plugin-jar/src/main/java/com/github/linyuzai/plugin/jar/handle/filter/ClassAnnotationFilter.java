@@ -17,7 +17,7 @@ import java.util.Collection;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(JarClassResolver.class)
-public class AnnotationFilter extends AbstractPluginFilter<JarClass> {
+public class ClassAnnotationFilter extends AbstractPluginFilter<JarClass> {
 
     /**
      * 注解类
@@ -25,7 +25,7 @@ public class AnnotationFilter extends AbstractPluginFilter<JarClass> {
     private final Collection<Class<? extends Annotation>> annotationClasses;
 
     @SafeVarargs
-    public AnnotationFilter(Class<? extends Annotation>... annotationClasses) {
+    public ClassAnnotationFilter(Class<? extends Annotation>... annotationClasses) {
         this(Arrays.asList(annotationClasses));
     }
 
@@ -42,12 +42,12 @@ public class AnnotationFilter extends AbstractPluginFilter<JarClass> {
     /**
      * 类上是否有对应注解
      *
-     * @param clazz 类
+     * @param cls 类
      * @return 如果存在对应注解返回 true 否则返回 false
      */
-    public boolean hasAnnotation(Class<?> clazz) {
+    public boolean hasAnnotation(Class<?> cls) {
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
-            if (clazz.isAnnotationPresent(annotationClass)) {
+            if (cls.isAnnotationPresent(annotationClass)) {
                 return true;
             }
         }
