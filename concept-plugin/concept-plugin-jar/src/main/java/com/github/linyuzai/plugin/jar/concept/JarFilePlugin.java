@@ -24,8 +24,8 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
     }
 
     @Override
-    protected JarPluginEntry createZipPluginEntry(Object id, String name) {
-        return new JarFilePluginEntry(id, name, this, path);
+    protected JarPluginEntry createZipPluginEntry(URL url, String name) {
+        return new JarFilePluginEntry(url, name, this, path);
     }
 
     @Override

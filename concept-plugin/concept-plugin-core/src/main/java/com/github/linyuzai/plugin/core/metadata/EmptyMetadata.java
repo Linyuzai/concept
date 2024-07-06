@@ -34,12 +34,17 @@ public class EmptyMetadata implements PluginMetadata {
     }
 
     @Override
-    public <T extends Plugin.StandardMetadata> T standard() {
+    public <T extends Plugin.StandardMetadata> T asStandard() {
         return null;
     }
 
     @Override
     public void set(String name, String value) {
+
+    }
+
+    @Override
+    public void refresh() {
 
     }
 }

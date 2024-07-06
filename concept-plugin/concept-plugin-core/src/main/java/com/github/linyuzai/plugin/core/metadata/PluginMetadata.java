@@ -29,7 +29,9 @@ public interface PluginMetadata {
 
     <T> T bind(String name, Class<T> type);
 
-    <T extends Plugin.StandardMetadata> T standard();
+    <T extends Plugin.StandardMetadata> T asStandard();
 
     void set(String name, String value);
+
+    void refresh();
 }

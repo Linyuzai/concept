@@ -35,12 +35,17 @@ public class PropertiesMetadata implements PluginMetadata {
     }
 
     @Override
-    public <T extends Plugin.StandardMetadata> T standard() {
+    public <T extends Plugin.StandardMetadata> T asStandard() {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void set(String name, String value) {
         properties.setProperty(name, value);
+    }
+
+    @Override
+    public void refresh() {
+
     }
 }

@@ -57,9 +57,9 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
         }
     }
 
-    protected ZipPluginEntry createZipPluginEntry(Object id,
+    protected ZipPluginEntry createZipPluginEntry(URL url,
                                                   String name,
                                                   byte[] bytes) {
-        return new ZipStreamPluginEntry(id, name, this, parent, bytes);
+        return new ZipStreamPluginEntry(url, name, this, parent, bytes);
     }
 }

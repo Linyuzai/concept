@@ -2,11 +2,6 @@ package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
-import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
-import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 插件提取器

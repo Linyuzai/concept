@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.*;
 
@@ -49,7 +51,7 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
         public BinderMetadata(PluginMetadata delegate) {
             this.delegate = delegate;
             this.binder = Binder.get(new MetadataEnvironment(delegate, environment));
-            bind();
+            this.bindStandard();
         }
 
         @Override
@@ -74,19 +76,21 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T extends Plugin.StandardMetadata> T standard() {
+        public <T extends Plugin.StandardMetadata> T asStandard() {
             return (T) standard;
         }
 
         @Override
         public void set(String name, String value) {
             delegate.set(name, value);
-            if (name != null && name.startsWith(PluginMetadata.PREFIX)) {
-                bind();
-            }
         }
 
-        protected void bind() {
+        @Override
+        public void refresh() {
+            bindStandard();
+        }
+
+        protected void bindStandard() {
             this.standard = bind(PluginMetadata.PREFIX, standardMetadataType);
         }
     }
@@ -97,7 +101,11 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
             getPropertySources().addLast(new MetadataPropertySource(PluginMetadata.class.getSimpleName(), metadata));
             if (environment instanceof ConfigurableEnvironment) {
                 MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
-                sources.stream().forEach(it -> getPropertySources().addLast(it));
+                sources.stream().forEach(it -> {
+                    if (!"configurationProperties".equals(it.getName())) {
+                        getPropertySources().addLast(it);
+                    }
+                });
             }
         }
     }

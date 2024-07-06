@@ -10,35 +10,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.net.URL;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-@Getter
+
 public class ZipStreamPluginEntry implements ZipPluginEntry {
 
-    protected final Object id;
+    protected final URL url;
 
+    @Getter
     protected final String name;
 
+    @Getter
     protected final Plugin plugin;
 
+    @Getter
     protected final Plugin.Entry parent;
 
     protected volatile Reference<byte[]> reference;
 
-    public ZipStreamPluginEntry(Object id,
+    public ZipStreamPluginEntry(URL url,
                                 String name,
                                 Plugin plugin,
                                 Plugin.Entry parent,
                                 byte[] bytes) {
-        this.id = id;
+        this.url = url;
         this.name = name;
         this.plugin = plugin;
         this.parent = parent;
         if (!isDirectory()) {
             this.reference = createReference(bytes);
         }
+    }
+
+    @Override
+    public Object getId() {
+        return url;
+    }
+
+    @Override
+    public URL getURL() {
+        return url;
     }
 
     @Override

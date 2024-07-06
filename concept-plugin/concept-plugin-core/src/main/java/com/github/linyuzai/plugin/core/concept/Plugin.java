@@ -113,6 +113,8 @@ public interface Plugin {
 
         String getName();
 
+        URL getURL();
+
         Plugin getPlugin();
 
         Content getContent();

@@ -154,6 +154,11 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
             children.add(node);
             return node;
         }
+
+        @Override
+        public String toString() {
+            return "PluginNode(" + id + ")";
+        }
     }
 
     @Getter

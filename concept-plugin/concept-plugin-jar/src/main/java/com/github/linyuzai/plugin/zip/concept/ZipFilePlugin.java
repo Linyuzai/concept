@@ -54,7 +54,7 @@ public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
         return new ZipFile(path);
     }
 
-    protected ZipPluginEntry createZipPluginEntry(Object id, String name) {
-        return new ZipFilePluginEntry(id, name, this, path);
+    protected ZipPluginEntry createZipPluginEntry(URL url, String name) {
+        return new ZipFilePluginEntry(url, name, this, path);
     }
 }

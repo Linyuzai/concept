@@ -9,6 +9,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -16,13 +17,23 @@ import java.util.zip.ZipFile;
 @RequiredArgsConstructor
 public class ZipFilePluginEntry implements ZipPluginEntry {
 
-    protected final Object id;
+    protected final URL url;
 
     protected final String name;
 
     protected final Plugin plugin;
 
     protected final String path;
+
+    @Override
+    public Object getId() {
+        return url;
+    }
+
+    @Override
+    public URL getURL() {
+        return url;
+    }
 
     @Override
     public Plugin.Content getContent() {

@@ -12,7 +12,7 @@ public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
     }
 
     @Override
-    protected JarPluginEntry createZipPluginEntry(Object id, String name, byte[] bytes) {
-        return new JarStreamPluginEntry(id, name, this, parent, bytes);
+    protected JarPluginEntry createZipPluginEntry(URL url, String name, byte[] bytes) {
+        return new JarStreamPluginEntry(url, name, this, parent, bytes);
     }
 }

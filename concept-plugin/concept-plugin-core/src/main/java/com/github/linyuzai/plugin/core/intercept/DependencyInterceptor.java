@@ -18,7 +18,7 @@ public class DependencyInterceptor implements PluginInterceptor {
         if (plugin.getSource() instanceof Plugin.Entry) {
             return;
         }
-        String name = plugin.getMetadata().standard().getName();
+        String name = plugin.getMetadata().asStandard().getName();
         if (name == null || name.isEmpty()) {
             return;
         }
@@ -29,7 +29,7 @@ public class DependencyInterceptor implements PluginInterceptor {
                 .collect(Collectors.toList());
         PluginContext subContext = context.createSubContext(false);
         for (Plugin p : plugins) {
-            Set<String> names = p.getMetadata().standard().getDependency().getNames();
+            Set<String> names = p.getMetadata().asStandard().getDependency().getNames();
             if (names == null) {
                 continue;
             }

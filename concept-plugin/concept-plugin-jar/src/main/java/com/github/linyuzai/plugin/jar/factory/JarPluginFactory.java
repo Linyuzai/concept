@@ -39,7 +39,7 @@ public class JarPluginFactory extends ZipPluginFactory {
     }
 
     public String getMode(File file, PluginMetadata metadata, PluginContext context) {
-        JarPlugin.StandardMetadata standard = metadata.standard();
+        JarPlugin.StandardMetadata standard = metadata.asStandard();
         String mode = standard.getJar().getMode();
         return (mode == null || mode.isEmpty()) ? defaultMode : mode;
     }

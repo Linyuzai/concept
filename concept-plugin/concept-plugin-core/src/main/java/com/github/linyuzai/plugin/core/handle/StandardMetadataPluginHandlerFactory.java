@@ -8,7 +8,7 @@ public abstract class StandardMetadataPluginHandlerFactory<T extends Plugin.Stan
 
     @Override
     public PluginHandler create(PluginContext context) {
-        T metadata = context.getPlugin().getMetadata().standard();
+        T metadata = context.getPlugin().getMetadata().asStandard();
         return doCreate(metadata);
     }
 

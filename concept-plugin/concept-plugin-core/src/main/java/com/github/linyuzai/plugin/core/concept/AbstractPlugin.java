@@ -159,8 +159,6 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String toString() {
-        String name = metadata.standard().getName();
-        String s = (name == null || name.isEmpty()) ? getId().toString() : name;
-        return getClass().getSimpleName() + "(" + s + ")";
+        return getClass().getSimpleName() + "(" + getURL() + ")";
     }
 }
