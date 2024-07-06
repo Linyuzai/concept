@@ -197,7 +197,7 @@ public class PluginConceptConfiguration {
             return new LocalPluginLocation(basePath, filter);
         }
 
-        @Bean(destroyMethod = "stop")
+        @Bean(initMethod = "start", destroyMethod = "stop")
         @ConditionalOnMissingBean
         public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
                                                  PluginExecutor executor,

@@ -79,7 +79,7 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
         }
         pluginMethods.clear();
         PluginAutoLoader loader = applicationContext.getBean(PluginAutoLoader.class);
-        loader.start();
+        loader.load();
     }
 
     @Override

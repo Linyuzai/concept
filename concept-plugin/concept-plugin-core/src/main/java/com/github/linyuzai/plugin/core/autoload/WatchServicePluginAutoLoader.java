@@ -54,8 +54,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         executor.execute(this::listen);
 
         for (String group : location.getGroups()) {
-            //开始就执行一次回调
-            notifyOnStart(group);
             addGroup(group);
         }
     }
@@ -83,7 +81,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         return watchStates.getOrDefault(group, false);
     }
 
-    private void notifyOnStart(String group) {
+    private void performNotify(String group) {
         String[] names = location.getLoadedPlugins(group);
         for (String name : names) {
             onNotify(StandardWatchEventKinds.ENTRY_CREATE, group, name);
@@ -101,6 +99,13 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             if (!es.isShutdown()) {
                 es.shutdown();
             }
+        }
+    }
+
+    @Override
+    public void load() {
+        for (String group : location.getGroups()) {
+            performNotify(group);
         }
     }
 
