@@ -6,8 +6,8 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
-import com.github.linyuzai.plugin.jar.handle.filter.ModifierFilter;
-import com.github.linyuzai.plugin.jar.handle.extract.match.PluginAnnotation;
+import com.github.linyuzai.plugin.jar.handle.filter.ClassModifierFilter;
+import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClass;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassName;
 import lombok.SneakyThrows;
@@ -46,7 +46,7 @@ public class ConceptPluginController {
             //.addFilter(new PathFilter("plugin"))
             //.addFilter(new NameFilter("*.json"))
             //.addFilters(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
-            .addFilters(new ModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
+            .addFilters(new ClassModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter(CustomPluginAnnotation.class))
             /*.addExtractor(new PluginContextExtractor<PluginContext>() {
                 @Override
@@ -698,7 +698,7 @@ public class ConceptPluginController {
             Class<? extends CustomPlugin> p4_1,
 
             //所有标注了 CustomPluginAnnotation 注解的类
-            @PluginAnnotation(CustomPluginAnnotation.class) Class<?>[] p5
+            @PluginClassAnnotation(CustomPluginAnnotation.class) Class<?>[] p5
 
             //properties 文件通过 Map 接收
             //@PluginProperties("plugin.map.**") Map<String, String> p6,

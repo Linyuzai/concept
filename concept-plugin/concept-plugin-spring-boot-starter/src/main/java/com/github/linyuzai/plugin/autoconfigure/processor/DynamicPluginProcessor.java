@@ -75,7 +75,7 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
                 applicationContext.getBeansOfType(MethodPluginExtractor.InvokerFactory.class).values();
         List<PluginExtractor> extractors = new ArrayList<>();
         for (PluginMethods pms : pluginMethods) {
-            BeanDynamicExtractor extractor = new BeanDynamicExtractor(applicationContext, pms.target, pms.methods);
+            BeanDynamicExtractor extractor = new BeanDynamicExtractor(pms.target, pms.methods);
             for (MethodPluginExtractor.InvokerFactory factory : factories) {
                 extractor.addInvokerFactory(factory);
             }

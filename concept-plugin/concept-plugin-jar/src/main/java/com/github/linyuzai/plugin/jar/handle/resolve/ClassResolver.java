@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.resolve.AbstractPluginResolver;
+import com.github.linyuzai.plugin.core.handle.resolve.AbstractSupplier;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
  * 类解析器
  */
 @HandlerDependency(EntryResolver.class)
-public class JarClassResolver extends AbstractPluginResolver<Plugin.Entry, JarClass> {
+public class ClassResolver extends AbstractPluginResolver<Plugin.Entry, ClassSupplier> {
 
     @Override
     public boolean doFilter(Plugin.Entry source, PluginContext context) {
@@ -27,12 +28,12 @@ public class JarClassResolver extends AbstractPluginResolver<Plugin.Entry, JarCl
      * @return 类
      */
     @Override
-    public JarClass doResolve(Plugin.Entry entry, PluginContext context) {
+    public ClassSupplier doResolve(Plugin.Entry entry, PluginContext context) {
         String name = entry.getName();
         String className = name.substring(0, name.lastIndexOf("."))
                 .replace("/", ".");
         Plugin plugin = context.getPlugin();
-        return new ClassSupplier(className, plugin);
+        return new ClassSupplierImpl(className, plugin);
     }
 
     @Override
@@ -42,29 +43,20 @@ public class JarClassResolver extends AbstractPluginResolver<Plugin.Entry, JarCl
 
     @Override
     public Object getOutboundKey() {
-        return JarClass.class;
+        return ClassSupplier.class;
     }
 
     @Getter
     @RequiredArgsConstructor
-    public static class ClassSupplier implements JarClass {
+    public static class ClassSupplierImpl extends AbstractSupplier<Class<?>> implements ClassSupplier {
 
         private final String name;
 
         private final Plugin plugin;
 
-        private volatile Class<?> read;
-
         @Override
-        public Class<?> get() {
-            if (read == null) {
-                synchronized (this) {
-                    if (read == null) {
-                        this.read = plugin.read(Class.class, name);
-                    }
-                }
-            }
-            return read;
+        public Class<?> create() {
+            return plugin.read(Class.class, name);
         }
     }
 }

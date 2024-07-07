@@ -16,6 +16,6 @@ public class SampleClassArrayExtractor extends ClassExtractor<Class<? extends Cu
 
     @Override
     public void onExtract(@PluginClassName(PluginConfig.CLASS_NAME_FILTER) Class<? extends CustomPlugin>[] plugins, PluginContext context) {
-        log.info("Array => {}", Arrays.toString(plugins));
+        log.info("Class Array => {}", Arrays.toString(plugins));
     }
 }

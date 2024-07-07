@@ -5,7 +5,6 @@ import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;

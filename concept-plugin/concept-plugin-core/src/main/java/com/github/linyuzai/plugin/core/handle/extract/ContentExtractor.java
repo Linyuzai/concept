@@ -1,26 +1,17 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToByteArrayConvertor;
-import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToInputStreamConvertor;
-import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToStringConvertor;
-import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
+import com.github.linyuzai.plugin.core.handle.extract.convert.*;
 import com.github.linyuzai.plugin.core.handle.extract.format.ObjectFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginText;
 import com.github.linyuzai.plugin.core.type.NestedType;
-import com.github.linyuzai.plugin.core.type.TypeMetadata;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
@@ -36,25 +27,25 @@ public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
      * 及对应类型的 {@link java.util.Collection} {@link java.util.List} {@link java.util.Set}
      * {@link java.util.Map} 和数组
      *
-     * @param type        {@link TypeMetadata}
+     * @param type
      * @param annotations 注解
      * @return {@link ContentMatcher}
      */
     @Override
     public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
-        if (String.class == cls || InputStream.class == cls || byte[].class == cls) {
+        if (String.class == cls || InputStream.class == cls || ByteBuffer.class == cls || byte[].class == cls) {
             return new ContentMatcher(annotations);
         }
         return null;
     }
 
     /**
-     * 根据 {@link TypeMetadata} 和注解获得 {@link PluginConvertor}。
+     * 根据  和注解获得 {@link PluginConvertor}。
      * 特殊情况，如果是 {@link InputStream} 返回 {@link ContentToInputStreamConvertor}，
      * {@link String} 返回 {@link ContentToStringConvertor}。
      *
-     * @param type        {@link TypeMetadata}
+     * @param type
      * @param annotations 注解
      * @return 插件转换器 {@link PluginConvertor}
      */
@@ -66,6 +57,8 @@ public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
             return new ContentToStringConvertor(charset);
         } else if (InputStream.class == cls) {
             return new ContentToInputStreamConvertor();
+        } else if (ByteBuffer.class == cls) {
+            return new ContentToByteBufferConvertor();
         } else if (byte[].class == cls) {
             return new ContentToByteArrayConvertor();
         } else {
@@ -84,10 +77,10 @@ public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
     }
 
     /**
-     * 根据 {@link TypeMetadata} 和注解获得 {@link PluginFormatter}。
+     * 根据 和注解获得 {@link PluginFormatter}。
      * 特殊情况，如果是 byte[] 则返回 {@link ObjectFormatter}
      *
-     * @param type        {@link TypeMetadata}
+     * @param type
      * @param annotations 注解
      * @return 插件格式器 {@link PluginFormatter}
      */

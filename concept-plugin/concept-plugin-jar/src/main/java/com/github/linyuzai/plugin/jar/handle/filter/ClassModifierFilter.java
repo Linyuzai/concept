@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.jar.handle.filter;
 
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.filter.PredicateModifierFilter;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,8 +15,8 @@ import java.util.function.Predicate;
  */
 @Getter
 @RequiredArgsConstructor
-@HandlerDependency(JarClassResolver.class)
-public class ClassModifierFilter extends PredicateModifierFilter<JarClass, Integer> {
+@HandlerDependency(ClassResolver.class)
+public class ClassModifierFilter extends PredicateModifierFilter<ClassSupplier, Integer> {
 
     @SafeVarargs
     public ClassModifierFilter(Predicate<Integer>... predicates) {
@@ -28,12 +28,12 @@ public class ClassModifierFilter extends PredicateModifierFilter<JarClass, Integ
     }
 
     @Override
-    protected Integer to(JarClass jarClass) {
-        return jarClass.get().getModifiers();
+    protected Integer to(ClassSupplier classSupplier) {
+        return classSupplier.get().getModifiers();
     }
 
     @Override
     public Object getKey() {
-        return JarClass.class;
+        return ClassSupplier.class;
     }
 }

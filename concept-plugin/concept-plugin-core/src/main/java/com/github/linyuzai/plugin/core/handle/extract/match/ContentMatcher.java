@@ -23,7 +23,7 @@ public class ContentMatcher extends AbstractPluginMatcher<Plugin.Content> {
     }
 
     @Override
-    public boolean doFilter(Plugin.Content source, PluginContext context) {
+    public boolean doFilter(Plugin.Content content, PluginContext context) {
         return true;
     }
 }

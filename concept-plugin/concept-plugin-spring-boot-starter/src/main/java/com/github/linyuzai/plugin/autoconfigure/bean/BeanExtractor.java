@@ -5,11 +5,6 @@ import com.github.linyuzai.plugin.core.handle.extract.AbstractPluginExtractor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.NestedType;
-import com.github.linyuzai.plugin.core.type.TypeMetadata;
-import lombok.*;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.lang.annotation.Annotation;
 
@@ -18,18 +13,12 @@ import java.lang.annotation.Annotation;
  *
  * @param <T> 实例类型
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public abstract class BeanExtractor<T> extends AbstractPluginExtractor<T> implements ApplicationContextAware {
-
-    private ApplicationContext applicationContext;
+public abstract class BeanExtractor<T> extends AbstractPluginExtractor<T> {
 
     /**
      * 返回一个 {@link BeanMatcher}
      *
-     * @param type        {@link TypeMetadata}
+     * @param type
      * @param annotations 注解
      * @return {@link BeanMatcher}
      */
@@ -40,21 +29,14 @@ public abstract class BeanExtractor<T> extends AbstractPluginExtractor<T> implem
 
     @Override
     public PluginConvertor getConvertor(NestedType type, Annotation[] annotations) {
-        return new BeanConvertor(applicationContext);
+        return new BeanConvertor();
     }
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory
-            implements ApplicationContextAware {
-
-        private ApplicationContext applicationContext;
+    public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
 
         @Override
         protected AbstractPluginExtractor<?> createExtractor() {
-            return new BeanExtractor<Object>(applicationContext) {
+            return new BeanExtractor<Object>() {
                 @Override
                 public void onExtract(Object plugin, PluginContext context) {
                 }

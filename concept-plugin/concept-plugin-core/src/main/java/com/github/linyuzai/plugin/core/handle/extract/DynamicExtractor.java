@@ -9,7 +9,6 @@ import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -128,122 +127,6 @@ public class DynamicExtractor implements MethodPluginExtractor {
             }
         }
         return null;
-        /*Annotation[] annotations = parameter.getAnnotations();
-        for (Annotation annotation : annotations) {
-            Invoker invoker = getAnnotationInvoker(method, parameter, annotation);
-            if (invoker != null) {
-                return invoker;
-            }
-        }
-        Invoker pluginContextInvoker = getPluginContextInvoker(method, parameter);
-        if (pluginContextInvoker != null) {
-            return pluginContextInvoker;
-        }
-        Invoker pluginObjectInvoker = getPluginObjectInvoker(method, parameter);
-        if (pluginObjectInvoker != null) {
-            return pluginObjectInvoker;
-        }
-        Invoker propertiesInvoker = getPropertiesInvoker(method, parameter);
-        if (propertiesInvoker != null) {
-            return propertiesInvoker;
-        }
-        Invoker contentInvoker = getContentInvoker(method, parameter, null);
-        if (contentInvoker != null) {
-            return contentInvoker;
-        }
-        return null;*/
-    }
-
-    /**
-     * 根据明确指定的注解获得对应的执行器。
-     * {@link PluginText} 返回 {@link ContentExtractor} 对应的执行器。
-     *
-     * @param annotation 注解
-     * @param parameter  参数 {@link Parameter}
-     * @return 插件提取执行器
-     */
-    /*public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
-        return null;
-    }
-*/
-    /**
-     * 尝试获得 {@link PluginContextExtractor} 对应的执行器。
-     *
-     * @param parameter 参数 {@link Parameter}
-     * @return {@link PluginContextExtractor} 对应的执行器或 null
-     */
-    public Invoker getPluginContextInvoker(Method method, Parameter parameter) {
-        try {
-            return new PluginContextExtractor<PluginContext>() {
-
-                @Override
-                public void onExtract(PluginContext context) {
-
-                }
-            }.createInvoker(method, parameter);
-        } catch (Throwable e) {
-            return null;
-        }
-    }
-
-    /**
-     * 尝试获得 {@link PluginObjectExtractor} 对应的执行器。
-     *
-     * @param parameter 参数 {@link Parameter}
-     * @return {@link PluginObjectExtractor} 对应的执行器或 null
-     */
-    public Invoker getPluginObjectInvoker(Method method, Parameter parameter) {
-        try {
-            return new PluginObjectExtractor<Plugin>() {
-
-                @Override
-                public void onExtract(Plugin plugin, PluginContext context) {
-
-                }
-            }.createInvoker(method, parameter);
-        } catch (Throwable e) {
-            return null;
-        }
-    }
-
-    /**
-     * 尝试获得 {@link PropertiesExtractor} 对应的执行器。
-     *
-     * @param parameter 参数 {@link Parameter}
-     * @return {@link PropertiesExtractor} 对应的执行器或 null
-     */
-    public Invoker getPropertiesInvoker(Method method, Parameter parameter) {
-        try {
-            return new PropertiesExtractor<Void>() {
-
-                @Override
-                public void onExtract(Void plugin, PluginContext context) {
-
-                }
-            }.createInvoker(method, parameter);
-        } catch (Throwable e) {
-            return null;
-        }
-    }
-
-    /**
-     * 尝试获得 {@link ContentExtractor} 对应的执行器。
-     *
-     * @param parameter 参数 {@link Parameter}
-     * @return {@link ContentExtractor} 对应的执行器或 null
-     */
-    public Invoker getContentInvoker(Method method, Parameter parameter, Charset charset) {
-        try {
-            return new ContentExtractor<Void>() {
-
-                @Override
-                public void onExtract(Void plugin, PluginContext context) {
-
-                }
-            }.createInvoker(method, parameter);
-        } catch (Throwable e) {
-            return null;
-        }
     }
 
     /**

@@ -14,6 +14,6 @@ public class SampleClassExtractor extends ClassExtractor<Class<? extends CustomP
 
     @Override
     public void onExtract(@PluginClassName(PluginConfig.CLASS_NAME_SAMPLE_FILTER) Class<? extends CustomPlugin> plugin, PluginContext context) {
-        log.info("Object => {}", plugin);
+        log.info("Class Object => {}", plugin);
     }
 }

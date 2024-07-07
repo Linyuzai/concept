@@ -4,8 +4,6 @@ import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.StandardMetadataPluginHandlerFactory;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 
-import java.util.Set;
-
 @Deprecated
 public class ClassNameFilterFactory extends StandardMetadataPluginHandlerFactory<JarPlugin.StandardMetadata> {
 

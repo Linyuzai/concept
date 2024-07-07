@@ -9,13 +9,12 @@ import lombok.SneakyThrows;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.Supplier;
 
 /**
  * {@link Properties} 解析器
  */
 @HandlerDependency(EntryResolver.class)
-public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Supplier<Properties>> {
+public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, PropertiesSupplier> {
 
     @Override
     public boolean doFilter(Plugin.Entry entry, PluginContext context) {
@@ -30,8 +29,8 @@ public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Sup
      * @return {@link Properties} 的 {@link Map}
      */
     @Override
-    public Supplier<Properties> doResolve(Plugin.Entry entry, PluginContext context) {
-        return new PropertiesContent(entry.getContent());
+    public PropertiesSupplier doResolve(Plugin.Entry entry, PluginContext context) {
+        return new PropertiesSupplierImpl(entry.getContent());
     }
 
     @Override
@@ -41,30 +40,17 @@ public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Sup
 
     @Override
     public Object getOutboundKey() {
-        return Properties.class;
+        return PropertiesSupplier.class;
     }
 
     @RequiredArgsConstructor
-    public static class PropertiesContent implements Supplier<Properties> {
+    public static class PropertiesSupplierImpl extends AbstractSupplier<Properties> implements PropertiesSupplier {
 
         private final Plugin.Content content;
 
-        private volatile Properties properties;
-
-        @Override
-        public Properties get() {
-            if (properties == null) {
-                synchronized (this) {
-                    if (properties == null) {
-                        properties = load();
-                    }
-                }
-            }
-            return properties;
-        }
-
         @SneakyThrows
-        protected Properties load() {
+        @Override
+        public Properties create() {
             try (InputStream is = content.getInputStream()) {
                 Properties properties = new Properties();
                 properties.load(is);

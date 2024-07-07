@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.jar.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.jar.concept.JarStreamPlugin;
-import com.github.linyuzai.plugin.jar.extension.ExJarEntry;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPluginEntry;

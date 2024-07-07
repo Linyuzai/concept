@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.jar.handle.filter;
 
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.filter.PredicateModifierFilter;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,8 +12,8 @@ import java.util.function.Predicate;
 /**
  * 类过滤器
  */
-@HandlerDependency(JarClassResolver.class)
-public class ClassFilter extends PredicateModifierFilter<JarClass, Class<?>> {
+@HandlerDependency(ClassResolver.class)
+public class ClassFilter extends PredicateModifierFilter<ClassSupplier, Class<?>> {
 
     public ClassFilter(Class<?>... classes) {
         this(Arrays.asList(classes));
@@ -36,12 +36,12 @@ public class ClassFilter extends PredicateModifierFilter<JarClass, Class<?>> {
     }
 
     @Override
-    protected Class<?> to(JarClass jarClass) {
-        return jarClass.get();
+    protected Class<?> to(ClassSupplier classSupplier) {
+        return classSupplier.get();
     }
 
     @Override
     public Object getKey() {
-        return JarClass.class;
+        return ClassSupplier.class;
     }
 }

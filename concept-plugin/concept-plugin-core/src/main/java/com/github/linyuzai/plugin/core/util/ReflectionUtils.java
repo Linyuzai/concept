@@ -1,13 +1,11 @@
 package com.github.linyuzai.plugin.core.util;
 
-import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * 反射相关的工具类
@@ -44,7 +42,13 @@ public class ReflectionUtils {
 
     public static void resolve(Type type, BiConsumer<Class<?>, Type[]> consumer) {
         if (type instanceof Class) {
-            consumer.accept((Class<?>) type, new Type[0]);
+            Type[] types;
+            if (((Class<?>) type).isArray()) {
+                types = new Type[]{((Class<?>) type).getComponentType()};
+            } else {
+                types = new Type[]{};
+            }
+            consumer.accept((Class<?>) type, types);
         } else if (type instanceof ParameterizedType) {
             Type rawType = ((ParameterizedType) type).getRawType();
             if (rawType instanceof Class) {

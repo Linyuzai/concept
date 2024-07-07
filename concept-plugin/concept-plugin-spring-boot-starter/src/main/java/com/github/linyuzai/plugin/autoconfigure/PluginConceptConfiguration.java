@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
+import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
 import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataJarPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
@@ -40,7 +41,7 @@ import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -141,8 +142,13 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public JarClassResolver pluginJarClassResolver() {
-        return new JarClassResolver();
+    public ClassResolver pluginClassResolver() {
+        return new ClassResolver();
+    }
+
+    @Bean
+    public BeanResolver pluginBeanResolver() {
+        return new BeanResolver();
     }
 
     @Bean

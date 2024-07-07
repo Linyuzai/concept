@@ -9,7 +9,6 @@ import com.github.linyuzai.plugin.core.handle.extract.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PropertiesMatcher;
 import com.github.linyuzai.plugin.core.type.NestedType;
-import com.github.linyuzai.plugin.core.type.TypeMetadata;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -28,7 +27,7 @@ public abstract class PropertiesExtractor<T> extends AbstractPluginExtractor<T> 
      * 及对应类型的 {@link java.util.Collection} {@link java.util.List} {@link java.util.Set}
      * {@link java.util.Map} 和数组
      *
-     * @param type        {@link TypeMetadata}
+     * @param type
      * @param annotations 注解
      * @return {@link ContentMatcher}
      */
@@ -41,9 +40,9 @@ public abstract class PropertiesExtractor<T> extends AbstractPluginExtractor<T> 
     }
 
     /**
-     * 根据 {@link TypeMetadata} 和注解获得 {@link PluginConvertor}。
+     * 根据 和注解获得 {@link PluginConvertor}。
      *
-     * @param type    {@link TypeMetadata}
+     * @param type
      * @param annotations 注解
      * @return 插件转换器 {@link PluginConvertor}
      */

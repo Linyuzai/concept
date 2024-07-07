@@ -7,8 +7,8 @@ import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassAnnotationFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilter;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
-import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -17,15 +17,15 @@ import java.util.List;
 /**
  * 类匹配器
  */
-@HandlerDependency(JarClassResolver.class)
-public class ClassMatcher extends AbstractPluginMatcher<JarClass> {
+@HandlerDependency(ClassResolver.class)
+public class ClassMatcher extends AbstractPluginMatcher<ClassSupplier> {
 
     /**
      * 类型
      */
     protected final Class<?> target;
 
-    protected List<AbstractPluginFilter<JarClass>> filters = new ArrayList<>();
+    protected List<AbstractPluginFilter<ClassSupplier>> filters = new ArrayList<>();
 
     public ClassMatcher(Class<?> target, Annotation[] annotations) {
         super(annotations);
@@ -35,47 +35,55 @@ public class ClassMatcher extends AbstractPluginMatcher<JarClass> {
             if (annotation.annotationType() == PluginClassName.class) {
                 String[] classNames = ((PluginClassName) annotation).value();
                 if (classNames.length > 0) {
-                    filters.add(new ClassNameFilter(classNames));
+                    addFilter(new ClassNameFilter(classNames));
                 }
             } else if (annotation.annotationType() == PluginClass.class) {
                 Class<?>[] classes = ((PluginClass) annotation).value();
                 if (classes.length > 0) {
-                    filters.add(new ClassFilter(classes));
+                    addFilter(new ClassFilter(classes));
                 }
             } else if (annotation.annotationType() == PluginClassAnnotation.class) {
                 Class<? extends Annotation>[] classes = ((PluginClassAnnotation) annotation).value();
                 if (classes.length > 0) {
-                    filters.add(new ClassAnnotationFilter(classes));
+                    addFilter(new ClassAnnotationFilter(classes));
                 }
             }
         }
     }
 
+    public void addFilter(AbstractPluginFilter<ClassSupplier> filter) {
+        this.filters.add(filter);
+    }
+
+    public void removeFilter(AbstractPluginFilter<ClassSupplier> filter) {
+        this.filters.remove(filter);
+    }
+
     @Override
     public Object getKey() {
-        return JarClass.class;
+        return ClassSupplier.class;
     }
 
     /**
      * 是对应的类或其子类并基于注解匹配
      *
-     * @param jarClass 类
+     * @param classSupplier 类
      * @return 匹配之后的类
      */
     @Override
-    public boolean doFilter(JarClass jarClass, PluginContext context) {
-        return applyFilters(jarClass) && target.isAssignableFrom(jarClass.get());
+    public boolean doFilter(ClassSupplier classSupplier, PluginContext context) {
+        return applyFilters(classSupplier) && target.isAssignableFrom(classSupplier.get());
     }
 
     /**
      * 结合类相关的注解进行过滤
      *
-     * @param jarClass 类
+     * @param classSupplier 类
      * @return 是否匹配
      */
-    public boolean applyFilters(JarClass jarClass) {
-        for (AbstractPluginFilter<JarClass> filter : filters) {
-            if (!filter.applyNegation(filter.doFilter(jarClass))) {
+    public boolean applyFilters(ClassSupplier classSupplier) {
+        for (AbstractPluginFilter<ClassSupplier> filter : filters) {
+            if (!filter.applyNegation(filter.doFilter(classSupplier))) {
                 return false;
             }
         }

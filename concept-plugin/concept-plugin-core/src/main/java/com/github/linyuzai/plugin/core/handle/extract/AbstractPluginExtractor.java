@@ -133,18 +133,26 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
         if (Map.class.isAssignableFrom(cls)) {
-            return new NestedTypeFormatter(new MapFormatter(cls), type.getChildren().get(1));
+            return new NestedTypeFormatter(new MapFormatter(cls), getChild(type, 1));
         } else if (List.class.isAssignableFrom(cls)) {
-            return new NestedTypeFormatter(new ListFormatter(cls), type.getChildren().get(0));
+            return new NestedTypeFormatter(new ListFormatter(cls), getChild(type, 0));
         } else if (Set.class.isAssignableFrom(cls)) {
-            return new NestedTypeFormatter(new SetFormatter(cls), type.getChildren().get(0));
+            return new NestedTypeFormatter(new SetFormatter(cls), getChild(type, 0));
         } else if (Collection.class.isAssignableFrom(cls)) {
-            return new NestedTypeFormatter(new ListFormatter(cls), type.getChildren().get(0));
+            return new NestedTypeFormatter(new ListFormatter(cls), getChild(type, 0));
         } else if (cls.isArray()) {
             return new NestedTypeFormatter(new ArrayFormatter(cls), type.getChildren().get(0));
         } else {
             return new ObjectFormatter();
         }
+    }
+
+    protected NestedType getChild(NestedType type, int index) {
+        List<NestedType> children = type.getChildren();
+        if (children.size() > index) {
+            return children.get(index);
+        }
+        return getNestedTypeFactory().create(Object.class);
     }
 
     /**

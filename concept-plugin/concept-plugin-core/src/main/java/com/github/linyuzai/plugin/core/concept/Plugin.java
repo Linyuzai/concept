@@ -65,8 +65,6 @@ public interface Plugin {
 
         private DependencyMetadata dependency = new DependencyMetadata();
 
-        //private FilterMetadata filter = new FilterMetadata();
-
         @Data
         public static class HandlerMetadata {
 
@@ -78,34 +76,7 @@ public interface Plugin {
 
             private Set<String> names = Collections.emptySet();
         }
-
-        /*@Data
-        public static class FilterMetadata {
-
-            private EntryMetadata entry = new EntryMetadata();
-
-            @Data
-            public static class EntryMetadata {
-
-                private Set<String> patterns;
-            }
-        }*/
     }
-
-    /*interface MetadataProperties {
-
-        MetadataProperty<String> NAME = new StringValueMetadataProperty("name");
-
-        MetadataProperty<?> DEPENDENCY = new PrefixMetadataProperty("dependency");
-
-        MetadataProperty<String[]> DEPENDENCY_NAMES = new StringArrayValueMetadataProperty("names", DEPENDENCY);
-
-        MetadataProperty<?> FILTER = new PrefixMetadataProperty("filter");
-
-        MetadataProperty<?> FILTER_ENTRY = new PrefixMetadataProperty("entry", FILTER);
-
-        MetadataProperty<String[]> FILTER_ENTRY_PATTERNS = new StringArrayValueMetadataProperty("patterns", FILTER_ENTRY);
-    }*/
 
     interface Entry {
 
