@@ -28,7 +28,7 @@ public class ArrayFormatter extends TreeNodePluginFormatter<Object> {
      */
     @Override
     public Object formatNodes(List<PluginTree.Node> nodes) {
-        Object array = Array.newInstance(arrayClass, nodes.size());
+        Object array = Array.newInstance(arrayClass.getComponentType(), nodes.size());
         for (int i = 0; i < nodes.size(); i++) {
             PluginTree.Node node = nodes.get(i);
             Array.set(array, i, node.getValue());

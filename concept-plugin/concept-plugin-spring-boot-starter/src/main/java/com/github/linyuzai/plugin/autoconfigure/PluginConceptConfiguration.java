@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
+import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
 import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataJarPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
@@ -23,6 +24,7 @@ import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
+import com.github.linyuzai.plugin.core.handle.extract.*;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
@@ -37,47 +39,19 @@ import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
+import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class PluginConceptConfiguration {
-
-    @Configuration(proxyBeanMethods = false)
-    public static class JarConfiguration {
-
-        @Bean
-        public PluginFactory jarPluginFactory(PluginConceptProperties properties) {
-            String mode = properties.getJar().getMode();
-            Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
-            BinderMetadataJarPluginFactory factory = new BinderMetadataJarPluginFactory();
-            factory.setDefaultMode(mode);
-            factory.setStandardMetadataType(standardType);
-            return factory;
-        }
-
-        @Bean
-        public JarSubPluginFactory jarSubPluginFactory() {
-            return new JarSubPluginFactory();
-        }
-
-        @Bean
-        public JarClassResolver jarClassResolver() {
-            return new JarClassResolver();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public PluginLocation.Filter jarLocationFilter() {
-            return new JarLocationFilter();
-        }
-    }
 
     @Bean
     public static DynamicPluginProcessor dynamicPluginProcessor() {
@@ -137,6 +111,21 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
+    public PluginFactory pluginJarPluginFactory(PluginConceptProperties properties) {
+        String mode = properties.getJar().getMode();
+        Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
+        BinderMetadataJarPluginFactory factory = new BinderMetadataJarPluginFactory();
+        factory.setDefaultMode(mode);
+        factory.setStandardMetadataType(standardType);
+        return factory;
+    }
+
+    @Bean
+    public JarSubPluginFactory pluginJarSubPluginFactory() {
+        return new JarSubPluginFactory();
+    }
+
+    @Bean
     public EntryResolver pluginEntryResolver() {
         return new EntryResolver();
     }
@@ -149,6 +138,47 @@ public class PluginConceptConfiguration {
     @Bean
     public PropertiesResolver pluginPropertiesResolver() {
         return new PropertiesResolver();
+    }
+
+    @Bean
+    public JarClassResolver pluginJarClassResolver() {
+        return new JarClassResolver();
+    }
+
+    @Bean
+    @Order(100)
+    public MethodPluginExtractor.InvokerFactory pluginObjectExtractorInvokerFactory() {
+        return new PluginObjectExtractor.InvokerFactory();
+    }
+
+    @Bean
+    @Order(200)
+    public MethodPluginExtractor.InvokerFactory pluginContextExtractorInvokerFactory() {
+        return new PluginContextExtractor.InvokerFactory();
+    }
+
+    @Bean
+    @Order(300)
+    public MethodPluginExtractor.InvokerFactory pluginPropertiesExtractorInvokerFactory() {
+        return new PropertiesExtractor.InvokerFactory();
+    }
+
+    @Bean
+    @Order(400)
+    public MethodPluginExtractor.InvokerFactory pluginContentExtractorInvokerFactory() {
+        return new ContentExtractor.InvokerFactory();
+    }
+
+    @Bean
+    @Order(500)
+    public MethodPluginExtractor.InvokerFactory pluginClassExtractorInvokerFactory() {
+        return new ClassExtractor.InvokerFactory();
+    }
+
+    @Bean
+    @Order(600)
+    public MethodPluginExtractor.InvokerFactory pluginBeanExtractorInvokerFactory() {
+        return new BeanExtractor.InvokerFactory();
     }
 
     @Bean(initMethod = "initialize", destroyMethod = "destroy")
@@ -182,6 +212,12 @@ public class PluginConceptConfiguration {
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "concept.plugin.autoload.enabled", havingValue = "true", matchIfMissing = true)
     public static class AutoloadConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public PluginLocation.Filter pluginJarLocationFilter() {
+            return new JarLocationFilter();
+        }
 
         @Bean
         @ConditionalOnMissingBean

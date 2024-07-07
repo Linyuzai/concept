@@ -1,24 +1,21 @@
 package com.github.linyuzai.plugin.core.handle.extract.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 /**
  * 插件上下文 {@link PluginContext} 匹配器
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PluginContextMatcher implements PluginMatcher {
 
     /**
      * 上下文类型
      */
-    private final Class<?> contextClass;
-
-    public PluginContextMatcher() {
-        this(PluginContext.class);
-    }
+    private Class<?> contextClass = PluginContext.class;
 
     /**
      * 通过 {@link Class#isInstance(Object)} 匹配

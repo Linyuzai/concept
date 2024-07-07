@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToByteArrayConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToInputStreamConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.ContentToStringConvertor;
@@ -8,7 +9,8 @@ import com.github.linyuzai.plugin.core.handle.extract.format.ObjectFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.match.ContentMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
+import com.github.linyuzai.plugin.core.handle.extract.match.PluginText;
+import com.github.linyuzai.plugin.core.type.NestedType;
 import com.github.linyuzai.plugin.core.type.TypeMetadata;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +19,8 @@ import lombok.Setter;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.nio.charset.Charset;
 
 /**
@@ -25,37 +29,21 @@ import java.nio.charset.Charset;
  *
  * @param <T> 插件类型
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T> {
-
-    /**
-     * 提取成 {@link String} 时的编码
-     */
-    private Charset charset;
-
-    public ContentExtractor(String charset) {
-        this.charset = Charset.forName(charset);
-    }
+public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
 
     /**
      * 匹配类型为 byte[] {@link String} {@link InputStream}
      * 及对应类型的 {@link java.util.Collection} {@link java.util.List} {@link java.util.Set}
      * {@link java.util.Map} 和数组
      *
-     * @param metadata    {@link TypeMetadata}
+     * @param type        {@link TypeMetadata}
      * @param annotations 注解
      * @return {@link ContentMatcher}
      */
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> elementClass = metadata.getElementClass();
-        if (metadata instanceof ArrayTypeMetadata && elementClass == byte.class ||
-                elementClass == byte[].class ||
-                elementClass == String.class ||
-                InputStream.class.isAssignableFrom(elementClass)) {
+    public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
+        Class<?> cls = type.toClass();
+        if (String.class == cls || InputStream.class == cls || byte[].class == cls) {
             return new ContentMatcher(annotations);
         }
         return null;
@@ -66,38 +54,61 @@ public abstract class ContentExtractor<T> extends TypeMetadataPluginExtractor<T>
      * 特殊情况，如果是 {@link InputStream} 返回 {@link ContentToInputStreamConvertor}，
      * {@link String} 返回 {@link ContentToStringConvertor}。
      *
-     * @param metadata    {@link TypeMetadata}
+     * @param type        {@link TypeMetadata}
      * @param annotations 注解
      * @return 插件转换器 {@link PluginConvertor}
      */
     @Override
-    public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
-        Class<?> elementClass = metadata.getElementClass();
-        if (InputStream.class == elementClass) {
-            return new ContentToInputStreamConvertor();
-        }
-        if (String.class == elementClass) {
+    public PluginConvertor getConvertor(NestedType type, Annotation[] annotations) {
+        Class<?> cls = type.toClass();
+        if (String.class == cls) {
+            Charset charset = getCharset(annotations);
             return new ContentToStringConvertor(charset);
-        }
-        if (byte[].class == elementClass) {
+        } else if (InputStream.class == cls) {
+            return new ContentToInputStreamConvertor();
+        } else if (byte[].class == cls) {
             return new ContentToByteArrayConvertor();
+        } else {
+            return null;
         }
-        return super.getConvertor(metadata, annotations);
+    }
+
+    protected Charset getCharset(Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType() == PluginText.class) {
+                String charset = ((PluginText) annotation).charset();
+                return Charset.forName(charset);
+            }
+        }
+        return null;
     }
 
     /**
      * 根据 {@link TypeMetadata} 和注解获得 {@link PluginFormatter}。
      * 特殊情况，如果是 byte[] 则返回 {@link ObjectFormatter}
      *
-     * @param metadata    {@link TypeMetadata}
+     * @param type        {@link TypeMetadata}
      * @param annotations 注解
      * @return 插件格式器 {@link PluginFormatter}
      */
     @Override
-    public PluginFormatter getFormatter(TypeMetadata metadata, Annotation[] annotations) {
-        if (metadata instanceof ArrayTypeMetadata && metadata.getElementClass() == byte.class) {
+    public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
+        Class<?> cls = type.toClass();
+        if (cls.isArray() && cls.getComponentType() == byte.class) {
             return new ObjectFormatter();
         }
-        return super.getFormatter(metadata, annotations);
+        return super.getFormatter(type, annotations);
+    }
+
+    public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
+
+        @Override
+        protected AbstractPluginExtractor<?> createExtractor() {
+            return new ContentExtractor<Object>() {
+                @Override
+                public void onExtract(Object plugin, PluginContext context) {
+                }
+            };
+        }
     }
 }

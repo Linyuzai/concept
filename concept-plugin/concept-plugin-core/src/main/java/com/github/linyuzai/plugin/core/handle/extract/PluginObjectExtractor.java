@@ -1,9 +1,10 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginObjectMatcher;
-import com.github.linyuzai.plugin.core.util.ReflectionUtils;
+import com.github.linyuzai.plugin.core.type.NestedType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -24,14 +25,23 @@ public abstract class PluginObjectExtractor<T extends Plugin> extends AbstractPl
      * @return {@link PluginObjectMatcher} 或 null
      */
     @Override
-    public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
-        Class<?> clazz = ReflectionUtils.toClass(type);
-        if (clazz == null) {
-            return null;
-        }
-        if (Plugin.class.isAssignableFrom(clazz)) {
-            return new PluginObjectMatcher(clazz);
+    public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
+        Class<?> cls = type.toClass();
+        if (Plugin.class.isAssignableFrom(cls)) {
+            return new PluginObjectMatcher(cls);
         }
         return null;
+    }
+
+    public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
+
+        @Override
+        protected AbstractPluginExtractor<?> createExtractor() {
+            return new PluginObjectExtractor<Plugin>() {
+                @Override
+                public void onExtract(Plugin plugin, PluginContext context) {
+                }
+            };
+        }
     }
 }

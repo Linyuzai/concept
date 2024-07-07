@@ -1,13 +1,13 @@
 package com.github.linyuzai.plugin.core.util;
 
+import com.github.linyuzai.plugin.core.type.ArrayTypeMetadata;
 import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * 反射相关的工具类
@@ -34,22 +34,44 @@ public class ReflectionUtils {
      * @return {@link Class}
      */
     public static Class<?> toClass(Type type) {
+        List<Class<?>> list = new ArrayList<>();
+        resolve(type, (cls, types) -> list.add(cls));
+        if (list.size() == 1) {
+            return list.get(0);
+        }
+        return null;
+    }
+
+    public static void resolve(Type type, BiConsumer<Class<?>, Type[]> consumer) {
         if (type instanceof Class) {
-            return (Class<?>) type;
+            consumer.accept((Class<?>) type, new Type[0]);
         } else if (type instanceof ParameterizedType) {
             Type rawType = ((ParameterizedType) type).getRawType();
             if (rawType instanceof Class) {
-                return (Class<?>) rawType;
+                Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
+                consumer.accept((Class<?>) rawType, actualTypeArguments);
             }
-            return null;
         } else if (type instanceof WildcardType) {
             Type[] upperBounds = ((WildcardType) type).getUpperBounds();
-            if (upperBounds.length > 0) {
-                return toClass(upperBounds[0]);
+            if (upperBounds.length == 1) {
+                resolve(upperBounds[0], consumer);
             }
-            return null;
+            Type[] lowerBounds = ((WildcardType) type).getLowerBounds();
+            if (lowerBounds.length == 1) {
+                resolve(lowerBounds[0], consumer);
+            }
+        } else if (type instanceof GenericArrayType) {
+            // A<?>[] A<B>[]
+            Type componentType = ((GenericArrayType) type).getGenericComponentType();
+            resolve(componentType, (componentClass, types) -> {
+                Object array = Array.newInstance(componentClass, 0);
+                Class<?> arrayClass = array.getClass();
+                consumer.accept(arrayClass, new Type[]{componentType});
+            });
         }
-        return null;
+        /*else if (type instanceof TypeVariable) {
+
+        }*/
     }
 
     @SneakyThrows

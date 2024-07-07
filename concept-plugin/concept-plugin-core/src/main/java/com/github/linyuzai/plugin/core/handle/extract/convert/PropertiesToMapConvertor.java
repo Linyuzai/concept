@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 /**
  * {@link Properties} 转 {@link Map} 的转换器
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class PropertiesToMapConvertor extends AbstractPluginConvertor<Supplier<Properties>, Map<String, String>> {

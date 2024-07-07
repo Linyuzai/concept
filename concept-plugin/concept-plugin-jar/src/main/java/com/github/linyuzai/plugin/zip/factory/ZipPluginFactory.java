@@ -41,18 +41,26 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
 
     @Override
     protected File getSource(Object o, PluginContext context) {
-        File file = getFile(o, context);
-        if (file != null && supportFile(file, context)) {
+        File file = getFile(o);
+        if (file != null && supportFile(file)) {
             return file;
         }
         return null;
     }
 
-    protected boolean supportFile(File file, PluginContext context) {
-        return file.getName().endsWith(".zip");
+    protected boolean supportFile(File file) {
+        if (file.exists() && file.isFile()) {
+            try {
+                ZipFile zf = new ZipFile(file);
+                zf.close();
+                return true;
+            } catch (Throwable ignore) {
+            }
+        }
+        return false;
     }
 
-    protected File getFile(Object o, PluginContext context) {
+    protected File getFile(Object o) {
         if (o instanceof File) {
             File file = (File) o;
             if (file.exists()) {

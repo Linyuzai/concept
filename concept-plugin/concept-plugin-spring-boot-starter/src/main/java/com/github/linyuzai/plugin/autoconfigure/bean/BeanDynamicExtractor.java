@@ -5,36 +5,37 @@ import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
 import lombok.Getter;
 import org.springframework.context.ApplicationContext;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 @Getter
 public class BeanDynamicExtractor extends JarDynamicExtractor {
 
-    private ApplicationContext applicationContext;
-
-    protected BeanDynamicExtractor() {
-    }
+    private final ApplicationContext applicationContext;
 
     public BeanDynamicExtractor(ApplicationContext applicationContext, Object target) {
-        this(applicationContext, target, getPluginMethod(target));
+        super(target);
+        this.applicationContext = applicationContext;
     }
 
     public BeanDynamicExtractor(ApplicationContext applicationContext, Object target, Method... methods) {
-        this.target = target;
-        this.methods = methods;
+        super(target, methods);
         this.applicationContext = applicationContext;
-        createInvokers();
     }
 
     @Override
+    public void useDefaultInvokerFactories() {
+        super.useDefaultInvokerFactories();
+        addInvokerFactory(new BeanExtractor.InvokerFactory(applicationContext));
+    }
+
+    /*@Override
     public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
         if (annotation.annotationType() == PluginBean.class) {
             return getBeanInvoker(method, parameter);
         }
         return super.getAnnotationInvoker(method, parameter, annotation);
-    }
+    }*/
 
     public Invoker getBeanInvoker(Method method, Parameter parameter) {
         try {

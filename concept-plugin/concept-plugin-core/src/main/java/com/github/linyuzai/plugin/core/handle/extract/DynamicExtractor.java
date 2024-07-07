@@ -15,12 +15,13 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 动态插件提取器。
  * 可以根据自己的需求同时提取多个插件。
  */
-public class DynamicExtractor implements PluginExtractor {
+public class DynamicExtractor implements MethodPluginExtractor {
 
     /**
      * 方法参数对应的插件提取执行器缓存
@@ -31,13 +32,13 @@ public class DynamicExtractor implements PluginExtractor {
      * 方法执行对象
      */
     @Getter
-    protected Object target;
+    protected final Object target;
 
     @Getter
-    protected Method[] methods;
+    protected final Method[] methods;
 
-    protected DynamicExtractor() {
-    }
+    @Getter
+    protected final List<InvokerFactory> invokerFactories = new CopyOnWriteArrayList<>();
 
     /**
      * 遍历所有的方法，
@@ -53,7 +54,6 @@ public class DynamicExtractor implements PluginExtractor {
     public DynamicExtractor(Object target, Method... methods) {
         this.target = target;
         this.methods = methods;
-        createInvokers();
     }
 
     protected static Method[] getPluginMethod(Object target) {
@@ -74,7 +74,26 @@ public class DynamicExtractor implements PluginExtractor {
         return annotated.toArray(new Method[0]);
     }
 
-    protected void createInvokers() {
+    public void useDefaultInvokerFactories() {
+        addInvokerFactory(new PluginObjectExtractor.InvokerFactory());
+        addInvokerFactory(new PluginContextExtractor.InvokerFactory());
+        addInvokerFactory(new PropertiesExtractor.InvokerFactory());
+        addInvokerFactory(new ContentExtractor.InvokerFactory());
+    }
+
+    @Override
+    public void addInvokerFactory(InvokerFactory factory) {
+        this.invokerFactories.add(factory);
+    }
+
+    @Override
+    public void removeInvokerFactory(InvokerFactory factory) {
+        this.invokerFactories.remove(factory);
+    }
+
+    @Override
+    public synchronized void prepareInvokers() {
+        methodInvokersMap.clear();
         for (Method method : methods) {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
@@ -102,7 +121,14 @@ public class DynamicExtractor implements PluginExtractor {
      * @return 插件提取执行器
      */
     public Invoker getInvoker(Method method, Parameter parameter) {
-        Annotation[] annotations = parameter.getAnnotations();
+        for (InvokerFactory invokerFactory : invokerFactories) {
+            Invoker invoker = invokerFactory.create(method, parameter);
+            if (invoker != null) {
+                return invoker;
+            }
+        }
+        return null;
+        /*Annotation[] annotations = parameter.getAnnotations();
         for (Annotation annotation : annotations) {
             Invoker invoker = getAnnotationInvoker(method, parameter, annotation);
             if (invoker != null) {
@@ -125,7 +151,7 @@ public class DynamicExtractor implements PluginExtractor {
         if (contentInvoker != null) {
             return contentInvoker;
         }
-        return null;
+        return null;*/
     }
 
     /**
@@ -136,14 +162,10 @@ public class DynamicExtractor implements PluginExtractor {
      * @param parameter  参数 {@link Parameter}
      * @return 插件提取执行器
      */
-    public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
-        if (annotation.annotationType() == PluginText.class) {
-            String charset = ((PluginText) annotation).charset();
-            return getContentInvoker(method, parameter, charset.isEmpty() ? null : Charset.forName(charset));
-        }
+    /*public Invoker getAnnotationInvoker(Method method, Parameter parameter, Annotation annotation) {
         return null;
     }
-
+*/
     /**
      * 尝试获得 {@link PluginContextExtractor} 对应的执行器。
      *
@@ -212,7 +234,7 @@ public class DynamicExtractor implements PluginExtractor {
      */
     public Invoker getContentInvoker(Method method, Parameter parameter, Charset charset) {
         try {
-            return new ContentExtractor<Void>(charset) {
+            return new ContentExtractor<Void>() {
 
                 @Override
                 public void onExtract(Void plugin, PluginContext context) {

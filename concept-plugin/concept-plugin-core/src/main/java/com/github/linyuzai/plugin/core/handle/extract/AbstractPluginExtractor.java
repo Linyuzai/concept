@@ -4,18 +4,19 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
-import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
+import com.github.linyuzai.plugin.core.handle.extract.format.*;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
+import com.github.linyuzai.plugin.core.type.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * {@link PluginExtractor} 的抽象类
@@ -24,6 +25,9 @@ import java.util.Map;
  */
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
+    @Getter
+    @Setter
+    protected NestedTypeFactory nestedTypeFactory = DefaultNestedTypeFactory.getInstance();
     /**
      * 插件提取执行器
      */
@@ -80,12 +84,22 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @return 插件提取执行器
      */
     public Invoker createInvoker(Type type, Annotation[] annotations) {
-        PluginMatcher matcher = getMatcher(type, annotations);
-        if (matcher == null) {
-            throw new PluginException("Can not match " + type);
+        NestedType nestedType = nestedTypeFactory.create(type);
+        if (nestedType == null || nestedType.toClass() == null) {
+            throw new PluginException("Can not resolve type: " + type);
         }
-        PluginConvertor convertor = getConvertor(type, annotations);
-        PluginFormatter formatter = getFormatter(type, annotations);
+        NestedType formattedNestedType;
+        PluginFormatter formatter = getFormatter(nestedType, annotations);
+        if (formatter instanceof NestedTypeFormatter) {
+            formattedNestedType = ((NestedTypeFormatter) formatter).getNestedType();
+        } else {
+            formattedNestedType = nestedType;
+        }
+        PluginMatcher matcher = getMatcher(formattedNestedType, annotations);
+        if (matcher == null) {
+            throw new PluginException("Can not match type: " + type);
+        }
+        PluginConvertor convertor = getConvertor(formattedNestedType, annotations);
         return new InvokerImpl(matcher, convertor, formatter);
     }
 
@@ -96,7 +110,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @param annotations 注解
      * @return 插件匹配器 {@link PluginMatcher}
      */
-    public abstract PluginMatcher getMatcher(Type type, Annotation[] annotations);
+    public abstract PluginMatcher getMatcher(NestedType type, Annotation[] annotations);
 
     /**
      * 根据插件类型 {@link Type} 和注解获得 {@link PluginConvertor}
@@ -105,7 +119,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @param annotations 注解
      * @return 插件转换器 {@link PluginConvertor}
      */
-    public PluginConvertor getConvertor(Type type, Annotation[] annotations) {
+    public PluginConvertor getConvertor(NestedType type, Annotation[] annotations) {
         return null;
     }
 
@@ -116,8 +130,21 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
      * @param annotations 注解
      * @return 插件格式器 {@link PluginFormatter}
      */
-    public PluginFormatter getFormatter(Type type, Annotation[] annotations) {
-        return null;
+    public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
+        Class<?> cls = type.toClass();
+        if (Map.class.isAssignableFrom(cls)) {
+            return new NestedTypeFormatter(new MapFormatter(cls), type.getChildren().get(1));
+        } else if (List.class.isAssignableFrom(cls)) {
+            return new NestedTypeFormatter(new ListFormatter(cls), type.getChildren().get(0));
+        } else if (Set.class.isAssignableFrom(cls)) {
+            return new NestedTypeFormatter(new SetFormatter(cls), type.getChildren().get(0));
+        } else if (Collection.class.isAssignableFrom(cls)) {
+            return new NestedTypeFormatter(new ListFormatter(cls), type.getChildren().get(0));
+        } else if (cls.isArray()) {
+            return new NestedTypeFormatter(new ArrayFormatter(cls), type.getChildren().get(0));
+        } else {
+            return new ObjectFormatter();
+        }
     }
 
     /**
@@ -152,6 +179,20 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     @Override
     public Class<? extends PluginHandler>[] getDependencies() {
         return getInvoker().getDependencies();
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class NestedTypeFormatter implements PluginFormatter {
+
+        private final PluginFormatter formatter;
+
+        private final NestedType nestedType;
+
+        @Override
+        public Object format(Object source, PluginContext context) {
+            return formatter.format(source, context);
+        }
     }
 
     @Getter
@@ -200,5 +241,19 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         public Class<? extends PluginHandler>[] getDependencies() {
             return matcher.getDependencies();
         }
+    }
+
+    public static abstract class InvokerFactory implements MethodPluginExtractor.InvokerFactory {
+
+        @Override
+        public Invoker create(Method method, Parameter parameter) {
+            try {
+                return createExtractor().createInvoker(method, parameter);
+            } catch (Throwable e) {
+                return null;
+            }
+        }
+
+        protected abstract AbstractPluginExtractor<?> createExtractor();
     }
 }

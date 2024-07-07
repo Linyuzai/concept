@@ -50,11 +50,6 @@ public class JarPluginFactory extends ZipPluginFactory {
     }
 
     @Override
-    protected boolean supportFile(File file, PluginContext context) {
-        return file.getName().endsWith(".jar") || super.supportFile(file, context);
-    }
-
-    @Override
     protected URL getURL(File file) throws MalformedURLException {
         return PluginUtils.getURL(file);
     }

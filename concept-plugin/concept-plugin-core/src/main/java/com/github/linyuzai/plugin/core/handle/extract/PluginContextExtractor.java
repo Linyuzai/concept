@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.core.handle.extract;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginContextMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.util.ReflectionUtils;
+import com.github.linyuzai.plugin.core.type.NestedType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -24,13 +24,10 @@ public abstract class PluginContextExtractor<T extends PluginContext> extends Ab
      * @return {@link PluginContextMatcher} 或 null
      */
     @Override
-    public PluginMatcher getMatcher(Type type, Annotation[] annotations) {
-        Class<?> clazz = ReflectionUtils.toClass(type);
-        if (clazz == null) {
-            return null;
-        }
-        if (PluginContext.class.isAssignableFrom(clazz)) {
-            return new PluginContextMatcher(clazz);
+    public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
+        Class<?> cls = type.toClass();
+        if (PluginContext.class.isAssignableFrom(cls)) {
+            return new PluginContextMatcher(cls);
         }
         return null;
     }
@@ -41,4 +38,16 @@ public abstract class PluginContextExtractor<T extends PluginContext> extends Ab
     }
 
     public abstract void onExtract(T context);
+
+    public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
+
+        @Override
+        protected AbstractPluginExtractor<?> createExtractor() {
+            return new PluginContextExtractor<PluginContext>() {
+                @Override
+                public void onExtract(PluginContext context) {
+                }
+            };
+        }
+    }
 }

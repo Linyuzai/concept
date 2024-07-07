@@ -1,15 +1,14 @@
 package com.github.linyuzai.plugin.jar.handle.filter;
 
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
-import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
+import com.github.linyuzai.plugin.core.handle.filter.PredicateModifierFilter;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClass;
 import com.github.linyuzai.plugin.jar.handle.resolve.JarClassResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * {@link java.lang.reflect.Modifier} 过滤器
@@ -17,41 +16,24 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor
 @HandlerDependency(JarClassResolver.class)
-public class ClassModifierFilter extends AbstractPluginFilter<JarClass> {
-
-    /**
-     * {@link java.lang.reflect.Modifier} 对应的 {@link Function}
-     */
-    private final Collection<Function<Integer, Boolean>> functions;
+public class ClassModifierFilter extends PredicateModifierFilter<JarClass, Integer> {
 
     @SafeVarargs
-    public ClassModifierFilter(Function<Integer, Boolean>... functions) {
-        this(Arrays.asList(functions));
+    public ClassModifierFilter(Predicate<Integer>... predicates) {
+        super(predicates);
+    }
+
+    public ClassModifierFilter(Collection<Predicate<Integer>> predicates) {
+        super(predicates);
     }
 
     @Override
-    public boolean doFilter(JarClass jarClass) {
-        return filterModifier(jarClass.get());
+    protected Integer to(JarClass jarClass) {
+        return jarClass.get().getModifiers();
     }
 
     @Override
     public Object getKey() {
         return JarClass.class;
-    }
-
-    /**
-     * 类的 {@link java.lang.reflect.Modifier} 是否匹配
-     *
-     * @param cls 类
-     * @return 如果 {@link java.lang.reflect.Modifier} 匹配返回 true 否则返回 false
-     */
-    private boolean filterModifier(Class<?> cls) {
-        int modifiers = cls.getModifiers();
-        for (Function<Integer, Boolean> function : functions) {
-            if (function.apply(modifiers)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

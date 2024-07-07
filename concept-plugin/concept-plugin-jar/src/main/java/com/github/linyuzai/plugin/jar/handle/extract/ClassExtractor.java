@@ -1,12 +1,10 @@
 package com.github.linyuzai.plugin.jar.handle.extract;
 
-import com.github.linyuzai.plugin.core.handle.extract.TypeMetadataPluginExtractor;
+import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.extract.AbstractPluginExtractor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.type.DefaultTypeMetadataFactory;
-import com.github.linyuzai.plugin.core.type.ObjectTypeMetadata;
-import com.github.linyuzai.plugin.core.type.TypeMetadata;
-import com.github.linyuzai.plugin.core.type.TypeMetadataFactory;
+import com.github.linyuzai.plugin.core.type.*;
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import com.github.linyuzai.plugin.jar.handle.extract.convert.ClassConvertor;
 import com.github.linyuzai.plugin.jar.handle.extract.match.ClassMatcher;
@@ -21,41 +19,41 @@ import java.lang.reflect.WildcardType;
  *
  * @param <T> 类型
  */
-public abstract class ClassExtractor<T> extends TypeMetadataPluginExtractor<T> {
+public abstract class ClassExtractor<T> extends AbstractPluginExtractor<T> {
 
     /**
      * 返回一个 {@link ClassMatcher}
      *
-     * @param metadata    {@link TypeMetadata}
+     * @param type        {@link TypeMetadata}
      * @param annotations 注解
      * @return {@link ClassMatcher}
      */
     @Override
-    public PluginMatcher getMatcher(TypeMetadata metadata, Annotation[] annotations) {
-        if (metadata instanceof ObjectTypeMetadata) {
-            if (metadata.getContainerClass() != Class.class) {
-                return null;
-            }
+    public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
+        if (type.toClass() == Class.class) {
+            return new ClassMatcher(type.getChildren().get(0).toClass(), annotations);
         }
-        Class<?> elementClass = metadata.getElementClass();
-        return new ClassMatcher(elementClass, annotations);
+        return null;
     }
 
     @Override
-    public PluginConvertor getConvertor(TypeMetadata metadata, Annotation[] annotations) {
+    public PluginConvertor getConvertor(NestedType type, Annotation[] annotations) {
         return new ClassConvertor();
     }
 
-    /**
-     * 由于类的元素对象需要获得其泛型类型，所以重写了相关方法
-     *
-     * @return {@link TypeMetadataFactory}
-     */
-    @Override
-    protected TypeMetadataFactory createTypeMetadataFactory() {
-        return new ClassTypeMetadataFactory();
+    public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
+
+        @Override
+        protected AbstractPluginExtractor<?> createExtractor() {
+            return new ClassExtractor<Object>() {
+                @Override
+                public void onExtract(Object plugin, PluginContext context) {
+                }
+            };
+        }
     }
 
+    @Deprecated
     public static class ClassTypeMetadataFactory extends DefaultTypeMetadataFactory {
 
         @Override

@@ -17,5 +17,5 @@ public @interface PluginText {
      *
      * @return 编码
      */
-    String charset() default "";
+    String charset();
 }

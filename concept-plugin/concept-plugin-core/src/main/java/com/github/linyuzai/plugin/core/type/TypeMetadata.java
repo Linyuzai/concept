@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
  * 指定了容器类 {@link java.util.Map} {@link java.util.List} {@link java.util.Set} {@link java.util.Collection} 和数组等，
  * 还有里面的元素类型。
  */
+@Deprecated
 public interface TypeMetadata {
 
     /**
