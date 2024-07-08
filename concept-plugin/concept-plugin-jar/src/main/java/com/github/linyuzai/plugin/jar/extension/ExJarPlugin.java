@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.PluginClassLoader;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -25,6 +26,8 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
     private final Object source;
 
     private final URL url;
+
+    private PluginClassLoader pluginClassLoader;
 
     @SneakyThrows
     public ExJarPlugin(ExJarFile jarFile, Object source) {
@@ -71,13 +74,16 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
         if (urls.isEmpty()) {
             return;
         }
-        ExJarPluginClassLoader classLoader =
-                new ExJarPluginClassLoader(urls.toArray(new URL[0]), getClass().getClassLoader());
-        addReader(new JarClassReader(this, classLoader));
+        this.pluginClassLoader = new ExJarPluginClassLoader(this, urls.toArray(new URL[0]), getClass().getClassLoader());
+        //addReader(new JarClassReader(this, classLoader));
     }
 
     @Override
     public void onRelease(PluginContext context) {
+        try {
+            pluginClassLoader.close();
+        } catch (Throwable ignore) {
+        }
         try {
             jarFile.close();
         } catch (Throwable ignore) {

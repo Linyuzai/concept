@@ -11,6 +11,8 @@ import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -83,9 +85,21 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private void performNotify(String group) {
         String[] names = location.getLoadedPlugins(group);
+        List<String> paths = new ArrayList<>();
         for (String name : names) {
-            onNotify(StandardWatchEventKinds.ENTRY_CREATE, group, name);
+            String path = location.getLoadedPluginPath(group, name);
+            if (path == null) {
+                continue;
+            }
+            paths.add(path);
         }
+        concept.load(paths, false, (o, plugin) -> {
+            String path = (String) o;
+            concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
+        }, (o, e) -> {
+            String path = (String) o;
+            concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
+        });
     }
 
     /**

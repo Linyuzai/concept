@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Manifest;
 
-public class JarPluginClassLoader extends AbstractPluginClassLoader {
+public class JarPluginClassLoader extends PluginClassLoader {
 
     static {
         registerAsParallelCapable();
@@ -25,16 +25,17 @@ public class JarPluginClassLoader extends AbstractPluginClassLoader {
      * @param parent the parent class loader for delegation
      * @since 2.3.1
      */
-    public JarPluginClassLoader(Map<String, Plugin.Content> packages,
+    public JarPluginClassLoader(Plugin plugin,
+                                Map<String, Plugin.Content> packages,
                                 Map<String, Plugin.Content> classes,
                                 ClassLoader parent) {
-        super(new URL[0], parent);
+        super(plugin, new URL[0], parent);
         this.packages.putAll(packages);
         this.classes.putAll(classes);
     }
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    public Class<?> findPluginClass(String name) throws ClassNotFoundException {
         String path = name.replace('.', '/').concat(".class");
         Plugin.Content content = classes.get(path);
         if (content == null) {

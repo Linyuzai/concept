@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.extension;
 
-import com.github.linyuzai.plugin.jar.concept.AbstractPluginClassLoader;
+import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.jar.concept.PluginClassLoader;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -8,7 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.jar.JarFile;
 
-public class ExJarPluginClassLoader extends AbstractPluginClassLoader {
+public class ExJarPluginClassLoader extends PluginClassLoader {
 
     static {
         registerAsParallelCapable();
@@ -21,8 +22,8 @@ public class ExJarPluginClassLoader extends AbstractPluginClassLoader {
      * @param parent the parent class loader for delegation
      * @since 2.3.1
      */
-    public ExJarPluginClassLoader(URL[] urls, ClassLoader parent) {
-        super(urls, parent);
+    public ExJarPluginClassLoader(Plugin plugin, URL[] urls, ClassLoader parent) {
+        super(plugin, urls, parent);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.read.PluginReader;
 
+@Deprecated
 public interface ClassReader extends PluginReader {
 
     @Override

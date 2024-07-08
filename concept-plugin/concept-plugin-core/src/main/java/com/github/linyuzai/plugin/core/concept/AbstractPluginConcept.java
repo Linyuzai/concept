@@ -23,11 +23,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * {@link PluginConcept} 抽象类
@@ -149,8 +146,56 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public Plugin load(Object o) {
-        return load(o, false);
+    public Plugin load(Object source) {
+        return load(source, false);
+    }
+
+    @Override
+    public Plugin load(Object source, boolean reloadIfExist) {
+        return doLoad(source, reloadIfExist, null);
+    }
+
+    @Override
+    public void load(Collection<?> sources,
+                     boolean reloadIfExist,
+                     BiConsumer<Object, Plugin> onSuccess,
+                     BiConsumer<Object, Throwable> onError) {
+        Iterator<?> iterator = new ArrayList<>(sources).iterator();
+        loadDependency(iterator, reloadIfExist, new ArrayList<>(), onSuccess, onError);
+    }
+
+    protected void loadDependency(Iterator<?> iterator,
+                                  boolean reloadIfExist,
+                                  List<String> dependencyList,
+                                  BiConsumer<Object, Plugin> onSuccess,
+                                  BiConsumer<Object, Throwable> onError) {
+        while (iterator.hasNext()) {
+            Object source = iterator.next();
+            iterator.remove();
+            try {
+                Plugin load = doLoad(source, reloadIfExist, (plugin, name) -> {
+                    List<String> list = new ArrayList<>(dependencyList);
+                    if (list.contains(name)) {
+                        list.add(name);
+                        int start = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            if (Objects.equals(list.get(i), name)) {
+                                start = i;
+                                break;
+                            }
+                        }
+                        String message = String.join("<==", list.subList(start, list.size() - 1));
+                        throw new PluginException("Cycle dependency: " + message);
+                    }
+                    while (iterator.hasNext() && !existDependency(name)) {
+                        loadDependency(iterator, reloadIfExist, list, onSuccess, onError);
+                    }
+                });
+                onSuccess.accept(source, load);
+            } catch (Throwable e) {
+                onError.accept(source, e);
+            }
+        }
     }
 
     /**
@@ -162,51 +207,45 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 通过 {@link PluginExtractor} 提取插件，
      * 销毁上下文，释放插件资源。
      *
-     * @param o 插件源
+     * @param source 插件源
      */
-    @Override
-    public Plugin load(@NonNull Object o, boolean reloadIfExist) {
-        Plugin exist = repository.get(o);
+    protected Plugin doLoad(@NonNull Object source, boolean reloadIfExist, BiConsumer<Plugin, String> onDependency) {
+        Plugin exist = repository.get(source);
         if (exist != null && !reloadIfExist) {
-            throw new IllegalArgumentException("Plugin is already loaded: " + o);
+            throw new IllegalArgumentException("Plugin is already loaded: " + source);
         }
         //创建上下文
         PluginContext context = contextFactory.create(this);
 
-        return load(o, context, plugin -> {
-            repository.add(plugin);
-            if (exist != null) {
-                try {
-                    exist.destroy();
-                } catch (Throwable e) {
-                    logger.error("Plugin destroy", e);
-                }
-            }
-        }, e -> {
-            if (e instanceof PluginLoadException) {
-                throw (PluginLoadException) e;
-            } else {
-                throw new PluginLoadException(context, e);
-            }
-        }, () -> {
-        });
-    }
-
-    @Override
-    public Plugin load(Object o, PluginContext context, Consumer<Plugin> onSuccess, Consumer<Throwable> onError, Runnable onComplete) {
-        lock.lock(o, PluginLock.LOADING);
+        lock.lock(source, PluginLock.LOADING);
         try {
             //初始化上下文
             context.set(PluginConcept.class, this);
             context.initialize();
 
-            Plugin plugin = create(o, context);
+            Plugin plugin = create(source, context);
             if (plugin == null) {
-                throw new PluginException("Plugin can not create: " + o);
+                throw new PluginException("Plugin can not create: " + source);
             }
+
             plugin.setConcept(this);
             plugin.initialize();
             eventPublisher.publish(new PluginCreatedEvent(plugin));
+
+            Set<String> names = plugin.getMetadata().asStandard().getDependency().getNames();
+            if (names != null && !names.isEmpty()) {
+                for (String name : names) {
+                    if (existDependency(name)) {
+                        continue;
+                    }
+                    if (onDependency != null) {
+                        onDependency.accept(plugin, name);
+                    }
+                    if (!existDependency(name)) {
+                        throw new PluginException("Plugin dependency not found: " + name);
+                    }
+                }
+            }
 
             PluginTree tree = treeFactory.create(plugin, this);
             context.set(Plugin.class, plugin);
@@ -230,20 +269,33 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             //销毁上下文
             context.destroy();
 
-            onSuccess.accept(plugin);
+            repository.add(plugin);
+            if (exist != null) {
+                try {
+                    exist.destroy();
+                } catch (Throwable e) {
+                    logger.error("Plugin destroy error", e);
+                }
+            }
 
             eventPublisher.publish(new PluginLoadedEvent(plugin));
 
             return plugin;
         } catch (Throwable e) {
-            onError.accept(e);
-            return null;
+            if (e instanceof PluginLoadException) {
+                throw (PluginLoadException) e;
+            } else {
+                throw new PluginLoadException(context, e);
+            }
         } finally {
-            onComplete.run();
-            lock.unlock(o, PluginLock.LOADING);
+            lock.unlock(source, PluginLock.LOADING);
         }
     }
 
+    protected boolean existDependency(String name) {
+        return repository.stream().anyMatch(it ->
+                Objects.equals(name, it.getMetadata().asStandard().getName()));
+    }
 
     /**
      * 卸载插件。

@@ -6,9 +6,9 @@ public interface PluginLock {
 
     String UNLOADING = "UNLOADING";
 
-    void lock(Object o, Object arg);
+    void lock(Object lockable, Object arg);
 
-    void unlock(Object o, Object arg);
+    void unlock(Object lockable, Object arg);
 
-    Object getLockArg(Object o);
+    Object getLockArg(Object lockable);
 }

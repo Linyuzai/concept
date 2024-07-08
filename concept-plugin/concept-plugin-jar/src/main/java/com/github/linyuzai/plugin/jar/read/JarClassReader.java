@@ -3,18 +3,19 @@ package com.github.linyuzai.plugin.jar.read;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.read.DependencyReader;
+import com.github.linyuzai.plugin.jar.concept.PluginClassLoader;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.io.Closeable;
 import java.io.IOException;
 
+@Deprecated
 @Getter
 public class JarClassReader extends DependencyReader implements ClassReader {
 
-    private final ClassLoader classLoader;
+    private final PluginClassLoader classLoader;
 
-    public JarClassReader(Plugin plugin, ClassLoader classLoader) {
+    public JarClassReader(Plugin plugin, PluginClassLoader classLoader) {
         super(plugin);
         this.classLoader = classLoader;
     }
@@ -37,8 +38,6 @@ public class JarClassReader extends DependencyReader implements ClassReader {
 
     @Override
     public void close() throws IOException {
-        if (classLoader instanceof Closeable) {
-            ((Closeable) classLoader).close();
-        }
+        classLoader.close();
     }
 }

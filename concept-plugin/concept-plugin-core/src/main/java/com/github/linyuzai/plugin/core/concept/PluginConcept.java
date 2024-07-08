@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -37,26 +38,15 @@ public interface PluginConcept {
     /**
      * 加载插件
      *
-     * @param o 插件源
+     * @param source 插件源
      * @return 插件 {@link Plugin}
      */
-    Plugin load(Object o);
+    Plugin load(Object source);
 
-    /**
-     * 加载插件
-     *
-     * @param o 插件源
-     * @return 插件 {@link Plugin}
-     */
-    Plugin load(Object o, boolean reloadIfExist);
+    Plugin load(Object source, boolean reloadIfExist);
 
-    /**
-     * 加载插件
-     *
-     * @param o 插件源
-     * @return 插件 {@link Plugin}
-     */
-    Plugin load(Object o, PluginContext context, Consumer<Plugin> onSuccess, Consumer<Throwable> onError, Runnable onComplete);
+
+    void load(Collection<?> sources, boolean reloadIfExist, BiConsumer<Object, Plugin> onSuccess, BiConsumer<Object, Throwable> onError);
 
     /**
      * 卸载插件

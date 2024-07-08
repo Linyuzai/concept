@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 
@@ -53,7 +55,7 @@ public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Pro
         public Properties create() {
             try (InputStream is = content.getInputStream()) {
                 Properties properties = new Properties();
-                properties.load(is);
+                properties.load(new InputStreamReader(is, StandardCharsets.UTF_8));
                 return properties;
             }
         }

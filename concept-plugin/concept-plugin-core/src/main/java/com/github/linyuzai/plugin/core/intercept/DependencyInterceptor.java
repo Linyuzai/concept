@@ -35,10 +35,7 @@ public class DependencyInterceptor implements PluginInterceptor {
             }
             for (String n : names) {
                 if (name.equals(n)) {
-                    plugin.getConcept().load(n, subContext, repository::add, e -> {
-                        throw new PluginLoadException(context, e);
-                    }, () -> {
-                    });
+
                 }
             }
         }

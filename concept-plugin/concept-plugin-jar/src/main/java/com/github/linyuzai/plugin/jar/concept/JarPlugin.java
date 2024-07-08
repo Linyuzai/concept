@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 
 public interface JarPlugin extends ZipPlugin {
 
+    PluginClassLoader getPluginClassLoader();
+
     @Data
     @EqualsAndHashCode(callSuper = true)
     class StandardMetadata extends ZipPlugin.StandardMetadata {

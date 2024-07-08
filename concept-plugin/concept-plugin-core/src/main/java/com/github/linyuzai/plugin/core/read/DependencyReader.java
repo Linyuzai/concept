@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated
 @Getter
 public abstract class DependencyReader implements PluginReader {
 

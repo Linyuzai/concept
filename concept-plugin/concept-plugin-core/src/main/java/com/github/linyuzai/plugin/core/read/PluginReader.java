@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import java.io.Closeable;
 import java.io.IOException;
 
+@Deprecated
 public interface PluginReader extends Closeable {
 
     Object read(Object key, PluginContext context);

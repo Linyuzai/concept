@@ -11,18 +11,18 @@ public class DefaultPluginLock implements PluginLock {
     private final Map<Object, LockObject> lockMap = new ConcurrentHashMap<>();
 
     @Override
-    public void lock(Object o, Object arg) {
-        LockObject lock = lockMap.computeIfAbsent(o, key -> new LockObject());
+    public void lock(Object lockable, Object arg) {
+        LockObject lock = lockMap.computeIfAbsent(lockable, key -> new LockObject());
         if (lock.tryLock()) {
             lock.arg = arg;
             return;
         }
-        throw new PluginLockException(o, lock.arg, arg);
+        throw new PluginLockException(lockable, lock.arg, arg);
     }
 
     @Override
-    public void unlock(Object o, Object arg) {
-        LockObject lock = lockMap.remove(o);
+    public void unlock(Object lockable, Object arg) {
+        LockObject lock = lockMap.remove(lockable);
         if (lock == null) {
             return;
         }
