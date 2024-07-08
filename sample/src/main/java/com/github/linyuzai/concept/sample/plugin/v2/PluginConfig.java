@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class PluginConfig {
 
-    public static final String CLASS_NAME_FILTER = "com.github.linyuzai.concept.sample.plugin.**";
+    public static final String CLASS_NAME_FILTER = "com.example.jarplugin.sample.SampleCustomPlugin";
 
-    public static final String CLASS_NAME_SAMPLE_FILTER = "com.github.linyuzai.concept.sample.plugin.Sample**";
+    public static final String CLASS_NAME_SAMPLE_FILTER = CLASS_NAME_FILTER;
 }

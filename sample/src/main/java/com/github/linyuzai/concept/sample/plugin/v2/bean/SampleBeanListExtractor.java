@@ -15,7 +15,7 @@ import java.util.List;
 public class SampleBeanListExtractor extends BeanExtractor<List<? extends CustomPlugin>> {
 
     @Override
-    public void onExtract(@PluginClassName(PluginConfig.CLASS_NAME_FILTER) List<? extends CustomPlugin> plugins, PluginContext context) {
+    public void onExtract( List<? extends CustomPlugin> plugins, PluginContext context) {
         log.info("Bean List => {}", plugins);
     }
 }

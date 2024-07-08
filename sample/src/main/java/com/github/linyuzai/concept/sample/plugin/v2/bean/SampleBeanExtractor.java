@@ -8,14 +8,13 @@ import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassName;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
-public class SampleBeanExtractor extends BeanExtractor<List<? extends CustomPlugin>> {
+public class SampleBeanExtractor extends BeanExtractor<CustomPlugin> {
 
     @Override
-    public void onExtract(@PluginClassName(PluginConfig.CLASS_NAME_FILTER) List<? extends CustomPlugin> plugins, PluginContext context) {
-        log.info("Bean Object => {}", plugins);
+    public void onExtract(CustomPlugin plugin, PluginContext context) {
+        log.info("Bean Object => {}", plugin);
+        plugin.run();
     }
 }

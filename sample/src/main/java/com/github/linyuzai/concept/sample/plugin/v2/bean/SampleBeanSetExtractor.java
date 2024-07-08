@@ -15,7 +15,7 @@ import java.util.Set;
 public class SampleBeanSetExtractor extends BeanExtractor<Set<? extends CustomPlugin>> {
 
     @Override
-    public void onExtract(@PluginClassName(PluginConfig.CLASS_NAME_FILTER) Set<? extends CustomPlugin> plugins, PluginContext context) {
+    public void onExtract(Set<? extends CustomPlugin> plugins, PluginContext context) {
         log.info("Bean Set => {}", plugins);
     }
 }

@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class SampleBeanArrayExtractor extends BeanExtractor<CustomPlugin[]> {
 
     @Override
-    public void onExtract(@PluginClassName(PluginConfig.CLASS_NAME_FILTER) CustomPlugin[] plugins, PluginContext context) {
+    public void onExtract(CustomPlugin[] plugins, PluginContext context) {
         log.info("Bean Array => {}", Arrays.toString(plugins));
     }
 }
