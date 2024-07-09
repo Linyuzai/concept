@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.lock;
 
+@Deprecated
 public interface PluginLock {
 
     String LOADING = "LOADING";

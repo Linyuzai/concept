@@ -14,7 +14,6 @@ import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
 import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
-import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
@@ -45,8 +44,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected PluginHandlerChainFactory handlerChainFactory;
 
     protected PluginRepository repository;
-
-    protected PluginLock lock;
 
     /**
      * 事件发布者
@@ -152,7 +149,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public Plugin load(Object source) {
+    public Plugin load(@NonNull Object source) {
         List<Plugin> plugins = new ArrayList<>();
         load(Collections.singleton(source), (o, plugin) -> plugins.add(plugin), (o, e) -> {
             if (e instanceof RuntimeException) {
@@ -176,9 +173,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param sources 插件源
      */
     @Override
-    public synchronized void load(Collection<?> sources,
-                                  BiConsumer<Object, Plugin> onSuccess,
-                                  BiConsumer<Object, Throwable> onError) {
+    public synchronized void load(@NonNull Collection<?> sources,
+                                  @NonNull BiConsumer<Object, Plugin> onSuccess,
+                                  @NonNull BiConsumer<Object, Throwable> onError) {
         List<Object> list = new ArrayList<>();
         for (Object source : sources) {
             if (repository.contains(source)) {
@@ -332,38 +329,38 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 卸载插件。
      * 通过插件的 id 或插件本身移除对应的插件
      *
-     * @param o 插件源
+     * @param source 插件源
      */
     @Override
-    public Plugin unload(@NonNull Object o) {
-        lock.lock(o, PluginLock.UNLOADING);
+    public Plugin unload(@NonNull Object source) {
+        unloading.add(source);
         try {
-            Plugin removed = repository.remove(o);
+            Plugin removed = repository.remove(source);
             if (removed != null) {
                 removed.destroy();
                 eventPublisher.publish(new PluginUnloadedEvent(removed));
             }
             return removed;
         } catch (Throwable e) {
-            throw new PluginUnloadException(o, e);
+            throw new PluginUnloadException(source, e);
         } finally {
-            lock.unlock(o, PluginLock.UNLOADING);
+            unloading.remove(source);
         }
+    }
+
+    @Override
+    public boolean isLoading(Object source) {
+        return loading.contains(source);
+    }
+
+    @Override
+    public boolean isUnloading(Object source) {
+        return unloading.contains(source);
     }
 
     @Override
     public boolean isLoaded(Object o) {
         return repository.contains(o);
-    }
-
-    @Override
-    public boolean isLoading(Object o) {
-        return PluginLock.LOADING.equals(lock.getLockArg(o));
-    }
-
-    @Override
-    public boolean isUnloading(Object o) {
-        return PluginLock.UNLOADING.equals(lock.getLockArg(o));
     }
 
     @Getter
@@ -387,8 +384,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected PluginHandlerChainFactory handlerChainFactory;
 
         protected PluginRepository repository;
-
-        protected PluginLock lock;
 
         protected PluginEventPublisher eventPublisher;
 
@@ -425,11 +420,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         public B repository(PluginRepository repository) {
             this.repository = repository;
-            return (B) this;
-        }
-
-        public B lock(PluginLock lock) {
-            this.lock = lock;
             return (B) this;
         }
 
@@ -576,7 +566,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setTreeFactory(treeFactory);
             concept.setHandlerChainFactory(handlerChainFactory);
             concept.setRepository(repository);
-            concept.setLock(lock);
             concept.setEventPublisher(eventPublisher);
             concept.setLogger(logger);
             concept.setFactories(factories);

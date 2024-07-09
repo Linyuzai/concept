@@ -42,11 +42,16 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     private boolean running = false;
 
+    @Override
+    public synchronized void start() {
+        start(true);
+    }
+
     /**
      * 开始监听
      */
     @Override
-    public synchronized void start() {
+    public synchronized void start(boolean load) {
         //如果已经开始，直接忽略
         if (running) {
             return;
@@ -55,8 +60,31 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
         executor.execute(this::listen);
 
-        for (String group : location.getGroups()) {
+        String[] groups = location.getGroups();
+        for (String group : groups) {
             addGroup(group);
+        }
+
+        if (load) {
+            List<String> paths = new ArrayList<>();
+            for (String group : groups) {
+                String[] names = location.getLoadedPlugins(group);
+                for (String name : names) {
+                    String path = location.getLoadedPluginPath(group, name);
+                    if (path == null) {
+                        continue;
+                    }
+                    paths.add(path);
+                }
+            }
+
+            concept.load(paths, (o, plugin) -> {
+                String path = (String) o;
+                concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
+            }, (o, e) -> {
+                String path = (String) o;
+                concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
+            });
         }
     }
 
@@ -83,25 +111,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         return watchStates.getOrDefault(group, false);
     }
 
-    private void performNotify(String group) {
-        String[] names = location.getLoadedPlugins(group);
-        List<String> paths = new ArrayList<>();
-        for (String name : names) {
-            String path = location.getLoadedPluginPath(group, name);
-            if (path == null) {
-                continue;
-            }
-            paths.add(path);
-        }
-        concept.load(paths, (o, plugin) -> {
-            String path = (String) o;
-            concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
-        }, (o, e) -> {
-            String path = (String) o;
-            concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
-        });
-    }
-
     /**
      * 停止监听
      */
@@ -113,13 +122,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
             if (!es.isShutdown()) {
                 es.shutdown();
             }
-        }
-    }
-
-    @Override
-    public void load() {
-        for (String group : location.getGroups()) {
-            performNotify(group);
         }
     }
 

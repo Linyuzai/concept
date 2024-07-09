@@ -20,10 +20,17 @@ public class PluginErrorLogger implements PluginEventListener {
             if (error instanceof PluginLoadException) {
                 Object source = ((PluginLoadException) error).getSource();
                 String message = source == null ? "Load error" : "Load error: " + source;
-                logger.error(message, error);
+                logger.error(message, getPluginException(error));
             } else {
                 logger.error("Plugin error", error);
             }
         }
+    }
+
+    private Throwable getPluginException(Throwable e) {
+        if (e instanceof PluginLoadException) {
+            return getPluginException(e.getCause());
+        }
+        return e;
     }
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Deprecated
 public class DefaultPluginLock implements PluginLock {
 
     private final Map<Object, LockObject> lockMap = new ConcurrentHashMap<>();

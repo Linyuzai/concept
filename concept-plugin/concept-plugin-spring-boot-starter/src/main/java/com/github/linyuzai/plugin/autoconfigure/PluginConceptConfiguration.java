@@ -29,7 +29,6 @@ import com.github.linyuzai.plugin.core.handle.extract.*;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
-import com.github.linyuzai.plugin.core.lock.DefaultPluginLock;
 import com.github.linyuzai.plugin.core.lock.PluginLock;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLoadLogger;
@@ -81,12 +80,6 @@ public class PluginConceptConfiguration {
     @ConditionalOnMissingBean
     public PluginRepository pluginRepository() {
         return new DefaultPluginRepository();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public PluginLock pluginLock() {
-        return new DefaultPluginLock();
     }
 
     @Bean
@@ -193,7 +186,6 @@ public class PluginConceptConfiguration {
                                        PluginHandlerChainFactory handlerChainFactory,
                                        PluginTreeFactory treeFactory,
                                        PluginRepository repository,
-                                       PluginLock lock,
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
                                        List<PluginFactory> factories,
@@ -205,7 +197,6 @@ public class PluginConceptConfiguration {
                 .handlerChainFactory(handlerChainFactory)
                 .treeFactory(treeFactory)
                 .repository(repository)
-                .lock(lock)
                 .eventPublisher(eventPublisher)
                 .logger(logger)
                 .addFactories(factories)
@@ -239,7 +230,7 @@ public class PluginConceptConfiguration {
             return new LocalPluginLocation(basePath, filter);
         }
 
-        @Bean(initMethod = "start", destroyMethod = "stop")
+        @Bean(destroyMethod = "stop")
         @ConditionalOnMissingBean
         public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
                                                  PluginExecutor executor,

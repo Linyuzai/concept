@@ -47,15 +47,15 @@ public interface PluginConcept {
     /**
      * 卸载插件
      *
-     * @param o 插件源
+     * @param source 插件源
      */
-    Plugin unload(Object o);
+    Plugin unload(Object source);
+
+    boolean isLoading(Object source);
+
+    boolean isUnloading(Object source);
 
     boolean isLoaded(Object o);
-
-    boolean isLoading(Object o);
-
-    boolean isUnloading(Object o);
 
     /**
      * 获得插件存储

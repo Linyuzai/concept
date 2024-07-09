@@ -10,12 +10,12 @@ public interface PluginAutoLoader {
      */
     void start();
 
+    void start(boolean load);
+
     /**
      * 停止监听
      */
     void stop();
-
-    void load();
 
     void addGroup(String group);
 
