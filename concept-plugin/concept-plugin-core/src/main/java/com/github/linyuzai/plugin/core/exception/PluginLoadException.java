@@ -1,15 +1,14 @@
 package com.github.linyuzai.plugin.core.exception;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.Getter;
 
 @Getter
 public class PluginLoadException extends PluginException {
 
-    private final PluginContext context;
+    private final Object source;
 
-    public PluginLoadException(PluginContext context, Throwable cause) {
+    public PluginLoadException(Object source, Throwable cause) {
         super(cause);
-        this.context = context;
+        this.source = source;
     }
 }

@@ -8,7 +8,6 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * 插件概念
@@ -43,10 +42,7 @@ public interface PluginConcept {
      */
     Plugin load(Object source);
 
-    Plugin load(Object source, boolean reloadIfExist);
-
-
-    void load(Collection<?> sources, boolean reloadIfExist, BiConsumer<Object, Plugin> onSuccess, BiConsumer<Object, Throwable> onError);
+    void load(Collection<?> sources, BiConsumer<Object, Plugin> onSuccess, BiConsumer<Object, Throwable> onError);
 
     /**
      * 卸载插件

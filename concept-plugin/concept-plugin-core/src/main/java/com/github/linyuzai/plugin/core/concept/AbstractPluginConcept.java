@@ -21,10 +21,12 @@ import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * {@link PluginConcept} 抽象类
@@ -63,6 +65,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected Collection<PluginHandlerFactory> handlerFactories;
 
     protected volatile PluginHandlerChain handlerChain;
+
+    protected volatile Set<Object> loading = new LinkedHashSet<>();
+
+    protected volatile Set<Object> unloading = new LinkedHashSet<>();
 
     @Override
     public void initialize() {
@@ -147,55 +153,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public Plugin load(Object source) {
-        return load(source, false);
-    }
-
-    @Override
-    public Plugin load(Object source, boolean reloadIfExist) {
-        return doLoad(source, reloadIfExist, null);
-    }
-
-    @Override
-    public void load(Collection<?> sources,
-                     boolean reloadIfExist,
-                     BiConsumer<Object, Plugin> onSuccess,
-                     BiConsumer<Object, Throwable> onError) {
-        Iterator<?> iterator = new ArrayList<>(sources).iterator();
-        loadDependency(iterator, reloadIfExist, new ArrayList<>(), onSuccess, onError);
-    }
-
-    protected void loadDependency(Iterator<?> iterator,
-                                  boolean reloadIfExist,
-                                  List<String> dependencyList,
-                                  BiConsumer<Object, Plugin> onSuccess,
-                                  BiConsumer<Object, Throwable> onError) {
-        while (iterator.hasNext()) {
-            Object source = iterator.next();
-            iterator.remove();
-            try {
-                Plugin load = doLoad(source, reloadIfExist, (plugin, name) -> {
-                    List<String> list = new ArrayList<>(dependencyList);
-                    if (list.contains(name)) {
-                        list.add(name);
-                        int start = 0;
-                        for (int i = 0; i < list.size(); i++) {
-                            if (Objects.equals(list.get(i), name)) {
-                                start = i;
-                                break;
-                            }
-                        }
-                        String message = String.join("<==", list.subList(start, list.size() - 1));
-                        throw new PluginException("Cycle dependency: " + message);
-                    }
-                    while (iterator.hasNext() && !existDependency(name)) {
-                        loadDependency(iterator, reloadIfExist, list, onSuccess, onError);
-                    }
-                });
-                onSuccess.accept(source, load);
-            } catch (Throwable e) {
-                onError.accept(source, e);
+        List<Plugin> plugins = new ArrayList<>();
+        load(Collections.singleton(source), (o, plugin) -> plugins.add(plugin), (o, e) -> {
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            } else {
+                throw new PluginLoadException(source, e);
             }
-        }
+        });
+        return plugins.get(0);
     }
 
     /**
@@ -207,48 +173,121 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 通过 {@link PluginExtractor} 提取插件，
      * 销毁上下文，释放插件资源。
      *
-     * @param source 插件源
+     * @param sources 插件源
      */
-    protected Plugin doLoad(@NonNull Object source, boolean reloadIfExist, BiConsumer<Plugin, String> onDependency) {
-        Plugin exist = repository.get(source);
-        if (exist != null && !reloadIfExist) {
-            throw new IllegalArgumentException("Plugin is already loaded: " + source);
-        }
-        //创建上下文
-        PluginContext context = contextFactory.create(this);
-
-        lock.lock(source, PluginLock.LOADING);
-        try {
-            //初始化上下文
-            context.set(PluginConcept.class, this);
-            context.initialize();
-
-            Plugin plugin = create(source, context);
-            if (plugin == null) {
-                throw new PluginException("Plugin can not create: " + source);
+    @Override
+    public synchronized void load(Collection<?> sources,
+                                  BiConsumer<Object, Plugin> onSuccess,
+                                  BiConsumer<Object, Throwable> onError) {
+        List<Object> list = new ArrayList<>();
+        for (Object source : sources) {
+            if (repository.contains(source)) {
+                onError.accept(source, new IllegalArgumentException("Plugin is already loaded: " + source));
+            } else {
+                loading.add(source);
+                list.add(source);
             }
+        }
 
-            plugin.setConcept(this);
-            plugin.initialize();
-            eventPublisher.publish(new PluginCreatedEvent(plugin));
+        BiConsumer<Object, Plugin> success = (source, plugin) -> {
+            loading.remove(source);
+            onSuccess.accept(source, plugin);
+        };
 
-            Set<String> names = plugin.getMetadata().asStandard().getDependency().getNames();
-            if (names != null && !names.isEmpty()) {
-                for (String name : names) {
-                    if (existDependency(name)) {
+        BiConsumer<Object, Throwable> error = (source, e) -> {
+            loading.remove(source);
+            if (e instanceof PluginLoadException) {
+                onError.accept(source, e);
+            } else {
+                onError.accept(source, new PluginLoadException(source, e));
+            }
+        };
+
+        List<LoadingEntry> entries = new ArrayList<>();
+
+        for (Object source : list) {
+            try {
+                //创建上下文
+                PluginContext context = contextFactory.create(this);
+
+                //初始化上下文
+                context.set(PluginConcept.class, this);
+                context.initialize();
+
+                Plugin plugin = create(source, context);
+                if (plugin == null) {
+                    throw new PluginException("Plugin can not create: " + source);
+                }
+
+                plugin.setConcept(this);
+                plugin.initialize();
+
+                context.set(Plugin.class, plugin);
+
+                eventPublisher.publish(new PluginCreatedEvent(plugin));
+
+                entries.add(new LoadingEntry(source, plugin, context));
+            } catch (Throwable e) {
+                error.accept(source, e);
+            }
+        }
+
+        while (!entries.isEmpty()) {
+            LoadingEntry entry = entries.remove(0);
+            loadDependency(entry, entries, new Stack<>(), success, error);
+        }
+    }
+
+    protected void loadDependency(LoadingEntry entry,
+                                  Collection<LoadingEntry> original,
+                                  Stack<String> dependencyChain,
+                                  BiConsumer<Object, Plugin> onSuccess,
+                                  BiConsumer<Object, Throwable> onError) {
+        Object source = entry.getSource();
+        Plugin plugin = entry.getPlugin();
+        PluginContext context = entry.getContext();
+        String name = entry.getPlugin().getMetadata().asStandard().getName();
+        if (name != null) {
+            dependencyChain.push(name);
+        }
+        try {
+            Set<String> dependencyNames = entry.getPlugin().getMetadata()
+                    .asStandard().getDependency().getNames();
+            if (dependencyNames != null && !dependencyNames.isEmpty()) {
+                for (String dependencyName : dependencyNames) {
+                    if (existDependency(dependencyName)) {
                         continue;
                     }
-                    if (onDependency != null) {
-                        onDependency.accept(plugin, name);
+
+                    if (dependencyChain.contains(dependencyName)) {
+                        for (int i = 0; i < dependencyChain.size(); i++) {
+                            String n = dependencyChain.get(i);
+                            if (Objects.equals(n, dependencyName)) {
+                                List<String> subList = dependencyChain.subList(i, dependencyChain.size());
+                                List<String> cycle = new ArrayList<>(subList);
+                                cycle.add(dependencyName);
+                                String message = "Plugin cycle dependency: " + String.join(" <== ", cycle);
+                                throw new PluginException(message);
+                            }
+                        }
                     }
-                    if (!existDependency(name)) {
-                        throw new PluginException("Plugin dependency not found: " + name);
+
+                    List<LoadingEntry> dependencyList = original.stream()
+                            .filter(it -> Objects.equals(dependencyName, it.getPlugin()
+                                    .getMetadata().asStandard().getName()))
+                            .collect(Collectors.toList());
+                    for (LoadingEntry dependency : dependencyList) {
+                        original.remove(dependency);
+                        loadDependency(dependency, original, dependencyChain, onSuccess, onError);
+                    }
+
+                    if (!existDependency(dependencyName)) {
+                        throw new PluginException("Plugin dependency not found: " + dependencyName);
                     }
                 }
             }
 
             PluginTree tree = treeFactory.create(plugin, this);
-            context.set(Plugin.class, plugin);
             context.set(PluginTree.class, tree);
             context.set(PluginTree.Node.class, tree.getRoot());
 
@@ -270,25 +309,17 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             context.destroy();
 
             repository.add(plugin);
-            if (exist != null) {
-                try {
-                    exist.destroy();
-                } catch (Throwable e) {
-                    logger.error("Plugin destroy error", e);
-                }
-            }
 
             eventPublisher.publish(new PluginLoadedEvent(plugin));
 
-            return plugin;
+            onSuccess.accept(source, plugin);
+
         } catch (Throwable e) {
-            if (e instanceof PluginLoadException) {
-                throw (PluginLoadException) e;
-            } else {
-                throw new PluginLoadException(context, e);
-            }
+            onError.accept(source, e);
         } finally {
-            lock.unlock(source, PluginLock.LOADING);
+            if (name != null) {
+                dependencyChain.pop();
+            }
         }
     }
 
@@ -333,6 +364,17 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public boolean isUnloading(Object o) {
         return PluginLock.UNLOADING.equals(lock.getLockArg(o));
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class LoadingEntry {
+
+        private final Object source;
+
+        private final Plugin plugin;
+
+        private final PluginContext context;
     }
 
     @SuppressWarnings("unchecked")
