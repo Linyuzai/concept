@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.read.PluginReader;
 import lombok.Data;
 
 import java.io.IOException;
@@ -30,17 +29,9 @@ public interface Plugin {
 
     void setConcept(PluginConcept concept);
 
-    void addReader(PluginReader reader);
-
-    void removeReader(PluginReader reader);
-
     void addDestroyListener(DestroyListener listener);
 
     void removeDestroyListener(DestroyListener listener);
-
-    <T> T read(Class<T> readable, Object key);
-
-    <T> T read(Class<T> readable, Object key, PluginContext context);
 
     void initialize();
 

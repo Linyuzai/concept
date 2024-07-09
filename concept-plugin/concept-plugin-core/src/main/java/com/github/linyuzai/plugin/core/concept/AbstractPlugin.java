@@ -1,40 +1,24 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import com.github.linyuzai.plugin.core.context.DefaultPluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.read.PluginReader;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public abstract class AbstractPlugin implements Plugin {
-
-    private final Collection<PluginReader> readers = new CopyOnWriteArrayList<>();
 
     private final Collection<DestroyListener> destroyListeners = new CopyOnWriteArrayList<>();
 
     private PluginMetadata metadata;
 
     private PluginConcept concept;
-
-    @Override
-    public void addReader(PluginReader reader) {
-        this.readers.add(reader);
-    }
-
-    @Override
-    public void removeReader(PluginReader reader) {
-        this.readers.remove(reader);
-    }
 
     @Override
     public void addDestroyListener(DestroyListener listener) {
@@ -44,34 +28,6 @@ public abstract class AbstractPlugin implements Plugin {
     @Override
     public void removeDestroyListener(DestroyListener listener) {
         this.destroyListeners.remove(listener);
-    }
-
-    public Collection<PluginReader> getReaders(Class<?> readable) {
-        return readers.stream()
-                .filter(it -> it.support(readable))
-                .collect(Collectors.toList());
-    }
-
-
-    @Override
-    public <T> T read(Class<T> readable, Object key) {
-        return read(readable, key, createReadContent());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T read(Class<T> readable, Object key, PluginContext context) {
-        for (PluginReader reader : getReaders(readable)) {
-            Object read = reader.read(key, context.createSubContext(false));
-            if (read != null) {
-                return (T) read;
-            }
-        }
-        return null;
-    }
-
-    protected PluginContext createReadContent() {
-        return new DefaultPluginContext(null);
     }
 
     @Override
@@ -129,12 +85,6 @@ public abstract class AbstractPlugin implements Plugin {
     public void destroy() {
         for (DestroyListener listener : destroyListeners) {
             listener.onDestroy(this);
-        }
-        for (PluginReader reader : readers) {
-            try {
-                reader.close();
-            } catch (IOException ignore) {
-            }
         }
         onDestroy();
     }

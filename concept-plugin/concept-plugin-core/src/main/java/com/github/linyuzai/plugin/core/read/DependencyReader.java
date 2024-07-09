@@ -44,10 +44,11 @@ public abstract class DependencyReader implements PluginReader {
                 continue;
             }
             if (dependencies.contains(name)) {
-                Object read = plugin.read(getReadableType(), key, context);
+                return null;
+                /*Object read = plugin.read(getReadableType(), key, context);
                 if (read != null) {
                     return read;
-                }
+                }*/
             }
         }
         return null;
