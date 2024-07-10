@@ -89,6 +89,7 @@ public abstract class PluginClassLoader extends URLClassLoader {
         return super.findClass(name);
     }
 
+    @Deprecated
     protected void collectDependencyPlugins(Plugin plugin, Collection<Plugin> plugins) {
         if (plugins.contains(plugin)) {
             return;

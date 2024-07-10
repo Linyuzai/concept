@@ -41,15 +41,6 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
         Map<String, Content> packages = new HashMap<>();
         collectClassContents(tree.getRoot(), classes, packages);
         this.pluginClassLoader = new JarPluginClassLoader(this, packages, classes, getClass().getClassLoader());
-        //addReader(new JarClassReader(this, classLoader));
-    }
-
-    @Override
-    public void onRelease(PluginContext context) {
-        try {
-            pluginClassLoader.close();
-        } catch (Throwable ignore) {
-        }
     }
 
     protected void collectClassContents(PluginTree.Node node,
@@ -80,5 +71,13 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        try {
+            pluginClassLoader.close();
+        } catch (Throwable ignore) {
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.PluginClassLoader;
 import com.github.linyuzai.plugin.jar.read.JarClassReader;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.net.JarURLConnection;
@@ -19,6 +20,7 @@ import java.util.function.Consumer;
  * 基于 jar 的插件
  */
 @Getter
+@Setter
 public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
 
     private final ExJarFile jarFile;
@@ -75,17 +77,16 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
             return;
         }
         this.pluginClassLoader = new ExJarPluginClassLoader(this, urls.toArray(new URL[0]), getClass().getClassLoader());
-        //addReader(new JarClassReader(this, classLoader));
     }
 
     @Override
-    public void onRelease(PluginContext context) {
+    public void onDestroy() {
         try {
-            pluginClassLoader.close();
+            jarFile.close();
         } catch (Throwable ignore) {
         }
         try {
-            jarFile.close();
+            pluginClassLoader.close();
         } catch (Throwable ignore) {
         }
     }

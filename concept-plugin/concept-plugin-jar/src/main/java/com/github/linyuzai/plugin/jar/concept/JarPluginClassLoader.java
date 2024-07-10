@@ -63,4 +63,11 @@ public class JarPluginClassLoader extends PluginClassLoader {
             }
         }
     }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        packages.clear();
+        classes.clear();
+    }
 }

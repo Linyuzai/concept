@@ -41,7 +41,12 @@ public class PluginConceptProperties {
     @Data
     public static class JarProperties {
 
-        private String mode = JarPlugin.Mode.STREAM;
+        private Mode mode = Mode.STREAM;
+
+        public enum Mode {
+
+            STREAM, FILE
+        }
     }
 
     @Data

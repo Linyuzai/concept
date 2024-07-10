@@ -13,6 +13,10 @@ public class SampleBeanExtractor extends BeanExtractor<CustomPlugin> {
     @Override
     public void onExtract(CustomPlugin plugin, PluginContext context) {
         log.info("Bean Object => {}", plugin);
-        plugin.run();
+        try {
+            plugin.run();
+        } catch (Throwable e) {
+
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginContextMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.NestedType;
@@ -29,6 +30,11 @@ public abstract class PluginContextExtractor<T extends PluginContext> extends Ab
         if (PluginContext.class.isAssignableFrom(cls)) {
             return new PluginContextMatcher(cls);
         }
+        return null;
+    }
+
+    @Override
+    public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
         return null;
     }
 

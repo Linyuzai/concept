@@ -106,7 +106,7 @@ public class PluginConceptConfiguration {
 
     @Bean
     public PluginFactory pluginJarPluginFactory(PluginConceptProperties properties) {
-        String mode = properties.getJar().getMode();
+        String mode = properties.getJar().getMode().name();
         Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
         BinderMetadataJarPluginFactory factory = new BinderMetadataJarPluginFactory();
         factory.setDefaultMode(mode);
