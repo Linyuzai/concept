@@ -26,8 +26,8 @@ public class JarPluginFactory extends ZipPluginFactory {
 
     @SneakyThrows
     @Override
-    public Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
-        String mode = getMode(file, metadata, context);
+    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
+        String mode = getMode(metadata);
         switch (mode.toUpperCase()) {
             case JarPlugin.Mode.FILE:
                 return new ExJarPlugin(new ExJarFile(file), file.getAbsolutePath());
@@ -38,7 +38,7 @@ public class JarPluginFactory extends ZipPluginFactory {
         }
     }
 
-    public String getMode(File file, PluginMetadata metadata, PluginContext context) {
+    public String getMode(PluginMetadata metadata) {
         JarPlugin.StandardMetadata standard = metadata.asStandard();
         String mode = standard.getJar().getMode();
         return (mode == null || mode.isEmpty()) ? defaultMode : mode;

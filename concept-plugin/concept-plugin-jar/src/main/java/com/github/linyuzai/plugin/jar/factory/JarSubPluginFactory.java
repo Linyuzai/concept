@@ -22,12 +22,13 @@ public class JarSubPluginFactory extends ZipSubPluginFactory {
             } catch (Throwable e) {
                 return null;
             }
+        } else {
+            return super.createFromEntry(entry, url, context);
         }
-        return super.createFromEntry(entry, url, context);
     }
 
     @Override
-    protected JarStreamPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
+    protected JarStreamPlugin createSubPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
         return new JarStreamPlugin(zis, url, parent);
     }
 

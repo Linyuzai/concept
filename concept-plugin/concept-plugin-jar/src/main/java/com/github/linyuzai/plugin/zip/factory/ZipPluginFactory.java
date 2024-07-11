@@ -3,13 +3,15 @@ package com.github.linyuzai.plugin.zip.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.factory.MetadataPluginFactory;
+import com.github.linyuzai.plugin.core.factory.AbstractPluginFactory;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,12 +19,15 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZipPluginFactory extends MetadataPluginFactory<File> {
+@Getter
+@Setter
+public class ZipPluginFactory extends AbstractPluginFactory<File> {
+
+    private PluginMetadataFactory metadataFactory = new ZipPluginMetadataFactory();
 
     @SneakyThrows
     @Override
-    public Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
-        //ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()));
+    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
         return createZipPlugin(file, getURL(file));
     }
 
@@ -31,17 +36,8 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
     }
 
     @Override
-    protected PluginMetadata createMetadata(File file, PluginContext context) {
-        try {
-            return createMetadata(file);
-        } catch (Throwable e) {
-            return null;
-        }
-    }
-
-    @Override
-    protected File getSource(Object o, PluginContext context) {
-        File file = getFile(o);
+    protected File getSupported(Object source) {
+        File file = getFile(source);
         if (file != null && supportFile(file)) {
             return file;
         }
@@ -49,46 +45,54 @@ public class ZipPluginFactory extends MetadataPluginFactory<File> {
     }
 
     protected boolean supportFile(File file) {
-        if (file.exists() && file.isFile()) {
-            try {
-                ZipFile zf = new ZipFile(file);
-                zf.close();
-                return true;
-            } catch (Throwable ignore) {
-            }
+        try {
+            ZipFile zf = new ZipFile(file);
+            zf.close();
+            return true;
+        } catch (Throwable ignore) {
         }
         return false;
-    }
-
-    protected File getFile(Object o) {
-        if (o instanceof File) {
-            File file = (File) o;
-            if (file.exists()) {
-                return file;
-            }
-        } else if (o instanceof String) {
-            File file = new File((String) o);
-            if (file.exists()) {
-                return file;
-            }
-        }
-        return null;
     }
 
     protected URL getURL(File file) throws MalformedURLException {
         return file.toURI().toURL();
     }
 
-    public static PluginMetadata createMetadata(File file) throws IOException {
-        try (ZipFile zipFile = new ZipFile(file)) {
-            Properties properties = new Properties();
-            ZipEntry entry = zipFile.getEntry(PluginMetadata.NAME);
-            if (entry != null) {
-                try (InputStream is = zipFile.getInputStream(entry)) {
-                    properties.load(is);
-                }
+    public static File getFile(Object o) {
+        File file;
+        if (o instanceof File) {
+            file = (File) o;
+        } else if (o instanceof String) {
+            file = new File((String) o);
+        } else {
+            file = null;
+        }
+        if (file != null && file.exists() && file.isFile()) {
+            return file;
+        }
+        return null;
+    }
+
+    public class ZipPluginMetadataFactory implements PluginMetadataFactory {
+
+        @Override
+        public PluginMetadata create(Object source) {
+            File file = getSupported(source);
+            if (file == null) {
+                return null;
             }
-            return new PropertiesMetadata(properties);
+            try (ZipFile zipFile = new ZipFile(file)) {
+                Properties properties = new Properties();
+                ZipEntry entry = zipFile.getEntry(PluginMetadata.NAME);
+                if (entry != null) {
+                    try (InputStream is = zipFile.getInputStream(entry)) {
+                        properties.load(is);
+                    }
+                }
+                return new PropertiesMetadata(properties);
+            } catch (Throwable e) {
+                return null;
+            }
         }
     }
 }

@@ -2,19 +2,15 @@ package com.github.linyuzai.plugin.autoconfigure.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.*;
 
-import java.io.File;
 import java.util.Set;
 
 @Getter
@@ -26,12 +22,8 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
     private Environment environment;
 
     @Override
-    protected PluginMetadata createMetadata(File file, PluginContext context) {
-        PluginMetadata metadata = super.createMetadata(file, context);
-        if (metadata == null) {
-            return null;
-        }
-        return new BinderMetadata(metadata);
+    protected PluginMetadata createMetadata(Object source) {
+        return new BinderMetadata(super.createMetadata(source));
     }
 
     @Override

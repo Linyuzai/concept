@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.zip.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.SubPluginFactory;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import lombok.SneakyThrows;
 
@@ -15,7 +16,7 @@ public class ZipSubPluginFactory extends SubPluginFactory {
 
     @SneakyThrows
     @Override
-    public Plugin doCreate(Plugin.Entry entry, PluginContext context) {
+    protected Plugin doCreate(Plugin.Entry entry, PluginMetadata metadata, PluginContext context) {
         if (supportEntry(entry, context)) {
             Object id = entry.getId();
             if (id instanceof URL) {
@@ -29,10 +30,10 @@ public class ZipSubPluginFactory extends SubPluginFactory {
     @SneakyThrows
     protected Plugin createFromEntry(Plugin.Entry entry, URL url, PluginContext context) {
         ZipInputStream zis = new ZipInputStream(entry.getContent().getInputStream());
-        return createZipPlugin(zis, url, entry);
+        return createSubPlugin(zis, url, entry);
     }
 
-    protected ZipStreamPlugin createZipPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
+    protected ZipStreamPlugin createSubPlugin(ZipInputStream zis, URL url, Plugin.Entry parent) {
         return new ZipStreamPlugin(zis, url, parent);
     }
 

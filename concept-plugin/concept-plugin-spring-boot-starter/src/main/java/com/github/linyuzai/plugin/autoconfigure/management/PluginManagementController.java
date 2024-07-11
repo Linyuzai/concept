@@ -70,7 +70,9 @@ public class PluginManagementController {
 
     @GetMapping("/setting")
     public Response setting() {
-        return manage(() -> new Setting(properties.getManagement().getHeader(),
+        return manage(() -> new Setting(
+                properties.getManagement().getGithubCorner(),
+                properties.getManagement().getHeader(),
                 properties.getManagement().getFooter()), () -> "获取配置");
     }
 
@@ -405,6 +407,8 @@ public class PluginManagementController {
     @Getter
     @RequiredArgsConstructor
     public static class Setting {
+
+        private final PluginConceptProperties.ManagementProperties.GithubCornerProperties githubCorner;
 
         private final PluginConceptProperties.ManagementProperties.HeaderProperties header;
 

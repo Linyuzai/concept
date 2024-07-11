@@ -1,10 +1,13 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
+import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
@@ -56,6 +59,12 @@ public interface PluginConcept {
     boolean isUnloading(Object source);
 
     boolean isLoaded(Object o);
+
+    PluginContextFactory getContextFactory();
+
+    PluginTreeFactory getTreeFactory();
+
+    PluginHandlerChainFactory getHandlerChainFactory();
 
     /**
      * 获得插件存储

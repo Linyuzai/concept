@@ -3,13 +3,12 @@ package com.github.linyuzai.plugin.autoconfigure.management;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.zip.factory.ZipPluginFactory;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 @Getter
@@ -20,6 +19,8 @@ public class DefaultPluginPropertiesProvider implements PluginPropertiesProvider
 
     protected final PluginConcept concept;
 
+    protected final List<PluginFactory> factories;
+
     @Override
     public List<PluginPropertyEntry> getProperties(String group, String name) {
         return collect(getMetadata(group, name));
@@ -29,19 +30,33 @@ public class DefaultPluginPropertiesProvider implements PluginPropertiesProvider
         String path = location.getLoadedPluginPath(group, name);
         Plugin plugin = concept.getRepository().get(path);
         if (plugin == null) {
-            try {
-                File file = new File(location.getUnloadedPluginPath(group, name));
-                return ZipPluginFactory.createMetadata(file);
-            } catch (IOException e) {
-                try {
-                    return ZipPluginFactory.createMetadata(new File(path));
-                } catch (IOException ex) {
-                    return null;
-                }
+            PluginMetadata metadata = getMetadata(location.getUnloadedPluginPath(group, name));
+            if (metadata == null) {
+                return getMetadata(path);
+            } else {
+                return metadata;
             }
         } else {
             return plugin.getMetadata();
         }
+    }
+
+    public PluginMetadata getMetadata(String path) {
+        for (PluginFactory factory : factories) {
+            PluginMetadataFactory metadataFactory = factory.getMetadataFactory();
+            if (metadataFactory == null) {
+                continue;
+            }
+            try {
+                PluginMetadata metadata = metadataFactory.create(path);
+                if (metadata == null) {
+                    continue;
+                }
+                return metadata;
+            } catch (Throwable ignore) {
+            }
+        }
+        return null;
     }
 
     public static List<PluginPropertyEntry> collect(PluginMetadata metadata) {

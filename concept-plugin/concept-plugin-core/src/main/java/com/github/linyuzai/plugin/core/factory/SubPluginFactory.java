@@ -1,25 +1,37 @@
 package com.github.linyuzai.plugin.core.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.EmptyMetadata;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class SubPluginFactory implements PluginFactory {
+@Getter
+@Setter
+public abstract class SubPluginFactory extends AbstractPluginFactory<Plugin.Entry> {
 
-    private final EmptyMetadata metadata = new EmptyMetadata(new Plugin.StandardMetadata());
+    private PluginMetadataFactory metadataFactory = new SubPluginMetadataFactory();
 
     @Override
-    public Plugin create(Object o, PluginContext context) {
-        if (o instanceof Plugin.Entry) {
-            Plugin plugin = doCreate((Plugin.Entry) o, context);
-            if (plugin != null) {
-                plugin.setMetadata(metadata);
-            }
-            return plugin;
+    protected Plugin.Entry getSupported(Object source) {
+        if (source instanceof Plugin.Entry) {
+            return (Plugin.Entry) source;
         }
         return null;
     }
 
-    public abstract Plugin doCreate(Plugin.Entry entry, PluginContext context);
+    public class SubPluginMetadataFactory implements PluginMetadataFactory {
 
+        private final EmptyMetadata metadata = new EmptyMetadata(new Plugin.StandardMetadata());
+
+        @Override
+        public PluginMetadata create(Object source) {
+            if (getSupported(source) != null) {
+                return metadata;
+            } else {
+                return null;
+            }
+        }
+    }
 }

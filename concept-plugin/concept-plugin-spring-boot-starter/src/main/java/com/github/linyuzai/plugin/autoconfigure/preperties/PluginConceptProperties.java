@@ -54,6 +54,8 @@ public class PluginConceptProperties {
 
         private AuthorizationProperties authorization = new AuthorizationProperties();
 
+        private GithubCornerProperties githubCorner = new GithubCornerProperties();
+
         private HeaderProperties header = new HeaderProperties();
 
         private FooterProperties footer = new FooterProperties();
@@ -65,13 +67,17 @@ public class PluginConceptProperties {
         }
 
         @Data
+        public static class GithubCornerProperties {
+
+            private boolean display = true;
+        }
+
+        @Data
         public static class HeaderProperties {
 
             private boolean display = true;
 
             private TitleProperties title = new TitleProperties();
-
-            private GithubCornerProperties githubCorner = new GithubCornerProperties();
 
             @Data
             public static class TitleProperties {
@@ -79,12 +85,6 @@ public class PluginConceptProperties {
                 private boolean display = true;
 
                 private String text = "Concept Plugin";
-            }
-
-            @Data
-            public static class GithubCornerProperties {
-
-                private boolean display = true;
             }
         }
 
