@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.extract.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
-import com.github.linyuzai.plugin.jar.handle.filter.ClassAnnotationFilter;
+import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilter;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
@@ -12,6 +12,7 @@ import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -40,12 +41,12 @@ public class ClassMatcher extends AbstractPluginMatcher<ClassSupplier> {
             } else if (annotation.annotationType() == PluginClass.class) {
                 Class<?>[] classes = ((PluginClass) annotation).value();
                 if (classes.length > 0) {
-                    addFilter(new ClassFilter(classes));
+                    addFilter(ClassFilter.create(classes));
                 }
             } else if (annotation.annotationType() == PluginClassAnnotation.class) {
                 Class<? extends Annotation>[] classes = ((PluginClassAnnotation) annotation).value();
                 if (classes.length > 0) {
-                    addFilter(new ClassAnnotationFilter(classes));
+                    addFilter(ClassFilter.annotation(classes));
                 }
             }
         }
@@ -53,10 +54,15 @@ public class ClassMatcher extends AbstractPluginMatcher<ClassSupplier> {
 
     public void addFilter(AbstractPluginFilter<ClassSupplier> filter) {
         this.filters.add(filter);
+        sort();
     }
 
     public void removeFilter(AbstractPluginFilter<ClassSupplier> filter) {
         this.filters.remove(filter);
+    }
+
+    protected void sort() {
+        this.filters.sort(Comparator.comparingInt(PluginFilter::getOrder));
     }
 
     @Override

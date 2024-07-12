@@ -5,7 +5,6 @@ import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.extract.match.AbstractPluginMatcher;
 import com.github.linyuzai.plugin.jar.handle.extract.match.ClassMatcher;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
-import com.github.linyuzai.plugin.jar.handle.filter.ClassModifierFilter;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
@@ -23,8 +22,8 @@ public class BeanMatcher extends AbstractPluginMatcher<BeanSupplier> {
     public BeanMatcher(Class<?> target, Annotation[] annotations) {
         super(annotations);
         this.classMatcher = new ClassMatcher(target, annotations);
-        this.classMatcher.addFilter(new ClassModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate());
-        this.classMatcher.addFilter(new ClassFilter(cls -> !cls.isEnum()));
+        this.classMatcher.addFilter(ClassFilter.modifier(Modifier::isInterface, Modifier::isAbstract).negate());
+        this.classMatcher.addFilter(ClassFilter.isEnum().negate());
     }
 
     @Override

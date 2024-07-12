@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,19 +36,21 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
         List<PluginHandler> sorted = resolveDependency(resolvers);
         for (PluginHandler handler : sorted) {
             List<PluginHandler> filtered = filters.stream().filter(it -> {
-                if (it instanceof PluginHandler.Dependency) {
-                    Class<? extends PluginHandler>[] dependencies =
-                            ((PluginHandler.Dependency) it).getDependencies();
-                    for (Class<? extends PluginHandler> dependency : dependencies) {
-                        if (dependency.isInstance(handler)) {
+                        if (it instanceof PluginHandler.Dependency) {
+                            Class<? extends PluginHandler>[] dependencies =
+                                    ((PluginHandler.Dependency) it).getDependencies();
+                            for (Class<? extends PluginHandler> dependency : dependencies) {
+                                if (dependency.isInstance(handler)) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        } else {
                             return true;
                         }
-                    }
-                    return false;
-                } else {
-                    return true;
-                }
-            }).collect(Collectors.toList());
+                    }).map(PluginFilter.class::cast)
+                    .sorted(Comparator.comparingInt(f -> f == null ? 0 : f.getOrder()))
+                    .collect(Collectors.toList());
             entries.add(new Entry(handler, filtered));
         }
     }

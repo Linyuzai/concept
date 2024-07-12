@@ -7,28 +7,24 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-
 @Getter
 @RequiredArgsConstructor
-public abstract class PredicateModifierFilter<T, P> extends AbstractPluginFilter<T> {
+public abstract class PredicateModifierFilter<T> extends AbstractPluginFilter<T> {
 
-    private final Collection<Predicate<P>> predicates;
+    private final Collection<Predicate<T>> predicates;
 
     @SafeVarargs
-    public PredicateModifierFilter(Predicate<P>... functions) {
+    public PredicateModifierFilter(Predicate<T>... functions) {
         this(Arrays.asList(functions));
     }
 
     @Override
     public boolean doFilter(T original) {
-        P p = to(original);
-        for (Predicate<P> predicate : predicates) {
-            if (predicate.test(p)) {
+        for (Predicate<T> predicate : predicates) {
+            if (predicate.test(original)) {
                 return true;
             }
         }
         return false;
     }
-
-    protected abstract P to(T t);
 }
