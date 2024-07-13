@@ -14,9 +14,7 @@ public interface PluginExtractor extends PluginHandler, PluginHandler.Dependency
     }
 
     /**
-     * 提取插件
-     *
-     * @param context 上下文 {@link PluginContext}
+     * 提取
      */
     void extract(PluginContext context);
 
@@ -26,11 +24,7 @@ public interface PluginExtractor extends PluginHandler, PluginHandler.Dependency
     interface Invoker extends Dependency {
 
         /**
-         * 执行插件提取。
-         * 包括匹配，转换，格式化三个步骤。
-         *
-         * @param context 上下文 {@link PluginContext}
-         * @return 插件对象
+         * 执行插件提取
          */
         Object invoke(PluginContext context);
     }

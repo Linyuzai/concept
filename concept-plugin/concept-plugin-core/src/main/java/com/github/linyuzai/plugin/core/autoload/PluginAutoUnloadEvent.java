@@ -10,6 +10,9 @@ import lombok.Getter;
 @Getter
 public class PluginAutoUnloadEvent extends AbstractPluginEvent implements PluginAutoEvent {
 
+    /**
+     * 插件路径
+     */
     private final String path;
 
     public PluginAutoUnloadEvent(Plugin plugin, String path) {

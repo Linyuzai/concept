@@ -14,8 +14,6 @@ public @interface PluginText {
 
     /**
      * 编码
-     *
-     * @return 编码
      */
     String charset();
 }

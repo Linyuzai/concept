@@ -17,7 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 /**
- * 基于 {@link WatchService} 的插件文件自动加载器
+ * 基于目录监听的插件文件自动加载
+ *
+ * @see WatchService
  */
 @Getter
 @RequiredArgsConstructor
@@ -35,10 +37,16 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
      */
     private final PluginLocation location;
 
+    /**
+     * 目录状态
+     */
     private final Map<String, Boolean> watchStates = new ConcurrentHashMap<>();
 
     private WatchService watchService;
 
+    /**
+     * 是否运行
+     */
     private boolean running = false;
 
     @Override
@@ -59,11 +67,13 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
         executor.execute(this::listen);
 
+        //添加目录监听
         String[] groups = location.getGroups();
         for (String group : groups) {
             addGroup(group);
         }
 
+        //加载已经存在的插件
         if (load) {
             List<String> paths = new ArrayList<>();
             for (String group : groups) {
@@ -90,15 +100,15 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     @Override
     public void addGroup(String group) {
         try {
-            String path = location.getLoadedPath(group);
-            registerPath(path);
+            String path = location.getLoadedBasePath(group);
+            registerPath(path, watchService);
             watchStates.put(group, true);
         } catch (Throwable e) {
             watchStates.put(group, true);
         }
     }
 
-    protected void registerPath(String path) throws IOException {
+    protected void registerPath(String path, WatchService watchService) throws IOException {
         Paths.get(path).register(watchService,
                 StandardWatchEventKinds.ENTRY_CREATE,
                 StandardWatchEventKinds.ENTRY_MODIFY,
@@ -136,6 +146,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                 try {
                     final WatchKey key = watchService.take();
                     for (WatchEvent<?> event : key.pollEvents()) {
+                        //获得分组
                         String groupPath = key.watchable().toString();
                         String group = location.getGroup(groupPath);
                         if (group == null) {
@@ -159,7 +170,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         if (kind == StandardWatchEventKinds.OVERFLOW) {
             return;
         }
-        String name = event.context().toString();
+        String name = event.context().toString();//文件名
         onNotify(kind, group, name);
     }
 
@@ -179,8 +190,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     /**
      * 文件创建
-     *
-     * @param path 监听到的事件
      */
     public void onFileCreated(String path) {
         load(path);
@@ -188,8 +197,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     /**
      * 文件修改
-     *
-     * @param path 监听到的事件
      */
     public void onFileModified(String path) {
         reload(path);
@@ -197,8 +204,6 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
     /**
      * 文件删除
-     *
-     * @param path 监听到的事件
      */
     public void onFileDeleted(String path) {
         unload(path);
@@ -208,6 +213,9 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         concept.getLogger().error("Plugin listen error", e);
     }
 
+    /**
+     * 加载插件
+     */
     public void load(String path) {
         try {
             Plugin plugin = concept.load(path);
@@ -217,6 +225,9 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         }
     }
 
+    /**
+     * 重新加载插件
+     */
     public void reload(String path) {
         unload(path);
         load(path);
@@ -229,9 +240,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
     }
 
     /**
-     * 卸载并移除映射关系
-     *
-     * @param path 文件路径
+     * 卸载插件
      */
     public void unload(String path) {
         try {

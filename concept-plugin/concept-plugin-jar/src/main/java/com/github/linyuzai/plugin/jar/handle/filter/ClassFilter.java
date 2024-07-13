@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.jar.handle.filter;
 
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
-import com.github.linyuzai.plugin.core.handle.filter.PredicateModifierFilter;
+import com.github.linyuzai.plugin.core.handle.filter.PredicateFilter;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * 类过滤器
  */
 @HandlerDependency(ClassResolver.class)
-public class ClassFilter extends PredicateModifierFilter<ClassSupplier> {
+public class ClassFilter extends PredicateFilter<ClassSupplier> {
 
     public static ClassFilter create(Class<?>... classes) {
         return create(Arrays.asList(classes));

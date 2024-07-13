@@ -7,14 +7,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+/**
+ * 基于断言的过滤器
+ */
 @Getter
 @RequiredArgsConstructor
-public abstract class PredicateModifierFilter<T> extends AbstractPluginFilter<T> {
+public abstract class PredicateFilter<T> extends AbstractPluginFilter<T> {
 
     private final Collection<Predicate<T>> predicates;
 
     @SafeVarargs
-    public PredicateModifierFilter(Predicate<T>... functions) {
+    public PredicateFilter(Predicate<T>... functions) {
         this(Arrays.asList(functions));
     }
 

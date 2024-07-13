@@ -28,18 +28,13 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
     }
 
     @Override
-    public Object getSource() {
-        return parent;
-    }
-
-    @Override
     public URL getURL() {
         return url;
     }
 
     @SneakyThrows
     @Override
-    public void collectEntries(PluginContext context, Consumer<Entry> consumer) {
+    public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
         try (ZipInputStream zis = inputStream) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {

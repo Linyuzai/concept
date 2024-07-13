@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 /**
- * {@link Properties} 转 {@link Map} 的转换器
+ * {@link Properties} 转 {@link Map}
  */
 @Deprecated
 @Getter
@@ -21,12 +21,6 @@ public class PropertiesToMapConvertor extends AbstractPluginConvertor<Supplier<P
      */
     private final Class<?> mapClass;
 
-    /**
-     * 将所有的 {@link Properties} 转为 {@link Map}
-     *
-     * @param supplier value 类型为 {@link Properties} 的 {@link Map}
-     * @return value 类型为 {@link Map} 的 {@link Map}
-     */
     @Override
     public Map<String, String> doConvert(Supplier<Properties> supplier) {
         Properties properties = supplier.get();

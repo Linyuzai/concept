@@ -18,7 +18,7 @@ public class JarSubPluginFactory extends ZipSubPluginFactory {
         if (entry instanceof ExJarPluginEntry) {
             try {
                 ExJarFile file = ((ExJarPluginEntry) entry).getJarEntry().asJarFile();
-                return new ExJarPlugin(file, entry);
+                return new ExJarPlugin(file);
             } catch (Throwable e) {
                 return null;
             }

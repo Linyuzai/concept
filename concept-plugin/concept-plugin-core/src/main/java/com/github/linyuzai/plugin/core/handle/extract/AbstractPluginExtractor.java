@@ -19,20 +19,22 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * {@link PluginExtractor} 的抽象类
- *
- * @param <T> 插件类型
+ * 插件提取器抽象类
  */
 public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
     @Getter
     @Setter
     protected NestedTypeFactory nestedTypeFactory = DefaultNestedTypeFactory.getInstance();
+
     /**
      * 插件提取执行器
      */
     protected volatile Invoker invoker;
 
+    /**
+     * 获得插件提取执行器
+     */
     public Invoker getInvoker() {
         if (invoker == null) {
             synchronized (this) {
@@ -44,14 +46,20 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         return invoker;
     }
 
+    /**
+     * 创建插件提取执行器
+     */
     protected Invoker createInvoker() {
         Method[] methods = getClass().getMethods();
         for (Method method : methods) {
+            //匹配方法名
             if ("onExtract".equals(method.getName()) && !method.isBridge()) {
                 Parameter[] parameters = method.getParameters();
+                //参数是2个
                 if (parameters.length != 2) {
                     continue;
                 }
+                //第二个参数是PluginContext
                 if (!PluginContext.class.isAssignableFrom(parameters[1].getType())) {
                     continue;
                 }
@@ -61,6 +69,9 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         return null;
     }
 
+    /**
+     * 根据 方法和参数 获得插件提取执行器
+     */
     public Invoker createInvoker(Method method, Parameter parameter) {
         Map<Class<? extends Annotation>, Annotation> annotationMap = new LinkedHashMap<>();
         putAnnotations(method.getAnnotations(), annotationMap);
@@ -69,6 +80,9 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         return createInvoker(parameter.getParameterizedType(), annotations);
     }
 
+    /**
+     * 覆盖注解
+     */
     protected void putAnnotations(Annotation[] annotations,
                                   Map<Class<? extends Annotation>, Annotation> annotationMap) {
         for (Annotation annotation : annotations) {
@@ -78,57 +92,48 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
 
     /**
      * 通过插件类型 {@link Type} 和注解获得执行器
-     *
-     * @param type        插件类型 {@link Type}
-     * @param annotations 注解
-     * @return 插件提取执行器
      */
     public Invoker createInvoker(Type type, Annotation[] annotations) {
+        //获得嵌套类型
         NestedType nestedType = nestedTypeFactory.create(type);
         if (nestedType == null || nestedType.toClass() == null) {
             throw new PluginException("Can not resolve type: " + type);
         }
-        NestedType formattedNestedType;
+        //获得格式化器
         PluginFormatter formatter = getFormatter(nestedType, annotations);
+        //格式化器对嵌套类型有修改
         if (formatter instanceof NestedTypeFormatter) {
-            formattedNestedType = ((NestedTypeFormatter) formatter).getNestedType();
-        } else {
-            formattedNestedType = nestedType;
+            //使用修改后的嵌套类型
+            nestedType = ((NestedTypeFormatter) formatter).getNestedType();
+            //获得真实的格式化器
+            formatter = ((NestedTypeFormatter) formatter).formatter;
         }
-        PluginMatcher matcher = getMatcher(formattedNestedType, annotations);
+        //获得匹配器
+        PluginMatcher matcher = getMatcher(nestedType, annotations);
         if (matcher == null) {
             throw new PluginException("Can not match type: " + type);
         }
-        PluginConvertor convertor = getConvertor(formattedNestedType, annotations);
+        //获得转换器
+        PluginConvertor convertor = getConvertor(nestedType, annotations);
         return new InvokerImpl(matcher, convertor, formatter);
     }
 
     /**
-     * 根据插件类型 {@link Type} 和注解获得 {@link PluginMatcher}
-     *
-     * @param type        插件类型 {@link Type}
-     * @param annotations 注解
-     * @return 插件匹配器 {@link PluginMatcher}
+     * 根据嵌套类型和注解获得匹配器
      */
     public abstract PluginMatcher getMatcher(NestedType type, Annotation[] annotations);
 
     /**
-     * 根据插件类型 {@link Type} 和注解获得 {@link PluginConvertor}
-     *
-     * @param type        插件类型 {@link Type}
-     * @param annotations 注解
-     * @return 插件转换器 {@link PluginConvertor}
+     * 根据嵌套类型和注解获得转换器
      */
     public PluginConvertor getConvertor(NestedType type, Annotation[] annotations) {
         return null;
     }
 
     /**
-     * 根据插件类型 {@link Type} 和注解获得 {@link PluginFormatter}
-     *
-     * @param type        插件类型 {@link Type}
-     * @param annotations 注解
-     * @return 插件格式器 {@link PluginFormatter}
+     * 根据嵌套类型和注解获得格式化器
+     * <p>
+     * 如果是容器类型则返回子类型作为嵌套类型
      */
     public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
@@ -147,6 +152,9 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         }
     }
 
+    /**
+     * 如果存在子类型则返回子类型，否则返回Object类型
+     */
     protected NestedType getChild(NestedType type, int index) {
         List<NestedType> children = type.getChildren();
         if (children.size() > index) {
@@ -155,40 +163,36 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         return getNestedTypeFactory().create(Object.class);
     }
 
-    /**
-     * 提取插件并发布 {@link PluginExtractedEvent} 事件
-     *
-     * @param context 上下文 {@link PluginContext}
-     */
     @SuppressWarnings("unchecked")
     @Override
     public void extract(PluginContext context) {
         //执行插件提取
         Object invoke = getInvoker().invoke(context);
         if (invoke == null) {
+            //如果没有提取到则不触发回调
             return;
         }
         onExtract((T) invoke, context);
-        context.publish(new PluginExtractedEvent(context, this, invoke));
+        PluginExtractedEvent event = new PluginExtractedEvent(context, this, invoke);
+        context.getConcept().getEventPublisher().publish(event);
     }
 
     /**
      * 插件提取回调
-     *
-     * @param plugin 插件对象
      */
     public abstract void onExtract(T plugin, PluginContext context);
 
     /**
-     * 依赖的解析器 {@link PluginResolver}
-     *
-     * @return 依赖的解析器 {@link PluginResolver} 的类
+     * 获得依赖的解析器类型
      */
     @Override
     public Class<? extends PluginHandler>[] getDependencies() {
         return getInvoker().getDependencies();
     }
 
+    /**
+     * 携带修改后的嵌套类型
+     */
     @Getter
     @RequiredArgsConstructor
     public static class NestedTypeFormatter implements PluginFormatter {
@@ -223,11 +227,9 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         private final PluginFormatter formatter;
 
         /**
-         * 执行插件提取。
-         * 包括匹配，转换，格式化三个步骤。
-         *
-         * @param context 上下文 {@link PluginContext}
-         * @return 插件对象
+         * 执行插件提取
+         * <p>
+         * 包括匹配，转换，格式化三个步骤
          */
         @Override
         public Object invoke(PluginContext context) {
@@ -251,6 +253,9 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         }
     }
 
+    /**
+     * 插件提取执行器工厂抽象类
+     */
     public static abstract class InvokerFactory implements MethodPluginExtractor.InvokerFactory {
 
         @Override

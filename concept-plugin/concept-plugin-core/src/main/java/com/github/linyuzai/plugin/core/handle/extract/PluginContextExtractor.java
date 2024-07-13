@@ -1,29 +1,17 @@
 package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginContextMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.type.NestedType;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 /**
- * {@link PluginContext} 提取器
- *
- * @param <T> {@link PluginContext} 类型
+ * 插件上下文提取器
  */
-public abstract class PluginContextExtractor<T extends PluginContext> extends AbstractPluginExtractor<T> {
+public abstract class PluginContextExtractor<T extends PluginContext> extends AssignableFromPluginExtractor<T> {
 
-    /**
-     * 如果插件类型为 {@link PluginContext} 则返回 {@link PluginContextMatcher}，
-     * 否则返回 null。
-     *
-     * @param type        插件类型 {@link Type}
-     * @param annotations 注解
-     * @return {@link PluginContextMatcher} 或 null
-     */
     @Override
     public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
@@ -34,8 +22,13 @@ public abstract class PluginContextExtractor<T extends PluginContext> extends Ab
     }
 
     @Override
-    public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
-        return null;
+    protected Class<?> getSuperClass() {
+        return PluginContext.class;
+    }
+
+    @Override
+    protected PluginMatcher getMatcher(Class<?> cls) {
+        return new PluginContextMatcher(cls);
     }
 
     @Override
@@ -43,8 +36,14 @@ public abstract class PluginContextExtractor<T extends PluginContext> extends Ab
         onExtract(plugin);
     }
 
+    /**
+     * 提取
+     */
     public abstract void onExtract(T context);
 
+    /**
+     * 插件上下文提取执行器工厂
+     */
     public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
 
         @Override

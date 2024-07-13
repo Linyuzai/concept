@@ -3,33 +3,25 @@ package com.github.linyuzai.plugin.core.handle.extract.format;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
 /**
- * {@link PluginFormatter} 的抽象类
+ * 插件格式化器抽象类
  *
  * @param <T> 格式化前的类型
  * @param <R> 格式化后的类型
  */
 public abstract class AbstractPluginFormatter<T, R> implements PluginFormatter {
 
-    /**
-     * 格式化并发布 {@link PluginFormattedEvent} 事件
-     *
-     * @param source 被格式化的对象
-     * @return 格式化后的对象
-     */
     @SuppressWarnings("unchecked")
     @Override
     public Object format(Object source, PluginContext context) {
         T original = (T) source;
-        R formatted = doFormat(original);
-        context.publish(new PluginFormattedEvent(context, this, original, formatted));
+        R formatted = doFormat(original, context);
+        PluginFormattedEvent event = new PluginFormattedEvent(context, this, original, formatted);
+        context.getConcept().getEventPublisher().publish(event);
         return formatted;
     }
 
     /**
-     * 基于泛型的格式化
-     *
-     * @param source 被格式化的对象
-     * @return 格式化后的对象
+     * 格式化
      */
-    public abstract R doFormat(T source);
+    public abstract R doFormat(T source, PluginContext context);
 }

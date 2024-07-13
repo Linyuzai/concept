@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * {@link PluginEvent} 抽象类，附带插件 {@link Plugin} 对象
+ * 插件事件抽象类，附带插件对象
  */
 @Getter
 @RequiredArgsConstructor

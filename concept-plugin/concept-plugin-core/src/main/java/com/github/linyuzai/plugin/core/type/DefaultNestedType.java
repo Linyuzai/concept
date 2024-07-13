@@ -8,6 +8,9 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 嵌套类型的默认实现
+ */
 @Getter
 @Setter
 public class DefaultNestedType implements NestedType {

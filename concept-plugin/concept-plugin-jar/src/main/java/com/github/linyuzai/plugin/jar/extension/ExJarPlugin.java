@@ -25,18 +25,14 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
 
     private final ExJarFile jarFile;
 
-    private final Object source;
-
     private final URL url;
 
     private PluginClassLoader pluginClassLoader;
 
     @SneakyThrows
-    public ExJarPlugin(ExJarFile jarFile, Object source) {
+    public ExJarPlugin(ExJarFile jarFile) {
         this.jarFile = jarFile;
-        this.source = source;
         this.url = jarFile.getURL();
-
     }
 
     @Override
@@ -50,7 +46,7 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
     }
 
     @Override
-    public void collectEntries(PluginContext context, Consumer<Entry> consumer) {
+    public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
         jarFile.stream()
                 .map(ExJarEntry.class::cast)
                 .map(it -> new ExJarPluginEntry(this, jarFile, it))

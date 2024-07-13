@@ -28,15 +28,12 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
- * {@link PluginConcept} 抽象类
+ * 插件概念抽象类
  */
 @Getter
 @Setter
 public abstract class AbstractPluginConcept implements PluginConcept {
 
-    /**
-     * 上下文工厂
-     */
     protected PluginContextFactory contextFactory;
 
     protected PluginTreeFactory treeFactory;
@@ -45,26 +42,29 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginRepository repository;
 
-    /**
-     * 事件发布者
-     */
     protected PluginEventPublisher eventPublisher;
 
     protected PluginLogger logger;
 
-    /**
-     * 插件工厂
-     */
     protected Collection<PluginFactory> factories;
 
     protected Collection<PluginHandler> handlers;
 
     protected Collection<PluginHandlerFactory> handlerFactories;
 
+    /**
+     * 处理链
+     */
     protected volatile PluginHandlerChain handlerChain;
 
+    /**
+     * 正在加载的插件
+     */
     protected volatile Set<Object> loading = new LinkedHashSet<>();
 
+    /**
+     * 正在卸载的插件
+     */
     protected volatile Set<Object> unloading = new LinkedHashSet<>();
 
     @Override
@@ -74,6 +74,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public void destroy() {
+        //卸载所有插件
         repository.stream().forEach(this::unload);
     }
 
@@ -85,6 +86,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public void addHandlers(Collection<? extends PluginHandler> handlers) {
         this.handlers.addAll(handlers);
+        //重置处理链
         resetHandlerChain();
     }
 
@@ -96,43 +98,57 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public void removeHandlers(Collection<? extends PluginHandler> handlers) {
         this.handlers.removeAll(handlers);
+        //重置处理链
         resetHandlerChain();
     }
 
-    protected PluginHandlerChain obtainHandlerChain(PluginContext context) {
+    /**
+     * 获得处理链
+     * <p>
+     * 如果存在动态处理器则创建新处理链
+     * <p>
+     * 如果不存在动态处理器则使用缓存的处理链
+     * <p>
+     * 如果没有缓存则创建新处理链并缓存
+     */
+    protected PluginHandlerChain obtainHandlerChain(Plugin plugin, PluginContext context) {
         List<PluginHandler> dynamicHandlers = new ArrayList<>();
+        //获得动态处理器
         for (PluginHandlerFactory factory : handlerFactories) {
-            PluginHandler handler = factory.create(context);
+            PluginHandler handler = factory.create(plugin, context, this);
             if (handler != null) {
                 dynamicHandlers.add(handler);
             }
         }
+        //有动态处理器需要重新生成处理链
         if (!dynamicHandlers.isEmpty()) {
             List<PluginHandler> combineHandlers = new ArrayList<>();
             combineHandlers.addAll(this.handlers);
             combineHandlers.addAll(dynamicHandlers);
-            return handlerChainFactory.create(combineHandlers);
+            return handlerChainFactory.create(combineHandlers, context, this);
         }
+        //获得缓存的处理链
         if (handlerChain == null) {
             synchronized (this) {
                 if (handlerChain == null) {
-                    handlerChain = handlerChainFactory.create(handlers);
+                    handlerChain = handlerChainFactory.create(handlers, context, this);
                 }
             }
         }
         return handlerChain;
     }
 
-
+    /**
+     * 重置处理链
+     * <p>
+     * 如果添加或移除了处理器就需要重新生成处理链
+     */
     protected void resetHandlerChain() {
         handlerChain = null;
     }
 
     /**
-     * 创建插件，如创建失败则抛出异常
-     *
-     * @param o 插件源
-     * @return 插件 {@link Plugin}
+     * 遍历插件工厂创建插件
      */
     @Override
     public Plugin create(Object o, PluginContext context) {
@@ -140,7 +156,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (Plugin) o;
         }
         for (PluginFactory factory : factories) {
-            Plugin plugin = factory.create(o, context);
+            Plugin plugin = factory.create(o, context, this);
             if (plugin != null) {
                 return plugin;
             }
@@ -162,15 +178,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     /**
-     * 加载插件。
-     * 通过 {@link PluginFactory} 创建插件，
-     * 准备插件 {@link Plugin#prepare(PluginContext)}，
-     * 通过 {@link PluginContextFactory} 创建上下文 {@link PluginContext} 并初始化，
-     * 执行插件解析链 {@link PluginResolver}，
-     * 通过 {@link PluginExtractor} 提取插件，
-     * 销毁上下文，释放插件资源。
-     *
-     * @param sources 插件源
+     * 加载插件
+     * <p>
+     * 加载已存在的插件将会失败
+     * <p>
+     * 插件创建后根据插件依赖进行解析提取
      */
     @Override
     public synchronized void load(@NonNull Collection<?> sources,
@@ -187,12 +199,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         }
 
         BiConsumer<Object, Plugin> success = (source, plugin) -> {
-            loading.remove(source);
+            loading.remove(source);//移除正在加载的状态
+            repository.add(plugin);//添加到存储中
             onSuccess.accept(source, plugin);
         };
 
         BiConsumer<Object, Throwable> error = (source, e) -> {
-            loading.remove(source);
+            loading.remove(source);//移除正在加载的状态
             if (e instanceof PluginLoadException) {
                 onError.accept(source, e);
             } else {
@@ -206,21 +219,19 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             try {
                 //创建上下文
                 PluginContext context = contextFactory.create(this);
-
                 //初始化上下文
                 context.set(PluginConcept.class, this);
                 context.initialize();
-
+                //创建插件
                 Plugin plugin = create(source, context);
                 if (plugin == null) {
                     throw new PluginException("Plugin can not create: " + source);
                 }
-
+                //初始化插件
                 plugin.setConcept(this);
                 plugin.initialize();
 
                 context.set(Plugin.class, plugin);
-
                 eventPublisher.publish(new PluginCreatedEvent(plugin));
 
                 entries.add(new LoadingEntry(source, plugin, context));
@@ -229,12 +240,16 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             }
         }
 
+        //遍历所有创建成功的插件进行解析，同时处理依赖关系
         while (!entries.isEmpty()) {
             LoadingEntry entry = entries.remove(0);
             loadDependency(entry, entries, new Stack<>(), success, error);
         }
     }
 
+    /**
+     * 基于依赖关系加载插件
+     */
     protected void loadDependency(LoadingEntry entry,
                                   Collection<LoadingEntry> original,
                                   Stack<String> dependencyChain,
@@ -245,17 +260,21 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         PluginContext context = entry.getContext();
         String name = entry.getPlugin().getMetadata().asStandard().getName();
         if (name != null) {
+            //添加到依赖链
             dependencyChain.push(name);
         }
         try {
+            //获得所有依赖的插件
             Set<String> dependencyNames = entry.getPlugin().getMetadata()
                     .asStandard().getDependency().getNames();
+            //存在依赖的插件
             if (dependencyNames != null && !dependencyNames.isEmpty()) {
                 for (String dependencyName : dependencyNames) {
                     if (existDependency(dependencyName)) {
+                        //插件已经加载
                         continue;
                     }
-
+                    //依赖链中已经存在判断为循环依赖
                     if (dependencyChain.contains(dependencyName)) {
                         for (int i = 0; i < dependencyChain.size(); i++) {
                             String n = dependencyChain.get(i);
@@ -268,46 +287,41 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                             }
                         }
                     }
-
+                    //获得匹配的插件
                     List<LoadingEntry> dependencyList = original.stream()
                             .filter(it -> Objects.equals(dependencyName, it.getPlugin()
                                     .getMetadata().asStandard().getName()))
                             .collect(Collectors.toList());
                     for (LoadingEntry dependency : dependencyList) {
+                        //插件提前加载，从待加载的插件中移除
                         original.remove(dependency);
+                        //加载依赖的插件
                         loadDependency(dependency, original, dependencyChain, onSuccess, onError);
                     }
-
+                    //依赖的插件不存在抛出异常
                     if (!existDependency(dependencyName)) {
                         throw new PluginException("Plugin dependency not found: " + dependencyName);
                     }
                 }
             }
-
-            PluginTree tree = treeFactory.create(plugin, this);
+            //创建插件树
+            PluginTree tree = treeFactory.create(plugin, context, this);
             context.set(PluginTree.class, tree);
             context.set(PluginTree.Node.class, tree.getRoot());
-
             //准备插件
             plugin.prepare(context);
             eventPublisher.publish(new PluginPreparedEvent(context));
-
+            //获取插件解析配置
             boolean handlerEnabled = plugin.getMetadata().asStandard().getHandler().isEnabled();
-
             if (handlerEnabled) {
                 //解析插件
-                plugin.load(obtainHandlerChain(context), context);
+                PluginHandlerChain chain = obtainHandlerChain(plugin, context);
+                plugin.load(chain, context);
             }
-
             //销毁上下文
             context.destroy();
-
-            repository.add(plugin);
-
             eventPublisher.publish(new PluginLoadedEvent(plugin));
-
             onSuccess.accept(source, plugin);
-
         } catch (Throwable e) {
             onError.accept(source, e);
         } finally {
@@ -317,6 +331,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         }
     }
 
+    /**
+     * 依赖是否存在
+     */
     protected boolean existDependency(String name) {
         return repository.stream().anyMatch(it ->
                 Objects.equals(name, it.getMetadata().asStandard().getName()));
@@ -324,9 +341,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     /**
      * 卸载插件。
-     * 通过插件的 id 或插件本身移除对应的插件
-     *
-     * @param source 插件源
+     * 通过插件的 id，source 或插件本身移除对应的插件
      */
     @Override
     public synchronized Plugin unload(@NonNull Object source) {
@@ -396,25 +411,31 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 设置上下文工厂
-         *
-         * @param contextFactory 上下文工厂
-         * @return {@link B}
          */
         public B contextFactory(PluginContextFactory contextFactory) {
             this.contextFactory = contextFactory;
             return (B) this;
         }
 
+        /**
+         * 设置插件树工厂
+         */
         public B treeFactory(PluginTreeFactory treeFactory) {
             this.treeFactory = treeFactory;
             return (B) this;
         }
 
+        /**
+         * 设置插件处理链工厂
+         */
         public B handlerChainFactory(PluginHandlerChainFactory handlerChainFactory) {
             this.handlerChainFactory = handlerChainFactory;
             return (B) this;
         }
 
+        /**
+         * 设置插件仓储
+         */
         public B repository(PluginRepository repository) {
             this.repository = repository;
             return (B) this;
@@ -422,15 +443,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 设置事件发布者
-         *
-         * @param eventPublisher 事件发布者
-         * @return {@link B}
          */
         public B eventPublisher(PluginEventPublisher eventPublisher) {
             this.eventPublisher = eventPublisher;
             return (B) this;
         }
 
+        /**
+         * 设置日志
+         */
         public B logger(PluginLogger logger) {
             this.logger = logger;
             return (B) this;
@@ -438,9 +459,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加事件监听器
-         *
-         * @param listeners 事件监听器
-         * @return {@link B}
          */
         public B addEventListeners(PluginEventListener... listeners) {
             return addEventListeners(Arrays.asList(listeners));
@@ -448,9 +466,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加事件监听器
-         *
-         * @param listeners 事件监听器
-         * @return {@link B}
          */
         public B addEventListeners(Collection<? extends PluginEventListener> listeners) {
             this.eventListeners.addAll(listeners);
@@ -459,9 +474,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件工厂
-         *
-         * @param factories 插件工厂
-         * @return {@link B}
          */
         public B addFactories(PluginFactory... factories) {
             return addFactories(Arrays.asList(factories));
@@ -469,9 +481,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件工厂
-         *
-         * @param factories 插件工厂
-         * @return {@link B}
          */
         public B addFactories(Collection<? extends PluginFactory> factories) {
             this.factories.addAll(factories);
@@ -480,9 +489,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件解析器
-         *
-         * @param resolvers 插件解析器
-         * @return {@link B}
          */
         public B addResolvers(PluginResolver... resolvers) {
             return addHandlers(resolvers);
@@ -490,9 +496,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件解析器
-         *
-         * @param resolvers 插件解析器
-         * @return {@link B}
          */
         public B addResolvers(Collection<? extends PluginResolver> resolvers) {
             return addHandlers(resolvers);
@@ -500,9 +503,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件过滤器
-         *
-         * @param filters 插件过滤器
-         * @return {@link B}
          */
         public B addFilters(PluginFilter... filters) {
             return addHandlers(filters);
@@ -510,9 +510,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件过滤器
-         *
-         * @param filters 插件过滤器
-         * @return {@link B}
          */
         public B addFilters(Collection<? extends PluginFilter> filters) {
             return addHandlers(filters);
@@ -520,9 +517,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件提取器
-         *
-         * @param extractors 插件提取器
-         * @return {@link B}
          */
         public B addExtractors(PluginExtractor... extractors) {
             return addHandlers(extractors);
@@ -530,27 +524,36 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         /**
          * 添加插件提取器
-         *
-         * @param extractors 插件提取器
-         * @return {@link B}
          */
         public B addExtractors(Collection<? extends PluginExtractor> extractors) {
             return addHandlers(extractors);
         }
 
+        /**
+         * 添加插件处理器
+         */
         public B addHandlers(PluginHandler... handlers) {
             return addHandlers(Arrays.asList(handlers));
         }
 
+        /**
+         * 添加插件处理器
+         */
         public B addHandlers(Collection<? extends PluginHandler> handlers) {
             this.handlers.addAll(handlers);
             return (B) this;
         }
 
+        /**
+         * 添加插件处理器工厂
+         */
         public B addHandlerFactories(PluginHandlerFactory... factories) {
             return addHandlerFactories(Arrays.asList(factories));
         }
 
+        /**
+         * 添加插件处理器工厂
+         */
         public B addHandlerFactories(Collection<? extends PluginHandlerFactory> factories) {
             this.handlerFactories.addAll(factories);
             return (B) this;

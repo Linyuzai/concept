@@ -4,6 +4,9 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 
+/**
+ * 条目解析器
+ */
 public class EntryResolver implements PluginResolver {
 
     @Override

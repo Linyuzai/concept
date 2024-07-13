@@ -9,10 +9,7 @@ import com.github.linyuzai.plugin.core.handle.PluginHandler;
 public interface PluginMatcher extends PluginHandler.Dependency {
 
     /**
-     * 匹配插件
-     *
-     * @param context 上下文 {@link PluginContext}
-     * @return 如果匹配到则返回匹配到的插件，否则返回 null
+     * 匹配
      */
     Object match(PluginContext context);
 }

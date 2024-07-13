@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.zip.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.SubPluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
@@ -16,7 +17,7 @@ public class ZipSubPluginFactory extends SubPluginFactory {
 
     @SneakyThrows
     @Override
-    protected Plugin doCreate(Plugin.Entry entry, PluginMetadata metadata, PluginContext context) {
+    protected Plugin doCreate(Plugin.Entry entry, PluginMetadata metadata, PluginContext context, PluginConcept concept) {
         if (supportEntry(entry, context)) {
             Object id = entry.getId();
             if (id instanceof URL) {

@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.core.lock;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Getter;
 
+@Deprecated
 @Getter
 public class PluginLockException extends PluginException {
 

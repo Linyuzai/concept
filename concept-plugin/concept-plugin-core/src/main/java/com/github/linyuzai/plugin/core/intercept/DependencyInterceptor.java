@@ -27,7 +27,7 @@ public class DependencyInterceptor implements PluginInterceptor {
                 .getRepository()
                 .stream()
                 .collect(Collectors.toList());
-        PluginContext subContext = context.createSubContext(false);
+        PluginContext subContext = context.createSubContext();
         for (Plugin p : plugins) {
             Set<String> names = p.getMetadata().asStandard().getDependency().getNames();
             if (names == null) {

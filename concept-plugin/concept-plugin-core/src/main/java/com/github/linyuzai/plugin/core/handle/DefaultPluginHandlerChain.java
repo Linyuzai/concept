@@ -13,15 +13,27 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 默认的插件处理链
+ * <p>
+ * 根据插件处理器的依赖关系生成插件处理链
+ */
 public class DefaultPluginHandlerChain implements PluginHandlerChain {
 
-    private final List<Entry> entries = new ArrayList<>();
+    /**
+     * 插件解析器及其对应的插件过滤器
+     */
+    private final List<HandlerEntry> entries = new ArrayList<>();
 
+    /**
+     * 插件提取器
+     */
     private final List<PluginHandler> extractors = new ArrayList<>();
 
     public DefaultPluginHandlerChain(Collection<? extends PluginHandler> handlers) {
         List<PluginHandler> resolvers = new ArrayList<>();
         List<PluginHandler> filters = new ArrayList<>();
+        //区分解析器，过滤器，提取器
         for (PluginHandler handler : handlers) {
             if (handler instanceof PluginResolver) {
                 resolvers.add(handler);
@@ -33,8 +45,10 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                 extractors.add(handler);
             }
         }
+        //根据依赖关系排序解析器
         List<PluginHandler> sorted = resolveDependency(resolvers);
         for (PluginHandler handler : sorted) {
+            //获得每个解析器对应的过滤器
             List<PluginHandler> filtered = filters.stream().filter(it -> {
                         if (it instanceof PluginHandler.Dependency) {
                             Class<? extends PluginHandler>[] dependencies =
@@ -51,25 +65,29 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                     }).map(PluginFilter.class::cast)
                     .sorted(Comparator.comparingInt(f -> f == null ? 0 : f.getOrder()))
                     .collect(Collectors.toList());
-            entries.add(new Entry(handler, filtered));
+            entries.add(new HandlerEntry(handler, filtered));
         }
     }
 
     protected List<PluginHandler> resolveDependency(List<PluginHandler> unsorted) {
         List<PluginHandler> container = new ArrayList<>();
         //根据提取器筛选解析器
+        //不需要提取的内容将不会被解析
         for (PluginHandler extractor : this.extractors) {
             if (extractor instanceof PluginHandler.Dependency) {
+                //获得依赖的处理器类型
                 Class<? extends PluginHandler>[] dependencies =
                         ((PluginHandler.Dependency) extractor).getDependencies();
                 if (dependencies.length == 0) {
                     continue;
                 }
                 for (Class<? extends PluginHandler> dependency : dependencies) {
+                    //判断是否存在处理器类型对应的处理器
                     PluginHandler dependence = findDependency(dependency, unsorted);
                     if (dependence == null) {
                         throwDependencyNotFound(dependency);
                     }
+                    //添加处理器并处理依赖关系
                     resolveDependency(dependence, unsorted, container);
                 }
             }
@@ -83,6 +101,7 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                                      Collection<PluginHandler> container) {
         //Stack<PluginHandler> stack = new Stack<>();
         if (handler instanceof PluginHandler.Dependency) {
+            //获得依赖的处理器类型
             Class<? extends PluginHandler>[] dependencies =
                     ((PluginHandler.Dependency) handler).getDependencies();
             if (dependencies.length == 0) {
@@ -90,12 +109,15 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
             } else {
                 for (Class<? extends PluginHandler> dependency : dependencies) {
                     if (containsDependency(dependency, container)) {
+                        //依赖的处理器已经存在
                         continue;
                     }
+                    //判断是否存在处理器类型对应的处理器
                     PluginHandler dependence = findDependency(dependency, handlers);
                     if (dependence == null) {
                         throwDependencyNotFound(dependency);
                     }
+                    //添加处理器并处理依赖关系
                     resolveDependency(dependence, handlers, container);
                 }
                 addHandler(handler, container);
@@ -105,6 +127,9 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
         }
     }
 
+    /**
+     * 依赖的处理器是否已经存在
+     */
     protected boolean containsDependency(Class<? extends PluginHandler> dependency,
                                          Collection<? extends PluginHandler> handlers) {
         for (PluginHandler handler : handlers) {
@@ -115,6 +140,9 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
         return false;
     }
 
+    /**
+     * 是否存在处理器类型对应的处理器
+     */
     protected PluginHandler findDependency(Class<? extends PluginHandler> dependency,
                                            Collection<? extends PluginHandler> handlers) {
         for (PluginHandler handler : handlers) {
@@ -125,6 +153,9 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
         return null;
     }
 
+    /**
+     * 去重添加
+     */
     protected void addHandler(PluginHandler handler, Collection<PluginHandler> container) {
         if (container.contains(handler)) {
             return;
@@ -142,23 +173,31 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
     }
 
     protected void doNext(PluginContext context, int index) {
+        //如果解析器已经处理完成则调用提取器
         if (index >= entries.size()) {
             for (PluginHandler extractor : extractors) {
                 extractor.handle(context);
             }
             return;
         }
-        Entry entry = entries.get(index);
+        //获得指定的解析器
+        HandlerEntry entry = entries.get(index);
+        //解析
         entry.resolver.handle(context);
+        //过滤
         for (PluginHandler filter : entry.filters) {
             filter.handle(context);
         }
+        //触发下一个解析器或执行提取
         doNext(context, index + 1);
     }
 
+    /**
+     * 持有插件解析器和对应的插件过滤器
+     */
     @Getter
     @RequiredArgsConstructor
-    public static class Entry {
+    public static class HandlerEntry {
 
         private final PluginHandler resolver;
 

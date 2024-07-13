@@ -8,10 +8,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 插件仓储抽象类
+ * <p>
+ * 使用 {@link Map} 存储
+ */
 public abstract class AbstractPluginRepository implements PluginRepository {
 
     private final Map<Object, Plugin> plugins = createMap();
 
+    /**
+     * 通过插件的 id，source 获得插件
+     */
     @Override
     public Plugin get(Object o) {
         Plugin plugin = plugins.get(o);
@@ -26,6 +34,9 @@ public abstract class AbstractPluginRepository implements PluginRepository {
         return null;
     }
 
+    /**
+     * 以 source 为 key 存储插件
+     */
     @Override
     public void add(Plugin plugin) {
         if (plugin == null) {
@@ -34,6 +45,9 @@ public abstract class AbstractPluginRepository implements PluginRepository {
         plugins.put(plugin.getSource(), plugin);
     }
 
+    /**
+     * 根据 id，source 或插件本身移除插件
+     */
     @Override
     public Plugin remove(Object o) {
         Plugin plugin = plugins.remove(o);
@@ -51,6 +65,9 @@ public abstract class AbstractPluginRepository implements PluginRepository {
         return null;
     }
 
+    /**
+     * 根据 id，source 或插件本身判断是否存在
+     */
     @Override
     public boolean contains(Object o) {
         return plugins.containsKey(o) || plugins.values()
@@ -65,5 +82,8 @@ public abstract class AbstractPluginRepository implements PluginRepository {
         return plugins.values().stream();
     }
 
+    /**
+     * 创建存储插件的 Map
+     */
     protected abstract Map<Object, Plugin> createMap();
 }

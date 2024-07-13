@@ -12,12 +12,13 @@ import lombok.Getter;
 @Getter
 public abstract class AbstractPluginFilter<T> implements PluginFilter {
 
+    /**
+     * 是否取反
+     */
     protected boolean negate;
 
     /**
      * 取反
-     *
-     * @return {@link PluginFilter} 本身
      */
     @Override
     public AbstractPluginFilter<T> negate() {
@@ -26,12 +27,11 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
     }
 
     /**
-     * 过滤。
-     * 通过 key 获得插件数据，
-     * 过滤之后重新设置，
-     * 发布 {@link PluginFilteredEvent} 事件。
-     *
-     * @param context 上下文 {@link PluginContext}
+     * 过滤
+     * <p>
+     * 通过 key 获得插件数据
+     * <p>
+     * 过滤之后重新设置
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -44,14 +44,11 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
                 .inboundKey(inboundKey)
                 .transform(node -> node.filter(it -> applyNegation(doFilter((T) it.getValue()))))
                 .outboundKey(outboundKey);
-        context.publish(new PluginFilteredEvent(context, this, inboundKey, outboundKey));
+        context.getConcept().getEventPublisher().publish(new PluginFilteredEvent(context, this, inboundKey, outboundKey));
     }
 
     /**
      * 计算过滤与取反的最终值
-     *
-     * @param filter 是否过滤
-     * @return 结合取反配置是否过滤
      */
     public boolean applyNegation(boolean filter) {
         return negate != filter;
@@ -67,16 +64,11 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
 
     /**
      * 获得插件 key
-     *
-     * @return 插件的 key
      */
     public abstract Object getKey();
 
     /**
-     * 以泛型的方式过滤
-     *
-     * @param original 需要过滤的插件
-     * @return 过滤之后的插件
+     * 过滤
      */
     public abstract boolean doFilter(T original);
 

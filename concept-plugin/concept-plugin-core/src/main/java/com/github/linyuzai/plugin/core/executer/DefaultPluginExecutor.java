@@ -6,6 +6,15 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 默认的插件执行器
+ * <p>
+ * 默认2个线程
+ * <p>
+ * 一个用于监听插件文件
+ * <p>
+ * 另一个用于可视化页面异步操作
+ */
 public class DefaultPluginExecutor implements PluginExecutor, ThreadFactory {
 
     private final AtomicInteger count = new AtomicInteger(0);

@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.preperties;
 
+import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
@@ -13,6 +14,8 @@ public class PluginConceptProperties {
     private MetadataProperties metadata = new MetadataProperties();
 
     private AutoloadProperties autoload = new AutoloadProperties();
+
+    private LoggerProperties logger = new LoggerProperties();
 
     private JarProperties jar = new JarProperties();
 
@@ -34,7 +37,27 @@ public class PluginConceptProperties {
         @Data
         public static class LocationProperties {
 
-            private String basePath = PluginLocation.DEFAULT_BASE_PATH;
+            private String basePath = LocalPluginLocation.DEFAULT_BASE_PATH;
+        }
+    }
+
+    @Data
+    public static class LoggerProperties {
+
+        private StandardProperties standard = new StandardProperties();
+
+        private ErrorProperties error = new ErrorProperties();
+
+        @Data
+        public static class StandardProperties {
+
+            private boolean enabled = true;
+        }
+
+        @Data
+        public static class ErrorProperties {
+
+            private boolean enabled = true;
         }
     }
 

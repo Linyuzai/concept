@@ -4,17 +4,15 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 
 /**
- * {@link PluginResolver} 抽象类
+ * 插件解析器抽象类
  *
- * @param <T> 未解析的插件类型
- * @param <R> 解析后的插件类型
+ * @param <T> 输入类型
+ * @param <R> 输出类型
  */
 public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
 
     /**
-     * 解析并发布 {@link PluginResolvedEvent} 事件
-     *
-     * @param context 上下文 {@link PluginContext}
+     * 转换插件树
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -29,33 +27,29 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
                         it -> doResolve((T) it.getValue(), context),
                         it -> doFilter((T) it.getValue(), context)))
                 .outboundKey(outboundKey);
-        context.publish(new PluginResolvedEvent(context, this, inboundKey, outboundKey));
+        PluginResolvedEvent event = new PluginResolvedEvent(context, this, inboundKey, outboundKey);
+        context.getConcept().getEventPublisher().publish(event);
     }
 
+    /**
+     * 过滤
+     */
     public boolean doFilter(T source, PluginContext context) {
         return true;
     }
 
     /**
-     * 基于泛型及上下文 {@link PluginContext} 的插件解析
-     *
-     * @param source  未解析的插件
-     * @param context 上下文 {@link PluginContext}
-     * @return 解析后的插件
+     * 解析
      */
     public abstract R doResolve(T source, PluginContext context);
 
     /**
-     * 未解析的插件的 key
-     *
-     * @return 未解析的插件的 key
+     * 输入数据的key
      */
     public abstract Object getInboundKey();
 
     /**
-     * 解析后插件的 key
-     *
-     * @return 解析后插件的 key
+     * 输出数据key
      */
     public abstract Object getOutboundKey();
 }

@@ -9,7 +9,6 @@ import lombok.SneakyThrows;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -18,18 +17,14 @@ import java.util.Properties;
 @HandlerDependency(EntryResolver.class)
 public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, PropertiesSupplier> {
 
+    /**
+     * 过滤名称后缀.properties
+     */
     @Override
     public boolean doFilter(Plugin.Entry entry, PluginContext context) {
         return entry.getName().endsWith(".properties");
     }
 
-    /**
-     * 将所有名称对象的文件都加载到 {@link Properties} 对象中
-     *
-     * @param entry   插件项
-     * @param context 上下文 {@link PluginContext}
-     * @return {@link Properties} 的 {@link Map}
-     */
     @Override
     public PropertiesSupplier doResolve(Plugin.Entry entry, PluginContext context) {
         return new PropertiesSupplierImpl(entry.getContent());

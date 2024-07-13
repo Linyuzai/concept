@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.zip.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.AbstractPluginFactory;
@@ -27,7 +28,7 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
 
     @SneakyThrows
     @Override
-    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
+    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context, PluginConcept concept) {
         return createZipPlugin(file, getURL(file));
     }
 

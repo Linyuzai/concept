@@ -16,12 +16,12 @@ public class PluginConvertedEvent extends PluginContextEvent {
     private final PluginConvertor convertor;
 
     /**
-     * 原始对象
+     * 未转换的内容
      */
     private final Object inbound;
 
     /**
-     * 转换后对象
+     * 转换后的内容
      */
     private final Object outbound;
 

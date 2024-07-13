@@ -7,6 +7,11 @@ import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 子插件工厂
+ * <p>
+ * 用于将 {@link Plugin.Entry} 解析成插件
+ */
 @Getter
 @Setter
 public abstract class SubPluginFactory extends AbstractPluginFactory<Plugin.Entry> {
@@ -21,6 +26,11 @@ public abstract class SubPluginFactory extends AbstractPluginFactory<Plugin.Entr
         return null;
     }
 
+    /**
+     * 子插件配置工厂
+     * <p>
+     * 返回空配置
+     */
     public class SubPluginMetadataFactory implements PluginMetadataFactory {
 
         private final EmptyMetadata metadata = new EmptyMetadata(new Plugin.StandardMetadata());

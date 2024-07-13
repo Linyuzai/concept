@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * 空配置
+ */
 @Getter
 @RequiredArgsConstructor
 public class EmptyMetadata implements PluginMetadata {
@@ -33,9 +36,10 @@ public class EmptyMetadata implements PluginMetadata {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Plugin.StandardMetadata> T asStandard() {
-        return null;
+        return (T) standard;
     }
 
     @Override

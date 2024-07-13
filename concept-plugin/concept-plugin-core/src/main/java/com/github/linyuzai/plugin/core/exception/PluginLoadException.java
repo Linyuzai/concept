@@ -2,6 +2,9 @@ package com.github.linyuzai.plugin.core.exception;
 
 import lombok.Getter;
 
+/**
+ * 插件加载异常类
+ */
 @Getter
 public class PluginLoadException extends PluginException {
 

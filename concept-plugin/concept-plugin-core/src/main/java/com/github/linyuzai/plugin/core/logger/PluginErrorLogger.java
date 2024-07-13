@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.logger;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.event.PluginErrorEvent;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.exception.PluginLoadException;

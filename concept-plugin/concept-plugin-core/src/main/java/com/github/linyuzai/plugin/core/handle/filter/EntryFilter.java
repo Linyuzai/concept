@@ -11,7 +11,7 @@ import java.util.Collection;
  * 名称过滤器
  */
 @HandlerDependency(EntryResolver.class)
-public class EntryFilter extends PatternPluginFilter<Plugin.Entry> {
+public class EntryFilter extends AntPathPluginFilter<Plugin.Entry> {
 
     public EntryFilter(String... patterns) {
         super(Arrays.asList(patterns));

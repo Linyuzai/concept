@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.autoload.location;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,20 +10,45 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
+/**
+ * 本地插件位置
+ */
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LocalPluginLocation implements PluginLocation {
 
+    /**
+     * 默认的缓存路径 {user.home}/concept/plugin
+     */
+    public static final String DEFAULT_BASE_PATH = new File(System.getProperty("user.home"), "concept/plugin").getAbsolutePath();
+
+    /**
+     * 需要加载的插件目录名
+     */
     public static final String LOADED = "_loaded";
 
+    /**
+     * 不需要加载的插件目录名
+     */
     public static final String UNLOADED = "_unloaded";
 
+    /**
+     * 删除的插件目录名
+     */
     public static final String DELETED = "_deleted";
 
-    private final String basePath;
+    /**
+     * 基础目录
+     */
+    private String basePath = DEFAULT_BASE_PATH;
 
-    private final PluginLocation.Filter filter;
+    private PluginLocation.Filter filter;
 
+    /**
+     * 基础路径下的子目录为分组
+     */
     @Override
     public String[] getGroups() {
         File file = check(new File(basePath));
@@ -37,6 +61,9 @@ public class LocalPluginLocation implements PluginLocation {
                 .toArray(String[]::new);
     }
 
+    /**
+     * 当前目录的上级目录是基础目录时，当前目录为分组
+     */
     @Override
     public String getGroup(String path) {
         if (path.startsWith(basePath)) {
@@ -52,8 +79,11 @@ public class LocalPluginLocation implements PluginLocation {
         return null;
     }
 
+    /**
+     * {basePath}/{group}/_loaded
+     */
     @Override
-    public String getLoadedPath(String group) {
+    public String getLoadedBasePath(String group) {
         return getPluginDirectory(group, LOADED).getAbsolutePath();
     }
 
@@ -62,6 +92,9 @@ public class LocalPluginLocation implements PluginLocation {
         return getPlugins(group, LOADED);
     }
 
+    /**
+     * {basePath}/{group}/_loaded/{name}
+     */
     @Override
     public String getLoadedPluginPath(String group, String name) {
         return getPluginPath(group, name, LOADED);
@@ -73,8 +106,11 @@ public class LocalPluginLocation implements PluginLocation {
         return Files.newInputStream(file.toPath());
     }
 
+    /**
+     * {basePath}/{group}/_unloaded
+     */
     @Override
-    public String getUnloadedPath(String group) {
+    public String getUnloadedBasePath(String group) {
         return getPluginDirectory(group, UNLOADED).getAbsolutePath();
     }
 
@@ -83,6 +119,9 @@ public class LocalPluginLocation implements PluginLocation {
         return getPlugins(group, UNLOADED);
     }
 
+    /**
+     * {basePath}/{group}/_unloaded/{name}
+     */
     @Override
     public String getUnloadedPluginPath(String group, String name) {
         return getPluginPath(group, name, UNLOADED);
@@ -94,8 +133,11 @@ public class LocalPluginLocation implements PluginLocation {
         return Files.newInputStream(file.toPath());
     }
 
+    /**
+     * {basePath}/{group}/_deleted
+     */
     @Override
-    public String getDeletedPath(String group) {
+    public String getDeletedBasePath(String group) {
         return getPluginDirectory(group, DELETED).getAbsolutePath();
     }
 
@@ -104,6 +146,9 @@ public class LocalPluginLocation implements PluginLocation {
         return getPlugins(group, DELETED);
     }
 
+    /**
+     * {basePath}/{group}/_deleted/{name}
+     */
     @Override
     public String getDeletedPluginPath(String group, String name) {
         return getPluginPath(group, name, DELETED);
@@ -115,6 +160,9 @@ public class LocalPluginLocation implements PluginLocation {
         return Files.newInputStream(file.toPath());
     }
 
+    /**
+     * 文件大小
+     */
     @Override
     public long getSize(String path) {
         try {
@@ -124,6 +172,9 @@ public class LocalPluginLocation implements PluginLocation {
         }
     }
 
+    /**
+     * 文件创建时间
+     */
     @Override
     public long getCreationTimestamp(String path) {
         try {
@@ -134,16 +185,25 @@ public class LocalPluginLocation implements PluginLocation {
         }
     }
 
+    /**
+     * 将插件文件从不需要加载的目录移动到需要加载的目录触发插件加载
+     */
     @Override
     public void load(String group, String name) {
         move(group, name, UNLOADED, LOADED);
     }
 
+    /**
+     * 将插件文件从需要加载的目录移动到不需要加载的目录触发插件卸载
+     */
     @Override
     public void unload(String group, String name) {
         move(group, name, LOADED, UNLOADED);
     }
 
+    /**
+     * 将插件文件移动到删除的文件目录
+     */
     @Override
     public void delete(String group, String name) {
         try {
@@ -220,7 +280,7 @@ public class LocalPluginLocation implements PluginLocation {
         File directory = getPluginDirectory(group, type);
         File[] files = directory.listFiles(pathname -> {
             String name = pathname.getName();
-            return filter.filter(group, name);
+            return filter == null || filter.filter(group, name);
         });
         if (files == null) {
             return new String[0];
@@ -237,6 +297,9 @@ public class LocalPluginLocation implements PluginLocation {
         return file;
     }
 
+    /**
+     * 如果文件存在则顺序添加后缀
+     */
     public static File getFileAutoName(File file) {
         int i = 1;
         while (file.exists()) {

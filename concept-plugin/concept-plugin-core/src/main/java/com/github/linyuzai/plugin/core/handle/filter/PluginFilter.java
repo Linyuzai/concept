@@ -14,19 +14,18 @@ public interface PluginFilter extends PluginHandler, PluginHandler.Dependency {
     }
 
     /**
-     * 过滤插件
-     *
-     * @param context 上下文 {@link PluginContext}
+     * 过滤
      */
     void filter(PluginContext context);
 
     /**
      * 取反
-     *
-     * @return {@link PluginFilter} 本身
      */
     PluginFilter negate();
 
+    /**
+     * 排序
+     */
     default int getOrder() {
         return 0;
     }

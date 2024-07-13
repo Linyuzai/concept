@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * {@link PluginEventPublisher} 默认实现
+ * 插件事件发布器默认实现
  */
 public class DefaultPluginEventPublisher implements PluginEventPublisher {
 
@@ -15,10 +15,7 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     private final Collection<PluginEventListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
-     * 发布事件。
-     * 遍历所有的事件监听器。
-     *
-     * @param event 事件
+     * 遍历所有的事件监听器发布事件
      */
     @Override
     public void publish(Object event) {
@@ -38,9 +35,7 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     }
 
     /**
-     * 获得所有事件监听器 {@link PluginEventListener} 的不可变集合
-     *
-     * @return {@link PluginEventListener} 的不可变集合
+     * 获得所有事件监听器
      */
     public Collection<PluginEventListener> getEventListeners() {
         return Collections.unmodifiableCollection(listeners);

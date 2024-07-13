@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * 基于 {@link Properties} 的插件配置
+ */
 @Getter
 @RequiredArgsConstructor
 public class PropertiesMetadata implements PluginMetadata {

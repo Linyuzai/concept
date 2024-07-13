@@ -16,12 +16,12 @@ public class PluginFormattedEvent extends PluginContextEvent {
     private final PluginFormatter formatter;
 
     /**
-     * 原始对象
+     * 未格式化的内容
      */
     private final Object original;
 
     /**
-     * 格式化后的对象
+     * 格式化后的内容
      */
     private final Object formatted;
 

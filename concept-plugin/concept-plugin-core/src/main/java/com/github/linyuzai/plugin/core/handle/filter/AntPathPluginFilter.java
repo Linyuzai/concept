@@ -7,14 +7,14 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collection;
 
 /**
- * 名称过滤器
+ * 基于 AntPath 匹配的过滤器
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class PatternPluginFilter<T> extends AbstractPluginFilter<T> {
+public abstract class AntPathPluginFilter<T> extends AbstractPluginFilter<T> {
 
     /**
-     * 名称模式
+     * 匹配模式
      */
     private final Collection<String> patterns;
 
@@ -25,6 +25,9 @@ public abstract class PatternPluginFilter<T> extends AbstractPluginFilter<T> {
         return matchPattern(getMatchable(original));
     }
 
+    /**
+     * 获得可匹配的字符串
+     */
     protected abstract String getMatchable(T original);
 
     /**

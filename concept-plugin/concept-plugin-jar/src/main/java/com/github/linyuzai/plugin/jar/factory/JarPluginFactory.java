@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
@@ -26,13 +27,13 @@ public class JarPluginFactory extends ZipPluginFactory {
 
     @SneakyThrows
     @Override
-    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
+    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context, PluginConcept concept) {
         String mode = getMode(metadata);
         switch (mode.toUpperCase()) {
             case JarPlugin.Mode.FILE:
-                return new ExJarPlugin(new ExJarFile(file), file.getAbsolutePath());
+                return new ExJarPlugin(new ExJarFile(file));
             case JarPlugin.Mode.STREAM:
-                return super.doCreate(file, metadata, context);
+                return super.doCreate(file, metadata, context, concept);
             default:
                 throw new PluginException("Plugin mode not supported");
         }

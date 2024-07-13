@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.Getter;
 
 /**
- * 附带上下文 {@link PluginContext} 的插件事件
+ * 附带上下文的插件事件
  */
 @Getter
 public abstract class PluginContextEvent extends AbstractPluginEvent {

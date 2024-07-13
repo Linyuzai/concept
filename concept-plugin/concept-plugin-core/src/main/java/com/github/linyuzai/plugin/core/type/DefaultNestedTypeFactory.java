@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.lang.reflect.Type;
 
+/**
+ * 嵌套类型默认工厂
+ */
 public class DefaultNestedTypeFactory implements NestedTypeFactory {
 
     @Getter

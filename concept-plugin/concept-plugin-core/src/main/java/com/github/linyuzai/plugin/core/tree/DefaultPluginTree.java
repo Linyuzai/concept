@@ -9,23 +9,33 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+/**
+ * 默认插件树
+ */
 @Getter
 @RequiredArgsConstructor
 public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, PluginTree.Tracer {
 
     private final Node root;
 
-    private final Map<Object, HandleStage> traceMap = new LinkedHashMap<>();
+    /**
+     * 转换映射
+     */
+    private final Map<Object, List<TransformEntry>> transformMap = new LinkedHashMap<>();
+
+    /**
+     * 追踪链
+     */
+    private TracerStages trace;
+
+    /**
+     * 当前追踪节点
+     */
+    private TracerStages current;
 
     public DefaultPluginTree(Plugin plugin) {
         root = createNode(plugin.getId(), "", plugin, null);
-    }
-
-    @Override
-    public Object getId() {
-        return root.getId();
     }
 
     @Override
@@ -41,16 +51,6 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
     @Override
     public InboundStage create(Object handler) {
         return new TransformerStages(handler);
-    }
-
-    @Override
-    public HandleStage getTrace(Object id) {
-        return traceMap.get(id);
-    }
-
-    @Override
-    public Stream<HandleStage> stream() {
-        return traceMap.values().stream();
     }
 
     protected DefaultNode createNode(Object id, String name, Object value, Node parent) {
@@ -74,6 +74,23 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
         private final Collection<Node> children = new ArrayList<>();
 
         @Override
+        public int getSize() {
+            return getSize(node -> true);
+        }
+
+        @Override
+        public int getSize(Predicate<Node> predicate) {
+            int size = 0;
+            if (predicate.test(this)) {
+                size++;
+            }
+            for (Node child : children) {
+                size += child.getSize(predicate);
+            }
+            return size;
+        }
+
+        @Override
         public Node map(Function<Node, Object> function) {
             return doMap(this, null, function, node -> true);
         }
@@ -84,6 +101,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
         }
 
         protected Node doMap(Node node, Node parent, Function<Node, Object> function, Predicate<Node> predicate) {
+            //转换当前节点
             Object apply;
             if (isTransformable(node)) {
                 if (!predicate.test(node)) {
@@ -93,8 +111,10 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
             } else {
                 apply = node.getValue();
             }
+            //创建当前节点的对应节点并使用转换后的值
             DefaultNode create = createNode(node.getId(), node.getName(), apply, parent);
             if (!node.getChildren().isEmpty()) {
+                //转换子节点
                 List<Node> collect = node.getChildren().stream()
                         .map(it -> doMap(it, create, function, predicate))
                         .filter(Objects::nonNull)
@@ -110,11 +130,14 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
         }
 
         public Node doFilter(Node node, Node parent, Predicate<Node> predicate) {
+            //过滤当前节点
             if (isTransformable(node) && !predicate.test(node)) {
                 return null;
             }
+            //拷贝当前节点
             DefaultNode create = createNode(node.getId(), node.getName(), node.getValue(), parent);
             if (!node.getChildren().isEmpty()) {
+                //过滤子节点
                 List<Node> collect = node.getChildren().stream()
                         .map(it -> doFilter(it, create, predicate))
                         .filter(Objects::nonNull)
@@ -179,11 +202,11 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public Transformer.TransformStage inboundKey(Object inboundKey) {
-            HandleStage trace = traceMap.get(inboundKey);
-            if (trace == null) {
+            List<TransformEntry> entries = transformMap.getOrDefault(inboundKey, Collections.emptyList());
+            if (entries.isEmpty()) {
                 throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
             }
-            inbound = trace.getNode();
+            inbound = entries.get(0).getNode();
             return this;
         }
 
@@ -200,22 +223,58 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public void outboundKey(Object outboundKey) {
-            traceMap.compute(outboundKey, (k, trace) -> new TracerStages(outbound, handler, trace));
+            TransformEntry entry = new TransformEntry(outbound, handler);
+            transformMap.computeIfAbsent(outboundKey, k -> new ArrayList<>()).add(0, entry);
+
+            //设置追踪链
+            TracerStages ts = new TracerStages(entry);
+            if (trace == null) {
+                trace = ts;
+            }
+            if (current != null) {
+                ts.previous = current;
+                current.next = ts;
+            }
+            current = ts;
         }
     }
 
     @Getter
     @RequiredArgsConstructor
-    public static class TracerStages implements HandleStage {
+    public static class TransformEntry {
 
         private final Node node;
 
         private final Object handler;
+    }
 
-        private final HandleStage next;
+    @Getter
+    @RequiredArgsConstructor
+    public static class TracerStages implements TraceStage {
+
+        private final TransformEntry entry;
+
+        private TraceStage previous;
+
+        private TraceStage next;
 
         @Override
-        public HandleStage next() {
+        public Node getNode() {
+            return entry.node;
+        }
+
+        @Override
+        public Object getHandler() {
+            return entry.handler;
+        }
+
+        @Override
+        public TraceStage previous() {
+            return previous;
+        }
+
+        @Override
+        public TraceStage next() {
             return next;
         }
     }

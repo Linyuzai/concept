@@ -27,9 +27,6 @@ public class ReflectionUtils {
 
     /**
      * 将 {@link Type} 转为 {@link Class}
-     *
-     * @param type {@link Type}
-     * @return {@link Class}
      */
     public static Class<?> toClass(Type type) {
         List<Class<?>> list = new ArrayList<>();
@@ -40,6 +37,9 @@ public class ReflectionUtils {
         return null;
     }
 
+    /**
+     * 根据 {@link Type} 获得 {@link Class} 和范型
+     */
     public static void resolve(Type type, BiConsumer<Class<?>, Type[]> consumer) {
         if (type instanceof Class) {
             Type[] types;

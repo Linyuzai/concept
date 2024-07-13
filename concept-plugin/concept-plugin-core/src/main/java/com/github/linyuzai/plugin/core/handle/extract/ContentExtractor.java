@@ -15,57 +15,42 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * 插件内容提取器。
- * 支持 byte[] {@link String} {@link InputStream}。
- *
- * @param <T> 插件类型
+ * 内容提取器
+ * <p>
+ * 支持 byte[] {@link String} {@link InputStream} {@link ByteBuffer}
  */
 public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
 
-    /**
-     * 匹配类型为 byte[] {@link String} {@link InputStream}
-     * 及对应类型的 {@link java.util.Collection} {@link java.util.List} {@link java.util.Set}
-     * {@link java.util.Map} 和数组
-     *
-     * @param type
-     * @param annotations 注解
-     * @return {@link ContentMatcher}
-     */
     @Override
     public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
+        //如果是指定类型则匹配内容
         if (String.class == cls || InputStream.class == cls || ByteBuffer.class == cls || byte[].class == cls) {
             return new ContentMatcher(annotations);
         }
         return null;
     }
 
-    /**
-     * 根据  和注解获得 {@link PluginConvertor}。
-     * 特殊情况，如果是 {@link InputStream} 返回 {@link ContentToInputStreamConvertor}，
-     * {@link String} 返回 {@link ContentToStringConvertor}。
-     *
-     * @param type
-     * @param annotations 注解
-     * @return 插件转换器 {@link PluginConvertor}
-     */
     @Override
     public PluginConvertor getConvertor(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
         if (String.class == cls) {
-            Charset charset = getCharset(annotations);
-            return new ContentToStringConvertor(charset);
+            Charset charset = getCharset(annotations);//获得编码
+            return new ContentToStringConvertor(charset);//转String
         } else if (InputStream.class == cls) {
-            return new ContentToInputStreamConvertor();
+            return new ContentToInputStreamConvertor();//转InputStream
         } else if (ByteBuffer.class == cls) {
-            return new ContentToByteBufferConvertor();
+            return new ContentToByteBufferConvertor();//转ByteBuffer
         } else if (byte[].class == cls) {
-            return new ContentToByteArrayConvertor();
+            return new ContentToByteArrayConvertor();//转byte[]
         } else {
             return null;
         }
     }
 
+    /**
+     * 获得编码
+     */
     protected Charset getCharset(Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == PluginText.class) {
@@ -76,23 +61,19 @@ public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
         return null;
     }
 
-    /**
-     * 根据 和注解获得 {@link PluginFormatter}。
-     * 特殊情况，如果是 byte[] 则返回 {@link ObjectFormatter}
-     *
-     * @param type
-     * @param annotations 注解
-     * @return 插件格式器 {@link PluginFormatter}
-     */
     @Override
     public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
         Class<?> cls = type.toClass();
+        //如果是字节数组返回单个对象的格式化器
         if (cls.isArray() && cls.getComponentType() == byte.class) {
             return new ObjectFormatter();
         }
         return super.getFormatter(type, annotations);
     }
 
+    /**
+     * 内容提取执行器工厂
+     */
     public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
 
         @Override

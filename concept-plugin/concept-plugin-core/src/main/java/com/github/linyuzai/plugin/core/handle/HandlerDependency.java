@@ -10,5 +10,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface HandlerDependency {
 
+    /**
+     * 依赖的插件处理器
+     */
     Class<? extends PluginHandler>[] value();
 }

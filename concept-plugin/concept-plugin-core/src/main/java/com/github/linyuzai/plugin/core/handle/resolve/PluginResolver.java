@@ -15,8 +15,6 @@ public interface PluginResolver extends PluginHandler, PluginHandler.Dependency 
 
     /**
      * 解析
-     *
-     * @param context 上下文 {@link PluginContext}
      */
     void resolve(PluginContext context);
 }

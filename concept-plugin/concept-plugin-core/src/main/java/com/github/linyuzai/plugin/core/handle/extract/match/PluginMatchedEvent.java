@@ -16,10 +16,13 @@ public class PluginMatchedEvent extends PluginContextEvent {
     private final PluginMatcher matcher;
 
     /**
-     * 原始对象
+     * 依赖的 key
      */
     private final Object inboundKey;
 
+    /**
+     * 匹配到的内容
+     */
     private final Object outbound;
 
     public PluginMatchedEvent(PluginContext context,

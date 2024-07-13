@@ -2,43 +2,27 @@ package com.github.linyuzai.plugin.core.handle.extract;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.handle.extract.format.PluginFormatter;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginObjectMatcher;
-import com.github.linyuzai.plugin.core.type.NestedType;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 /**
- * {@link Plugin} 提取器
- *
- * @param <T> {@link Plugin} 类型
+ * 插件实例提取器
  */
-public abstract class PluginObjectExtractor<T extends Plugin> extends AbstractPluginExtractor<T> {
+public abstract class PluginObjectExtractor<T extends Plugin> extends AssignableFromPluginExtractor<T> {
+
+    @Override
+    protected Class<?> getSuperClass() {
+        return Plugin.class;
+    }
+
+    @Override
+    protected PluginMatcher getMatcher(Class<?> cls) {
+        return new PluginObjectMatcher(cls);
+    }
 
     /**
-     * 如果插件类型为 {@link Plugin} 则返回 {@link PluginObjectMatcher}，
-     * 否则返回 null。
-     *
-     * @param type        插件类型 {@link Type}
-     * @param annotations 注解
-     * @return {@link PluginObjectMatcher} 或 null
+     * 插件实例提取执行器工厂
      */
-    @Override
-    public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
-        Class<?> cls = type.toClass();
-        if (Plugin.class.isAssignableFrom(cls)) {
-            return new PluginObjectMatcher(cls);
-        }
-        return null;
-    }
-
-    @Override
-    public PluginFormatter getFormatter(NestedType type, Annotation[] annotations) {
-        return null;
-    }
-
     public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
 
         @Override
