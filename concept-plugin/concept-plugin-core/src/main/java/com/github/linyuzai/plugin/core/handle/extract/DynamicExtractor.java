@@ -158,7 +158,9 @@ public class DynamicExtractor implements MethodPluginExtractor {
                     continue;
                 }
                 values[index] = invoked;
-                matched = true;
+                if (isExtractable(invoked)) {
+                    matched = true;
+                }
             }
             if (matched) {
                 try {
@@ -169,6 +171,10 @@ public class DynamicExtractor implements MethodPluginExtractor {
                 context.publish(new DynamicExtractedEvent(context, this, values, method, target));
             }
         }
+    }
+
+    protected boolean isExtractable(Object object) {
+        return !(object instanceof Plugin) && !(object instanceof PluginContext);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
 
@@ -29,6 +30,10 @@ public interface Plugin {
 
     void setConcept(PluginConcept concept);
 
+    void addLoadListener(LoadListener listener);
+
+    void removeLoadListener(LoadListener listener);
+
     void addDestroyListener(DestroyListener listener);
 
     void removeDestroyListener(DestroyListener listener);
@@ -42,10 +47,7 @@ public interface Plugin {
      */
     void prepare(PluginContext context);
 
-    /**
-     * 释放
-     */
-    void release(PluginContext context);
+    void load(PluginHandlerChain chain, PluginContext context);
 
     @Data
     class StandardMetadata {
@@ -85,6 +87,11 @@ public interface Plugin {
     interface Content {
 
         InputStream getInputStream() throws IOException;
+    }
+
+    interface LoadListener {
+
+        void onLoad(Plugin plugin);
     }
 
     interface DestroyListener {

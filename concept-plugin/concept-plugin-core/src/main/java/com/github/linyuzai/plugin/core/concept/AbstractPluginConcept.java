@@ -296,11 +296,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
             if (handlerEnabled) {
                 //解析插件
-                obtainHandlerChain(context).next(context);
+                plugin.load(obtainHandlerChain(context), context);
             }
-
-            plugin.release(context);
-            eventPublisher.publish(new PluginReleasedEvent(context));
 
             //销毁上下文
             context.destroy();
@@ -332,7 +329,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * @param source 插件源
      */
     @Override
-    public Plugin unload(@NonNull Object source) {
+    public synchronized Plugin unload(@NonNull Object source) {
         unloading.add(source);
         try {
             Plugin removed = repository.remove(source);

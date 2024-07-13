@@ -21,12 +21,7 @@ public class PluginLoadLogger implements PluginLifecycleListener {
     }
 
     @Override
-    public void onPrepare(Plugin plugin, PluginContext context) {
-
-    }
-
-    @Override
-    public void onRelease(Plugin plugin, PluginContext context) {
+    public void onPrepare(Plugin plugin) {
 
     }
 

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
@@ -14,11 +15,23 @@ import java.util.function.Consumer;
 @Setter
 public abstract class AbstractPlugin implements Plugin {
 
+    private final Collection<LoadListener> loadListeners = new CopyOnWriteArrayList<>();
+
     private final Collection<DestroyListener> destroyListeners = new CopyOnWriteArrayList<>();
 
     private PluginMetadata metadata;
 
     private PluginConcept concept;
+
+    @Override
+    public void addLoadListener(LoadListener listener) {
+        this.loadListeners.add(listener);
+    }
+
+    @Override
+    public void removeLoadListener(LoadListener listener) {
+        this.loadListeners.remove(listener);
+    }
 
     @Override
     public void addDestroyListener(DestroyListener listener) {
@@ -65,20 +78,11 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     @Override
-    public void release(PluginContext context) {
-        PluginTree.Node node = context.get(PluginTree.Node.class);
-        for (PluginTree.Node child : node.getChildren()) {
-            if (child.getValue() instanceof Plugin) {
-                Plugin subPlugin = (Plugin) child.getValue();
-                PluginContext subContext = context.createSubContext(false);
-                subContext.initialize();
-                subContext.set(PluginTree.Node.class, child);
-                subContext.set(Plugin.class, subPlugin);
-                subPlugin.release(subContext);
-                subContext.destroy();
-            }
+    public void load(PluginHandlerChain chain, PluginContext context) {
+        chain.next(context);
+        for (LoadListener listener : loadListeners) {
+            listener.onLoad(this);
         }
-        onRelease(context);
     }
 
     @Override
@@ -100,10 +104,6 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     public void onPrepare(PluginContext context) {
-
-    }
-
-    public void onRelease(PluginContext context) {
 
     }
 

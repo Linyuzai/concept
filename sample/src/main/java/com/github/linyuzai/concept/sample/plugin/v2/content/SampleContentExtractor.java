@@ -18,6 +18,6 @@ public class SampleContentExtractor extends ContentExtractor<InputStream> {
     @PluginEntry("content/**")
     @Override
     public void onExtract(InputStream plugin, PluginContext context) {
-        log.info("Content Object => {}", PluginUtils.read(plugin));
+        log.info("Content Object => {}", new String(PluginUtils.read(plugin)));
     }
 }

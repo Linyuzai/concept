@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.core.autoload;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.event.PluginLoadErrorEvent;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -146,7 +145,7 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
                     }
                     key.reset();
                 } catch (Throwable e) {
-                    onError(e);
+                    onListenError(e);
                 }
             }
         }
@@ -205,8 +204,8 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
         unload(path);
     }
 
-    public void onError(Throwable e) {
-        concept.getEventPublisher().publish(new PluginLoadErrorEvent(e));
+    public void onListenError(Throwable e) {
+        concept.getLogger().error("Plugin listen error", e);
     }
 
     public void load(String path) {
