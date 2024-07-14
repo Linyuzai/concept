@@ -75,24 +75,25 @@ public class WatchServicePluginAutoLoader implements PluginAutoLoader {
 
         //加载已经存在的插件
         if (load) {
-            List<String> paths = new ArrayList<>();
-            for (String group : groups) {
-                String[] names = location.getLoadedPlugins(group);
-                for (String name : names) {
-                    String path = location.getLoadedPluginPath(group, name);
-                    if (path == null) {
-                        continue;
+            concept.post(() -> {
+                List<String> paths = new ArrayList<>();
+                for (String group : groups) {
+                    String[] names = location.getLoadedPlugins(group);
+                    for (String name : names) {
+                        String path = location.getLoadedPluginPath(group, name);
+                        if (path == null) {
+                            continue;
+                        }
+                        paths.add(path);
                     }
-                    paths.add(path);
                 }
-            }
-
-            concept.load(paths, (o, plugin) -> {
-                String path = (String) o;
-                concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
-            }, (o, e) -> {
-                String path = (String) o;
-                concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
+                concept.load(paths, (o, plugin) -> {
+                    String path = (String) o;
+                    concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
+                }, (o, e) -> {
+                    String path = (String) o;
+                    concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
+                });
             });
         }
     }

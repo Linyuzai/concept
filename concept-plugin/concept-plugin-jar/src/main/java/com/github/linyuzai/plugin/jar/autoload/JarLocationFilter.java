@@ -2,6 +2,9 @@ package com.github.linyuzai.plugin.jar.autoload;
 
 import com.github.linyuzai.plugin.zip.autoload.ZipLocationFilter;
 
+/**
+ * 过滤 jar 和 zip
+ */
 public class JarLocationFilter extends ZipLocationFilter {
 
     @Override

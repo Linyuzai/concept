@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArrayFormatter extends PluginTreeValueFormatter<Object> {
+public class ArrayFormatter extends TreeValueFormatter<Object> {
 
     /**
      * 数组的类型

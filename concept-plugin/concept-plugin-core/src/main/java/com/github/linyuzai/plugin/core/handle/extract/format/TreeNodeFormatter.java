@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 基于
+ * 基于插件树节点的格式化器
  */
-public abstract class PluginTreeNodeFormatter<T> extends AbstractPluginFormatter<PluginTree.Node, T> {
+public abstract class TreeNodeFormatter<T> extends AbstractPluginFormatter<PluginTree.Node, T> {
 
     @Override
     public T doFormat(PluginTree.Node node, PluginContext context) {
@@ -22,5 +22,8 @@ public abstract class PluginTreeNodeFormatter<T> extends AbstractPluginFormatter
         return doFormat(nodes, context);
     }
 
+    /**
+     * 格式化节点
+     */
     public abstract T doFormat(List<PluginTree.Node> nodes, PluginContext context);
 }

@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.autoload.location;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 

@@ -21,8 +21,6 @@ public interface Plugin {
      */
     Object getId();
 
-    URL getURL();
-
     /**
      * 获得初始对象
      */
@@ -138,12 +136,13 @@ public interface Plugin {
         Object getId();
 
         /**
-         * 条目名称
+         * 获得条目名称
          */
         String getName();
 
-        URL getURL();
-
+        /**
+         * 获得插件
+         */
         Plugin getPlugin();
 
         /**

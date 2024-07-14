@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected Collection<PluginHandlerFactory> handlerFactories;
 
+    protected List<Runnable> posts = new CopyOnWriteArrayList<>();
+
     /**
      * 处理链
      */
@@ -69,13 +72,20 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public void initialize() {
-
+        for (Runnable post : this.posts) {
+            post.run();
+        }
     }
 
     @Override
     public void destroy() {
         //卸载所有插件
         repository.stream().forEach(this::unload);
+    }
+
+    @Override
+    public void post(Runnable runnable) {
+        this.posts.add(runnable);
     }
 
     @Override

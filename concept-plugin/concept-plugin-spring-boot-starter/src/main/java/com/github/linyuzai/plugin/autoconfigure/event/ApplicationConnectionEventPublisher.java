@@ -8,9 +8,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 /**
- * 支持 {@link EventListener} 的事件发布器。
- * <p>
- * {@link PluginEventPublisher} supported {@link EventListener}.
+ * 支持 {@link EventListener} 的事件发布器
  */
 @Getter
 @RequiredArgsConstructor

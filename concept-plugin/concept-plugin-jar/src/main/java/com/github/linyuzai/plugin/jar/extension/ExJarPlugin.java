@@ -5,7 +5,6 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.PluginClassLoader;
-import com.github.linyuzai.plugin.jar.read.JarClassReader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -49,7 +48,7 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
         jarFile.stream()
                 .map(ExJarEntry.class::cast)
-                .map(it -> new ExJarPluginEntry(this, jarFile, it))
+                .map(it -> new ExJarPluginEntry(jarFile, it, this))
                 .forEach(consumer);
     }
 
@@ -62,17 +61,19 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
         if (tree == null) {
             return;
         }
-        List<URL> urls = new ArrayList<>();
+        List<URL> urlList = new ArrayList<>();
         tree.getRoot().forEach(it -> {
             if (it.isPluginNode() && it.getId() instanceof URL) {
                 URL url = (URL) it.getId();
-                urls.add(url);
+                urlList.add(url);
             }
         });
-        if (urls.isEmpty()) {
+        if (urlList.isEmpty()) {
             return;
         }
-        this.pluginClassLoader = new ExJarPluginClassLoader(this, urls.toArray(new URL[0]), getClass().getClassLoader());
+        URL[] urls = urlList.toArray(new URL[0]);
+        ClassLoader parent = getClass().getClassLoader();
+        this.pluginClassLoader = new ExJarPluginClassLoader(this, urls, parent);
     }
 
     @Override

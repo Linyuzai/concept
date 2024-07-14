@@ -8,18 +8,25 @@ import com.github.linyuzai.plugin.core.factory.AbstractPluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * zip文件插件工厂
+ */
 @Getter
 @Setter
 public class ZipPluginFactory extends AbstractPluginFactory<File> {
@@ -29,13 +36,19 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
     @SneakyThrows
     @Override
     protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context, PluginConcept concept) {
-        return createZipPlugin(file, getURL(file));
+        return createPlugin(file, getURL(file));
     }
 
-    protected ZipFilePlugin createZipPlugin(File file, URL url) {
-        return new ZipFilePlugin(file.getAbsolutePath(), url);
+    /**
+     * 创建插件
+     */
+    protected ZipPlugin createPlugin(File file, URL url) throws IOException {
+        return new ZipFilePlugin(new ZipFile(file), url);
     }
 
+    /**
+     * 获得文件对象
+     */
     @Override
     protected File getSupported(Object source) {
         File file = getFile(source);
@@ -45,6 +58,9 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
         return null;
     }
 
+    /**
+     * 是否支持文件
+     */
     protected boolean supportFile(File file) {
         try {
             ZipFile zf = new ZipFile(file);
@@ -74,6 +90,9 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
         return null;
     }
 
+    /**
+     * zip插件配置工厂
+     */
     public class ZipPluginMetadataFactory implements PluginMetadataFactory {
 
         @Override
@@ -87,7 +106,7 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
                 ZipEntry entry = zipFile.getEntry(PluginMetadata.NAME);
                 if (entry != null) {
                     try (InputStream is = zipFile.getInputStream(entry)) {
-                        properties.load(is);
+                        properties.load(new InputStreamReader(is, StandardCharsets.UTF_8));
                     }
                 }
                 return new PropertiesMetadata(properties);

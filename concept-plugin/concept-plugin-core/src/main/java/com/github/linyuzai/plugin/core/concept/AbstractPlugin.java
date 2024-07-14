@@ -128,6 +128,6 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + getURL() + ")";
+        return getClass().getSimpleName() + "(" + getId() + ")";
     }
 }

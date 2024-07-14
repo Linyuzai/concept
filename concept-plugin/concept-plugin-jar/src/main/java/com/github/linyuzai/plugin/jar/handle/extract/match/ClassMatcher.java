@@ -61,6 +61,9 @@ public class ClassMatcher extends AbstractPluginMatcher<ClassSupplier> {
         this.filters.remove(filter);
     }
 
+    /**
+     * 排序过滤器
+     */
     protected void sort() {
         this.filters.sort(Comparator.comparingInt(PluginFilter::getOrder));
     }
@@ -70,22 +73,13 @@ public class ClassMatcher extends AbstractPluginMatcher<ClassSupplier> {
         return ClassSupplier.class;
     }
 
-    /**
-     * 是对应的类或其子类并基于注解匹配
-     *
-     * @param classSupplier 类
-     * @return 匹配之后的类
-     */
     @Override
     public boolean doFilter(ClassSupplier classSupplier, PluginContext context) {
         return applyFilters(classSupplier) && target.isAssignableFrom(classSupplier.get());
     }
 
     /**
-     * 结合类相关的注解进行过滤
-     *
-     * @param classSupplier 类
-     * @return 是否匹配
+     * 应用过滤器
      */
     public boolean applyFilters(ClassSupplier classSupplier) {
         for (AbstractPluginFilter<ClassSupplier> filter : filters) {

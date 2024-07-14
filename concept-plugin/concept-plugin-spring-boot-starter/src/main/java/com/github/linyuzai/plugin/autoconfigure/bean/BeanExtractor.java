@@ -9,19 +9,10 @@ import com.github.linyuzai.plugin.core.type.NestedType;
 import java.lang.annotation.Annotation;
 
 /**
- * 实例提取器
- *
- * @param <T> 实例类型
+ * Bean 提取器
  */
 public abstract class BeanExtractor<T> extends AbstractPluginExtractor<T> {
 
-    /**
-     * 返回一个 {@link BeanMatcher}
-     *
-     * @param type
-     * @param annotations 注解
-     * @return {@link BeanMatcher}
-     */
     @Override
     public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
         return new BeanMatcher(type.toClass(), annotations);
@@ -32,6 +23,9 @@ public abstract class BeanExtractor<T> extends AbstractPluginExtractor<T> {
         return new BeanConvertor();
     }
 
+    /**
+     * Bean 插件提取执行器工厂
+     */
     public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
 
         @Override

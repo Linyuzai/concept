@@ -8,6 +8,9 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 插件类加载器
+ */
 @Getter
 public abstract class PluginClassLoader extends URLClassLoader {
 
@@ -54,16 +57,22 @@ public abstract class PluginClassLoader extends URLClassLoader {
         throw new ClassNotFoundException(name);*/
     }
 
+    /**
+     * 基于依赖的插件获得类
+     */
     private Class<?> findPluginClass(String name, Collection<Plugin> plugins) throws ClassNotFoundException {
         if (plugins.contains(plugin)) {
             throw new ClassNotFoundException(name);
         }
+        //缓存已经找过的插件防止重复查找
         plugins.add(plugin);
         try {
+            //查找当前插件的类
             return findPluginClass(name);
         } catch (ClassNotFoundException e) {
             Plugin.StandardMetadata metadata = plugin.getMetadata().asStandard();
             Set<String> names = metadata.getDependency().getNames();
+            //没有依赖的插件
             if (names == null || names.isEmpty()) {
                 throw e;
             }
@@ -73,6 +82,7 @@ public abstract class PluginClassLoader extends URLClassLoader {
                     .collect(Collectors.toList());
             for (String n : names) {
                 for (Plugin p : list) {
+                    //匹配到依赖的jar尝试获取对应的类
                     if (p instanceof JarPlugin && Objects.equals(n, p.getMetadata().asStandard().getName())) {
                         try {
                             return ((JarPlugin) p).getPluginClassLoader().findPluginClass(name, plugins);
@@ -85,6 +95,9 @@ public abstract class PluginClassLoader extends URLClassLoader {
         }
     }
 
+    /**
+     * 获得插件中的类
+     */
     public Class<?> findPluginClass(String name) throws ClassNotFoundException {
         return super.findClass(name);
     }
@@ -141,5 +154,8 @@ public abstract class PluginClassLoader extends URLClassLoader {
         }
     }
 
+    /**
+     * 定义包名
+     */
     protected abstract void definePackage(String className, String packageName);
 }

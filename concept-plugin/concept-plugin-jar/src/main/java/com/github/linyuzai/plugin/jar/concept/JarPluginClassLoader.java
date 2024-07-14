@@ -9,21 +9,27 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Manifest;
 
+/**
+ * jar插件类加载器
+ */
 public class JarPluginClassLoader extends PluginClassLoader {
 
     static {
         registerAsParallelCapable();
     }
 
+    /**
+     * 包缓存
+     */
     private final Map<String, Plugin.Content> packages = new ConcurrentHashMap<>();
 
+    /**
+     * 类缓存
+     */
     private final Map<String, Plugin.Content> classes = new ConcurrentHashMap<>();
 
     /**
      * Create a new {@link JarPluginClassLoader} instance.
-     *
-     * @param parent the parent class loader for delegation
-     * @since 2.3.1
      */
     public JarPluginClassLoader(Plugin plugin,
                                 Map<String, Plugin.Content> packages,
@@ -34,6 +40,9 @@ public class JarPluginClassLoader extends PluginClassLoader {
         this.classes.putAll(classes);
     }
 
+    /**
+     * 通过缓存获取类
+     */
     @Override
     public Class<?> findPluginClass(String name) throws ClassNotFoundException {
         String path = name.replace('.', '/').concat(".class");
@@ -49,6 +58,9 @@ public class JarPluginClassLoader extends PluginClassLoader {
         }
     }
 
+    /**
+     * 通过缓存定义包名
+     */
     @Override
     protected void definePackage(String className, String packageName) {
         String packageEntryName = packageName.replace('.', '/') + "/";
@@ -58,12 +70,15 @@ public class JarPluginClassLoader extends PluginClassLoader {
             if (content != null) {
                 try {
                     definePackage(packageName, new Manifest(content.getInputStream()), null);
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }
     }
 
+    /**
+     * 清空包和类缓存
+     */
     @Override
     public void close() throws IOException {
         super.close();

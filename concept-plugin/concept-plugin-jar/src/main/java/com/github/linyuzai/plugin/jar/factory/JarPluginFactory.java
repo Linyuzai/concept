@@ -16,8 +16,10 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.jar.JarFile;
 
 @Getter
 @Setter
@@ -46,8 +48,8 @@ public class JarPluginFactory extends ZipPluginFactory {
     }
 
     @Override
-    protected JarFilePlugin createZipPlugin(File file, URL url) {
-        return new JarFilePlugin(file.getAbsolutePath(), url);
+    protected JarFilePlugin createPlugin(File file, URL url) throws IOException {
+        return new JarFilePlugin(new JarFile(file), url);
     }
 
     @Override

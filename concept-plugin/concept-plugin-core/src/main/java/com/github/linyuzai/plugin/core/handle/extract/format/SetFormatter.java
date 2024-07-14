@@ -13,7 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SetFormatter extends PluginTreeValueFormatter<Set<Object>> {
+public class SetFormatter extends TreeValueFormatter<Set<Object>> {
 
     /**
      * {@link Set} 的类型

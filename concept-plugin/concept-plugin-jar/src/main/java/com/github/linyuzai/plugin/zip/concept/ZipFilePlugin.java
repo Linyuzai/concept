@@ -6,18 +6,23 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-@Getter
+/**
+ * zip文件插件
+ */
 @RequiredArgsConstructor
 public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
 
-    protected final String path;
+    /**
+     * 插件路径
+     */
+    @Getter
+    protected final ZipFile zipFile;
 
     protected final URL url;
 
@@ -34,22 +39,31 @@ public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
     @SneakyThrows
     @Override
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
-        try (ZipFile zf = createZipFile()) {
-            Enumeration<? extends ZipEntry> entries = zf.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                String name = entry.getName();
-                URL id = new URL(url, name);
-                consumer.accept(createZipPluginEntry(id, name));
-            }
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            String name = entry.getName();
+            URL id = new URL(url, name);
+            ZipPluginEntry pluginEntry = createPluginEntry(id, name);
+            consumer.accept(pluginEntry);
         }
     }
 
-    protected ZipFile createZipFile() throws IOException {
-        return new ZipFile(path);
+    /**
+     * 创建zip插件条目
+     */
+    protected ZipPluginEntry createPluginEntry(URL url, String name) {
+        return new ZipFilePluginEntry(zipFile, url, name, this);
     }
 
-    protected ZipPluginEntry createZipPluginEntry(URL url, String name) {
-        return new ZipFilePluginEntry(url, name, this, path);
+    /**
+     * 关闭zip文件
+     */
+    @Override
+    public void onDestroy() {
+        try {
+            zipFile.close();
+        } catch (Throwable ignore) {
+        }
     }
 }

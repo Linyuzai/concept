@@ -16,149 +16,148 @@ import java.util.jar.Manifest;
 
 /**
  * Extended variant of {@link JarEntry} returned by {@link ExJarFile}s.
- *
- * @author Phillip Webb
- * @author Andy Wilkinson
  */
 public class ExJarEntry extends JarEntry implements FileHeader {
 
-	@Getter
-	private final int index;
+    @Getter
+    private final int index;
 
-	private final AsciiBytes name;
+    private final AsciiBytes name;
 
-	@Getter
-	private final AsciiBytes headerName;
+    @Getter
+    private final AsciiBytes headerName;
 
-	@Getter
-	private final ExJarFile jarFile;
+    @Getter
+    private final ExJarFile jarFile;
 
-	@Getter
-	private final long localHeaderOffset;
+    @Getter
+    private final long localHeaderOffset;
 
-	private volatile Certification certification;
+    private volatile Certification certification;
 
-	public ExJarEntry(ExJarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
-		super((nameAlias != null) ? nameAlias.toString() : header.getName().toString());
-		this.index = index;
-		this.name = (nameAlias != null) ? nameAlias : header.getName();
-		this.headerName = header.getName();
-		this.jarFile = jarFile;
-		this.localHeaderOffset = header.getLocalHeaderOffset();
-		setCompressedSize(header.getCompressedSize());
-		setMethod(header.getMethod());
-		setCrc(header.getCrc());
-		setComment(header.getComment().toString());
-		setSize(header.getSize());
-		setTime(header.getTime());
-		if (header.hasExtra()) {
-			setExtra(header.getExtra());
-		}
-	}
+    public ExJarEntry(ExJarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
+        super((nameAlias != null) ? nameAlias.toString() : header.getName().toString());
+        this.index = index;
+        this.name = (nameAlias != null) ? nameAlias : header.getName();
+        this.headerName = header.getName();
+        this.jarFile = jarFile;
+        this.localHeaderOffset = header.getLocalHeaderOffset();
+        setCompressedSize(header.getCompressedSize());
+        setMethod(header.getMethod());
+        setCrc(header.getCrc());
+        setComment(header.getComment().toString());
+        setSize(header.getSize());
+        setTime(header.getTime());
+        if (header.hasExtra()) {
+            setExtra(header.getExtra());
+        }
+    }
 
-	public AsciiBytes getAsciiBytesName() {
-		return this.name;
-	}
+    public AsciiBytes getAsciiBytesName() {
+        return this.name;
+    }
 
-	@Override
-	public boolean hasName(CharSequence name, char suffix) {
-		return this.headerName.matches(name, suffix);
-	}
+    @Override
+    public boolean hasName(CharSequence name, char suffix) {
+        return this.headerName.matches(name, suffix);
+    }
 
-	/**
-	 * Return a {@link URL} for this {@link ExJarEntry}.
-	 * @return the URL for the entry
-	 * @throws MalformedURLException if the URL is not valid
-	 */
-	public URL getURL() throws MalformedURLException {
-		return new URL(this.jarFile.getURL(), getName(), new ExJarHandler(jarFile));
-	}
+    /**
+     * Return a {@link URL} for this {@link ExJarEntry}.
+     *
+     * @return the URL for the entry
+     * @throws MalformedURLException if the URL is not valid
+     */
+    public URL getURL() throws MalformedURLException {
+        return new URL(this.jarFile.getURL(), getName(), new ExJarHandler(jarFile));
+    }
 
-	@Override
-	public Attributes getAttributes() throws IOException {
-		Manifest manifest = this.jarFile.getManifest();
-		return (manifest != null) ? manifest.getAttributes(getName()) : null;
-	}
+    @Override
+    public Attributes getAttributes() throws IOException {
+        Manifest manifest = this.jarFile.getManifest();
+        return (manifest != null) ? manifest.getAttributes(getName()) : null;
+    }
 
-	@Override
-	public Certificate[] getCertificates() {
-		return getCertification().getCertificates();
-	}
+    @Override
+    public Certificate[] getCertificates() {
+        return getCertification().getCertificates();
+    }
 
-	@Override
-	public CodeSigner[] getCodeSigners() {
-		return getCertification().getCodeSigners();
-	}
+    @Override
+    public CodeSigner[] getCodeSigners() {
+        return getCertification().getCodeSigners();
+    }
 
-	public Certification getCertification() {
-		if (!this.jarFile.isSigned()) {
-			return Certification.NONE;
-		}
-		Certification certification = this.certification;
-		if (certification == null) {
-			certification = this.jarFile.getCertification(this);
-			this.certification = certification;
-		}
-		return certification;
-	}
+    public Certification getCertification() {
+        if (!this.jarFile.isSigned()) {
+            return Certification.NONE;
+        }
+        Certification certification = this.certification;
+        if (certification == null) {
+            certification = this.jarFile.getCertification(this);
+            this.certification = certification;
+        }
+        return certification;
+    }
 
-	public ExJarFile asJarFile() throws IOException {
-		return jarFile.getNestedJarFile(this);
-	}
+    public ExJarFile asJarFile() throws IOException {
+        return jarFile.getNestedJarFile(this);
+    }
 
-	/**
-	 * Interface that can be used to filter and optionally rename jar entries.
-	 *
-	 * @author Phillip Webb
-	 */
-	public interface Filter {
+    /**
+     * Interface that can be used to filter and optionally rename jar entries.
+     *
+     * @author Phillip Webb
+     */
+    public interface Filter {
 
-		/**
-		 * Apply the jar entry filter.
-		 * @param name the current entry name. This may be different that the original entry
-		 * name if a previous filter has been applied
-		 * @return the new name of the entry or {@code null} if the entry should not be
-		 * included.
-		 */
-		AsciiBytes apply(AsciiBytes name);
+        /**
+         * Apply the jar entry filter.
+         *
+         * @param name the current entry name. This may be different that the original entry
+         *             name if a previous filter has been applied
+         * @return the new name of the entry or {@code null} if the entry should not be
+         * included.
+         */
+        AsciiBytes apply(AsciiBytes name);
 
-	}
+    }
 
-	/**
-	 * {@link Certificate} and {@link CodeSigner} details for a {@link ExJarEntry} from a signed
-	 * {@link ExJarFile}.
-	 *
-	 * @author Phillip Webb
-	 */
-	public static class Certification {
+    /**
+     * {@link Certificate} and {@link CodeSigner} details for a {@link ExJarEntry} from a signed
+     * {@link ExJarFile}.
+     *
+     * @author Phillip Webb
+     */
+    public static class Certification {
 
-		static final Certification NONE = new Certification(null, null);
+        static final Certification NONE = new Certification(null, null);
 
-		private final Certificate[] certificates;
+        private final Certificate[] certificates;
 
-		private final CodeSigner[] codeSigners;
+        private final CodeSigner[] codeSigners;
 
-		Certification(Certificate[] certificates, CodeSigner[] codeSigners) {
-			this.certificates = certificates;
-			this.codeSigners = codeSigners;
-		}
+        Certification(Certificate[] certificates, CodeSigner[] codeSigners) {
+            this.certificates = certificates;
+            this.codeSigners = codeSigners;
+        }
 
-		Certificate[] getCertificates() {
-			return (this.certificates != null) ? this.certificates.clone() : null;
-		}
+        Certificate[] getCertificates() {
+            return (this.certificates != null) ? this.certificates.clone() : null;
+        }
 
-		CodeSigner[] getCodeSigners() {
-			return (this.codeSigners != null) ? this.codeSigners.clone() : null;
-		}
+        CodeSigner[] getCodeSigners() {
+            return (this.codeSigners != null) ? this.codeSigners.clone() : null;
+        }
 
-		static Certification from(JarEntry certifiedEntry) {
-			Certificate[] certificates = (certifiedEntry != null) ? certifiedEntry.getCertificates() : null;
-			CodeSigner[] codeSigners = (certifiedEntry != null) ? certifiedEntry.getCodeSigners() : null;
-			if (certificates == null && codeSigners == null) {
-				return NONE;
-			}
-			return new Certification(certificates, codeSigners);
-		}
+        static Certification from(JarEntry certifiedEntry) {
+            Certificate[] certificates = (certifiedEntry != null) ? certifiedEntry.getCertificates() : null;
+            CodeSigner[] codeSigners = (certifiedEntry != null) ? certifiedEntry.getCodeSigners() : null;
+            if (certificates == null && codeSigners == null) {
+                return NONE;
+            }
+            return new Certification(certificates, codeSigners);
+        }
 
-	}
+    }
 }

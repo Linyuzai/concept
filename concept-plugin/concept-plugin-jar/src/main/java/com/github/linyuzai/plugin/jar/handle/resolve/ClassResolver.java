@@ -17,18 +17,14 @@ import lombok.SneakyThrows;
 @HandlerDependency(EntryResolver.class)
 public class ClassResolver extends AbstractPluginResolver<Plugin.Entry, ClassSupplier> {
 
+    /**
+     * 过滤 .class 文件
+     */
     @Override
     public boolean doFilter(Plugin.Entry source, PluginContext context) {
         return source.getName().endsWith(".class");
     }
 
-    /**
-     * 对于所有的类名使用类加载器进行加载
-     *
-     * @param entry   类名
-     * @param context 上下文 {@link PluginContext}
-     * @return 类
-     */
     @Override
     public ClassSupplier doResolve(Plugin.Entry entry, PluginContext context) {
         String name = entry.getName();
@@ -63,7 +59,6 @@ public class ClassResolver extends AbstractPluginResolver<Plugin.Entry, ClassSup
                 return ((JarPlugin) plugin).getPluginClassLoader().loadClass(name);
             }
             return null;
-            //return plugin.read(Class.class, name);
         }
     }
 }

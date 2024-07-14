@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 
 /**
- * 实例匹配器
+ * Bean 匹配器
  */
 @Getter
 @HandlerDependency(BeanResolver.class)
@@ -22,8 +22,12 @@ public class BeanMatcher extends AbstractPluginMatcher<BeanSupplier> {
     public BeanMatcher(Class<?> target, Annotation[] annotations) {
         super(annotations);
         this.classMatcher = new ClassMatcher(target, annotations);
+        //接口和抽象类不能实例化
         this.classMatcher.addFilter(ClassFilter.modifier(Modifier::isInterface, Modifier::isAbstract).negate());
+        //忽略枚举类
         this.classMatcher.addFilter(ClassFilter.isEnum().negate());
+        //忽略匿名类
+        this.classMatcher.addFilter(ClassFilter.isAnonymous().negate());
     }
 
     @Override

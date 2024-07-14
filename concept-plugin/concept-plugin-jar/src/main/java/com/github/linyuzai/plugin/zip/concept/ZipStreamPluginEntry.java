@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.zip.concept;
 
+import com.github.linyuzai.plugin.core.concept.AbstractPluginEntry;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
@@ -15,34 +16,36 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * zip流插件条目
+ */
+public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPluginEntry {
 
-public class ZipStreamPluginEntry implements ZipPluginEntry {
-
-    protected final URL url;
-
-    @Getter
-    protected final String name;
-
-    @Getter
-    protected final Plugin plugin;
-
+    /**
+     * 父条目
+     */
     @Getter
     protected final Plugin.Entry parent;
 
+    protected final URL url;
+
+    /**
+     * 数据引用
+     */
     protected volatile Reference<byte[]> reference;
 
-    public ZipStreamPluginEntry(URL url,
-                                String name,
+    public ZipStreamPluginEntry(String name,
                                 Plugin plugin,
                                 Plugin.Entry parent,
+                                URL url,
                                 byte[] bytes) {
-        this.url = url;
-        this.name = name;
-        this.plugin = plugin;
+        super(name, plugin);
         this.parent = parent;
-        if (!isDirectory()) {
-            this.reference = createReference(bytes);
+        this.url = url;
+        if (isDirectory()) {
+            return;
         }
+        this.reference = createReference(bytes);
     }
 
     @Override
@@ -60,18 +63,20 @@ public class ZipStreamPluginEntry implements ZipPluginEntry {
         if (isDirectory()) {
             return null;
         }
-        return new EntryContent();
+        return new ReferenceContent();
     }
 
-    protected boolean isDirectory() {
-        return name.endsWith("/");
-    }
-
+    /**
+     * 创建引用
+     */
     protected Reference<byte[]> createReference(byte[] bytes) {
         return new SoftReference<>(bytes);
     }
 
-    public class EntryContent implements Plugin.Content {
+    /**
+     * 引用内容
+     */
+    public class ReferenceContent implements Plugin.Content {
 
         @Override
         public InputStream getInputStream() throws IOException {
@@ -89,7 +94,7 @@ public class ZipStreamPluginEntry implements ZipPluginEntry {
                      ZipInputStream zis = new ZipInputStream(is)) {
                     ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {
-                        if (Objects.equals(name, entry.getName())) {
+                        if (Objects.equals(getName(), entry.getName())) {
                             byte[] read = PluginUtils.read(zis);
                             reference = createReference(read);
                             return new ByteArrayInputStream(read);

@@ -5,6 +5,9 @@ import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import java.net.URL;
 import java.util.zip.ZipInputStream;
 
+/**
+ * jar流插件
+ */
 public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
 
     public JarStreamPlugin(ZipInputStream inputStream, URL url, Entry parent) {
@@ -12,8 +15,8 @@ public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
     }
 
     @Override
-    protected JarPluginEntry createZipPluginEntry(URL url, String name, byte[] bytes) {
-        return new JarStreamPluginEntry(url, name, this, parent, bytes);
+    protected JarPluginEntry createPluginEntry(URL url, String name, byte[] bytes) {
+        return new JarStreamPluginEntry(name, this, parent, url, bytes);
     }
 
     @Override

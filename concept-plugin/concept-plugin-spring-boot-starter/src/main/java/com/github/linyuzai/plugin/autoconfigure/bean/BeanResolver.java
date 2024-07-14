@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * 类解析器
+ * Bean 解析器
  */
 @Getter
 @Setter
@@ -22,13 +22,6 @@ public class BeanResolver extends AbstractPluginResolver<ClassSupplier, BeanSupp
 
     private ApplicationContext applicationContext;
 
-    /**
-     * 对于所有的类名使用类加载器进行加载
-     *
-     * @param classSupplier 类名
-     * @param context       上下文 {@link PluginContext}
-     * @return 类
-     */
     @Override
     public BeanSupplier doResolve(ClassSupplier classSupplier, PluginContext context) {
         return new BeanSupplierImpl(classSupplier, applicationContext);

@@ -14,6 +14,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+/**
+ * 插件管理配置类
+ */
 @ConditionalOnPluginManagementEnabled
 @Configuration(proxyBeanMethods = false)
 public class PluginManagementConfiguration {

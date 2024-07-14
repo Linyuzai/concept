@@ -12,18 +12,9 @@ import java.lang.annotation.Annotation;
 
 /**
  * 类提取器
- *
- * @param <T> 类型
  */
 public abstract class ClassExtractor<T> extends AbstractPluginExtractor<T> {
 
-    /**
-     * 返回一个 {@link ClassMatcher}
-     *
-     * @param type
-     * @param annotations 注解
-     * @return {@link ClassMatcher}
-     */
     @Override
     public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {
         if (type.toClass() == Class.class) {
@@ -37,6 +28,9 @@ public abstract class ClassExtractor<T> extends AbstractPluginExtractor<T> {
         return new ClassConvertor();
     }
 
+    /**
+     * 类插件提取执行器工厂
+     */
     public static class InvokerFactory extends AbstractPluginExtractor.InvokerFactory {
 
         @Override

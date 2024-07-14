@@ -9,6 +9,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.jar.JarFile;
 
+/**
+ * 扩展jar插件类加载器
+ */
 public class ExJarPluginClassLoader extends PluginClassLoader {
 
     static {

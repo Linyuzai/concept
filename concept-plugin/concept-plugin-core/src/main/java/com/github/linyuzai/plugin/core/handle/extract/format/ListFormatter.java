@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListFormatter extends PluginTreeValueFormatter<List<Object>> {
+public class ListFormatter extends TreeValueFormatter<List<Object>> {
 
     /**
      * {@link List} 的类型

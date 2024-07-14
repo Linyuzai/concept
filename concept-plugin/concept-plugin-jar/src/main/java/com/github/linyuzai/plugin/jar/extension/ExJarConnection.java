@@ -11,10 +11,6 @@ import java.util.jar.JarFile;
 
 /**
  * {@link java.net.JarURLConnection} used to support {@link ExJarFile#getURL()}.
- *
- * @author Phillip Webb
- * @author Andy Wilkinson
- * @author Rostyslav Dudka
  */
 public class ExJarConnection extends JarURLConnection {
 

@@ -17,10 +17,16 @@ import java.util.stream.Collectors;
 @HandlerDependency(ClassResolver.class)
 public class ClassFilter extends PredicateFilter<ClassSupplier> {
 
+    /**
+     * 类型过滤
+     */
     public static ClassFilter create(Class<?>... classes) {
         return create(Arrays.asList(classes));
     }
 
+    /**
+     * 类型过滤
+     */
     public static ClassFilter create(Collection<? extends Class<?>> classes) {
         return new ClassFilter(cls -> {
             for (Class<?> c : classes) {
@@ -32,11 +38,17 @@ public class ClassFilter extends PredicateFilter<ClassSupplier> {
         });
     }
 
+    /**
+     * 类注解过滤
+     */
     @SafeVarargs
     public static ClassFilter annotation(Class<? extends Annotation>... annotations) {
         return annotation(Arrays.asList(annotations));
     }
 
+    /**
+     * 类注解过滤
+     */
     public static ClassFilter annotation(Collection<? extends Class<? extends Annotation>> annotations) {
         return new ClassFilter(cls -> {
             for (Class<? extends Annotation> annotation : annotations) {
@@ -48,11 +60,17 @@ public class ClassFilter extends PredicateFilter<ClassSupplier> {
         });
     }
 
+    /**
+     * 类修饰过滤
+     */
     @SafeVarargs
     public static ClassFilter modifier(Predicate<Integer>... predicates) {
         return modifier(Arrays.asList(predicates));
     }
 
+    /**
+     * 类修饰过滤
+     */
     public static ClassFilter modifier(Collection<? extends Predicate<Integer>> predicates) {
         return new ClassFilter(cls -> {
             int modifiers = cls.getModifiers();
@@ -65,8 +83,18 @@ public class ClassFilter extends PredicateFilter<ClassSupplier> {
         });
     }
 
+    /**
+     * 按是否是枚举过滤
+     */
     public static ClassFilter isEnum() {
         return new ClassFilter(Class::isEnum);
+    }
+
+    /**
+     * 按是否是匿名类
+     */
+    public static ClassFilter isAnonymous() {
+        return new ClassFilter(Class::isAnonymousClass);
     }
 
     @SafeVarargs

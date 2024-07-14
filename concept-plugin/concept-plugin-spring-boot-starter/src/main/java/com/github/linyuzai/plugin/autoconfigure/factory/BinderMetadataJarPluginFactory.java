@@ -13,6 +13,9 @@ import org.springframework.core.env.*;
 
 import java.util.Set;
 
+/**
+ * 可绑定配置文件的插件工厂
+ */
 @Getter
 @Setter
 public class BinderMetadataJarPluginFactory extends JarPluginFactory implements EnvironmentAware {
@@ -31,6 +34,9 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
         this.environment = environment;
     }
 
+    /**
+     * 可绑定的插件配置
+     */
     @Getter
     public class BinderMetadata implements PluginMetadata {
 
@@ -87,6 +93,9 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
         }
     }
 
+    /**
+     * 插件配置环境
+     */
     public static class MetadataEnvironment extends AbstractEnvironment {
 
         public MetadataEnvironment(PluginMetadata metadata, Environment environment) {
@@ -102,6 +111,9 @@ public class BinderMetadataJarPluginFactory extends JarPluginFactory implements 
         }
     }
 
+    /**
+     * 插件配置源
+     */
     public static class MetadataPropertySource extends EnumerablePropertySource<PluginMetadata> {
 
         public MetadataPropertySource(String name, PluginMetadata source) {

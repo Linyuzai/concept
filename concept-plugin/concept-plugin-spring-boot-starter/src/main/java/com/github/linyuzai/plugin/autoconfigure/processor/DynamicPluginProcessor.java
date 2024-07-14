@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.processor;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanDynamicExtractor;
-import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.handle.extract.MethodPluginExtractor;
 import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
@@ -21,6 +20,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 动态插件提取
+ */
 public class DynamicPluginProcessor implements BeanPostProcessor,
         ApplicationContextAware, SmartInitializingSingleton {
 
@@ -44,6 +46,7 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
             return bean;
         }
 
+        //获得所有标记 @OnPluginExtract 的方法
         Map<Method, Boolean> annotatedMethods = MethodIntrospector.selectMethods(targetClass,
                 (MethodIntrospector.MetadataLookup<Boolean>) method ->
                         method.isAnnotationPresent(OnPluginExtract.class));
@@ -54,6 +57,7 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
             // Non-empty set of methods
             annotatedMethods.forEach((method, annotated) -> {
                 if (annotated) {
+                    //有注解的方法
                     methods.add(method);
                 }
             });
@@ -71,23 +75,26 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
             return;
         }
         PluginConcept concept = applicationContext.getBean(PluginConcept.class);
+        //获得所有插件提取执行器工厂
         Collection<MethodPluginExtractor.InvokerFactory> factories =
                 applicationContext.getBeansOfType(MethodPluginExtractor.InvokerFactory.class).values();
         List<PluginExtractor> extractors = new ArrayList<>();
         for (PluginMethods pms : pluginMethods) {
+            //创建动态插件提取器
             BeanDynamicExtractor extractor = new BeanDynamicExtractor(pms.target, pms.methods);
             for (MethodPluginExtractor.InvokerFactory factory : factories) {
                 extractor.addInvokerFactory(factory);
             }
+            //初始化提取执行器
             extractor.prepareInvokers();
             extractors.add(extractor);
         }
         if (!extractors.isEmpty()) {
+            //添加提取器
             concept.addHandlers(extractors);
         }
+        concept.initialize();
         pluginMethods.clear();
-        PluginAutoLoader loader = applicationContext.getBean(PluginAutoLoader.class);
-        loader.start();
     }
 
     @Override

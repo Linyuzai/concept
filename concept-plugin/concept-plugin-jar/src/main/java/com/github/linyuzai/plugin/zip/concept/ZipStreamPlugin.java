@@ -12,14 +12,24 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-@Getter
+/**
+ * zip流插件
+ */
 @RequiredArgsConstructor
 public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
 
-    protected final ZipInputStream inputStream;
+    /**
+     * zip流
+     */
+    @Getter
+    protected final ZipInputStream zipInputStream;
 
     protected final URL url;
 
+    /**
+     * 父条目
+     */
+    @Getter
     protected final Entry parent;
 
     @Override
@@ -35,7 +45,7 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
     @SneakyThrows
     @Override
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
-        try (ZipInputStream zis = inputStream) {
+        try (ZipInputStream zis = zipInputStream) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String name = entry.getName();
@@ -46,15 +56,17 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
                 } else {
                     bytes = PluginUtils.read(zis);
                 }
-                consumer.accept(createZipPluginEntry(id, name, bytes));
+                ZipPluginEntry pluginEntry = createPluginEntry(id, name, bytes);
+                consumer.accept(pluginEntry);
                 zis.closeEntry();
             }
         }
     }
 
-    protected ZipPluginEntry createZipPluginEntry(URL url,
-                                                  String name,
-                                                  byte[] bytes) {
-        return new ZipStreamPluginEntry(url, name, this, parent, bytes);
+    /**
+     * 创建插件条目
+     */
+    protected ZipPluginEntry createPluginEntry(URL url, String name, byte[] bytes) {
+        return new ZipStreamPluginEntry(name, this, parent, url, bytes);
     }
 }

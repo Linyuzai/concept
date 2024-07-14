@@ -15,7 +15,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MapFormatter extends PluginTreeNodeFormatter<Map<Object, Object>> {
+public class MapFormatter extends TreeNodeFormatter<Map<Object, Object>> {
 
     /**
      * {@link Map} 的类型

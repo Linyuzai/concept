@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.jar.extension;
 
+import com.github.linyuzai.plugin.core.concept.AbstractPluginEntry;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -8,22 +9,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class ExJarPluginEntry implements Plugin.Entry {
+@Getter
+public class ExJarPluginEntry extends AbstractPluginEntry implements Plugin.Entry {
 
-    @Getter
-    private final Plugin plugin;
-
-    @Getter
     private final ExJarFile jarFile;
 
-    @Getter
     private final ExJarEntry jarEntry;
 
     private final URL url;
 
     @SneakyThrows
-    public ExJarPluginEntry(Plugin plugin, ExJarFile jarFile, ExJarEntry jarEntry) {
-        this.plugin = plugin;
+    public ExJarPluginEntry(ExJarFile jarFile, ExJarEntry jarEntry, Plugin plugin) {
+        super(jarEntry.getName(), plugin);
         this.jarFile = jarFile;
         this.jarEntry = jarEntry;
         this.url = jarEntry.getURL();
@@ -35,24 +32,17 @@ public class ExJarPluginEntry implements Plugin.Entry {
     }
 
     @Override
-    public String getName() {
-        return jarEntry.getName();
-    }
-
-    @Override
-    public URL getURL() {
-        return url;
-    }
-
-    @Override
     public Plugin.Content getContent() {
         if (jarEntry.isDirectory()) {
             return null;
         }
-        return new EntryContent();
+        return new ExJarEntryContent();
     }
 
-    public class EntryContent implements Plugin.Content {
+    /**
+     * 扩展jar内容
+     */
+    public class ExJarEntryContent implements Plugin.Content {
 
         @Override
         public InputStream getInputStream() throws IOException {

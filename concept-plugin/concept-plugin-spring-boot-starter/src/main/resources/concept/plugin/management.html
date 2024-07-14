@@ -489,15 +489,15 @@
         });
     }
 
-    const validateRename = (rule, value, callback) => {
-        if (value === '') {
+    const validateName = (rule, value, callback) => {
+        if (value.indexOf('/') !== -1) {
+            callback(new Error('名称不能包含\'/\''));
+        } else {
             callback();
-            return;
         }
-        if (value.endsWith('/')) {
-            callback(new Error('名称不能以\'/\'结尾'));
-            return;
-        }
+    };
+
+    const validateRename = (rule, value, callback) => {
         let params = {group: app.group.select, name: value};
         httpGet(getPluginUrl('exist', params), response => {
             let body = response;
@@ -558,7 +558,9 @@
                     visible: false,
                     rules: {
                         name: [
-                            {required: true, message: '分组名称不能为空', trigger: 'blur'}
+                            {required: true, message: '分组名称不能为空', trigger: 'blur'},
+                            {validator: validateName, trigger: 'blur'},
+                            {validator: validateRename, trigger: 'blur'}
                         ]
                     },
                     form: {
@@ -584,6 +586,7 @@
                     rules: {
                         rename: [
                             {required: true, message: '名称不能为空', trigger: 'blur'},
+                            {validator: validateName, trigger: 'blur'},
                             {validator: validateRename, trigger: 'blur'}
                         ]
                     },

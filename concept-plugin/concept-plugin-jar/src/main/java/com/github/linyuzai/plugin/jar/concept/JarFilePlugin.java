@@ -2,35 +2,39 @@ package com.github.linyuzai.plugin.jar.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
-import com.github.linyuzai.plugin.jar.read.JarClassReader;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
+/**
+ * jar文件插件
+ */
 @Getter
 public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
 
     private PluginClassLoader pluginClassLoader;
 
-    public JarFilePlugin(String path, URL url) {
-        super(path, url);
+    public JarFilePlugin(JarFile jarFile, URL url) {
+        super(jarFile, url);
     }
 
     @Override
-    protected JarFile createZipFile() throws IOException {
-        return new JarFile(path);
+    public JarFile getZipFile() {
+        return (JarFile) super.getZipFile();
     }
 
     @Override
-    protected JarPluginEntry createZipPluginEntry(URL url, String name) {
-        return new JarFilePluginEntry(url, name, this, path);
+    protected JarPluginEntry createPluginEntry(URL url, String name) {
+        return new JarFilePluginEntry(getZipFile(), url, name, this);
     }
 
+    /**
+     * 缓存包和类的内容创建插件类加载器
+     */
     @Override
     public void onPrepare(PluginContext context) {
         PluginTree tree = context.get(PluginTree.class);
@@ -40,9 +44,13 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
         Map<String, Content> classes = new HashMap<>();
         Map<String, Content> packages = new HashMap<>();
         collectClassContents(tree.getRoot(), classes, packages);
-        this.pluginClassLoader = new JarPluginClassLoader(this, packages, classes, getClass().getClassLoader());
+        ClassLoader parent = getClass().getClassLoader();
+        this.pluginClassLoader = new JarPluginClassLoader(this, packages, classes, parent);
     }
 
+    /**
+     * 获取包和类的内容
+     */
     protected void collectClassContents(PluginTree.Node node,
                                         Map<String, Content> classes,
                                         Map<String, Content> packages) {
@@ -50,15 +58,22 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
             Object value = it.getValue();
             if (value instanceof Entry) {
                 Entry entry = (Entry) value;
+                if (entry.getName().startsWith("META-INF/")) {
+                    return;
+                }
                 if (entry.getName().endsWith("/")) {
                     packages.computeIfAbsent(entry.getName(), name -> findManifestContent(it));
                 } else if (entry.getName().endsWith(".class")) {
+
                     classes.putIfAbsent(entry.getName(), entry.getContent());
                 }
             }
         });
     }
 
+    /**
+     * 获得 Manifest 内容
+     */
     protected Content findManifestContent(PluginTree.Node node) {
         PluginTree.Node parent = node.getParent();
         for (PluginTree.Node child : parent.getChildren()) {
@@ -73,8 +88,12 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
         return null;
     }
 
+    /**
+     * 关闭插件类加载器
+     */
     @Override
     public void onDestroy() {
+        super.onDestroy();
         try {
             pluginClassLoader.close();
         } catch (Throwable ignore) {

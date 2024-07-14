@@ -32,11 +32,20 @@ public abstract class AbstractPluginFactory<T> implements PluginFactory {
         return plugin;
     }
 
+    /**
+     * 创建插件配置
+     */
     protected PluginMetadata createMetadata(Object source) {
         return getMetadataFactory().create(source);
     }
 
+    /**
+     * 获得支持解析的对象
+     */
     protected abstract T getSupported(Object source);
 
+    /**
+     * 创建插件
+     */
     protected abstract Plugin doCreate(T supported, PluginMetadata metadata, PluginContext context, PluginConcept concept);
 }

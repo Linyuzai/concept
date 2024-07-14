@@ -49,6 +49,9 @@ import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
+/**
+ * 插件配置类
+ */
 @Configuration(proxyBeanMethods = false)
 public class PluginConceptConfiguration {
 
@@ -181,7 +184,7 @@ public class PluginConceptConfiguration {
         return new BeanExtractor.InvokerFactory();
     }
 
-    @Bean(initMethod = "initialize", destroyMethod = "destroy")
+    @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
     public PluginConcept pluginConcept(PluginContextFactory contextFactory,
                                        PluginHandlerChainFactory handlerChainFactory,
@@ -231,7 +234,7 @@ public class PluginConceptConfiguration {
             return new LocalPluginLocation(basePath, filter);
         }
 
-        @Bean(destroyMethod = "stop")
+        @Bean(initMethod = "start", destroyMethod = "stop")
         @ConditionalOnMissingBean
         public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
                                                  PluginExecutor executor,

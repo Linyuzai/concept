@@ -2,6 +2,9 @@ package com.github.linyuzai.plugin.zip.autoload;
 
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 
+/**
+ * 过滤 zip 文件
+ */
 public class ZipLocationFilter implements PluginLocation.Filter {
 
     @Override
