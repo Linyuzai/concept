@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.handle.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.AbstractSupplier;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.jar.concept.PluginClassLoader;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -56,7 +57,11 @@ public class ClassResolver extends AbstractPluginResolver<Plugin.Entry, ClassSup
         @Override
         public Class<?> create() {
             if (plugin instanceof JarPlugin) {
-                return ((JarPlugin) plugin).getPluginClassLoader().loadClass(name);
+                PluginClassLoader pluginClassLoader = ((JarPlugin) plugin).getPluginClassLoader();
+                if (pluginClassLoader == null) {
+                    return null;
+                }
+                return pluginClassLoader.loadClass(name);
             }
             return null;
         }

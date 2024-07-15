@@ -42,6 +42,11 @@
             height: 0;
         }
 
+        .dialog-content {
+            max-height: 350px;
+            overflow-y: scroll
+        }
+
         .plugin-btn {
             padding: 0;
         }
@@ -102,10 +107,16 @@
 <div id="concept-plugin-app">
     <!--:style="{top: buttonTop + 'px',left: buttonLeft + 'px'}"-->
     <el-button class="floating-button"
-               @click="">
+               @click="help.visible = true">
         <i class="el-icon-question el-icon--left" style="margin-right: 10px"></i>
         帮助
     </el-button>
+        <el-dialog
+                :visible.sync="help.visible"
+                title="帮助">
+            <div class="dialog-content" v-html="help.html">
+            </div>
+        </el-dialog>
     <el-container style="height: 100vh">
         <el-header v-if="setting.header.display" class="header">
             <h1>
@@ -147,7 +158,8 @@
                                 active-text="锁定">
                         </el-switch>
                         <el-button-group style="margin-top: 20px; float: right">
-                            <el-button v-if="!auth.lock" @click="openGroupDialog" icon="el-icon-plus"></el-button>
+                            <el-button v-if="!auth.lock" @click="openGroupDialog"
+                                       icon="el-icon-plus"></el-button>
                             <el-button @click="refreshGroups" icon="el-icon-refresh"></el-button>
                             <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
                         </el-button-group>
@@ -172,12 +184,12 @@
                              @submit.native.prevent=""
                              ref="group.add.form">
                         <el-form-item label="分组名称" prop="name">
-                            <el-tooltip class="item" effect="dark" placement="right">
+                            <!--<el-tooltip class="item" effect="dark" placement="right">
                                 <div slot="content" v-cloak>
-                                    分组名称
+                                    与文件目录对应
                                 </div>
                                 <i class="el-icon-warning-outline" v-cloak></i>
-                            </el-tooltip>
+                            </el-tooltip>-->
                             <el-input v-model="group.add.form.name"
                                       @keyup.enter.native="addGroup"
                                       name="name"
@@ -375,9 +387,10 @@
                         </el-table>
                         <el-dialog title="插件配置"
                                    :visible.sync="plugin.property.visible">
-                            <el-form v-cloak style="max-height: 350px; overflow-y: scroll">
+                            <el-form v-cloak class="dialog-content">
                                 <el-form-item v-for="property in plugin.property.list" :label="property.name">
-                                    <el-input v-model="property.value" :name="property.name" disabled></el-input>
+                                    <el-input v-model="property.value" :name="property.name"
+                                              disabled></el-input>
                                 </el-form-item>
                             </el-form>
                         </el-dialog>
@@ -416,10 +429,11 @@
     </el-container>
 </div>
 </body>
-<script src="/webjars/vue/2.6.11/vue.js" type="text/javascript"></script>
+<script src="/webjars/vue/2.6.11/vue.min.js" type="text/javascript"></script>
 <script src="/webjars/axios/1.7.2/dist/axios.min.js" type="text/javascript"></script>
 <!--<script src="/webjars/vue-resource/1.5.1/dist/vue-resource.min.js" type="text/javascript"></script>-->
 <script src="/webjars/element-ui/2.15.1/lib/index.js" type="text/javascript"></script>
+<script src="/webjars/showdown/2.1.0/dist/showdown.min.js" type="text/javascript"></script>
 <script src="/concept-plugin/concept-plugin.js" type="text/javascript"></script>
 <script>
     const urlPrefix = '/concept-plugin/management/';
@@ -549,7 +563,10 @@
                     }
                 }
             },
-            help: {},
+            help: {
+                visible: false,
+                html: ""
+            },
             group: {
                 select: null,
                 badge: true,
@@ -622,6 +639,13 @@
                     import(script);
                 });*/
             },
+            initHelp() {
+                this._get('/concept-plugin/help.md', response => {
+                    let body = response;
+                    this.help.html = new showdown.Converter().makeHtml(body);
+                });
+            },
+
             lock(lock) {
                 if (lock) {
                     this.auth.lock = true;
@@ -999,6 +1023,7 @@
         },
         mounted: function () {
             this.initSettings();
+            this.initHelp();
             this.refreshGroups();
         }
     });

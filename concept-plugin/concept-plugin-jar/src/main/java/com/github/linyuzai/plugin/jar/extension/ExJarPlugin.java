@@ -61,19 +61,21 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
         if (tree == null) {
             return;
         }
-        List<URL> urlList = new ArrayList<>();
-        tree.getRoot().forEach(it -> {
-            if (it.isPluginNode() && it.getId() instanceof URL) {
-                URL url = (URL) it.getId();
-                urlList.add(url);
+        if (pluginClassLoader == null) {
+            List<URL> urlList = new ArrayList<>();
+            tree.getRoot().forEach(it -> {
+                if (it.isPluginNode() && it.getId() instanceof URL) {
+                    URL url = (URL) it.getId();
+                    urlList.add(url);
+                }
+            });
+            if (urlList.isEmpty()) {
+                return;
             }
-        });
-        if (urlList.isEmpty()) {
-            return;
+            URL[] urls = urlList.toArray(new URL[0]);
+            ClassLoader parent = getClass().getClassLoader();
+            this.pluginClassLoader = new ExJarPluginClassLoader(this, urls, parent);
         }
-        URL[] urls = urlList.toArray(new URL[0]);
-        ClassLoader parent = getClass().getClassLoader();
-        this.pluginClassLoader = new ExJarPluginClassLoader(this, urls, parent);
     }
 
     @Override

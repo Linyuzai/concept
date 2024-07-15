@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
+import com.github.linyuzai.plugin.autoconfigure.autoload.ConditionalOnPluginAutoloadEnabled;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
@@ -211,7 +212,7 @@ public class PluginConceptConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "concept.plugin.autoload.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnPluginAutoloadEnabled
     public static class AutoloadConfiguration {
 
         @Bean

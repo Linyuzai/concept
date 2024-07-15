@@ -22,6 +22,7 @@ dependencies {
     //api "org.webjars.npm:vue-resource:${VueResourceVersion}"
     api "org.webjars.npm:axios:${AxiosVersion}"
     api "org.webjars.npm:element-ui:${ElementUIVersion}"
+    api "org.webjars.npm:showdown:${ShowdownVersion}"
 }
 
 apply from: '../../publish.gradle'

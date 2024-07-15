@@ -24,6 +24,7 @@ allprojects {
         set('VueResourceVersion', '1.5.1')
         set('AxiosVersion', '1.7.2')
         set('ElementUIVersion', '2.15.1')
+        set('ShowdownVersion', '2.1.0')
     }
 
     group = 'com.github.linyuzai'

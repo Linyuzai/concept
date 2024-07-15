@@ -91,10 +91,24 @@ public class ClassFilter extends PredicateFilter<ClassSupplier> {
     }
 
     /**
-     * 按是否是匿名类
+     * 按是否是成员类过滤
+     */
+    public static ClassFilter isMember() {
+        return new ClassFilter(Class::isMemberClass);
+    }
+
+    /**
+     * 按是否是匿名类过滤
      */
     public static ClassFilter isAnonymous() {
         return new ClassFilter(Class::isAnonymousClass);
+    }
+
+    /**
+     * 按是否是本地类过滤
+     */
+    public static ClassFilter isLocal() {
+        return new ClassFilter(Class::isLocalClass);
     }
 
     @SafeVarargs

@@ -156,6 +156,11 @@ public class PluginConceptProperties {
     public static class ManagementProperties {
 
         /**
+         * 是否启用管理页面
+         */
+        private boolean enabled = true;
+
+        /**
          * 权限配置
          */
         private AuthorizationProperties authorization = new AuthorizationProperties();

@@ -84,8 +84,12 @@ public abstract class PluginClassLoader extends URLClassLoader {
                 for (Plugin p : list) {
                     //匹配到依赖的jar尝试获取对应的类
                     if (p instanceof JarPlugin && Objects.equals(n, p.getMetadata().asStandard().getName())) {
+                        PluginClassLoader pluginClassLoader = ((JarPlugin) p).getPluginClassLoader();
+                        if (pluginClassLoader == null) {
+                            continue;
+                        }
                         try {
-                            return ((JarPlugin) p).getPluginClassLoader().findPluginClass(name, plugins);
+                            return pluginClassLoader.findPluginClass(name, plugins);
                         } catch (ClassNotFoundException ignore) {
                         }
                     }

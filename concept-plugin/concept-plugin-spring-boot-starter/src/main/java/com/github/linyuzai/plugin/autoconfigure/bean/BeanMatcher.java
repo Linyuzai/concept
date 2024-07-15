@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.util.function.Predicate;
 
 /**
  * Bean 匹配器
@@ -28,6 +29,11 @@ public class BeanMatcher extends AbstractPluginMatcher<BeanSupplier> {
         this.classMatcher.addFilter(ClassFilter.isEnum().negate());
         //忽略匿名类
         this.classMatcher.addFilter(ClassFilter.isAnonymous().negate());
+        //忽略本地类
+        this.classMatcher.addFilter(ClassFilter.isLocal().negate());
+        //忽略内部类（非静态）
+        this.classMatcher.addFilter(new ClassFilter(cls ->
+                !cls.isMemberClass() || Modifier.isStatic(cls.getModifiers())));
     }
 
     @Override

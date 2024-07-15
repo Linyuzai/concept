@@ -21,12 +21,12 @@ public class SampleDynamicExtractor {
     }
 
     @OnPluginExtract
-    public void sampleExtract(@PluginClassName("com.example.jarplugin.spring.**") Object bean,
+    public void sampleExtract(List<Object> beans,
                               List<Properties> properties,
                               List<Class<?>> classes,
                               @PluginEntry("content/**") String text,
                               Plugin plugin) {
-        log.info("Dynamic Bean: {}", bean);
+        log.info("Dynamic Bean: {}", beans);
         log.info("Dynamic Prop: {}", properties);
         log.info("Dynamic Class: {}", classes);
         log.info("Dynamic Text: {}", text);

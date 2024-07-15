@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
+import com.github.linyuzai.plugin.autoconfigure.autoload.ConditionalOnPluginAutoloadEnabled;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.lang.annotation.ElementType;
@@ -12,6 +13,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
+@ConditionalOnPluginAutoloadEnabled
 @ConditionalOnProperty(name = "concept.plugin.management.enabled", havingValue = "true", matchIfMissing = true)
 public @interface ConditionalOnPluginManagementEnabled {
 }

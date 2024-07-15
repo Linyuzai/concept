@@ -14,6 +14,8 @@ public interface JarPlugin extends ZipPlugin {
      */
     PluginClassLoader getPluginClassLoader();
 
+    void setPluginClassLoader(PluginClassLoader classLoader);
+
     @Data
     @EqualsAndHashCode(callSuper = true)
     class StandardMetadata extends ZipPlugin.StandardMetadata {

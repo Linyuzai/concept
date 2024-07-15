@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.jar.JarFile;
  * jar文件插件
  */
 @Getter
+@Setter
 public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
 
     private PluginClassLoader pluginClassLoader;
@@ -41,11 +43,13 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
         if (tree == null) {
             return;
         }
-        Map<String, Content> classes = new HashMap<>();
-        Map<String, Content> packages = new HashMap<>();
-        collectClassContents(tree.getRoot(), classes, packages);
-        ClassLoader parent = getClass().getClassLoader();
-        this.pluginClassLoader = new JarPluginClassLoader(this, packages, classes, parent);
+        if (pluginClassLoader == null) {
+            Map<String, Content> classes = new HashMap<>();
+            Map<String, Content> packages = new HashMap<>();
+            collectClassContents(tree.getRoot(), classes, packages);
+            ClassLoader parent = getClass().getClassLoader();
+            this.pluginClassLoader = new JarPluginClassLoader(this, packages, classes, parent);
+        }
     }
 
     /**
