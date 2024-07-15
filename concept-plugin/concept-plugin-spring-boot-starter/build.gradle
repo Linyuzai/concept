@@ -18,6 +18,9 @@ dependencies {
     compileOnly project(':concept-plugin:concept-plugin-core')
     compileOnly project(':concept-plugin:concept-plugin-jar')
 
+    //api "com.github.linyuzai:concept-plugin-core:${ConceptPluginVersion}"
+    //api "com.github.linyuzai:concept-plugin-jar:${ConceptPluginVersion}"
+
     api "org.webjars:vue:${VueVersion}"
     //api "org.webjars.npm:vue-resource:${VueResourceVersion}"
     api "org.webjars.npm:axios:${AxiosVersion}"

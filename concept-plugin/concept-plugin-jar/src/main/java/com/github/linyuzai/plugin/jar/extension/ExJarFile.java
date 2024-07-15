@@ -39,10 +39,6 @@ public class ExJarFile extends JarFile implements Iterable<JarEntry> {
 
     private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF";
 
-    //private static final String PROTOCOL_HANDLER = "java.protocol.handler.pkgs";
-
-    //private static final String HANDLERS_PACKAGE = "org.springframework.boot.loader";
-
     private static final AsciiBytes META_INF = new AsciiBytes("META-INF/");
 
     private static final AsciiBytes SIGNATURE_FILE_EXTENSION = new AsciiBytes(".SF");
@@ -60,8 +56,6 @@ public class ExJarFile extends JarFile implements Iterable<JarEntry> {
 
     private URL url;
 
-    //private String urlString;
-
     private final ExJarFileEntries entries;
 
     private final Supplier<Manifest> manifestSupplier;
@@ -75,8 +69,6 @@ public class ExJarFile extends JarFile implements Iterable<JarEntry> {
 
     @Getter
     private volatile boolean closed;
-
-    //private volatile JarFileWrapper wrapper;
 
     /**
      * Create a new {@link ExJarFile} backed by the specified file.
@@ -166,15 +158,6 @@ public class ExJarFile extends JarFile implements Iterable<JarEntry> {
 
         };
     }
-
-	/*JarFileWrapper getWrapper() throws IOException {
-		JarFileWrapper wrapper = this.wrapper;
-		if (wrapper == null) {
-			wrapper = new JarFileWrapper(this);
-			this.wrapper = wrapper;
-		}
-		return wrapper;
-	}*/
 
     Permission getPermission() {
         return new FilePermission(this.rootFile.getFile().getPath(), READ_ACTION);
@@ -349,13 +332,6 @@ public class ExJarFile extends JarFile implements Iterable<JarEntry> {
         }
     }
 
-	/*String getUrlString() throws MalformedURLException {
-		if (this.urlString == null) {
-			this.urlString = getURL().toString();
-		}
-		return this.urlString;
-	}*/
-
     public URL getURL() throws MalformedURLException {
         if (this.url == null) {
             String file = this.rootFile.getFile().toURI() + this.pathFromRoot + "!/";
@@ -383,39 +359,13 @@ public class ExJarFile extends JarFile implements Iterable<JarEntry> {
         }
     }
 
-	/*public void clearCache() {
+	public void clearCache() {
 		this.entries.clearCache();
-	}*/
+	}
 
     protected String getPathFromRoot() {
         return this.pathFromRoot;
     }
-
-    /**
-     * Register a {@literal 'java.protocol.handler.pkgs'} property so that a
-     * {@link URLStreamHandler} will be located to deal with jar URLs.
-     */
-	/*public static void registerUrlProtocolHandler() {
-		Handler.captureJarContextUrl();
-		String handlers = System.getProperty(PROTOCOL_HANDLER, "");
-		System.setProperty(PROTOCOL_HANDLER,
-				((handlers == null || handlers.isEmpty()) ? HANDLERS_PACKAGE : handlers + "|" + HANDLERS_PACKAGE));
-		resetCachedUrlHandlers();
-	}*/
-
-    /**
-     * Reset any cached handlers just in case a jar protocol has already been used. We
-     * reset the handler by trying to set a null {@link URLStreamHandlerFactory} which
-     * should have no effect other than clearing the handlers cache.
-     */
-	/*private static void resetCachedUrlHandlers() {
-		try {
-			URL.setURLStreamHandlerFactory(null);
-		}
-		catch (Error ex) {
-			// Ignore
-		}
-	}*/
 
     /**
      * The type of a {@link ExJarFile}.

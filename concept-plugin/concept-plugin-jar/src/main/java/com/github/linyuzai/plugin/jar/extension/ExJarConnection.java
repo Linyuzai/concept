@@ -120,17 +120,11 @@ public class ExJarConnection extends JarURLConnection {
 
     @Override
     public String getEntryName() {
-        /*if (this.jarFile == null) {
-            throw NOT_FOUND_CONNECTION_EXCEPTION;
-        }*/
         return this.jarEntryName.toString();
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        /*if (this.jarFile == null) {
-            throw FILE_NOT_FOUND_EXCEPTION;
-        }*/
         if (this.jarEntryName.isEmpty() && this.jarFile.getType() == ExJarFile.Type.DIRECT) {
             throw new IOException("no entry name specified");
         }
@@ -144,9 +138,6 @@ public class ExJarConnection extends JarURLConnection {
     }
 
     private void throwFileNotFound(Object entry, ExJarFile jarFile) throws FileNotFoundException {
-        /*if (Boolean.TRUE.equals(useFastExceptions.get())) {
-            throw FILE_NOT_FOUND_EXCEPTION;
-        }*/
         throw new FileNotFoundException("JAR entry " + entry + " not found in " + jarFile.getName());
     }
 
@@ -161,9 +152,6 @@ public class ExJarConnection extends JarURLConnection {
 
     @Override
     public long getContentLengthLong() {
-        /*if (this.jarFile == null) {
-            return -1;
-        }*/
         try {
             if (this.jarEntryName.isEmpty()) {
                 return this.jarFile.size();
@@ -187,10 +175,7 @@ public class ExJarConnection extends JarURLConnection {
     }
 
     @Override
-    public Permission getPermission() throws IOException {
-        /*if (this.jarFile == null) {
-            throw FILE_NOT_FOUND_EXCEPTION;
-        }*/
+    public Permission getPermission() {
         if (this.permission == null) {
             this.permission = this.jarFile.getPermission();
         }
@@ -210,17 +195,11 @@ public class ExJarConnection extends JarURLConnection {
         }
     }
 
-    /*static void setUseFastExceptions(boolean useFastExceptions) {
-        //JarURLConnection.useFastExceptions.set(useFastExceptions);
-    }*/
-
     public static ExJarConnection get(URL url, ExJarFile jarFile) throws IOException {
         StringSequence spec = new StringSequence(url.getFile());
         int index = indexOfRootSpec(spec, jarFile.getPathFromRoot());
         if (index == -1) {
             throw new IllegalArgumentException("'" + SEPARATOR + "' not found: " + url);
-			/*return (Boolean.TRUE.equals(useFastExceptions.get()) ? NOT_FOUND_CONNECTION
-					: new JarURLConnection(url, null, EMPTY_JAR_ENTRY_NAME));*/
         }
         int separator;
         while ((separator = spec.indexOf(SEPARATOR, index)) > 0) {
@@ -228,7 +207,6 @@ public class ExJarConnection extends JarURLConnection {
             ExJarEntry jarEntry = jarFile.getJarEntry(entryName.toCharSequence());
             if (jarEntry == null) {
                 throw new IllegalArgumentException("Jar entity not found: " + entryName);
-                //return JarURLConnection.notFound(jarFile, entryName);
             }
             jarFile = jarFile.getNestedJarFile(jarEntry);
             index = separator + SEPARATOR.length();
@@ -237,10 +215,6 @@ public class ExJarConnection extends JarURLConnection {
         if (!jarEntryName.isEmpty() && !jarFile.containsEntry(jarEntryName.toString())) {
             throw new IllegalArgumentException("Jar entity not found: " + jarEntryName);
         }
-        /*if (Boolean.TRUE.equals(useFastExceptions.get()) && !jarEntryName.isEmpty()
-                && !jarFile.containsEntry(jarEntryName.toString())) {
-            return NOT_FOUND_CONNECTION;
-        }*/
         return new ExJarConnection(url, jarFile, jarEntryName);
     }
 
@@ -251,21 +225,6 @@ public class ExJarConnection extends JarURLConnection {
         }
         return separatorIndex + SEPARATOR.length() + pathFromRoot.length();
     }
-
-    /*private static JarURLConnection notFound() {
-        try {
-            return notFound(null, null);
-        } catch (IOException ex) {
-            throw new IllegalStateException(ex);
-        }
-    }*/
-
-    /*private static JarURLConnection notFound(JarFile jarFile, JarEntryName jarEntryName) throws IOException {
-        if (Boolean.TRUE.equals(useFastExceptions.get())) {
-            return NOT_FOUND_CONNECTION;
-        }
-        return new JarURLConnection(null, jarFile, jarEntryName);
-    }*/
 
     /**
      * A JarEntryName parsed from a URL String.

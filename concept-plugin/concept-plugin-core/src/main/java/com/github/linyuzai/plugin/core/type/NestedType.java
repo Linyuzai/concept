@@ -6,16 +6,16 @@ import java.util.List;
 /**
  * 嵌套类型
  * <p>
- * 以 List<? extends Class<? extends A>[]> 为例
+ * 以 List&lt;? extends Class&lt;? extends A&gt;[]&gt; 为例
  * <blockquote><pre>
  * {
- *     toType: List<? extends Class<? extends A>[]>,
+ *     toType: List&lt;? extends Class&lt;? extends A&gt;[]&gt;,
  *     toClass: List,
  *     children: [{
- *          toType: Class<? extends A>[],
+ *          toType: Class&lt;? extends A&gt;[],
  *          toClass: Class[],
  *          children: [{
- *              toType: Class<? extends A>,
+ *              toType: Class&lt;? extends A&gt;,
  *              toClass: Class,
  *              children: [{
  *                  toType: A,

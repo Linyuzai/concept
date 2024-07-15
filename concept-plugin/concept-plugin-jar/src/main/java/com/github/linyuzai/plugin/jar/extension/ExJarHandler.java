@@ -29,25 +29,7 @@ public class ExJarHandler extends URLStreamHandler {
 
     private static final String PARENT_DIR = "/../";
 
-    //private static final String PROTOCOL_HANDLER = "java.protocol.handler.pkgs";
-
-    //private static final String[] FALLBACK_HANDLERS = { "sun.net.www.protocol.jar.Handler" };
-
-    //private static URL jarContextUrl;
-
-    //private static SoftReference<Map<File, NestedJarFile>> rootFileCache;
-
-	/*static {
-		rootFileCache = new SoftReference<>(null);
-	}*/
-
     private final ExJarFile jarFile;
-
-    //private URLStreamHandler fallbackHandler;
-
-	/*public NestedJarHandler() {
-		this(null);
-	}*/
 
     public ExJarHandler(ExJarFile jarFile) {
         this.jarFile = jarFile;
@@ -59,12 +41,6 @@ public class ExJarHandler extends URLStreamHandler {
             return ExJarConnection.get(url, this.jarFile);
         }
         return ExJarConnection.get(url, getRootJarFileFromUrl(url));
-		/*try {
-			return JarURLConnection.get(url, getRootJarFileFromUrl(url));
-		}
-		catch (Exception ex) {
-			return openFallbackConnection(url, ex);
-		}*/
     }
 
     private boolean isUrlInJarFile(URL url, ExJarFile jarFile) throws MalformedURLException {
@@ -73,123 +49,6 @@ public class ExJarHandler extends URLStreamHandler {
                 && url.toString().startsWith(jarFile.getURL().toString());
     }
 
-	/*private URLConnection openFallbackConnection(URL url, Exception reason) throws IOException {
-		try {
-			URLConnection connection = openFallbackTomcatConnection(url);
-			connection = (connection != null) ? connection : openFallbackContextConnection(url);
-			return (connection != null) ? connection : openFallbackHandlerConnection(url);
-		}
-		catch (Exception ex) {
-			if (reason instanceof IOException) {
-				log(false, "Unable to open fallback handler", ex);
-				throw (IOException) reason;
-			}
-			log(true, "Unable to open fallback handler", ex);
-			if (reason instanceof RuntimeException) {
-				throw (RuntimeException) reason;
-			}
-			throw new IllegalStateException(reason);
-		}
-	}*/
-
-    /**
-     * Attempt to open a Tomcat formatted 'jar:war:file:...' URL. This method allows us to
-     * use our own nested JAR support to open the content rather than the logic in
-     * {@code sun.net.www.protocol.jar.URLJarFile} which will extract the nested jar to
-     * the temp folder to that its content can be accessed.
-     * @param url the URL to open
-     * @return a {@link URLConnection} or {@code null}
-     */
-//	private URLConnection openFallbackTomcatConnection(URL url) {
-//		String file = url.getFile();
-//		if (isTomcatWarUrl(file)) {
-//			file = file.substring(TOMCAT_WARFILE_PROTOCOL.length());
-//			file = file.replaceFirst("\\*/", "!/");
-//			try {
-//				URLConnection connection = openConnection(new URL("jar:file:" + file));
-//				connection.getInputStream().close();
-//				return connection;
-//			}
-//			catch (IOException ex) {
-//			}
-//		}
-//		return null;
-//	}
-
-//	private boolean isTomcatWarUrl(String file) {
-//		if (file.startsWith(TOMCAT_WARFILE_PROTOCOL) || !file.contains("*/")) {
-//			try {
-//				URLConnection connection = new URL(file).openConnection();
-//				if (connection.getClass().getName().startsWith("org.apache.catalina")) {
-//					return true;
-//				}
-//			}
-//			catch (Exception ex) {
-//			}
-//		}
-//		return false;
-//	}
-
-    /**
-     * Attempt to open a fallback connection by using a context URL captured before the
-     * jar handler was replaced with our own version. Since this method doesn't use
-     * reflection it won't trigger "illegal reflective access operation has occurred"
-     * warnings on Java 13+.
-     * @param url the URL to open
-     * @return a {@link URLConnection} or {@code null}
-     */
-	/*private URLConnection openFallbackContextConnection(URL url) {
-		try {
-			if (jarContextUrl != null) {
-				return new URL(jarContextUrl, url.toExternalForm()).openConnection();
-			}
-		}
-		catch (Exception ex) {
-		}
-		return null;
-	}*/
-
-    /**
-     * Attempt to open a fallback connection by using reflection to access Java's default
-     * jar {@link URLStreamHandler}.
-     *
-     * @param url the URL to open
-     * @return the {@link URLConnection}
-     * @throws Exception if not connection could be opened
-     */
-	/*private URLConnection openFallbackHandlerConnection(URL url) throws Exception {
-		URLStreamHandler fallbackHandler = getFallbackHandler();
-		return new URL(null, url.toExternalForm(), fallbackHandler).openConnection();
-	}*/
-
-	/*private URLStreamHandler getFallbackHandler() {
-		if (this.fallbackHandler != null) {
-			return this.fallbackHandler;
-		}
-		for (String handlerClassName : FALLBACK_HANDLERS) {
-			try {
-				Class<?> handlerClass = Class.forName(handlerClassName);
-				this.fallbackHandler = (URLStreamHandler) handlerClass.getDeclaredConstructor().newInstance();
-				return this.fallbackHandler;
-			}
-			catch (Exception ex) {
-				// Ignore
-			}
-		}
-		throw new IllegalStateException("Unable to find fallback handler");
-	}*/
-
-	/*private void log(boolean warning, String message, Exception cause) {
-		try {
-			Level level = warning ? Level.WARNING : Level.FINEST;
-			Logger.getLogger(getClass().getName()).log(level, message, cause);
-		}
-		catch (Exception ex) {
-			if (warning) {
-				System.err.println("WARNING: " + message);
-			}
-		}
-	}*/
     @Override
     protected void parseURL(URL context, String spec, int start, int limit) {
         if (spec.regionMatches(true, 0, JAR_PROTOCOL, 0, JAR_PROTOCOL.length())) {
@@ -346,87 +205,8 @@ public class ExJarHandler extends URLStreamHandler {
             }
             File file = new File(URI.create(name));
             return new ExJarFile(file);
-			/*Map<File, JarFile> cache = rootFileCache.get();
-			JarFile result = (cache != null) ? cache.get(file) : null;
-			if (result == null) {
-				result = new JarFile(file);
-				addToRootFileCache(file, result);
-			}
-			return result;*/
         } catch (Exception ex) {
             throw new IOException("Unable to open root Jar file '" + name + "'", ex);
         }
     }
-
-    /**
-     * Add the given {@link ExJarFile} to the root file cache.
-     * @param sourceFile the source file to add
-     * @param jarFile the jar file.
-     */
-	/*static void addToRootFileCache(File sourceFile, JarFile jarFile) {
-		Map<File, JarFile> cache = rootFileCache.get();
-		if (cache == null) {
-			cache = new ConcurrentHashMap<>();
-			rootFileCache = new SoftReference<>(cache);
-		}
-		cache.put(sourceFile, jarFile);
-	}*/
-
-    /**
-     * If possible, capture a URL that is configured with the original jar handler so that
-     * we can use it as a fallback context later. We can only do this if we know that we
-     * can reset the handlers after.
-     */
-	/*static void captureJarContextUrl() {
-		if (canResetCachedUrlHandlers()) {
-			String handlers = System.getProperty(PROTOCOL_HANDLER);
-			try {
-				System.clearProperty(PROTOCOL_HANDLER);
-				try {
-					resetCachedUrlHandlers();
-					jarContextUrl = new URL("jar:file:context.jar!/");
-					URLConnection connection = jarContextUrl.openConnection();
-					if (connection instanceof NestedJarConnection) {
-						jarContextUrl = null;
-					}
-				}
-				catch (Exception ex) {
-				}
-			}
-			finally {
-				if (handlers == null) {
-					System.clearProperty(PROTOCOL_HANDLER);
-				}
-				else {
-					System.setProperty(PROTOCOL_HANDLER, handlers);
-				}
-			}
-			resetCachedUrlHandlers();
-		}
-	}*/
-
-	/*private static boolean canResetCachedUrlHandlers() {
-		try {
-			resetCachedUrlHandlers();
-			return true;
-		}
-		catch (Error ex) {
-			return false;
-		}
-	}*/
-
-	/*private static void resetCachedUrlHandlers() {
-		URL.setURLStreamHandlerFactory(null);
-	}*/
-
-    /**
-     * Set if a generic static exception can be thrown when a URL cannot be connected.
-     * This optimization is used during class loading to save creating lots of exceptions
-     * which are then swallowed.
-     * @param useFastConnectionExceptions if fast connection exceptions can be used.
-     */
-	/*public static void setUseFastConnectionExceptions(boolean useFastConnectionExceptions) {
-		//JarURLConnection.setUseFastExceptions(useFastConnectionExceptions);
-	}*/
-
 }
