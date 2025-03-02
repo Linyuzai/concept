@@ -34,6 +34,18 @@ public class DefaultPluginExecutor implements PluginExecutor, ThreadFactory {
     }
 
     @Override
+    public void schedule(Runnable runnable, long period, TimeUnit unit) {
+        executor.scheduleWithFixedDelay(runnable, 0, period, unit);
+    }
+
+    @Override
+    public void shutdown() {
+        if (!executor.isShutdown()) {
+            executor.shutdown();
+        }
+    }
+
+    @Override
     public Thread newThread(Runnable runnable) {
         return new Thread(group, runnable, "concept-plugin-" + count.incrementAndGet());
     }

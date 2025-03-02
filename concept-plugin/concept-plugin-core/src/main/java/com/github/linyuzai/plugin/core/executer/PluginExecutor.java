@@ -10,4 +10,8 @@ public interface PluginExecutor {
     void execute(Runnable runnable);
 
     void execute(Runnable runnable, long delay, TimeUnit unit);
+
+    void schedule(Runnable runnable, long period, TimeUnit unit);
+
+    void shutdown();
 }

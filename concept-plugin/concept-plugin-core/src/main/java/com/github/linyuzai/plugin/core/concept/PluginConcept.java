@@ -27,6 +27,7 @@ public interface PluginConcept {
      */
     void destroy();
 
+    @Deprecated
     void post(Runnable runnable);
 
     /**

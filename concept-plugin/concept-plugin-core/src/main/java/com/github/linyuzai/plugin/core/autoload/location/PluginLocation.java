@@ -119,6 +119,11 @@ public interface PluginLocation {
     void rename(String group, String name, String rename);
 
     /**
+     * 获得Tag
+     */
+    Object getTag(String path);
+
+    /**
      * 插件过滤器
      */
     interface Filter {

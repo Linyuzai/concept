@@ -70,11 +70,17 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
 
     @Override
     public void afterSingletonsInstantiated() {
+        PluginConcept concept = applicationContext.getBean(PluginConcept.class);
+        registerDynamicPlugins(concept);
+        concept.initialize();
+    }
+
+    private void registerDynamicPlugins(PluginConcept concept) {
         this.nonAnnotatedClasses.clear();
         if (this.pluginMethods.isEmpty()) {
             return;
         }
-        PluginConcept concept = applicationContext.getBean(PluginConcept.class);
+
         //获得所有插件提取执行器工厂
         Collection<MethodPluginExtractor.InvokerFactory> factories =
                 applicationContext.getBeansOfType(MethodPluginExtractor.InvokerFactory.class).values();
@@ -93,7 +99,6 @@ public class DynamicPluginProcessor implements BeanPostProcessor,
             //添加提取器
             concept.addHandlers(extractors);
         }
-        concept.initialize();
         pluginMethods.clear();
     }
 

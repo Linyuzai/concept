@@ -8,8 +8,8 @@ import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataJarPluginF
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
+import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.WatchServicePluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
@@ -115,7 +115,9 @@ public class PluginConceptConfiguration {
         Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
         BinderMetadataJarPluginFactory factory = new BinderMetadataJarPluginFactory();
         factory.setDefaultMode(mode);
-        factory.setStandardMetadataType(standardType);
+        if (standardType != null) {
+            factory.setStandardMetadataType(standardType);
+        }
         return factory;
     }
 
@@ -221,7 +223,7 @@ public class PluginConceptConfiguration {
             return new JarLocationFilter();
         }
 
-        @Bean
+        @Bean(destroyMethod = "shutdown")
         @ConditionalOnMissingBean
         public PluginExecutor pluginExecutor() {
             return new DefaultPluginExecutor();
@@ -239,8 +241,10 @@ public class PluginConceptConfiguration {
         @ConditionalOnMissingBean
         public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
                                                  PluginExecutor executor,
-                                                 PluginLocation location) {
-            return new WatchServicePluginAutoLoader(concept, executor, location);
+                                                 PluginLocation location,
+                                                 PluginConceptProperties properties) {
+            return new DefaultPluginAutoLoader(concept, executor, location,
+                    properties.getAutoload().getPeriod());
         }
     }
 }

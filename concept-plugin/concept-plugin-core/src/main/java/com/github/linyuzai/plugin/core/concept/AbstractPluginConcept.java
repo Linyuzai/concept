@@ -53,6 +53,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected Collection<PluginHandlerFactory> handlerFactories;
 
+    @Deprecated
     protected List<Runnable> posts = new CopyOnWriteArrayList<>();
 
     /**
@@ -75,14 +76,17 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         for (Runnable post : this.posts) {
             post.run();
         }
+        eventPublisher.publish(new PluginConceptInitializedEvent(this));
     }
 
     @Override
     public void destroy() {
         //卸载所有插件
         repository.stream().forEach(this::unload);
+        eventPublisher.publish(new PluginConceptDestroyedEvent(this));
     }
 
+    @Deprecated
     @Override
     public void post(Runnable runnable) {
         this.posts.add(runnable);

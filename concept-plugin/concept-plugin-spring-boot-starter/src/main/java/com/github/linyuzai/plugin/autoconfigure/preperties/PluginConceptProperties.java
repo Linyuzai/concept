@@ -63,6 +63,11 @@ public class PluginConceptProperties {
         private boolean enabled = true;
 
         /**
+         * 自动加载器轮训间隔ms，默认5000
+         */
+        private long period = 5000;
+
+        /**
          * 自动加载插件目录
          */
         private LocationProperties location = new LocationProperties();

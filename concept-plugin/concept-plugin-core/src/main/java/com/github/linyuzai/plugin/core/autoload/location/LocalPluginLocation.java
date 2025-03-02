@@ -254,6 +254,11 @@ public class LocalPluginLocation implements PluginLocation {
         boolean renameTo = from.renameTo(renameFile);
     }
 
+    @Override
+    public Object getTag(String path) {
+        return new File(path).lastModified();
+    }
+
     protected boolean move(String group, String name, String from, String to) {
         File fromFile = new File(getPluginPath(group, name, from));
         if (!fromFile.exists()) {
