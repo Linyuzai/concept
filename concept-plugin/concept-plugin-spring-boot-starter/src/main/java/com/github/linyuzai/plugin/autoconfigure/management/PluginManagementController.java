@@ -206,6 +206,9 @@ public class PluginManagementController {
                                @RequestParam("deleted") Boolean deleted) {
         return manage(() -> {
             List<ManagedPlugin> list = new ArrayList<>();
+            if (group.isEmpty()) {
+                return list;
+            }
             if (deleted == Boolean.TRUE) {
                 String[] plugins = location.getDeletedPlugins(group);
                 for (String plugin : plugins) {

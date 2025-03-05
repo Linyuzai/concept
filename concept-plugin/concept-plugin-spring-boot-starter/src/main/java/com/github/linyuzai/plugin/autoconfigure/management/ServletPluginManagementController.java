@@ -1,7 +1,9 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.util.StreamUtils;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +25,17 @@ public class ServletPluginManagementController extends PluginManagementControlle
     }
 
     @GetMapping("/plugin/download")
+    public ResponseEntity<Resource> downloadPlugin(@RequestParam("group") String group,
+                                                   @RequestParam("name") String name,
+                                                   @RequestParam("deleted") Boolean deleted) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        InputStream is = downloadPlugin(group, name, deleted, headers);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new InputStreamResource(is));
+    }
+
+    /*@GetMapping("/plugin/download")
     public void downloadPlugin(@RequestParam("group") String group,
                                @RequestParam("name") String name,
                                @RequestParam("deleted") Boolean deleted,
@@ -30,5 +43,5 @@ public class ServletPluginManagementController extends PluginManagementControlle
         try (InputStream is = downloadPlugin(group, name, deleted, response.getHeaders())) {
             StreamUtils.copy(is, response.getBody());
         }
-    }
+    }*/
 }
