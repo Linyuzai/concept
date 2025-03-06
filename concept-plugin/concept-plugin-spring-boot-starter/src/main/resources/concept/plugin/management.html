@@ -111,12 +111,12 @@
         <i class="el-icon-question el-icon--left" style="margin-right: 10px"></i>
         帮助
     </el-button>
-        <el-dialog
-                :visible.sync="help.visible"
-                title="帮助">
-            <div class="dialog-content" v-html="help.html">
-            </div>
-        </el-dialog>
+    <el-dialog
+            :visible.sync="help.visible"
+            title="帮助">
+        <div class="dialog-content" v-html="help.html">
+        </div>
+    </el-dialog>
     <el-container style="height: 100vh">
         <el-header v-if="setting.header.display" class="header">
             <h1>
@@ -145,7 +145,7 @@
         <el-container>
             <el-aside>
                 <el-container>
-                    <el-header style="border-right: solid 1px #e6e6e6;">
+                    <el-header style="height: 80px;border-right: solid 1px #e6e6e6;">
                         <!--<el-input placeholder="搜索分组"
                                   v-model="group.search"
                                   clearable>
@@ -165,7 +165,7 @@
                         </el-button-group>
                     </el-header>
                     <el-main style="padding: 0">
-                        <el-menu style="height: 100%;padding-top: 20px"
+                        <el-menu style="height: 100%"
                                  :default-active="group.select"
                                  @select="selectGroup" v-cloak>
                             <el-menu-item :index="group.name"
@@ -512,6 +512,10 @@
     };
 
     const validateRename = (rule, value, callback) => {
+        if (app.group.select === '') {
+            callback();
+            return;
+        }
         let params = {group: app.group.select, name: value};
         httpGet(getPluginUrl('exist', params), response => {
             let body = response;
@@ -576,8 +580,7 @@
                     rules: {
                         name: [
                             {required: true, message: '分组名称不能为空', trigger: 'blur'},
-                            {validator: validateName, trigger: 'blur'},
-                            {validator: validateRename, trigger: 'blur'}
+                            {validator: validateName, trigger: 'blur'}
                         ]
                     },
                     form: {
@@ -705,12 +708,17 @@
                     let body = response;
                     if (body.success) {
                         this.group.list = body.data;
-                        if (!this.group.select && this.group.list.length > 0) {
-                            this.group.select = this.group.list[0].name;
+                        if (this.group.list.length > 0) {
+                            if (this.group.select === '') {
+                                this.group.select = this.group.list[0].name;
+                            }
+                        } else {
+                            this.group.select = '';
                         }
                         this.refreshPlugins();
                     } else {
                         this.group.list = [];
+                        this.group.select = '';
                         console.log(response);
                     }
                 });

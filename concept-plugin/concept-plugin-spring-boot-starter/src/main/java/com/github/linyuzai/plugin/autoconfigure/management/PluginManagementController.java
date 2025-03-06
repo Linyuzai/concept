@@ -8,7 +8,6 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
