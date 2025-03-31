@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,15 +30,22 @@ public class JarPluginClassLoader extends PluginClassLoader {
     private final Map<String, Plugin.Content> classes = new ConcurrentHashMap<>();
 
     /**
+     * 类缓存
+     */
+    private final Map<String, Plugin.Content> resources = new ConcurrentHashMap<>();
+
+    /**
      * Create a new {@link JarPluginClassLoader} instance.
      */
     public JarPluginClassLoader(Plugin plugin,
+                                ClassLoader parent,
                                 Map<String, Plugin.Content> packages,
                                 Map<String, Plugin.Content> classes,
-                                ClassLoader parent) {
+                                Map<String, Plugin.Content> resources) {
         super(plugin, new URL[0], parent);
         this.packages.putAll(packages);
         this.classes.putAll(classes);
+        this.resources.putAll(resources);
     }
 
     /**
@@ -73,6 +81,16 @@ public class JarPluginClassLoader extends PluginClassLoader {
                 } catch (IOException ignore) {
                 }
             }
+        }
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String name) {
+        Plugin.Content content = resources.getOrDefault(name, classes.get(name));
+        try {
+            return content == null ? null : content.getInputStream();
+        } catch (IOException e) {
+            return null;
         }
     }
 

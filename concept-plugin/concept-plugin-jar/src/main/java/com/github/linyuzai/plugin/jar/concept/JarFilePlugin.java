@@ -46,18 +46,21 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
         if (pluginClassLoader == null) {
             Map<String, Content> classes = new HashMap<>();
             Map<String, Content> packages = new HashMap<>();
-            collectClassContents(tree.getRoot(), classes, packages);
+            Map<String, Content> resources = new HashMap<>();
+            collectPackageAndClassContents(tree.getRoot(), classes, packages, resources);
             ClassLoader parent = getClass().getClassLoader();
-            this.pluginClassLoader = new JarPluginClassLoader(this, packages, classes, parent);
+            this.pluginClassLoader = new JarPluginClassLoader(this, parent,
+                    packages, classes, resources);
         }
     }
 
     /**
      * 获取包和类的内容
      */
-    protected void collectClassContents(PluginTree.Node node,
-                                        Map<String, Content> classes,
-                                        Map<String, Content> packages) {
+    protected void collectPackageAndClassContents(PluginTree.Node node,
+                                                  Map<String, Content> classes,
+                                                  Map<String, Content> packages,
+                                                  Map<String, Content> resources) {
         node.forEach(it -> {
             Object value = it.getValue();
             if (value instanceof Entry) {
@@ -68,8 +71,9 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
                 if (entry.getName().endsWith("/")) {
                     packages.computeIfAbsent(entry.getName(), name -> findManifestContent(it));
                 } else if (entry.getName().endsWith(".class")) {
-
                     classes.putIfAbsent(entry.getName(), entry.getContent());
+                } else {
+                    resources.putIfAbsent(entry.getName(), entry.getContent());
                 }
             }
         });
