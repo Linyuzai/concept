@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @see WatchService
  */
+// Linux 会有监听问题
+@Deprecated
 public class WatchServicePluginAutoLoader extends AbstractPluginAutoLoader {
 
     /**

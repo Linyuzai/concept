@@ -20,6 +20,8 @@ allprojects {
         set('Zip4jVersion', '2.11.5')
         set('CommonsCompressVersion', '1.25.0')
         set('XnioVersion', '3.8.6.Final')
+        set('AwsS3V1Version', '1.12.783')
+        set('AwsS3V2Version', '2.31.33')
         set('VueVersion', '2.6.11')
         set('VueResourceVersion', '1.5.1')
         set('AxiosVersion', '1.7.2')

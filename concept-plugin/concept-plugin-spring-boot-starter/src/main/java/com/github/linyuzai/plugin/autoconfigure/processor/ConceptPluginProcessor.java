@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 动态插件提取
  */
-public class DynamicPluginProcessor implements BeanPostProcessor,
+public class ConceptPluginProcessor implements BeanPostProcessor,
         ApplicationContextAware, SmartInitializingSingleton {
 
     private ApplicationContext applicationContext;

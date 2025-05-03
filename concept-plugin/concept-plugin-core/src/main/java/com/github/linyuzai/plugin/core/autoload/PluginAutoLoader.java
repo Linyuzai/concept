@@ -25,10 +25,12 @@ public interface PluginAutoLoader {
     /**
      * 添加分组监听
      */
+    @Deprecated
     void addGroup(String group);
 
     /**
      * 获取分组监听状态
      */
+    @Deprecated
     Boolean getGroupState(String group);
 }

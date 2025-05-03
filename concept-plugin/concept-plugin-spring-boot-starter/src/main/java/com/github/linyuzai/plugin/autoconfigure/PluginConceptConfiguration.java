@@ -7,7 +7,7 @@ import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEvent
 import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataJarPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
-import com.github.linyuzai.plugin.autoconfigure.processor.DynamicPluginProcessor;
+import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
@@ -57,8 +57,8 @@ import java.util.List;
 public class PluginConceptConfiguration {
 
     @Bean
-    public static DynamicPluginProcessor dynamicPluginProcessor() {
-        return new DynamicPluginProcessor();
+    public static ConceptPluginProcessor conceptPluginProcessor() {
+        return new ConceptPluginProcessor();
     }
 
     @Bean

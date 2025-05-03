@@ -2,9 +2,7 @@ package com.github.linyuzai.plugin.core.autoload.location;
 
 import lombok.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -23,21 +21,6 @@ public class LocalPluginLocation implements PluginLocation {
      * 默认的缓存路径 {user.home}/concept/plugin
      */
     public static final String DEFAULT_BASE_PATH = new File(System.getProperty("user.home"), "concept/plugin").getAbsolutePath();
-
-    /**
-     * 需要加载的插件目录名
-     */
-    public static final String LOADED = "_loaded";
-
-    /**
-     * 不需要加载的插件目录名
-     */
-    public static final String UNLOADED = "_unloaded";
-
-    /**
-     * 删除的插件目录名
-     */
-    public static final String DELETED = "_deleted";
 
     /**
      * 基础目录
@@ -77,6 +60,11 @@ public class LocalPluginLocation implements PluginLocation {
             }
         }
         return null;
+    }
+
+    @Override
+    public void addGroup(String group) {
+        getPluginDirectory(group, LOADED);
     }
 
     /**
@@ -185,6 +173,23 @@ public class LocalPluginLocation implements PluginLocation {
         }
     }
 
+
+    @Override
+    public String upload(String group, String name, InputStream is, long length) throws IOException {
+        String loadedPath = getLoadedPluginPath(group, name);
+        File file = new File(generateFileName(loadedPath));
+        String unloadedPath = getUnloadedPluginPath(group, file.getName());
+        File generate = new File(generateFileName(unloadedPath));
+        try (FileOutputStream out = new FileOutputStream(generate)) {
+            int bytesRead;
+            for (byte[] buffer = new byte[4096]; (bytesRead = is.read(buffer)) != -1; ) {
+                out.write(buffer, 0, bytesRead);
+            }
+            out.flush();
+        }
+        return generate.getName();
+    }
+
     /**
      * 将插件文件从不需要加载的目录移动到需要加载的目录触发插件加载
      */
@@ -265,7 +270,7 @@ public class LocalPluginLocation implements PluginLocation {
             throw new IllegalArgumentException(name + " not existed");
         }
         String toPath = getPluginPath(group, name, to);
-        File toFile = getFileAutoName(new File(toPath));
+        File toFile = new File(generateFileName(toPath));
         return fromFile.renameTo(toFile);
     }
 
@@ -305,18 +310,18 @@ public class LocalPluginLocation implements PluginLocation {
     /**
      * 如果文件存在则顺序添加后缀
      */
-    public static File getFileAutoName(File file) {
+    public static String generateFileName(String path) {
         int i = 1;
-        while (file.exists()) {
-            String path = file.getAbsolutePath();
-            int index = path.lastIndexOf(".");
+        String tryPath = path;
+        while (new File(tryPath).exists()) {
+            int index = tryPath.lastIndexOf(".");
             if (index == -1) {
-                file = new File(path + i);
+                tryPath = tryPath + i;
             } else {
-                file = new File(path.substring(0, index) + "(" + i + ")" + path.substring(index));
+                tryPath = tryPath.substring(0, index) + "(" + i + ")" + tryPath.substring(index);
             }
             i++;
         }
-        return file;
+        return tryPath;
     }
 }

@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.autoconfigure.management;
 
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.autoload.*;
-import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -54,9 +52,6 @@ public class PluginManagementController {
     protected PluginLocation location;
 
     @Autowired
-    protected PluginAutoLoader loader;
-
-    @Autowired
     protected PluginExecutor executor;
 
     @Autowired
@@ -83,7 +78,7 @@ public class PluginManagementController {
     @PostMapping("/group/add")
     public Response addGroup(@RequestParam("group") String group) {
         return manage(() -> {
-            loader.addGroup(group);
+            location.addGroup(group);
             return null;
         }, () -> "插件分组添加");
     }
@@ -228,13 +223,15 @@ public class PluginManagementController {
         }, () -> "插件列表获取");
     }
 
-    public void autoload(String group, String name, File file) {
-        if (name == null || name.trim().isEmpty()) {
+    public void autoload(InputStream is, long length, String group, String original, String upload) throws IOException {
+        String name = location.upload(group, upload, is, length);
+        if (original == null || original.trim().isEmpty()) {
+            // 更新才有老名字，上传没有老名字
             return;
         }
-        String newPath = location.getLoadedPluginPath(group, file.getName());
+        String newPath = location.getLoadedPluginPath(group, name);
         loadingSet.add(newPath);
-        String oldPath = location.getLoadedPluginPath(group, name);
+        String oldPath = location.getLoadedPluginPath(group, original);
         updatingSet.add(oldPath);
         PluginEventListener listener = new PluginEventListener() {
 
@@ -245,7 +242,7 @@ public class PluginManagementController {
                     if (Objects.equals(newPath, path)) {
                         updatingSet.remove(oldPath);
                         if (event instanceof PluginAutoLoadEvent) {
-                            location.delete(group, name);
+                            location.delete(group, original);
                             concept.getEventPublisher().unregister(this);
                         }
                     }
@@ -254,7 +251,7 @@ public class PluginManagementController {
         };
         concept.getEventPublisher().register(listener);
         try {
-            location.load(group, file.getName());
+            location.load(group, name);
         } catch (Throwable e) {
             log.error("Load plugin error: " + newPath, e);
             loadingSet.remove(newPath);
@@ -292,7 +289,7 @@ public class PluginManagementController {
     }
 
     public ManagedGroup group(String group) {
-        return new ManagedGroup(group, loader.getGroupState(group));
+        return new ManagedGroup(group, true);
     }
 
     public ManagedPlugin loadedPlugin(String group, String plugin) {
@@ -356,12 +353,12 @@ public class PluginManagementController {
         concept.getEventPublisher().register(new PluginAutoLoadListener());
     }
 
-    protected File getFinalFile(String group, String name) {
+    /*protected File getFinalFile(String group, String name) {
         String loadedPath = location.getLoadedPluginPath(group, name);
         File file = LocalPluginLocation.getFileAutoName(new File(loadedPath));
         String unloadedPath = location.getUnloadedPluginPath(group, file.getName());
         return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
-    }
+    }*/
 
     protected String formatSize(long size) {
         if (size < 0) {

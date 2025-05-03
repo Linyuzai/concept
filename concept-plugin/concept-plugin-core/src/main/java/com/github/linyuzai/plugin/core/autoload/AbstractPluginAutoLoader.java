@@ -104,7 +104,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
 
     @Override
     public void addGroup(String group) {
-        this.location.getLoadedBasePath(group);
+        this.location.addGroup(group);
     }
 
     @Override

@@ -19,9 +19,9 @@ public class ServletPluginManagementController extends PluginManagementControlle
     public void upload(@RequestParam("file") MultipartFile file,
                        @RequestParam("group") String group,
                        @RequestParam("name") String name) throws IOException {
-        File finalFile = getFinalFile(group, file.getOriginalFilename());
-        file.transferTo(finalFile);
-        autoload(group, name, finalFile);
+        //File finalFile = getFinalFile(group, file.getOriginalFilename());
+        //file.transferTo(finalFile);
+        autoload(file.getInputStream(),file.getSize(), group, name, file.getOriginalFilename());
     }
 
     @GetMapping("/plugin/download")

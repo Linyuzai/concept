@@ -9,6 +9,21 @@ import java.io.InputStream;
 public interface PluginLocation {
 
     /**
+     * 需要加载的插件
+     */
+    String LOADED = "_loaded";
+
+    /**
+     * 不需要加载的插件
+     */
+    String UNLOADED = "_unloaded";
+
+    /**
+     * 删除的插件
+     */
+    String DELETED = "_deleted";
+
+    /**
      * 获得基础路径
      */
     String getBasePath();
@@ -21,11 +36,15 @@ public interface PluginLocation {
     /**
      * 根据插件路径获取插件分组
      */
+    @Deprecated
     String getGroup(String path);
+
+    void addGroup(String group);
 
     /**
      * 获得分组下的需要加载的插件基础路径
      */
+    @Deprecated
     String getLoadedBasePath(String group);
 
     /**
@@ -46,6 +65,7 @@ public interface PluginLocation {
     /**
      * 获得分组下的不需要加载的插件基础路径
      */
+    @Deprecated
     String getUnloadedBasePath(String group);
 
     /**
@@ -66,6 +86,7 @@ public interface PluginLocation {
     /**
      * 获得分组下的删除的插件基础路径
      */
+    @Deprecated
     String getDeletedBasePath(String group);
 
     /**
@@ -92,6 +113,8 @@ public interface PluginLocation {
      * 获得插件创建时间
      */
     long getCreationTimestamp(String path);
+
+    String upload(String group, String name, InputStream is, long length) throws IOException;
 
     /**
      * 加载分组下的插件
