@@ -10,13 +10,16 @@ import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
+import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.net.URL;
 import java.util.jar.JarFile;
-import java.util.zip.ZipFile;
+
+import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
 
 @Getter
 @Setter
@@ -26,29 +29,18 @@ public class JarFilePluginFactory extends ZipFilePluginFactory {
 
     @SneakyThrows
     @Override
-    protected Plugin doCreate(ZipFile file, PluginMetadata metadata, PluginContext context) {
-        if (file instanceof ExJarFile) {
-            return new ExJarPlugin((ExJarFile) file);
-        } else if (file instanceof JarFile) {
-            return new JarFilePlugin((JarFile) file, PluginUtils.getURL(file.getName() + "!/"));
-        } else {
-            return super.doCreate(file, metadata, context);
-        }
-    }
-
-    @SneakyThrows
-    @Override
-    protected JarFile parseSource(Object source, PluginMetadata metadata, PluginContext context) {
-        File file = getFile(source, ".jar");
+    public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
+        File file = ZipUtils.getFile(source, ".jar");
         if (file == null) {
             return null;
         }
         String mode = getMode(metadata);
         switch (mode.toUpperCase()) {
             case JarPlugin.Mode.FILE:
-                return new ExJarFile(file);
+                new ExJarPlugin(new ExJarFile(file));
             case JarPlugin.Mode.STREAM:
-                return new JarFile(file);
+                URL url = PluginUtils.getURL(file.getName() + SEPARATOR);
+                new JarFilePlugin(new JarFile(file), url);
             default:
                 throw new PluginException("Plugin mode not supported: " + mode);
         }

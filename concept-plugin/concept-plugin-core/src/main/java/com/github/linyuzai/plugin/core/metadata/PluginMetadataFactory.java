@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.core.metadata;
 /**
  * 插件配置工厂
  */
+@Deprecated
 public interface PluginMetadataFactory {
 
     /**

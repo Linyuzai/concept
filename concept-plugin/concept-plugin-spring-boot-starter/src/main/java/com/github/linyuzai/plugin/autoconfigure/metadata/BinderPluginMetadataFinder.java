@@ -1,9 +1,10 @@
-package com.github.linyuzai.plugin.autoconfigure.factory;
+package com.github.linyuzai.plugin.autoconfigure.metadata;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFinder;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.jar.factory.JarPluginFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -14,19 +15,21 @@ import org.springframework.core.env.*;
 import java.util.Set;
 
 /**
- * 可绑定配置文件的插件工厂
+ * 可绑定配置文件的元数据Finder
  */
 @Getter
 @Setter
-public class BinderMetadataJarPluginFactory extends JarPluginFactory implements EnvironmentAware {
+public class BinderPluginMetadataFinder implements PluginMetadataFinder, EnvironmentAware {
+
+    private PluginMetadataFinder metadataFinder;
 
     private Class<? extends Plugin.StandardMetadata> standardMetadataType = JarPlugin.StandardMetadata.class;
 
     private Environment environment;
 
     @Override
-    protected PluginMetadata createMetadata(Object source) {
-        return new BinderMetadata(super.createMetadata(source));
+    public PluginMetadata find(Object source, PluginContext context) {
+        return new BinderMetadata(metadataFinder.find(source, context));
     }
 
     @Override

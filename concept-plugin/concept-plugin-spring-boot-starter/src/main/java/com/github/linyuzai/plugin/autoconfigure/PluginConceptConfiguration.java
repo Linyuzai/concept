@@ -4,7 +4,6 @@ import com.github.linyuzai.plugin.autoconfigure.autoload.ConditionalOnPluginAuto
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
-import com.github.linyuzai.plugin.autoconfigure.factory.BinderMetadataJarPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
@@ -13,7 +12,6 @@ import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
@@ -38,9 +36,13 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
-import com.github.linyuzai.plugin.jar.factory.JarSubPluginFactory;
+import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
+import com.github.linyuzai.plugin.jar.factory.JarInputStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
+import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
+import com.github.linyuzai.plugin.zip.factory.ZipInputStreamPluginFactory;
+import com.github.linyuzai.plugin.zip.metadata.ZipFilePluginMetadataFinder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -110,20 +112,31 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public PluginFactory pluginJarPluginFactory(PluginConceptProperties properties) {
+    public ZipFilePluginMetadataFinder zipFilePluginMetadataFinder() {
+        return new ZipFilePluginMetadataFinder();
+    }
+
+    @Bean
+    public JarFilePluginFactory jarFilePluginFactory(PluginConceptProperties properties) {
         String mode = properties.getJar().getMode().name();
-        Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
-        BinderMetadataJarPluginFactory factory = new BinderMetadataJarPluginFactory();
+        JarFilePluginFactory factory = new JarFilePluginFactory();
         factory.setDefaultMode(mode);
-        if (standardType != null) {
-            factory.setStandardMetadataType(standardType);
-        }
         return factory;
     }
 
     @Bean
-    public JarSubPluginFactory pluginJarSubPluginFactory() {
-        return new JarSubPluginFactory();
+    public JarInputStreamPluginFactory jarInputStreamPluginFactory() {
+        return new JarInputStreamPluginFactory();
+    }
+
+    @Bean
+    public ZipFilePluginFactory zipFilePluginFactory() {
+        return new ZipFilePluginFactory();
+    }
+
+    @Bean
+    public ZipInputStreamPluginFactory zipInputStreamPluginFactory() {
+        return new ZipInputStreamPluginFactory();
     }
 
     @Bean

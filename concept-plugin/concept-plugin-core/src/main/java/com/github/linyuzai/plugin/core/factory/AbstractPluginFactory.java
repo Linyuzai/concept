@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 /**
  * 插件工厂抽象类
  */
+@Deprecated
 public abstract class AbstractPluginFactory<T> implements PluginFactory {
 
     @Override
