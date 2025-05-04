@@ -15,6 +15,9 @@ import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
+import com.github.linyuzai.plugin.core.metadata.EmptyMetadata;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFinder;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
@@ -46,6 +49,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected PluginEventPublisher eventPublisher;
 
     protected PluginLogger logger;
+
+    protected Collection<PluginMetadataFinder> metadataFinders;
 
     protected Collection<PluginFactory> factories;
 
@@ -161,17 +166,37 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         handlerChain = null;
     }
 
+    @Override
+    public PluginMetadata metadata(Object source, PluginContext context) {
+        if (source instanceof Plugin) {
+            return ((Plugin) source).getMetadata();
+        }
+        for (PluginMetadataFinder finder : metadataFinders) {
+            PluginMetadata metadata = finder.find(source, context);
+            if (metadata != null) {
+                return metadata;
+            }
+        }
+        return null;
+    }
+
     /**
      * 遍历插件工厂创建插件
      */
     @Override
-    public Plugin create(Object o, PluginContext context) {
-        if (o instanceof Plugin) {
-            return (Plugin) o;
+    public Plugin create(Object source, PluginContext context) {
+        if (source instanceof Plugin) {
+            return (Plugin) source;
+        }
+        PluginMetadata metadata = metadata(source, context);
+        if (metadata == null) {
+            return null;
         }
         for (PluginFactory factory : factories) {
-            Plugin plugin = factory.create(o, context, this);
+            Plugin plugin = factory.create(source, metadata, context);
             if (plugin != null) {
+                plugin.setSource(source);
+                plugin.setMetadata(metadata);
                 return plugin;
             }
         }

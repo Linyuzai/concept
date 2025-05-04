@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.zip.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.AbstractPluginFactory;
@@ -35,7 +34,7 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
 
     @SneakyThrows
     @Override
-    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context, PluginConcept concept) {
+    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
         return createPlugin(file, getURL(file));
     }
 
@@ -50,7 +49,7 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
      * 获得文件对象
      */
     @Override
-    protected File getSupported(Object source) {
+    protected File parseSource(Object source) {
         File file = getFile(source);
         if (file != null && supportFile(file)) {
             return file;
@@ -97,7 +96,7 @@ public class ZipPluginFactory extends AbstractPluginFactory<File> {
 
         @Override
         public PluginMetadata create(Object source) {
-            File file = getSupported(source);
+            File file = parseSource(source);
             if (file == null) {
                 return null;
             }

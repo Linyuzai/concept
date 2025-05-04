@@ -1,43 +1,56 @@
 package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import com.github.linyuzai.plugin.jar.concept.JarFilePlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
-import com.github.linyuzai.plugin.zip.factory.ZipPluginFactory;
+import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
 @Getter
 @Setter
-public class JarPluginFactory extends ZipPluginFactory {
+public class JarFilePluginFactory extends ZipFilePluginFactory {
 
     private String defaultMode = JarPlugin.Mode.STREAM;
 
     @SneakyThrows
     @Override
-    protected Plugin doCreate(File file, PluginMetadata metadata, PluginContext context) {
+    protected Plugin doCreate(ZipFile file, PluginMetadata metadata, PluginContext context) {
+        if (file instanceof ExJarFile) {
+            return new ExJarPlugin((ExJarFile) file);
+        } else if (file instanceof JarFile) {
+            return new JarFilePlugin((JarFile) file, PluginUtils.getURL(file.getName() + "!/"));
+        } else {
+            return super.doCreate(file, metadata, context);
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    protected JarFile parseSource(Object source, PluginMetadata metadata, PluginContext context) {
+        File file = getFile(source, ".jar");
+        if (file == null) {
+            return null;
+        }
         String mode = getMode(metadata);
         switch (mode.toUpperCase()) {
             case JarPlugin.Mode.FILE:
-                return new ExJarPlugin(new ExJarFile(file));
+                return new ExJarFile(file);
             case JarPlugin.Mode.STREAM:
-                return super.doCreate(file, metadata, context);
+                return new JarFile(file);
             default:
-                throw new PluginException("Plugin mode not supported");
+                throw new PluginException("Plugin mode not supported: " + mode);
         }
     }
 
@@ -45,15 +58,5 @@ public class JarPluginFactory extends ZipPluginFactory {
         JarPlugin.StandardMetadata standard = metadata.asStandard();
         String mode = standard.getJar().getMode();
         return (mode == null || mode.isEmpty()) ? defaultMode : mode;
-    }
-
-    @Override
-    protected JarFilePlugin createPlugin(File file, URL url) throws IOException {
-        return new JarFilePlugin(new JarFile(file), url);
-    }
-
-    @Override
-    protected URL getURL(File file) throws MalformedURLException {
-        return PluginUtils.getURL(file);
     }
 }

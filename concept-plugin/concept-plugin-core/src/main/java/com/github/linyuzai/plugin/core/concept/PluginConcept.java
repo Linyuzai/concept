@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 
@@ -51,9 +52,14 @@ public interface PluginConcept {
     void removeHandlers(Collection<? extends PluginHandler> handlers);
 
     /**
+     * 获得插件配置
+     */
+    PluginMetadata metadata(Object source, PluginContext context);
+
+    /**
      * 创建插件
      */
-    Plugin create(Object o, PluginContext context);
+    Plugin create(Object source, PluginContext context);
 
     /**
      * 加载插件

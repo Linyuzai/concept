@@ -44,7 +44,7 @@ public class PluginUtils {
         return getURL(file.getAbsolutePath() + "!/");
     }
 
-    private static URL getURL(String path) throws MalformedURLException {
+    public static URL getURL(String path) throws MalformedURLException {
         String file = path.replace("file:////", "file://"); // Fix UNC paths
         return new URL("jar", "", -1, file);
     }

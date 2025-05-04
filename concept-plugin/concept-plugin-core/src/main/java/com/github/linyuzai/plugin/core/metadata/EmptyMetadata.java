@@ -14,6 +14,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class EmptyMetadata implements PluginMetadata {
 
+    public static final EmptyMetadata STANDARD = new EmptyMetadata(new Plugin.StandardMetadata());
+
     private final Plugin.StandardMetadata standard;
 
     @Override

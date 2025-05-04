@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.bean;
 
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.resolve.AbstractPluginResolver;
@@ -24,7 +25,7 @@ public class BeanResolver extends AbstractPluginResolver<ClassSupplier, BeanSupp
 
     @Override
     public BeanSupplier doResolve(ClassSupplier classSupplier, PluginContext context) {
-        return new BeanSupplierImpl(classSupplier, applicationContext);
+        return new BeanSupplierImpl(classSupplier, context.getPlugin(), applicationContext);
     }
 
     @Override
@@ -43,11 +44,17 @@ public class BeanResolver extends AbstractPluginResolver<ClassSupplier, BeanSupp
 
         private final ClassSupplier classSupplier;
 
+        private final Plugin plugin;
+
         private final ApplicationContext applicationContext;
 
         @Override
         public Object create() {
-            return applicationContext.getAutowireCapableBeanFactory().createBean(classSupplier.get());
+            Object bean = applicationContext.getAutowireCapableBeanFactory()
+                    .createBean(classSupplier.get());
+            plugin.addDestroyListener(plugin ->
+                    applicationContext.getAutowireCapableBeanFactory().destroyBean(bean));
+            return bean;
         }
     }
 }

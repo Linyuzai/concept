@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.format.*;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.type.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
