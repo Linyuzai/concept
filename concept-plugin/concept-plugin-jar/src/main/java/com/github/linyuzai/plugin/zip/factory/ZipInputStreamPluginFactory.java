@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
@@ -23,7 +24,7 @@ public class ZipInputStreamPluginFactory implements PluginFactory {
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
         if (source instanceof Plugin.Entry) {
             Plugin.Entry entry = (Plugin.Entry) source;
-            if (entry.getName().endsWith(ZipUtils.SUFFIX)) {
+            if (entry.getName().endsWith(ZipPlugin.SUFFIX)) {
                 Object id = entry.getId();
                 if (id instanceof URL) {
                     URL url = new URL((URL) id, entry.getName() + SEPARATOR);

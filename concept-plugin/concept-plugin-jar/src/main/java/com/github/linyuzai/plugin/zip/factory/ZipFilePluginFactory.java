@@ -5,9 +5,11 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
 
+import java.io.File;
 import java.net.URL;
 import java.util.zip.ZipFile;
 
@@ -19,11 +21,11 @@ public class ZipFilePluginFactory implements PluginFactory {
     @SneakyThrows
     @Override
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        ZipFile zipFile = ZipUtils.getZipFile(source);
-        if(zipFile == null) {
+        File file = ZipUtils.getFile(source, ZipPlugin.SUFFIX);
+        if(file == null) {
             return null;
         }
-        URL url = new URL(zipFile.getName());
-        return new ZipFilePlugin(zipFile, url);
+        URL url = new URL(file.getAbsolutePath());
+        return new ZipFilePlugin(new ZipFile(file), url);
     }
 }

@@ -30,7 +30,7 @@ public class JarFilePluginFactory extends ZipFilePluginFactory {
     @SneakyThrows
     @Override
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        File file = ZipUtils.getFile(source, ".jar");
+        File file = ZipUtils.getFile(source, JarPlugin.SUFFIX);
         if (file == null) {
             return null;
         }
