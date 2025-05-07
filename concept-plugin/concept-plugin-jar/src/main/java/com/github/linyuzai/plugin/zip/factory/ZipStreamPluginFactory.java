@@ -2,13 +2,14 @@ package com.github.linyuzai.plugin.zip.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
-import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.zip.ZipInputStream;
 
@@ -17,7 +18,7 @@ import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
 /**
  * zip流插件工厂
  */
-public class ZipInputStreamPluginFactory implements PluginFactory {
+public class ZipStreamPluginFactory implements PluginFactory {
 
     @SneakyThrows
     @Override
@@ -28,10 +29,14 @@ public class ZipInputStreamPluginFactory implements PluginFactory {
                 Object id = entry.getId();
                 if (id instanceof URL) {
                     URL url = new URL((URL) id, entry.getName() + SEPARATOR);
-                    ZipInputStream zis = new ZipInputStream(entry.getContent().getInputStream());
-                    new ZipStreamPlugin(zis, url, entry);
+                    return new ZipStreamPlugin(url, () -> {
+                        try {
+                            return entry.getContent().getInputStream();
+                        } catch (IOException e) {
+                            throw new PluginException("Read Plugin Stream Error", e);
+                        }
+                    });
                 }
-
             }
         }
         return null;

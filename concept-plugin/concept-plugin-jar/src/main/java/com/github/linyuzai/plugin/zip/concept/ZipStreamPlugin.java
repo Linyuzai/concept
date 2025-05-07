@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -18,19 +20,9 @@ import java.util.zip.ZipInputStream;
 @RequiredArgsConstructor
 public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
 
-    /**
-     * zip流
-     */
-    @Getter
-    protected final ZipInputStream zipInputStream;
-
     protected final URL url;
 
-    /**
-     * 父条目
-     */
-    @Getter
-    protected final Entry parent;
+    protected final Supplier<InputStream> supplier;
 
     @Override
     public Object getId() {
@@ -45,7 +37,7 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
     @SneakyThrows
     @Override
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
-        try (ZipInputStream zis = zipInputStream) {
+        try (ZipInputStream zis = new ZipInputStream(supplier.get())) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String name = entry.getName();
@@ -67,6 +59,6 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
      * 创建插件条目
      */
     protected ZipPluginEntry createPluginEntry(URL url, String name, byte[] bytes) {
-        return new ZipStreamPluginEntry(name, this, parent, url, bytes);
+        return new ZipStreamPluginEntry(name, this, url, supplier, bytes);
     }
 }

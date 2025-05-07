@@ -13,6 +13,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -21,13 +22,13 @@ import java.util.zip.ZipInputStream;
  */
 public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPluginEntry {
 
+    protected final URL url;
+
     /**
      * 父条目
      */
     @Getter
-    protected final Plugin.Entry parent;
-
-    protected final URL url;
+    protected final Supplier<InputStream> supplier;
 
     /**
      * 数据引用
@@ -36,12 +37,12 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
 
     public ZipStreamPluginEntry(String name,
                                 Plugin plugin,
-                                Plugin.Entry parent,
                                 URL url,
+                                Supplier<InputStream> supplier,
                                 byte[] bytes) {
         super(name, plugin);
-        this.parent = parent;
         this.url = url;
+        this.supplier = supplier;
         if (isDirectory()) {
             return;
         }
@@ -90,7 +91,7 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
                 if (bytes != null) {
                     return new ByteArrayInputStream(bytes);
                 }
-                try (InputStream is = parent.getContent().getInputStream();
+                try (InputStream is = supplier.get();
                      ZipInputStream zis = new ZipInputStream(is)) {
                     ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {

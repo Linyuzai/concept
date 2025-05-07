@@ -9,6 +9,7 @@ import com.github.linyuzai.plugin.jar.concept.JarFilePlugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
 import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.Getter;
@@ -23,14 +24,14 @@ import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
 
 @Getter
 @Setter
-public class JarFilePluginFactory extends ZipFilePluginFactory {
+public class JarFilePluginFactory extends JarPluginFactory {
 
     private String defaultMode = JarPlugin.Mode.STREAM;
 
     @SneakyThrows
     @Override
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        File file = ZipUtils.getFile(source, JarPlugin.SUFFIX);
+        File file = ZipUtils.getFile(source, JarPlugin.SUFFIX, ZipPlugin.SUFFIX);
         if (file == null) {
             return null;
         }
@@ -50,5 +51,15 @@ public class JarFilePluginFactory extends ZipFilePluginFactory {
         JarPlugin.StandardMetadata standard = metadata.asStandard();
         String mode = standard.getJar().getMode();
         return (mode == null || mode.isEmpty()) ? defaultMode : mode;
+    }
+
+    @Override
+    protected Plugin create(Object source, PluginContext context) {
+        return null;
+    }
+
+    @Override
+    protected boolean supportMode(String mode) {
+        return JarPlugin.Mode.STREAM.equalsIgnoreCase(mode);
     }
 }

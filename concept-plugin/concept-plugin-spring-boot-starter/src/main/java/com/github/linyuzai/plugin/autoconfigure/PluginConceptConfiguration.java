@@ -37,11 +37,11 @@ import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
-import com.github.linyuzai.plugin.jar.factory.JarInputStreamPluginFactory;
+import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
-import com.github.linyuzai.plugin.zip.factory.ZipInputStreamPluginFactory;
+import com.github.linyuzai.plugin.zip.factory.ZipStreamPluginFactory;
 import com.github.linyuzai.plugin.zip.metadata.ZipFilePluginMetadataFinder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -125,8 +125,8 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public JarInputStreamPluginFactory jarInputStreamPluginFactory() {
-        return new JarInputStreamPluginFactory();
+    public JarStreamPluginFactory jarInputStreamPluginFactory() {
+        return new JarStreamPluginFactory();
     }
 
     @Bean
@@ -135,8 +135,8 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public ZipInputStreamPluginFactory zipInputStreamPluginFactory() {
-        return new ZipInputStreamPluginFactory();
+    public ZipStreamPluginFactory zipInputStreamPluginFactory() {
+        return new ZipStreamPluginFactory();
     }
 
     @Bean
