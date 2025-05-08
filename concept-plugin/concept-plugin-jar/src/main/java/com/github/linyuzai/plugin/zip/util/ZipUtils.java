@@ -1,6 +1,8 @@
 package com.github.linyuzai.plugin.zip.util;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.function.Supplier;
 import java.util.zip.ZipFile;
 
 public class ZipUtils {

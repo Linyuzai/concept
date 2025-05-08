@@ -8,6 +8,7 @@ import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPluginEntry;
+import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
 
@@ -17,27 +18,20 @@ public class ExJarPluginFactory extends JarPluginFactory {
 
     @SneakyThrows
     @Override
-    protected Plugin create(Object source, PluginContext context) {
-        File file = ZipUtils.getFile(source, JarPlugin.SUFFIX);
-        ExJarFile jarFile;
-        if (file == null) {
-            if (source instanceof ExJarPluginEntry) {
-                jarFile = ((ExJarPluginEntry) source).getJarEntry().asJarFile();
-            } else {
-                jarFile = null;
-            }
-        } else {
-            jarFile = new ExJarFile(file);
-        }
-        if (jarFile == null) {
-            return null;
-        } else {
+    public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
+        if (source instanceof ExJarPluginEntry) {
+            ExJarFile jarFile = ((ExJarPluginEntry) source).getJarEntry().asJarFile();
             return new ExJarPlugin(jarFile);
         }
-    }
-
-    @Override
-    protected boolean supportMode(String mode) {
-        return JarPlugin.Mode.FILE.equalsIgnoreCase(mode);
+        String mode = getMode(metadata);
+        if (JarPlugin.Mode.FILE.equalsIgnoreCase(mode)) {
+            File file = ZipUtils.getFile(source, JarPlugin.SUFFIX, ZipPlugin.SUFFIX);
+            if (file == null) {
+                return null;
+            } else {
+                return new ExJarPlugin(new ExJarFile(file));
+            }
+        }
+        return null;
     }
 }

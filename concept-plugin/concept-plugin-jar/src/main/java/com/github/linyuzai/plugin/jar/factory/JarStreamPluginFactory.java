@@ -10,10 +10,13 @@ import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPluginEntry;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
+import com.github.linyuzai.plugin.zip.concept.ZipStreamProvider;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.function.Supplier;
 import java.util.zip.ZipInputStream;
 
 import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
@@ -25,7 +28,7 @@ public class JarStreamPluginFactory extends JarPluginFactory {
 
     @SneakyThrows
     @Override
-    protected Plugin create(Object source, PluginContext context) {
+    public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
         if (source instanceof Plugin.Entry) {
             Plugin.Entry entry = (Plugin.Entry) source;
             if (entry.getName().endsWith(JarPlugin.SUFFIX) ||
@@ -43,11 +46,19 @@ public class JarStreamPluginFactory extends JarPluginFactory {
                 }
             }
         }
+        String mode = getMode(metadata);
+        if (JarPlugin.Mode.STREAM.equalsIgnoreCase(mode)) {
+            if (source instanceof ZipStreamProvider) {
+                ZipStreamProvider provider = (ZipStreamProvider) source;
+                return new JarStreamPlugin(provider.getURL(), new Supplier<InputStream>() {
+                    @SneakyThrows
+                    @Override
+                    public InputStream get() {
+                        return provider.getInputStream();
+                    }
+                });
+            }
+        }
         return null;
-    }
-
-    @Override
-    protected boolean supportMode(String mode) {
-        return JarPlugin.Mode.STREAM.equalsIgnoreCase(mode);
     }
 }

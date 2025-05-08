@@ -22,44 +22,20 @@ import java.util.jar.JarFile;
 
 import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
 
-@Getter
-@Setter
 public class JarFilePluginFactory extends JarPluginFactory {
-
-    private String defaultMode = JarPlugin.Mode.STREAM;
 
     @SneakyThrows
     @Override
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        File file = ZipUtils.getFile(source, JarPlugin.SUFFIX, ZipPlugin.SUFFIX);
-        if (file == null) {
-            return null;
-        }
         String mode = getMode(metadata);
-        switch (mode.toUpperCase()) {
-            case JarPlugin.Mode.FILE:
-                new ExJarPlugin(new ExJarFile(file));
-            case JarPlugin.Mode.STREAM:
-                URL url = PluginUtils.getURL(file.getName() + SEPARATOR);
-                new JarFilePlugin(new JarFile(file), url);
-            default:
-                throw new PluginException("Plugin mode not supported: " + mode);
+        if (JarPlugin.Mode.STREAM.equalsIgnoreCase(mode)) {
+            File file = ZipUtils.getFile(source, JarPlugin.SUFFIX, ZipPlugin.SUFFIX);
+            if (file == null) {
+                return null;
+            }
+            URL url = PluginUtils.getURL(file.getName() + SEPARATOR);
+            new JarFilePlugin(new JarFile(file), url);
         }
-    }
-
-    public String getMode(PluginMetadata metadata) {
-        JarPlugin.StandardMetadata standard = metadata.asStandard();
-        String mode = standard.getJar().getMode();
-        return (mode == null || mode.isEmpty()) ? defaultMode : mode;
-    }
-
-    @Override
-    protected Plugin create(Object source, PluginContext context) {
         return null;
-    }
-
-    @Override
-    protected boolean supportMode(String mode) {
-        return JarPlugin.Mode.STREAM.equalsIgnoreCase(mode);
     }
 }
