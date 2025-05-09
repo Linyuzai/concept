@@ -1,13 +1,10 @@
 package com.github.linyuzai.plugin.jar.metadata;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.zip.metadata.ZipStreamPluginMetadataFinder;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
-import java.util.zip.ZipInputStream;
 
 public abstract class JarStreamPluginMetadataFinder extends ZipStreamPluginMetadataFinder {
 
@@ -15,7 +12,7 @@ public abstract class JarStreamPluginMetadataFinder extends ZipStreamPluginMetad
     protected String[] getSupportSuffixes() {
         return Stream.concat(
                         Arrays.stream(super.getSupportSuffixes()),
-                        Arrays.stream(new String[]{JarPlugin.SUFFIX}))
+                        Arrays.stream(new String[]{JarPlugin.SUFFIX_ZIP}))
                 .toArray(String[]::new);
     }
 }

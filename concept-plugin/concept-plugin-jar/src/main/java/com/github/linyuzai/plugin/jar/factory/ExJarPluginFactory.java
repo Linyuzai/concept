@@ -2,19 +2,17 @@ package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarFile;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.extension.ExJarPluginEntry;
-import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
 
 import java.io.File;
 
-public class ExJarPluginFactory extends JarPluginFactory {
+public class ExJarPluginFactory extends ModePluginFactory implements JarPluginFactory {
 
     @SneakyThrows
     @Override
@@ -25,7 +23,7 @@ public class ExJarPluginFactory extends JarPluginFactory {
         }
         String mode = getMode(metadata);
         if (JarPlugin.Mode.FILE.equalsIgnoreCase(mode)) {
-            File file = ZipUtils.getFile(source, JarPlugin.SUFFIX, ZipPlugin.SUFFIX);
+            File file = ZipUtils.getFile(source, getSupportedSuffixes());
             if (file == null) {
                 return null;
             } else {

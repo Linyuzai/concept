@@ -12,7 +12,7 @@ public class JarFilePluginMetadataFinder extends ZipFilePluginMetadataFinder {
     protected String[] getSupportSuffixes() {
         return Stream.concat(
                         Arrays.stream(super.getSupportSuffixes()),
-                        Arrays.stream(new String[]{JarPlugin.SUFFIX}))
+                        Arrays.stream(new String[]{JarPlugin.SUFFIX_ZIP}))
                 .toArray(String[]::new);
     }
 }

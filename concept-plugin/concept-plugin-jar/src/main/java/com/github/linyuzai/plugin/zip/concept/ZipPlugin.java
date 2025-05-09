@@ -11,7 +11,7 @@ import java.net.URL;
  */
 public interface ZipPlugin extends Plugin {
 
-    String SUFFIX = ".zip";
+    String SUFFIX_ZIP = ".zip";
 
     URL getURL();
 

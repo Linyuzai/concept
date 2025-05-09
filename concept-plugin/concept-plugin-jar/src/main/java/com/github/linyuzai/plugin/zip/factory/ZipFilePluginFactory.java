@@ -21,7 +21,7 @@ public class ZipFilePluginFactory implements PluginFactory {
     @SneakyThrows
     @Override
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        File file = ZipUtils.getFile(source, ZipPlugin.SUFFIX);
+        File file = ZipUtils.getFile(source, ZipPlugin.SUFFIX_ZIP);
         if(file == null) {
             return null;
         }

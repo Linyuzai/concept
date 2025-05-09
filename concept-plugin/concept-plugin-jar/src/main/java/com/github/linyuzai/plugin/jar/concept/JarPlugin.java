@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
  */
 public interface JarPlugin extends ZipPlugin {
 
-    String SUFFIX = ".jar";
+    String SUFFIX_JAR = ".jar";
 
     /**
      * 获得插件类加载器
