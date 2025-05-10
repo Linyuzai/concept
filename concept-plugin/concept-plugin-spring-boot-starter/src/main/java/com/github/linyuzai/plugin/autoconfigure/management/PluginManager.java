@@ -212,7 +212,7 @@ public class PluginManager {
         }
     }
 
-    public String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
+    public synchronized String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
         return location.upload(group, name, is, length);
     }
 

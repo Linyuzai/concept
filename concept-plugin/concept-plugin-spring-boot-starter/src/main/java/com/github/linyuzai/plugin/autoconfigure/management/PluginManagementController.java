@@ -28,33 +28,16 @@ import java.util.function.Supplier;
 
 public class PluginManagementController {
 
-    protected final Log log = LogFactory.getLog("PluginManagement");
-
-    protected final Set<String> loadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
-    protected final Set<String> unloadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
-    protected final Set<String> updatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    protected final Log log = LogFactory.getLog(PluginManagementController.class);
 
     @Autowired
     protected PluginConceptProperties properties;
-
-    @Autowired
-    protected PluginConcept concept;
-
-    @Autowired
-    protected PluginLocation location;
-
-    @Autowired
-    protected PluginExecutor executor;
 
     @Autowired
     protected PluginManagementAuthorizer authorizer;
 
     @Autowired
     protected PluginManager manager;
-
-    protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping("/setting")
     public Response setting() {
@@ -134,7 +117,7 @@ public class PluginManagementController {
         }, () -> "插件列表获取");
     }
 
-    protected String updatePlugin(String group, String original, String upload) throws IOException {
+    protected void updatePlugin(String group, String original, String upload) throws IOException {
         manager.updatePlugin(group, original, upload);
     }
 
