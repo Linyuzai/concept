@@ -113,7 +113,7 @@ public class LocalPluginLocation implements PluginLocation {
      * 文件大小
      */
     @Override
-    public long getSize(String path) {
+    public long getPluginSize(String path) {
         try {
             return new File(path).length();
         } catch (Throwable e) {
@@ -125,7 +125,7 @@ public class LocalPluginLocation implements PluginLocation {
      * 文件创建时间
      */
     @Override
-    public long getCreationTimestamp(String path) {
+    public long getPluginCreateTime(String path) {
         try {
             BasicFileAttributes attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
             return attr.creationTime().toMillis();
@@ -134,9 +134,13 @@ public class LocalPluginLocation implements PluginLocation {
         }
     }
 
+    @Override
+    public Object getPluginSource(String path) {
+        return path;
+    }
 
     @Override
-    public String upload(String group, String name, InputStream is, long length) throws IOException {
+    public String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
         String loadedPath = getLoadedPluginPath(group, name);
         File file = new File(generateFileName(loadedPath));
         String unloadedPath = getUnloadedPluginPath(group, file.getName());
@@ -155,7 +159,7 @@ public class LocalPluginLocation implements PluginLocation {
      * 将插件文件从不需要加载的目录移动到需要加载的目录触发插件加载
      */
     @Override
-    public void load(String group, String name) {
+    public void loadPlugin(String group, String name) {
         move(group, name, UNLOADED, LOADED);
     }
 
@@ -163,7 +167,7 @@ public class LocalPluginLocation implements PluginLocation {
      * 将插件文件从需要加载的目录移动到不需要加载的目录触发插件卸载
      */
     @Override
-    public void unload(String group, String name) {
+    public void unloadPlugin(String group, String name) {
         move(group, name, LOADED, UNLOADED);
     }
 
@@ -171,7 +175,7 @@ public class LocalPluginLocation implements PluginLocation {
      * 将插件文件移动到删除的文件目录
      */
     @Override
-    public void delete(String group, String name) {
+    public void deletePlugin(String group, String name) {
         try {
             move(group, name, UNLOADED, DELETED);
         } catch (Throwable e) {
@@ -194,13 +198,13 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     @Override
-    public boolean exist(String group, String name) {
+    public boolean existPlugin(String group, String name) {
         return getExistFile(group, name) != null;
     }
 
     @Override
-    public void rename(String group, String name, String rename) {
-        if (exist(group, rename)) {
+    public void renamePlugin(String group, String name, String rename) {
+        if (existPlugin(group, rename)) {
             throw new IllegalArgumentException("File existed");
         }
         String renamePath = getUnloadedPluginPath(group, rename);

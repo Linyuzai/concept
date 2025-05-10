@@ -80,7 +80,7 @@ public abstract class AmazonS3Location implements PluginLocation {
     }
 
     @Override
-    public String upload(String group, String name, InputStream is, long length) {
+    public String uploadPlugin(String group, String name, InputStream is, long length) {
         String pluginName = getPluginName(group, name);
         Map<String, String> map = new LinkedHashMap<>();
         map.put(METADATA_STATUS, UNLOADED);
@@ -90,17 +90,17 @@ public abstract class AmazonS3Location implements PluginLocation {
     }
 
     @Override
-    public void load(String group, String name) {
+    public void loadPlugin(String group, String name) {
         updateStatus(group, name, LOADED);
     }
 
     @Override
-    public void unload(String group, String name) {
+    public void unloadPlugin(String group, String name) {
         updateStatus(group, name, UNLOADED);
     }
 
     @Override
-    public void delete(String group, String name) {
+    public void deletePlugin(String group, String name) {
         updateStatus(group, name, DELETED);
     }
 
@@ -111,7 +111,7 @@ public abstract class AmazonS3Location implements PluginLocation {
     protected String getPluginName(String group, String name) {
         int i = 1;
         String tryName = name;
-        while (exist(group, tryName)) {
+        while (existPlugin(group, tryName)) {
             int index = tryName.lastIndexOf(".");
             if (index == -1) {
                 tryName = tryName + i;

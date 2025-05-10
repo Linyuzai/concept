@@ -85,47 +85,52 @@ public interface PluginLocation {
     /**
      * 获得插件大小
      */
-    long getSize(String path);
+    long getPluginSize(String path);
 
     /**
      * 获得插件创建时间
      */
-    long getCreationTimestamp(String path);
-
-    /**
-     * 上传插件
-     */
-    String upload(String group, String name, InputStream is, long length) throws IOException;
-
-    /**
-     * 加载分组下的插件
-     */
-    void load(String group, String name);
-
-    /**
-     * 卸载分组下的插件
-     */
-    void unload(String group, String name);
-
-    /**
-     * 删除分组下的插件
-     */
-    void delete(String group, String name);
-
-    /**
-     * 分组下的插件是否存在
-     */
-    boolean exist(String group, String name);
-
-    /**
-     * 重命名分组下的插件
-     */
-    void rename(String group, String name, String rename);
+    long getPluginCreateTime(String path);
 
     /**
      * 获得版本
      */
     Object getVersion(String path);
+
+    /**
+     * 获得插件源
+     */
+    Object getPluginSource(String path);
+
+    /**
+     * 上传插件
+     */
+    String uploadPlugin(String group, String name, InputStream is, long length) throws IOException;
+
+    /**
+     * 加载分组下的插件
+     */
+    void loadPlugin(String group, String name);
+
+    /**
+     * 卸载分组下的插件
+     */
+    void unloadPlugin(String group, String name);
+
+    /**
+     * 删除分组下的插件
+     */
+    void deletePlugin(String group, String name);
+
+    /**
+     * 分组下的插件是否存在
+     */
+    boolean existPlugin(String group, String name);
+
+    /**
+     * 重命名分组下的插件
+     */
+    void renamePlugin(String group, String name, String rename);
 
     /**
      * 插件过滤器

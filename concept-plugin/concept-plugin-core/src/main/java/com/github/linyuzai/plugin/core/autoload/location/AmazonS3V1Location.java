@@ -41,12 +41,12 @@ public class AmazonS3V1Location extends AmazonS3Location {
     }
 
     @Override
-    public long getSize(String path) {
+    public long getPluginSize(String path) {
         return getObjectMetadata(path).getContentLength();
     }
 
     @Override
-    public long getCreationTimestamp(String path) {
+    public long getPluginCreateTime(String path) {
         String creation = getObjectMetadata(path).getUserMetaDataOf(METADATA_CREATION);
         try {
             return Long.parseLong(creation);
@@ -56,12 +56,17 @@ public class AmazonS3V1Location extends AmazonS3Location {
     }
 
     @Override
-    public boolean exist(String group, String name) {
+    public Object getPluginSource(String path) {
+        return null;
+    }
+
+    @Override
+    public boolean existPlugin(String group, String name) {
         return amazonS3.doesObjectExist(bucket, getPluginPath(group, name));
     }
 
     @Override
-    public void rename(String group, String name, String rename) {
+    public void renamePlugin(String group, String name, String rename) {
         amazonS3.copyObject(bucket, getPluginPath(group, name), bucket, getPluginPath(group, rename));
     }
 

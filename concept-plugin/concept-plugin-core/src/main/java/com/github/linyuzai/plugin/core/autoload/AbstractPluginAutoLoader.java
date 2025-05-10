@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 文件自动加载器抽象类
@@ -74,7 +75,10 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
 
     protected Collection<String> loadPlugins() {
         Collection<String> paths = getPluginPaths();
-        concept.load(paths, (o, plugin) -> {
+        List<Object> sources = paths.stream()
+                .map(location::getPluginSource)
+                .collect(Collectors.toList());
+        concept.load(sources, (o, plugin) -> {
             String path = (String) o;
             concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
         }, (o, e) -> {
@@ -85,10 +89,10 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     }
 
     protected Collection<String> getPluginPaths() {
-        String[] groups = location.getGroups();
+        List<String> groups = location.getGroups();
         List<String> paths = new ArrayList<>();
         for (String group : groups) {
-            String[] names = location.getLoadedPlugins(group);
+            List<String> names = location.getLoadedPlugins(group);
             for (String name : names) {
                 String path = location.getLoadedPluginPath(group, name);
                 if (path == null) {
@@ -150,7 +154,8 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
      */
     public void load(String path) {
         try {
-            Plugin plugin = concept.load(path);
+            Object source = location.getPluginSource(path);
+            Plugin plugin = concept.load(source);
             concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
         } catch (Throwable e) {
             concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
