@@ -1,11 +1,9 @@
 package com.github.linyuzai.plugin.autoconfigure.management;
 
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
-import com.github.linyuzai.plugin.core.autoload.*;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Data;
 import lombok.Getter;
@@ -21,16 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class PluginManagementController {
 
@@ -58,13 +52,13 @@ public class PluginManagementController {
     protected PluginManagementAuthorizer authorizer;
 
     @Autowired
-    protected PluginPropertiesProvider propertiesProvider;
+    protected PluginManager manager;
 
     protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping("/setting")
     public Response setting() {
-        return manage(() -> new Setting(
+        return response(() -> new Setting(
                 properties.getManagement().getGithubCorner(),
                 properties.getManagement().getHeader(),
                 properties.getManagement().getFooter()), () -> "获取配置");
@@ -72,209 +66,103 @@ public class PluginManagementController {
 
     @PostMapping("/auth/unlock")
     public Response unlock(@RequestParam("password") String password) {
-        return manage(() -> authorizer.unlock(password), () -> null);
+        return response(() -> authorizer.unlock(password), () -> null);
     }
 
     @PostMapping("/group/add")
     public Response addGroup(@RequestParam("group") String group) {
-        return manage(() -> {
-            location.addGroup(group);
-            return null;
-        }, () -> "插件分组添加");
+        return response(() -> manager.addGroup(group), () -> "插件分组添加");
     }
 
     @GetMapping("/group/list")
     public Response listGroup() {
-        return manage(() -> {
-            String[] groups = location.getGroups();
-            return Arrays.stream(groups)
-                    .map(this::group)
-                    .collect(Collectors.toList());
-        }, () -> "插件分组获取");
+        return response(() -> manager.getGroups(), () -> "插件分组获取");
     }
 
     @PostMapping("/plugin/load")
     public Response loadPlugin(@RequestParam("group") String group,
                                @RequestParam("name") String name) {
-        return manage(() -> {
-            String path = location.getLoadedPluginPath(group, name);
-            loadingSet.add(path);
-            try {
-                location.load(group, name);
-            } catch (Throwable e) {
-                executor.execute(() -> {
-                    try {
-                        concept.load(path);
-                    } catch (Throwable e1) {
-                        log.error("Load plugin error: " + path, e1);
-                    } finally {
-                        loadingSet.remove(path);
-                    }
-                }, 1000, TimeUnit.MILLISECONDS);
-            }
-            return null;
-        }, () -> "插件加载");
+        return response(() -> manager.loadPlugin(group, name), () -> "插件加载");
     }
 
     @PostMapping("/plugin/unload")
     public Response unloadPlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
-        return manage(() -> {
-            String path = location.getLoadedPluginPath(group, name);
-            unloadingSet.add(path);
-            try {
-                location.unload(group, name);
-            } catch (Throwable e) {
-                executor.execute(() -> {
-                    try {
-                        concept.unload(path);
-                    } catch (Throwable e1) {
-                        log.error("Unload plugin error: " + path, e1);
-                    } finally {
-                        unloadingSet.remove(path);
-                    }
-                }, 1000, TimeUnit.MILLISECONDS);
-            }
-            return null;
-        }, () -> "插件卸载");
+        return response(() -> manager.unloadPlugin(group, name), () -> "插件卸载");
     }
 
     @PostMapping("/plugin/reload")
     public Response reloadPlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
-        return manage(() -> {
-            String path = location.getLoadedPluginPath(group, name);
-            loadingSet.add(path);
-            try {
-                concept.unload(path);
-            } catch (Throwable e) {
-                loadingSet.remove(path);
-                throw e;
-            }
-            executor.execute(() -> {
-                try {
-                    concept.load(path);
-                } catch (Throwable e) {
-                    log.error("Reload plugin error: " + path, e);
-                } finally {
-                    loadingSet.remove(path);
-                }
-            }, 1000, TimeUnit.MILLISECONDS);
-            return null;
-        }, () -> "插件重新加载");
+        return response(() -> manager.reloadPlugin(group, name), () -> "插件重新加载");
     }
 
     @GetMapping("/plugin/exist")
     public Response existPlugin(@RequestParam("group") String group,
                                 @RequestParam("name") String name) {
-        return manage(() -> location.exist(group, name), () -> "插件包重名判断");
+        return response(() -> manager.existPlugin(group, name), () -> "插件包重名判断");
     }
 
     @PostMapping("/plugin/rename")
     public Response renamePlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name,
                                  @RequestParam("rename") String rename) {
-        return manage(() -> {
-            location.rename(group, name, rename);
-            return null;
-        }, () -> "插件包重命名");
+        return response(() -> manager.renamePlugin(group, name, rename), () -> "插件包重命名");
     }
 
     @PostMapping("/plugin/delete")
     public Response deletePlugin(@RequestParam("group") String group,
                                  @RequestParam("name") String name) {
-        return manage(() -> {
-            location.delete(group, name);
-            return null;
-        }, () -> "插件删除");
+        return response(() -> manager.deletePlugin(group, name), () -> "插件删除");
     }
 
     @GetMapping("/plugin/properties")
     public Response getProperties(@RequestParam("group") String group,
                                   @RequestParam("name") String name) {
-        return manage(() -> propertiesProvider.getProperties(group, name), () -> "查询配置");
+        return response(() -> manager.getMetadataSummaries(group, name), () -> "查询配置");
     }
 
     @GetMapping("/plugin/list")
     public Response listPlugin(@RequestParam("group") String group,
                                @RequestParam("deleted") Boolean deleted) {
-        return manage(() -> {
-            List<ManagedPlugin> list = new ArrayList<>();
-            if (group.isEmpty()) {
-                return list;
-            }
+        return response(() -> {
             if (deleted == Boolean.TRUE) {
-                String[] plugins = location.getDeletedPlugins(group);
-                for (String plugin : plugins) {
-                    list.add(deletedPlugin(group, plugin));
-                }
+                return manager.getDeletedPlugins(group);
             } else {
-                String[] loaded = location.getLoadedPlugins(group);
-                for (String load : loaded) {
-                    list.add(loadedPlugin(group, load));
-                }
-                String[] unloaded = location.getUnloadedPlugins(group);
-                for (String unload : unloaded) {
-                    list.add(unloadedPlugin(group, unload));
-                }
+                return manager.getPlugins(group);
             }
-            list.sort((o1, o2) -> Long.compare(o2.sort, o1.sort));
-            return list;
         }, () -> "插件列表获取");
     }
 
-    public void autoload(InputStream is, long length, String group, String original, String upload) throws IOException {
-        String name = location.upload(group, upload, is, length);
-        if (original == null || original.trim().isEmpty()) {
-            // 更新才有老名字，上传没有老名字
-            return;
-        }
-        String newPath = location.getLoadedPluginPath(group, name);
-        loadingSet.add(newPath);
-        String oldPath = location.getLoadedPluginPath(group, original);
-        updatingSet.add(oldPath);
-        PluginEventListener listener = new PluginEventListener() {
+    protected String updatePlugin(String group, String original, String upload) throws IOException {
+        manager.updatePlugin(group, original, upload);
+    }
 
-            @Override
-            public void onEvent(Object event) {
-                if (event instanceof PluginAutoEvent) {
-                    String path = ((PluginAutoEvent) event).getPath();
-                    if (Objects.equals(newPath, path)) {
-                        updatingSet.remove(oldPath);
-                        if (event instanceof PluginAutoLoadEvent) {
-                            location.delete(group, original);
-                            concept.getEventPublisher().unregister(this);
-                        }
-                    }
-                }
-            }
-        };
-        concept.getEventPublisher().register(listener);
-        try {
-            location.load(group, name);
-        } catch (Throwable e) {
-            log.error("Load plugin error: " + newPath, e);
-            loadingSet.remove(newPath);
-            updatingSet.remove(oldPath);
-            concept.getEventPublisher().unregister(listener);
+    protected String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
+        return manager.uploadPlugin(group, name, is, length);
+    }
+
+    protected InputStream downloadPlugin(String group, String name, Boolean deleted) throws IOException {
+        if (deleted == Boolean.TRUE) {
+            return manager.downloadDeletedPlugin(group, name);
+        } else {
+            return manager.downloadPlugin(group, name);
         }
     }
 
-    public InputStream downloadPlugin(String group, String name, Boolean deleted, HttpHeaders headers) throws IOException {
+    protected void setDownloadHeaders(HttpHeaders headers, String name) throws UnsupportedEncodingException {
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + URLEncoder.encode(name, "UTF-8"));
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        if (deleted == Boolean.TRUE) {
-            return location.getDeletedPluginInputStream(group, name);
-        } else {
-            try {
-                return location.getLoadedPluginInputStream(group, name);
-            } catch (Throwable e) {
-                return location.getUnloadedPluginInputStream(group, name);
-            }
-        }
     }
 
-    public Response manage(Supplier<Object> success, Supplier<String> message) {
+    protected Response response(Runnable success, Supplier<String> message) {
+        return response(() -> {
+            success.run();
+            return null;
+        }, message);
+    }
+
+    protected Response response(Supplier<Object> success, Supplier<String> message) {
         String msg = message.get();
         try {
             Object object = success.get();
@@ -288,119 +176,12 @@ public class PluginManagementController {
         }
     }
 
-    public ManagedGroup group(String group) {
-        return new ManagedGroup(group, true);
-    }
-
-    public ManagedPlugin loadedPlugin(String group, String plugin) {
-        String path = location.getLoadedPluginPath(group, plugin);
-        long timestamp = location.getCreationTimestamp(path);
-        long size = location.getSize(path);
-        ManagedPlugin.State state;
-        if (loadingSet.contains(path) || concept.isLoading(path)) {
-            state = ManagedPlugin.State.LOADING;
-        } else {
-            Plugin get = concept.getRepository().get(path);
-            if (get == null) {
-                state = ManagedPlugin.State.LOAD_ERROR;
-            } else {
-                if (updatingSet.contains(path)) {
-                    state = ManagedPlugin.State.UPDATING;
-                } else {
-                    state = ManagedPlugin.State.LOADED;
-                }
-            }
-        }
-        return new ManagedPlugin(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
-    }
-
-    public ManagedPlugin unloadedPlugin(String group, String plugin) {
-        String unloadPath = location.getUnloadedPluginPath(group, plugin);
-        long timestamp = location.getCreationTimestamp(unloadPath);
-        long size = location.getSize(unloadPath);
-        ManagedPlugin.State state;
-        String path = location.getLoadedPluginPath(group, plugin);
-        if (unloadingSet.contains(path) || concept.isUnloading(path)) {
-            state = ManagedPlugin.State.UNLOADING;
-        } else {
-            Plugin get = concept.getRepository().get(path);
-            if (get == null) {
-                state = ManagedPlugin.State.UNLOADED;
-            } else {
-                state = ManagedPlugin.State.UNLOAD_ERROR;
-            }
-        }
-        return new ManagedPlugin(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
-    }
-
-    public ManagedPlugin deletedPlugin(String group, String plugin) {
-        String deletePath = location.getDeletedPluginPath(group, plugin);
-        long timestamp = location.getCreationTimestamp(deletePath);
-        long size = location.getSize(deletePath);
-        ManagedPlugin.State state = ManagedPlugin.State.DELETED;
-        return new ManagedPlugin(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
-    }
-
-    public Response success(String message, Object data) {
+    protected Response success(String message, Object data) {
         return new Response(true, message, data);
     }
 
-    public Response failure(String message, Throwable e) {
+    protected Response failure(String message, Throwable e) {
         return new Response(false, message, e);
-    }
-
-    public void init() {
-        concept.getEventPublisher().register(new PluginAutoLoadListener());
-    }
-
-    /*protected File getFinalFile(String group, String name) {
-        String loadedPath = location.getLoadedPluginPath(group, name);
-        File file = LocalPluginLocation.getFileAutoName(new File(loadedPath));
-        String unloadedPath = location.getUnloadedPluginPath(group, file.getName());
-        return LocalPluginLocation.getFileAutoName(new File(unloadedPath));
-    }*/
-
-    protected String formatSize(long size) {
-        if (size < 0) {
-            return null;
-        }
-        if (size >= 1024) {
-            double k = size / 1024.0;
-            if (k >= 1024) {
-                double m = k / 1024;
-                return String.format("%.2f", m) + "M";
-            } else {
-                return String.format("%.2f", k) + "K";
-            }
-        } else {
-            return size + "B";
-        }
-    }
-
-    protected String formatTime(long time) {
-        if (time < 0) {
-            return null;
-        }
-        Instant instant = Instant.ofEpochMilli(time);
-        LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        return formatter.format(dateTime);
-    }
-
-    public class PluginAutoLoadListener implements PluginEventListener {
-
-        @Override
-        public void onEvent(Object event) {
-            if (event instanceof PluginAutoEvent) {
-                String path = ((PluginAutoEvent) event).getPath();
-                if (event instanceof PluginAutoLoadEvent ||
-                        event instanceof PluginAutoLoadErrorEvent) {
-                    loadingSet.remove(path);
-                } else if (event instanceof PluginAutoUnloadEvent ||
-                        event instanceof PluginAutoUnloadErrorEvent) {
-                    unloadingSet.remove(path);
-                }
-            }
-        }
     }
 
     @Getter
@@ -412,35 +193,6 @@ public class PluginManagementController {
         private final PluginConceptProperties.ManagementProperties.HeaderProperties header;
 
         private final PluginConceptProperties.ManagementProperties.FooterProperties footer;
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class ManagedGroup {
-
-        private final String name;
-
-        private final Boolean state;
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class ManagedPlugin {
-
-        private final String plugin;
-
-        private final String size;
-
-        private final String creationTime;
-
-        private final State state;
-
-        private final long sort;
-
-        public enum State {
-
-            LOADED, LOADING, LOAD_ERROR, UNLOADED, UNLOADING, UNLOAD_ERROR, DELETED, UPDATING
-        }
     }
 
     @Data

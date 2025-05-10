@@ -15,9 +15,8 @@ import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
-import com.github.linyuzai.plugin.core.metadata.EmptyMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadataFinder;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -50,16 +48,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginLogger logger;
 
-    protected Collection<PluginMetadataFinder> metadataFinders;
+    protected Collection<PluginMetadataFactory> metadataFinders;
 
     protected Collection<PluginFactory> factories;
 
     protected Collection<PluginHandler> handlers;
 
     protected Collection<PluginHandlerFactory> handlerFactories;
-
-    @Deprecated
-    protected List<Runnable> posts = new CopyOnWriteArrayList<>();
 
     /**
      * 处理链
@@ -69,18 +64,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 正在加载的插件
      */
-    protected volatile Set<Object> loading = new LinkedHashSet<>();
+    protected final Set<Object> loading = new LinkedHashSet<>();
 
     /**
      * 正在卸载的插件
      */
-    protected volatile Set<Object> unloading = new LinkedHashSet<>();
+    protected final Set<Object> unloading = new LinkedHashSet<>();
 
     @Override
     public void initialize() {
-        for (Runnable post : this.posts) {
-            post.run();
-        }
         eventPublisher.publish(new PluginConceptInitializedEvent(this));
     }
 
@@ -89,12 +81,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         //卸载所有插件
         repository.stream().forEach(this::unload);
         eventPublisher.publish(new PluginConceptDestroyedEvent(this));
-    }
-
-    @Deprecated
-    @Override
-    public void post(Runnable runnable) {
-        this.posts.add(runnable);
     }
 
     @Override
@@ -167,12 +153,17 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public PluginMetadata metadata(Object source, PluginContext context) {
+    public PluginContext createContext() {
+        return contextFactory.create(this);
+    }
+
+    @Override
+    public PluginMetadata createMetadata(Object source, PluginContext context) {
         if (source instanceof Plugin) {
             return ((Plugin) source).getMetadata();
         }
-        for (PluginMetadataFinder finder : metadataFinders) {
-            PluginMetadata metadata = finder.find(source, context);
+        for (PluginMetadataFactory finder : metadataFinders) {
+            PluginMetadata metadata = finder.create(source, context);
             if (metadata != null) {
                 return metadata;
             }
@@ -188,7 +179,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         if (source instanceof Plugin) {
             return (Plugin) source;
         }
-        PluginMetadata metadata = metadata(source, context);
+        PluginMetadata metadata = createMetadata(source, context);
         if (metadata == null) {
             return null;
         }
@@ -257,7 +248,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         for (Object source : list) {
             try {
                 //创建上下文
-                PluginContext context = contextFactory.create(this);
+                PluginContext context = createContext();
                 //初始化上下文
                 context.set(PluginConcept.class, this);
                 context.initialize();
@@ -355,7 +346,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             if (handlerEnabled) {
                 //解析插件
                 PluginHandlerChain chain = obtainHandlerChain(plugin, context);
-                plugin.load(chain, context);
+                chain.next(context);
             }
             //销毁上下文
             context.destroy();

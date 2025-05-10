@@ -52,9 +52,14 @@ public interface PluginConcept {
     void removeHandlers(Collection<? extends PluginHandler> handlers);
 
     /**
+     * 创建上下文
+     */
+    PluginContext createContext();
+
+    /**
      * 获得插件配置
      */
-    PluginMetadata metadata(Object source, PluginContext context);
+    PluginMetadata createMetadata(Object source, PluginContext context);
 
     /**
      * 创建插件

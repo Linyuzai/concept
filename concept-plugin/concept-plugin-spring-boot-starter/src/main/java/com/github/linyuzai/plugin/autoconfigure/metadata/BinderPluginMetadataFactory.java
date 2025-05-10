@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.autoconfigure.metadata;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadataFinder;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,17 +19,17 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class BinderPluginMetadataFinder implements PluginMetadataFinder, EnvironmentAware {
+public class BinderPluginMetadataFactory implements PluginMetadataFactory, EnvironmentAware {
 
-    private PluginMetadataFinder metadataFinder;
+    private PluginMetadataFactory metadataFactory;
 
     private Class<? extends Plugin.StandardMetadata> standardMetadataType = JarPlugin.StandardMetadata.class;
 
     private Environment environment;
 
     @Override
-    public PluginMetadata find(Object source, PluginContext context) {
-        return new BinderMetadata(metadataFinder.find(source, context));
+    public PluginMetadata create(Object source, PluginContext context) {
+        return new BinderMetadata(metadataFactory.create(source, context));
     }
 
     @Override

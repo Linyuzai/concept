@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.metadata;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,11 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.function.Supplier;
 
 @Getter
 @Setter
-public abstract class AbstractPluginMetadataFinder implements PluginMetadataFinder {
+public abstract class AbstractPluginMetadataFactory implements PluginMetadataFactory {
 
     private Collection<Adapter> adapters = Collections.emptyList();
 

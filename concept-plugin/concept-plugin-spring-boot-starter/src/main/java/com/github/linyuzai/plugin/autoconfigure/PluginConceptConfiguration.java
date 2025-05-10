@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
+import com.github.linyuzai.plugin.autoconfigure.metadata.BinderPluginMetadataFactory;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
@@ -12,6 +13,7 @@ import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
 import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
@@ -31,18 +33,20 @@ import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
 import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
+import com.github.linyuzai.plugin.core.metadata.SubPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
+import com.github.linyuzai.plugin.jar.factory.ExJarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
-import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
-import com.github.linyuzai.plugin.zip.factory.ZipStreamPluginFactory;
-import com.github.linyuzai.plugin.zip.metadata.ZipFilePluginMetadataFinder;
+import com.github.linyuzai.plugin.jar.metadata.JarFilePluginMetadataFactory;
+import com.github.linyuzai.plugin.jar.metadata.JarStreamPluginMetadataFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -112,8 +116,29 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public ZipFilePluginMetadataFinder zipFilePluginMetadataFinder() {
-        return new ZipFilePluginMetadataFinder();
+    public BinderPluginMetadataFactory jarFilePluginMetadataFactory(PluginConceptProperties properties) {
+        return newBinderPluginMetadataFactory(new JarFilePluginMetadataFactory(), properties);
+    }
+
+    @Bean
+    public BinderPluginMetadataFactory jarStreamPluginMetadataFactory(PluginConceptProperties properties) {
+        return newBinderPluginMetadataFactory(new JarStreamPluginMetadataFactory(), properties);
+    }
+
+    private BinderPluginMetadataFactory newBinderPluginMetadataFactory(PluginMetadataFactory metadataFactory,
+                                                                       PluginConceptProperties properties) {
+        BinderPluginMetadataFactory factory = new BinderPluginMetadataFactory();
+        factory.setMetadataFactory(metadataFactory);
+        Class<? extends Plugin.StandardMetadata> standardType = properties.getMetadata().getStandardType();
+        if (standardType != null) {
+            factory.setStandardMetadataType(standardType);
+        }
+        return factory;
+    }
+
+    @Bean
+    public SubPluginMetadataFactory subPluginMetadataFactory() {
+        return new SubPluginMetadataFactory();
     }
 
     @Bean
@@ -125,18 +150,16 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public JarStreamPluginFactory jarInputStreamPluginFactory() {
+    public ExJarPluginFactory exJarPluginFactory(PluginConceptProperties properties) {
+        String mode = properties.getJar().getMode().name();
+        ExJarPluginFactory factory = new ExJarPluginFactory();
+        factory.setDefaultMode(mode);
+        return factory;
+    }
+
+    @Bean
+    public JarStreamPluginFactory jarStreamPluginFactory() {
         return new JarStreamPluginFactory();
-    }
-
-    @Bean
-    public ZipFilePluginFactory zipFilePluginFactory() {
-        return new ZipFilePluginFactory();
-    }
-
-    @Bean
-    public ZipStreamPluginFactory zipInputStreamPluginFactory() {
-        return new ZipStreamPluginFactory();
     }
 
     @Bean

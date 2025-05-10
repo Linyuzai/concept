@@ -45,16 +45,6 @@ public interface Plugin {
     void setConcept(PluginConcept concept);
 
     /**
-     * 添加加载监听
-     */
-    void addLoadListener(LoadListener listener);
-
-    /**
-     * 移除加载监听
-     */
-    void removeLoadListener(LoadListener listener);
-
-    /**
      * 添加销毁监听
      */
     void addDestroyListener(DestroyListener listener);
@@ -78,11 +68,6 @@ public interface Plugin {
      * 准备
      */
     void prepare(PluginContext context);
-
-    /**
-     * 加载
-     */
-    void load(PluginHandlerChain chain, PluginContext context);
 
     /**
      * 标准配置
@@ -159,17 +144,6 @@ public interface Plugin {
          * 获得数据流
          */
         InputStream getInputStream() throws IOException;
-    }
-
-    /**
-     * 加载监听器
-     */
-    interface LoadListener {
-
-        /**
-         * 插件加载
-         */
-        void onLoad(Plugin plugin);
     }
 
     /**

@@ -1,13 +1,11 @@
 package com.github.linyuzai.plugin.core.metadata;
 
-/**
- * 插件配置工厂
- */
-@Deprecated
+import com.github.linyuzai.plugin.core.context.PluginContext;
+
 public interface PluginMetadataFactory {
 
     /**
      * 创建插件配置
      */
-    PluginMetadata create(Object source);
+    PluginMetadata create(Object source, PluginContext context);
 }

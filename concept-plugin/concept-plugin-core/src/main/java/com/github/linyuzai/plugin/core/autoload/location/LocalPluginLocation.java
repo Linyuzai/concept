@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 本地插件位置
@@ -33,33 +36,15 @@ public class LocalPluginLocation implements PluginLocation {
      * 基础路径下的子目录为分组
      */
     @Override
-    public String[] getGroups() {
+    public List<String> getGroups() {
         File file = check(new File(basePath));
         File[] files = file.listFiles(File::isDirectory);
         if (files == null) {
-            return new String[0];
+            return Collections.emptyList();
         }
         return Arrays.stream(files)
                 .map(File::getName)
-                .toArray(String[]::new);
-    }
-
-    /**
-     * 当前目录的上级目录是基础目录时，当前目录为分组
-     */
-    @Override
-    public String getGroup(String path) {
-        if (path.startsWith(basePath)) {
-            File file = new File(path);
-            String parent;
-            while ((parent = file.getParent()) != null) {
-                if (parent.equals(basePath)) {
-                    return file.getName();
-                }
-                file = file.getParentFile();
-            }
-        }
-        return null;
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -67,16 +52,8 @@ public class LocalPluginLocation implements PluginLocation {
         getPluginDirectory(group, LOADED);
     }
 
-    /**
-     * {basePath}/{group}/_loaded
-     */
     @Override
-    public String getLoadedBasePath(String group) {
-        return getPluginDirectory(group, LOADED).getAbsolutePath();
-    }
-
-    @Override
-    public String[] getLoadedPlugins(String group) {
+    public List<String> getLoadedPlugins(String group) {
         return getPlugins(group, LOADED);
     }
 
@@ -94,16 +71,8 @@ public class LocalPluginLocation implements PluginLocation {
         return Files.newInputStream(file.toPath());
     }
 
-    /**
-     * {basePath}/{group}/_unloaded
-     */
     @Override
-    public String getUnloadedBasePath(String group) {
-        return getPluginDirectory(group, UNLOADED).getAbsolutePath();
-    }
-
-    @Override
-    public String[] getUnloadedPlugins(String group) {
+    public List<String> getUnloadedPlugins(String group) {
         return getPlugins(group, UNLOADED);
     }
 
@@ -121,16 +90,8 @@ public class LocalPluginLocation implements PluginLocation {
         return Files.newInputStream(file.toPath());
     }
 
-    /**
-     * {basePath}/{group}/_deleted
-     */
     @Override
-    public String getDeletedBasePath(String group) {
-        return getPluginDirectory(group, DELETED).getAbsolutePath();
-    }
-
-    @Override
-    public String[] getDeletedPlugins(String group) {
+    public List<String> getDeletedPlugins(String group) {
         return getPlugins(group, DELETED);
     }
 
@@ -260,7 +221,7 @@ public class LocalPluginLocation implements PluginLocation {
     }
 
     @Override
-    public Object getTag(String path) {
+    public Object getVersion(String path) {
         return new File(path).lastModified();
     }
 
@@ -286,18 +247,18 @@ public class LocalPluginLocation implements PluginLocation {
         return new File(getPluginDirectory(group, type), name.trim()).getAbsolutePath();
     }
 
-    protected String[] getPlugins(String group, String type) {
+    protected List<String> getPlugins(String group, String type) {
         File directory = getPluginDirectory(group, type);
         File[] files = directory.listFiles(pathname -> {
             String name = pathname.getName();
             return filter == null || filter.filter(group, name);
         });
         if (files == null) {
-            return new String[0];
+            return Collections.emptyList();
         }
         return Arrays.stream(files)
                 .map(File::getName)
-                .toArray(String[]::new);
+                .collect(Collectors.toList());
     }
 
     protected File check(File file) {

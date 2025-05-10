@@ -22,15 +22,6 @@ public abstract class AmazonS3Location implements PluginLocation {
         return bucket;
     }
 
-    @Deprecated
-    @Override
-    public String getGroup(String path) {
-        if (path == null) {
-            return null;
-        }
-        return path.split("/")[0];
-    }
-
     @SneakyThrows
     @Override
     public void addGroup(String group) {
@@ -43,14 +34,8 @@ public abstract class AmazonS3Location implements PluginLocation {
                 new ByteArrayInputStream(bytes), bytes.length, Collections.emptyMap());
     }
 
-    @Deprecated
     @Override
-    public String getLoadedBasePath(String group) {
-        return group;
-    }
-
-    @Override
-    public String[] getLoadedPlugins(String group) {
+    public List<String> getLoadedPlugins(String group) {
         return getPlugins(group, LOADED);
     }
 
@@ -64,14 +49,8 @@ public abstract class AmazonS3Location implements PluginLocation {
         return getPluginInputStream(group, name);
     }
 
-    @Deprecated
     @Override
-    public String getUnloadedBasePath(String group) {
-        return group;
-    }
-
-    @Override
-    public String[] getUnloadedPlugins(String group) {
+    public List<String> getUnloadedPlugins(String group) {
         return getPlugins(group, UNLOADED);
     }
 
@@ -85,14 +64,8 @@ public abstract class AmazonS3Location implements PluginLocation {
         return getPluginInputStream(group, name);
     }
 
-    @Deprecated
     @Override
-    public String getDeletedBasePath(String group) {
-        return group;
-    }
-
-    @Override
-    public String[] getDeletedPlugins(String group) {
+    public List<String> getDeletedPlugins(String group) {
         return getPlugins(group, DELETED);
     }
 
@@ -152,7 +125,7 @@ public abstract class AmazonS3Location implements PluginLocation {
 
     protected abstract String validBucket();
 
-    protected abstract String[] getPlugins(String group, String type);
+    protected abstract List<String> getPlugins(String group, String type);
 
     protected abstract InputStream getPluginInputStream(String group, String name) throws IOException;
 

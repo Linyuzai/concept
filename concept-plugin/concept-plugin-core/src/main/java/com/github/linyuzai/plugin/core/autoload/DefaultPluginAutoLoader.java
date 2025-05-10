@@ -45,7 +45,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
     private Map<String, Object> newPlugins(Collection<String> paths) {
         Map<String, Object> newPlugins = new HashMap<>();
         for (String path : paths) {
-            Object tag = location.getTag(path);
+            Object tag = location.getVersion(path);
             newPlugins.put(path, tag);
         }
         return newPlugins;

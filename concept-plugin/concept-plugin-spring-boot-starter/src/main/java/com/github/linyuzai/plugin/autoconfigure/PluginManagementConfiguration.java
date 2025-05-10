@@ -21,18 +21,16 @@ import java.util.List;
 @Configuration(proxyBeanMethods = false)
 public class PluginManagementConfiguration {
 
-    @Bean
+    @Bean(initMethod = "init")
     @ConditionalOnMissingBean
-    public PluginManagementAuthorizer pluginManagementAuthorizer(PluginConceptProperties properties) {
-        return new Base64PluginManagementAuthorizer(properties.getManagement().getAuthorization().getPassword());
+    public PluginManager pluginManager() {
+        return new PluginManager();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public PluginPropertiesProvider pluginPropertiesProvider(PluginLocation location,
-                                                             PluginConcept concept,
-                                                             List<PluginFactory> factories) {
-        return new DefaultPluginPropertiesProvider(location, concept, factories);
+    public PluginManagementAuthorizer pluginManagementAuthorizer(PluginConceptProperties properties) {
+        return new Base64PluginManagementAuthorizer(properties.getManagement().getAuthorization().getPassword());
     }
 
     @ConditionalOnPluginManagementEnabled
@@ -40,7 +38,7 @@ public class PluginManagementConfiguration {
     @Configuration(proxyBeanMethods = false)
     public static class WebMvcConfiguration implements WebMvcConfigurer {
 
-        @Bean(initMethod = "init")
+        @Bean
         public ServletPluginManagementController servletPluginManagementController() {
             return new ServletPluginManagementController();
         }
@@ -59,7 +57,7 @@ public class PluginManagementConfiguration {
     @Configuration(proxyBeanMethods = false)
     public static class WebFluxConfiguration implements WebFluxConfigurer {
 
-        @Bean(initMethod = "init")
+        @Bean
         public ReactivePluginManagementController reactivePluginManagementController() {
             return new ReactivePluginManagementController();
         }

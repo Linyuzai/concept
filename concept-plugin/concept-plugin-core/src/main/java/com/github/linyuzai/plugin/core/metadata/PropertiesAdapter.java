@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-public class PropertiesAdapter implements AbstractPluginMetadataFinder.Adapter {
+public class PropertiesAdapter implements AbstractPluginMetadataFactory.Adapter {
 
     @Override
     public boolean support(String name) {

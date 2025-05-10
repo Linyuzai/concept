@@ -1,10 +1,8 @@
 package com.github.linyuzai.plugin.zip.metadata;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFinder;
+import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadataFinder;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.util.ZipUtils;
@@ -12,18 +10,17 @@ import lombok.SneakyThrows;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZipFilePluginMetadataFinder extends ZipPluginMetadataFinder {
+public class ZipFilePluginMetadataFactory extends AbstractPluginMetadataFactory {
 
     @SneakyThrows
     @Override
-    public PluginMetadata find(Object source, PluginContext context) {
-        try (ZipFile zipFile = getZipFile(source, context)) {
+    public PluginMetadata create(Object source, PluginContext context) {
+        try (ZipFile zipFile = getZipFile(source)) {
             if (zipFile == null) {
                 return null;
             }
@@ -39,11 +36,15 @@ public class ZipFilePluginMetadataFinder extends ZipPluginMetadataFinder {
         }
     }
 
-    protected ZipFile getZipFile(Object source, PluginContext context) throws IOException {
+    protected ZipFile getZipFile(Object source) throws IOException {
         File file = ZipUtils.getFile(source, getSupportSuffixes());
         if (file == null) {
             return null;
         }
         return new ZipFile(file);
+    }
+
+    protected String[] getSupportSuffixes() {
+        return new String[]{ZipPlugin.SUFFIX_ZIP};
     }
 }

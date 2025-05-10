@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.autoload.location;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * 插件位置抽象，本地文件和远程文件（后续扩展）
@@ -31,26 +32,15 @@ public interface PluginLocation {
     /**
      * 插件分组，便于管理不同业务的插件
      */
-    String[] getGroups();
+    List<String> getGroups();
 
-    /**
-     * 根据插件路径获取插件分组
-     */
-    @Deprecated
-    String getGroup(String path);
 
     void addGroup(String group);
 
     /**
-     * 获得分组下的需要加载的插件基础路径
-     */
-    @Deprecated
-    String getLoadedBasePath(String group);
-
-    /**
      * 获得分组下的需要加载的插件名
      */
-    String[] getLoadedPlugins(String group);
+    List<String> getLoadedPlugins(String group);
 
     /**
      * 获得分组下需要加载的插件路径
@@ -63,15 +53,9 @@ public interface PluginLocation {
     InputStream getLoadedPluginInputStream(String group, String name) throws IOException;
 
     /**
-     * 获得分组下的不需要加载的插件基础路径
-     */
-    @Deprecated
-    String getUnloadedBasePath(String group);
-
-    /**
      * 获得分组下的不需要加载的插件名
      */
-    String[] getUnloadedPlugins(String group);
+    List<String> getUnloadedPlugins(String group);
 
     /**
      * 获得分组下不需要加载的插件路径
@@ -84,15 +68,9 @@ public interface PluginLocation {
     InputStream getUnloadedPluginInputStream(String group, String name) throws IOException;
 
     /**
-     * 获得分组下的删除的插件基础路径
-     */
-    @Deprecated
-    String getDeletedBasePath(String group);
-
-    /**
      * 获得分组下的删除的插件名
      */
-    String[] getDeletedPlugins(String group);
+    List<String> getDeletedPlugins(String group);
 
     /**
      * 获得分组下删除的插件路径
@@ -114,6 +92,9 @@ public interface PluginLocation {
      */
     long getCreationTimestamp(String path);
 
+    /**
+     * 上传插件
+     */
     String upload(String group, String name, InputStream is, long length) throws IOException;
 
     /**
@@ -142,9 +123,9 @@ public interface PluginLocation {
     void rename(String group, String name, String rename);
 
     /**
-     * 获得Tag
+     * 获得版本
      */
-    Object getTag(String path);
+    Object getVersion(String path);
 
     /**
      * 插件过滤器

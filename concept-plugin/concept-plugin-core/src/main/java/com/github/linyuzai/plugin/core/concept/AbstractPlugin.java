@@ -18,8 +18,6 @@ import java.util.function.Consumer;
 @Setter
 public abstract class AbstractPlugin implements Plugin {
 
-    private final Collection<LoadListener> loadListeners = new CopyOnWriteArrayList<>();
-
     private final Collection<DestroyListener> destroyListeners = new CopyOnWriteArrayList<>();
 
     private Object source;
@@ -27,16 +25,6 @@ public abstract class AbstractPlugin implements Plugin {
     private PluginMetadata metadata;
 
     private PluginConcept concept;
-
-    @Override
-    public void addLoadListener(LoadListener listener) {
-        this.loadListeners.add(listener);
-    }
-
-    @Override
-    public void removeLoadListener(LoadListener listener) {
-        this.loadListeners.remove(listener);
-    }
 
     @Override
     public void addDestroyListener(DestroyListener listener) {
@@ -82,14 +70,6 @@ public abstract class AbstractPlugin implements Plugin {
             }
         });
         onPrepare(context);
-    }
-
-    @Override
-    public void load(PluginHandlerChain chain, PluginContext context) {
-        chain.next(context);
-        for (LoadListener listener : loadListeners) {
-            listener.onLoad(this);
-        }
     }
 
     @Override

@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 public class AmazonS3V1Location extends AmazonS3Location {
@@ -21,7 +23,7 @@ public class AmazonS3V1Location extends AmazonS3Location {
     }
 
     @Override
-    public String[] getGroups() {
+    public List<String> getGroups() {
         ListObjectsRequest request = new ListObjectsRequest()
                 .withBucketName(validBucket())
                 .withDelimiter("/");
@@ -35,7 +37,7 @@ public class AmazonS3V1Location extends AmazonS3Location {
                         return it;
                     }
                 })
-                .toArray(String[]::new);
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -64,7 +66,7 @@ public class AmazonS3V1Location extends AmazonS3Location {
     }
 
     @Override
-    public Object getTag(String path) {
+    public Object getVersion(String path) {
         return getObjectMetadata(path).getLastModified().getTime();
     }
 
@@ -81,7 +83,7 @@ public class AmazonS3V1Location extends AmazonS3Location {
     }
 
     @Override
-    protected String[] getPlugins(String group, String type) {
+    protected List<String> getPlugins(String group, String type) {
         ListObjectsRequest request = new ListObjectsRequest()
                 .withBucketName(bucket)
                 .withDelimiter("/")
@@ -95,7 +97,7 @@ public class AmazonS3V1Location extends AmazonS3Location {
                     String pluginStatus = metadata.getUserMetaDataOf(METADATA_STATUS);
                     return type.equals(pluginStatus);
                 })
-                .toArray(String[]::new);
+                .collect(Collectors.toList());
     }
 
     @Override

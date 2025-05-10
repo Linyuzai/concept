@@ -4,10 +4,10 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,15 +21,19 @@ public class ServletPluginManagementController extends PluginManagementControlle
                        @RequestParam("name") String name) throws IOException {
         //File finalFile = getFinalFile(group, file.getOriginalFilename());
         //file.transferTo(finalFile);
-        autoload(file.getInputStream(),file.getSize(), group, name, file.getOriginalFilename());
+        String upload = uploadPlugin(group, file.getOriginalFilename(), file.getInputStream(), file.getSize());
+        if (StringUtils.hasText(name)) {
+            updatePlugin(group, name, upload);
+        }
     }
 
     @GetMapping("/plugin/download")
-    public ResponseEntity<Resource> downloadPlugin(@RequestParam("group") String group,
-                                                   @RequestParam("name") String name,
-                                                   @RequestParam("deleted") Boolean deleted) throws IOException {
+    public ResponseEntity<Resource> download(@RequestParam("group") String group,
+                                             @RequestParam("name") String name,
+                                             @RequestParam("deleted") Boolean deleted) throws IOException {
         HttpHeaders headers = new HttpHeaders();
-        InputStream is = downloadPlugin(group, name, deleted, headers);
+        setDownloadHeaders(headers, name);
+        InputStream is = downloadPlugin(group, name, deleted);
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new InputStreamResource(is));

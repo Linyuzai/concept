@@ -53,4 +53,6 @@ public interface PluginMetadata {
      * 刷新配置
      */
     void refresh();
+
+
 }
