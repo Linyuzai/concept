@@ -10,8 +10,8 @@ import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperti
 import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.location.LocalPluginLocation;
-import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
+import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -39,7 +39,7 @@ import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.jar.autoload.JarLocationFilter;
+import com.github.linyuzai.plugin.jar.storage.JarStorageFilter;
 import com.github.linyuzai.plugin.jar.factory.ExJarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
@@ -53,6 +53,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -255,8 +256,8 @@ public class PluginConceptConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public PluginLocation.Filter pluginJarLocationFilter() {
-            return new JarLocationFilter();
+        public PluginStorage.Filter pluginJarLocationFilter() {
+            return new JarStorageFilter();
         }
 
         @Bean(destroyMethod = "shutdown")
@@ -267,19 +268,21 @@ public class PluginConceptConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public PluginLocation pluginLocation(PluginConceptProperties properties,
-                                             PluginLocation.Filter filter) {
-            String basePath = properties.getAutoload().getLocation().getBasePath();
-            return new LocalPluginLocation(basePath, filter);
+        public PluginStorage pluginStorage(PluginConceptProperties properties,
+                                           PluginStorage.Filter filter) {
+            String location = properties.getAutoload().getStorage().getLocation();
+            String basePath = StringUtils.hasText(location) ?
+                    location : LocalPluginStorage.DEFAULT_BASE_PATH;
+            return new LocalPluginStorage(basePath, filter);
         }
 
         @Bean(initMethod = "start", destroyMethod = "stop")
         @ConditionalOnMissingBean
         public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
                                                  PluginExecutor executor,
-                                                 PluginLocation location,
+                                                 PluginStorage storage,
                                                  PluginConceptProperties properties) {
-            return new DefaultPluginAutoLoader(concept, executor, location,
+            return new DefaultPluginAutoLoader(concept, executor, storage,
                     properties.getAutoload().getPeriod());
         }
     }

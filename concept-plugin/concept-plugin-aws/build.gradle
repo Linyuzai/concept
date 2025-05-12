@@ -4,7 +4,7 @@ apply from: '../version.gradle'
 version ConceptPluginVersion
 
 ext {
-    set('publishName', 'Plugin Core')
+    set('publishName', 'Plugin AWS')
     set('publishDescription', 'Dynamic loading class with external jar simply and gracefully')
 }
 
@@ -12,7 +12,10 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
+    compileOnly project(':concept-plugin:concept-plugin-core')
 
+    compileOnly "com.amazonaws:aws-java-sdk-s3:${AwsS3V1Version}"
+    compileOnly "software.amazon.awssdk:s3:${AwsS3V2Version}"
 }
 
 apply from: '../../publish.gradle'

@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.autoload.location;
+package com.github.linyuzai.plugin.aws;
 
 import lombok.Getter;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
-public class AmazonS3V2Location extends AmazonS3Location {
+public class AmazonS3V2Storage extends AmazonS3Storage {
 
     private final S3Client s3Client;
 
-    public AmazonS3V2Location(String bucket, S3Client s3Client) {
+    public AmazonS3V2Storage(String bucket, S3Client s3Client) {
         super(bucket);
         this.s3Client = s3Client;
     }

@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.autoload.location;
+package com.github.linyuzai.plugin.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
-public class AmazonS3V1Location extends AmazonS3Location {
+public class AmazonS3V1Storage extends AmazonS3Storage {
 
     private final AmazonS3 amazonS3;
 
-    public AmazonS3V1Location(String bucket, AmazonS3 amazonS3) {
+    public AmazonS3V1Storage(String bucket, AmazonS3 amazonS3) {
         super(bucket);
         this.amazonS3 = amazonS3;
     }

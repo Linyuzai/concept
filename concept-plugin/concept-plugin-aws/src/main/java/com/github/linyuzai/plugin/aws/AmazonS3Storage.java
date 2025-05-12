@@ -1,5 +1,6 @@
-package com.github.linyuzai.plugin.core.autoload.location;
+package com.github.linyuzai.plugin.aws;
 
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -9,7 +10,7 @@ import java.util.*;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class AmazonS3Location implements PluginLocation {
+public abstract class AmazonS3Storage implements PluginStorage {
 
     public static final String METADATA_STATUS = "ConceptPlugin.Status";
 
@@ -18,7 +19,7 @@ public abstract class AmazonS3Location implements PluginLocation {
     protected final String bucket;
 
     @Override
-    public String getBasePath() {
+    public String getLocation() {
         return bucket;
     }
 
@@ -36,7 +37,7 @@ public abstract class AmazonS3Location implements PluginLocation {
 
     @Override
     public List<String> getLoadedPlugins(String group) {
-        return getPlugins(group, LOADED);
+        return getPlugins(group, PluginStorage.LOADED);
     }
 
     @Override
@@ -51,7 +52,7 @@ public abstract class AmazonS3Location implements PluginLocation {
 
     @Override
     public List<String> getUnloadedPlugins(String group) {
-        return getPlugins(group, UNLOADED);
+        return getPlugins(group, PluginStorage.UNLOADED);
     }
 
     @Override
@@ -66,12 +67,12 @@ public abstract class AmazonS3Location implements PluginLocation {
 
     @Override
     public List<String> getDeletedPlugins(String group) {
-        return getPlugins(group, DELETED);
+        return getPlugins(group, PluginStorage.DELETED);
     }
 
     @Override
     public String getDeletedPluginPath(String group, String name) {
-        return getPluginPath(group, DELETED);
+        return getPluginPath(group, PluginStorage.DELETED);
     }
 
     @Override
@@ -83,7 +84,7 @@ public abstract class AmazonS3Location implements PluginLocation {
     public String uploadPlugin(String group, String name, InputStream is, long length) {
         String pluginName = getPluginName(group, name);
         Map<String, String> map = new LinkedHashMap<>();
-        map.put(METADATA_STATUS, UNLOADED);
+        map.put(METADATA_STATUS, PluginStorage.UNLOADED);
         map.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
         putObject(bucket, getPluginPath(group, pluginName), is, length, map);
         return pluginName;
@@ -91,17 +92,17 @@ public abstract class AmazonS3Location implements PluginLocation {
 
     @Override
     public void loadPlugin(String group, String name) {
-        updateStatus(group, name, LOADED);
+        updateStatus(group, name, PluginStorage.LOADED);
     }
 
     @Override
     public void unloadPlugin(String group, String name) {
-        updateStatus(group, name, UNLOADED);
+        updateStatus(group, name, PluginStorage.UNLOADED);
     }
 
     @Override
     public void deletePlugin(String group, String name) {
-        updateStatus(group, name, DELETED);
+        updateStatus(group, name, PluginStorage.DELETED);
     }
 
     protected String getPluginPath(String group, String name) {

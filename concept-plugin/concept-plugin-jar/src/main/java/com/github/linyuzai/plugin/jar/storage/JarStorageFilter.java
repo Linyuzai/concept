@@ -1,12 +1,12 @@
-package com.github.linyuzai.plugin.jar.autoload;
+package com.github.linyuzai.plugin.jar.storage;
 
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.zip.autoload.ZipLocationFilter;
+import com.github.linyuzai.plugin.zip.storage.ZipStorageFilter;
 
 /**
  * 过滤 jar 和 zip
  */
-public class JarLocationFilter extends ZipLocationFilter {
+public class JarStorageFilter extends ZipStorageFilter {
 
     @Override
     public boolean filter(String group, String name) {

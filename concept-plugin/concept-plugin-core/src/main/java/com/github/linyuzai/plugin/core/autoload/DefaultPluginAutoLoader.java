@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Getter;
@@ -26,9 +26,9 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
 
     public DefaultPluginAutoLoader(PluginConcept concept,
                                    PluginExecutor executor,
-                                   PluginLocation location,
+                                   PluginStorage storage,
                                    long period) {
-        super(concept, executor, location);
+        super(concept, executor, storage);
         this.period = period;
     }
 
@@ -45,7 +45,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
     private Map<String, Object> newPlugins(Collection<String> paths) {
         Map<String, Object> newPlugins = new HashMap<>();
         for (String path : paths) {
-            Object tag = location.getVersion(path);
+            Object tag = storage.getVersion(path);
             newPlugins.put(path, tag);
         }
         return newPlugins;

@@ -17,6 +17,7 @@ dependencies {
 
     compileOnly project(':concept-plugin:concept-plugin-core')
     compileOnly project(':concept-plugin:concept-plugin-jar')
+    compileOnly project(':concept-plugin:concept-plugin-aws')
 
     //api "com.github.linyuzai:concept-plugin-core:${ConceptPluginVersion}"
     //api "com.github.linyuzai:concept-plugin-jar:${ConceptPluginVersion}"

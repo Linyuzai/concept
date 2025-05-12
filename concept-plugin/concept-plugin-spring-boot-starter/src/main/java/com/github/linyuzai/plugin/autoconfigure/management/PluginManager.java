@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.autoconfigure.management;
 
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.autoload.*;
-import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
@@ -40,7 +40,7 @@ public class PluginManager {
     protected PluginConcept concept;
 
     @Autowired
-    protected PluginLocation location;
+    protected PluginStorage storage;
 
     @Autowired
     protected PluginExecutor executor;
@@ -48,11 +48,11 @@ public class PluginManager {
     protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<String> getGroups() {
-        return location.getGroups();
+        return storage.getGroups();
     }
 
     public synchronized void addGroup(String group) {
-        location.addGroup(group);
+        storage.addGroup(group);
     }
 
     public List<PluginSummary> getPlugins(String group) {
@@ -60,11 +60,11 @@ public class PluginManager {
         if (group.isEmpty()) {
             return list;
         }
-        List<String> loaded = location.getLoadedPlugins(group);
+        List<String> loaded = storage.getLoadedPlugins(group);
         for (String load : loaded) {
             list.add(getLoadedPluginSummary(group, load));
         }
-        List<String> unloaded = location.getUnloadedPlugins(group);
+        List<String> unloaded = storage.getUnloadedPlugins(group);
         for (String unload : unloaded) {
             list.add(getUnloadedPluginSummary(group, unload));
         }
@@ -78,7 +78,7 @@ public class PluginManager {
             return list;
         }
 
-        List<String> plugins = location.getDeletedPlugins(group);
+        List<String> plugins = storage.getDeletedPlugins(group);
         for (String plugin : plugins) {
             list.add(getDeletedPluginSummary(group, plugin));
         }
@@ -88,18 +88,18 @@ public class PluginManager {
     }
 
     public boolean existPlugin(String group, String name) {
-        return location.existPlugin(group, name);
+        return storage.existPlugin(group, name);
     }
 
     public synchronized void loadPlugin(String group, String name) {
-        String path = location.getLoadedPluginPath(group, name);
+        String path = storage.getLoadedPluginPath(group, name);
         loadingSet.add(path);
         try {
-            location.loadPlugin(group, name);
+            storage.loadPlugin(group, name);
         } catch (Throwable e) {
             executor.execute(() -> {
                 try {
-                    Object source = location.getPluginSource(path);
+                    Object source = storage.getPluginSource(path);
                     concept.load(source);
                 } catch (Throwable e1) {
                     log.error("Load plugin error: " + path, e1);
@@ -111,10 +111,10 @@ public class PluginManager {
     }
 
     public synchronized void unloadPlugin(String group, String name) {
-        String path = location.getLoadedPluginPath(group, name);
+        String path = storage.getLoadedPluginPath(group, name);
         unloadingSet.add(path);
         try {
-            location.unloadPlugin(group, name);
+            storage.unloadPlugin(group, name);
         } catch (Throwable e) {
             executor.execute(() -> {
                 try {
@@ -129,7 +129,7 @@ public class PluginManager {
     }
 
     public synchronized void reloadPlugin(String group, String name) {
-        String path = location.getLoadedPluginPath(group, name);
+        String path = storage.getLoadedPluginPath(group, name);
         loadingSet.add(path);
         try {
             concept.unload(path);
@@ -139,7 +139,7 @@ public class PluginManager {
         }
         executor.execute(() -> {
             try {
-                Object source = location.getPluginSource(path);
+                Object source = storage.getPluginSource(path);
                 concept.load(source);
             } catch (Throwable e) {
                 log.error("Reload plugin error: " + path, e);
@@ -150,18 +150,18 @@ public class PluginManager {
     }
 
     public synchronized void renamePlugin(String group, String name, String rename) {
-        location.renamePlugin(group, name, rename);
+        storage.renamePlugin(group, name, rename);
     }
 
     public synchronized void deletePlugin(String group, String name) {
-        location.deletePlugin(group, name);
+        storage.deletePlugin(group, name);
     }
 
     public PluginMetadata getMetadata(String group, String name) {
-        String path = location.getLoadedPluginPath(group, name);
+        String path = storage.getLoadedPluginPath(group, name);
         Plugin plugin = concept.getRepository().get(path);
         if (plugin == null) {
-            return concept.createMetadata(location.getUnloadedPluginPath(group, name),
+            return concept.createMetadata(storage.getUnloadedPluginPath(group, name),
                     concept.createContext());
         } else {
             return plugin.getMetadata();
@@ -183,9 +183,9 @@ public class PluginManager {
     }
 
     public synchronized void updatePlugin(String group, String original, String upload) throws IOException {
-        String newPath = location.getLoadedPluginPath(group, upload);
+        String newPath = storage.getLoadedPluginPath(group, upload);
         loadingSet.add(newPath);
-        String oldPath = location.getLoadedPluginPath(group, original);
+        String oldPath = storage.getLoadedPluginPath(group, original);
         updatingSet.add(oldPath);
         PluginEventListener listener = new PluginEventListener() {
 
@@ -196,7 +196,7 @@ public class PluginManager {
                     if (Objects.equals(newPath, path)) {
                         updatingSet.remove(oldPath);
                         if (event instanceof PluginAutoLoadEvent) {
-                            location.deletePlugin(group, original);
+                            storage.deletePlugin(group, original);
                             concept.getEventPublisher().unregister(this);
                         }
                     }
@@ -205,7 +205,7 @@ public class PluginManager {
         };
         concept.getEventPublisher().register(listener);
         try {
-            location.loadPlugin(group, upload);
+            storage.loadPlugin(group, upload);
         } catch (Throwable e) {
             log.error("Load plugin error: " + newPath, e);
             loadingSet.remove(newPath);
@@ -215,25 +215,25 @@ public class PluginManager {
     }
 
     public synchronized String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
-        return location.uploadPlugin(group, name, is, length);
+        return storage.uploadPlugin(group, name, is, length);
     }
 
     public InputStream downloadPlugin(String group, String name) throws IOException {
         try {
-            return location.getLoadedPluginInputStream(group, name);
+            return storage.getLoadedPluginInputStream(group, name);
         } catch (Throwable e) {
-            return location.getUnloadedPluginInputStream(group, name);
+            return storage.getUnloadedPluginInputStream(group, name);
         }
     }
 
     public InputStream downloadDeletedPlugin(String group, String name) throws IOException {
-        return location.getDeletedPluginInputStream(group, name);
+        return storage.getDeletedPluginInputStream(group, name);
     }
 
     protected PluginSummary getLoadedPluginSummary(String group, String plugin) {
-        String path = location.getLoadedPluginPath(group, plugin);
-        long timestamp = location.getPluginCreateTime(path);
-        long size = location.getPluginSize(path);
+        String path = storage.getLoadedPluginPath(group, plugin);
+        long timestamp = storage.getPluginCreateTime(path);
+        long size = storage.getPluginSize(path);
         PluginState state;
         if (loadingSet.contains(path) || concept.isLoading(path)) {
             state = PluginState.LOADING;
@@ -253,11 +253,11 @@ public class PluginManager {
     }
 
     protected PluginSummary getUnloadedPluginSummary(String group, String plugin) {
-        String unloadPath = location.getUnloadedPluginPath(group, plugin);
-        long timestamp = location.getPluginCreateTime(unloadPath);
-        long size = location.getPluginSize(unloadPath);
+        String unloadPath = storage.getUnloadedPluginPath(group, plugin);
+        long timestamp = storage.getPluginCreateTime(unloadPath);
+        long size = storage.getPluginSize(unloadPath);
         PluginState state;
-        String path = location.getLoadedPluginPath(group, plugin);
+        String path = storage.getLoadedPluginPath(group, plugin);
         if (unloadingSet.contains(path) || concept.isUnloading(path)) {
             state = PluginState.UNLOADING;
         } else {
@@ -272,9 +272,9 @@ public class PluginManager {
     }
 
     protected PluginSummary getDeletedPluginSummary(String group, String plugin) {
-        String deletePath = location.getDeletedPluginPath(group, plugin);
-        long timestamp = location.getPluginCreateTime(deletePath);
-        long size = location.getPluginSize(deletePath);
+        String deletePath = storage.getDeletedPluginPath(group, plugin);
+        long timestamp = storage.getPluginCreateTime(deletePath);
+        long size = storage.getPluginSize(deletePath);
         PluginState state = PluginState.DELETED;
         return new PluginSummary(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
     }

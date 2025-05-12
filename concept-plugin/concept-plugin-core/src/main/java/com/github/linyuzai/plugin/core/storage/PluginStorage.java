@@ -1,13 +1,13 @@
-package com.github.linyuzai.plugin.core.autoload.location;
+package com.github.linyuzai.plugin.core.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 /**
- * 插件位置抽象，本地文件和远程文件（后续扩展）
+ * 插件存储抽象，本地文件或远程文件
  */
-public interface PluginLocation {
+public interface PluginStorage {
 
     /**
      * 需要加载的插件
@@ -25,9 +25,9 @@ public interface PluginLocation {
     String DELETED = "_deleted";
 
     /**
-     * 获得基础路径
+     * 获得插件位置
      */
-    String getBasePath();
+    String getLocation();
 
     /**
      * 插件分组，便于管理不同业务的插件

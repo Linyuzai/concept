@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.autoload.location;
+package com.github.linyuzai.plugin.core.storage;
 
 import lombok.*;
 
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocalPluginLocation implements PluginLocation {
+public class LocalPluginStorage implements PluginStorage {
 
     /**
      * 默认的缓存路径 {user.home}/concept/plugin
@@ -30,7 +30,12 @@ public class LocalPluginLocation implements PluginLocation {
      */
     private String basePath = DEFAULT_BASE_PATH;
 
-    private PluginLocation.Filter filter;
+    private PluginStorage.Filter filter;
+
+    @Override
+    public String getLocation() {
+        return basePath;
+    }
 
     /**
      * 基础路径下的子目录为分组

@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.autoload.location.PluginLocation;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginConceptInitializedEvent;
@@ -31,7 +31,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     /**
      * 插件位置
      */
-    protected final PluginLocation location;
+    protected final PluginStorage storage;
 
     /**
      * 是否运行
@@ -76,7 +76,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     protected Collection<String> loadPlugins() {
         Collection<String> paths = getPluginPaths();
         List<Object> sources = paths.stream()
-                .map(location::getPluginSource)
+                .map(storage::getPluginSource)
                 .collect(Collectors.toList());
         concept.load(sources, (o, plugin) -> {
             String path = (String) o;
@@ -89,12 +89,12 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     }
 
     protected Collection<String> getPluginPaths() {
-        List<String> groups = location.getGroups();
+        List<String> groups = storage.getGroups();
         List<String> paths = new ArrayList<>();
         for (String group : groups) {
-            List<String> names = location.getLoadedPlugins(group);
+            List<String> names = storage.getLoadedPlugins(group);
             for (String name : names) {
-                String path = location.getLoadedPluginPath(group, name);
+                String path = storage.getLoadedPluginPath(group, name);
                 if (path == null) {
                     continue;
                 }
@@ -108,7 +108,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
 
     @Override
     public void addGroup(String group) {
-        this.location.addGroup(group);
+        this.storage.addGroup(group);
     }
 
     @Override
@@ -154,7 +154,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
      */
     public void load(String path) {
         try {
-            Object source = location.getPluginSource(path);
+            Object source = storage.getPluginSource(path);
             Plugin plugin = concept.load(source);
             concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
         } catch (Throwable e) {
