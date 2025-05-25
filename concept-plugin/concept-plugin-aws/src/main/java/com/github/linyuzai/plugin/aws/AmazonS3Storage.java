@@ -1,138 +1,137 @@
 package com.github.linyuzai.plugin.aws;
 
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
+import com.github.linyuzai.plugin.core.factory.PluginSourceProvider;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
-@RequiredArgsConstructor
-public abstract class AmazonS3Storage implements PluginStorage {
+public class AmazonS3Storage extends AWSStorage {
 
-    public static final String METADATA_STATUS = "ConceptPlugin.Status";
+    private final AmazonS3 amazonS3;
 
-    public static final String METADATA_CREATION = "ConceptPlugin.Creation";
-
-    protected final String bucket;
-
-    @Override
-    public String getLocation() {
-        return bucket;
-    }
-
-    @SneakyThrows
-    @Override
-    public void addGroup(String group) {
-        Properties properties = new Properties();
-        properties.setProperty("group.name", group);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        properties.store(os, "");
-        byte[] bytes = os.toByteArray();
-        putObject(bucket, getPluginPath(group, "concept_plugin.properties"),
-                new ByteArrayInputStream(bytes), bytes.length, Collections.emptyMap());
+    public AmazonS3Storage(String bucket, AmazonS3 amazonS3) {
+        super(bucket);
+        this.amazonS3 = amazonS3;
     }
 
     @Override
-    public List<String> getLoadedPlugins(String group) {
-        return getPlugins(group, PluginStorage.LOADED);
+    public long getPluginSize(String path) {
+        return getObjectMetadata(getOrCreateBucket(), path).getContentLength();
     }
 
     @Override
-    public String getLoadedPluginPath(String group, String name) {
-        return getPluginPath(group, name);
-    }
-
-    @Override
-    public InputStream getLoadedPluginInputStream(String group, String name) throws IOException {
-        return getPluginInputStream(group, name);
-    }
-
-    @Override
-    public List<String> getUnloadedPlugins(String group) {
-        return getPlugins(group, PluginStorage.UNLOADED);
-    }
-
-    @Override
-    public String getUnloadedPluginPath(String group, String name) {
-        return getPluginPath(group, name);
-    }
-
-    @Override
-    public InputStream getUnloadedPluginInputStream(String group, String name) throws IOException {
-        return getPluginInputStream(group, name);
-    }
-
-    @Override
-    public List<String> getDeletedPlugins(String group) {
-        return getPlugins(group, PluginStorage.DELETED);
-    }
-
-    @Override
-    public String getDeletedPluginPath(String group, String name) {
-        return getPluginPath(group, PluginStorage.DELETED);
-    }
-
-    @Override
-    public InputStream getDeletedPluginInputStream(String group, String name) throws IOException {
-        return getPluginInputStream(group, name);
-    }
-
-    @Override
-    public String uploadPlugin(String group, String name, InputStream is, long length) {
-        String pluginName = getPluginName(group, name);
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put(METADATA_STATUS, PluginStorage.UNLOADED);
-        map.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
-        putObject(bucket, getPluginPath(group, pluginName), is, length, map);
-        return pluginName;
-    }
-
-    @Override
-    public void loadPlugin(String group, String name) {
-        updateStatus(group, name, PluginStorage.LOADED);
-    }
-
-    @Override
-    public void unloadPlugin(String group, String name) {
-        updateStatus(group, name, PluginStorage.UNLOADED);
-    }
-
-    @Override
-    public void deletePlugin(String group, String name) {
-        updateStatus(group, name, PluginStorage.DELETED);
-    }
-
-    protected String getPluginPath(String group, String name) {
-        return group + "/" + name;
-    }
-
-    protected String getPluginName(String group, String name) {
-        int i = 1;
-        String tryName = name;
-        while (existPlugin(group, tryName)) {
-            int index = tryName.lastIndexOf(".");
-            if (index == -1) {
-                tryName = tryName + i;
-            } else {
-                tryName = tryName.substring(0, index) + "(" + i + ")" + tryName.substring(index);
-            }
-            i++;
+    public long getPluginCreateTime(String path) {
+        String creation = getObjectMetadata(getOrCreateBucket(), path)
+                .getUserMetaDataOf(METADATA_CREATION);
+        try {
+            return Long.parseLong(creation);
+        } catch (Throwable e) {
+            return -1;
         }
-        return tryName;
     }
 
-    protected abstract String validBucket();
+    @Override
+    public Object getPluginSource(String path) {
+        return new PluginSource(path);
+    }
 
-    protected abstract List<String> getPlugins(String group, String type);
+    @Override
+    public boolean existPlugin(String group, String name) {
+        return amazonS3.doesObjectExist(bucket, getPluginPath(group, name));
+    }
 
-    protected abstract InputStream getPluginInputStream(String group, String name) throws IOException;
+    @Override
+    public void renamePlugin(String group, String name, String rename) {
+        amazonS3.copyObject(bucket, getPluginPath(group, name), bucket, getPluginPath(group, rename));
+    }
 
-    protected abstract void updateStatus(String group, String name, String status);
+    @Override
+    public Object getVersion(String path) {
+        return getObjectMetadata(getOrCreateBucket(), path).getLastModified().getTime();
+    }
 
-    protected abstract void putObject(String bucket, String key,
-                                      InputStream is, long length,
-                                      Map<String, String> userMetadata);
+    private ObjectMetadata getObjectMetadata(String bucket, String key) {
+        return amazonS3.getObjectMetadata(bucket, key);
+    }
+
+    @Override
+    protected boolean existBucket(String bucket) {
+        return amazonS3.doesBucketExistV2(bucket);
+    }
+
+    @Override
+    protected void createBucket(String bucket) {
+        amazonS3.createBucket(bucket);
+    }
+
+    @Override
+    protected List<String> listObjects(String bucket, String prefix, String delimiter) {
+        ListObjectsRequest request = new ListObjectsRequest()
+                .withBucketName(bucket)
+                .withDelimiter(delimiter)
+                .withPrefix(prefix);
+        ObjectListing listing = amazonS3.listObjects(request);
+        return listing.getObjectSummaries()
+                .stream()
+                .map(S3ObjectSummary::getKey)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    protected Map<String, String> getUserMetadata(String bucket, String key) {
+        return getObjectMetadata(bucket, key).getUserMetadata();
+    }
+
+    @Override
+    protected void putUserMetadata(String bucket, String key, Map<String, String> userMetadata) {
+        ObjectMetadata metadata = amazonS3.getObjectMetadata(bucket, key);
+        metadata.setUserMetadata(userMetadata);
+        CopyObjectRequest request = new CopyObjectRequest();
+        request.setSourceBucketName(bucket);
+        request.setSourceKey(key);
+        request.setDestinationBucketName(bucket);
+        request.setDestinationKey(key);
+        request.setNewObjectMetadata(metadata);
+        request.setMetadataDirective(MetadataDirective.REPLACE.name());
+        amazonS3.copyObject(request);
+    }
+
+    @Override
+    protected InputStream getObject(String group, String name) throws IOException {
+        return amazonS3.getObject(bucket, getPluginPath(group, name)).getObjectContent();
+    }
+
+    @Override
+    protected void putObject(String bucket, String key,
+                             InputStream is, long length,
+                             Map<String, String> userMetadata) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setUserMetadata(userMetadata);
+        metadata.setContentLength(length);
+        amazonS3.putObject(bucket, key, is, metadata);
+    }
+
+    @RequiredArgsConstructor
+    public class PluginSource implements PluginSourceProvider {
+
+        private final String path;
+
+        @Override
+        public String getKey() {
+            return path;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return getObject(getOrCreateBucket(), path);
+        }
+    }
 }

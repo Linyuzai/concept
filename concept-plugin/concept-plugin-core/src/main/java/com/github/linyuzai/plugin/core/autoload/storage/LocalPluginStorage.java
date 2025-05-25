@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.storage;
+package com.github.linyuzai.plugin.core.autoload.storage;
 
 import lombok.*;
 

@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration(proxyBeanMethods = false)
 public class PluginManagementConfiguration {
 
-    @Bean(initMethod = "init")
+    @Bean(initMethod = "initialize")
     @ConditionalOnMissingBean
     public PluginManager pluginManager() {
         return new PluginManager();

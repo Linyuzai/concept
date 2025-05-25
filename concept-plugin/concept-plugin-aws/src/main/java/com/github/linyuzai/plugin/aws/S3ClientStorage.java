@@ -1,56 +1,36 @@
 package com.github.linyuzai.plugin.aws;
 
+import com.github.linyuzai.plugin.core.factory.PluginSourceProvider;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
-public class AmazonS3V2Storage extends AmazonS3Storage {
+public class S3ClientStorage extends AWSStorage {
 
     private final S3Client s3Client;
 
-    public AmazonS3V2Storage(String bucket, S3Client s3Client) {
+    public S3ClientStorage(String bucket, S3Client s3Client) {
         super(bucket);
         this.s3Client = s3Client;
     }
 
     @Override
-    public List<String> getGroups() {
-        ListObjectsRequest request = ListObjectsRequest.builder()
-                .bucket(validBucket())
-                .delimiter("/")
-                .build();
-        ListObjectsResponse listing = s3Client.listObjects(request);
-        return listing.commonPrefixes()
-                .stream()
-                .map(CommonPrefix::prefix)
-                .map(it -> {
-                    if (it.endsWith("/")) {
-                        return it.substring(0, it.length() - 1);
-                    } else {
-                        return it;
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public long getPluginSize(String path) {
-        return getHeadObject(path).contentLength();
+        return getHeadObject(getOrCreateBucket(), path).contentLength();
     }
 
     @Override
     public long getPluginCreateTime(String path) {
-        String creation = getHeadObject(path).metadata().get(METADATA_CREATION);
+        String creation = getHeadObject(getOrCreateBucket(), path)
+                .metadata().get(METADATA_CREATION);
         try {
             return Long.parseLong(creation);
         } catch (Throwable e) {
@@ -60,13 +40,13 @@ public class AmazonS3V2Storage extends AmazonS3Storage {
 
     @Override
     public Object getPluginSource(String path) {
-        return null;
+        return new PluginSource(path);
     }
 
     @Override
     public boolean existPlugin(String group, String name) {
         try {
-            getHeadObject(getPluginPath(group, name));
+            getHeadObject(getOrCreateBucket(), getPluginPath(group, name));
             return true;
         } catch (NoSuchKeyException e) {
             return false;
@@ -86,10 +66,10 @@ public class AmazonS3V2Storage extends AmazonS3Storage {
 
     @Override
     public Object getVersion(String path) {
-        return getHeadObject(path).lastModified().getEpochSecond();
+        return getHeadObject(getOrCreateBucket(), path).lastModified().getEpochSecond();
     }
 
-    private HeadObjectResponse getHeadObject(String key) {
+    private HeadObjectResponse getHeadObject(String bucket, String key) {
         HeadObjectRequest request = HeadObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -98,58 +78,45 @@ public class AmazonS3V2Storage extends AmazonS3Storage {
     }
 
     @Override
-    protected String validBucket() {
+    protected boolean existBucket(String bucket) {
         try {
             s3Client.headBucket(HeadBucketRequest.builder()
                     .bucket(bucket)
                     .build());
+            return true;
         } catch (NoSuchBucketException e) {
-            s3Client.createBucket(CreateBucketRequest.builder()
-                    .bucket(bucket)
-                    .build());
+            return false;
         }
-        return bucket;
     }
 
     @Override
-    protected List<String> getPlugins(String group, String type) {
+    protected void createBucket(String bucket) {
+        s3Client.createBucket(CreateBucketRequest.builder()
+                .bucket(bucket)
+                .build());
+    }
+
+    @Override
+    protected List<String> listObjects(String bucket, String prefix, String delimiter) {
         ListObjectsRequest request = ListObjectsRequest.builder()
                 .bucket(bucket)
-                .delimiter("/")
-                .prefix(group + "/")
+                .delimiter(delimiter)
+                .prefix(prefix)
                 .build();
         ListObjectsResponse listing = s3Client.listObjects(request);
         return listing.contents()
                 .stream()
                 .map(S3Object::key)
-                .filter(it -> {
-                    String pluginStatus = getHeadObject(it).metadata().get(METADATA_STATUS);
-                    return type.equals(pluginStatus);
-                })
                 .collect(Collectors.toList());
     }
 
     @Override
-    protected InputStream getPluginInputStream(String group, String name) throws IOException {
-        GetObjectRequest request = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(getPluginPath(group, name))
-                .build();
-        return s3Client.getObject(request);
+    protected Map<String, String> getUserMetadata(String bucket, String key) {
+        return getHeadObject(bucket, key).metadata();
     }
 
     @Override
-    protected void updateStatus(String group, String name, String status) {
-        String key = getPluginPath(group, name);
-        HeadObjectResponse metadata = getHeadObject(key);
-        Map<String, String> userMetadata;
-        if (metadata.metadata() == null) {
-            userMetadata = new LinkedHashMap<>();
-            userMetadata.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
-        } else {
-            userMetadata = metadata.metadata();
-        }
-        userMetadata.put(METADATA_STATUS, status);
+    protected void putUserMetadata(String bucket, String key, Map<String, String> userMetadata) {
         CopyObjectRequest request = CopyObjectRequest.builder()
                 .sourceBucket(bucket)
                 .sourceKey(key)
@@ -162,6 +129,15 @@ public class AmazonS3V2Storage extends AmazonS3Storage {
     }
 
     @Override
+    protected InputStream getObject(String group, String name) throws IOException {
+        GetObjectRequest request = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(getPluginPath(group, name))
+                .build();
+        return s3Client.getObject(request);
+    }
+
+    @Override
     protected void putObject(String bucket, String key,
                              InputStream is, long length,
                              Map<String, String> userMetadata) {
@@ -171,5 +147,21 @@ public class AmazonS3V2Storage extends AmazonS3Storage {
                 .metadata(userMetadata)
                 .build();
         s3Client.putObject(request, RequestBody.fromInputStream(is, length));
+    }
+
+    @RequiredArgsConstructor
+    public class PluginSource implements PluginSourceProvider {
+
+        private final String path;
+
+        @Override
+        public String getKey() {
+            return path;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return getObject(getOrCreateBucket(), path);
+        }
     }
 }

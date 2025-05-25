@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.preperties;
 
-import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
+import com.github.linyuzai.plugin.core.autoload.storage.LocalPluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.Data;

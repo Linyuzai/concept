@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.autoconfigure.management;
 
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.autoload.*;
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.autoload.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
@@ -279,7 +279,7 @@ public class PluginManager {
         return new PluginSummary(plugin, formatSize(size), formatTime(timestamp), state, timestamp);
     }
 
-    public void init() {
+    public void initialize() {
         concept.getEventPublisher().register(new PluginAutoLoadListener());
     }
 

@@ -1,7 +1,7 @@
-package com.github.linyuzai.plugin.jar.storage;
+package com.github.linyuzai.plugin.jar.autoload;
 
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
-import com.github.linyuzai.plugin.zip.storage.ZipStorageFilter;
+import com.github.linyuzai.plugin.zip.autoload.ZipStorageFilter;
 
 /**
  * 过滤 jar 和 zip

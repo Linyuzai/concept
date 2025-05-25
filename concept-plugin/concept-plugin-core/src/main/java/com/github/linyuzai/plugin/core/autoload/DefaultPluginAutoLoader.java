@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.autoload.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Getter;
@@ -64,11 +64,11 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
             Map<String, Object> lastPlugins = new HashMap<>(plugins);
 
             for (Map.Entry<String, Object> entry : newPlugins.entrySet()) {
-                Object tag = lastPlugins.remove(entry.getKey());
-                if (tag == null) {
+                Object version = lastPlugins.remove(entry.getKey());
+                if (version == null) {
                     load.put(entry.getKey(), entry.getValue());
                 } else {
-                    if (Objects.equals(tag, entry.getValue())) {
+                    if (Objects.equals(version, entry.getValue())) {
                         // 相同的文件忽略
                     } else {
                         reload.put(entry.getKey(), entry.getValue());
