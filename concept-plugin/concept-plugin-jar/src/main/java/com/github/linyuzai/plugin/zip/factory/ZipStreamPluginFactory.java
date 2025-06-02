@@ -7,7 +7,7 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
-import com.github.linyuzai.plugin.core.factory.PluginSourceProvider;
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
@@ -25,14 +25,14 @@ public class ZipStreamPluginFactory implements PluginFactory {
     @SneakyThrows
     @Override
     public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        if (source instanceof PluginSourceProvider) {
-            PluginSourceProvider provider = (PluginSourceProvider) source;
-            URL url = new URL(provider.getKey());
+        if (source instanceof PluginDefinition.Loadable) {
+            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) source;
+            URL url = new URL(loadable.getPath());
             return create(url, new Supplier<InputStream>() {
                 @SneakyThrows
                 @Override
                 public InputStream get() {
-                    return provider.getInputStream();
+                    return loadable.getInputStream();
                 }
             });
         } else if (source instanceof Plugin.Entry) {

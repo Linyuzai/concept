@@ -10,8 +10,8 @@ import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperti
 import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.storage.LocalPluginStorage;
-import com.github.linyuzai.plugin.core.autoload.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;

@@ -1,23 +1,16 @@
 package com.github.linyuzai.plugin.zip.metadata;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.factory.PluginSourceProvider;
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
-import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
 
 public abstract class ZipStreamPluginMetadataFactory extends AbstractPluginMetadataFactory {
 
@@ -44,9 +37,9 @@ public abstract class ZipStreamPluginMetadataFactory extends AbstractPluginMetad
     }
 
     protected ZipInputStream getZipInputStream(Object source) throws IOException {
-        if (source instanceof PluginSourceProvider) {
-            PluginSourceProvider provider = (PluginSourceProvider) source;
-            return new ZipInputStream(provider.getInputStream());
+        if (source instanceof PluginDefinition.Loadable) {
+            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) source;
+            return new ZipInputStream(loadable.getInputStream());
         }
         return null;
     }

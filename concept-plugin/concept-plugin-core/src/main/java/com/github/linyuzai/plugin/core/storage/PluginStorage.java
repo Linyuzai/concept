@@ -1,7 +1,10 @@
-package com.github.linyuzai.plugin.core.autoload.storage;
+package com.github.linyuzai.plugin.core.storage;
+
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -83,24 +86,14 @@ public interface PluginStorage {
     InputStream getDeletedPluginInputStream(String group, String name) throws IOException;
 
     /**
-     * 获得插件大小
+     * 获得插件源
      */
-    long getPluginSize(String path);
-
-    /**
-     * 获得插件创建时间
-     */
-    long getPluginCreateTime(String path);
-
-    /**
-     * 获得版本
-     */
-    Object getVersion(String path);
+    PluginDefinition getPluginDefinition(String path);
 
     /**
      * 获得插件源
      */
-    Object getPluginSource(String path);
+    List<PluginDefinition> getPluginDefinitions(Collection<? extends String> paths);
 
     /**
      * 上传插件

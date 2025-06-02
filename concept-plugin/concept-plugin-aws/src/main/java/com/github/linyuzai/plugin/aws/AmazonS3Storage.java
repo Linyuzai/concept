@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.github.linyuzai.plugin.core.factory.PluginSourceProvider;
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
-public class AmazonS3Storage extends AWSStorage {
+public class AmazonS3Storage extends AbstractAwsStorage {
 
     private final AmazonS3 amazonS3;
 
@@ -22,24 +22,8 @@ public class AmazonS3Storage extends AWSStorage {
     }
 
     @Override
-    public long getPluginSize(String path) {
-        return getObjectMetadata(getOrCreateBucket(), path).getContentLength();
-    }
-
-    @Override
-    public long getPluginCreateTime(String path) {
-        String creation = getObjectMetadata(getOrCreateBucket(), path)
-                .getUserMetaDataOf(METADATA_CREATION);
-        try {
-            return Long.parseLong(creation);
-        } catch (Throwable e) {
-            return -1;
-        }
-    }
-
-    @Override
-    public Object getPluginSource(String path) {
-        return new PluginSource(path);
+    public PluginDefinition getPluginDefinition(String path) {
+        return new PluginDefinitionImpl(path);
     }
 
     @Override
@@ -50,11 +34,6 @@ public class AmazonS3Storage extends AWSStorage {
     @Override
     public void renamePlugin(String group, String name, String rename) {
         amazonS3.copyObject(bucket, getPluginPath(group, name), bucket, getPluginPath(group, rename));
-    }
-
-    @Override
-    public Object getVersion(String path) {
-        return getObjectMetadata(getOrCreateBucket(), path).getLastModified().getTime();
     }
 
     private ObjectMetadata getObjectMetadata(String bucket, String key) {
@@ -119,14 +98,36 @@ public class AmazonS3Storage extends AWSStorage {
         amazonS3.putObject(bucket, key, is, metadata);
     }
 
+    @Getter
     @RequiredArgsConstructor
-    public class PluginSource implements PluginSourceProvider {
+    public class PluginDefinitionImpl implements PluginDefinition, PluginDefinition.Loadable {
 
         private final String path;
 
         @Override
-        public String getKey() {
-            return path;
+        public long getSize() {
+            return getObjectMetadata(getOrCreateBucket(), path).getContentLength();
+        }
+
+        @Override
+        public long getCreateTime() {
+            String creation = getObjectMetadata(getOrCreateBucket(), path)
+                    .getUserMetaDataOf(METADATA_CREATION);
+            try {
+                return Long.parseLong(creation);
+            } catch (Throwable e) {
+                return -1;
+            }
+        }
+
+        @Override
+        public Object getVersion() {
+            return getObjectMetadata(getOrCreateBucket(), path).getLastModified().getTime();
+        }
+
+        @Override
+        public Object getSource() {
+            return this;
         }
 
         @Override

@@ -1,14 +1,14 @@
-package com.github.linyuzai.plugin.core.autoload.storage;
+package com.github.linyuzai.plugin.core.storage;
 
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.*;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -114,34 +114,14 @@ public class LocalPluginStorage implements PluginStorage {
         return Files.newInputStream(file.toPath());
     }
 
-    /**
-     * 文件大小
-     */
     @Override
-    public long getPluginSize(String path) {
-        try {
-            return new File(path).length();
-        } catch (Throwable e) {
-            return -1;
-        }
-    }
-
-    /**
-     * 文件创建时间
-     */
-    @Override
-    public long getPluginCreateTime(String path) {
-        try {
-            BasicFileAttributes attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
-            return attr.creationTime().toMillis();
-        } catch (Throwable e) {
-            return -1;
-        }
+    public PluginDefinition getPluginDefinition(String path) {
+        return new LocalPluginDefinition(path);
     }
 
     @Override
-    public Object getPluginSource(String path) {
-        return path;
+    public List<PluginDefinition> getPluginDefinitions(Collection<? extends String> paths) {
+        return paths.stream().map(this::getPluginDefinition).collect(Collectors.toList());
     }
 
     @Override
@@ -229,11 +209,6 @@ public class LocalPluginStorage implements PluginStorage {
         boolean renameTo = from.renameTo(renameFile);
     }
 
-    @Override
-    public Object getVersion(String path) {
-        return new File(path).lastModified();
-    }
-
     protected boolean move(String group, String name, String from, String to) {
         File fromFile = new File(getPluginPath(group, name, from));
         if (!fromFile.exists()) {
@@ -293,5 +268,37 @@ public class LocalPluginStorage implements PluginStorage {
             i++;
         }
         return tryPath;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class LocalPluginDefinition implements PluginDefinition {
+
+        private final String path;
+
+        @Override
+        public long getSize() {
+            return new File(path).length();
+        }
+
+        @Override
+        public long getCreateTime() {
+            try {
+                BasicFileAttributes attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
+                return attr.creationTime().toMillis();
+            } catch (Throwable e) {
+                return -1;
+            }
+        }
+
+        @Override
+        public Object getVersion() {
+            return new File(path).lastModified();
+        }
+
+        @Override
+        public Object getSource() {
+            return path;
+        }
     }
 }

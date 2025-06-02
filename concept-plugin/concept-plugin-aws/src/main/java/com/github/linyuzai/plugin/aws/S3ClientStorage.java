@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.aws;
 
-import com.github.linyuzai.plugin.core.factory.PluginSourceProvider;
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
-public class S3ClientStorage extends AWSStorage {
+public class S3ClientStorage extends AbstractAwsStorage {
 
     private final S3Client s3Client;
 
@@ -23,24 +23,8 @@ public class S3ClientStorage extends AWSStorage {
     }
 
     @Override
-    public long getPluginSize(String path) {
-        return getHeadObject(getOrCreateBucket(), path).contentLength();
-    }
-
-    @Override
-    public long getPluginCreateTime(String path) {
-        String creation = getHeadObject(getOrCreateBucket(), path)
-                .metadata().get(METADATA_CREATION);
-        try {
-            return Long.parseLong(creation);
-        } catch (Throwable e) {
-            return -1;
-        }
-    }
-
-    @Override
-    public Object getPluginSource(String path) {
-        return new PluginSource(path);
+    public PluginDefinition getPluginDefinition(String path) {
+        return new PluginDefinitionImpl(path);
     }
 
     @Override
@@ -62,11 +46,6 @@ public class S3ClientStorage extends AWSStorage {
                 .destinationKey(getPluginPath(group, rename))
                 .build();
         s3Client.copyObject(request);
-    }
-
-    @Override
-    public Object getVersion(String path) {
-        return getHeadObject(getOrCreateBucket(), path).lastModified().getEpochSecond();
     }
 
     private HeadObjectResponse getHeadObject(String bucket, String key) {
@@ -149,14 +128,36 @@ public class S3ClientStorage extends AWSStorage {
         s3Client.putObject(request, RequestBody.fromInputStream(is, length));
     }
 
+    @Getter
     @RequiredArgsConstructor
-    public class PluginSource implements PluginSourceProvider {
+    public class PluginDefinitionImpl implements PluginDefinition, PluginDefinition.Loadable {
 
         private final String path;
 
         @Override
-        public String getKey() {
-            return path;
+        public long getSize() {
+            return getHeadObject(getOrCreateBucket(), path).contentLength();
+        }
+
+        @Override
+        public long getCreateTime() {
+            String creation = getHeadObject(getOrCreateBucket(), path)
+                    .metadata().get(METADATA_CREATION);
+            try {
+                return Long.parseLong(creation);
+            } catch (Throwable e) {
+                return -1;
+            }
+        }
+
+        @Override
+        public Object getVersion() {
+            return getHeadObject(getOrCreateBucket(), path).lastModified().getEpochSecond();
+        }
+
+        @Override
+        public Object getSource() {
+            return this;
         }
 
         @Override

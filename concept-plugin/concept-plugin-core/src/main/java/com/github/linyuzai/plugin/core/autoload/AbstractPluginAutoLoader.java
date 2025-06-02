@@ -1,16 +1,16 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.autoload.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginConceptInitializedEvent;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,14 +69,15 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
         });
     }
 
-    protected void onExistPluginLoaded(Collection<String> paths) {
+    protected void onExistPluginLoaded(List<PluginDefinition> definitions) {
 
     }
 
-    protected Collection<String> loadPlugins() {
-        Collection<String> paths = getPluginPaths();
-        List<Object> sources = paths.stream()
-                .map(storage::getPluginSource)
+    protected List<PluginDefinition> loadPlugins() {
+        List<PluginDefinition> definitions = storage.getPluginDefinitions(getPluginPaths());
+        List<Object> sources = definitions
+                .stream()
+                .map(PluginDefinition::getSource)
                 .collect(Collectors.toList());
         concept.load(sources, (o, plugin) -> {
             String path = (String) o;
@@ -85,10 +86,10 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
             String path = (String) o;
             concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
         });
-        return paths;
+        return definitions;
     }
 
-    protected Collection<String> getPluginPaths() {
+    protected List<String> getPluginPaths() {
         List<String> groups = storage.getGroups();
         List<String> paths = new ArrayList<>();
         for (String group : groups) {
@@ -127,22 +128,22 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     /**
      * 文件创建
      */
-    protected void onCreated(String path) {
-        load(path);
+    protected void onCreated(String path, PluginDefinition source) {
+        load(path, source);
     }
 
     /**
      * 文件修改
      */
-    protected void onModified(String path) {
-        reload(path);
+    protected void onModified(String path, PluginDefinition source) {
+        reload(path, source);
     }
 
     /**
      * 文件删除
      */
-    protected void onDeleted(String path) {
-        unload(path);
+    protected void onDeleted(String path, PluginDefinition source) {
+        unload(path, source);
     }
 
     protected void onListenError(Throwable e) {
@@ -152,10 +153,9 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     /**
      * 加载插件
      */
-    public void load(String path) {
+    public void load(String path, PluginDefinition source) {
         try {
-            Object source = storage.getPluginSource(path);
-            Plugin plugin = concept.load(source);
+            Plugin plugin = concept.load(source.getSource());
             concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
         } catch (Throwable e) {
             concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
@@ -165,23 +165,17 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     /**
      * 重新加载插件
      */
-    public void reload(String path) {
-        unload(path);
-        load(path);
-        /*try {
-            Plugin plugin = concept.load(path, true);
-            concept.getEventPublisher().publish(new PluginAutoLoadEvent(plugin, path));
-        } catch (Throwable e) {
-            concept.getEventPublisher().publish(new PluginAutoLoadErrorEvent(path, e));
-        }*/
+    public void reload(String path, PluginDefinition source) {
+        unload(path, source);
+        load(path, source);
     }
 
     /**
      * 卸载插件
      */
-    public void unload(String path) {
+    public void unload(String path, PluginDefinition source) {
         try {
-            Plugin plugin = concept.unload(path);
+            Plugin plugin = concept.unload(source.getSource());
             if (plugin != null) {
                 concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin, path));
             }

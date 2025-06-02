@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.preperties;
 
-import com.github.linyuzai.plugin.core.autoload.storage.LocalPluginStorage;
+import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.Data;
@@ -17,6 +17,11 @@ public class PluginConceptProperties {
      * 元数据配置
      */
     private MetadataProperties metadata = new MetadataProperties();
+
+    /**
+     * 插件目录
+     */
+    private StorageProperties storage = new StorageProperties();
 
     /**
      * 自动加载配置
@@ -51,6 +56,25 @@ public class PluginConceptProperties {
     }
 
     /**
+     * 插件目录
+     */
+    @Data
+    public static class StorageProperties {
+
+        private StorageType type = StorageType.LOCAL;
+
+        /**
+         * 自动加载插件目录基础路径
+         */
+        private String location = LocalPluginStorage.DEFAULT_BASE_PATH;
+
+        public enum StorageType {
+
+            LOCAL, AWS
+        }
+    }
+
+    /**
      * 自动加载配置
      */
     @Data
@@ -65,30 +89,6 @@ public class PluginConceptProperties {
          * 自动加载器轮训间隔ms，默认5000
          */
         private long period = 5000;
-
-        /**
-         * 自动加载插件目录
-         */
-        private StorageProperties storage = new StorageProperties();
-
-        /**
-         * 自动加载插件目录
-         */
-        @Data
-        public static class StorageProperties {
-
-            private StorageType type = StorageType.LOCAL;
-
-            /**
-             * 自动加载插件目录基础路径
-             */
-            private String location = LocalPluginStorage.DEFAULT_BASE_PATH;
-
-            public enum StorageType {
-
-                LOCAL, AWS
-            }
-        }
     }
 
     /**

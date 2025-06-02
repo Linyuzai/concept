@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.aws;
 
-import com.github.linyuzai.plugin.core.autoload.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class AWSStorage implements PluginStorage {
+public abstract class AbstractAwsStorage implements PluginStorage {
 
     public static final String METADATA_STATUS = "ConceptPlugin.Status";
 
@@ -100,6 +101,24 @@ public abstract class AWSStorage implements PluginStorage {
     @Override
     public InputStream getDeletedPluginInputStream(String group, String name) throws IOException {
         return getObject(getOrCreateBucket(), getPluginPath(group, name));
+    }
+
+    @Override
+    public List<PluginDefinition> getPluginDefinitions(Collection<? extends String> paths) {
+        List<CompletableFuture<PluginDefinition>> futures = new ArrayList<>();
+        for (String path : paths) {
+            Supplier<PluginDefinition> supplier = () -> getPluginDefinition(path);
+            CompletableFuture<PluginDefinition> future;
+            if (executor == null) {
+                future = CompletableFuture.supplyAsync(supplier);
+            } else {
+                future = CompletableFuture.supplyAsync(supplier, executor);
+            }
+            futures.add(future);
+        }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        return futures.stream().map(CompletableFuture::join)
+                .collect(Collectors.toList());
     }
 
     @Override
