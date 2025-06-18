@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.aws;
 
-import com.github.linyuzai.plugin.core.factory.PluginDefinition;
+import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;

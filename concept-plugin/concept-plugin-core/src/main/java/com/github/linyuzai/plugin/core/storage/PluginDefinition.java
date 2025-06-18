@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.factory;
+package com.github.linyuzai.plugin.core.storage;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -7,7 +7,7 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
-import com.github.linyuzai.plugin.core.factory.PluginDefinition;
+import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.SneakyThrows;
 
 import java.io.IOException;

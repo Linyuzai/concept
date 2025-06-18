@@ -1,7 +1,5 @@
 package com.github.linyuzai.plugin.core.storage;
 
-import com.github.linyuzai.plugin.core.factory.PluginDefinition;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;

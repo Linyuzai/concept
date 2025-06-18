@@ -6,7 +6,7 @@ import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.event.PluginConceptInitializedEvent;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
-import com.github.linyuzai.plugin.core.factory.PluginDefinition;
+import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -2,7 +2,7 @@ package com.github.linyuzai.plugin.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.github.linyuzai.plugin.core.factory.PluginDefinition;
+import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

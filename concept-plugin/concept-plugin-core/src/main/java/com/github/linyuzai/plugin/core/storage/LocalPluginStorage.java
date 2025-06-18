@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.storage;
 
-import com.github.linyuzai.plugin.core.factory.PluginDefinition;
 import lombok.*;
 
 import java.io.*;
@@ -8,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
