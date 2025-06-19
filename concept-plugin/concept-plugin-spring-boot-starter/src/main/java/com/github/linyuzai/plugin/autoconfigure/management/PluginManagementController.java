@@ -16,9 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,12 +74,14 @@ public class PluginManagementController {
     }
 
     @PostMapping("/auth/unlock")
-    public Response unlock(@RequestParam("password") String password) {
+    public Response unlock(@RequestBody Map<String, String> body/*@RequestParam("password") String password*/) {
+        String password = body.get("password");
         return manage(() -> authorizer.unlock(password), () -> null);
     }
 
     @PostMapping("/group/add")
-    public Response addGroup(@RequestParam("group") String group) {
+    public Response addGroup(@RequestBody Map<String, String> body/*@RequestParam("group") String group*/) {
+        String group = body.get("group");
         return manage(() -> {
             loader.addGroup(group);
             return null;
@@ -99,8 +99,10 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/load")
-    public Response loadPlugin(@RequestParam("group") String group,
-                               @RequestParam("name") String name) {
+    public Response loadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                               @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             loadingSet.add(path);
@@ -122,12 +124,19 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/unload")
-    public Response unloadPlugin(@RequestParam("group") String group,
-                                 @RequestParam("name") String name) {
+    public Response unloadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                                 @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             unloadingSet.add(path);
             try {
+                // 先释放资源
+                Plugin plugin = concept.getRepository().get(path);
+                if (plugin != null) {
+                    plugin.destroy();
+                }
                 location.unload(group, name);
             } catch (Throwable e) {
                 executor.execute(() -> {
@@ -145,8 +154,10 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/reload")
-    public Response reloadPlugin(@RequestParam("group") String group,
-                                 @RequestParam("name") String name) {
+    public Response reloadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                                 @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return manage(() -> {
             String path = location.getLoadedPluginPath(group, name);
             loadingSet.add(path);
@@ -176,9 +187,12 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/rename")
-    public Response renamePlugin(@RequestParam("group") String group,
+    public Response renamePlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
                                  @RequestParam("name") String name,
-                                 @RequestParam("rename") String rename) {
+                                 @RequestParam("rename") String rename*/) {
+        String group = body.get("group");
+        String name = body.get("name");
+        String rename = body.get("rename");
         return manage(() -> {
             location.rename(group, name, rename);
             return null;
@@ -186,8 +200,10 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/delete")
-    public Response deletePlugin(@RequestParam("group") String group,
-                                 @RequestParam("name") String name) {
+    public Response deletePlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                                 @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return manage(() -> {
             location.delete(group, name);
             return null;

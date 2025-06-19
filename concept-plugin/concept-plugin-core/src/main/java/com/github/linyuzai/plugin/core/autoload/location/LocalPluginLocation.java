@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
@@ -259,6 +260,7 @@ public class LocalPluginLocation implements PluginLocation {
         return new File(path).lastModified();
     }
 
+    @SneakyThrows
     protected boolean move(String group, String name, String from, String to) {
         File fromFile = new File(getPluginPath(group, name, from));
         if (!fromFile.exists()) {
@@ -266,7 +268,10 @@ public class LocalPluginLocation implements PluginLocation {
         }
         String toPath = getPluginPath(group, name, to);
         File toFile = getFileAutoName(new File(toPath));
-        return fromFile.renameTo(toFile);
+        // 移动失败会抛出异常
+        Files.move(fromFile.toPath(), toFile.toPath());
+        //return fromFile.renameTo(toFile);
+        return true;
     }
 
     protected File getGroupDirectory(String group) {

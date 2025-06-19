@@ -41,6 +41,7 @@ public class PluginManagementConfiguration {
     public static class WebMvcConfiguration implements WebMvcConfigurer {
 
         @Bean(initMethod = "init")
+        @ConditionalOnMissingBean
         public ServletPluginManagementController servletPluginManagementController() {
             return new ServletPluginManagementController();
         }
@@ -60,6 +61,7 @@ public class PluginManagementConfiguration {
     public static class WebFluxConfiguration implements WebFluxConfigurer {
 
         @Bean(initMethod = "init")
+        @ConditionalOnMissingBean
         public ReactivePluginManagementController reactivePluginManagementController() {
             return new ReactivePluginManagementController();
         }

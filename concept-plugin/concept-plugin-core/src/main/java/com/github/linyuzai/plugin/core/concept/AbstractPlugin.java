@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -27,6 +28,8 @@ public abstract class AbstractPlugin implements Plugin {
     private PluginMetadata metadata;
 
     private PluginConcept concept;
+
+    private AtomicBoolean destroyed = new AtomicBoolean(false);
 
     @Override
     public void addLoadListener(LoadListener listener) {
@@ -94,10 +97,12 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public void destroy() {
-        for (DestroyListener listener : destroyListeners) {
-            listener.onDestroy(this);
+        if (destroyed.compareAndSet(false, true)) {
+            for (DestroyListener listener : destroyListeners) {
+                listener.onDestroy(this);
+            }
+            onDestroy();
         }
-        onDestroy();
     }
 
     /**
