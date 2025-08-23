@@ -1,0 +1,18 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptTxVersion
+
+ext {
+    set('publishName', 'Tx Read Cache')
+    set('publishDescription', 'Tx Read Cache')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    compileOnly project(':concept-tx:concept-tx-core')
+}
+
+apply from: '../../publish.gradle'
