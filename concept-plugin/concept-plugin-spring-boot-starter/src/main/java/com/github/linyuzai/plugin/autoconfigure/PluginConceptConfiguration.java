@@ -270,7 +270,7 @@ public class PluginConceptConfiguration {
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            PluginStorage.Filter filter) {
-            String location = properties.getAutoload().getStorage().getLocation();
+            String location = properties.getStorage().getLocation();
             String basePath = StringUtils.hasText(location) ?
                     location : LocalPluginStorage.DEFAULT_BASE_PATH;
             return new LocalPluginStorage(basePath, filter);

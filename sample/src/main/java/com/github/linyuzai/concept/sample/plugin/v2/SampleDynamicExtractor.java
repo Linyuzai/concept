@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Slf4j
-@Component
+//@Component
 public class SampleDynamicExtractor {
 
     @OnPluginExtract
@@ -32,12 +32,12 @@ public class SampleDynamicExtractor {
         log.info("Dynamic Text: {}", text);
         SpringData bind = plugin.getMetadata().bind("spring-sample", SpringData.class);
         log.info("Dynamic Bind: {}", bind);
-        plugin.addLoadListener(new Plugin.LoadListener() {
+        /*plugin.addLoadListener(new Plugin.LoadListener() {
             @Override
             public void onLoad(Plugin plugin) {
                 log.info("Dynamic Load");
             }
-        });
+        });*/
         plugin.addDestroyListener(new Plugin.DestroyListener() {
             @Override
             public void onDestroy(Plugin plugin) {

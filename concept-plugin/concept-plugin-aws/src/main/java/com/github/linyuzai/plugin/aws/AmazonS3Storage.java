@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
-public class AmazonS3Storage extends AbstractAwsStorage {
+public class AmazonS3Storage extends RemotePluginStorage {
 
     private final AmazonS3 amazonS3;
 

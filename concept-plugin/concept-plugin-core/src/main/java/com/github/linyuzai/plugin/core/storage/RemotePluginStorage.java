@@ -1,7 +1,5 @@
-package com.github.linyuzai.plugin.aws;
+package com.github.linyuzai.plugin.core.storage;
 
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class AbstractAwsStorage implements PluginStorage {
+public abstract class RemotePluginStorage implements PluginStorage {
 
     public static final String METADATA_STATUS = "ConceptPlugin.Status";
 
