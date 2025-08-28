@@ -17,7 +17,17 @@ public interface PluginMetadata {
     /**
      * 配置文件名
      */
-    String NAME = "plugin.properties";
+    String PROP_NAME = "plugin.properties";
+
+    /**
+     * 配置文件名
+     */
+    String YAML_NAME = "plugin.yaml";
+
+    /**
+     * 配置文件名
+     */
+    String YML_NAME = "plugin.yml";
 
     /**
      * 获得配置

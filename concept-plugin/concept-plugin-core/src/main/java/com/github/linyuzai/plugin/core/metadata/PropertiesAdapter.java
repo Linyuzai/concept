@@ -10,7 +10,7 @@ public class PropertiesAdapter implements AbstractPluginMetadataFactory.Adapter 
 
     @Override
     public boolean support(String name) {
-        return PluginMetadata.NAME.equals(name);
+        return PluginMetadata.PROP_NAME.equals(name);
     }
 
     @Override
