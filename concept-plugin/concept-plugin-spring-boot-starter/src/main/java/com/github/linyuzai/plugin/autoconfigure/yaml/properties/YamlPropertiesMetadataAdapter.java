@@ -9,7 +9,7 @@ import org.springframework.core.io.InputStreamResource;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class YamlPropertiesAdapter implements AbstractPluginMetadataFactory.Adapter {
+public class YamlPropertiesMetadataAdapter implements AbstractPluginMetadataFactory.Adapter {
 
     @Override
     public boolean support(String name) {

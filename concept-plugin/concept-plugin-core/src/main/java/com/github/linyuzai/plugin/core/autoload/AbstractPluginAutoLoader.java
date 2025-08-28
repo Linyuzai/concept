@@ -61,7 +61,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
                     concept.getEventPublisher().unregister(this);
                     if (load) {
                         //加载已经存在的插件
-                        onExistPluginLoaded(loadPlugins());
+                        loadedOnStart(loadPlugins());
                     }
                     listen(executor);
                 }
@@ -69,7 +69,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
         });
     }
 
-    protected void onExistPluginLoaded(List<PluginDefinition> definitions) {
+    protected void loadedOnStart(List<PluginDefinition> definitions) {
 
     }
 
@@ -146,8 +146,8 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
         unload(path, source);
     }
 
-    protected void onListenError(Throwable e) {
-        concept.getLogger().error("Plugin listen error", e);
+    protected void onError(Throwable e) {
+        concept.getLogger().error("Plugin autoload error", e);
     }
 
     /**

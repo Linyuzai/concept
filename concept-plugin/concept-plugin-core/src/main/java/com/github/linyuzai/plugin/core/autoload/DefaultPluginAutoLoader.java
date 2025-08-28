@@ -6,7 +6,6 @@ import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.storage.PluginDefinition;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -33,72 +32,72 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
     @Override
     protected void listen(PluginExecutor executor) {
         if (period > 0) {
-            executor.schedule(this::doListen, period, TimeUnit.MILLISECONDS);
+            executor.schedule(this::refresh, period, TimeUnit.MILLISECONDS);
         }
     }
 
     @Override
-    protected void onExistPluginLoaded(List<PluginDefinition> definitions) {
+    protected void loadedOnStart(List<PluginDefinition> definitions) {
         plugins.putAll(listToMap(definitions));
     }
 
     /**
-     * 开始监听。
+     * 刷新插件。
      */
-    @SneakyThrows
-    public void doListen() {
-        doLoad(storage.getPluginDefinitions(getPluginPaths()));
+    @Override
+    public void refresh() {
+        try {
+            doRefresh(storage.getPluginDefinitions(getPluginPaths()));
+        } catch (Throwable e) {
+            onError(e);
+        }
     }
 
-    protected synchronized void doLoad(List<PluginDefinition> definitions) {
-        try {
-            Map<String, PluginDefinition> load = new HashMap<>();
-            Map<String, PluginDefinition> reload = new HashMap<>();
+    protected synchronized void doRefresh(List<PluginDefinition> definitions) {
+        Map<String, PluginDefinition> load = new HashMap<>();
+        Map<String, PluginDefinition> reload = new HashMap<>();
 
-            Map<String, PluginDefinition> lastPlugins = new HashMap<>(plugins);
-            Map<String, PluginDefinition> newPlugins = listToMap(definitions);
+        Map<String, PluginDefinition> lastPlugins = new HashMap<>(plugins);
+        Map<String, PluginDefinition> newPlugins = listToMap(definitions);
 
-            for (Map.Entry<String, PluginDefinition> entry : newPlugins.entrySet()) {
-                PluginDefinition last = lastPlugins.remove(entry.getKey());
-                if (last == null) {
-                    load.put(entry.getKey(), entry.getValue());
-                } else {
-                    if (!Objects.equals(last.getVersion(),
-                            entry.getValue().getVersion())) {
-                        reload.put(entry.getKey(), entry.getValue());
-                    }
+        for (Map.Entry<String, PluginDefinition> entry : newPlugins.entrySet()) {
+            PluginDefinition last = lastPlugins.remove(entry.getKey());
+            if (last == null) {
+                load.put(entry.getKey(), entry.getValue());
+            } else {
+                if (!Objects.equals(last.getVersion(),
+                        entry.getValue().getVersion())) {
+                    reload.put(entry.getKey(), entry.getValue());
                 }
             }
-
-            Map<String, PluginDefinition> unload = new HashMap<>(lastPlugins);
-
-            load.forEach((path, source) -> {
-                try {
-                    plugins.put(path, source);
-                    onCreated(path, source);
-                } catch (Throwable e) {
-                    onListenError(e);
-                }
-            });
-            reload.forEach((path, source) -> {
-                try {
-                    plugins.put(path, source);
-                    onModified(path, source);
-                } catch (Throwable e) {
-                    onListenError(e);
-                }
-            });
-            unload.forEach((path, source) -> {
-                try {
-                    plugins.remove(path);
-                    onDeleted(path, source);
-                } catch (Throwable e) {
-                    onListenError(e);
-                }
-            });
-        } catch (Throwable e) {
-            onListenError(e);
         }
+
+        Map<String, PluginDefinition> unload = new HashMap<>(lastPlugins);
+
+        load.forEach((path, source) -> {
+            try {
+                plugins.put(path, source);
+                onCreated(path, source);
+            } catch (Throwable e) {
+                onError(e);
+            }
+        });
+        reload.forEach((path, source) -> {
+            try {
+                plugins.put(path, source);
+                onModified(path, source);
+            } catch (Throwable e) {
+                onError(e);
+            }
+        });
+        unload.forEach((path, source) -> {
+            try {
+                plugins.remove(path);
+                onDeleted(path, source);
+            } catch (Throwable e) {
+                onError(e);
+            }
+        });
     }
 
     private Map<String, PluginDefinition> listToMap(List<PluginDefinition> plugins) {

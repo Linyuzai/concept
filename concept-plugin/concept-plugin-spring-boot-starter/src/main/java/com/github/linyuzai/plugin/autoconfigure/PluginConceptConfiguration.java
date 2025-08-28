@@ -8,8 +8,13 @@ import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.metadata.BinderPluginMetadataFactory;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
+import com.github.linyuzai.plugin.autoconfigure.yaml.YamlResolver;
+import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesMetadataAdapter;
+import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesResolver;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
+import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
+import com.github.linyuzai.plugin.core.metadata.PropertiesMetadataAdapter;
 import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
@@ -117,13 +122,29 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public BinderPluginMetadataFactory jarFilePluginMetadataFactory(PluginConceptProperties properties) {
-        return newBinderPluginMetadataFactory(new JarFilePluginMetadataFactory(), properties);
+    public PropertiesMetadataAdapter propertiesMetadataAdapter() {
+        return new PropertiesMetadataAdapter();
     }
 
     @Bean
-    public BinderPluginMetadataFactory jarStreamPluginMetadataFactory(PluginConceptProperties properties) {
-        return newBinderPluginMetadataFactory(new JarStreamPluginMetadataFactory(), properties);
+    public YamlPropertiesMetadataAdapter yamlPropertiesMetadataAdapter() {
+        return new YamlPropertiesMetadataAdapter();
+    }
+
+    @Bean
+    public BinderPluginMetadataFactory jarFilePluginMetadataFactory(List<AbstractPluginMetadataFactory.Adapter> adapters,
+                                                                    PluginConceptProperties properties) {
+        JarFilePluginMetadataFactory factory = new JarFilePluginMetadataFactory();
+        factory.setAdapters(adapters);
+        return newBinderPluginMetadataFactory(factory, properties);
+    }
+
+    @Bean
+    public BinderPluginMetadataFactory jarStreamPluginMetadataFactory(List<AbstractPluginMetadataFactory.Adapter> adapters,
+                                                                      PluginConceptProperties properties) {
+        JarStreamPluginMetadataFactory factory = new JarStreamPluginMetadataFactory();
+        factory.setAdapters(adapters);
+        return newBinderPluginMetadataFactory(factory, properties);
     }
 
     private BinderPluginMetadataFactory newBinderPluginMetadataFactory(PluginMetadataFactory metadataFactory,
@@ -176,6 +197,16 @@ public class PluginConceptConfiguration {
     @Bean
     public PropertiesResolver pluginPropertiesResolver() {
         return new PropertiesResolver();
+    }
+
+    @Bean
+    public YamlResolver pluginYamlResolver() {
+        return new YamlResolver();
+    }
+
+    @Bean
+    public YamlPropertiesResolver pluginYamlPropertiesResolver() {
+        return new YamlPropertiesResolver();
     }
 
     @Bean
