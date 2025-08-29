@@ -6,7 +6,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
 import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
 import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
-import com.github.linyuzai.plugin.jar.handle.filter.ClassModifierFilter;
+import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClass;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassName;
@@ -46,7 +46,8 @@ public class ConceptPluginController {
             //.addFilter(new PathFilter("plugin"))
             //.addFilter(new NameFilter("*.json"))
             //.addFilters(new PackageFilter("com.github.linyuzai.concept.sample.plugin"))
-            .addFilters(new ClassModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
+            //.addFilters(new ClassModifierFilter(Modifier::isInterface, Modifier::isAbstract).negate())
+            .addFilters(ClassFilter.modifier(Modifier::isInterface, Modifier::isAbstract).negate())
             //.addFilter(new AnnotationFilter(CustomPluginAnnotation.class))
             /*.addExtractor(new PluginContextExtractor<PluginContext>() {
                 @Override
@@ -714,7 +715,7 @@ public class ConceptPluginController {
 
             //名称为 config.json 的文件内容
             //@PluginName("plugin.json") String p10
-        ) {
+    ) {
 
         System.out.println("onPluginExtract: " + plugin);
         System.out.println("onPluginExtract: " + context);

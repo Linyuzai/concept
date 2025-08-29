@@ -486,7 +486,8 @@
     }
 
     function httpPost(url, params, success, error) {
-        http(axios.post(url, params, {headers: {"Content-Type": "application/x-www-form-urlencoded"}}), success, error);
+        //http(axios.post(url, params, {headers: {"Content-Type": "application/x-www-form-urlencoded"}}), success, error);
+        http(axios.post(url, params, {headers: {"Content-Type": "application/json"}}), success, error);
     }
 
     function http(promise, success, error) {
