@@ -21,26 +21,21 @@ public class LocalPluginStorage implements PluginStorage {
     /**
      * 默认的缓存路径 {user.home}/concept/plugin
      */
-    public static final String DEFAULT_BASE_PATH = new File(System.getProperty("user.home"), "concept/plugin").getAbsolutePath();
+    public static final String DEFAULT_LOCATION = new File(System.getProperty("user.home"), "concept/plugin").getAbsolutePath();
 
     /**
      * 基础目录
      */
-    private String basePath = DEFAULT_BASE_PATH;
+    private String location = DEFAULT_LOCATION;
 
     private PluginStorage.Filter filter;
-
-    @Override
-    public String getLocation() {
-        return basePath;
-    }
 
     /**
      * 基础路径下的子目录为分组
      */
     @Override
     public List<String> getGroups() {
-        File file = check(new File(basePath));
+        File file = check(new File(location));
         File[] files = file.listFiles(File::isDirectory);
         if (files == null) {
             return Collections.emptyList();
@@ -218,7 +213,7 @@ public class LocalPluginStorage implements PluginStorage {
     }
 
     protected File getGroupDirectory(String group) {
-        return check(new File(basePath, group.trim()));
+        return check(new File(location, group.trim()));
     }
 
     protected File getPluginDirectory(String group, String type) {

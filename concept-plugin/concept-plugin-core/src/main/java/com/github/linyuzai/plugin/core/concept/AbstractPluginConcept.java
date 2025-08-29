@@ -48,7 +48,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginLogger logger;
 
-    protected Collection<PluginMetadataFactory> metadataFinders;
+    protected Collection<PluginMetadataFactory> metadataFactories;
 
     protected Collection<PluginFactory> factories;
 
@@ -162,8 +162,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         if (source instanceof Plugin) {
             return ((Plugin) source).getMetadata();
         }
-        for (PluginMetadataFactory finder : metadataFinders) {
-            PluginMetadata metadata = finder.create(source, context);
+        for (PluginMetadataFactory factory : metadataFactories) {
+            PluginMetadata metadata = factory.create(source, context);
             if (metadata != null) {
                 return metadata;
             }
@@ -433,6 +433,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
+        protected List<PluginMetadataFactory> metadataFactories = new ArrayList<>();
+
         protected List<PluginFactory> factories = new ArrayList<>();
 
         protected List<PluginHandler> handlers = new ArrayList<>();
@@ -499,6 +501,21 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B addEventListeners(Collection<? extends PluginEventListener> listeners) {
             this.eventListeners.addAll(listeners);
+            return (B) this;
+        }
+
+        /**
+         * 添加插件元数据工厂
+         */
+        public B addMetadataFactories(PluginMetadataFactory... factories) {
+            return addMetadataFactories(Arrays.asList(factories));
+        }
+
+        /**
+         * 添加插件元数据工厂
+         */
+        public B addMetadataFactories(Collection<? extends PluginMetadataFactory> factories) {
+            this.metadataFactories.addAll(factories);
             return (B) this;
         }
 
@@ -598,6 +615,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setRepository(repository);
             concept.setEventPublisher(eventPublisher);
             concept.setLogger(logger);
+            concept.setMetadataFactories(metadataFactories);
             concept.setFactories(factories);
             concept.setHandlers(handlers);
             concept.setHandlerFactories(handlerFactories);

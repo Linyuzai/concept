@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.autoconfigure.preperties;
 
-import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.Data;
@@ -66,7 +65,7 @@ public class PluginConceptProperties {
         /**
          * 自动加载插件目录基础路径
          */
-        private String location = LocalPluginStorage.DEFAULT_BASE_PATH;
+        private String location;
 
         public enum StorageType {
 

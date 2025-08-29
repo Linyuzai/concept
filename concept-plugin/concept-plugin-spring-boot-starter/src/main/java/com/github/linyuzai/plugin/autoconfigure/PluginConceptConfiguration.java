@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.github.linyuzai.plugin.autoconfigure.autoload.ConditionalOnPluginAutoloadEnabled;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
@@ -11,6 +12,8 @@ import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor
 import com.github.linyuzai.plugin.autoconfigure.yaml.YamlResolver;
 import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesMetadataAdapter;
 import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesResolver;
+import com.github.linyuzai.plugin.aws.AmazonS3Storage;
+import com.github.linyuzai.plugin.aws.S3ClientStorage;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
@@ -42,6 +45,7 @@ import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.SubPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
+import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import com.github.linyuzai.plugin.jar.autoload.JarStorageFilter;
@@ -52,6 +56,8 @@ import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import com.github.linyuzai.plugin.jar.metadata.JarFilePluginMetadataFactory;
 import com.github.linyuzai.plugin.jar.metadata.JarStreamPluginMetadataFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -59,6 +65,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.util.StringUtils;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
@@ -263,6 +270,7 @@ public class PluginConceptConfiguration {
                                        PluginRepository repository,
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
+                                       List<PluginMetadataFactory> metadataFactories,
                                        List<PluginFactory> factories,
                                        List<PluginHandler> handlers,
                                        List<PluginHandlerFactory> handlerFactories,
@@ -274,6 +282,7 @@ public class PluginConceptConfiguration {
                 .repository(repository)
                 .eventPublisher(eventPublisher)
                 .logger(logger)
+                .addMetadataFactories(metadataFactories)
                 .addFactories(factories)
                 .addHandlers(handlers)
                 .addHandlerFactories(handlerFactories)
@@ -282,29 +291,61 @@ public class PluginConceptConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnPluginAutoloadEnabled
-    public static class AutoloadConfiguration {
+    public static class StorageConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public PluginStorage.Filter pluginJarLocationFilter() {
-            return new JarStorageFilter();
+        @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "LOCAL", matchIfMissing = true)
+        public PluginStorage pluginStorage(PluginConceptProperties properties) {
+            String location = properties.getStorage().getLocation();
+            String localLocation = StringUtils.hasText(location) ?
+                    location : LocalPluginStorage.DEFAULT_LOCATION;
+            return new LocalPluginStorage(localLocation, new JarStorageFilter());
         }
+
+        @Configuration(proxyBeanMethods = false)
+        //@ConditionalOnBean(type = "com.amazonaws.services.s3.AmazonS3")
+        @ConditionalOnBean(AmazonS3.class)
+        @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS", matchIfMissing = true)
+        public static class AmazonS3Configuration {
+
+            @Bean
+            @ConditionalOnMissingBean
+            public PluginStorage pluginStorage(PluginConceptProperties properties,
+                                               AmazonS3 amazonS3) {
+                String location = properties.getStorage().getLocation();
+                String bucket = StringUtils.hasText(location) ?
+                        location : RemotePluginStorage.DEFAULT_LOCATION;
+                return new AmazonS3Storage(bucket, amazonS3);
+            }
+        }
+
+        @Configuration(proxyBeanMethods = false)
+        //@ConditionalOnBean(type = "software.amazon.awssdk.services.s3.S3Client")
+        @ConditionalOnBean(S3Client.class)
+        @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS", matchIfMissing = true)
+        public static class S3ClientConfiguration {
+
+            @Bean
+            @ConditionalOnMissingBean
+            public PluginStorage pluginStorage(PluginConceptProperties properties,
+                                               S3Client s3Client) {
+                String location = properties.getStorage().getLocation();
+                String bucket = StringUtils.hasText(location) ?
+                        location : RemotePluginStorage.DEFAULT_LOCATION;
+                return new S3ClientStorage(bucket, s3Client);
+            }
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnPluginAutoloadEnabled
+    public static class AutoloadConfiguration {
 
         @Bean(destroyMethod = "shutdown")
         @ConditionalOnMissingBean
         public PluginExecutor pluginExecutor() {
             return new DefaultPluginExecutor();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public PluginStorage pluginStorage(PluginConceptProperties properties,
-                                           PluginStorage.Filter filter) {
-            String location = properties.getStorage().getLocation();
-            String basePath = StringUtils.hasText(location) ?
-                    location : LocalPluginStorage.DEFAULT_BASE_PATH;
-            return new LocalPluginStorage(basePath, filter);
         }
 
         @Bean(initMethod = "start", destroyMethod = "stop")

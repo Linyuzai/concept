@@ -29,7 +29,11 @@ public class BinderPluginMetadataFactory implements PluginMetadataFactory, Envir
 
     @Override
     public PluginMetadata create(Object source, PluginContext context) {
-        return new BinderMetadata(metadataFactory.create(source, context));
+        PluginMetadata metadata = metadataFactory.create(source, context);
+        if (metadata == null) {
+            return null;
+        }
+        return new BinderMetadata(metadata);
     }
 
     @Override

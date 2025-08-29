@@ -11,6 +11,7 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Getter
@@ -19,7 +20,11 @@ public class S3ClientStorage extends RemotePluginStorage {
     private final S3Client s3Client;
 
     public S3ClientStorage(String bucket, S3Client s3Client) {
-        super(bucket);
+        this(bucket, s3Client, null);
+    }
+
+    public S3ClientStorage(String bucket, S3Client s3Client, Executor executor) {
+        super(bucket, executor);
         this.s3Client = s3Client;
     }
 
@@ -111,7 +116,7 @@ public class S3ClientStorage extends RemotePluginStorage {
     @Override
     protected InputStream getObject(String group, String name) throws IOException {
         GetObjectRequest request = GetObjectRequest.builder()
-                .bucket(bucket)
+                .bucket(getBucket())
                 .key(getPluginPath(group, name))
                 .build();
         return s3Client.getObject(request);

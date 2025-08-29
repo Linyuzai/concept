@@ -1,9 +1,6 @@
 package com.github.linyuzai.plugin.core.storage;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import lombok.*;
 
 import java.io.*;
 import java.util.*;
@@ -13,16 +10,19 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class RemotePluginStorage implements PluginStorage {
+
+    public static final String DEFAULT_LOCATION = "concept_plugin";
 
     public static final String METADATA_STATUS = "ConceptPlugin.Status";
 
     public static final String METADATA_CREATION = "ConceptPlugin.Creation";
 
-    protected final String bucket;
+    protected String bucket = DEFAULT_LOCATION;
 
-    @Setter
     protected Executor executor;
 
     @Override

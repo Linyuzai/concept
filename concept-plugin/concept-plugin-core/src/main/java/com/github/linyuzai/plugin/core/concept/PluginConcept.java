@@ -28,9 +28,6 @@ public interface PluginConcept {
      */
     void destroy();
 
-    @Deprecated
-    void post(Runnable runnable);
-
     /**
      * 添加插件处理器
      */

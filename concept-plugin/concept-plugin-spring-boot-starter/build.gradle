@@ -22,6 +22,9 @@ dependencies {
     //api "com.github.linyuzai:concept-plugin-core:${ConceptPluginVersion}"
     //api "com.github.linyuzai:concept-plugin-jar:${ConceptPluginVersion}"
 
+    compileOnly "com.amazonaws:aws-java-sdk-s3:${AwsS3V1Version}"
+    compileOnly "software.amazon.awssdk:s3:${AwsS3V2Version}"
+
     api "org.webjars:vue:${VueVersion}"
     //api "org.webjars.npm:vue-resource:${VueResourceVersion}"
     api "org.webjars.npm:axios:${AxiosVersion}"

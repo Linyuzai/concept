@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Getter
@@ -18,7 +19,12 @@ public class AmazonS3Storage extends RemotePluginStorage {
     private final AmazonS3 amazonS3;
 
     public AmazonS3Storage(String bucket, AmazonS3 amazonS3) {
-        super(bucket);
+        this(bucket, amazonS3, null);
+
+    }
+
+    public AmazonS3Storage(String bucket, AmazonS3 amazonS3, Executor executor) {
+        super(bucket, executor);
         this.amazonS3 = amazonS3;
     }
 
@@ -29,12 +35,12 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
     @Override
     public boolean existPlugin(String group, String name) {
-        return amazonS3.doesObjectExist(bucket, getPluginPath(group, name));
+        return amazonS3.doesObjectExist(getBucket(), getPluginPath(group, name));
     }
 
     @Override
     public void renamePlugin(String group, String name, String rename) {
-        amazonS3.copyObject(bucket, getPluginPath(group, name), bucket, getPluginPath(group, rename));
+        amazonS3.copyObject(getBucket(), getPluginPath(group, name), getBucket(), getPluginPath(group, rename));
     }
 
     private ObjectMetadata getObjectMetadata(String bucket, String key) {
