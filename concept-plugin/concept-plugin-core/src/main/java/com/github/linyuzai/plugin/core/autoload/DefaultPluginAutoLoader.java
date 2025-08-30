@@ -37,7 +37,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
     }
 
     @Override
-    protected void loadedOnStart(List<PluginDefinition> definitions) {
+    protected synchronized void loadedOnStart(List<PluginDefinition> definitions) {
         plugins.putAll(listToMap(definitions));
     }
 

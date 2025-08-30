@@ -1,21 +1,12 @@
 package com.github.linyuzai.plugin.autoconfigure.observable;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
-import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.type.NestedType;
-import com.github.linyuzai.plugin.core.type.NestedTypeFactory;
-import lombok.NonNull;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
-import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
-public abstract class GenericPluginObservable<K, V> implements PluginObservable<K, V>, ApplicationContextAware {
+public abstract class GenericPluginObservable<K, V> extends BeanExtractor<V> implements PluginObservable<K, V> {
 
     private final Map<K, V> plugins = createMap();
 
@@ -30,28 +21,14 @@ public abstract class GenericPluginObservable<K, V> implements PluginObservable<
     }
 
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
-        NestedTypeFactory nestedTypeFactory = applicationContext.getBean(NestedTypeFactory.class);
-        NestedType nestedType = nestedTypeFactory.create(getClass());
-        PluginConcept concept = applicationContext.getBean(PluginConcept.class);
-        concept.addHandlers(new BeanExtractor<V>() {
-
-            @Override
-            protected Invoker createInvoker() {
-                return super.createInvoker(nestedType.getChildren().get(1).toType(), new Annotation[]{});
-            }
-
-            @Override
-            public void onExtract(V plugin, PluginContext context) {
-                K key = mappingKey(plugin, context);
-                context.getPlugin().addDestroyListener(p -> plugins.remove(key));
-                plugins.compute(key, (k, v) -> {
-                    if (v == null) {
-                        return plugin;
-                    } else {
-                        return mergingValue(k, v, plugin, context);
-                    }
-                });
+    public void onExtract(V plugin, PluginContext context) {
+        K key = mappingKey(plugin, context);
+        context.getPlugin().addDestroyListener(p -> plugins.remove(key));
+        plugins.compute(key, (k, v) -> {
+            if (v == null) {
+                return plugin;
+            } else {
+                return mergingValue(k, v, plugin, context);
             }
         });
     }

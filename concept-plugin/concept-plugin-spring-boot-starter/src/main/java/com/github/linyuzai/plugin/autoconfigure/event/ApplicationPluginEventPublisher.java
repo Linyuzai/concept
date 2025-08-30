@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.autoconfigure.event;
 
 import com.github.linyuzai.plugin.core.event.DefaultPluginEventPublisher;
-import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -12,7 +11,7 @@ import org.springframework.context.event.EventListener;
  */
 @Getter
 @RequiredArgsConstructor
-public class ApplicationConnectionEventPublisher extends DefaultPluginEventPublisher {
+public class ApplicationPluginEventPublisher extends DefaultPluginEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 

@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.github.linyuzai.plugin.autoconfigure.autoload.ConditionalOnPluginAutoloadEnabled;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
-import com.github.linyuzai.plugin.autoconfigure.event.ApplicationConnectionEventPublisher;
+import com.github.linyuzai.plugin.autoconfigure.event.ApplicationPluginEventPublisher;
 import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.metadata.BinderPluginMetadataFactory;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
@@ -57,7 +57,6 @@ import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import com.github.linyuzai.plugin.jar.metadata.JarFilePluginMetadataFactory;
 import com.github.linyuzai.plugin.jar.metadata.JarStreamPluginMetadataFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -107,7 +106,7 @@ public class PluginConceptConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public PluginEventPublisher pluginEventPublisher(ApplicationEventPublisher eventPublisher) {
-        return new ApplicationConnectionEventPublisher(eventPublisher);
+        return new ApplicationPluginEventPublisher(eventPublisher);
     }
 
     @Bean
