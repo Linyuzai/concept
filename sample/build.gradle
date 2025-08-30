@@ -4,7 +4,7 @@ apply plugin: 'java-library'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-//apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.jvm'
 //apply plugin: 'org.jetbrains.dokka'
 
 version = '0.0.1-SNAPSHOT'
@@ -13,6 +13,11 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+
+    implementation 'org.java-websocket:Java-WebSocket:1.5.6'
 
     implementation "org.springframework.boot:spring-boot-loader"
 
@@ -44,7 +49,10 @@ dependencies {
     //compile "com.github.linyuzai:concept-plugin-jar:1.0.1"
     implementation project(path: ':concept-plugin:concept-plugin-core', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-jar', configuration: 'default')
+    implementation project(path: ':concept-plugin:concept-plugin-aws', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-spring-boot-starter', configuration: 'default')
+    implementation "com.amazonaws:aws-java-sdk-s3:${AwsS3V1Version}"
+    implementation "software.amazon.awssdk:s3:${AwsS3V2Version}"
 
     //compile "com.github.linyuzai:concept-event-spring-boot-starter:0.5.0"
     implementation project(path: ':concept-event:concept-event-core', configuration: 'default')
@@ -87,8 +95,8 @@ dependencies {
 
     compileOnly 'org.springframework.boot:spring-boot-starter'
     //compileOnly 'org.springframework.boot:spring-boot-starter-aop'
-    //compileOnly 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    //compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
     //compileOnly 'org.springframework.boot:spring-boot-starter-websocket'
     compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
 

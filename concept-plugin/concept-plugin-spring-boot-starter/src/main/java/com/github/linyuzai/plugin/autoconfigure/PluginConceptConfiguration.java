@@ -290,50 +290,46 @@ public class PluginConceptConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    public static class StorageConfiguration {
+    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "LOCAL", matchIfMissing = true)
+    public static class LocalStorageConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "LOCAL", matchIfMissing = true)
         public PluginStorage pluginStorage(PluginConceptProperties properties) {
             String location = properties.getStorage().getLocation();
             String localLocation = StringUtils.hasText(location) ?
                     location : LocalPluginStorage.DEFAULT_LOCATION;
             return new LocalPluginStorage(localLocation, new JarStorageFilter());
         }
+    }
 
-        @Configuration(proxyBeanMethods = false)
-        //@ConditionalOnBean(type = "com.amazonaws.services.s3.AmazonS3")
-        @ConditionalOnBean(AmazonS3.class)
-        @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS", matchIfMissing = true)
-        public static class AmazonS3Configuration {
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS_V1")
+    public static class AmazonS3StorageConfiguration {
 
-            @Bean
-            @ConditionalOnMissingBean
-            public PluginStorage pluginStorage(PluginConceptProperties properties,
-                                               AmazonS3 amazonS3) {
-                String location = properties.getStorage().getLocation();
-                String bucket = StringUtils.hasText(location) ?
-                        location : RemotePluginStorage.DEFAULT_LOCATION;
-                return new AmazonS3Storage(bucket, amazonS3);
-            }
+        @Bean
+        @ConditionalOnMissingBean
+        public PluginStorage pluginStorage(PluginConceptProperties properties,
+                                           AmazonS3 amazonS3) {
+            String location = properties.getStorage().getLocation();
+            String bucket = StringUtils.hasText(location) ?
+                    location : RemotePluginStorage.DEFAULT_LOCATION;
+            return new AmazonS3Storage(bucket, amazonS3);
         }
+    }
 
-        @Configuration(proxyBeanMethods = false)
-        //@ConditionalOnBean(type = "software.amazon.awssdk.services.s3.S3Client")
-        @ConditionalOnBean(S3Client.class)
-        @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS", matchIfMissing = true)
-        public static class S3ClientConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS_V2")
+    public static class S3ClientStorageConfiguration {
 
-            @Bean
-            @ConditionalOnMissingBean
-            public PluginStorage pluginStorage(PluginConceptProperties properties,
-                                               S3Client s3Client) {
-                String location = properties.getStorage().getLocation();
-                String bucket = StringUtils.hasText(location) ?
-                        location : RemotePluginStorage.DEFAULT_LOCATION;
-                return new S3ClientStorage(bucket, s3Client);
-            }
+        @Bean
+        @ConditionalOnMissingBean
+        public PluginStorage pluginStorage(PluginConceptProperties properties,
+                                           S3Client s3Client) {
+            String location = properties.getStorage().getLocation();
+            String bucket = StringUtils.hasText(location) ?
+                    location : RemotePluginStorage.DEFAULT_LOCATION;
+            return new S3ClientStorage(bucket, s3Client);
         }
     }
 

@@ -69,7 +69,7 @@ public class PluginConceptProperties {
 
         public enum StorageType {
 
-            LOCAL, AWS
+            LOCAL, AWS_V1, AWS_V2
         }
     }
 

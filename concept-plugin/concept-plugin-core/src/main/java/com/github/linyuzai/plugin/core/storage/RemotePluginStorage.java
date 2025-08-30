@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public abstract class RemotePluginStorage implements PluginStorage {
 
-    public static final String DEFAULT_LOCATION = "concept_plugin";
+    public static final String DEFAULT_LOCATION = "concept-plugin";
 
     public static final String METADATA_STATUS = "ConceptPlugin.Status";
 
