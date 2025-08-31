@@ -2,6 +2,10 @@ package com.github.linyuzai.plugin.autoconfigure;
 
 import com.github.linyuzai.plugin.autoconfigure.management.*;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +22,11 @@ public class PluginManagementConfiguration {
 
     @Bean(initMethod = "initialize")
     @ConditionalOnMissingBean
-    public PluginManager pluginManager() {
-        return new PluginManager();
+    public PluginManager pluginManager(PluginConceptProperties properties,
+                                       PluginConcept concept,
+                                       PluginStorage storage,
+                                       PluginExecutor executor) {
+        return new PluginManager(properties, concept, storage, executor);
     }
 
     @Bean

@@ -22,6 +22,7 @@ allprojects {
         set('XnioVersion', '3.8.6.Final')
         set('AwsS3V1Version', '1.12.783')
         set('AwsS3V2Version', '2.31.33')
+        set('MinioVersion', '8.5.10')
         set('SnakeYamlVersion', '1.30')
         set('VueVersion', '2.6.11')
         set('VueResourceVersion', '1.5.1')

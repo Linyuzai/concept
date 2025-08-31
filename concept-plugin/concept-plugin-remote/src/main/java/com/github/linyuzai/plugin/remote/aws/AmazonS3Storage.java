@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.aws;
+package com.github.linyuzai.plugin.remote.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
@@ -78,7 +78,7 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
     @Override
     protected void putUserMetadata(String bucket, String key, Map<String, String> userMetadata) {
-        ObjectMetadata metadata = amazonS3.getObjectMetadata(bucket, key);
+        ObjectMetadata metadata = getObjectMetadata(bucket, key);
         metadata.setUserMetadata(userMetadata);
         CopyObjectRequest request = new CopyObjectRequest();
         request.setSourceBucketName(bucket);

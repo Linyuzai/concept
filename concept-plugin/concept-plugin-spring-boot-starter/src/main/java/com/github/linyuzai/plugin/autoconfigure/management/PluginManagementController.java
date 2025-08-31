@@ -11,12 +11,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class PluginManagementController {
@@ -41,12 +43,14 @@ public class PluginManagementController {
     }
 
     @PostMapping("/auth/unlock")
-    public Response unlock(@RequestParam("password") String password) {
+    public Response unlock(@RequestBody Map<String, String> body/*@RequestParam("password") String password*/) {
+        String password = body.get("password");
         return response(() -> authorizer.unlock(password), () -> null);
     }
 
     @PostMapping("/group/add")
-    public Response addGroup(@RequestParam("group") String group) {
+    public Response addGroup(@RequestBody Map<String, String> body/*@RequestParam("group") String group*/) {
+        String group = body.get("group");
         return response(() -> manager.addGroup(group), () -> "插件分组添加");
     }
 
@@ -56,20 +60,25 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/load")
-    public Response loadPlugin(@RequestParam("group") String group,
-                               @RequestParam("name") String name) {
+    public Response loadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                               @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return response(() -> manager.loadPlugin(group, name), () -> "插件加载");
     }
 
     @PostMapping("/plugin/unload")
-    public Response unloadPlugin(@RequestParam("group") String group,
-                                 @RequestParam("name") String name) {
-        return response(() -> manager.unloadPlugin(group, name), () -> "插件卸载");
+    public Response unloadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                                 @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");return response(() -> manager.unloadPlugin(group, name), () -> "插件卸载");
     }
 
     @PostMapping("/plugin/reload")
-    public Response reloadPlugin(@RequestParam("group") String group,
-                                 @RequestParam("name") String name) {
+    public Response reloadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                                 @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return response(() -> manager.reloadPlugin(group, name), () -> "插件重新加载");
     }
 
@@ -80,15 +89,20 @@ public class PluginManagementController {
     }
 
     @PostMapping("/plugin/rename")
-    public Response renamePlugin(@RequestParam("group") String group,
+    public Response renamePlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
                                  @RequestParam("name") String name,
-                                 @RequestParam("rename") String rename) {
+                                 @RequestParam("rename") String rename*/) {
+        String group = body.get("group");
+        String name = body.get("name");
+        String rename = body.get("rename");
         return response(() -> manager.renamePlugin(group, name, rename), () -> "插件包重命名");
     }
 
     @PostMapping("/plugin/delete")
-    public Response deletePlugin(@RequestParam("group") String group,
-                                 @RequestParam("name") String name) {
+    public Response deletePlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
+                                 @RequestParam("name") String name*/) {
+        String group = body.get("group");
+        String name = body.get("name");
         return response(() -> manager.deletePlugin(group, name), () -> "插件删除");
     }
 

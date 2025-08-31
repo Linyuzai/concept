@@ -12,8 +12,8 @@ import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor
 import com.github.linyuzai.plugin.autoconfigure.yaml.YamlResolver;
 import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesMetadataAdapter;
 import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesResolver;
-import com.github.linyuzai.plugin.aws.AmazonS3Storage;
-import com.github.linyuzai.plugin.aws.S3ClientStorage;
+import com.github.linyuzai.plugin.remote.aws.AmazonS3Storage;
+import com.github.linyuzai.plugin.remote.aws.S3ClientStorage;
 import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
 import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
 import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
@@ -56,7 +56,8 @@ import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import com.github.linyuzai.plugin.jar.metadata.JarFilePluginMetadataFactory;
 import com.github.linyuzai.plugin.jar.metadata.JarStreamPluginMetadataFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import com.github.linyuzai.plugin.remote.minio.MinioPluginStorage;
+import io.minio.MinioClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -287,70 +288,5 @@ public class PluginConceptConfiguration {
                 .addHandlerFactories(handlerFactories)
                 .addEventListeners(eventListeners)
                 .build();
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "LOCAL", matchIfMissing = true)
-    public static class LocalStorageConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public PluginStorage pluginStorage(PluginConceptProperties properties) {
-            String location = properties.getStorage().getLocation();
-            String localLocation = StringUtils.hasText(location) ?
-                    location : LocalPluginStorage.DEFAULT_LOCATION;
-            return new LocalPluginStorage(localLocation, new JarStorageFilter());
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS_V1")
-    public static class AmazonS3StorageConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public PluginStorage pluginStorage(PluginConceptProperties properties,
-                                           AmazonS3 amazonS3) {
-            String location = properties.getStorage().getLocation();
-            String bucket = StringUtils.hasText(location) ?
-                    location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new AmazonS3Storage(bucket, amazonS3);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS_V2")
-    public static class S3ClientStorageConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public PluginStorage pluginStorage(PluginConceptProperties properties,
-                                           S3Client s3Client) {
-            String location = properties.getStorage().getLocation();
-            String bucket = StringUtils.hasText(location) ?
-                    location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new S3ClientStorage(bucket, s3Client);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnPluginAutoloadEnabled
-    public static class AutoloadConfiguration {
-
-        @Bean(destroyMethod = "shutdown")
-        @ConditionalOnMissingBean
-        public PluginExecutor pluginExecutor() {
-            return new DefaultPluginExecutor();
-        }
-
-        @Bean(initMethod = "start", destroyMethod = "stop")
-        @ConditionalOnMissingBean
-        public PluginAutoLoader pluginAutoLoader(PluginConcept concept,
-                                                 PluginExecutor executor,
-                                                 PluginStorage storage,
-                                                 PluginConceptProperties properties) {
-            return new DefaultPluginAutoLoader(concept, executor, storage,
-                    properties.getAutoload().getPeriod());
-        }
     }
 }

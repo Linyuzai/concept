@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.aws;
+package com.github.linyuzai.plugin.remote.aws;
 
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import com.github.linyuzai.plugin.core.storage.PluginDefinition;

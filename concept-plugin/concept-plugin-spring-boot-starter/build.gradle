@@ -17,13 +17,14 @@ dependencies {
 
     compileOnly project(':concept-plugin:concept-plugin-core')
     compileOnly project(':concept-plugin:concept-plugin-jar')
-    compileOnly project(':concept-plugin:concept-plugin-aws')
+    compileOnly project(':concept-plugin:concept-plugin-remote')
 
     //api "com.github.linyuzai:concept-plugin-core:${ConceptPluginVersion}"
     //api "com.github.linyuzai:concept-plugin-jar:${ConceptPluginVersion}"
 
     compileOnly "com.amazonaws:aws-java-sdk-s3:${AwsS3V1Version}"
     compileOnly "software.amazon.awssdk:s3:${AwsS3V2Version}"
+    compileOnly "io.minio:minio:${MinioVersion}"
 
     api "org.webjars:vue:${VueVersion}"
     //api "org.webjars.npm:vue-resource:${VueResourceVersion}"

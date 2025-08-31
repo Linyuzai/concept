@@ -1,6 +1,12 @@
 server:
-  port: 18080
+  port: 8080
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  application:
+    name: concept-sample
   datasource:
     url: jdbc:mysql://localhost:3306/concept?serverTimezone=GMT%2b8
     username: root
@@ -104,6 +110,18 @@ download:
 #            routing-key: concept-event.dev
 #            exchange: concept-event
 concept:
+  download:
+      source:
+        cache:
+          enabled: true #网络资源缓存是否启用
+  #        path: /Applications/source_cache #网络资源缓存路径，默认为 user.home/concept/download
+          delete: true #下载结束后网络资源缓存是否删除
+      compress:
+        format: zip #压缩格式
+        cache:
+          enabled: true #压缩缓存是否启用
+  #        path: /compress_cache #压缩缓存路径，默认为 user.home/concept/download
+          delete: true #下载结束后压缩缓存是否删除
   cloud:
     web:
       intercept:
@@ -124,3 +142,27 @@ concept:
                 - /**/api-docs/**
               negate: true
               order: 0
+#concept:
+  plugin:
+    #metadata:
+      #standard-type: com.github.linyuzai.plugin.jar.concept.JarPlugin.StandardMetadata
+    autoload:
+      enabled: true
+      period: -1
+    storage:
+      type: minio
+    jar:
+      mode: stream
+    management:
+      authorization:
+        password: 123
+      enabled: true
+      github-corner:
+        display: true
+      header:
+        display: true
+        title:
+          display: true
+          text: "插件管理"
+      footer:
+        display: true

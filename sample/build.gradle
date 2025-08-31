@@ -49,10 +49,11 @@ dependencies {
     //compile "com.github.linyuzai:concept-plugin-jar:1.0.1"
     implementation project(path: ':concept-plugin:concept-plugin-core', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-jar', configuration: 'default')
-    implementation project(path: ':concept-plugin:concept-plugin-aws', configuration: 'default')
+    implementation project(path: ':concept-plugin:concept-plugin-remote', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-spring-boot-starter', configuration: 'default')
     implementation "com.amazonaws:aws-java-sdk-s3:${AwsS3V1Version}"
     implementation "software.amazon.awssdk:s3:${AwsS3V2Version}"
+    implementation "io.minio:minio:${MinioVersion}"
 
     //compile "com.github.linyuzai:concept-event-spring-boot-starter:0.5.0"
     implementation project(path: ':concept-event:concept-event-core', configuration: 'default')

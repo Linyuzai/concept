@@ -3,13 +3,13 @@ package com.github.linyuzai.concept.sample.plugin.v2;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.github.linyuzai.plugin.autoconfigure.EnablePluginConcept;
 import com.github.linyuzai.plugin.core.handle.filter.EntryFilter;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
+import io.minio.MinioClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +29,7 @@ public class PluginConfig {
         return new EntryFilter("**/**.properties");
     }
 
-    @Bean
+    //@Bean
     public AmazonS3 amazonS3() {
        return AmazonS3ClientBuilder.standard()
                .withCredentials(new AWSStaticCredentialsProvider(
@@ -41,4 +41,11 @@ public class PluginConfig {
                .build();
     }
 
+    @Bean
+    public MinioClient minioClient() {
+        return MinioClient.builder()
+                .endpoint("http://localhost:9090")
+                .credentials("minioadmin", "minioadmin")
+                .build();
+    }
 }

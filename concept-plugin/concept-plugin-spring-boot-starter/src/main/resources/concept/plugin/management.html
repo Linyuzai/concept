@@ -168,11 +168,11 @@
                         <el-menu style="height: 100%"
                                  :default-active="group.select"
                                  @select="selectGroup" v-cloak>
-                            <el-menu-item :index="group.name"
+                            <el-menu-item :index="group"
                                           v-for="group in group.list">
-                                <i v-if="group.state" class="el-icon-folder-checked"></i>
-                                <i v-else class="el-icon-folder-delete"></i>
-                                <span slot="title">{{group.name}}</span>
+                                    <!--<i v-if="group.state" class="el-icon-folder-checked"></i>-->
+                                    <!--<i v-else class="el-icon-folder-delete"></i>-->
+                                    <span slot="title">{{group}}</span>
                             </el-menu-item>
                         </el-menu>
                     </el-main>
@@ -283,7 +283,7 @@
                                 </el-table-column>
                                 <el-table-column prop="size" label="插件大小" sortable>
                                 </el-table-column>
-                                <el-table-column prop="creationTime" label="上传时间" sortable>
+                                <el-table-column prop="createTime" label="上传时间" sortable>
                                 </el-table-column>
                                 <el-table-column label="操作" prop="url" fixed="right">
                                     <template slot="header">操作
@@ -319,7 +319,7 @@
                             </el-table-column>-->
                             <el-table-column prop="size" label="插件大小" sortable>
                             </el-table-column>
-                            <el-table-column prop="creationTime" label="上传时间" sortable>
+                            <el-table-column prop="createTime" label="上传时间" sortable>
                             </el-table-column>
                             <el-table-column prop="state" label="插件状态" sortable fixed="right">
                                 <template slot="header">插件状态</template>

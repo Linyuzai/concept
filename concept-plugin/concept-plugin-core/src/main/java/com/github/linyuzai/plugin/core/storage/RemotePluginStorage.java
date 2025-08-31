@@ -17,9 +17,9 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     public static final String DEFAULT_LOCATION = "concept-plugin";
 
-    public static final String METADATA_STATUS = "ConceptPlugin.Status";
+    public static final String METADATA_STATUS = "concept-plugin.status";
 
-    public static final String METADATA_CREATION = "ConceptPlugin.Creation";
+    public static final String METADATA_CREATION = "concept-plugin.creation";
 
     protected String bucket = DEFAULT_LOCATION;
 
@@ -191,6 +191,9 @@ public abstract class RemotePluginStorage implements PluginStorage {
         List<String> list = listObjects(bucketToUse, group + "/", "/");
         List<CompletableFuture<String>> futures = new ArrayList<>();
         for (String plugin : list) {
+            if (plugin.endsWith("concept_plugin.properties")) {
+                continue;
+            }
             Supplier<String> supplier = () -> {
                 Map<String, String> userMetadata = getUserMetadata(bucketToUse, plugin);
                 String pluginStatus = userMetadata.get(METADATA_STATUS);
@@ -211,6 +214,13 @@ public abstract class RemotePluginStorage implements PluginStorage {
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         return futures.stream().map(CompletableFuture::join)
                 .filter(Objects::nonNull)
+                .map(it -> {
+                    if (it.startsWith(group + "/")) {
+                        return it.substring(group.length() + 1);
+                    } else {
+                        return it;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 

@@ -15,7 +15,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @EnableConfigurationProperties(PluginConceptProperties.class)
-@Import({PluginConceptConfiguration.class, PluginManagementConfiguration.class})
+@Import({PluginStorageConfiguration.class,
+        PluginConceptConfiguration.class,
+        PluginAutoloadConfiguration.class,
+        PluginManagementConfiguration.class})
 public @interface EnablePluginConcept {
 
 }

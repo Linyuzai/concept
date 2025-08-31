@@ -10,9 +10,9 @@ import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,33 +21,33 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class PluginManager {
 
     protected final Log log = LogFactory.getLog(PluginManager.class);
 
-    protected final Set<String> loadingSet = new HashSet<>();
+    protected final Set<String> loadingSet = new ConcurrentSkipListSet<>();
 
-    protected final Set<String> unloadingSet = new HashSet<>();
+    protected final Set<String> unloadingSet = new ConcurrentSkipListSet<>();
 
-    protected final Set<String> updatingSet = new HashSet<>();
+    protected final Set<String> updatingSet = new ConcurrentSkipListSet<>();
 
-    @Autowired
-    protected PluginConceptProperties properties;
+    protected final PluginConceptProperties properties;
 
-    @Autowired
-    protected PluginConcept concept;
+    protected final PluginConcept concept;
 
-    @Autowired
-    protected PluginStorage storage;
+    protected final PluginStorage storage;
 
-    @Autowired
-    protected PluginExecutor executor;
+    protected final PluginExecutor executor;
 
-    protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    @Getter
+    @Setter
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<String> getGroups() {
         return storage.getGroups();
@@ -90,7 +90,7 @@ public class PluginManager {
         try {
             storage.loadPlugin(group, name);
         } catch (Throwable e) {
-            executor.execute(() -> {
+            execute(() -> {
                 try {
                     Object source = storage.getPluginDefinition(path);
                     concept.load(source);
@@ -99,7 +99,7 @@ public class PluginManager {
                 } finally {
                     loadingSet.remove(path);
                 }
-            }, 1000, TimeUnit.MILLISECONDS);
+            });
         }
     }
 
@@ -109,7 +109,7 @@ public class PluginManager {
         try {
             storage.unloadPlugin(group, name);
         } catch (Throwable e) {
-            executor.execute(() -> {
+            execute(() -> {
                 try {
                     concept.unload(path);
                 } catch (Throwable e1) {
@@ -117,7 +117,7 @@ public class PluginManager {
                 } finally {
                     unloadingSet.remove(path);
                 }
-            }, 1000, TimeUnit.MILLISECONDS);
+            });
         }
     }
 
@@ -130,7 +130,7 @@ public class PluginManager {
             loadingSet.remove(path);
             throw e;
         }
-        executor.execute(() -> {
+        execute(() -> {
             try {
                 Object source = storage.getPluginDefinition(path);
                 concept.load(source);
@@ -139,7 +139,7 @@ public class PluginManager {
             } finally {
                 loadingSet.remove(path);
             }
-        }, 1000, TimeUnit.MILLISECONDS);
+        });
     }
 
     public synchronized void renamePlugin(String group, String name, String rename) {
@@ -260,7 +260,7 @@ public class PluginManager {
                 .stream()
                 .collect(Collectors.toMap(name ->
                         storage.getUnloadedPluginPath(group, name), Function.identity()));
-        return storage.getPluginDefinitions(pathNames.values()).stream()
+        return storage.getPluginDefinitions(pathNames.keySet()).stream()
                 .map(definition -> {
                     long timestamp = definition.getCreateTime();
                     long size = definition.getSize();
@@ -328,6 +328,10 @@ public class PluginManager {
         Instant instant = Instant.ofEpochMilli(time);
         LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         return formatter.format(dateTime);
+    }
+
+    protected void execute(Runnable runnable) {
+        executor.execute(runnable, 1000, TimeUnit.MILLISECONDS);
     }
 
     public class PluginAutoLoadListener implements PluginEventListener {
