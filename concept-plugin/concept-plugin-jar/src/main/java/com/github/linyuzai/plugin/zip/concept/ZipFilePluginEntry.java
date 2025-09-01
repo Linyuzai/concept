@@ -28,8 +28,13 @@ public class ZipFilePluginEntry extends AbstractPluginEntry implements ZipPlugin
     }
 
     @Override
-    public Object getId() {
-        return url;
+    public String getPath() {
+        return url.toString();
+    }
+
+    @Override
+    public long getSize() {
+        return zipFile.size();
     }
 
     @Override

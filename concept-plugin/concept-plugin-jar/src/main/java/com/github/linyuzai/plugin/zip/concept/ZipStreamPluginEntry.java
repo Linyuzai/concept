@@ -24,6 +24,9 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
 
     protected final URL url;
 
+    @Getter
+    protected final long size;
+
     /**
      * 父条目
      */
@@ -44,14 +47,16 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
         this.url = url;
         this.supplier = supplier;
         if (isDirectory()) {
+            this.size = 0L;
             return;
         }
+        this.size = bytes.length;
         this.reference = createReference(bytes);
     }
 
     @Override
-    public Object getId() {
-        return url;
+    public String getPath() {
+        return url.toString();
     }
 
     @Override

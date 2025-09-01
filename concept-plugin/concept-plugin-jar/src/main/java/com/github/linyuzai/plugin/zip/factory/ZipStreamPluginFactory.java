@@ -45,7 +45,7 @@ public class ZipStreamPluginFactory implements PluginFactory {
         } else if (definition instanceof Plugin.Entry) {
             Plugin.Entry entry = (Plugin.Entry) definition;
             if (support(entry.getName())) {
-                Object id = entry.getId();
+                Object id = entry.getPath();
                 if (id instanceof URL) {
                     URL url = new URL((URL) id, entry.getName() + SEPARATOR);
                     return create(url, () -> {

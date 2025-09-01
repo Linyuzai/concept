@@ -109,11 +109,6 @@ public interface Plugin {
     interface Entry extends PluginDefinition {
 
         /**
-         * 唯一标识
-         */
-        Object getId();
-
-        /**
          * 获得条目名称
          */
         String getName();

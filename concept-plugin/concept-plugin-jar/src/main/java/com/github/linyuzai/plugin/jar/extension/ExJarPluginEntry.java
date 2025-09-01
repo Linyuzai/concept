@@ -27,8 +27,13 @@ public class ExJarPluginEntry extends AbstractPluginEntry implements Plugin.Entr
     }
 
     @Override
-    public Object getId() {
-        return url;
+    public String getPath() {
+        return url.toString();
+    }
+
+    @Override
+    public long getSize() {
+        return jarEntry.getSize();
     }
 
     @Override

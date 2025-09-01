@@ -58,12 +58,12 @@ public abstract class AbstractPlugin implements Plugin {
             //子插件
             Plugin subPlugin = getConcept().createPlugin(entry, subContext);
             if (subPlugin == null) {
-                node.create(entry.getId(), entry.getName(), entry);
+                node.create(entry.getPath(), entry.getName(), entry);
             } else {
                 subPlugin.setConcept(concept);
                 subPlugin.initialize();
                 //子插件树
-                PluginTree.Node subTree = node.create(entry.getId(), entry.getName(), subPlugin);
+                PluginTree.Node subTree = node.create(entry.getPath(), entry.getName(), subPlugin);
                 subContext.set(Plugin.class, subPlugin);
                 subContext.set(PluginTree.Node.class, subTree);
                 //解析子插件
