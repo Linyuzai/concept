@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.storage;
+package com.github.linyuzai.plugin.core.concept;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ public interface PluginDefinition {
 
     interface Loadable {
 
-        String getPath();
+        String getUrl();
 
         InputStream getInputStream() throws IOException;
     }

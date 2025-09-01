@@ -35,11 +35,6 @@ public class ExJarPlugin extends AbstractPlugin implements JarPlugin {
     }
 
     @Override
-    public Object getId() {
-        return url;
-    }
-
-    @Override
     public URL getURL() {
         return url;
     }

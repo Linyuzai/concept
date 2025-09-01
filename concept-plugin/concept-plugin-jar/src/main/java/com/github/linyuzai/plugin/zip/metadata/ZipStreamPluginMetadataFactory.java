@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.zip.metadata;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
@@ -16,8 +16,8 @@ public abstract class ZipStreamPluginMetadataFactory extends AbstractPluginMetad
 
     @SneakyThrows
     @Override
-    public PluginMetadata create(Object source, PluginContext context) {
-        try (ZipInputStream zis = getZipInputStream(source)) {
+    public PluginMetadata create(PluginDefinition definition, PluginContext context) {
+        try (ZipInputStream zis = getZipInputStream(definition)) {
             if (zis == null) {
                 return null;
             }
@@ -36,9 +36,9 @@ public abstract class ZipStreamPluginMetadataFactory extends AbstractPluginMetad
         return new PropertiesMetadata(new Properties());
     }
 
-    protected ZipInputStream getZipInputStream(Object source) throws IOException {
-        if (source instanceof PluginDefinition.Loadable) {
-            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) source;
+    protected ZipInputStream getZipInputStream(PluginDefinition definition) throws IOException {
+        if (definition instanceof PluginDefinition.Loadable) {
+            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) definition;
             return new ZipInputStream(loadable.getInputStream());
         }
         return null;

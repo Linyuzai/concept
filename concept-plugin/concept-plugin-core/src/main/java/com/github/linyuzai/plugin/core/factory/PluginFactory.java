@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 
@@ -12,5 +13,5 @@ public interface PluginFactory {
     /**
      * 创建插件
      */
-    Plugin create(Object source, PluginMetadata metadata, PluginContext context);
+    Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context);
 }

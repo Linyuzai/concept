@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
 
@@ -16,19 +15,14 @@ import java.util.Set;
 public interface Plugin {
 
     /**
-     * 插件唯一标识
+     * 获得插件定义
      */
-    Object getId();
+    PluginDefinition getDefinition();
 
     /**
-     * 获得初始对象
+     * 设置插件定义
      */
-    Object getSource();
-
-    /**
-     * 设置初始对象
-     */
-    void setSource(Object source);
+    void setDefinition(PluginDefinition definition);
 
     /**
      * 获得插件配置
@@ -112,7 +106,7 @@ public interface Plugin {
     /**
      * 插件条目
      */
-    interface Entry {
+    interface Entry extends PluginDefinition {
 
         /**
          * 唯一标识

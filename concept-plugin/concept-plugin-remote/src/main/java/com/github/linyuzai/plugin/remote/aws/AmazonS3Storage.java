@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.remote.aws;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -113,12 +113,12 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
         @Override
         public long getSize() {
-            return getObjectMetadata(getOrCreateBucket(), path).getContentLength();
+            return getObjectMetadata(getBucket(), path).getContentLength();
         }
 
         @Override
         public long getCreateTime() {
-            String creation = getObjectMetadata(getOrCreateBucket(), path)
+            String creation = getObjectMetadata(getBucket(), path)
                     .getUserMetaDataOf(METADATA_CREATION);
             try {
                 return Long.parseLong(creation);
@@ -129,7 +129,7 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
         @Override
         public Object getVersion() {
-            return getObjectMetadata(getOrCreateBucket(), path).getLastModified().getTime();
+            return getObjectMetadata(getBucket(), path).getLastModified().getTime();
         }
 
         @Override
@@ -138,8 +138,13 @@ public class AmazonS3Storage extends RemotePluginStorage {
         }
 
         @Override
+        public String getUrl() {
+            return "aws1:" + path;
+        }
+
+        @Override
         public InputStream getInputStream() throws IOException {
-            return getObject(getOrCreateBucket(), path);
+            return getObject(getBucket(), path);
         }
     }
 }

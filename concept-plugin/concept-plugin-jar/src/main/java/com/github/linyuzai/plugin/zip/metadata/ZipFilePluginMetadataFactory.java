@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.zip.metadata;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
@@ -19,8 +20,8 @@ public class ZipFilePluginMetadataFactory extends AbstractPluginMetadataFactory 
 
     @SneakyThrows
     @Override
-    public PluginMetadata create(Object source, PluginContext context) {
-        try (ZipFile zipFile = getZipFile(source)) {
+    public PluginMetadata create(PluginDefinition definition, PluginContext context) {
+        try (ZipFile zipFile = getZipFile(definition)) {
             if (zipFile == null) {
                 return null;
             }
@@ -36,8 +37,8 @@ public class ZipFilePluginMetadataFactory extends AbstractPluginMetadataFactory 
         }
     }
 
-    protected ZipFile getZipFile(Object source) throws IOException {
-        File file = ZipUtils.getFile(source, getSupportSuffixes());
+    protected ZipFile getZipFile(PluginDefinition definition) throws IOException {
+        File file = ZipUtils.getFile(definition, getSupportSuffixes());
         if (file == null) {
             return null;
         }

@@ -11,6 +11,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -56,42 +57,44 @@ public interface PluginConcept {
     /**
      * 获得插件配置
      */
-    PluginMetadata createMetadata(Object source, PluginContext context);
+    PluginMetadata createMetadata(PluginDefinition definition, PluginContext context);
 
     /**
      * 创建插件
      */
-    Plugin create(Object source, PluginContext context);
+    Plugin createPlugin(PluginDefinition definition, PluginContext context);
 
     /**
      * 加载插件
      */
-    Plugin load(Object source);
+    Plugin load(String path);
 
     /**
      * 加载插件
      */
-    void load(Collection<?> sources, BiConsumer<Object, Plugin> onSuccess, BiConsumer<Object, Throwable> onError);
+    Collection<PluginDefinition> load(Collection<String> paths,
+                                BiConsumer<String, Plugin> onSuccess,
+                                BiConsumer<String, Throwable> onError);
 
     /**
      * 卸载插件
      */
-    Plugin unload(Object source);
+    Plugin unload(String path);
 
     /**
      * 插件是否正在加载
      */
-    boolean isLoading(Object source);
+    boolean isLoading(String path);
 
     /**
      * 插件是否正在卸载
      */
-    boolean isUnloading(Object source);
+    boolean isUnloading(String path);
 
     /**
      * 插件是否已加载
      */
-    boolean isLoaded(Object o);
+    boolean isLoaded(String path);
 
     /**
      * 获得上下文工厂

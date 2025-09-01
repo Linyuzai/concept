@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultPluginRepository extends AbstractPluginRepository {
 
     @Override
-    protected Map<Object, Plugin> createMap() {
+    protected Map<String, Plugin> createMap() {
         return new ConcurrentHashMap<>();
     }
 }

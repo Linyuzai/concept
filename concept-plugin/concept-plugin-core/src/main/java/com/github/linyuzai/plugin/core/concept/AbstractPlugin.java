@@ -1,7 +1,6 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.handle.PluginHandlerChain;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
@@ -21,7 +20,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     private final Collection<DestroyListener> destroyListeners = new CopyOnWriteArrayList<>();
 
-    private Object source;
+    private PluginDefinition definition;
 
     private PluginMetadata metadata;
 
@@ -57,7 +56,7 @@ public abstract class AbstractPlugin implements Plugin {
             subContext.set(PluginConcept.class, concept);
             subContext.initialize();
             //子插件
-            Plugin subPlugin = getConcept().create(entry, subContext);
+            Plugin subPlugin = getConcept().createPlugin(entry, subContext);
             if (subPlugin == null) {
                 node.create(entry.getId(), entry.getName(), entry);
             } else {
@@ -113,6 +112,6 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + getId() + ")";
+        return getClass().getSimpleName() + "(" + getDefinition().getPath() + ")";
     }
 }

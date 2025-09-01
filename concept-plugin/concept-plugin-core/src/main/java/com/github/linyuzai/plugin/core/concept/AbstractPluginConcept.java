@@ -18,6 +18,7 @@ import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 import lombok.Getter;
@@ -35,6 +36,8 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public abstract class AbstractPluginConcept implements PluginConcept {
+
+    protected PluginStorage storage;
 
     protected PluginContextFactory contextFactory;
 
@@ -64,12 +67,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 正在加载的插件
      */
-    protected final Set<Object> loading = new LinkedHashSet<>();
+    protected final Set<String> loading = new LinkedHashSet<>();
 
     /**
      * 正在卸载的插件
      */
-    protected final Set<Object> unloading = new LinkedHashSet<>();
+    protected final Set<String> unloading = new LinkedHashSet<>();
 
     @Override
     public void initialize() {
@@ -79,7 +82,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public void destroy() {
         //卸载所有插件
-        repository.stream().forEach(this::unload);
+        repository.stream().forEach(it -> unload(it.getDefinition().getPath()));
         eventPublisher.publish(new PluginConceptDestroyedEvent(this));
     }
 
@@ -158,12 +161,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public PluginMetadata createMetadata(Object source, PluginContext context) {
-        if (source instanceof Plugin) {
-            return ((Plugin) source).getMetadata();
-        }
+    public PluginMetadata createMetadata(PluginDefinition definition, PluginContext context) {
         for (PluginMetadataFactory factory : metadataFactories) {
-            PluginMetadata metadata = factory.create(source, context);
+            PluginMetadata metadata = factory.create(definition, context);
             if (metadata != null) {
                 return metadata;
             }
@@ -175,18 +175,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 遍历插件工厂创建插件
      */
     @Override
-    public Plugin create(Object source, PluginContext context) {
-        if (source instanceof Plugin) {
-            return (Plugin) source;
-        }
-        PluginMetadata metadata = createMetadata(source, context);
+    public Plugin createPlugin(PluginDefinition definition, PluginContext context) {
+        PluginMetadata metadata = createMetadata(definition, context);
         if (metadata == null) {
             return null;
         }
         for (PluginFactory factory : factories) {
-            Plugin plugin = factory.create(source, metadata, context);
+            Plugin plugin = factory.create(definition, metadata, context);
             if (plugin != null) {
-                plugin.setSource(source);
+                plugin.setDefinition(definition);
                 plugin.setMetadata(metadata);
                 return plugin;
             }
@@ -195,13 +192,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public Plugin load(@NonNull Object source) {
+    public Plugin load(@NonNull String path) {
         List<Plugin> plugins = new ArrayList<>();
-        load(Collections.singleton(source), (o, plugin) -> plugins.add(plugin), (o, e) -> {
+        load(Collections.singleton(path), (o, plugin) -> plugins.add(plugin), (o, e) -> {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             } else {
-                throw new PluginLoadException(source, e);
+                throw new PluginLoadException(path, e);
             }
         });
         return plugins.get(0);
@@ -215,37 +212,39 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 插件创建后根据插件依赖进行解析提取
      */
     @Override
-    public synchronized void load(@NonNull Collection<?> sources,
-                                  @NonNull BiConsumer<Object, Plugin> onSuccess,
-                                  @NonNull BiConsumer<Object, Throwable> onError) {
-        List<Object> list = new ArrayList<>();
-        for (Object source : sources) {
-            if (repository.contains(source)) {
-                onError.accept(source, new IllegalArgumentException("Plugin is already loaded: " + source));
+    public synchronized Collection<PluginDefinition> load(@NonNull Collection<String> paths,
+                                  @NonNull BiConsumer<String, Plugin> onSuccess,
+                                  @NonNull BiConsumer<String, Throwable> onError) {
+        List<PluginDefinition> definitions = new ArrayList<>();
+
+        List<String> list = new ArrayList<>();
+        for (String path : paths) {
+            if (repository.contains(path)) {
+                onError.accept(path, new IllegalArgumentException("Plugin is already loaded: " + path));
             } else {
-                loading.add(source);
-                list.add(source);
+                loading.add(path);
+                list.add(path);
             }
         }
 
-        BiConsumer<Object, Plugin> success = (source, plugin) -> {
-            loading.remove(source);//移除正在加载的状态
+        BiConsumer<String, Plugin> success = (path, plugin) -> {
+            loading.remove(path);//移除正在加载的状态
             repository.add(plugin);//添加到存储中
-            onSuccess.accept(source, plugin);
+            onSuccess.accept(path, plugin);
         };
 
-        BiConsumer<Object, Throwable> error = (source, e) -> {
-            loading.remove(source);//移除正在加载的状态
+        BiConsumer<String, Throwable> error = (path, e) -> {
+            loading.remove(path);//移除正在加载的状态
             if (e instanceof PluginLoadException) {
-                onError.accept(source, e);
+                onError.accept(path, e);
             } else {
-                onError.accept(source, new PluginLoadException(source, e));
+                onError.accept(path, new PluginLoadException(path, e));
             }
         };
 
         List<LoadingEntry> entries = new ArrayList<>();
 
-        for (Object source : list) {
+        for (String path : list) {
             try {
                 //创建上下文
                 PluginContext context = createContext();
@@ -253,9 +252,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 context.set(PluginConcept.class, this);
                 context.initialize();
                 //创建插件
-                Plugin plugin = create(source, context);
+                PluginDefinition definition = storage.getPluginDefinition(path);
+                Plugin plugin = createPlugin(definition, context);
                 if (plugin == null) {
-                    throw new PluginException("Plugin can not create: " + source);
+                    throw new PluginException("Plugin can not create: " + path);
                 }
                 //初始化插件
                 plugin.setConcept(this);
@@ -264,9 +264,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 context.set(Plugin.class, plugin);
                 eventPublisher.publish(new PluginCreatedEvent(plugin));
 
-                entries.add(new LoadingEntry(source, plugin, context));
+                entries.add(new LoadingEntry(path, plugin, context));
+
+                definitions.add(definition);
             } catch (Throwable e) {
-                error.accept(source, e);
+                error.accept(path, e);
             }
         }
 
@@ -275,6 +277,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             LoadingEntry entry = entries.remove(0);
             loadDependency(entry, entries, new Stack<>(), success, error);
         }
+
+        return definitions;
     }
 
     /**
@@ -283,9 +287,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected void loadDependency(LoadingEntry entry,
                                   Collection<LoadingEntry> original,
                                   Stack<String> dependencyChain,
-                                  BiConsumer<Object, Plugin> onSuccess,
-                                  BiConsumer<Object, Throwable> onError) {
-        Object source = entry.getSource();
+                                  BiConsumer<String, Plugin> onSuccess,
+                                  BiConsumer<String, Throwable> onError) {
+        String path = entry.getPath();
         Plugin plugin = entry.getPlugin();
         PluginContext context = entry.getContext();
         String name = entry.getPlugin().getMetadata().asStandard().getName();
@@ -351,9 +355,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             //销毁上下文
             context.destroy();
             eventPublisher.publish(new PluginLoadedEvent(plugin));
-            onSuccess.accept(source, plugin);
+            onSuccess.accept(path, plugin);
         } catch (Throwable e) {
-            onError.accept(source, e);
+            onError.accept(path, e);
         } finally {
             if (name != null) {
                 dependencyChain.pop();
@@ -371,45 +375,45 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     /**
      * 卸载插件。
-     * 通过插件的 id，source 或插件本身移除对应的插件
+     * 通过插件path移除对应的插件
      */
     @Override
-    public synchronized Plugin unload(@NonNull Object source) {
-        unloading.add(source);
+    public synchronized Plugin unload(@NonNull String path) {
+        unloading.add(path);
         try {
-            Plugin removed = repository.remove(source);
+            Plugin removed = repository.remove(path);
             if (removed != null) {
                 removed.destroy();
                 eventPublisher.publish(new PluginUnloadedEvent(removed));
             }
             return removed;
         } catch (Throwable e) {
-            throw new PluginUnloadException(source, e);
+            throw new PluginUnloadException(path, e);
         } finally {
-            unloading.remove(source);
+            unloading.remove(path);
         }
     }
 
     @Override
-    public boolean isLoading(Object source) {
-        return loading.contains(source);
+    public boolean isLoading(String path) {
+        return loading.contains(path);
     }
 
     @Override
-    public boolean isUnloading(Object source) {
-        return unloading.contains(source);
+    public boolean isUnloading(String path) {
+        return unloading.contains(path);
     }
 
     @Override
-    public boolean isLoaded(Object o) {
-        return repository.contains(o);
+    public boolean isLoaded(String path) {
+        return repository.contains(path);
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class LoadingEntry {
 
-        private final Object source;
+        private final String path;
 
         private final Plugin plugin;
 
@@ -418,6 +422,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends AbstractPluginConcept> {
+
+        protected PluginStorage storage;
 
         protected PluginContextFactory contextFactory;
 
@@ -440,6 +446,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected List<PluginHandler> handlers = new ArrayList<>();
 
         protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
+
+        public B storage(PluginStorage storage) {
+            this.storage = storage;
+            return (B) this;
+        }
 
         /**
          * 设置上下文工厂
@@ -609,6 +620,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         public T build() {
             T concept = create();
             eventPublisher.register(eventListeners);
+            concept.setStorage(storage);
             concept.setContextFactory(contextFactory);
             concept.setTreeFactory(treeFactory);
             concept.setHandlerChainFactory(handlerChainFactory);

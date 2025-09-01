@@ -12,7 +12,7 @@ public interface PluginRepository {
     /**
      * 获得插件
      */
-    Plugin get(Object o);
+    Plugin get(String path);
 
     /**
      * 添加插件
@@ -22,12 +22,12 @@ public interface PluginRepository {
     /**
      * 移除插件
      */
-    Plugin remove(Object o);
+    Plugin remove(String path);
 
     /**
      * 包含插件
      */
-    boolean contains(Object o);
+    boolean contains(String path);
 
     /**
      * 插件流

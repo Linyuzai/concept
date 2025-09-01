@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
@@ -20,10 +21,10 @@ public class JarFilePluginFactory extends ModePluginFactory implements JarPlugin
 
     @SneakyThrows
     @Override
-    public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
+    public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
         String mode = getMode(metadata);
         if (JarPlugin.Mode.STREAM.equalsIgnoreCase(mode)) {
-            File file = ZipUtils.getFile(source, getSupportedSuffixes());
+            File file = ZipUtils.getFile(definition, getSupportedSuffixes());
             if (file == null) {
                 return null;
             }

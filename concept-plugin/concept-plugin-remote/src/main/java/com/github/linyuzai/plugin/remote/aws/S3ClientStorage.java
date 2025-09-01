@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.remote.aws;
 
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -36,7 +36,7 @@ public class S3ClientStorage extends RemotePluginStorage {
     @Override
     public boolean existPlugin(String group, String name) {
         try {
-            getHeadObject(getOrCreateBucket(), getPluginPath(group, name));
+            getHeadObject(getBucket(), getPluginPath(group, name));
             return true;
         } catch (NoSuchKeyException e) {
             return false;
@@ -142,12 +142,12 @@ public class S3ClientStorage extends RemotePluginStorage {
 
         @Override
         public long getSize() {
-            return getHeadObject(getOrCreateBucket(), path).contentLength();
+            return getHeadObject(getBucket(), path).contentLength();
         }
 
         @Override
         public long getCreateTime() {
-            String creation = getHeadObject(getOrCreateBucket(), path)
+            String creation = getHeadObject(getBucket(), path)
                     .metadata().get(METADATA_CREATION);
             try {
                 return Long.parseLong(creation);
@@ -158,7 +158,7 @@ public class S3ClientStorage extends RemotePluginStorage {
 
         @Override
         public Object getVersion() {
-            return getHeadObject(getOrCreateBucket(), path).lastModified().getEpochSecond();
+            return getHeadObject(getBucket(), path).lastModified().getEpochSecond();
         }
 
         @Override
@@ -167,8 +167,13 @@ public class S3ClientStorage extends RemotePluginStorage {
         }
 
         @Override
+        public String getUrl() {
+            return "aws1:" + path;
+        }
+
+        @Override
         public InputStream getInputStream() throws IOException {
-            return getObject(getOrCreateBucket(), path);
+            return getObject(getBucket(), path);
         }
     }
 }

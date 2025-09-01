@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.storage;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.*;
 
 import java.io.*;
@@ -26,13 +27,20 @@ public abstract class RemotePluginStorage implements PluginStorage {
     protected Executor executor;
 
     @Override
+    public void initialize() {
+        if (!existBucket(bucket)) {
+            createBucket(bucket);
+        }
+    }
+
+    @Override
     public String getLocation() {
         return bucket;
     }
 
     @Override
     public List<String> getGroups() {
-        return listObjects(getOrCreateBucket(), null, "/")
+        return listObjects(getBucket(), null, "/")
                 .stream()
                 .map(it -> {
                     if (it.endsWith("/")) {
@@ -68,7 +76,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     @Override
     public InputStream getLoadedPluginInputStream(String group, String name) throws IOException {
-        return getObject(getOrCreateBucket(), getPluginPath(group, name));
+        return getObject(getBucket(), getPluginPath(group, name));
     }
 
     @Override
@@ -83,7 +91,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     @Override
     public InputStream getUnloadedPluginInputStream(String group, String name) throws IOException {
-        return getObject(getOrCreateBucket(), getPluginPath(group, name));
+        return getObject(getBucket(), getPluginPath(group, name));
     }
 
     @Override
@@ -98,7 +106,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     @Override
     public InputStream getDeletedPluginInputStream(String group, String name) throws IOException {
-        return getObject(getOrCreateBucket(), getPluginPath(group, name));
+        return getObject(getBucket(), getPluginPath(group, name));
     }
 
     @Override
@@ -121,7 +129,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     @Override
     public String uploadPlugin(String group, String name, InputStream is, long length) {
-        String pluginName = getPluginName(group, name);
+        String pluginName = generatePluginName(group, name);
         Map<String, String> map = new LinkedHashMap<>();
         map.put(METADATA_STATUS, PluginStorage.UNLOADED);
         map.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
@@ -132,26 +140,26 @@ public abstract class RemotePluginStorage implements PluginStorage {
     @Override
     public void loadPlugin(String group, String name) {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.LOADED);
-        putUserMetadata(group, name, userMetadata);
+        putUserMetadata(getBucket(), getPluginPath(group, name), userMetadata);
     }
 
     @Override
     public void unloadPlugin(String group, String name) {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.UNLOADED);
-        putUserMetadata(group, name, userMetadata);
+        putUserMetadata(getBucket(), getPluginPath(group, name), userMetadata);
     }
 
     @Override
     public void deletePlugin(String group, String name) {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.DELETED);
-        putUserMetadata(group, name, userMetadata);
+        putUserMetadata(getBucket(), getPluginPath(group, name), userMetadata);
     }
 
     protected String getPluginPath(String group, String name) {
         return group + "/" + name;
     }
 
-    protected String getPluginName(String group, String name) {
+    protected String generatePluginName(String group, String name) {
         int i = 1;
         String tryName = name;
         while (existPlugin(group, tryName)) {
@@ -166,28 +174,20 @@ public abstract class RemotePluginStorage implements PluginStorage {
         return tryName;
     }
 
-    protected String getOrCreateBucket() {
-        if (!existBucket(bucket)) {
-            createBucket(bucket);
-        }
-        return bucket;
-    }
-
     protected Map<String, String> createUserMetadata(String group, String name, String status) {
-        Map<String, String> userMetadata = getUserMetadata(getOrCreateBucket(), getPluginPath(group, name));
-        Map<String, String> newUserMetadata;
+        Map<String, String> userMetadata = getUserMetadata(getBucket(), getPluginPath(group, name));
+        Map<String, String> newUserMetadata = new LinkedHashMap<>();
         if (userMetadata == null) {
-            newUserMetadata = new LinkedHashMap<>();
             newUserMetadata.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
         } else {
-            newUserMetadata = userMetadata;
+            newUserMetadata.putAll(userMetadata);
         }
         newUserMetadata.put(METADATA_STATUS, status);
         return newUserMetadata;
     }
 
     protected List<String> getPlugins(String group, String type) {
-        String bucketToUse = getOrCreateBucket();
+        String bucketToUse = getBucket();
         List<String> list = listObjects(bucketToUse, group + "/", "/");
         List<CompletableFuture<String>> futures = new ArrayList<>();
         for (String plugin : list) {

@@ -24,7 +24,7 @@ public class PluginStorageConfiguration {
     @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "LOCAL")
     public static class LocalConfiguration {
 
-        @Bean
+        @Bean(initMethod = "initialize")
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties) {
             String location = properties.getStorage().getLocation();
@@ -38,7 +38,7 @@ public class PluginStorageConfiguration {
     @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "MINIO")
     public static class MinioConfiguration {
 
-        @Bean
+        @Bean(initMethod = "initialize")
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            MinioClient minioClient) {
@@ -53,7 +53,7 @@ public class PluginStorageConfiguration {
     @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS_V1")
     public static class AmazonS3Configuration {
 
-        @Bean
+        @Bean(initMethod = "initialize")
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            AmazonS3 amazonS3) {
@@ -68,7 +68,7 @@ public class PluginStorageConfiguration {
     @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "AWS_V2")
     public static class S3ClientConfiguration {
 
-        @Bean
+        @Bean(initMethod = "initialize")
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            S3Client s3Client) {

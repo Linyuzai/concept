@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.storage;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.*;
 
 import java.io.*;
@@ -29,6 +30,11 @@ public class LocalPluginStorage implements PluginStorage {
     private String location = DEFAULT_LOCATION;
 
     private PluginStorage.Filter filter;
+
+    @Override
+    public void initialize() {
+
+    }
 
     /**
      * 基础路径下的子目录为分组

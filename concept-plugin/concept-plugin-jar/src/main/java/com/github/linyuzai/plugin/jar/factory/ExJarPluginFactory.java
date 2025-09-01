@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
@@ -17,14 +18,14 @@ public class ExJarPluginFactory extends ModePluginFactory implements JarPluginSu
 
     @SneakyThrows
     @Override
-    public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        if (source instanceof ExJarPluginEntry) {
-            ExJarFile jarFile = ((ExJarPluginEntry) source).getJarEntry().asJarFile();
+    public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
+        if (definition instanceof ExJarPluginEntry) {
+            ExJarFile jarFile = ((ExJarPluginEntry) definition).getJarEntry().asJarFile();
             return new ExJarPlugin(jarFile);
         }
         String mode = getMode(metadata);
         if (JarPlugin.Mode.FILE.equalsIgnoreCase(mode)) {
-            File file = ZipUtils.getFile(source, getSupportedSuffixes());
+            File file = ZipUtils.getFile(definition, getSupportedSuffixes());
             if (file == null) {
                 return null;
             } else {

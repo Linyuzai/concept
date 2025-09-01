@@ -11,7 +11,7 @@ import java.util.Map;
 public class LinkedPluginRepository extends AbstractPluginRepository {
 
     @Override
-    protected Map<Object, Plugin> createMap() {
+    protected Map<String, Plugin> createMap() {
         return new LinkedHashMap<>();
     }
 }

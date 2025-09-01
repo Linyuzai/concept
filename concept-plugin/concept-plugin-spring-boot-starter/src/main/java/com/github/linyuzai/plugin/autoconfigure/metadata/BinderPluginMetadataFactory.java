@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.autoconfigure.metadata;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
@@ -28,8 +29,8 @@ public class BinderPluginMetadataFactory implements PluginMetadataFactory, Envir
     private Environment environment;
 
     @Override
-    public PluginMetadata create(Object source, PluginContext context) {
-        PluginMetadata metadata = metadataFactory.create(source, context);
+    public PluginMetadata create(PluginDefinition definition, PluginContext context) {
+        PluginMetadata metadata = metadataFactory.create(definition, context);
         if (metadata == null) {
             return null;
         }

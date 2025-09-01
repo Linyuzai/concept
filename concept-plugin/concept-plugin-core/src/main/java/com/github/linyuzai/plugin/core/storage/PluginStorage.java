@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.core.storage;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -24,6 +26,8 @@ public interface PluginStorage {
      * 删除的插件
      */
     String DELETED = "_deleted";
+
+    void initialize();
 
     /**
      * 获得插件位置

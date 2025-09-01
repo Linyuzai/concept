@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.zip.util;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.function.Supplier;
@@ -9,15 +11,8 @@ public class ZipUtils {
 
     public static final String SEPARATOR = "!/";
 
-    public static File getFile(Object o, String... suffixes) {
-        File file;
-        if (o instanceof File) {
-            file = (File) o;
-        } else if (o instanceof String) {
-            file = new File((String) o);
-        } else {
-            return null;
-        }
+    public static File getFile(PluginDefinition definition, String... suffixes) {
+        File file = new File(definition.getPath());
         if (!file.exists() || !file.isFile()) {
             return null;
         }

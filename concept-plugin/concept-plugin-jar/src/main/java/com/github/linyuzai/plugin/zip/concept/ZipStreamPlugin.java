@@ -25,11 +25,6 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
     protected final Supplier<InputStream> supplier;
 
     @Override
-    public Object getId() {
-        return url;
-    }
-
-    @Override
     public URL getURL() {
         return url;
     }

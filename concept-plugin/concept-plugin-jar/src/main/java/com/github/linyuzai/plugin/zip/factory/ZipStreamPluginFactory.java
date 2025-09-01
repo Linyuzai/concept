@@ -7,12 +7,14 @@ import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 import java.util.function.Supplier;
 
 import static com.github.linyuzai.plugin.zip.util.ZipUtils.SEPARATOR;
@@ -24,10 +26,15 @@ public class ZipStreamPluginFactory implements PluginFactory {
 
     @SneakyThrows
     @Override
-    public Plugin create(Object source, PluginMetadata metadata, PluginContext context) {
-        if (source instanceof PluginDefinition.Loadable) {
-            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) source;
-            URL url = new URL(loadable.getPath());
+    public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
+        if (definition instanceof PluginDefinition.Loadable) {
+            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) definition;
+            URL url = new URL(null, loadable.getUrl(), new URLStreamHandler() {
+                @Override
+                protected URLConnection openConnection(URL u) throws IOException {
+                    return null;
+                }
+            });
             return create(url, new Supplier<InputStream>() {
                 @SneakyThrows
                 @Override
@@ -35,8 +42,8 @@ public class ZipStreamPluginFactory implements PluginFactory {
                     return loadable.getInputStream();
                 }
             });
-        } else if (source instanceof Plugin.Entry) {
-            Plugin.Entry entry = (Plugin.Entry) source;
+        } else if (definition instanceof Plugin.Entry) {
+            Plugin.Entry entry = (Plugin.Entry) definition;
             if (support(entry.getName())) {
                 Object id = entry.getId();
                 if (id instanceof URL) {

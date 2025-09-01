@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.autoconfigure.management;
 
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.autoload.*;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -90,10 +91,10 @@ public class PluginManager {
         try {
             storage.loadPlugin(group, name);
         } catch (Throwable e) {
+            log.error("Load plugin error: " + path, e);
             execute(() -> {
                 try {
-                    Object source = storage.getPluginDefinition(path);
-                    concept.load(source);
+                    concept.load(path);
                 } catch (Throwable e1) {
                     log.error("Load plugin error: " + path, e1);
                 } finally {
@@ -109,6 +110,7 @@ public class PluginManager {
         try {
             storage.unloadPlugin(group, name);
         } catch (Throwable e) {
+            log.error("Unload plugin error: " + path, e);
             execute(() -> {
                 try {
                     concept.unload(path);
@@ -132,8 +134,7 @@ public class PluginManager {
         }
         execute(() -> {
             try {
-                Object source = storage.getPluginDefinition(path);
-                concept.load(source);
+                concept.load(path);
             } catch (Throwable e) {
                 log.error("Reload plugin error: " + path, e);
             } finally {
@@ -154,8 +155,8 @@ public class PluginManager {
         String path = storage.getLoadedPluginPath(group, name);
         Plugin plugin = concept.getRepository().get(path);
         if (plugin == null) {
-            return concept.createMetadata(storage.getUnloadedPluginPath(group, name),
-                    concept.createContext());
+            PluginDefinition definition = storage.getPluginDefinition(storage.getUnloadedPluginPath(group, name));
+            return concept.createMetadata(definition, concept.createContext());
         } else {
             return plugin.getMetadata();
         }
@@ -200,7 +201,7 @@ public class PluginManager {
         try {
             storage.loadPlugin(group, upload);
         } catch (Throwable e) {
-            log.error("Load plugin error: " + newPath, e);
+            log.error("Update plugin error: " + newPath, e);
             loadingSet.remove(newPath);
             updatingSet.remove(oldPath);
             concept.getEventPublisher().unregister(listener);
@@ -228,7 +229,7 @@ public class PluginManager {
                 .stream()
                 .collect(Collectors.toMap(name ->
                         storage.getLoadedPluginPath(group, name), Function.identity()));
-        return storage.getPluginDefinitions(pathNames.values())
+        return storage.getPluginDefinitions(pathNames.keySet())
                 .stream()
                 .map(definition -> {
                     String path = definition.getPath();
@@ -288,7 +289,7 @@ public class PluginManager {
                 .stream()
                 .collect(Collectors.toMap(name ->
                         storage.getDeletedPluginPath(group, name), Function.identity()));
-        return storage.getPluginDefinitions(pathNames.values()).stream()
+        return storage.getPluginDefinitions(pathNames.keySet()).stream()
                 .map(definition -> {
                     String path = definition.getPath();
                     long timestamp = definition.getCreateTime();
@@ -331,7 +332,7 @@ public class PluginManager {
     }
 
     protected void execute(Runnable runnable) {
-        executor.execute(runnable, 1000, TimeUnit.MILLISECONDS);
+        executor.execute(runnable, 5000, TimeUnit.MILLISECONDS);
     }
 
     public class PluginAutoLoadListener implements PluginEventListener {

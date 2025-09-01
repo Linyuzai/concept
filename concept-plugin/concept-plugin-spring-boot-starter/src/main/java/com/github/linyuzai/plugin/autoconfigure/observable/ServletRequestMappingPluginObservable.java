@@ -5,21 +5,21 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.MethodIntrospector;
-import org.springframework.web.reactive.result.method.RequestMappingInfo;
-import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-public class ReactiveControllerPluginObservable extends ControllerPluginObservable implements ApplicationContextAware {
+public class ServletRequestMappingPluginObservable extends RequestMappingPluginObservable implements ApplicationContextAware {
 
     private RequestMappingHandlerMapping handlerMapping;
 
     private Method getMappingForMethod;
 
     @Override
-    protected void doRegister(Class<?> type, Object controller, List<Runnable> destroyList) {
+    protected void doRegister(Class<?> type, Object requestMapping, List<Runnable> destroyList) {
         Map<Method, RequestMappingInfo> methods = MethodIntrospector.selectMethods(type,
                 (MethodIntrospector.MetadataLookup<RequestMappingInfo>) method -> {
                     try {
@@ -32,10 +32,11 @@ public class ReactiveControllerPluginObservable extends ControllerPluginObservab
                 });
         //BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(controller);
         methods.forEach((method, requestMappingInfo) -> {
-            handlerMapping.registerMapping(requestMappingInfo, controller, method);
+            handlerMapping.registerMapping(requestMappingInfo, requestMapping, method);
             destroyList.add(() -> handlerMapping.unregisterMapping(requestMappingInfo));
         });
     }
+
 
     @SneakyThrows
     @Override

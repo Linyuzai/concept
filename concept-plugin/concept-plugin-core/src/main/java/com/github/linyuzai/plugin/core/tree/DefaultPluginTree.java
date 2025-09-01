@@ -35,7 +35,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
     private TracerStages current;
 
     public DefaultPluginTree(Plugin plugin) {
-        root = createNode(plugin.getId(), "", plugin, null);
+        root = createNode(plugin.getDefinition().getPath(), "", plugin, null);
     }
 
     @Override

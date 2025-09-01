@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.remote.minio;
 
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import io.minio.*;
 import io.minio.errors.*;
@@ -103,7 +103,7 @@ public class MinioPluginStorage extends RemotePluginStorage {
     @Override
     public boolean existPlugin(String group, String name) {
         try {
-            getObjectMetadata(getOrCreateBucket(), getPluginPath(group, name));
+            getObjectMetadata(getBucket(), getPluginPath(group, name));
             return true;
         } catch (ErrorResponseException e) {
             return false;
@@ -142,12 +142,12 @@ public class MinioPluginStorage extends RemotePluginStorage {
         @SneakyThrows
         @Override
         public long getSize() {
-            return getObjectMetadata(getOrCreateBucket(), path).size();
+            return getObjectMetadata(getBucket(), path).size();
         }
 
         @Override
         public long getCreateTime() {
-            String creation = getUserMetadata(getOrCreateBucket(), path).get(METADATA_CREATION);
+            String creation = getUserMetadata(getBucket(), path).get(METADATA_CREATION);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {
@@ -158,7 +158,7 @@ public class MinioPluginStorage extends RemotePluginStorage {
         @SneakyThrows
         @Override
         public Object getVersion() {
-            return getObjectMetadata(getOrCreateBucket(), path).lastModified().toEpochSecond();
+            return getObjectMetadata(getBucket(), path).lastModified().toEpochSecond();
         }
 
         @Override
@@ -167,8 +167,13 @@ public class MinioPluginStorage extends RemotePluginStorage {
         }
 
         @Override
+        public String getUrl() {
+            return "minio:" + path;
+        }
+
+        @Override
         public InputStream getInputStream() throws IOException {
-            return getObject(getOrCreateBucket(), path);
+            return getObject(getBucket(), path);
         }
     }
 }

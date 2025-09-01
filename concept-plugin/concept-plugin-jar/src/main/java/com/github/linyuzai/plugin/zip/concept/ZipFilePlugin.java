@@ -27,11 +27,6 @@ public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
     protected final URL url;
 
     @Override
-    public Object getId() {
-        return url;
-    }
-
-    @Override
     public URL getURL() {
         return url;
     }

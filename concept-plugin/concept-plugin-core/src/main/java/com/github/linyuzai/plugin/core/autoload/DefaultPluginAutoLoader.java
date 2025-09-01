@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.core.autoload;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
-import com.github.linyuzai.plugin.core.storage.PluginDefinition;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,8 +37,8 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
     }
 
     @Override
-    protected synchronized void loadedOnStart(List<PluginDefinition> definitions) {
-        plugins.putAll(listToMap(definitions));
+    protected synchronized void loadedOnStart(Collection<? extends PluginDefinition> definitions) {
+        plugins.putAll(toMap(definitions));
     }
 
     /**
@@ -58,7 +58,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
         Map<String, PluginDefinition> reload = new HashMap<>();
 
         Map<String, PluginDefinition> lastPlugins = new HashMap<>(plugins);
-        Map<String, PluginDefinition> newPlugins = listToMap(definitions);
+        Map<String, PluginDefinition> newPlugins = toMap(definitions);
 
         for (Map.Entry<String, PluginDefinition> entry : newPlugins.entrySet()) {
             PluginDefinition last = lastPlugins.remove(entry.getKey());
@@ -74,33 +74,33 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
 
         Map<String, PluginDefinition> unload = new HashMap<>(lastPlugins);
 
-        load.forEach((path, source) -> {
+        load.forEach((path, definition) -> {
             try {
-                plugins.put(path, source);
-                onCreated(path, source);
+                plugins.put(path, definition);
+                onCreated(path, definition);
             } catch (Throwable e) {
                 onError(e);
             }
         });
-        reload.forEach((path, source) -> {
+        reload.forEach((path, definition) -> {
             try {
-                plugins.put(path, source);
-                onModified(path, source);
+                plugins.put(path, definition);
+                onModified(path, definition);
             } catch (Throwable e) {
                 onError(e);
             }
         });
-        unload.forEach((path, source) -> {
+        unload.forEach((path, definition) -> {
             try {
                 plugins.remove(path);
-                onDeleted(path, source);
+                onDeleted(path, definition);
             } catch (Throwable e) {
                 onError(e);
             }
         });
     }
 
-    private Map<String, PluginDefinition> listToMap(List<PluginDefinition> plugins) {
+    private Map<String, PluginDefinition> toMap(Collection<? extends PluginDefinition> plugins) {
         Map<String, PluginDefinition> map = new HashMap<>();
         for (PluginDefinition plugin : plugins) {
             map.put(plugin.getPath(), plugin);

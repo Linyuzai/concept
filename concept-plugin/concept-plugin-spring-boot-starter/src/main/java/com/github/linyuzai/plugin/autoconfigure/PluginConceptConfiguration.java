@@ -264,7 +264,8 @@ public class PluginConceptConfiguration {
 
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
-    public PluginConcept pluginConcept(PluginContextFactory contextFactory,
+    public PluginConcept pluginConcept(PluginStorage storage,
+                                       PluginContextFactory contextFactory,
                                        PluginHandlerChainFactory handlerChainFactory,
                                        PluginTreeFactory treeFactory,
                                        PluginRepository repository,
@@ -276,6 +277,7 @@ public class PluginConceptConfiguration {
                                        List<PluginHandlerFactory> handlerFactories,
                                        List<PluginEventListener> eventListeners) {
         return new DefaultPluginConcept.Builder()
+                .storage(storage)
                 .contextFactory(contextFactory)
                 .handlerChainFactory(handlerChainFactory)
                 .treeFactory(treeFactory)
