@@ -127,7 +127,7 @@ public interface Plugin {
     /**
      * 插件内容
      */
-    interface Content {
+    interface Content extends PluginDefinition.Loadable {
 
         /**
          * 获得数据流

@@ -13,8 +13,6 @@ public interface PluginDefinition {
 
     Object getVersion();
 
-    Object getSource();
-
     interface Loadable {
 
         String getUrl();

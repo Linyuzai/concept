@@ -32,7 +32,7 @@ public class ZipStreamPluginFactory implements PluginFactory {
             URL url = new URL(null, loadable.getUrl(), new URLStreamHandler() {
                 @Override
                 protected URLConnection openConnection(URL u) throws IOException {
-                    return null;
+                    throw new UnsupportedOperationException();
                 }
             });
             return create(url, new Supplier<InputStream>() {

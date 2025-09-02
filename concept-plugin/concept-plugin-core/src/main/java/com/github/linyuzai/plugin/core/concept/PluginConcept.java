@@ -72,9 +72,14 @@ public interface PluginConcept {
     /**
      * 加载插件
      */
+    Plugin load(PluginDefinition definition);
+
+    /**
+     * 加载插件
+     */
     Collection<PluginDefinition> load(Collection<String> paths,
-                                BiConsumer<String, Plugin> onSuccess,
-                                BiConsumer<String, Throwable> onError);
+                                      BiConsumer<String, Plugin> onSuccess,
+                                      BiConsumer<String, Throwable> onError);
 
     /**
      * 卸载插件

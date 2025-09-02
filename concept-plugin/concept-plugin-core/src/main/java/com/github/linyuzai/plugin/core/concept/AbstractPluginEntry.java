@@ -20,9 +20,4 @@ public abstract class AbstractPluginEntry implements Plugin.Entry {
     public Object getVersion() {
         return plugin.getDefinition().getVersion();
     }
-
-    @Override
-    public Object getSource() {
-        return this;
-    }
 }

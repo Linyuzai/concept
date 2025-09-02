@@ -162,13 +162,8 @@ public class MinioPluginStorage extends RemotePluginStorage {
         }
 
         @Override
-        public Object getSource() {
-            return this;
-        }
-
-        @Override
         public String getUrl() {
-            return "minio:" + path;
+            return "minio://" + path;
         }
 
         @Override

@@ -193,15 +193,27 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public Plugin load(@NonNull String path) {
+        PluginDefinition definition = storage.getPluginDefinition(path);
+        return load(definition);
+    }
+
+    @Override
+    public Plugin load(PluginDefinition definition) {
         List<Plugin> plugins = new ArrayList<>();
-        load(Collections.singleton(path), (o, plugin) -> plugins.add(plugin), (o, e) -> {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new PluginLoadException(path, e);
-            }
-        });
-        return plugins.get(0);
+        doLoad(Collections.singleton(definition),
+                (o, plugin) -> plugins.add(plugin),
+                (path, e) -> {
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    } else {
+                        throw new PluginLoadException(path, e);
+                    }
+                });
+        if (plugins.isEmpty()) {
+            return null;
+        } else {
+            return plugins.get(0);
+        }
     }
 
     /**
@@ -212,18 +224,28 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 插件创建后根据插件依赖进行解析提取
      */
     @Override
-    public synchronized Collection<PluginDefinition> load(@NonNull Collection<String> paths,
-                                  @NonNull BiConsumer<String, Plugin> onSuccess,
-                                  @NonNull BiConsumer<String, Throwable> onError) {
-        List<PluginDefinition> definitions = new ArrayList<>();
+    public Collection<PluginDefinition> load(@NonNull Collection<String> paths,
+                                             @NonNull BiConsumer<String, Plugin> onSuccess,
+                                             @NonNull BiConsumer<String, Throwable> onError) {
+        List<PluginDefinition> definitions = paths.stream()
+                .map(storage::getPluginDefinition)
+                .collect(Collectors.toList());
+        doLoad(definitions, onSuccess, onError);
+        return definitions;
+    }
 
-        List<String> list = new ArrayList<>();
-        for (String path : paths) {
+    protected synchronized void doLoad(
+            @NonNull Collection<? extends PluginDefinition> definitions,
+            @NonNull BiConsumer<String, Plugin> onSuccess,
+            @NonNull BiConsumer<String, Throwable> onError) {
+        List<PluginDefinition> list = new ArrayList<>();
+        for (PluginDefinition definition : definitions) {
+            String path = definition.getPath();
             if (repository.contains(path)) {
                 onError.accept(path, new IllegalArgumentException("Plugin is already loaded: " + path));
             } else {
                 loading.add(path);
-                list.add(path);
+                list.add(definition);
             }
         }
 
@@ -244,7 +266,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         List<LoadingEntry> entries = new ArrayList<>();
 
-        for (String path : list) {
+        for (PluginDefinition definition : list) {
+            String path = definition.getPath();
             try {
                 //创建上下文
                 PluginContext context = createContext();
@@ -252,7 +275,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 context.set(PluginConcept.class, this);
                 context.initialize();
                 //创建插件
-                PluginDefinition definition = storage.getPluginDefinition(path);
                 Plugin plugin = createPlugin(definition, context);
                 if (plugin == null) {
                     throw new PluginException("Plugin can not create: " + path);
@@ -265,8 +287,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 eventPublisher.publish(new PluginCreatedEvent(plugin));
 
                 entries.add(new LoadingEntry(path, plugin, context));
-
-                definitions.add(definition);
             } catch (Throwable e) {
                 error.accept(path, e);
             }
@@ -277,8 +297,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             LoadingEntry entry = entries.remove(0);
             loadDependency(entry, entries, new Stack<>(), success, error);
         }
-
-        return definitions;
     }
 
     /**

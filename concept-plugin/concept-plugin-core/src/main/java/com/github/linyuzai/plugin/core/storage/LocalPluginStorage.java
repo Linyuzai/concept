@@ -294,10 +294,5 @@ public class LocalPluginStorage implements PluginStorage {
         public Object getVersion() {
             return new File(path).lastModified();
         }
-
-        @Override
-        public Object getSource() {
-            return path;
-        }
     }
 }

@@ -162,13 +162,8 @@ public class S3ClientStorage extends RemotePluginStorage {
         }
 
         @Override
-        public Object getSource() {
-            return this;
-        }
-
-        @Override
         public String getUrl() {
-            return "aws1:" + path;
+            return "aws://" + path;
         }
 
         @Override

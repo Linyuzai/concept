@@ -50,6 +50,11 @@ public class ExJarPluginEntry extends AbstractPluginEntry implements Plugin.Entr
     public class ExJarEntryContent implements Plugin.Content {
 
         @Override
+        public String getUrl() {
+            return url.toString();
+        }
+
+        @Override
         public InputStream getInputStream() throws IOException {
             return jarFile.getInputStream(jarEntry);
         }
