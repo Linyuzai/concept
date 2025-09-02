@@ -148,7 +148,7 @@ concept:
       #standard-type: com.github.linyuzai.plugin.jar.concept.JarPlugin.StandardMetadata
     autoload:
       enabled: true
-      period: -1
+      period: 5000
     storage:
       type: minio
     jar:

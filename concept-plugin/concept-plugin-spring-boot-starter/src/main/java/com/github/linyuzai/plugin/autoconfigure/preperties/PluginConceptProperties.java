@@ -67,9 +67,23 @@ public class PluginConceptProperties {
          */
         private String location;
 
+        private AutocleaningProperties autocleaning = new AutocleaningProperties();
+
         public enum StorageType {
 
             LOCAL, MINIO, AWS_V1, AWS_V2
+        }
+
+        @Data
+        public static class AutocleaningProperties {
+
+            private boolean enabled = true;
+
+            private long maxSize = -1;
+
+            private long maxCount = -1;
+
+            private long maxDuration = -1;
         }
     }
 

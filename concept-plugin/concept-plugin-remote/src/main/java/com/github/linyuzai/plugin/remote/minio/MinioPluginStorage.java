@@ -59,15 +59,20 @@ public class MinioPluginStorage extends RemotePluginStorage {
         return getObjectMetadata(bucket, key).userMetadata();
     }
 
-    @SneakyThrows
     @Override
     protected void putUserMetadata(String bucket, String key, Map<String, String> userMetadata) {
+        copyObject(bucket, key, bucket, key, userMetadata);
+    }
+
+    @SneakyThrows
+    @Override
+    protected void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata) {
         CopyObjectArgs args = CopyObjectArgs.builder()
-                .bucket(bucket)
-                .object(key)
+                .bucket(destBucket)
+                .object(destKey)
                 .source(CopySource.builder()
-                        .bucket(bucket)
-                        .object(key)
+                        .bucket(srcBucket)
+                        .object(srcKey)
                         .build())
                 .userMetadata(userMetadata)
                 .metadataDirective(Directive.REPLACE)
@@ -80,6 +85,16 @@ public class MinioPluginStorage extends RemotePluginStorage {
     protected InputStream getObject(String bucket, String key) throws IOException {
         GetObjectArgs args = GetObjectArgs.builder().bucket(bucket).object(key).build();
         return minioClient.getObject(args);
+    }
+
+    @SneakyThrows
+    @Override
+    protected void deleteObject(String bucket, String key) {
+        RemoveObjectArgs args = RemoveObjectArgs.builder()
+                .bucket(bucket)
+                .object(key)
+                .build();
+        minioClient.removeObject(args);
     }
 
     @SneakyThrows

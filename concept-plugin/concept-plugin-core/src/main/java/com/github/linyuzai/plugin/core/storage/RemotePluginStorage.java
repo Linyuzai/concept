@@ -4,6 +4,8 @@ import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.*;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -22,9 +24,11 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     public static final String METADATA_CREATION = "concept-plugin.creation";
 
-    protected String bucket = DEFAULT_LOCATION;
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
-    protected Executor executor;
+    private String bucket = DEFAULT_LOCATION;
+
+    private Executor executor;
 
     @Override
     public void initialize() {
@@ -101,7 +105,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     @Override
     public String getDeletedPluginPath(String group, String name) {
-        return getPluginPath(group, PluginStorage.DELETED);
+        return getPluginPath(group, name);
     }
 
     @Override
@@ -152,7 +156,11 @@ public abstract class RemotePluginStorage implements PluginStorage {
     @Override
     public void deletePlugin(String group, String name) {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.DELETED);
-        putUserMetadata(getBucket(), getPluginPath(group, name), userMetadata);
+        String bucket = getBucket();
+        String key = getPluginPath(group, name);
+        String deleteKey = key + PluginStorage.DELETED + FORMATTER.format(LocalDateTime.now());
+        copyObject(bucket, key, bucket, deleteKey, userMetadata);
+        deleteObject(bucket, key);
     }
 
     protected String getPluginPath(String group, String name) {
@@ -234,7 +242,11 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     protected abstract void putUserMetadata(String bucket, String key, Map<String, String> userMetadata);
 
+    protected abstract void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata);
+
     protected abstract InputStream getObject(String bucket, String key) throws IOException;
+
+    protected abstract void deleteObject(String bucket, String key);
 
     protected abstract void putObject(String bucket, String key,
                                       InputStream is, long length,

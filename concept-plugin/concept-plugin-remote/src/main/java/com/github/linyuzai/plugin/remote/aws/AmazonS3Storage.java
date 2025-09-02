@@ -70,7 +70,6 @@ public class AmazonS3Storage extends RemotePluginStorage {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     protected Map<String, String> getUserMetadata(String bucket, String key) {
         return getObjectMetadata(bucket, key).getUserMetadata();
@@ -78,21 +77,31 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
     @Override
     protected void putUserMetadata(String bucket, String key, Map<String, String> userMetadata) {
-        ObjectMetadata metadata = getObjectMetadata(bucket, key);
+        copyObject(bucket, key, bucket, key, userMetadata);
+    }
+
+    @Override
+    protected void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata) {
+        ObjectMetadata metadata = getObjectMetadata(srcBucket, srcKey);
         metadata.setUserMetadata(userMetadata);
         CopyObjectRequest request = new CopyObjectRequest();
-        request.setSourceBucketName(bucket);
-        request.setSourceKey(key);
-        request.setDestinationBucketName(bucket);
-        request.setDestinationKey(key);
+        request.setSourceBucketName(srcBucket);
+        request.setSourceKey(srcKey);
+        request.setDestinationBucketName(destBucket);
+        request.setDestinationKey(destKey);
         request.setNewObjectMetadata(metadata);
         request.setMetadataDirective(MetadataDirective.REPLACE.name());
         amazonS3.copyObject(request);
     }
 
     @Override
-    protected InputStream getObject(String group, String name) throws IOException {
-        return amazonS3.getObject(bucket, getPluginPath(group, name)).getObjectContent();
+    protected InputStream getObject(String bucket, String key) throws IOException {
+        return amazonS3.getObject(bucket, key).getObjectContent();
+    }
+
+    @Override
+    protected void deleteObject(String bucket, String key) {
+        amazonS3.deleteObject(bucket, key);
     }
 
     @Override

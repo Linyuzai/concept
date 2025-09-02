@@ -46,9 +46,9 @@ public class S3ClientStorage extends RemotePluginStorage {
     @Override
     public void renamePlugin(String group, String name, String rename) {
         CopyObjectRequest request = CopyObjectRequest.builder()
-                .sourceBucket(bucket)
+                .sourceBucket(getBucket())
                 .sourceKey(getPluginPath(group, name))
-                .destinationBucket(bucket)
+                .destinationBucket(getBucket())
                 .destinationKey(getPluginPath(group, rename))
                 .build();
         s3Client.copyObject(request);
@@ -102,11 +102,16 @@ public class S3ClientStorage extends RemotePluginStorage {
 
     @Override
     protected void putUserMetadata(String bucket, String key, Map<String, String> userMetadata) {
+        copyObject(bucket, key, bucket, key, userMetadata);
+    }
+
+    @Override
+    protected void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata) {
         CopyObjectRequest request = CopyObjectRequest.builder()
-                .sourceBucket(bucket)
-                .sourceKey(key)
-                .destinationBucket(bucket)
-                .destinationKey(key)
+                .sourceBucket(srcBucket)
+                .sourceKey(srcKey)
+                .destinationBucket(destBucket)
+                .destinationKey(destKey)
                 .metadata(userMetadata)
                 .metadataDirective(MetadataDirective.REPLACE)
                 .build();
@@ -114,12 +119,21 @@ public class S3ClientStorage extends RemotePluginStorage {
     }
 
     @Override
-    protected InputStream getObject(String group, String name) throws IOException {
+    protected InputStream getObject(String bucket, String key) throws IOException {
         GetObjectRequest request = GetObjectRequest.builder()
-                .bucket(getBucket())
-                .key(getPluginPath(group, name))
+                .bucket(bucket)
+                .key(key)
                 .build();
         return s3Client.getObject(request);
+    }
+
+    @Override
+    protected void deleteObject(String bucket, String key) {
+        DeleteObjectRequest request = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+        s3Client.deleteObject(request);
     }
 
     @Override
