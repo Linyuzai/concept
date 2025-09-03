@@ -4,7 +4,6 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 

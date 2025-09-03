@@ -3,11 +3,16 @@ package com.github.linyuzai.plugin.core.storage;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -69,8 +74,9 @@ public class LocalPluginStorage implements PluginStorage {
         return getPluginPath(group, name, LOADED);
     }
 
+    @SneakyThrows
     @Override
-    public InputStream getLoadedPluginInputStream(String group, String name) throws IOException {
+    public InputStream getLoadedPluginInputStream(String group, String name) {
         File file = new File(getLoadedPluginPath(group, name));
         return Files.newInputStream(file.toPath());
     }
@@ -88,8 +94,9 @@ public class LocalPluginStorage implements PluginStorage {
         return getPluginPath(group, name, UNLOADED);
     }
 
+    @SneakyThrows
     @Override
-    public InputStream getUnloadedPluginInputStream(String group, String name) throws IOException {
+    public InputStream getUnloadedPluginInputStream(String group, String name) {
         File file = new File(getUnloadedPluginPath(group, name));
         return Files.newInputStream(file.toPath());
     }
@@ -107,8 +114,9 @@ public class LocalPluginStorage implements PluginStorage {
         return getPluginPath(group, name, DELETED);
     }
 
+    @SneakyThrows
     @Override
-    public InputStream getDeletedPluginInputStream(String group, String name) throws IOException {
+    public InputStream getDeletedPluginInputStream(String group, String name) {
         File file = new File(getDeletedPluginPath(group, name));
         return Files.newInputStream(file.toPath());
     }
@@ -123,8 +131,9 @@ public class LocalPluginStorage implements PluginStorage {
         return paths.stream().map(this::getPluginDefinition).collect(Collectors.toList());
     }
 
+    @SneakyThrows
     @Override
-    public String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
+    public String uploadPlugin(String group, String name, InputStream is, long length) {
         String loadedPath = getLoadedPluginPath(group, name);
         File file = new File(generateFileName(loadedPath));
         String unloadedPath = getUnloadedPluginPath(group, file.getName());

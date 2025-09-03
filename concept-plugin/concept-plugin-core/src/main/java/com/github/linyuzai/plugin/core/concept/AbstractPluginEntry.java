@@ -7,17 +7,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class AbstractPluginEntry implements Plugin.Entry {
 
-    private final String name;
+    private final Plugin parent;
 
-    private final Plugin plugin;
+    private final String name;
 
     @Override
     public long getCreateTime() {
-        return plugin.getDefinition().getCreateTime();
+        return parent.getDefinition().getCreateTime();
     }
 
     @Override
     public Object getVersion() {
-        return plugin.getDefinition().getVersion();
+        return parent.getDefinition().getVersion();
     }
 }

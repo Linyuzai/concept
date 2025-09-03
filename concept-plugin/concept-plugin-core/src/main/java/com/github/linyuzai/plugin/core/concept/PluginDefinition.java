@@ -1,6 +1,5 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 public interface PluginDefinition {
@@ -15,8 +14,6 @@ public interface PluginDefinition {
 
     interface Loadable {
 
-        String getUrl();
-
-        InputStream getInputStream() throws IOException;
+        InputStream getInputStream();
     }
 }

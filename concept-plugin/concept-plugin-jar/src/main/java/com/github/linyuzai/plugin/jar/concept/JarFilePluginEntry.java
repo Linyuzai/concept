@@ -3,7 +3,6 @@ package com.github.linyuzai.plugin.jar.concept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePluginEntry;
 
-import java.net.URL;
 import java.util.jar.JarFile;
 
 /**
@@ -11,7 +10,7 @@ import java.util.jar.JarFile;
  */
 public class JarFilePluginEntry extends ZipFilePluginEntry implements JarPluginEntry {
 
-    public JarFilePluginEntry(JarFile jarFile, URL url, String name, Plugin plugin) {
-        super(jarFile, url, name, plugin);
+    public JarFilePluginEntry(Plugin parent, String name, String path, JarFile jarFile) {
+        super(parent, name, path, jarFile);
     }
 }

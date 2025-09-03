@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.AbstractPluginExtractor;
 import com.github.linyuzai.plugin.core.handle.extract.convert.PluginConvertor;
 import com.github.linyuzai.plugin.core.handle.extract.match.PluginMatcher;
-import com.github.linyuzai.plugin.core.type.*;
+import com.github.linyuzai.plugin.core.type.NestedType;
 import com.github.linyuzai.plugin.jar.handle.extract.convert.ClassConvertor;
 import com.github.linyuzai.plugin.jar.handle.extract.match.ClassMatcher;
 

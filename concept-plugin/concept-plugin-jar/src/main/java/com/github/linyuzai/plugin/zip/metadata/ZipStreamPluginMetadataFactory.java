@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.zip.metadata;
 
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;

@@ -7,11 +7,12 @@ import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -102,6 +103,11 @@ public interface PluginConcept {
     boolean isLoaded(String path);
 
     /**
+     * 获得路径工厂
+     */
+    PluginPathFactory getPathFactory();
+
+    /**
      * 获得上下文工厂
      */
     PluginContextFactory getContextFactory();
@@ -119,7 +125,13 @@ public interface PluginConcept {
     /**
      * 获得插件存储
      */
+    PluginStorage getStorage();
+
+    /**
+     * 获得插件仓储
+     */
     PluginRepository getRepository();
+
 
     /**
      * 获得事件发布器

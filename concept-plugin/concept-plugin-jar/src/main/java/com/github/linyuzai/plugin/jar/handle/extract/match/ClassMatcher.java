@@ -7,8 +7,8 @@ import com.github.linyuzai.plugin.core.handle.filter.AbstractPluginFilter;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassNameFilter;
-import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

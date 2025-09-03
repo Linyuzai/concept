@@ -1,6 +1,9 @@
 package com.github.linyuzai.plugin.core.handle.extract.format;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.lang.reflect.Array;
 import java.util.List;

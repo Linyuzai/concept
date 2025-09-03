@@ -33,11 +33,6 @@ public class PluginConceptProperties {
     private LoggerProperties logger = new LoggerProperties();
 
     /**
-     * jar插件配置
-     */
-    private JarProperties jar = new JarProperties();
-
-    /**
      * 管理配置
      */
     private ManagementProperties management = new ManagementProperties();
@@ -142,34 +137,6 @@ public class PluginConceptProperties {
              * 是否启用异常日志配置
              */
             private boolean enabled = true;
-        }
-    }
-
-    /**
-     * jar插件配置
-     */
-    @Data
-    public static class JarProperties {
-
-        /**
-         * jar插件模式
-         */
-        private Mode mode = Mode.STREAM;
-
-        /**
-         * jar插件模式
-         */
-        public enum Mode {
-
-            /**
-             * 数据流
-             */
-            STREAM,
-
-            /**
-             * 文件随机访问
-             */
-            FILE
         }
     }
 

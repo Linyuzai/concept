@@ -32,18 +32,6 @@ public class SampleDynamicExtractor {
         log.info("Dynamic Text: {}", text);
         SpringData bind = plugin.getMetadata().bind("spring-sample", SpringData.class);
         log.info("Dynamic Bind: {}", bind);
-        /*plugin.addLoadListener(new Plugin.LoadListener() {
-            @Override
-            public void onLoad(Plugin plugin) {
-                log.info("Dynamic Load");
-            }
-        });*/
-        plugin.addDestroyListener(new Plugin.DestroyListener() {
-            @Override
-            public void onDestroy(Plugin plugin) {
-                log.info("Dynamic Destroy");
-            }
-        });
     }
 
     @Data

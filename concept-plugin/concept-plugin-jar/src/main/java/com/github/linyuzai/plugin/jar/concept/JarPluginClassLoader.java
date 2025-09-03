@@ -87,11 +87,7 @@ public class JarPluginClassLoader extends PluginClassLoader {
     @Override
     public InputStream getResourceAsStream(String name) {
         Plugin.Content content = resources.getOrDefault(name, classes.get(name));
-        try {
-            return content == null ? null : content.getInputStream();
-        } catch (IOException e) {
-            return null;
-        }
+        return content == null ? null : content.getInputStream();
     }
 
     /**

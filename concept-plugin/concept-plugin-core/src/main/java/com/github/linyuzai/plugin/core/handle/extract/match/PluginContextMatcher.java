@@ -1,7 +1,10 @@
 package com.github.linyuzai.plugin.core.handle.extract.match;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 插件上下文匹配器

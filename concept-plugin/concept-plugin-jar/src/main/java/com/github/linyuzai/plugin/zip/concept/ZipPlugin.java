@@ -4,16 +4,12 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.net.URL;
-
 /**
  * zip插件
  */
 public interface ZipPlugin extends Plugin {
 
     String SUFFIX_ZIP = ".zip";
-
-    URL getURL();
 
     @Data
     @EqualsAndHashCode(callSuper = true)

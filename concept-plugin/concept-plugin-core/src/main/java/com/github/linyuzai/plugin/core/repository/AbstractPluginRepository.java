@@ -2,10 +2,7 @@ package com.github.linyuzai.plugin.core.repository;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**

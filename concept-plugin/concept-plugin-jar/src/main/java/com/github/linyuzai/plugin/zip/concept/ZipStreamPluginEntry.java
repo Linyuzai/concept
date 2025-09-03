@@ -5,13 +5,12 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.net.URL;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
@@ -22,7 +21,8 @@ import java.util.zip.ZipInputStream;
  */
 public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPluginEntry {
 
-    protected final URL url;
+    @Getter
+    protected final String path;
 
     @Getter
     protected final long size;
@@ -38,13 +38,13 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
      */
     protected volatile Reference<byte[]> reference;
 
-    public ZipStreamPluginEntry(String name,
-                                Plugin plugin,
-                                URL url,
+    public ZipStreamPluginEntry(Plugin parent,
+                                String name,
+                                String path,
                                 Supplier<InputStream> supplier,
                                 byte[] bytes) {
-        super(name, plugin);
-        this.url = url;
+        super(parent, name);
+        this.path = path;
         this.supplier = supplier;
         if (isDirectory()) {
             this.size = 0L;
@@ -52,16 +52,6 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
         }
         this.size = bytes.length;
         this.reference = createReference(bytes);
-    }
-
-    @Override
-    public String getPath() {
-        return url.toString();
-    }
-
-    @Override
-    public URL getURL() {
-        return url;
     }
 
     @Override
@@ -84,13 +74,9 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
      */
     public class ReferenceContent implements Plugin.Content {
 
+        @SneakyThrows
         @Override
-        public String getUrl() {
-            return url.toString();
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             byte[] bytes;
             bytes = reference.get();
             if (bytes != null) {

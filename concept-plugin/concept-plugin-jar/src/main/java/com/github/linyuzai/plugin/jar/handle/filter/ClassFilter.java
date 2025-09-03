@@ -2,8 +2,8 @@ package com.github.linyuzai.plugin.jar.handle.filter;
 
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.filter.PredicateFilter;
-import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
+import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -122,12 +122,8 @@ public class ClassFilter extends PredicateFilter<ClassSupplier> {
 
     private static Collection<Predicate<ClassSupplier>> wrap(Collection<? extends Predicate<Class<?>>> predicates) {
         return predicates.stream()
-                .map(it -> new Predicate<ClassSupplier>() {
-                    @Override
-                    public boolean test(ClassSupplier classSupplier) {
-                        return it.test(classSupplier.get());
-                    }
-                })
+                .map(it -> (Predicate<ClassSupplier>)
+                        classSupplier -> it.test(classSupplier.get()))
                 .collect(Collectors.toList());
     }
 

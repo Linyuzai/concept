@@ -9,7 +9,6 @@ import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
-import java.util.function.Predicate;
 
 /**
  * Bean 匹配器

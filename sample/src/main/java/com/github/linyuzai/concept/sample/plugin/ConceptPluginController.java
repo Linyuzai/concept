@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.extract.OnPluginExtract;
-import com.github.linyuzai.plugin.jar.extension.ExJarPlugin;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.handle.extract.JarDynamicExtractor;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation;
@@ -682,7 +682,7 @@ public class ConceptPluginController {
      */
     @OnPluginExtract
     private void onPluginExtract(
-            ExJarPlugin plugin, PluginContext context,
+            JarPlugin plugin, PluginContext context,
 
             //所有的 CustomPlugin 类和 properties 文件
             List<Class<? extends CustomPlugin>> p0, Properties p1,

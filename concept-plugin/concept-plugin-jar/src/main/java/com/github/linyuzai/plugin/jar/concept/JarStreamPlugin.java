@@ -1,13 +1,12 @@
 package com.github.linyuzai.plugin.jar.concept;
 
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.function.Supplier;
-import java.util.zip.ZipInputStream;
 
 /**
  * jar流插件
@@ -18,12 +17,32 @@ public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
 
     private PluginClassLoader pluginClassLoader;
 
-    public JarStreamPlugin(URL url, Supplier<InputStream> supplier) {
-        super(url, supplier);
+    public JarStreamPlugin(Supplier<InputStream> supplier) {
+        super(supplier);
     }
 
     @Override
-    protected JarPluginEntry createPluginEntry(URL url, String name, byte[] bytes) {
-        return new JarStreamPluginEntry(name, this, url, supplier, bytes);
+    protected JarPluginEntry createPluginEntry(String path, String name, byte[] bytes) {
+        return new JarStreamPluginEntry(this, name, path, supplier, bytes);
+    }
+
+    /**
+     * 缓存包和类的内容创建插件类加载器
+     */
+    @Override
+    public void onPrepare(PluginContext context) {
+        prepareClassLoader(context);
+    }
+
+    /**
+     * 关闭插件类加载器
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            pluginClassLoader.close();
+        } catch (Throwable ignore) {
+        }
     }
 }

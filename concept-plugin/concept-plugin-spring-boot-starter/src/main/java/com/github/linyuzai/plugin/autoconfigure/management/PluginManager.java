@@ -2,13 +2,13 @@ package com.github.linyuzai.plugin.autoconfigure.management;
 
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.autoload.*;
-import com.github.linyuzai.plugin.core.concept.PluginDefinition;
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

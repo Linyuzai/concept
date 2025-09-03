@@ -4,7 +4,6 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
@@ -109,14 +108,14 @@ public interface Plugin {
     interface Entry extends PluginDefinition {
 
         /**
+         * 获得插件
+         */
+        Plugin getParent();
+
+        /**
          * 获得条目名称
          */
         String getName();
-
-        /**
-         * 获得插件
-         */
-        Plugin getPlugin();
 
         /**
          * 获得内容
@@ -132,7 +131,7 @@ public interface Plugin {
         /**
          * 获得数据流
          */
-        InputStream getInputStream() throws IOException;
+        InputStream getInputStream();
     }
 
     /**

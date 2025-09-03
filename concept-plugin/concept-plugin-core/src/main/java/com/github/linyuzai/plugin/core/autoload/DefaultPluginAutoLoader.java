@@ -1,9 +1,9 @@
 package com.github.linyuzai.plugin.core.autoload;
 
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
-import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import lombok.Getter;
 import lombok.Setter;
 

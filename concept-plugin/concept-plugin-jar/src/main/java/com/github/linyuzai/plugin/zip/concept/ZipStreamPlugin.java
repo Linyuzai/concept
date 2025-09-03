@@ -1,14 +1,13 @@
 package com.github.linyuzai.plugin.zip.concept;
 
 import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
+import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
@@ -20,30 +19,28 @@ import java.util.zip.ZipInputStream;
 @RequiredArgsConstructor
 public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
 
-    protected final URL url;
-
     protected final Supplier<InputStream> supplier;
 
-    @Override
-    public URL getURL() {
-        return url;
+    public ZipInputStream getInputStream() {
+        return new ZipInputStream(supplier.get());
     }
 
     @SneakyThrows
     @Override
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
+        PluginConcept concept = context.getConcept();
         try (ZipInputStream zis = new ZipInputStream(supplier.get())) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String name = entry.getName();
-                URL id = new URL(url, name);
+                String path = concept.getPathFactory().create(getDefinition().getPath(), name);
                 byte[] bytes;
                 if (entry.isDirectory()) {
                     bytes = null;
                 } else {
                     bytes = PluginUtils.read(zis);
                 }
-                ZipPluginEntry pluginEntry = createPluginEntry(id, name, bytes);
+                ZipPluginEntry pluginEntry = createPluginEntry(path, name, bytes);
                 consumer.accept(pluginEntry);
                 zis.closeEntry();
             }
@@ -53,7 +50,7 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
     /**
      * 创建插件条目
      */
-    protected ZipPluginEntry createPluginEntry(URL url, String name, byte[] bytes) {
-        return new ZipStreamPluginEntry(name, this, url, supplier, bytes);
+    protected ZipPluginEntry createPluginEntry(String path, String name, byte[] bytes) {
+        return new ZipStreamPluginEntry(this, name, path, supplier, bytes);
     }
 }

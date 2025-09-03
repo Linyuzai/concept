@@ -1,16 +1,16 @@
 package com.github.linyuzai.plugin.remote.aws;
 
-import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
@@ -119,7 +119,7 @@ public class S3ClientStorage extends RemotePluginStorage {
     }
 
     @Override
-    protected InputStream getObject(String bucket, String key) throws IOException {
+    protected InputStream getObject(String bucket, String key) {
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -176,12 +176,7 @@ public class S3ClientStorage extends RemotePluginStorage {
         }
 
         @Override
-        public String getUrl() {
-            return "aws://" + path;
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             return getObject(getBucket(), path);
         }
     }

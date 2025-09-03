@@ -1,7 +1,5 @@
 package com.github.linyuzai.plugin.autoconfigure;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.github.linyuzai.plugin.autoconfigure.autoload.ConditionalOnPluginAutoloadEnabled;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanResolver;
 import com.github.linyuzai.plugin.autoconfigure.event.ApplicationPluginEventPublisher;
@@ -12,14 +10,6 @@ import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor
 import com.github.linyuzai.plugin.autoconfigure.yaml.YamlResolver;
 import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesMetadataAdapter;
 import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesResolver;
-import com.github.linyuzai.plugin.remote.aws.AmazonS3Storage;
-import com.github.linyuzai.plugin.remote.aws.S3ClientStorage;
-import com.github.linyuzai.plugin.core.autoload.DefaultPluginAutoLoader;
-import com.github.linyuzai.plugin.core.autoload.PluginAutoLoader;
-import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
-import com.github.linyuzai.plugin.core.metadata.PropertiesMetadataAdapter;
-import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -27,8 +17,6 @@ import com.github.linyuzai.plugin.core.context.DefaultPluginContextFactory;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
-import com.github.linyuzai.plugin.core.executer.DefaultPluginExecutor;
-import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.handle.DefaultPluginHandlerChainFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
@@ -39,33 +27,31 @@ import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
-import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
+import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
+import com.github.linyuzai.plugin.core.metadata.AbstractPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
+import com.github.linyuzai.plugin.core.metadata.PropertiesMetadataAdapter;
 import com.github.linyuzai.plugin.core.metadata.SubPluginMetadataFactory;
+import com.github.linyuzai.plugin.core.path.DefaultPluginPathFactory;
+import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
-import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.jar.autoload.JarStorageFilter;
-import com.github.linyuzai.plugin.jar.factory.ExJarPluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarFilePluginFactory;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import com.github.linyuzai.plugin.jar.metadata.JarFilePluginMetadataFactory;
 import com.github.linyuzai.plugin.jar.metadata.JarStreamPluginMetadataFactory;
-import com.github.linyuzai.plugin.remote.minio.MinioPluginStorage;
-import io.minio.MinioClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.util.StringUtils;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
@@ -78,6 +64,12 @@ public class PluginConceptConfiguration {
     @Bean
     public static ConceptPluginProcessor conceptPluginProcessor() {
         return new ConceptPluginProcessor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PluginPathFactory pluginPathFactory() {
+        return new DefaultPluginPathFactory();
     }
 
     @Bean
@@ -171,19 +163,8 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public JarFilePluginFactory jarFilePluginFactory(PluginConceptProperties properties) {
-        String mode = properties.getJar().getMode().name();
-        JarFilePluginFactory factory = new JarFilePluginFactory();
-        factory.setDefaultMode(mode);
-        return factory;
-    }
-
-    @Bean
-    public ExJarPluginFactory exJarPluginFactory(PluginConceptProperties properties) {
-        String mode = properties.getJar().getMode().name();
-        ExJarPluginFactory factory = new ExJarPluginFactory();
-        factory.setDefaultMode(mode);
-        return factory;
+    public JarFilePluginFactory jarFilePluginFactory() {
+        return new JarFilePluginFactory();
     }
 
     @Bean
@@ -264,10 +245,11 @@ public class PluginConceptConfiguration {
 
     @Bean(destroyMethod = "destroy")
     @ConditionalOnMissingBean
-    public PluginConcept pluginConcept(PluginStorage storage,
+    public PluginConcept pluginConcept(PluginPathFactory pathFactory,
                                        PluginContextFactory contextFactory,
                                        PluginHandlerChainFactory handlerChainFactory,
                                        PluginTreeFactory treeFactory,
+                                       PluginStorage storage,
                                        PluginRepository repository,
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
@@ -277,10 +259,11 @@ public class PluginConceptConfiguration {
                                        List<PluginHandlerFactory> handlerFactories,
                                        List<PluginEventListener> eventListeners) {
         return new DefaultPluginConcept.Builder()
-                .storage(storage)
+                .pathFactory(pathFactory)
                 .contextFactory(contextFactory)
                 .handlerChainFactory(handlerChainFactory)
                 .treeFactory(treeFactory)
+                .storage(storage)
                 .repository(repository)
                 .eventPublisher(eventPublisher)
                 .logger(logger)

@@ -5,7 +5,6 @@ import com.github.linyuzai.plugin.jar.concept.JarStreamPlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipStreamPluginFactory;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.function.Supplier;
 
 /**
@@ -14,8 +13,8 @@ import java.util.function.Supplier;
 public class JarStreamPluginFactory extends ZipStreamPluginFactory implements JarPluginSuffixes {
 
     @Override
-    protected JarStreamPlugin create(URL url, Supplier<InputStream> supplier) {
-        return new JarStreamPlugin(url, supplier);
+    protected JarStreamPlugin create(Supplier<InputStream> supplier) {
+        return new JarStreamPlugin(supplier);
     }
 
     @Override

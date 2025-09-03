@@ -3,7 +3,9 @@ package com.github.linyuzai.plugin.core.storage;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -79,7 +81,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
     }
 
     @Override
-    public InputStream getLoadedPluginInputStream(String group, String name) throws IOException {
+    public InputStream getLoadedPluginInputStream(String group, String name) {
         return getObject(getBucket(), getPluginPath(group, name));
     }
 
@@ -94,7 +96,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
     }
 
     @Override
-    public InputStream getUnloadedPluginInputStream(String group, String name) throws IOException {
+    public InputStream getUnloadedPluginInputStream(String group, String name) {
         return getObject(getBucket(), getPluginPath(group, name));
     }
 
@@ -109,7 +111,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
     }
 
     @Override
-    public InputStream getDeletedPluginInputStream(String group, String name) throws IOException {
+    public InputStream getDeletedPluginInputStream(String group, String name) {
         return getObject(getBucket(), getPluginPath(group, name));
     }
 
@@ -244,7 +246,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     protected abstract void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata);
 
-    protected abstract InputStream getObject(String bucket, String key) throws IOException;
+    protected abstract InputStream getObject(String bucket, String key);
 
     protected abstract void deleteObject(String bucket, String key);
 

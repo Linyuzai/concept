@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.core.storage;
 
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +54,7 @@ public interface PluginStorage {
     /**
      * 获得分组下需要加载的插件流
      */
-    InputStream getLoadedPluginInputStream(String group, String name) throws IOException;
+    InputStream getLoadedPluginInputStream(String group, String name);
 
     /**
      * 获得分组下的不需要加载的插件名
@@ -70,7 +69,7 @@ public interface PluginStorage {
     /**
      * 获得分组下不需要加载的插件流
      */
-    InputStream getUnloadedPluginInputStream(String group, String name) throws IOException;
+    InputStream getUnloadedPluginInputStream(String group, String name);
 
     /**
      * 获得分组下的删除的插件名
@@ -85,7 +84,7 @@ public interface PluginStorage {
     /**
      * 获得分组下删除的插件流
      */
-    InputStream getDeletedPluginInputStream(String group, String name) throws IOException;
+    InputStream getDeletedPluginInputStream(String group, String name);
 
     /**
      * 获得插件源
@@ -100,7 +99,7 @@ public interface PluginStorage {
     /**
      * 上传插件
      */
-    String uploadPlugin(String group, String name, InputStream is, long length) throws IOException;
+    String uploadPlugin(String group, String name, InputStream is, long length);
 
     /**
      * 加载分组下的插件

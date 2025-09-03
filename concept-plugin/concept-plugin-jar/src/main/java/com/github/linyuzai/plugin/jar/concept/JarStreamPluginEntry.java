@@ -4,7 +4,6 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPluginEntry;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.function.Supplier;
 
 /**
@@ -12,8 +11,8 @@ import java.util.function.Supplier;
  */
 public class JarStreamPluginEntry extends ZipStreamPluginEntry implements JarPluginEntry {
 
-    public JarStreamPluginEntry(String name, Plugin plugin, URL url,
+    public JarStreamPluginEntry(Plugin parent, String name, String path,
                                 Supplier<InputStream> supplier, byte[] bytes) {
-        super(name, plugin, url, supplier, bytes);
+        super(parent, name, path, supplier, bytes);
     }
 }

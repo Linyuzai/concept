@@ -11,7 +11,6 @@ import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.net.URL;
 import java.util.zip.ZipFile;
 
 /**
@@ -23,10 +22,9 @@ public class ZipFilePluginFactory implements PluginFactory {
     @Override
     public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
         File file = ZipUtils.getFile(definition, ZipPlugin.SUFFIX_ZIP);
-        if(file == null) {
+        if (file == null) {
             return null;
         }
-        URL url = new URL(file.getAbsolutePath());
-        return new ZipFilePlugin(new ZipFile(file), url);
+        return new ZipFilePlugin(new ZipFile(file));
     }
 }

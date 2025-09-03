@@ -82,7 +82,7 @@ public class MinioPluginStorage extends RemotePluginStorage {
 
     @SneakyThrows
     @Override
-    protected InputStream getObject(String bucket, String key) throws IOException {
+    protected InputStream getObject(String bucket, String key) {
         GetObjectArgs args = GetObjectArgs.builder().bucket(bucket).object(key).build();
         return minioClient.getObject(args);
     }
@@ -177,12 +177,7 @@ public class MinioPluginStorage extends RemotePluginStorage {
         }
 
         @Override
-        public String getUrl() {
-            return "minio://" + path;
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             return getObject(getBucket(), path);
         }
     }

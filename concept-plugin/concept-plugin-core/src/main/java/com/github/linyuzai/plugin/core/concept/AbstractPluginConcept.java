@@ -17,6 +17,7 @@ import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
+import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
@@ -37,13 +38,15 @@ import java.util.stream.Collectors;
 @Setter
 public abstract class AbstractPluginConcept implements PluginConcept {
 
-    protected PluginStorage storage;
+    protected PluginPathFactory pathFactory;
 
     protected PluginContextFactory contextFactory;
 
     protected PluginTreeFactory treeFactory;
 
     protected PluginHandlerChainFactory handlerChainFactory;
+
+    protected PluginStorage storage;
 
     protected PluginRepository repository;
 
@@ -441,13 +444,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends AbstractPluginConcept> {
 
-        protected PluginStorage storage;
+        protected PluginPathFactory pathFactory;
 
         protected PluginContextFactory contextFactory;
 
         protected PluginTreeFactory treeFactory;
 
         protected PluginHandlerChainFactory handlerChainFactory;
+
+        protected PluginStorage storage;
 
         protected PluginRepository repository;
 
@@ -465,8 +470,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
 
-        public B storage(PluginStorage storage) {
-            this.storage = storage;
+        /**
+         * 设置路径工厂
+         */
+        public B pathFactory(PluginPathFactory pathFactory) {
+            this.pathFactory = pathFactory;
             return (B) this;
         }
 
@@ -491,6 +499,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B handlerChainFactory(PluginHandlerChainFactory handlerChainFactory) {
             this.handlerChainFactory = handlerChainFactory;
+            return (B) this;
+        }
+
+        /**
+         * 设置插件存储
+         */
+        public B storage(PluginStorage storage) {
+            this.storage = storage;
             return (B) this;
         }
 
@@ -638,10 +654,11 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         public T build() {
             T concept = create();
             eventPublisher.register(eventListeners);
-            concept.setStorage(storage);
+            concept.setPathFactory(pathFactory);
             concept.setContextFactory(contextFactory);
             concept.setTreeFactory(treeFactory);
             concept.setHandlerChainFactory(handlerChainFactory);
+            concept.setStorage(storage);
             concept.setRepository(repository);
             concept.setEventPublisher(eventPublisher);
             concept.setLogger(logger);

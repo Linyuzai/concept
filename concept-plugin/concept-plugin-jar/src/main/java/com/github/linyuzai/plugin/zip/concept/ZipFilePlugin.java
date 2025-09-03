@@ -2,11 +2,10 @@ package com.github.linyuzai.plugin.zip.concept;
 
 import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
@@ -15,31 +14,21 @@ import java.util.zip.ZipFile;
 /**
  * zip文件插件
  */
+@Getter
 @RequiredArgsConstructor
 public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
 
-    /**
-     * 插件路径
-     */
-    @Getter
     protected final ZipFile zipFile;
 
-    protected final URL url;
-
-    @Override
-    public URL getURL() {
-        return url;
-    }
-
-    @SneakyThrows
     @Override
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
+        PluginPathFactory pathFactory = context.getConcept().getPathFactory();
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             String name = entry.getName();
-            URL id = new URL(url, name);
-            ZipPluginEntry pluginEntry = createPluginEntry(id, name);
+            String path = pathFactory.create(getDefinition().getPath(), name);
+            ZipPluginEntry pluginEntry = createPluginEntry(path, name);
             consumer.accept(pluginEntry);
         }
     }
@@ -47,8 +36,8 @@ public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
     /**
      * 创建zip插件条目
      */
-    protected ZipPluginEntry createPluginEntry(URL url, String name) {
-        return new ZipFilePluginEntry(zipFile, url, name, this);
+    protected ZipPluginEntry createPluginEntry(String path, String name) {
+        return new ZipFilePluginEntry(this, name, path, zipFile);
     }
 
     /**

@@ -3,9 +3,6 @@ package com.github.linyuzai.plugin.zip.util;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.function.Supplier;
-import java.util.zip.ZipFile;
 
 public class ZipUtils {
 
