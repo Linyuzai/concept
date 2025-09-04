@@ -32,7 +32,6 @@ import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadataAdapter;
-import com.github.linyuzai.plugin.core.metadata.SubPluginMetadataFactory;
 import com.github.linyuzai.plugin.core.path.DefaultPluginPathFactory;
 import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
@@ -125,11 +124,6 @@ public class PluginConceptConfiguration {
     @Bean
     public YamlPropertiesMetadataAdapter yamlPropertiesMetadataAdapter() {
         return new YamlPropertiesMetadataAdapter();
-    }
-
-    @Bean
-    public SubPluginMetadataFactory subPluginMetadataFactory() {
-        return new SubPluginMetadataFactory();
     }
 
     @Bean

@@ -47,7 +47,11 @@ public class ZipStreamPluginFactory extends StreamPluginFactory {
     }
 
     protected ZipInputStream getZipInputStream(PluginDefinition definition) {
-        return new ZipInputStream(definition.getInputStream());
+        InputStream is = definition.getInputStream();
+        if (is == null) {
+            return null;
+        }
+        return new ZipInputStream(is);
     }
 
     @Override

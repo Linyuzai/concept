@@ -10,6 +10,7 @@ import java.util.Set;
 /**
  * 空配置
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class EmptyMetadata implements PluginMetadata {

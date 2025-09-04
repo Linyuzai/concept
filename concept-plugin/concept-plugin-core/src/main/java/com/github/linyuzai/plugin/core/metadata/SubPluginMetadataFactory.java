@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
+@Deprecated
 public class SubPluginMetadataFactory implements PluginMetadataFactory {
 
     @Override

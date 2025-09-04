@@ -12,10 +12,10 @@ public interface PluginDefinition {
 
     Object getVersion();
 
+    /**
+     * 获得输入流
+     * <p>
+     * 可能为null
+     */
     InputStream getInputStream();
-
-    interface Loadable {
-
-        InputStream getInputStream();
-    }
 }

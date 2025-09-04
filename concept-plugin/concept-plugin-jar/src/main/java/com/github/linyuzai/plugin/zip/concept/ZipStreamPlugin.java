@@ -22,14 +22,21 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
     protected final Supplier<InputStream> supplier;
 
     public ZipInputStream getInputStream() {
-        return new ZipInputStream(supplier.get());
+        InputStream is = supplier.get();
+        if (is == null) {
+            return null;
+        }
+        return new ZipInputStream(is);
     }
 
     @SneakyThrows
     @Override
     public void forEachEntry(PluginContext context, Consumer<Entry> consumer) {
         PluginConcept concept = context.getConcept();
-        try (ZipInputStream zis = new ZipInputStream(supplier.get())) {
+        try (ZipInputStream zis = getInputStream()) {
+            if (zis == null) {
+                return;
+            }
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String name = entry.getName();
