@@ -16,14 +16,19 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
-@RequiredArgsConstructor
+@Getter
 public class MinioPluginStorage extends RemotePluginStorage {
 
     private final MinioClient minioClient;
 
-    public MinioPluginStorage(String bucket, MinioClient minioClient) {
-        super(bucket, null);
+    public MinioPluginStorage(String bucket, Filter filter, MinioClient minioClient) {
+        this(bucket, filter, minioClient, null);
+    }
+
+    public MinioPluginStorage(String bucket, Filter filter, MinioClient minioClient, Executor executor) {
+        super(bucket, filter, executor);
         this.minioClient = minioClient;
     }
 

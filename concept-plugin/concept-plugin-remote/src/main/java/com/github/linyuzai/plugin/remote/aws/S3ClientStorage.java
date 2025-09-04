@@ -19,12 +19,12 @@ public class S3ClientStorage extends RemotePluginStorage {
 
     private final S3Client s3Client;
 
-    public S3ClientStorage(String bucket, S3Client s3Client) {
-        this(bucket, s3Client, null);
+    public S3ClientStorage(String bucket, Filter filter, S3Client s3Client) {
+        this(bucket, filter, s3Client, null);
     }
 
-    public S3ClientStorage(String bucket, S3Client s3Client, Executor executor) {
-        super(bucket, executor);
+    public S3ClientStorage(String bucket, Filter filter, S3Client s3Client, Executor executor) {
+        super(bucket, filter, executor);
         this.s3Client = s3Client;
     }
 

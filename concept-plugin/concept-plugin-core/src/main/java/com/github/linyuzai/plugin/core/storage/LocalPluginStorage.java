@@ -217,26 +217,34 @@ public class LocalPluginStorage implements PluginStorage {
         boolean renameTo = from.renameTo(renameFile);
     }
 
+    @SneakyThrows
     protected boolean move(String group, String name, String from, String to) {
-        File fromFile = new File(getPluginPath(group, name, from));
+        File fromFile = new File(getPluginFile(group, name, from));
         if (!fromFile.exists()) {
             throw new IllegalArgumentException(name + " not existed");
         }
-        String toPath = getPluginPath(group, name, to);
+        String toPath = getPluginFile(group, name, to);
         File toFile = new File(generateFileName(toPath));
-        return fromFile.renameTo(toFile);
+        //return fromFile.renameTo(toFile);
+        // 移动失败会抛出异常
+        Files.move(fromFile.toPath(), toFile.toPath());
+        return true;
     }
 
     protected File getGroupDirectory(String group) {
-        return check(new File(location, group.trim()));
+        return check(new File(location, group));
     }
 
     protected File getPluginDirectory(String group, String type) {
         return check(new File(getGroupDirectory(group), type));
     }
 
+    protected String getPluginFile(String group, String name, String type) {
+        return new File(getPluginDirectory(group, type), name).getAbsolutePath();
+    }
+
     protected String getPluginPath(String group, String name, String type) {
-        return new File(getPluginDirectory(group, type), name.trim()).getAbsolutePath();
+        return group + "/" + type + "/" + name;
     }
 
     protected List<String> getPlugins(String group, String type) {

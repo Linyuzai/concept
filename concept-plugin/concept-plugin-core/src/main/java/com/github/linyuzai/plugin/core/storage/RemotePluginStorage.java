@@ -30,6 +30,8 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     private String bucket = DEFAULT_LOCATION;
 
+    private PluginStorage.Filter filter;
+
     private Executor executor;
 
     @Override
@@ -204,22 +206,24 @@ public abstract class RemotePluginStorage implements PluginStorage {
             if (plugin.endsWith("concept_plugin.properties")) {
                 continue;
             }
-            Supplier<String> supplier = () -> {
-                Map<String, String> userMetadata = getUserMetadata(bucketToUse, plugin);
-                String pluginStatus = userMetadata.get(METADATA_STATUS);
-                if (type.equals(pluginStatus)) {
-                    return plugin;
+            if (filter == null || filter.filter(group, plugin)) {
+                Supplier<String> supplier = () -> {
+                    Map<String, String> userMetadata = getUserMetadata(bucketToUse, plugin);
+                    String pluginStatus = userMetadata.get(METADATA_STATUS);
+                    if (type.equals(pluginStatus)) {
+                        return plugin;
+                    } else {
+                        return null;
+                    }
+                };
+                CompletableFuture<String> future;
+                if (executor == null) {
+                    future = CompletableFuture.supplyAsync(supplier);
                 } else {
-                    return null;
+                    future = CompletableFuture.supplyAsync(supplier, executor);
                 }
-            };
-            CompletableFuture<String> future;
-            if (executor == null) {
-                future = CompletableFuture.supplyAsync(supplier);
-            } else {
-                future = CompletableFuture.supplyAsync(supplier, executor);
+                futures.add(future);
             }
-            futures.add(future);
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         return futures.stream().map(CompletableFuture::join)
