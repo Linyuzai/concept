@@ -8,6 +8,7 @@ import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -46,6 +47,7 @@ public class ZipStreamPluginFactory extends StreamPluginFactory {
         return new PropertiesMetadata(new Properties());
     }
 
+    @Nullable
     protected ZipInputStream getZipInputStream(PluginDefinition definition) {
         InputStream is = definition.getInputStream();
         if (is == null) {

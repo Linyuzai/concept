@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -21,6 +22,7 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
 
     protected final Supplier<InputStream> supplier;
 
+    @Nullable
     public ZipInputStream getInputStream() {
         InputStream is = supplier.get();
         if (is == null) {

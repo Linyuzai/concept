@@ -6,6 +6,7 @@ import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -54,6 +55,7 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
         this.reference = createReference(bytes);
     }
 
+    @Nullable
     @Override
     public Plugin.Content getContent() {
         if (isDirectory()) {

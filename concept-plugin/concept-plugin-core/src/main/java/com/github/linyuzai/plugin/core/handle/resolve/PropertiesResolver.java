@@ -48,8 +48,11 @@ public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Pro
         @SneakyThrows
         @Override
         public Properties create() {
+            Properties properties = new Properties();
+            if (content == null) {
+                return properties;
+            }
             try (InputStream is = content.getInputStream()) {
-                Properties properties = new Properties();
                 properties.load(new InputStreamReader(is, StandardCharsets.UTF_8));
                 return properties;
             }

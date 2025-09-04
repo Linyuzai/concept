@@ -79,7 +79,7 @@ allprojects {
 
         compileOnly "org.jboss.xnio:xnio-api:${XnioVersion}"
         compileOnly "io.netty:netty-all:${NettyVersion}"*/
-
+        compileOnly 'org.jetbrains:annotations:13.0'
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
         annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

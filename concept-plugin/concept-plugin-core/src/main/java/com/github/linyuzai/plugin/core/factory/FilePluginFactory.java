@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -27,6 +28,7 @@ public abstract class FilePluginFactory extends AbstractPluginFactory {
 
     protected abstract boolean support(PluginDefinition definition);
 
+    @Nullable
     public static File getFile(PluginDefinition definition) {
         File file = new File(definition.getPath());
         if (file.exists() && file.isFile()) {

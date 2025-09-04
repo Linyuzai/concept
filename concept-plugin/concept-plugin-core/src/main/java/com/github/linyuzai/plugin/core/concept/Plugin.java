@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.core.concept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -120,8 +121,10 @@ public interface Plugin {
         /**
          * 获得内容
          */
+        @Nullable
         Content getContent();
 
+        @Nullable
         @Override
         default InputStream getInputStream() {
             Content content = getContent();
