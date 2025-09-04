@@ -3,28 +3,55 @@ package com.github.linyuzai.plugin.zip.factory;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.factory.PluginFactory;
+import com.github.linyuzai.plugin.core.factory.FilePluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipFilePlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
-import com.github.linyuzai.plugin.zip.util.ZipUtils;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
  * zip文件插件工厂
  */
-public class ZipFilePluginFactory implements PluginFactory {
+public class ZipFilePluginFactory extends FilePluginFactory {
+
+    @Override
+    protected Plugin create(File file) {
+        return new ZipFilePlugin(getZipFile(file));
+    }
 
     @SneakyThrows
     @Override
-    public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
-        File file = ZipUtils.getFile(definition, ZipPlugin.SUFFIX_ZIP);
-        if (file == null) {
-            return null;
+    public PluginMetadata create(PluginDefinition definition, PluginContext context) {
+        try (ZipFile zipFile = getZipFile(getFile(definition))) {
+            if (zipFile == null) {
+                return null;
+            }
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                PluginMetadata.Adapter adapter = getMetadataAdapter(entry.getName());
+                if (adapter != null) {
+                    return adapter.adapt(zipFile.getInputStream(entry));
+                }
+            }
+            return new PropertiesMetadata(new Properties());
         }
-        return new ZipFilePlugin(new ZipFile(file));
+    }
+
+    @SneakyThrows
+    protected ZipFile getZipFile(File file) {
+        return new ZipFile(file);
+    }
+
+    @Override
+    protected boolean support(PluginDefinition definition) {
+        return definition.getPath().endsWith(ZipPlugin.SUFFIX_ZIP);
     }
 }

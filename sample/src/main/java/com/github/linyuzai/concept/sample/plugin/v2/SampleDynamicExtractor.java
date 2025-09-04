@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Slf4j
-//@Component
+@Component
 public class SampleDynamicExtractor {
 
     @OnPluginExtract

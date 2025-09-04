@@ -150,7 +150,7 @@ public class S3ClientStorage extends RemotePluginStorage {
 
     @Getter
     @RequiredArgsConstructor
-    public class PluginDefinitionImpl implements PluginDefinition, PluginDefinition.Loadable {
+    public class PluginDefinitionImpl implements PluginDefinition {
 
         private final String path;
 

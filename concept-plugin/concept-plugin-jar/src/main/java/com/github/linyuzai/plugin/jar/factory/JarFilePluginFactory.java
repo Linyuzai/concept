@@ -2,26 +2,27 @@ package com.github.linyuzai.plugin.jar.factory;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
-import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.factory.PluginFactory;
-import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.jar.concept.JarFilePlugin;
-import com.github.linyuzai.plugin.jar.concept.JarPluginSuffixes;
-import com.github.linyuzai.plugin.zip.util.ZipUtils;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
+import com.github.linyuzai.plugin.zip.factory.ZipFilePluginFactory;
 import lombok.SneakyThrows;
 
 import java.io.File;
 import java.util.jar.JarFile;
 
-public class JarFilePluginFactory implements PluginFactory, JarPluginSuffixes {
+/**
+ * jar文件插件工厂
+ */
+public class JarFilePluginFactory extends ZipFilePluginFactory {
 
     @SneakyThrows
     @Override
-    public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
-        File file = ZipUtils.getFile(definition, getSupportedSuffixes());
-        if (file == null) {
-            return null;
-        }
+    protected Plugin create(File file) {
         return new JarFilePlugin(new JarFile(file));
+    }
+
+    @Override
+    protected boolean support(PluginDefinition definition) {
+        return definition.getPath().endsWith(JarPlugin.SUFFIX_JAR) || super.support(definition);
     }
 }

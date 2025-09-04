@@ -20,11 +20,11 @@ public class PluginStandardLogger implements PluginLifecycleListener {
 
     @Override
     public void onLoaded(Plugin plugin) {
-        plugin.getConcept().getLogger().info("Load " + plugin);
+        plugin.getConcept().getLogger().info("Loaded " + plugin);
     }
 
     @Override
     public void onUnloaded(Plugin plugin) {
-        plugin.getConcept().getLogger().info("Unload " + plugin);
+        plugin.getConcept().getLogger().info("Unloaded " + plugin);
     }
 }

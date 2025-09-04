@@ -12,6 +12,8 @@ public interface PluginDefinition {
 
     Object getVersion();
 
+    InputStream getInputStream();
+
     interface Loadable {
 
         InputStream getInputStream();

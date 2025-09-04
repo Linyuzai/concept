@@ -121,12 +121,21 @@ public interface Plugin {
          * 获得内容
          */
         Content getContent();
+
+        @Override
+        default InputStream getInputStream() {
+            Content content = getContent();
+            if (content == null) {
+                return null;
+            }
+            return content.getInputStream();
+        }
     }
 
     /**
      * 插件内容
      */
-    interface Content extends PluginDefinition.Loadable {
+    interface Content {
 
         /**
          * 获得数据流

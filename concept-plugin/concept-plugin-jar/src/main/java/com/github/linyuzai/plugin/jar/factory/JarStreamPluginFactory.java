@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.factory;
 
-import com.github.linyuzai.plugin.jar.concept.JarPluginSuffixes;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import com.github.linyuzai.plugin.jar.concept.JarStreamPlugin;
 import com.github.linyuzai.plugin.zip.factory.ZipStreamPluginFactory;
 
@@ -8,9 +9,9 @@ import java.io.InputStream;
 import java.util.function.Supplier;
 
 /**
- * zip流插件工厂
+ * jar流插件工厂
  */
-public class JarStreamPluginFactory extends ZipStreamPluginFactory implements JarPluginSuffixes {
+public class JarStreamPluginFactory extends ZipStreamPluginFactory {
 
     @Override
     protected JarStreamPlugin create(Supplier<InputStream> supplier) {
@@ -18,12 +19,7 @@ public class JarStreamPluginFactory extends ZipStreamPluginFactory implements Ja
     }
 
     @Override
-    protected boolean support(String name) {
-        for (String suffix : getSupportedSuffixes()) {
-            if (name.endsWith(suffix)) {
-                return true;
-            }
-        }
-        return false;
+    protected boolean support(PluginDefinition definition) {
+        return definition.getPath().endsWith(JarPlugin.SUFFIX_JAR) || super.support(definition);
     }
 }

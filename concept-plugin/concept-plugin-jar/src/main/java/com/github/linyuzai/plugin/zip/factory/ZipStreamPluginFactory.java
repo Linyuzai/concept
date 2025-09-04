@@ -1,42 +1,57 @@
 package com.github.linyuzai.plugin.zip.factory;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
-import com.github.linyuzai.plugin.core.factory.PluginFactory;
+import com.github.linyuzai.plugin.core.factory.StreamPluginFactory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;
 import com.github.linyuzai.plugin.zip.concept.ZipStreamPlugin;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
+import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * zip流插件工厂
  */
-public class ZipStreamPluginFactory implements PluginFactory {
-
-    @SneakyThrows
-    @Override
-    public Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context) {
-        if (definition instanceof PluginDefinition.Loadable) {
-            PluginDefinition.Loadable loadable = (PluginDefinition.Loadable) definition;
-            return create(loadable::getInputStream);
-        } else if (definition instanceof Plugin.Entry) {
-            Plugin.Entry entry = (Plugin.Entry) definition;
-            if (support(entry.getName())) {
-                return create(() -> entry.getContent().getInputStream());
-            }
-        }
-        return null;
-    }
+public class ZipStreamPluginFactory extends StreamPluginFactory {
 
     protected ZipStreamPlugin create(Supplier<InputStream> supplier) {
         return new ZipStreamPlugin(supplier);
     }
 
-    protected boolean support(String name) {
-        return name.endsWith(ZipPlugin.SUFFIX_ZIP);
+    @SneakyThrows
+    @Override
+    public PluginMetadata create(PluginDefinition definition, PluginContext context) {
+        try (ZipInputStream zis = getZipInputStream(definition)) {
+            if (zis == null) {
+                return null;
+            }
+            ZipEntry zipEntry;
+            while ((zipEntry = zis.getNextEntry()) != null) {
+                String name = zipEntry.getName();
+                if (!zipEntry.isDirectory()) {
+                    PluginMetadata.Adapter adapter = getMetadataAdapter(name);
+                    if (adapter != null) {
+                        return adapter.adapt(zis);
+                    }
+                }
+                zis.closeEntry();
+            }
+        }
+        return new PropertiesMetadata(new Properties());
+    }
+
+    protected ZipInputStream getZipInputStream(PluginDefinition definition) {
+        return new ZipInputStream(definition.getInputStream());
+    }
+
+    @Override
+    protected boolean support(PluginDefinition definition) {
+        return definition.getPath().endsWith(ZipPlugin.SUFFIX_ZIP);
     }
 }

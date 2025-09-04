@@ -303,5 +303,11 @@ public class LocalPluginStorage implements PluginStorage {
         public Object getVersion() {
             return new File(path).lastModified();
         }
+
+        @SneakyThrows
+        @Override
+        public InputStream getInputStream() {
+            return Files.newInputStream(Paths.get(path));
+        }
     }
 }

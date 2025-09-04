@@ -151,12 +151,12 @@ concept:
       period: 5000
     storage:
       type: minio
-    jar:
-      mode: stream
+      autocleaning:
+        enabled: true
     management:
+      enabled: true
       authorization:
         password: 123
-      enabled: true
       github-corner:
         display: true
       header:

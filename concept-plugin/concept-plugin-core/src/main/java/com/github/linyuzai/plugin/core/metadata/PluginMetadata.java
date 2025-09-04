@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.metadata;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 
+import java.io.InputStream;
 import java.util.Set;
 
 /**
@@ -64,5 +65,10 @@ public interface PluginMetadata {
      */
     void refresh();
 
+    interface Adapter {
 
+        boolean support(String name);
+
+        PluginMetadata adapt(InputStream is);
+    }
 }

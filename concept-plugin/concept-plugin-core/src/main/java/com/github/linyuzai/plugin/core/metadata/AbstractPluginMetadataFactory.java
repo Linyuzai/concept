@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
+@Deprecated
 @Getter
 @Setter
 public abstract class AbstractPluginMetadataFactory implements PluginMetadataFactory {
