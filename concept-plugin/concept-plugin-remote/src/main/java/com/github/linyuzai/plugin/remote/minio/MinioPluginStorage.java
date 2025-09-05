@@ -71,18 +71,37 @@ public class MinioPluginStorage extends RemotePluginStorage {
 
     @SneakyThrows
     @Override
+    protected boolean existObject(String bucket, String key) {
+        try {
+            getObjectMetadata(bucket, key);
+            return true;
+        } catch (ErrorResponseException e) {
+            return false;
+        }
+    }
+
+    @SneakyThrows
+    @Override
     protected void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata) {
-        CopyObjectArgs args = CopyObjectArgs.builder()
+        CopyObjectArgs.Builder builder = CopyObjectArgs.builder()
                 .bucket(destBucket)
                 .object(destKey)
                 .source(CopySource.builder()
                         .bucket(srcBucket)
                         .object(srcKey)
-                        .build())
-                .userMetadata(userMetadata)
-                .metadataDirective(Directive.REPLACE)
-                .build();
-        minioClient.copyObject(args);
+                        .build());
+        if (userMetadata == null) {
+            CopyObjectArgs args = builder
+                    .metadataDirective(Directive.COPY)
+                    .build();
+            minioClient.copyObject(args);
+        } else {
+            CopyObjectArgs args = builder
+                    .userMetadata(userMetadata)
+                    .metadataDirective(Directive.REPLACE)
+                    .build();
+            minioClient.copyObject(args);
+        }
     }
 
     @SneakyThrows
@@ -117,32 +136,6 @@ public class MinioPluginStorage extends RemotePluginStorage {
     @Override
     public PluginDefinition getPluginDefinition(String path) {
         return new PluginDefinitionImpl(path);
-    }
-
-    @SneakyThrows
-    @Override
-    public boolean existPlugin(String group, String name) {
-        try {
-            getObjectMetadata(getBucket(), getPluginPath(group, name));
-            return true;
-        } catch (ErrorResponseException e) {
-            return false;
-        }
-    }
-
-    @SneakyThrows
-    @Override
-    public void renamePlugin(String group, String name, String rename) {
-        CopyObjectArgs args = CopyObjectArgs.builder()
-                .bucket(getBucket())
-                .object(getPluginPath(group, rename))
-                .source(CopySource.builder()
-                        .bucket(getBucket())
-                        .object(getPluginPath(group, name))
-                        .build())
-                .metadataDirective(Directive.COPY)
-                .build();
-        minioClient.copyObject(args);
     }
 
     private StatObjectResponse getObjectMetadata(String bucket, String key)

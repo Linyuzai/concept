@@ -5,6 +5,8 @@ import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * 插件存储抽象，本地文件或远程文件
@@ -125,6 +127,34 @@ public interface PluginStorage {
      * 重命名分组下的插件
      */
     void renamePlugin(String group, String name, String rename);
+
+    /**
+     * 生成文件名
+     */
+    default String generateName(String name,
+                                Function<String, Boolean> exist,
+                                Function<Integer, String> generator) {
+        int i = 1;
+        int index = name.lastIndexOf(".");
+        String prefix;
+        String suffix;
+        if (index == -1) {
+            prefix = name;
+            suffix = "";
+        } else {
+            prefix = name.substring(0, index);
+            suffix = name.substring(index);
+        }
+        String generate = name;
+        while (exist.apply(generate)) {
+            generate = prefix + generator.apply(i) + suffix;
+            if (Objects.equals(generate, name)) {
+                throw new IllegalArgumentException("Generated name '" + name + "' is same as original name");
+            }
+            i++;
+        }
+        return generate;
+    }
 
     /**
      * 插件过滤器

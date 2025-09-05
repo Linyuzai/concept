@@ -50,15 +50,18 @@ public class PluginConceptProperties {
     }
 
     /**
-     * 插件目录
+     * 插件存储
      */
     @Data
     public static class StorageProperties {
 
+        /**
+         * 插件存储类型
+         */
         private StorageType type = StorageType.LOCAL;
 
         /**
-         * 自动加载插件目录基础路径
+         * 插件存储基础路径
          */
         private String location;
 

@@ -162,9 +162,26 @@ public abstract class RemotePluginStorage implements PluginStorage {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.DELETED);
         String bucket = getBucket();
         String key = getPluginPath(group, name);
-        String deleteKey = key + PluginStorage.DELETED + FORMATTER.format(LocalDateTime.now());
+        String deleteKey = generateName(key, p -> existObject(bucket, p), i ->
+                PluginStorage.DELETED + FORMATTER.format(LocalDateTime.now()));
         copyObject(bucket, key, bucket, deleteKey, userMetadata);
         deleteObject(bucket, key);
+    }
+
+    @Override
+    public boolean existPlugin(String group, String name) {
+        return existObject(getBucket(), getPluginPath(group, name));
+    }
+
+    @Override
+    public void renamePlugin(String group, String name, String rename) {
+        if (existPlugin(group, rename)) {
+            throw new IllegalArgumentException("Name existed");
+        }
+        String bucket = getBucket();
+        String src = getPluginPath(group, name);
+        copyObject(bucket, src, bucket, getPluginPath(group, rename), null);
+        deleteObject(bucket, src);
     }
 
     protected String getPluginPath(String group, String name) {
@@ -247,6 +264,8 @@ public abstract class RemotePluginStorage implements PluginStorage {
     protected abstract Map<String, String> getUserMetadata(String bucket, String key);
 
     protected abstract void putUserMetadata(String bucket, String key, Map<String, String> userMetadata);
+
+    protected abstract boolean existObject(String bucket, String key);
 
     protected abstract void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata);
 

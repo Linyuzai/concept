@@ -33,16 +33,6 @@ public class AmazonS3Storage extends RemotePluginStorage {
         return new PluginDefinitionImpl(path);
     }
 
-    @Override
-    public boolean existPlugin(String group, String name) {
-        return amazonS3.doesObjectExist(getBucket(), getPluginPath(group, name));
-    }
-
-    @Override
-    public void renamePlugin(String group, String name, String rename) {
-        amazonS3.copyObject(getBucket(), getPluginPath(group, name), getBucket(), getPluginPath(group, rename));
-    }
-
     private ObjectMetadata getObjectMetadata(String bucket, String key) {
         return amazonS3.getObjectMetadata(bucket, key);
     }
@@ -81,17 +71,26 @@ public class AmazonS3Storage extends RemotePluginStorage {
     }
 
     @Override
+    protected boolean existObject(String bucket, String key) {
+        return amazonS3.doesObjectExist(bucket, key);
+    }
+
+    @Override
     protected void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata) {
-        ObjectMetadata metadata = getObjectMetadata(srcBucket, srcKey);
-        metadata.setUserMetadata(userMetadata);
-        CopyObjectRequest request = new CopyObjectRequest();
-        request.setSourceBucketName(srcBucket);
-        request.setSourceKey(srcKey);
-        request.setDestinationBucketName(destBucket);
-        request.setDestinationKey(destKey);
-        request.setNewObjectMetadata(metadata);
-        request.setMetadataDirective(MetadataDirective.REPLACE.name());
-        amazonS3.copyObject(request);
+        if (userMetadata == null) {
+            amazonS3.copyObject(srcBucket, srcKey, destBucket, destKey);
+        } else {
+            ObjectMetadata metadata = getObjectMetadata(srcBucket, srcKey);
+            metadata.setUserMetadata(userMetadata);
+            CopyObjectRequest request = new CopyObjectRequest();
+            request.setSourceBucketName(srcBucket);
+            request.setSourceKey(srcKey);
+            request.setDestinationBucketName(destBucket);
+            request.setDestinationKey(destKey);
+            request.setNewObjectMetadata(metadata);
+            request.setMetadataDirective(MetadataDirective.REPLACE.name());
+            amazonS3.copyObject(request);
+        }
     }
 
     @Override

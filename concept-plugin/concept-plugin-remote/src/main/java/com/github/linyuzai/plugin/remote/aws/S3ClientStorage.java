@@ -33,27 +33,6 @@ public class S3ClientStorage extends RemotePluginStorage {
         return new PluginDefinitionImpl(path);
     }
 
-    @Override
-    public boolean existPlugin(String group, String name) {
-        try {
-            getHeadObject(getBucket(), getPluginPath(group, name));
-            return true;
-        } catch (NoSuchKeyException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public void renamePlugin(String group, String name, String rename) {
-        CopyObjectRequest request = CopyObjectRequest.builder()
-                .sourceBucket(getBucket())
-                .sourceKey(getPluginPath(group, name))
-                .destinationBucket(getBucket())
-                .destinationKey(getPluginPath(group, rename))
-                .build();
-        s3Client.copyObject(request);
-    }
-
     private HeadObjectResponse getHeadObject(String bucket, String key) {
         HeadObjectRequest request = HeadObjectRequest.builder()
                 .bucket(bucket)
@@ -106,16 +85,32 @@ public class S3ClientStorage extends RemotePluginStorage {
     }
 
     @Override
+    protected boolean existObject(String bucket, String key) {
+        try {
+            getHeadObject(bucket, key);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        }
+    }
+
+    @Override
     protected void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata) {
-        CopyObjectRequest request = CopyObjectRequest.builder()
+        CopyObjectRequest.Builder builder = CopyObjectRequest.builder()
                 .sourceBucket(srcBucket)
                 .sourceKey(srcKey)
                 .destinationBucket(destBucket)
-                .destinationKey(destKey)
-                .metadata(userMetadata)
-                .metadataDirective(MetadataDirective.REPLACE)
-                .build();
-        s3Client.copyObject(request);
+                .destinationKey(destKey);
+        if (userMetadata == null) {
+            CopyObjectRequest request = builder.build();
+            s3Client.copyObject(request);
+        } else {
+            CopyObjectRequest request = builder
+                    .metadata(userMetadata)
+                    .metadataDirective(MetadataDirective.REPLACE)
+                    .build();
+            s3Client.copyObject(request);
+        }
     }
 
     @Override

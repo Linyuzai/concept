@@ -198,7 +198,7 @@ public class LocalPluginStorage implements PluginStorage {
     @Override
     public void renamePlugin(String group, String name, String rename) {
         if (existPlugin(group, rename)) {
-            throw new IllegalArgumentException("File existed");
+            throw new IllegalArgumentException("Name existed");
         }
         String renamePath = getUnloadedPluginPath(group, rename);
         File renameFile = new File(renamePath);
@@ -271,19 +271,8 @@ public class LocalPluginStorage implements PluginStorage {
     /**
      * 如果文件存在则顺序添加后缀
      */
-    public static String generateFileName(String path) {
-        int i = 1;
-        String tryPath = path;
-        while (new File(tryPath).exists()) {
-            int index = tryPath.lastIndexOf(".");
-            if (index == -1) {
-                tryPath = tryPath + i;
-            } else {
-                tryPath = tryPath.substring(0, index) + "(" + i + ")" + tryPath.substring(index);
-            }
-            i++;
-        }
-        return tryPath;
+    protected String generateFileName(String path) {
+        return generateName(path, p -> new File(p).exists(), i -> "(" + i + ")");
     }
 
     @Getter
