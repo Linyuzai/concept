@@ -4,6 +4,8 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.SneakyThrows;
 
+import java.io.InputStream;
+
 /**
  * 转 byte[]
  */
@@ -12,6 +14,8 @@ public class ContentToByteArrayConvertor extends AbstractPluginConvertor<Plugin.
     @SneakyThrows
     @Override
     public byte[] doConvert(Plugin.Content content) {
-        return PluginUtils.read(content.getInputStream());
+        try (InputStream is = content.getInputStream()) {
+            return PluginUtils.read(is);
+        }
     }
 }

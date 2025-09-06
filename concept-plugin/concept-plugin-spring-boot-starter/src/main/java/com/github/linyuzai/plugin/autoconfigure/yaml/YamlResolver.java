@@ -51,8 +51,11 @@ public class YamlResolver extends AbstractPluginResolver<Plugin.Entry, YamlSuppl
         @SneakyThrows
         @Override
         public Yaml create() {
+            Yaml yaml = newYaml();
+            if (content == null) {
+                return yaml;
+            }
             try (InputStream is = content.getInputStream()) {
-                Yaml yaml = newYaml();
                 yaml.load(new InputStreamReader(is, StandardCharsets.UTF_8));
                 return yaml;
             }

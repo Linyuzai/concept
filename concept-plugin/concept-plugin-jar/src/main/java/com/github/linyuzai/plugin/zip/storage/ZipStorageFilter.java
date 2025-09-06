@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.zip.autoload;
+package com.github.linyuzai.plugin.zip.storage;
 
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.zip.concept.ZipPlugin;

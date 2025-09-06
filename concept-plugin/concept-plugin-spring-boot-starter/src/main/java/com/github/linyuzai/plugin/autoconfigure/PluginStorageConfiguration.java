@@ -5,7 +5,7 @@ import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperti
 import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
-import com.github.linyuzai.plugin.jar.autoload.JarStorageFilter;
+import com.github.linyuzai.plugin.jar.storage.JarStorageFilter;
 import com.github.linyuzai.plugin.remote.aws.AmazonS3Storage;
 import com.github.linyuzai.plugin.remote.aws.S3ClientStorage;
 import com.github.linyuzai.plugin.remote.minio.MinioPluginStorage;

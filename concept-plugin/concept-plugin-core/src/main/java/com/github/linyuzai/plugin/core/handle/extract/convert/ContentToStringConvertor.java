@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.*;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
@@ -23,7 +24,9 @@ public class ContentToStringConvertor extends AbstractPluginConvertor<Plugin.Con
     @SneakyThrows
     @Override
     public String doConvert(Plugin.Content content) {
-        byte[] bytes = PluginUtils.read(content.getInputStream());
-        return charset == null ? new String(bytes) : new String(bytes, charset);
+        try (InputStream is = content.getInputStream()) {
+            byte[] bytes = PluginUtils.read(is);
+            return charset == null ? new String(bytes) : new String(bytes, charset);
+        }
     }
 }

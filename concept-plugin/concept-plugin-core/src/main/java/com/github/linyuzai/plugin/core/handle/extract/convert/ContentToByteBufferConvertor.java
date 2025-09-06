@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.SneakyThrows;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -14,6 +15,8 @@ public class ContentToByteBufferConvertor extends AbstractPluginConvertor<Plugin
     @SneakyThrows
     @Override
     public ByteBuffer doConvert(Plugin.Content content) {
-        return ByteBuffer.wrap(PluginUtils.read(content.getInputStream()));
+        try (InputStream is = content.getInputStream()) {
+            return ByteBuffer.wrap(PluginUtils.read(is));
+        }
     }
 }

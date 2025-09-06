@@ -51,7 +51,11 @@ public class ZipFilePluginEntry extends AbstractPluginEntry implements ZipPlugin
             if (entry == null) {
                 throw new PluginException("Plugin entry not found");
             }
-            return zipFile.getInputStream(entry);
+            InputStream is = zipFile.getInputStream(entry);
+            if (is == null) {
+                throw new PluginException("Plugin entry no content");
+            }
+            return is;
         }
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.InputStreamResource;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.InputStream;
+
 /**
  * {@link Yaml} 解析器
  */
@@ -50,8 +52,13 @@ public class YamlPropertiesResolver extends AbstractPluginResolver<Plugin.Entry,
         @Override
         public YamlPropertiesFactoryBean create() {
             YamlPropertiesFactoryBean factoryBean = new YamlPropertiesFactoryBean();
-            factoryBean.setResources(new InputStreamResource(content.getInputStream()));
-            return factoryBean;
+            if (content == null) {
+                return factoryBean;
+            }
+            try (InputStream is = content.getInputStream()) {
+                factoryBean.setResources(new InputStreamResource(is));
+                return factoryBean;
+            }
         }
     }
 }

@@ -65,7 +65,7 @@ public class DynamicExtractor implements MethodPluginExtractor {
     }
 
     /**
-     * 使用默认的提取执行期工厂
+     * 使用默认的提取执行器工厂
      */
     public void useDefaultInvokerFactories() {
         addInvokerFactory(new PluginObjectExtractor.InvokerFactory());
