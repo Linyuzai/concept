@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@Deprecated
 public class PluginUtils {
 
     public static final int DEFAULT_BUFFER_SIZE = 8192;

@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.handle.extract.convert;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.SneakyThrows;
 
@@ -16,7 +17,7 @@ public class ContentToByteBufferConvertor extends AbstractPluginConvertor<Plugin
     @Override
     public ByteBuffer doConvert(Plugin.Content content) {
         try (InputStream is = content.getInputStream()) {
-            return ByteBuffer.wrap(PluginUtils.read(is));
+            return ByteBuffer.wrap(PluginStorage.read(is));
         }
     }
 }

@@ -12,16 +12,15 @@ import java.util.List;
  * 嵌套类型的默认实现
  */
 @Getter
-@Setter
 public class DefaultNestedType implements NestedType {
 
-    private Type type;
+    protected Type type;
 
-    private Class<?> cls;
+    protected Class<?> cls;
 
-    private NestedType parent;
+    protected NestedType parent;
 
-    private final List<NestedType> children = new ArrayList<>();
+    protected List<NestedType> children = new ArrayList<>();
 
     public DefaultNestedType(Type type) {
         this(type, null);

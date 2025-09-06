@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.handle.extract.convert;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.*;
 
@@ -25,7 +26,7 @@ public class ContentToStringConvertor extends AbstractPluginConvertor<Plugin.Con
     @Override
     public String doConvert(Plugin.Content content) {
         try (InputStream is = content.getInputStream()) {
-            byte[] bytes = PluginUtils.read(is);
+            byte[] bytes = PluginStorage.read(is);
             return charset == null ? new String(bytes) : new String(bytes, charset);
         }
     }

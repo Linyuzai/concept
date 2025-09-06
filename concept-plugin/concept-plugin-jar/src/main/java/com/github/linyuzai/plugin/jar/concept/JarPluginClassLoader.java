@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.jar.concept;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class JarPluginClassLoader extends PluginClassLoader {
             throw new ClassNotFoundException(name);
         }
         try {
-            byte[] bytes = PluginUtils.read(content.getInputStream());
+            byte[] bytes = PluginStorage.read(content.getInputStream());
             return defineClass(name, bytes, 0, bytes.length);
         } catch (IOException e) {
             throw new ClassNotFoundException(name, e);

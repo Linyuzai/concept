@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.zip.concept;
 import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -47,7 +48,7 @@ public class ZipStreamPlugin extends AbstractPlugin implements ZipPlugin {
                 if (entry.isDirectory()) {
                     bytes = null;
                 } else {
-                    bytes = PluginUtils.read(zis);
+                    bytes = PluginStorage.read(zis);
                 }
                 ZipPluginEntry pluginEntry = createPluginEntry(path, name, bytes);
                 consumer.accept(pluginEntry);

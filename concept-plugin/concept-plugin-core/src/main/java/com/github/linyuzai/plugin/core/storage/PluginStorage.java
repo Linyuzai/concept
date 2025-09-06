@@ -2,6 +2,8 @@ package com.github.linyuzai.plugin.core.storage;
 
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -154,6 +156,16 @@ public interface PluginStorage {
             i++;
         }
         return generate;
+    }
+
+    static byte[] read(InputStream is) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8192];
+        int n;
+        while (-1 != (n = is.read(buffer))) {
+            os.write(buffer, 0, n);
+        }
+        return os.toByteArray();
     }
 
     /**
