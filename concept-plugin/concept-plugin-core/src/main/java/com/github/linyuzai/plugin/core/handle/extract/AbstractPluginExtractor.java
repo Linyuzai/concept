@@ -97,7 +97,18 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
     public Invoker createInvoker(Type type, Annotation[] annotations) {
         //获得嵌套类型
         NestedType nestedType = nestedTypeFactory.create(type);
-        if (nestedType == null || nestedType.toClass() == null) {
+        return createInvoker(nestedType, annotations);
+    }
+
+    /**
+     * 通过插件类型 {@link NestedType} 和注解获得执行器
+     */
+    public Invoker createInvoker(NestedType nestedType, Annotation[] annotations) {
+        if (nestedType == null) {
+            throw new PluginException("Nested type is null");
+        }
+        Type type = nestedType.toType();
+        if (nestedType.toClass() == null) {
             throw new PluginException("Can not resolve type: " + type);
         }
         //获得格式化器

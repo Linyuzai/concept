@@ -6,7 +6,11 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.github.linyuzai.concept.sample.plugin.CustomPlugin;
 import com.github.linyuzai.plugin.autoconfigure.EnablePluginConcept;
+import com.github.linyuzai.plugin.autoconfigure.observable.GenericPluginObservable;
+import com.github.linyuzai.plugin.autoconfigure.observable.PluginObservable;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.filter.EntryFilter;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.jar.handle.filter.ClassFilter;
@@ -21,6 +25,9 @@ import software.amazon.awssdk.services.s3.endpoints.internal.DefaultS3EndpointPr
 
 import java.lang.reflect.Modifier;
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @EnablePluginConcept
 @Configuration
@@ -48,7 +55,7 @@ public class PluginConfig {
                .build();
     }
 
-    @Bean
+    //@Bean
     public S3Client s3Client() {
         return S3Client.builder()
                 .endpointOverride(URI.create("http://localhost:9090"))
@@ -58,11 +65,22 @@ public class PluginConfig {
                 .build();
     }
 
-    //@Bean
+    @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint("http://localhost:9090")
                 .credentials("minioadmin", "minioadmin")
                 .build();
+    }
+
+    @Bean
+    public PluginObservable<String, CustomPlugin> pluginObservable() {
+        return new GenericPluginObservable<String, CustomPlugin>() {
+
+            @Override
+            public String grouping(CustomPlugin plugin, PluginContext context) {
+                return plugin.getClass().getName();
+            }
+        };
     }
 }
