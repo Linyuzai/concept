@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<String, V>> implements PluginObservable<K, V> {
 
-    private final Map<K, List<Entry>> plugins = createMap();
+    private final Map<K, List<Entry>> plugins = newMap();
 
     @Override
     public V get(K key) {
@@ -40,24 +40,19 @@ public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<St
 
     @Override
     public Invoker createInvoker(Type type, Annotation[] annotations) {
-        Type superclass = getClass().getGenericSuperclass();
-        if (superclass instanceof ParameterizedType) {
-            Type actualTypeArgument = ((ParameterizedType) superclass).getActualTypeArguments()[1];
-            return super.createInvoker(new DefaultNestedType(Map.class) {
-                {
-                    children.add(new DefaultNestedType(String.class));
-                    children.add(new DefaultNestedType(actualTypeArgument));
-                }
-            }, annotations);
-        }
-        throw new PluginException("Unsupported type: " + type);
+        return super.createInvoker(new DefaultNestedType(Map.class) {
+            {
+                children.add(new DefaultNestedType(String.class));
+                children.add(new DefaultNestedType(getPluginType()));
+            }
+        }, annotations);
     }
 
     @Override
     public void onExtract(Map<String, V> plugin, PluginContext context) {
         plugin.forEach((k, v) -> {
             K key = grouping(v, context);
-            plugins.computeIfAbsent(key, func -> createList()).add(new Entry(k, v));
+            plugins.computeIfAbsent(key, func -> newList()).add(new Entry(k, v));
         });
         context.getPlugin().addDestroyListener(p ->
                 plugins.values().removeIf(entries -> {
@@ -66,12 +61,20 @@ public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<St
                 }));
     }
 
-    protected Map<K, List<Entry>> createMap() {
+    protected Map<K, List<Entry>> newMap() {
         return new ConcurrentHashMap<>();
     }
 
-    protected List<Entry> createList() {
+    protected List<Entry> newList() {
         return new ArrayList<>();
+    }
+
+    protected Type getPluginType() {
+        Type superclass = getClass().getGenericSuperclass();
+        if (superclass instanceof ParameterizedType) {
+            return ((ParameterizedType) superclass).getActualTypeArguments()[1];
+        }
+        throw new PluginException("Unsupported type: " + superclass);
     }
 
     public abstract K grouping(V plugin, PluginContext context);

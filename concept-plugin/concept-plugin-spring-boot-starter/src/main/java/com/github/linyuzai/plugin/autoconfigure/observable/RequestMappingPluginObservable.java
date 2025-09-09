@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<String, ?>>
         implements PluginObservable<String, Class<?>> {
 
-    private final Map<String, Class<?>> requestMappingMap = createMap();
+    private final Map<String, Class<?>> requestMappingMap = newMap();
 
     @Override
     public Class<?> get(String key) {
@@ -49,12 +49,12 @@ public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<S
             requestMappingMap.put(path, type);
         }
         context.getPlugin().addDestroyListener(p -> {
-            requestMappingMap.keySet().removeAll(requestMappingMap.keySet());
+            requestMappingMap.keySet().removeAll(requestMappings.keySet());
             destroyList.forEach(Runnable::run);
         });
     }
 
-    protected Map<String, Class<?>> createMap() {
+    protected Map<String, Class<?>> newMap() {
         return new ConcurrentHashMap<>();
     }
 
