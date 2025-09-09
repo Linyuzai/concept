@@ -13,14 +13,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class PluginConceptProperties {
 
     /**
-     * 元数据配置
+     * 插件元数据配置
      */
     private MetadataProperties metadata = new MetadataProperties();
 
     /**
-     * 插件目录
+     * 插件存储配置
      */
     private StorageProperties storage = new StorageProperties();
+
+    /**
+     * 插件扩展配置
+     */
+    private ExtensionProperties extension = new ExtensionProperties();
 
     /**
      * 自动加载配置
@@ -50,7 +55,7 @@ public class PluginConceptProperties {
     }
 
     /**
-     * 插件存储
+     * 插件存储配置
      */
     @Data
     public static class StorageProperties {
@@ -82,6 +87,18 @@ public class PluginConceptProperties {
             private long maxCount = -1;
 
             private long maxDuration = -1;
+        }
+    }
+
+    @Data
+    public static class ExtensionProperties {
+
+        private RequestMappingProperties requestMapping = new RequestMappingProperties();
+
+        @Data
+        public static class RequestMappingProperties {
+
+            private boolean enabled = true;
         }
     }
 

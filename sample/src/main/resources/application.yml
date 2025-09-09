@@ -153,6 +153,9 @@ concept:
       type: minio
       autocleaning:
         enabled: true
+    extension:
+      request-mapping:
+        enabled: true
     management:
       enabled: true
       authorization:
