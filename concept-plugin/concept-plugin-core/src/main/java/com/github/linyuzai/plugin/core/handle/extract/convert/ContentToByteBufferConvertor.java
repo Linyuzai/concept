@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.core.handle.extract.convert;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
-import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;

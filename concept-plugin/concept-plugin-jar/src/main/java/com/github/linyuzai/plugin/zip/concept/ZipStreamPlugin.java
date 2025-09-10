@@ -4,7 +4,6 @@ import com.github.linyuzai.plugin.core.concept.AbstractPlugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
-import com.github.linyuzai.plugin.core.util.PluginUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;

@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.core.type;
 
 import com.github.linyuzai.plugin.core.util.ReflectionUtils;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

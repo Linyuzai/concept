@@ -16,7 +16,7 @@ import org.springframework.core.env.*;
 import java.util.Set;
 
 /**
- * 可绑定配置文件的元数据Finder
+ * 可绑定配置文件的元数据工厂
  */
 @Getter
 @Setter

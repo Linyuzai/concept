@@ -2,7 +2,6 @@ package com.github.linyuzai.plugin.jar.concept;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
-import com.github.linyuzai.plugin.core.util.PluginUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
