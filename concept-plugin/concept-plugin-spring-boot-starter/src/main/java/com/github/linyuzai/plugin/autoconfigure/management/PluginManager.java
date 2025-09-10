@@ -24,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -86,45 +85,28 @@ public class PluginManager {
     }
 
     public synchronized void loadPlugin(String group, String name) {
-        String path = storage.getLoadedPluginPath(group, name);
+        String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
         loadingSet.add(path);
         try {
             storage.loadPlugin(group, name);
         } catch (Throwable e) {
             log.error("Load plugin error: " + path, e);
-            execute(() -> {
-                try {
-                    concept.load(path);
-                } catch (Throwable e1) {
-                    log.error("Load plugin error: " + path, e1);
-                } finally {
-                    loadingSet.remove(path);
-                }
-            });
         }
     }
 
     public synchronized void unloadPlugin(String group, String name) {
-        String path = storage.getLoadedPluginPath(group, name);
+        String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
         unloadingSet.add(path);
         try {
             storage.unloadPlugin(group, name);
         } catch (Throwable e) {
             log.error("Unload plugin error: " + path, e);
-            execute(() -> {
-                try {
-                    concept.unload(path);
-                } catch (Throwable e1) {
-                    log.error("Unload plugin error: " + path, e1);
-                } finally {
-                    unloadingSet.remove(path);
-                }
-            });
         }
     }
 
     public synchronized void reloadPlugin(String group, String name) {
-        String path = storage.getLoadedPluginPath(group, name);
+        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+        String path = definition.getPath();
         loadingSet.add(path);
         try {
             concept.unload(path);
@@ -132,15 +114,15 @@ public class PluginManager {
             loadingSet.remove(path);
             throw e;
         }
-        execute(() -> {
-            try {
-                concept.load(path);
-            } catch (Throwable e) {
-                log.error("Reload plugin error: " + path, e);
-            } finally {
-                loadingSet.remove(path);
-            }
-        });
+
+        try {
+            concept.load(definition);
+        } catch (Throwable e) {
+            log.error("Reload plugin error: " + path, e);
+        } finally {
+            loadingSet.remove(path);
+        }
+
     }
 
     public synchronized void renamePlugin(String group, String name, String rename) {
@@ -152,10 +134,10 @@ public class PluginManager {
     }
 
     public PluginMetadata getMetadata(String group, String name) {
-        String path = storage.getLoadedPluginPath(group, name);
+        String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
         Plugin plugin = concept.getRepository().get(path);
         if (plugin == null) {
-            PluginDefinition definition = storage.getPluginDefinition(storage.getUnloadedPluginPath(group, name));
+            PluginDefinition definition = storage.getPluginDefinition(PluginStorage.UNLOADED, group, name);
             return concept.createMetadata(definition, concept.createContext());
         } else {
             return plugin.getMetadata();
@@ -177,16 +159,16 @@ public class PluginManager {
     }
 
     public synchronized void updatePlugin(String group, String original, String upload) throws IOException {
-        String newPath = storage.getLoadedPluginPath(group, upload);
+        String newPath = storage.getPluginDefinition(PluginStorage.LOADED, group, upload).getPath();
         loadingSet.add(newPath);
-        String oldPath = storage.getLoadedPluginPath(group, original);
+        String oldPath = storage.getPluginDefinition(PluginStorage.LOADED, group, original).getPath();
         updatingSet.add(oldPath);
         PluginEventListener listener = new PluginEventListener() {
 
             @Override
             public void onEvent(Object event) {
                 if (event instanceof PluginAutoEvent) {
-                    String path = ((PluginAutoEvent) event).getPath();
+                    String path = ((PluginAutoEvent) event).getDefinition().getPath();
                     if (Objects.equals(newPath, path)) {
                         updatingSet.remove(oldPath);
                         if (event instanceof PluginAutoLoadEvent) {
@@ -208,30 +190,29 @@ public class PluginManager {
         }
     }
 
-    public synchronized String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
+    public synchronized String uploadPlugin(String group, String name, InputStream is, long length) {
         return storage.uploadPlugin(group, name, is, length);
     }
 
-    public InputStream downloadPlugin(String group, String name) throws IOException {
+    public InputStream downloadPlugin(String group, String name) {
         try {
-            return storage.getLoadedPluginInputStream(group, name);
+            return storage.getPluginDefinition(PluginStorage.LOADED, group, name).getInputStream();
         } catch (Throwable e) {
-            return storage.getUnloadedPluginInputStream(group, name);
+            return storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getInputStream();
         }
     }
 
-    public InputStream downloadDeletedPlugin(String group, String name) throws IOException {
-        return storage.getDeletedPluginInputStream(group, name);
+    public InputStream downloadDeletedPlugin(String group, String name) {
+        return storage.getPluginDefinition(PluginStorage.DELETED, group, name).getInputStream();
     }
 
     protected List<PluginSummary> getLoadedPluginSummaries(String group) {
-        Map<String, String> pathNames = storage.getLoadedPlugins(group)
+        return storage.getPluginDefinitions(PluginStorage.LOADED, group)
+                .entrySet()
                 .stream()
-                .collect(Collectors.toMap(name ->
-                        storage.getLoadedPluginPath(group, name), Function.identity()));
-        return storage.getPluginDefinitions(pathNames.keySet())
-                .stream()
-                .map(definition -> {
+                .map(entry -> {
+                    String name = entry.getKey();
+                    PluginDefinition definition = entry.getValue();
                     String path = definition.getPath();
                     long timestamp = definition.getCreateTime();
                     long size = definition.getSize();
@@ -250,24 +231,23 @@ public class PluginManager {
                             }
                         }
                     }
-                    return new PluginSummary(pathNames.get(path), formatSize(size),
+                    return new PluginSummary(name, formatSize(size),
                             formatTime(timestamp), state, timestamp);
                 })
                 .collect(Collectors.toList());
     }
 
     protected List<PluginSummary> getUnloadedPluginSummaries(String group) {
-        Map<String, String> pathNames = storage.getUnloadedPlugins(group)
+        return storage.getPluginDefinitions(PluginStorage.UNLOADED, group)
+                .entrySet()
                 .stream()
-                .collect(Collectors.toMap(name ->
-                        storage.getUnloadedPluginPath(group, name), Function.identity()));
-        return storage.getPluginDefinitions(pathNames.keySet()).stream()
-                .map(definition -> {
+                .map(entry -> {
+                    String name = entry.getKey();
+                    PluginDefinition definition = entry.getValue();
                     long timestamp = definition.getCreateTime();
                     long size = definition.getSize();
                     PluginState state;
-                    String name = pathNames.get(definition.getPath());
-                    String path = storage.getLoadedPluginPath(group, name);
+                    String path = storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getPath();
                     if (unloadingSet.contains(path) || concept.isUnloading(path)) {
                         state = PluginState.UNLOADING;
                     } else {
@@ -285,17 +265,16 @@ public class PluginManager {
     }
 
     protected List<PluginSummary> getDeletedPluginSummaries(String group) {
-        Map<String, String> pathNames = storage.getDeletedPlugins(group)
+        return storage.getPluginDefinitions(PluginStorage.DELETED, group)
+                .entrySet()
                 .stream()
-                .collect(Collectors.toMap(name ->
-                        storage.getDeletedPluginPath(group, name), Function.identity()));
-        return storage.getPluginDefinitions(pathNames.keySet()).stream()
-                .map(definition -> {
-                    String path = definition.getPath();
+                .map(entry -> {
+                    String name = entry.getKey();
+                    PluginDefinition definition = entry.getValue();
                     long timestamp = definition.getCreateTime();
                     long size = definition.getSize();
                     PluginState state = PluginState.DELETED;
-                    return new PluginSummary(pathNames.get(path), formatSize(size),
+                    return new PluginSummary(name, formatSize(size),
                             formatTime(timestamp), state, timestamp);
                 })
                 .collect(Collectors.toList());
@@ -331,6 +310,7 @@ public class PluginManager {
         return formatter.format(dateTime);
     }
 
+    @Deprecated
     protected void execute(Runnable runnable) {
         executor.execute(runnable, 5000, TimeUnit.MILLISECONDS);
     }
@@ -340,7 +320,7 @@ public class PluginManager {
         @Override
         public void onEvent(Object event) {
             if (event instanceof PluginAutoEvent) {
-                String path = ((PluginAutoEvent) event).getPath();
+                String path = ((PluginAutoEvent) event).getDefinition().getPath();
                 if (event instanceof PluginAutoLoadEvent ||
                         event instanceof PluginAutoLoadErrorEvent) {
                     loadingSet.remove(path);

@@ -740,6 +740,6 @@ public class ConceptPluginController {
 
     @GetMapping("/load")
     public void loadPlugin() {
-        concept.load("/Users/concept/plugin/sample-0.0.1-SNAPSHOT-plain.jar");
+        //concept.load("/Users/concept/plugin/sample-0.0.1-SNAPSHOT-plain.jar");
     }
 }

@@ -73,66 +73,22 @@ public abstract class RemotePluginStorage implements PluginStorage {
     }
 
     @Override
-    public List<String> getLoadedPlugins(String group) {
-        return getPlugins(group, PluginStorage.LOADED);
-    }
-
-    @Override
-    public String getLoadedPluginPath(String group, String name) {
-        return getPluginPath(group, name);
-    }
-
-    @Override
-    public InputStream getLoadedPluginInputStream(String group, String name) {
-        return getObject(getBucket(), getPluginPath(group, name));
-    }
-
-    @Override
-    public List<String> getUnloadedPlugins(String group) {
-        return getPlugins(group, PluginStorage.UNLOADED);
-    }
-
-    @Override
-    public String getUnloadedPluginPath(String group, String name) {
-        return getPluginPath(group, name);
-    }
-
-    @Override
-    public InputStream getUnloadedPluginInputStream(String group, String name) {
-        return getObject(getBucket(), getPluginPath(group, name));
-    }
-
-    @Override
-    public List<String> getDeletedPlugins(String group) {
-        return getPlugins(group, PluginStorage.DELETED);
-    }
-
-    @Override
-    public String getDeletedPluginPath(String group, String name) {
-        return getPluginPath(group, name);
-    }
-
-    @Override
-    public InputStream getDeletedPluginInputStream(String group, String name) {
-        return getObject(getBucket(), getPluginPath(group, name));
-    }
-
-    @Override
-    public List<PluginDefinition> getPluginDefinitions(Collection<? extends String> paths) {
-        List<CompletableFuture<PluginDefinition>> futures = new ArrayList<>();
-        for (String path : paths) {
-            Supplier<PluginDefinition> supplier = () -> getPluginDefinition(path);
+    public Map<String, PluginDefinition> getPluginDefinitions(String type, String group) {
+        Map<String, CompletableFuture<PluginDefinition>> futures = new LinkedHashMap<>();
+        for (String name : getPlugins(type, group)) {
+            Supplier<PluginDefinition> supplier = () -> getPluginDefinition(type, group, name);
             CompletableFuture<PluginDefinition> future;
             if (executor == null) {
                 future = CompletableFuture.supplyAsync(supplier);
             } else {
                 future = CompletableFuture.supplyAsync(supplier, executor);
             }
-            futures.add(future);
+            futures.put(name, future);
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        return futures.stream().map(CompletableFuture::join)
-                .collect(Collectors.toList());
+        CompletableFuture.allOf(futures.values().toArray(new CompletableFuture[0])).join();
+        return futures.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        it -> it.getValue().join()));
     }
 
     @Override
@@ -215,7 +171,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
         return newUserMetadata;
     }
 
-    protected List<String> getPlugins(String group, String type) {
+    protected List<String> getPlugins(String type, String group) {
         String bucketToUse = getBucket();
         List<String> list = listObjects(bucketToUse, group + "/", "/");
         List<CompletableFuture<String>> futures = new ArrayList<>();
@@ -276,4 +232,18 @@ public abstract class RemotePluginStorage implements PluginStorage {
     protected abstract void putObject(String bucket, String key,
                                       InputStream is, long length,
                                       Map<String, String> userMetadata);
+
+    public static abstract class RemotePluginDefinition<T> implements PluginDefinition {
+
+        private T objectMetadata;
+
+        protected T useObjectMetadata() {
+            if (objectMetadata == null) {
+                objectMetadata = newObjectMetadata();
+            }
+            return objectMetadata;
+        }
+
+        protected abstract T newObjectMetadata();
+    }
 }

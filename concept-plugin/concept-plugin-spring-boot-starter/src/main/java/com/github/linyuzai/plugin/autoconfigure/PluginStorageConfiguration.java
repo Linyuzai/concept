@@ -3,6 +3,7 @@ package com.github.linyuzai.plugin.autoconfigure;
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
+import com.github.linyuzai.plugin.core.storage.MemoryPluginStorage;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import com.github.linyuzai.plugin.jar.storage.JarStorageFilter;
@@ -23,6 +24,17 @@ public class PluginStorageConfiguration {
     @Bean
     public PluginStorage.Filter pluginStorageFilter() {
         return new JarStorageFilter();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "concept.plugin.storage.type", havingValue = "MEMORY", matchIfMissing = true)
+    public static class MemoryConfiguration {
+
+        @Bean(initMethod = "initialize")
+        @ConditionalOnMissingBean
+        public PluginStorage pluginStorage() {
+            return new MemoryPluginStorage();
+        }
     }
 
     @Configuration(proxyBeanMethods = false)

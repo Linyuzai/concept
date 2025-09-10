@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.autoload;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.event.AbstractPluginEvent;
 import lombok.Getter;
 
@@ -10,13 +11,12 @@ import lombok.Getter;
 @Getter
 public class PluginAutoUnloadEvent extends AbstractPluginEvent implements PluginAutoEvent {
 
-    /**
-     * 插件路径
-     */
-    private final String path;
-
-    public PluginAutoUnloadEvent(Plugin plugin, String path) {
+    public PluginAutoUnloadEvent(Plugin plugin) {
         super(plugin);
-        this.path = path;
+    }
+
+    @Override
+    public PluginDefinition getDefinition() {
+        return getPlugin().getDefinition();
     }
 }

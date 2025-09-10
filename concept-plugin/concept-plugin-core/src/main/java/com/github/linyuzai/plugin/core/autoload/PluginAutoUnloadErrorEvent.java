@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.autoload;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.event.PluginErrorEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ public class PluginAutoUnloadErrorEvent implements PluginAutoEvent, PluginErrorE
     /**
      * 插件路径
      */
-    private final String path;
+    private final PluginDefinition definition;
 
     private final Throwable error;
 }

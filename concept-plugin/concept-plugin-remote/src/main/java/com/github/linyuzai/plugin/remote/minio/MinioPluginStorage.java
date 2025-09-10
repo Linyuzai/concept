@@ -134,8 +134,8 @@ public class MinioPluginStorage extends RemotePluginStorage {
     }
 
     @Override
-    public PluginDefinition getPluginDefinition(String path) {
-        return new PluginDefinitionImpl(path);
+    public PluginDefinition getPluginDefinition(String type, String group, String name) {
+        return new PluginDefinitionImpl(getPluginPath(group, name));
     }
 
     private StatObjectResponse getObjectMetadata(String bucket, String key)
@@ -148,19 +148,19 @@ public class MinioPluginStorage extends RemotePluginStorage {
 
     @Getter
     @RequiredArgsConstructor
-    public class PluginDefinitionImpl implements PluginDefinition {
+    public class PluginDefinitionImpl extends RemotePluginDefinition<StatObjectResponse> {
 
         private final String path;
 
         @SneakyThrows
         @Override
         public long getSize() {
-            return getObjectMetadata(getBucket(), path).size();
+            return useObjectMetadata().size();
         }
 
         @Override
         public long getCreateTime() {
-            String creation = getUserMetadata(getBucket(), path).get(METADATA_CREATION);
+            String creation = useObjectMetadata().userMetadata().get(METADATA_CREATION);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {
@@ -171,12 +171,18 @@ public class MinioPluginStorage extends RemotePluginStorage {
         @SneakyThrows
         @Override
         public Object getVersion() {
-            return getObjectMetadata(getBucket(), path).lastModified().toEpochSecond();
+            return useObjectMetadata().lastModified().toEpochSecond();
         }
 
         @Override
         public InputStream getInputStream() {
             return getObject(getBucket(), path);
+        }
+
+        @SneakyThrows
+        @Override
+        protected StatObjectResponse newObjectMetadata() {
+            return getObjectMetadata(getBucket(), path);
         }
     }
 }

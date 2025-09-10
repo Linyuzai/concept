@@ -47,7 +47,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
     @Override
     public void refresh() {
         try {
-            doRefresh(storage.getPluginDefinitions(getPluginPaths()));
+            doRefresh(getPluginDefinitions());
         } catch (Throwable e) {
             onError(e);
         }
@@ -77,7 +77,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
         load.forEach((path, definition) -> {
             try {
                 plugins.put(path, definition);
-                onCreated(path, definition);
+                onCreated(definition);
             } catch (Throwable e) {
                 onError(e);
             }
@@ -85,7 +85,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
         reload.forEach((path, definition) -> {
             try {
                 plugins.put(path, definition);
-                onModified(path, definition);
+                onModified(definition);
             } catch (Throwable e) {
                 onError(e);
             }
@@ -93,7 +93,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
         unload.forEach((path, definition) -> {
             try {
                 plugins.remove(path);
-                onDeleted(path, definition);
+                onDeleted(definition);
             } catch (Throwable e) {
                 onError(e);
             }

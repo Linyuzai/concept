@@ -29,8 +29,8 @@ public class S3ClientStorage extends RemotePluginStorage {
     }
 
     @Override
-    public PluginDefinition getPluginDefinition(String path) {
-        return new PluginDefinitionImpl(path);
+    public PluginDefinition getPluginDefinition(String type, String group, String name) {
+        return new PluginDefinitionImpl(getPluginPath(group, name));
     }
 
     private HeadObjectResponse getHeadObject(String bucket, String key) {
@@ -145,19 +145,18 @@ public class S3ClientStorage extends RemotePluginStorage {
 
     @Getter
     @RequiredArgsConstructor
-    public class PluginDefinitionImpl implements PluginDefinition {
+    public class PluginDefinitionImpl extends RemotePluginDefinition<HeadObjectResponse> {
 
         private final String path;
 
         @Override
         public long getSize() {
-            return getHeadObject(getBucket(), path).contentLength();
+            return useObjectMetadata().contentLength();
         }
 
         @Override
         public long getCreateTime() {
-            String creation = getHeadObject(getBucket(), path)
-                    .metadata().get(METADATA_CREATION);
+            String creation = useObjectMetadata().metadata().get(METADATA_CREATION);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {
@@ -167,12 +166,17 @@ public class S3ClientStorage extends RemotePluginStorage {
 
         @Override
         public Object getVersion() {
-            return getHeadObject(getBucket(), path).lastModified().getEpochSecond();
+            return useObjectMetadata().lastModified().getEpochSecond();
         }
 
         @Override
         public InputStream getInputStream() {
             return getObject(getBucket(), path);
+        }
+
+        @Override
+        protected HeadObjectResponse newObjectMetadata() {
+            return getHeadObject(getBucket(), path);
         }
     }
 }

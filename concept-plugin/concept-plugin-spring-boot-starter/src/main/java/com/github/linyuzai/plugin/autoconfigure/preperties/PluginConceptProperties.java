@@ -63,7 +63,7 @@ public class PluginConceptProperties {
         /**
          * 插件存储类型
          */
-        private StorageType type = StorageType.LOCAL;
+        private StorageType type = StorageType.MEMORY;
 
         /**
          * 插件存储基础路径
@@ -74,7 +74,7 @@ public class PluginConceptProperties {
 
         public enum StorageType {
 
-            LOCAL, MINIO, AWS_V1, AWS_V2
+            MEMORY, LOCAL, MINIO, AWS_V1, AWS_V2
         }
 
         @Data

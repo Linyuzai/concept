@@ -9,10 +9,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -58,85 +56,26 @@ public class LocalPluginStorage implements PluginStorage {
 
     @Override
     public void addGroup(String group) {
-        getPluginDirectory(group, LOADED);
+        getPluginDirectory(LOADED, group);
     }
 
     @Override
-    public List<String> getLoadedPlugins(String group) {
-        return getPlugins(group, LOADED);
-    }
-
-    /**
-     * {basePath}/{group}/_loaded/{name}
-     */
-    @Override
-    public String getLoadedPluginPath(String group, String name) {
-        return getPluginPath(group, name, LOADED);
-    }
-
-    @SneakyThrows
-    @Override
-    public InputStream getLoadedPluginInputStream(String group, String name) {
-        File file = new File(getLoadedPluginPath(group, name));
-        return Files.newInputStream(file.toPath());
+    public PluginDefinition getPluginDefinition(String type, String group, String name) {
+        return new LocalPluginDefinition(getPluginPath(type, group, name));
     }
 
     @Override
-    public List<String> getUnloadedPlugins(String group) {
-        return getPlugins(group, UNLOADED);
-    }
-
-    /**
-     * {basePath}/{group}/_unloaded/{name}
-     */
-    @Override
-    public String getUnloadedPluginPath(String group, String name) {
-        return getPluginPath(group, name, UNLOADED);
-    }
-
-    @SneakyThrows
-    @Override
-    public InputStream getUnloadedPluginInputStream(String group, String name) {
-        File file = new File(getUnloadedPluginPath(group, name));
-        return Files.newInputStream(file.toPath());
-    }
-
-    @Override
-    public List<String> getDeletedPlugins(String group) {
-        return getPlugins(group, DELETED);
-    }
-
-    /**
-     * {basePath}/{group}/_deleted/{name}
-     */
-    @Override
-    public String getDeletedPluginPath(String group, String name) {
-        return getPluginPath(group, name, DELETED);
-    }
-
-    @SneakyThrows
-    @Override
-    public InputStream getDeletedPluginInputStream(String group, String name) {
-        File file = new File(getDeletedPluginPath(group, name));
-        return Files.newInputStream(file.toPath());
-    }
-
-    @Override
-    public PluginDefinition getPluginDefinition(String path) {
-        return new LocalPluginDefinition(path);
-    }
-
-    @Override
-    public List<PluginDefinition> getPluginDefinitions(Collection<? extends String> paths) {
-        return paths.stream().map(this::getPluginDefinition).collect(Collectors.toList());
+    public Map<String, PluginDefinition> getPluginDefinitions(String type, String group) {
+        return getPlugins(type, group).stream().collect(Collectors.toMap(Function.identity(), it ->
+                getPluginDefinition(type, group, it)));
     }
 
     @SneakyThrows
     @Override
     public String uploadPlugin(String group, String name, InputStream is, long length) {
-        String loadedPath = getLoadedPluginPath(group, name);
+        String loadedPath = getPluginDefinition(LOADED, group, name).getPath();
         File file = new File(generateFileName(loadedPath));
-        String unloadedPath = getUnloadedPluginPath(group, file.getName());
+        String unloadedPath = getPluginDefinition(UNLOADED, group, file.getName()).getPath();
         File generate = new File(generateFileName(unloadedPath));
         try (FileOutputStream out = new FileOutputStream(generate)) {
             int bytesRead;
@@ -177,12 +116,12 @@ public class LocalPluginStorage implements PluginStorage {
     }
 
     protected File getExistFile(String group, String name) {
-        String loadPath = getLoadedPluginPath(group, name);
+        String loadPath = getPluginDefinition(LOADED, group, name).getPath();
         File loadFile = new File(loadPath);
         if (loadFile.exists()) {
             return loadFile;
         }
-        String unloadPath = getUnloadedPluginPath(group, name);
+        String unloadPath = getPluginDefinition(UNLOADED, group, name).getPath();
         File unloadFile = new File(unloadPath);
         if (unloadFile.exists()) {
             return unloadFile;
@@ -200,14 +139,14 @@ public class LocalPluginStorage implements PluginStorage {
         if (existPlugin(group, rename)) {
             throw new IllegalArgumentException("Name existed");
         }
-        String renamePath = getUnloadedPluginPath(group, rename);
+        String renamePath = getPluginDefinition(UNLOADED, group, rename).getPath();
         File renameFile = new File(renamePath);
         File from;
-        File fromUnloaded = new File(getUnloadedPluginPath(group, name));
+        File fromUnloaded = new File(getPluginDefinition(UNLOADED, group, name).getPath());
         if (fromUnloaded.exists()) {
             from = fromUnloaded;
         } else {
-            File fromLoaded = new File(getLoadedPluginPath(group, name));
+            File fromLoaded = new File(getPluginDefinition(LOADED, group, name).getPath());
             if (fromLoaded.exists()) {
                 from = fromLoaded;
             } else {
@@ -218,37 +157,36 @@ public class LocalPluginStorage implements PluginStorage {
     }
 
     @SneakyThrows
-    protected boolean move(String group, String name, String from, String to) {
-        File fromFile = new File(getPluginFile(group, name, from));
+    protected void move(String group, String name, String from, String to) {
+        File fromFile = new File(getPluginFile(from, group, name));
         if (!fromFile.exists()) {
             throw new IllegalArgumentException(name + " not existed");
         }
-        String toPath = getPluginFile(group, name, to);
+        String toPath = getPluginFile(to, group, name);
         File toFile = new File(generateFileName(toPath));
         //return fromFile.renameTo(toFile);
         // 移动失败会抛出异常
         Files.move(fromFile.toPath(), toFile.toPath());
-        return true;
     }
 
     protected File getGroupDirectory(String group) {
         return check(new File(location, group));
     }
 
-    protected File getPluginDirectory(String group, String type) {
+    protected File getPluginDirectory(String type, String group) {
         return check(new File(getGroupDirectory(group), type));
     }
 
-    protected String getPluginFile(String group, String name, String type) {
-        return new File(getPluginDirectory(group, type), name).getAbsolutePath();
+    protected String getPluginFile(String type, String group, String name) {
+        return new File(getPluginDirectory(type, group), name).getAbsolutePath();
     }
 
-    protected String getPluginPath(String group, String name, String type) {
+    protected String getPluginPath(String type, String group, String name) {
         return group + "/" + type + "/" + name;
     }
 
-    protected List<String> getPlugins(String group, String type) {
-        File directory = getPluginDirectory(group, type);
+    protected List<String> getPlugins(String type, String group) {
+        File directory = getPluginDirectory(type, group);
         File[] files = directory.listFiles(pathname -> {
             String name = pathname.getName();
             return filter == null || filter.filter(group, name);

@@ -42,7 +42,7 @@ public class ConceptPluginSample {
      * @param filePath jar 文件路径
      */
     public void load(String filePath) {
-        concept.load(filePath);
+        //concept.load(filePath);
     }
 
     /**

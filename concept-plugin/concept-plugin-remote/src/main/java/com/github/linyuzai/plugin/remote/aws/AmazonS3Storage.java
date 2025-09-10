@@ -29,8 +29,8 @@ public class AmazonS3Storage extends RemotePluginStorage {
     }
 
     @Override
-    public PluginDefinition getPluginDefinition(String path) {
-        return new PluginDefinitionImpl(path);
+    public PluginDefinition getPluginDefinition(String type, String group, String name) {
+        return new PluginDefinitionImpl(getPluginPath(group, name));
     }
 
     private ObjectMetadata getObjectMetadata(String bucket, String key) {
@@ -115,19 +115,18 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
     @Getter
     @RequiredArgsConstructor
-    public class PluginDefinitionImpl implements PluginDefinition {
+    public class PluginDefinitionImpl extends RemotePluginDefinition<ObjectMetadata> {
 
         private final String path;
 
         @Override
         public long getSize() {
-            return getObjectMetadata(getBucket(), path).getContentLength();
+            return useObjectMetadata().getContentLength();
         }
 
         @Override
         public long getCreateTime() {
-            String creation = getObjectMetadata(getBucket(), path)
-                    .getUserMetaDataOf(METADATA_CREATION);
+            String creation = useObjectMetadata().getUserMetaDataOf(METADATA_CREATION);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {
@@ -137,12 +136,17 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
         @Override
         public Object getVersion() {
-            return getObjectMetadata(getBucket(), path).getLastModified().getTime();
+            return useObjectMetadata().getLastModified().getTime();
         }
 
         @Override
         public InputStream getInputStream() {
             return getObject(getBucket(), path);
+        }
+
+        @Override
+        protected ObjectMetadata newObjectMetadata() {
+            return getObjectMetadata(getBucket(), path);
         }
     }
 }

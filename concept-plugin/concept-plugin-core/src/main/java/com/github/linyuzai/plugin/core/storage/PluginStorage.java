@@ -5,8 +5,8 @@ import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -42,63 +42,20 @@ public interface PluginStorage {
      */
     List<String> getGroups();
 
-
+    /**
+     * 添加分组
+     */
     void addGroup(String group);
 
     /**
-     * 获得分组下的需要加载的插件名
+     * 获得插件源
      */
-    List<String> getLoadedPlugins(String group);
-
-    /**
-     * 获得分组下需要加载的插件路径
-     */
-    String getLoadedPluginPath(String group, String name);
-
-    /**
-     * 获得分组下需要加载的插件流
-     */
-    InputStream getLoadedPluginInputStream(String group, String name);
-
-    /**
-     * 获得分组下的不需要加载的插件名
-     */
-    List<String> getUnloadedPlugins(String group);
-
-    /**
-     * 获得分组下不需要加载的插件路径
-     */
-    String getUnloadedPluginPath(String group, String name);
-
-    /**
-     * 获得分组下不需要加载的插件流
-     */
-    InputStream getUnloadedPluginInputStream(String group, String name);
-
-    /**
-     * 获得分组下的删除的插件名
-     */
-    List<String> getDeletedPlugins(String group);
-
-    /**
-     * 获得分组下删除的插件路径
-     */
-    String getDeletedPluginPath(String group, String name);
-
-    /**
-     * 获得分组下删除的插件流
-     */
-    InputStream getDeletedPluginInputStream(String group, String name);
+    PluginDefinition getPluginDefinition(String type, String group, String name);
 
     /**
      * 获得插件源
      */
-    PluginDefinition getPluginDefinition(String path);
-
-    /**
-     * 获得插件源
-     */
-    List<PluginDefinition> getPluginDefinitions(Collection<? extends String> paths);
+    Map<String, PluginDefinition> getPluginDefinitions(String type, String group);
 
     /**
      * 上传插件
