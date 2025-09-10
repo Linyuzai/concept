@@ -78,6 +78,8 @@ public interface Plugin {
 
         private DependencyMetadata dependency = new DependencyMetadata();
 
+        private ConstraintMetadata constraint = new ConstraintMetadata();
+
         /**
          * 插件处理器配置
          */
@@ -100,6 +102,14 @@ public interface Plugin {
              * 依赖的插件名称
              */
             private Set<String> names = Collections.emptySet();
+        }
+
+        @Data
+        public static class ConstraintMetadata {
+
+            private String maxEntrySize;
+
+            private int maxNestedDepth;
         }
     }
 
