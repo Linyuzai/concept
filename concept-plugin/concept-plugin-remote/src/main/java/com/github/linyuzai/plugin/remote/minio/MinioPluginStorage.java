@@ -49,7 +49,11 @@ public class MinioPluginStorage extends RemotePluginStorage {
     @SneakyThrows
     @Override
     protected List<String> listObjects(String bucket, String prefix, String delimiter) {
-        ListObjectsArgs args = ListObjectsArgs.builder().bucket(bucket).prefix(prefix).build();
+        ListObjectsArgs args = ListObjectsArgs.builder()
+                .bucket(bucket)
+                .prefix(prefix)
+                .delimiter(delimiter)
+                .build();
         Iterable<Result<Item>> results = minioClient.listObjects(args);
         List<String> list = new ArrayList<>();
         for (Result<Item> result : results) {
