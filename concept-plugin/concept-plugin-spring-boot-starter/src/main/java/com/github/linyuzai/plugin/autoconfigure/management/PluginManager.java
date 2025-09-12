@@ -15,7 +15,6 @@ import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -161,7 +160,7 @@ public class PluginManager {
         return metadataSummaries;
     }
 
-    public synchronized void updatePlugin(String group, String original, String upload) throws IOException {
+    public synchronized void updatePlugin(String group, String original, String upload) {
         String newPath = storage.getPluginDefinition(PluginStorage.LOADED, group, upload).getPath();
         loadingSet.add(newPath);
         String oldPath = storage.getPluginDefinition(PluginStorage.LOADED, group, original).getPath();

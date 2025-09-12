@@ -150,7 +150,7 @@ concept:
       enabled: true
       period: 5000
     storage:
-      type: minio
+      #type: minio
       autocleaning:
         enabled: true
     extension:

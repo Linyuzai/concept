@@ -6,8 +6,6 @@ import lombok.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -18,7 +16,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class RemotePluginStorage implements PluginStorage {
+public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     public static final String GROUP_METADATA = "concept_plugin.properties";
 
@@ -27,8 +25,6 @@ public abstract class RemotePluginStorage implements PluginStorage {
     public static final String METADATA_STATUS = "concept-plugin.status";
 
     public static final String METADATA_CREATION = "concept-plugin.creation";
-
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
     private String bucket = DEFAULT_LOCATION;
 
@@ -95,7 +91,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
 
     @Override
     public String uploadPlugin(String group, String name, InputStream is, long length) {
-        String pluginName = generatePluginName(group, name);
+        String pluginName = generateName(getPluginPath(group, name));
         Map<String, String> map = new LinkedHashMap<>();
         map.put(METADATA_STATUS, PluginStorage.UNLOADED);
         map.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
@@ -120,8 +116,7 @@ public abstract class RemotePluginStorage implements PluginStorage {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.DELETED);
         String bucket = getBucket();
         String key = getPluginPath(group, name);
-        String deleteKey = generateName(key, p -> existObject(bucket, p), i ->
-                PluginStorage.DELETED + FORMATTER.format(LocalDateTime.now()));
+        String deleteKey = generateDeletedName(key);
         copyObject(bucket, key, bucket, deleteKey, userMetadata);
         deleteObject(bucket, key);
     }
@@ -146,19 +141,12 @@ public abstract class RemotePluginStorage implements PluginStorage {
         return group + "/" + name;
     }
 
-    protected String generatePluginName(String group, String name) {
-        int i = 1;
-        String tryName = name;
-        while (existPlugin(group, tryName)) {
-            int index = tryName.lastIndexOf(".");
-            if (index == -1) {
-                tryName = tryName + i;
-            } else {
-                tryName = tryName.substring(0, index) + "(" + i + ")" + tryName.substring(index);
-            }
-            i++;
-        }
-        return tryName;
+    protected String generateName(String path) {
+        return generateName(path, p -> existObject(getBucket(), p));
+    }
+
+    protected String generateDeletedName(String path) {
+        return generateDeletedName(path, p -> existObject(getBucket(), p));
     }
 
     protected Map<String, String> createUserMetadata(String group, String name, String status) {

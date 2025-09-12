@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocalPluginStorage implements PluginStorage {
+public class LocalPluginStorage extends AbstractPluginStorage {
 
     /**
      * 默认的缓存路径 {user.home}/concept/plugin
@@ -77,9 +77,9 @@ public class LocalPluginStorage implements PluginStorage {
     @Override
     public String uploadPlugin(String group, String name, InputStream is, long length) {
         String loadedPath = getPluginDefinition(LOADED, group, name).getPath();
-        File file = new File(generateFileName(loadedPath));
+        File file = new File(generateName(loadedPath));
         String unloadedPath = getPluginDefinition(UNLOADED, group, file.getName()).getPath();
-        File generate = new File(generateFileName(unloadedPath));
+        File generate = new File(generateName(unloadedPath));
         try (FileOutputStream out = new FileOutputStream(generate)) {
             int bytesRead;
             for (byte[] buffer = new byte[4096]; (bytesRead = is.read(buffer)) != -1; ) {
@@ -95,7 +95,7 @@ public class LocalPluginStorage implements PluginStorage {
      */
     @Override
     public void loadPlugin(String group, String name) {
-        move(group, name, UNLOADED, LOADED);
+        move(group, name, UNLOADED, LOADED, false);
     }
 
     /**
@@ -103,7 +103,7 @@ public class LocalPluginStorage implements PluginStorage {
      */
     @Override
     public void unloadPlugin(String group, String name) {
-        move(group, name, LOADED, UNLOADED);
+        move(group, name, LOADED, UNLOADED, false);
     }
 
     /**
@@ -112,9 +112,9 @@ public class LocalPluginStorage implements PluginStorage {
     @Override
     public void deletePlugin(String group, String name) {
         try {
-            move(group, name, UNLOADED, DELETED);
+            move(group, name, UNLOADED, DELETED, true);
         } catch (Throwable e) {
-            move(group, name, LOADED, DELETED);
+            move(group, name, LOADED, DELETED, true);
         }
     }
 
@@ -160,13 +160,13 @@ public class LocalPluginStorage implements PluginStorage {
     }
 
     @SneakyThrows
-    protected void move(String group, String name, String from, String to) {
+    protected void move(String group, String name, String from, String to, boolean deleted) {
         File fromFile = new File(getPluginFile(from, group, name));
         if (!fromFile.exists()) {
             throw new IllegalArgumentException(name + " not existed");
         }
         String toPath = getPluginFile(to, group, name);
-        File toFile = new File(generateFileName(toPath));
+        File toFile = new File(deleted ? generateDeletedName(toPath) : generateName(toPath));
         //return fromFile.renameTo(toFile);
         // 移动失败会抛出异常
         Files.move(fromFile.toPath(), toFile.toPath());
@@ -188,6 +188,14 @@ public class LocalPluginStorage implements PluginStorage {
         return group + "/" + type + "/" + name;
     }
 
+    protected String generateName(String path) {
+        return generateName(path, p -> new File(p).exists());
+    }
+
+    protected String generateDeletedName(String path) {
+        return generateDeletedName(path, p -> new File(p).exists());
+    }
+
     protected List<String> getPlugins(String type, String group) {
         File directory = getPluginDirectory(type, group);
         File[] files = directory.listFiles(pathname -> {
@@ -207,13 +215,6 @@ public class LocalPluginStorage implements PluginStorage {
             boolean mkdirs = file.mkdirs();
         }
         return file;
-    }
-
-    /**
-     * 如果文件存在则顺序添加后缀
-     */
-    protected String generateFileName(String path) {
-        return generateName(path, p -> new File(p).exists(), i -> "(" + i + ")");
     }
 
     @Getter

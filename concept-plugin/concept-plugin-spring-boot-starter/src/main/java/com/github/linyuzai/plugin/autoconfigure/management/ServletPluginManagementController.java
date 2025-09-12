@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequestMapping("/concept-plugin/management")
@@ -30,7 +31,7 @@ public class ServletPluginManagementController extends PluginManagementControlle
     @GetMapping("/plugin/download")
     public ResponseEntity<Resource> download(@RequestParam("group") String group,
                                              @RequestParam("name") String name,
-                                             @RequestParam("deleted") Boolean deleted) throws IOException {
+                                             @RequestParam("deleted") Boolean deleted) throws UnsupportedEncodingException {
         HttpHeaders headers = new HttpHeaders();
         setDownloadHeaders(headers, name);
         InputStream is = downloadPlugin(group, name, deleted);

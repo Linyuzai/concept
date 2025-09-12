@@ -711,7 +711,7 @@
                         this.group.list = body.data;
                         if (this.group.list.length > 0) {
                             if (this.group.select === '') {
-                                this.group.select = this.group.list[0].name;
+                                this.group.select = this.group.list[0];
                             }
                         } else {
                             this.group.select = '';

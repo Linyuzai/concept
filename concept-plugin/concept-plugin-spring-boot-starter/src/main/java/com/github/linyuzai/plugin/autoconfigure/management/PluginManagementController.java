@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -71,7 +70,8 @@ public class PluginManagementController {
     public Response unloadPlugin(@RequestBody Map<String, String> body/*@RequestParam("group") String group,
                                  @RequestParam("name") String name*/) {
         String group = body.get("group");
-        String name = body.get("name");return response(() -> manager.unloadPlugin(group, name), () -> "插件卸载");
+        String name = body.get("name");
+        return response(() -> manager.unloadPlugin(group, name), () -> "插件卸载");
     }
 
     @PostMapping("/plugin/reload")
@@ -124,15 +124,15 @@ public class PluginManagementController {
         }, () -> "插件列表获取");
     }
 
-    protected void updatePlugin(String group, String original, String upload) throws IOException {
+    protected void updatePlugin(String group, String original, String upload) {
         manager.updatePlugin(group, original, upload);
     }
 
-    protected String uploadPlugin(String group, String name, InputStream is, long length) throws IOException {
+    protected String uploadPlugin(String group, String name, InputStream is, long length) {
         return manager.uploadPlugin(group, name, is, length);
     }
 
-    protected InputStream downloadPlugin(String group, String name, Boolean deleted) throws IOException {
+    protected InputStream downloadPlugin(String group, String name, Boolean deleted) {
         if (deleted == Boolean.TRUE) {
             return manager.downloadDeletedPlugin(group, name);
         } else {
