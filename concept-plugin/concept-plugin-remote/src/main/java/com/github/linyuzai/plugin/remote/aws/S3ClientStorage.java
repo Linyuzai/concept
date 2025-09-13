@@ -30,7 +30,7 @@ public class S3ClientStorage extends RemotePluginStorage {
 
     @Override
     public PluginDefinition getPluginDefinition(String type, String group, String name) {
-        return new PluginDefinitionImpl(getPluginPath(group, name));
+        return new PluginDefinitionImpl(getPluginPath(group, name), name);
     }
 
     private HeadObjectResponse getHeadObject(String bucket, String key) {
@@ -148,6 +148,8 @@ public class S3ClientStorage extends RemotePluginStorage {
     public class PluginDefinitionImpl extends RemotePluginDefinition<HeadObjectResponse> {
 
         private final String path;
+
+        private final String name;
 
         @Override
         public long getSize() {

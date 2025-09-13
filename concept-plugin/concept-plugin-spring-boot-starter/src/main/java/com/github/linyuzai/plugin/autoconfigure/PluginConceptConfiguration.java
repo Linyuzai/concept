@@ -39,6 +39,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
+import com.github.linyuzai.plugin.core.tree.PluginTreeInterceptor;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
@@ -128,7 +129,7 @@ public class PluginConceptConfiguration {
 
     @Bean
     public BinderPluginFactory jarStreamPluginFactory(PluginConceptProperties properties,
-                                                         List<PluginMetadata.Adapter> adapters) {
+                                                      List<PluginMetadata.Adapter> adapters) {
         JarStreamPluginFactory pluginFactory = new JarStreamPluginFactory();
         pluginFactory.setMetadataAdapters(adapters);
         BinderPluginFactory factory = new BinderPluginFactory();
@@ -226,6 +227,7 @@ public class PluginConceptConfiguration {
                                        List<PluginFactory> factories,
                                        List<PluginHandler> handlers,
                                        List<PluginHandlerFactory> handlerFactories,
+                                       List<PluginTreeInterceptor> treeInterceptors,
                                        List<PluginEventListener> eventListeners) {
         return new DefaultPluginConcept.Builder()
                 .pathFactory(pathFactory)
@@ -240,6 +242,7 @@ public class PluginConceptConfiguration {
                 .addFactories(factories)
                 .addHandlers(handlers)
                 .addHandlerFactories(handlerFactories)
+                .addTreeInterceptors(treeInterceptors)
                 .addEventListeners(eventListeners)
                 .build();
     }

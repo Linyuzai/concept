@@ -139,7 +139,7 @@ public class MinioPluginStorage extends RemotePluginStorage {
 
     @Override
     public PluginDefinition getPluginDefinition(String type, String group, String name) {
-        return new PluginDefinitionImpl(getPluginPath(group, name));
+        return new PluginDefinitionImpl(getPluginPath(group, name), name);
     }
 
     private StatObjectResponse getObjectMetadata(String bucket, String key)
@@ -155,6 +155,8 @@ public class MinioPluginStorage extends RemotePluginStorage {
     public class PluginDefinitionImpl extends RemotePluginDefinition<StatObjectResponse> {
 
         private final String path;
+
+        private final String name;
 
         @SneakyThrows
         @Override

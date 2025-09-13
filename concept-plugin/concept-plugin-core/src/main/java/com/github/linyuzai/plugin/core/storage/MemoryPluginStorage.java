@@ -1,10 +1,10 @@
 package com.github.linyuzai.plugin.core.storage;
 
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+import com.github.linyuzai.plugin.core.exception.PluginException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         String path = getPluginPath(group, name);
         PluginDefinition definition = plugins.get(path);
         if (definition == null) {
-            return new PluginDefinitionImpl(path, null);
+            return new PluginDefinitionImpl(path, name, null);
         } else {
             return definition;
         }
@@ -64,7 +64,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
     @Override
     public synchronized String uploadPlugin(String group, String name, InputStream is, long length) {
         String path = generateName(getPluginPath(group, name));
-        PluginDefinition definition = new PluginDefinitionImpl(path, PluginStorage.read(is));
+        PluginDefinition definition = new PluginDefinitionImpl(path, name, PluginStorage.read(is));
         types.put(path, UNLOADED);
         plugins.put(path, definition);
         return name;
@@ -104,8 +104,8 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         }
         String newPath = getPluginPath(group, rename);
         types.put(newPath, types.remove(path));
-        plugins.put(newPath, new PluginDefinitionImpl(newPath,
-                PluginStorage.read(Objects.requireNonNull(definition.getInputStream()))));
+        plugins.put(newPath, new PluginDefinitionImpl(newPath, rename,
+                PluginStorage.read(definition.getInputStream())));
     }
 
     protected String getPluginPath(String group, String name) {
@@ -130,6 +130,8 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
 
         private final String path;
 
+        private final String name;
+
         private final byte[] bytes;
 
         private final long createTime = System.currentTimeMillis();
@@ -144,11 +146,10 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
             return createTime;
         }
 
-        @Nullable
         @Override
         public InputStream getInputStream() {
             if (bytes == null) {
-                return null;
+                throw new PluginException("Cannot read plugin bytes: " + path);
             }
             return new ByteArrayInputStream(bytes);
         }

@@ -17,6 +17,10 @@ public class PluginConceptProperties {
      */
     private MetadataProperties metadata = new MetadataProperties();
 
+    //private String maxEntrySize;
+
+    //private int maxNestedDepth;
+
     /**
      * 插件存储配置
      */

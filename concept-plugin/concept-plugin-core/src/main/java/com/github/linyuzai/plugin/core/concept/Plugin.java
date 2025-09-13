@@ -78,8 +78,6 @@ public interface Plugin {
 
         private DependencyMetadata dependency = new DependencyMetadata();
 
-        private ConstraintMetadata constraint = new ConstraintMetadata();
-
         /**
          * 插件处理器配置
          */
@@ -103,14 +101,6 @@ public interface Plugin {
              */
             private Set<String> names = Collections.emptySet();
         }
-
-        @Data
-        public static class ConstraintMetadata {
-
-            private String maxEntrySize;
-
-            private int maxNestedDepth;
-        }
     }
 
     /**
@@ -129,11 +119,14 @@ public interface Plugin {
         String getName();
 
         /**
-         * 获得内容
+         * 获得内容（文件夹为null）
          */
         @Nullable
         Content getContent();
 
+        /**
+         * 获得输入流（文件夹为null）
+         */
         @Nullable
         @Override
         default InputStream getInputStream() {

@@ -22,6 +22,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
+import com.github.linyuzai.plugin.core.tree.PluginTreeInterceptor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected Collection<PluginHandler> handlers;
 
     protected Collection<PluginHandlerFactory> handlerFactories;
+
+    protected Collection<PluginTreeInterceptor> treeInterceptors;
 
     /**
      * 处理链
@@ -179,6 +182,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      */
     @Override
     public Plugin createPlugin(PluginDefinition definition, PluginContext context) {
+        for (PluginTreeInterceptor interceptor : treeInterceptors) {
+            interceptor.intercept(definition, context);
+        }
         PluginMetadata metadata = createMetadata(definition, context);
         if (metadata == null) {
             return null;
@@ -441,8 +447,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected PluginLogger logger;
 
-        protected List<PluginEventListener> eventListeners = new ArrayList<>();
-
         protected List<PluginMetadataFactory> metadataFactories = new ArrayList<>();
 
         protected List<PluginFactory> factories = new ArrayList<>();
@@ -450,6 +454,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected List<PluginHandler> handlers = new ArrayList<>();
 
         protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
+
+        protected List<PluginTreeInterceptor> treeInterceptors = new ArrayList<>();
+
+        protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
         /**
          * 设置路径工厂
@@ -512,21 +520,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B logger(PluginLogger logger) {
             this.logger = logger;
-            return (B) this;
-        }
-
-        /**
-         * 添加事件监听器
-         */
-        public B addEventListeners(PluginEventListener... listeners) {
-            return addEventListeners(Arrays.asList(listeners));
-        }
-
-        /**
-         * 添加事件监听器
-         */
-        public B addEventListeners(Collection<? extends PluginEventListener> listeners) {
-            this.eventListeners.addAll(listeners);
             return (B) this;
         }
 
@@ -632,6 +625,36 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             return (B) this;
         }
 
+        /**
+         * 添加插件树拦截器
+         */
+        public B addTreeInterceptors(PluginTreeInterceptor... interceptors) {
+            return addTreeInterceptors(Arrays.asList(interceptors));
+        }
+
+        /**
+         * 添加插件树拦截器
+         */
+        public B addTreeInterceptors(Collection<? extends PluginTreeInterceptor> interceptors) {
+            this.treeInterceptors.addAll(interceptors);
+            return (B) this;
+        }
+
+        /**
+         * 添加事件监听器
+         */
+        public B addEventListeners(PluginEventListener... listeners) {
+            return addEventListeners(Arrays.asList(listeners));
+        }
+
+        /**
+         * 添加事件监听器
+         */
+        public B addEventListeners(Collection<? extends PluginEventListener> listeners) {
+            this.eventListeners.addAll(listeners);
+            return (B) this;
+        }
+
         public T build() {
             T concept = create();
             eventPublisher.register(eventListeners);
@@ -647,6 +670,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setFactories(factories);
             concept.setHandlers(handlers);
             concept.setHandlerFactories(handlerFactories);
+            concept.setTreeInterceptors(treeInterceptors);
             return concept;
         }
 

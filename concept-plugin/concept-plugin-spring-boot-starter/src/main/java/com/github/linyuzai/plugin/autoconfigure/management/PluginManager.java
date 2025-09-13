@@ -92,6 +92,7 @@ public class PluginManager {
         try {
             storage.loadPlugin(group, name);
         } catch (Throwable e) {
+            loadingSet.remove(path);
             log.error("Load plugin error: " + path, e);
         }
     }
@@ -102,6 +103,7 @@ public class PluginManager {
         try {
             storage.unloadPlugin(group, name);
         } catch (Throwable e) {
+            unloadingSet.remove(path);
             log.error("Unload plugin error: " + path, e);
         }
     }
@@ -116,7 +118,6 @@ public class PluginManager {
             loadingSet.remove(path);
             throw e;
         }
-
         try {
             concept.load(definition);
         } catch (Throwable e) {
@@ -124,7 +125,6 @@ public class PluginManager {
         } finally {
             loadingSet.remove(path);
         }
-
     }
 
     public synchronized void renamePlugin(String group, String name, String rename) {
@@ -139,8 +139,13 @@ public class PluginManager {
         String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
         Plugin plugin = concept.getRepository().get(path);
         if (plugin == null) {
-            PluginDefinition definition = storage.getPluginDefinition(PluginStorage.UNLOADED, group, name);
-            return concept.createMetadata(definition, concept.createContext());
+            PluginDefinition unload = storage.getPluginDefinition(PluginStorage.UNLOADED, group, name);
+            try {
+                return concept.createMetadata(unload, concept.createContext());
+            } catch (Throwable e) {
+                PluginDefinition loaded = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+                return concept.createMetadata(loaded, concept.createContext());
+            }
         } else {
             return plugin.getMetadata();
         }

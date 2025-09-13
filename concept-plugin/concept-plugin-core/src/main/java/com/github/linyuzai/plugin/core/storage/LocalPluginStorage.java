@@ -64,7 +64,7 @@ public class LocalPluginStorage extends AbstractPluginStorage {
 
     @Override
     public PluginDefinition getPluginDefinition(String type, String group, String name) {
-        return new LocalPluginDefinition(getPluginPath(type, group, name));
+        return new LocalPluginDefinition(getPluginPath(type, group, name), name);
     }
 
     @Override
@@ -161,11 +161,11 @@ public class LocalPluginStorage extends AbstractPluginStorage {
 
     @SneakyThrows
     protected void move(String group, String name, String from, String to, boolean deleted) {
-        File fromFile = new File(getPluginFile(from, group, name));
+        File fromFile = new File(getPluginPath(from, group, name));
         if (!fromFile.exists()) {
             throw new IllegalArgumentException(name + " not existed");
         }
-        String toPath = getPluginFile(to, group, name);
+        String toPath = getPluginPath(to, group, name);
         File toFile = new File(deleted ? generateDeletedName(toPath) : generateName(toPath));
         //return fromFile.renameTo(toFile);
         // 移动失败会抛出异常
@@ -180,12 +180,8 @@ public class LocalPluginStorage extends AbstractPluginStorage {
         return check(new File(getGroupDirectory(group), type));
     }
 
-    protected String getPluginFile(String type, String group, String name) {
-        return new File(getPluginDirectory(type, group), name).getAbsolutePath();
-    }
-
     protected String getPluginPath(String type, String group, String name) {
-        return group + "/" + type + "/" + name;
+        return new File(getPluginDirectory(type, group), name).getAbsolutePath();
     }
 
     protected String generateName(String path) {
@@ -222,6 +218,8 @@ public class LocalPluginStorage extends AbstractPluginStorage {
     public static class LocalPluginDefinition implements PluginDefinition {
 
         private final String path;
+
+        private final String name;
 
         @Override
         public long getSize() {
