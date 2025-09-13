@@ -37,9 +37,7 @@ import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
-import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
-import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.core.tree.PluginTreeInterceptor;
+import com.github.linyuzai.plugin.core.tree.*;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
@@ -79,6 +77,16 @@ public class PluginConceptConfiguration {
     @ConditionalOnMissingBean
     public PluginTreeFactory pluginTreeFactory() {
         return new DefaultPluginTreeFactory();
+    }
+
+    @Bean
+    public EntrySizePluginTreeInterceptor entrySizePluginTreeInterceptor(PluginConceptProperties properties) {
+        return new EntrySizePluginTreeInterceptor(properties.getValidation().getMaxEntrySize().toBytes());
+    }
+
+    @Bean
+    public NestedDepthPluginTreeInterceptor nestedDepthPluginTreeInterceptor(PluginConceptProperties properties) {
+        return new NestedDepthPluginTreeInterceptor(properties.getValidation().getMaxNestedDepth());
     }
 
     @Bean

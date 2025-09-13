@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.jar.concept.JarPlugin;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 /**
  * 配置
@@ -17,9 +18,10 @@ public class PluginConceptProperties {
      */
     private MetadataProperties metadata = new MetadataProperties();
 
-    //private String maxEntrySize;
-
-    //private int maxNestedDepth;
+    /**
+     * 插件校验配置
+     */
+    private ValidationProperties validation = new ValidationProperties();
 
     /**
      * 插件存储配置
@@ -56,6 +58,17 @@ public class PluginConceptProperties {
          * 标准配置类型
          */
         private Class<? extends Plugin.StandardMetadata> standardType = JarPlugin.StandardMetadata.class;
+    }
+
+    /**
+     * 校验配置
+     */
+    @Data
+    public static class ValidationProperties {
+
+        private DataSize maxEntrySize = DataSize.ofBytes(-1);
+
+        private int maxNestedDepth = -1;
     }
 
     /**
