@@ -26,6 +26,9 @@ import com.github.linyuzai.plugin.core.handle.extract.*;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
+import com.github.linyuzai.plugin.core.intercept.EntrySizePluginInterceptor;
+import com.github.linyuzai.plugin.core.intercept.NestedDepthPluginInterceptor;
+import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
@@ -80,13 +83,13 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public EntrySizePluginTreeInterceptor entrySizePluginTreeInterceptor(PluginConceptProperties properties) {
-        return new EntrySizePluginTreeInterceptor(properties.getValidation().getMaxEntrySize().toBytes());
+    public EntrySizePluginInterceptor entrySizePluginInterceptor(PluginConceptProperties properties) {
+        return new EntrySizePluginInterceptor(properties.getValidation().getMaxEntrySize().toBytes());
     }
 
     @Bean
-    public NestedDepthPluginTreeInterceptor nestedDepthPluginTreeInterceptor(PluginConceptProperties properties) {
-        return new NestedDepthPluginTreeInterceptor(properties.getValidation().getMaxNestedDepth());
+    public NestedDepthPluginInterceptor nestedDepthPluginInterceptor(PluginConceptProperties properties) {
+        return new NestedDepthPluginInterceptor(properties.getValidation().getMaxNestedDepth());
     }
 
     @Bean
@@ -232,10 +235,10 @@ public class PluginConceptConfiguration {
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
                                        List<PluginMetadataFactory> metadataFactories,
+                                       List<PluginInterceptor> interceptors,
                                        List<PluginFactory> factories,
                                        List<PluginHandler> handlers,
                                        List<PluginHandlerFactory> handlerFactories,
-                                       List<PluginTreeInterceptor> treeInterceptors,
                                        List<PluginEventListener> eventListeners) {
         return new DefaultPluginConcept.Builder()
                 .pathFactory(pathFactory)
@@ -247,10 +250,10 @@ public class PluginConceptConfiguration {
                 .eventPublisher(eventPublisher)
                 .logger(logger)
                 .addMetadataFactories(metadataFactories)
+                .addInterceptors(interceptors)
                 .addFactories(factories)
                 .addHandlers(handlers)
                 .addHandlerFactories(handlerFactories)
-                .addTreeInterceptors(treeInterceptors)
                 .addEventListeners(eventListeners)
                 .build();
     }

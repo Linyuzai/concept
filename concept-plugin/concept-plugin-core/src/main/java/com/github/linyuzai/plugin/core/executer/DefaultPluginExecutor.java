@@ -1,9 +1,6 @@
 package com.github.linyuzai.plugin.core.executer;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,7 +18,7 @@ public class DefaultPluginExecutor implements PluginExecutor, ThreadFactory {
 
     private final ThreadGroup group = new ThreadGroup("concept-plugin");
 
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2, this);
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4, this);
 
     @Override
     public void execute(Runnable runnable) {
@@ -43,6 +40,11 @@ public class DefaultPluginExecutor implements PluginExecutor, ThreadFactory {
         if (!executor.isShutdown()) {
             executor.shutdown();
         }
+    }
+
+    @Override
+    public Executor asExecutor() {
+        return executor;
     }
 
     @Override

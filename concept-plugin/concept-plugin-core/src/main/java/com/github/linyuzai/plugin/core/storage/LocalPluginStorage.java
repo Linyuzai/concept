@@ -37,11 +37,6 @@ public class LocalPluginStorage extends AbstractPluginStorage {
 
     private PluginStorage.Filter filter;
 
-    @Override
-    public void initialize() {
-
-    }
-
     /**
      * 基础路径下的子目录为分组
      */

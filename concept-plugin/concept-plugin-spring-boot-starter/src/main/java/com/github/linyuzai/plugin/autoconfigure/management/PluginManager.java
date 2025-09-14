@@ -113,7 +113,7 @@ public class PluginManager {
         String path = definition.getPath();
         loadingSet.add(path);
         try {
-            concept.unload(path);
+            concept.unload(definition);
         } catch (Throwable e) {
             loadingSet.remove(path);
             throw e;

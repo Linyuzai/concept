@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.executer;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,4 +15,6 @@ public interface PluginExecutor {
     void schedule(Runnable runnable, long period, TimeUnit unit);
 
     void shutdown();
+
+    Executor asExecutor();
 }

@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -30,10 +29,9 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     private PluginStorage.Filter filter;
 
-    private Executor executor;
-
     @Override
     public void initialize() {
+        super.initialize();
         if (!existBucket(bucket)) {
             createBucket(bucket);
         }
@@ -75,12 +73,8 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         Map<String, CompletableFuture<PluginDefinition>> futures = new LinkedHashMap<>();
         for (String name : getPlugins(type, group)) {
             Supplier<PluginDefinition> supplier = () -> getPluginDefinition(type, group, name);
-            CompletableFuture<PluginDefinition> future;
-            if (executor == null) {
-                future = CompletableFuture.supplyAsync(supplier);
-            } else {
-                future = CompletableFuture.supplyAsync(supplier, executor);
-            }
+            CompletableFuture<PluginDefinition> future =
+                    CompletableFuture.supplyAsync(supplier, getExecutor().asExecutor());
             futures.put(name, future);
         }
         CompletableFuture.allOf(futures.values().toArray(new CompletableFuture[0])).join();
@@ -179,12 +173,8 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
                         return null;
                     }
                 };
-                CompletableFuture<String> future;
-                if (executor == null) {
-                    future = CompletableFuture.supplyAsync(supplier);
-                } else {
-                    future = CompletableFuture.supplyAsync(supplier, executor);
-                }
+                CompletableFuture<String> future =
+                        CompletableFuture.supplyAsync(supplier, getExecutor().asExecutor());
                 futures.add(future);
             }
         }

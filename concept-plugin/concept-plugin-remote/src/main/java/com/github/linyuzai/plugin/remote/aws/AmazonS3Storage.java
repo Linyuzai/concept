@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Getter
@@ -19,12 +18,7 @@ public class AmazonS3Storage extends RemotePluginStorage {
     private final AmazonS3 amazonS3;
 
     public AmazonS3Storage(String bucket, Filter filter, AmazonS3 amazonS3) {
-        this(bucket, filter, amazonS3, null);
-
-    }
-
-    public AmazonS3Storage(String bucket, Filter filter, AmazonS3 amazonS3, Executor executor) {
-        super(bucket, filter, executor);
+        super(bucket, filter);
         this.amazonS3 = amazonS3;
     }
 

@@ -22,7 +22,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.core.tree.PluginTreeInterceptor;
+import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -57,13 +57,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected Collection<PluginMetadataFactory> metadataFactories;
 
+    protected Collection<PluginInterceptor> interceptors;
+
     protected Collection<PluginFactory> factories;
 
     protected Collection<PluginHandler> handlers;
 
     protected Collection<PluginHandlerFactory> handlerFactories;
-
-    protected Collection<PluginTreeInterceptor> treeInterceptors;
 
     /**
      * 处理链
@@ -88,7 +88,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public void destroy() {
         //卸载所有插件
-        repository.stream().forEach(it -> unload(it.getDefinition().getPath()));
+        repository.stream().forEach(it -> unload(it.getDefinition()));
         eventPublisher.publish(new PluginConceptDestroyedEvent(this));
     }
 
@@ -182,8 +182,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      */
     @Override
     public Plugin createPlugin(PluginDefinition definition, PluginContext context) {
-        for (PluginTreeInterceptor interceptor : treeInterceptors) {
-            interceptor.intercept(definition, context);
+        for (PluginInterceptor interceptor : interceptors) {
+            interceptor.beforeCreate(definition, context);
         }
         PluginMetadata metadata = createMetadata(definition, context);
         if (metadata == null) {
@@ -385,10 +385,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     /**
      * 卸载插件。
-     * 通过插件path移除对应的插件
      */
     @Override
-    public synchronized Plugin unload(@NonNull String path) {
+    public synchronized Plugin unload(@NonNull PluginDefinition definition) {
+        String path = definition.getPath();
         unloading.add(path);
         try {
             Plugin removed = repository.remove(path);
@@ -398,7 +398,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             }
             return removed;
         } catch (Throwable e) {
-            throw new PluginUnloadException(path, e);
+            throw new PluginUnloadException(definition, e);
         } finally {
             unloading.remove(path);
         }
@@ -449,13 +449,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected List<PluginMetadataFactory> metadataFactories = new ArrayList<>();
 
+        protected List<PluginInterceptor> interceptors = new ArrayList<>();
+
         protected List<PluginFactory> factories = new ArrayList<>();
 
         protected List<PluginHandler> handlers = new ArrayList<>();
 
         protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
-
-        protected List<PluginTreeInterceptor> treeInterceptors = new ArrayList<>();
 
         protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
@@ -535,6 +535,21 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B addMetadataFactories(Collection<? extends PluginMetadataFactory> factories) {
             this.metadataFactories.addAll(factories);
+            return (B) this;
+        }
+
+        /**
+         * 添加插件拦截器
+         */
+        public B addInterceptors(PluginInterceptor... interceptors) {
+            return addInterceptors(Arrays.asList(interceptors));
+        }
+
+        /**
+         * 添加插件拦截器
+         */
+        public B addInterceptors(Collection<? extends PluginInterceptor> interceptors) {
+            this.interceptors.addAll(interceptors);
             return (B) this;
         }
 
@@ -626,21 +641,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         }
 
         /**
-         * 添加插件树拦截器
-         */
-        public B addTreeInterceptors(PluginTreeInterceptor... interceptors) {
-            return addTreeInterceptors(Arrays.asList(interceptors));
-        }
-
-        /**
-         * 添加插件树拦截器
-         */
-        public B addTreeInterceptors(Collection<? extends PluginTreeInterceptor> interceptors) {
-            this.treeInterceptors.addAll(interceptors);
-            return (B) this;
-        }
-
-        /**
          * 添加事件监听器
          */
         public B addEventListeners(PluginEventListener... listeners) {
@@ -667,10 +667,10 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setEventPublisher(eventPublisher);
             concept.setLogger(logger);
             concept.setMetadataFactories(metadataFactories);
+            concept.setInterceptors(interceptors);
             concept.setFactories(factories);
             concept.setHandlers(handlers);
             concept.setHandlerFactories(handlerFactories);
-            concept.setTreeInterceptors(treeInterceptors);
             return concept;
         }
 

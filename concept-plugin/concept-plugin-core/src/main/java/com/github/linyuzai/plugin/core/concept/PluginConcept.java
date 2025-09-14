@@ -80,7 +80,7 @@ public interface PluginConcept {
     /**
      * 卸载插件
      */
-    Plugin unload(String path);
+    Plugin unload(PluginDefinition definition);
 
     /**
      * 插件是否正在加载

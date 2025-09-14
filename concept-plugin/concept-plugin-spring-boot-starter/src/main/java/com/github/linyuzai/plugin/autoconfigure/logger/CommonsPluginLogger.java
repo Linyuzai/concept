@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CommonsPluginLogger implements PluginLogger {
 
-    private final Log log = LogFactory.getLog(PluginLogger.class);
+    private final Log log = LogFactory.getLog(CommonsPluginLogger.class);
 
     @Override
     public void info(String message) {

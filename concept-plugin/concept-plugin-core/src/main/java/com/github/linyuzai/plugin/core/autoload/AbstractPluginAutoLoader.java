@@ -164,7 +164,7 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
      */
     public void unload(PluginDefinition definition) {
         try {
-            Plugin plugin = concept.unload(definition.getPath());
+            Plugin plugin = concept.unload(definition);
             if (plugin != null) {
                 concept.getEventPublisher().publish(new PluginAutoUnloadEvent(plugin));
             }

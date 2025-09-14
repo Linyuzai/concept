@@ -1,13 +1,26 @@
 package com.github.linyuzai.plugin.core.storage;
 
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.function.Function;
 
+@Getter
+@Setter
 public abstract class AbstractPluginStorage implements PluginStorage {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+
+    private PluginExecutor executor;
+
+    @Override
+    public void initialize() {
+
+    }
 
     /**
      * 如果文件存在则顺序添加后缀

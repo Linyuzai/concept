@@ -21,11 +21,6 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
     private final Map<String, PluginDefinition> plugins = new HashMap<>();
 
     @Override
-    public void initialize() {
-
-    }
-
-    @Override
     public String getLocation() {
         return "";
     }

@@ -11,7 +11,6 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Getter
@@ -20,11 +19,7 @@ public class S3ClientStorage extends RemotePluginStorage {
     private final S3Client s3Client;
 
     public S3ClientStorage(String bucket, Filter filter, S3Client s3Client) {
-        this(bucket, filter, s3Client, null);
-    }
-
-    public S3ClientStorage(String bucket, Filter filter, S3Client s3Client, Executor executor) {
-        super(bucket, filter, executor);
+        super(bucket, filter);
         this.s3Client = s3Client;
     }
 

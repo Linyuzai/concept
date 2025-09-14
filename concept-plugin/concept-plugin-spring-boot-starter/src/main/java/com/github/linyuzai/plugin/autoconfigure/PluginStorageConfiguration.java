@@ -2,10 +2,8 @@ package com.github.linyuzai.plugin.autoconfigure;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
-import com.github.linyuzai.plugin.core.storage.LocalPluginStorage;
-import com.github.linyuzai.plugin.core.storage.MemoryPluginStorage;
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
-import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
+import com.github.linyuzai.plugin.core.executer.PluginExecutor;
+import com.github.linyuzai.plugin.core.storage.*;
 import com.github.linyuzai.plugin.jar.storage.JarStorageFilter;
 import com.github.linyuzai.plugin.remote.aws.AmazonS3Storage;
 import com.github.linyuzai.plugin.remote.aws.S3ClientStorage;
@@ -32,8 +30,8 @@ public class PluginStorageConfiguration {
 
         @Bean(initMethod = "initialize")
         @ConditionalOnMissingBean
-        public PluginStorage pluginStorage() {
-            return new MemoryPluginStorage();
+        public PluginStorage pluginStorage(PluginExecutor executor) {
+            return applyPluginExecutor(new MemoryPluginStorage(), executor);
         }
     }
 
@@ -44,11 +42,12 @@ public class PluginStorageConfiguration {
         @Bean(initMethod = "initialize")
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
-                                           PluginStorage.Filter filter) {
+                                           PluginStorage.Filter filter,
+                                           PluginExecutor executor) {
             String location = properties.getStorage().getLocation();
             String localLocation = StringUtils.hasText(location) ?
                     location : LocalPluginStorage.DEFAULT_LOCATION;
-            return new LocalPluginStorage(localLocation, filter);
+            return applyPluginExecutor(new LocalPluginStorage(localLocation, filter), executor);
         }
     }
 
@@ -60,11 +59,12 @@ public class PluginStorageConfiguration {
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            PluginStorage.Filter filter,
-                                           MinioClient minioClient) {
+                                           MinioClient minioClient,
+                                           PluginExecutor executor) {
             String location = properties.getStorage().getLocation();
             String bucket = StringUtils.hasText(location) ?
                     location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new MinioPluginStorage(bucket, filter, minioClient);
+            return applyPluginExecutor(new MinioPluginStorage(bucket, filter, minioClient), executor);
         }
     }
 
@@ -76,11 +76,12 @@ public class PluginStorageConfiguration {
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            PluginStorage.Filter filter,
-                                           AmazonS3 amazonS3) {
+                                           AmazonS3 amazonS3,
+                                           PluginExecutor executor) {
             String location = properties.getStorage().getLocation();
             String bucket = StringUtils.hasText(location) ?
                     location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new AmazonS3Storage(bucket, filter, amazonS3);
+            return applyPluginExecutor(new AmazonS3Storage(bucket, filter, amazonS3), executor);
         }
     }
 
@@ -92,11 +93,17 @@ public class PluginStorageConfiguration {
         @ConditionalOnMissingBean
         public PluginStorage pluginStorage(PluginConceptProperties properties,
                                            PluginStorage.Filter filter,
-                                           S3Client s3Client) {
+                                           S3Client s3Client,
+                                           PluginExecutor executor) {
             String location = properties.getStorage().getLocation();
             String bucket = StringUtils.hasText(location) ?
                     location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new S3ClientStorage(bucket, filter, s3Client);
+            return applyPluginExecutor(new S3ClientStorage(bucket, filter, s3Client), executor);
         }
+    }
+
+    private static <T extends AbstractPluginStorage> T applyPluginExecutor(T storage, PluginExecutor executor) {
+        storage.setExecutor(executor);
+        return storage;
     }
 }

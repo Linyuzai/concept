@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.core.tree;
+package com.github.linyuzai.plugin.core.intercept;
 
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.context.PluginContext;
@@ -12,12 +12,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NestedDepthPluginTreeInterceptor implements PluginTreeInterceptor {
+public class NestedDepthPluginInterceptor implements PluginInterceptor {
 
     private int maxNestedDepth = -1;
 
     @Override
-    public void intercept(PluginDefinition definition, PluginContext context) {
+    public void beforeCreate(PluginDefinition definition, PluginContext context) {
         if (maxNestedDepth < 0) {
             return;
         }

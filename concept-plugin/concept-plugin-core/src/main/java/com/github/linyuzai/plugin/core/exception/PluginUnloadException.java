@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.exception;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.Getter;
 
 /**
@@ -8,10 +9,10 @@ import lombok.Getter;
 @Getter
 public class PluginUnloadException extends PluginException {
 
-    private final Object plugin;
+    private final PluginDefinition definition;
 
-    public PluginUnloadException(Object plugin, Throwable cause) {
+    public PluginUnloadException(PluginDefinition definition, Throwable cause) {
         super(cause);
-        this.plugin = plugin;
+        this.definition = definition;
     }
 }
