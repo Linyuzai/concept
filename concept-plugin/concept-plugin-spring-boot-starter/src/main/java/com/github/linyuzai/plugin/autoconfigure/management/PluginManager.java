@@ -214,77 +214,62 @@ public class PluginManager {
     }
 
     protected List<PluginSummary> getLoadedPluginSummaries(String group) {
-        return storage.getPluginDefinitions(PluginStorage.LOADED, group)
-                .entrySet()
-                .stream()
-                .map(entry -> {
-                    String name = entry.getKey();
-                    PluginDefinition definition = entry.getValue();
-                    String path = definition.getPath();
-                    long timestamp = definition.getCreateTime();
-                    long size = definition.getSize();
-                    PluginState state;
-                    if (loadingSet.contains(path) || concept.isLoading(definition)) {
-                        state = PluginState.LOADING;
+        return storage.getPluginDefinitions(PluginStorage.LOADED, group).map(definition -> {
+            String name = definition.getName();
+            String path = definition.getPath();
+            long timestamp = definition.getCreateTime();
+            long size = definition.getSize();
+            PluginState state;
+            if (loadingSet.contains(path) || concept.isLoading(definition)) {
+                state = PluginState.LOADING;
+            } else {
+                Plugin get = concept.getRepository().get(definition);
+                if (get == null) {
+                    state = PluginState.LOAD_ERROR;
+                } else {
+                    if (updatingSet.contains(path)) {
+                        state = PluginState.UPDATING;
                     } else {
-                        Plugin get = concept.getRepository().get(definition);
-                        if (get == null) {
-                            state = PluginState.LOAD_ERROR;
-                        } else {
-                            if (updatingSet.contains(path)) {
-                                state = PluginState.UPDATING;
-                            } else {
-                                state = PluginState.LOADED;
-                            }
-                        }
+                        state = PluginState.LOADED;
                     }
-                    return new PluginSummary(name, formatSize(size),
-                            formatTime(timestamp), state, timestamp);
-                })
-                .collect(Collectors.toList());
+                }
+            }
+            return new PluginSummary(name, formatSize(size),
+                    formatTime(timestamp), state, timestamp);
+        }).collect(Collectors.toList());
     }
 
     protected List<PluginSummary> getUnloadedPluginSummaries(String group) {
-        return storage.getPluginDefinitions(PluginStorage.UNLOADED, group)
-                .entrySet()
-                .stream()
-                .map(entry -> {
-                    String name = entry.getKey();
-                    PluginDefinition definition = entry.getValue();
-                    String path = definition.getPath();
-                    long timestamp = definition.getCreateTime();
-                    long size = definition.getSize();
-                    PluginState state;
-                    if (unloadingSet.contains(path) || concept.isUnloading(definition)) {
-                        state = PluginState.UNLOADING;
-                    } else {
-                        Plugin get = concept.getRepository().get(definition);
-                        if (get == null) {
-                            state = PluginState.UNLOADED;
-                        } else {
-                            state = PluginState.UNLOAD_ERROR;
-                        }
-                    }
-                    return new PluginSummary(name, formatSize(size),
-                            formatTime(timestamp), state, timestamp);
-                })
-                .collect(Collectors.toList());
+        return storage.getPluginDefinitions(PluginStorage.UNLOADED, group).map(definition -> {
+            String name = definition.getName();
+            String path = definition.getPath();
+            long timestamp = definition.getCreateTime();
+            long size = definition.getSize();
+            PluginState state;
+            if (unloadingSet.contains(path) || concept.isUnloading(definition)) {
+                state = PluginState.UNLOADING;
+            } else {
+                Plugin get = concept.getRepository().get(definition);
+                if (get == null) {
+                    state = PluginState.UNLOADED;
+                } else {
+                    state = PluginState.UNLOAD_ERROR;
+                }
+            }
+            return new PluginSummary(name, formatSize(size),
+                    formatTime(timestamp), state, timestamp);
+        }).collect(Collectors.toList());
     }
 
     protected List<PluginSummary> getDeletedPluginSummaries(String group) {
-        return storage.getPluginDefinitions(PluginStorage.DELETED, group)
-                .entrySet()
-                .stream()
-                .map(entry -> {
-                    String name = entry.getKey();
-                    PluginDefinition definition = entry.getValue();
-                    long timestamp = definition.getCreateTime();
-                    long size = definition.getSize();
-                    PluginState state = PluginState.DELETED;
-                    return new PluginSummary(name, formatSize(size),
-                            formatTime(timestamp), state, timestamp);
-                })
-                .collect(Collectors.toList());
+        return storage.getPluginDefinitions(PluginStorage.DELETED, group).map(definition -> {
+            String name = definition.getName();
+            long timestamp = definition.getCreateTime();
+            long size = definition.getSize();
+            PluginState state = PluginState.DELETED;
+            return new PluginSummary(name, formatSize(size),
+                    formatTime(timestamp), state, timestamp);
+        }).collect(Collectors.toList());
     }
 
     public void initialize() {

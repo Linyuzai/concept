@@ -9,16 +9,13 @@ import lombok.SneakyThrows;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MemoryPluginStorage extends AbstractPluginStorage {
 
-    private final Set<String> groups = new LinkedHashSet<>();
-
     private final Map<String, String> types = new HashMap<>();
 
-    private final Map<String, PluginDefinition> plugins = new HashMap<>();
+    private final Map<String, Map<String, PluginDefinition>> plugins = new LinkedHashMap<>();
 
     @Override
     public String getLocation() {
@@ -27,32 +24,30 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
 
     @Override
     public synchronized List<String> getGroups() {
-        return new ArrayList<>(groups);
+        return new ArrayList<>(plugins.keySet());
     }
 
     @Override
     public synchronized void addGroup(String group) {
-        groups.add(group);
+        plugins.computeIfAbsent(group, f -> new LinkedHashMap<>());
     }
 
     @Override
     public synchronized PluginDefinition getPluginDefinition(String type, String group, String name) {
-        String path = getPluginPath(group, name);
-        PluginDefinition definition = plugins.get(path);
+        PluginDefinition definition = plugins.getOrDefault(group, Collections.emptyMap()).get(name);
         if (definition == null) {
-            return new PluginDefinitionImpl(path, name, null);
+            return new PluginDefinitionImpl(getPluginPath(group, name), name, null);
         } else {
             return definition;
         }
     }
 
     @Override
-    public synchronized Map<String, PluginDefinition> getPluginDefinitions(String type, String group) {
-        return plugins.keySet().stream()
-                .filter(it -> type.equals(types.get(it)))
-                .filter(it -> it.startsWith(group + "/"))
-                .map(it -> it.substring(group.length() + 1))
-                .collect(Collectors.toMap(Function.identity(), it -> getPluginDefinition(type, group, it)));
+    public synchronized Stream<PluginDefinition> getPluginDefinitions(String type, String group) {
+        return plugins.getOrDefault(group, Collections.emptyMap())
+                .values()
+                .stream()
+                .filter(it -> type.equals(types.get(it.getPath())));
     }
 
     @SneakyThrows
@@ -61,7 +56,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         String path = generateName(getPluginPath(group, name));
         PluginDefinition definition = new PluginDefinitionImpl(path, name, PluginStorage.read(is));
         types.put(path, UNLOADED);
-        plugins.put(path, definition);
+        plugins.get(group).put(name, definition);
         return name;
     }
 
@@ -83,7 +78,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
 
     @Override
     public synchronized boolean existPlugin(String group, String name) {
-        return plugins.containsKey(getPluginPath(group, name));
+        return plugins.getOrDefault(group, Collections.emptyMap()).containsKey(name);
     }
 
     @SneakyThrows
@@ -92,14 +87,14 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         if (existPlugin(group, rename)) {
             throw new IllegalArgumentException("Name existed");
         }
-        String path = getPluginPath(group, name);
-        PluginDefinition definition = plugins.remove(path);
+        PluginDefinition definition = plugins.getOrDefault(group, Collections.emptyMap()).remove(rename);
         if (definition == null) {
             return;
         }
+        String path = getPluginPath(group, name);
         String newPath = getPluginPath(group, rename);
         types.put(newPath, types.remove(path));
-        plugins.put(newPath, new PluginDefinitionImpl(newPath, rename,
+        plugins.get(group).put(rename, new PluginDefinitionImpl(newPath, rename,
                 PluginStorage.read(definition.getInputStream())));
     }
 

@@ -22,6 +22,10 @@ public abstract class AbstractPluginStorage implements PluginStorage {
 
     }
 
+    protected void autocleaning() {
+
+    }
+
     /**
      * 如果文件存在则顺序添加后缀
      */

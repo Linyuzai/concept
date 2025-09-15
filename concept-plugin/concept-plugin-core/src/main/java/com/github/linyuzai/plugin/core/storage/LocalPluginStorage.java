@@ -12,9 +12,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 本地插件位置
@@ -63,9 +62,8 @@ public class LocalPluginStorage extends AbstractPluginStorage {
     }
 
     @Override
-    public Map<String, PluginDefinition> getPluginDefinitions(String type, String group) {
-        return getPlugins(type, group).stream().collect(Collectors.toMap(Function.identity(), it ->
-                getPluginDefinition(type, group, it)));
+    public Stream<PluginDefinition> getPluginDefinitions(String type, String group) {
+        return getPlugins(type, group).stream().map(it -> getPluginDefinition(type, group, it));
     }
 
     @SneakyThrows

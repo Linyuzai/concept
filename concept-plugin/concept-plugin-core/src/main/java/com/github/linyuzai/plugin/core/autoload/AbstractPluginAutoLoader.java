@@ -10,10 +10,9 @@ import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 文件自动加载器抽象类
@@ -85,13 +84,10 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     }
 
     protected List<PluginDefinition> getPluginDefinitions() {
-        List<String> groups = storage.getGroups();
-        List<PluginDefinition> definitions = new ArrayList<>();
-        for (String group : groups) {
-            Map<String, PluginDefinition> map = storage.getPluginDefinitions(PluginStorage.LOADED, group);
-            definitions.addAll(map.values());
-        }
-        return definitions;
+        return storage.getGroups()
+                .stream()
+                .flatMap(it -> storage.getPluginDefinitions(PluginStorage.LOADED, it))
+                .collect(Collectors.toList());
     }
 
     protected abstract void listen(PluginExecutor executor);

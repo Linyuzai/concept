@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -69,18 +70,16 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
     }
 
     @Override
-    public Map<String, PluginDefinition> getPluginDefinitions(String type, String group) {
-        Map<String, CompletableFuture<PluginDefinition>> futures = new LinkedHashMap<>();
+    public Stream<PluginDefinition> getPluginDefinitions(String type, String group) {
+        List<CompletableFuture<PluginDefinition>> futures = new ArrayList<>();
         for (String name : getPlugins(type, group)) {
             Supplier<PluginDefinition> supplier = () -> getPluginDefinition(type, group, name);
             CompletableFuture<PluginDefinition> future =
                     CompletableFuture.supplyAsync(supplier, getExecutor().asExecutor());
-            futures.put(name, future);
+            futures.add(future);
         }
-        CompletableFuture.allOf(futures.values().toArray(new CompletableFuture[0])).join();
-        return futures.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        it -> it.getValue().join()));
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        return futures.stream().map(CompletableFuture::join);
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * 插件存储抽象，本地文件或远程文件
@@ -53,7 +53,7 @@ public interface PluginStorage {
     /**
      * 获得插件源
      */
-    Map<String, PluginDefinition> getPluginDefinitions(String type, String group);
+    Stream<PluginDefinition> getPluginDefinitions(String type, String group);
 
     /**
      * 上传插件
