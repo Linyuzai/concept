@@ -153,7 +153,7 @@ public class S3ClientStorage extends RemotePluginStorage {
 
         @Override
         public long getCreateTime() {
-            String creation = useObjectMetadata().metadata().get(METADATA_CREATION);
+            String creation = useObjectMetadata().metadata().get(METADATA_CREATE_TIME);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {

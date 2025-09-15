@@ -83,19 +83,19 @@ public interface PluginConcept {
     Plugin unload(PluginDefinition definition);
 
     /**
+     * 插件是否已加载
+     */
+    boolean isLoaded(PluginDefinition definition);
+
+    /**
      * 插件是否正在加载
      */
-    boolean isLoading(String path);
+    boolean isLoading(PluginDefinition definition);
 
     /**
      * 插件是否正在卸载
      */
-    boolean isUnloading(String path);
-
-    /**
-     * 插件是否已加载
-     */
-    boolean isLoaded(String path);
+    boolean isUnloading(PluginDefinition definition);
 
     /**
      * 获得路径工厂

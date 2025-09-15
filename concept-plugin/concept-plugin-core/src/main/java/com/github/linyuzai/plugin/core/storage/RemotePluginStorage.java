@@ -23,7 +23,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     public static final String METADATA_STATUS = "concept-plugin.status";
 
-    public static final String METADATA_CREATION = "concept-plugin.creation";
+    public static final String METADATA_CREATE_TIME = "concept-plugin.create-time";
 
     private String bucket = DEFAULT_LOCATION;
 
@@ -88,7 +88,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         String pluginName = generateName(getPluginPath(group, name));
         Map<String, String> map = new LinkedHashMap<>();
         map.put(METADATA_STATUS, PluginStorage.UNLOADED);
-        map.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
+        map.put(METADATA_CREATE_TIME, String.valueOf(new Date().getTime()));
         putObject(bucket, getPluginPath(group, pluginName), is, length, map);
         return pluginName;
     }
@@ -147,7 +147,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         Map<String, String> userMetadata = getUserMetadata(getBucket(), getPluginPath(group, name));
         Map<String, String> newUserMetadata = new LinkedHashMap<>();
         if (userMetadata == null) {
-            newUserMetadata.put(METADATA_CREATION, String.valueOf(new Date().getTime()));
+            newUserMetadata.put(METADATA_CREATE_TIME, String.valueOf(new Date().getTime()));
         } else {
             newUserMetadata.putAll(userMetadata);
         }

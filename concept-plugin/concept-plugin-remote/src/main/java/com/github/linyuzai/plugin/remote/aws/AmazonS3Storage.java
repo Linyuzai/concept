@@ -122,7 +122,7 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
         @Override
         public long getCreateTime() {
-            String creation = useObjectMetadata().getUserMetaDataOf(METADATA_CREATION);
+            String creation = useObjectMetadata().getUserMetaDataOf(METADATA_CREATE_TIME);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {

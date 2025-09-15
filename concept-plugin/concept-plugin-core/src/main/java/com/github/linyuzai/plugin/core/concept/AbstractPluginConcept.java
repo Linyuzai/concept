@@ -14,6 +14,7 @@ import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
 import com.github.linyuzai.plugin.core.handle.extract.PluginExtractor;
 import com.github.linyuzai.plugin.core.handle.filter.PluginFilter;
 import com.github.linyuzai.plugin.core.handle.resolve.PluginResolver;
+import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
@@ -22,7 +23,6 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -233,7 +233,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         List<PluginDefinition> list = new ArrayList<>();
         for (PluginDefinition definition : definitions) {
             String path = definition.getPath();
-            if (repository.contains(path)) {
+            if (repository.contains(definition)) {
                 onError.accept(definition, new IllegalArgumentException("Plugin is already loaded: " + path));
             } else {
                 loading.add(path);
@@ -391,7 +391,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         String path = definition.getPath();
         unloading.add(path);
         try {
-            Plugin removed = repository.remove(path);
+            Plugin removed = repository.remove(definition);
             if (removed != null) {
                 removed.destroy();
                 eventPublisher.publish(new PluginUnloadedEvent(removed));
@@ -405,18 +405,18 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public boolean isLoading(String path) {
-        return loading.contains(path);
+    public boolean isLoaded(PluginDefinition definition) {
+        return repository.contains(definition);
     }
 
     @Override
-    public boolean isUnloading(String path) {
-        return unloading.contains(path);
+    public boolean isLoading(PluginDefinition definition) {
+        return loading.contains(definition.getPath());
     }
 
     @Override
-    public boolean isLoaded(String path) {
-        return repository.contains(path);
+    public boolean isUnloading(PluginDefinition definition) {
+        return unloading.contains(definition.getPath());
     }
 
     @Getter

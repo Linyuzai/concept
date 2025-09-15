@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.repository;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -15,15 +16,15 @@ public abstract class AbstractPluginRepository implements PluginRepository {
     private final Map<String, Plugin> plugins = createMap();
 
     /**
-     * 通过插件的 id，source 获得插件
+     * 获得插件
      */
     @Override
-    public Plugin get(String key) {
-        return plugins.get(key);
+    public Plugin get(PluginDefinition definition) {
+        return plugins.get(definition.getPath());
     }
 
     /**
-     * 以 source 为 key 存储插件
+     * 添加插件
      */
     @Override
     public void add(Plugin plugin) {
@@ -34,19 +35,19 @@ public abstract class AbstractPluginRepository implements PluginRepository {
     }
 
     /**
-     * 根据 id，source 或插件本身移除插件
+     * 移除插件
      */
     @Override
-    public Plugin remove(String path) {
-        return plugins.remove(path);
+    public Plugin remove(PluginDefinition definition) {
+        return plugins.remove(definition.getPath());
     }
 
     /**
-     * 根据 id，source 或插件本身判断是否存在
+     * 插件是否存在
      */
     @Override
-    public boolean contains(String path) {
-        return plugins.containsKey(path);
+    public boolean contains(PluginDefinition definition) {
+        return plugins.containsKey(definition.getPath());
     }
 
     @Override

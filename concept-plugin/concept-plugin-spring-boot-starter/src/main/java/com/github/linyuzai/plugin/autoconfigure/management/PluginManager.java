@@ -136,8 +136,8 @@ public class PluginManager {
     }
 
     public PluginMetadata getMetadata(String group, String name) {
-        String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
-        Plugin plugin = concept.getRepository().get(path);
+        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+        Plugin plugin = concept.getRepository().get(definition);
         if (plugin == null) {
             PluginDefinition unload = storage.getPluginDefinition(PluginStorage.UNLOADED, group, name);
             try {
@@ -224,10 +224,10 @@ public class PluginManager {
                     long timestamp = definition.getCreateTime();
                     long size = definition.getSize();
                     PluginState state;
-                    if (loadingSet.contains(path) || concept.isLoading(path)) {
+                    if (loadingSet.contains(path) || concept.isLoading(definition)) {
                         state = PluginState.LOADING;
                     } else {
-                        Plugin get = concept.getRepository().get(path);
+                        Plugin get = concept.getRepository().get(definition);
                         if (get == null) {
                             state = PluginState.LOAD_ERROR;
                         } else {
@@ -251,14 +251,14 @@ public class PluginManager {
                 .map(entry -> {
                     String name = entry.getKey();
                     PluginDefinition definition = entry.getValue();
+                    String path = definition.getPath();
                     long timestamp = definition.getCreateTime();
                     long size = definition.getSize();
                     PluginState state;
-                    String path = storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getPath();
-                    if (unloadingSet.contains(path) || concept.isUnloading(path)) {
+                    if (unloadingSet.contains(path) || concept.isUnloading(definition)) {
                         state = PluginState.UNLOADING;
                     } else {
-                        Plugin get = concept.getRepository().get(path);
+                        Plugin get = concept.getRepository().get(definition);
                         if (get == null) {
                             state = PluginState.UNLOADED;
                         } else {

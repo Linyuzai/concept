@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 public class PluginStorageConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean
     public PluginStorage.Filter pluginStorageFilter() {
         return new JarStorageFilter();
     }

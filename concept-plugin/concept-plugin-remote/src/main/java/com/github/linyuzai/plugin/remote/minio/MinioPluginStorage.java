@@ -161,7 +161,7 @@ public class MinioPluginStorage extends RemotePluginStorage {
 
         @Override
         public long getCreateTime() {
-            String creation = useObjectMetadata().userMetadata().get(METADATA_CREATION);
+            String creation = useObjectMetadata().userMetadata().get(METADATA_CREATE_TIME);
             try {
                 return Long.parseLong(creation);
             } catch (Throwable e) {

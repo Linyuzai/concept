@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.repository;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 
 import java.util.stream.Stream;
 
@@ -12,7 +13,7 @@ public interface PluginRepository {
     /**
      * 获得插件
      */
-    Plugin get(String path);
+    Plugin get(PluginDefinition definition);
 
     /**
      * 添加插件
@@ -22,12 +23,12 @@ public interface PluginRepository {
     /**
      * 移除插件
      */
-    Plugin remove(String path);
+    Plugin remove(PluginDefinition definition);
 
     /**
      * 包含插件
      */
-    boolean contains(String path);
+    boolean contains(PluginDefinition definition);
 
     /**
      * 插件流
