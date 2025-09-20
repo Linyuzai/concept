@@ -42,16 +42,20 @@ public class AmazonS3Storage extends RemotePluginStorage {
     }
 
     @Override
-    protected List<String> listObjects(String bucket, String prefix, String delimiter) {
+    protected List<String> listObjects(String bucket, String prefix) {
         ListObjectsRequest request = new ListObjectsRequest()
                 .withBucketName(bucket)
-                .withDelimiter(delimiter)
-                .withPrefix(prefix);
+                .withPrefix(prefix)
+                .withDelimiter("/");
         ObjectListing listing = amazonS3.listObjects(request);
-        return listing.getObjectSummaries()
-                .stream()
-                .map(S3ObjectSummary::getKey)
-                .collect(Collectors.toList());
+        if (prefix == null) {
+            return listing.getCommonPrefixes();
+        } else {
+            return listing.getObjectSummaries()
+                    .stream()
+                    .map(S3ObjectSummary::getKey)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override

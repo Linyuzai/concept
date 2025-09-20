@@ -1,13 +1,11 @@
 package com.github.linyuzai.plugin.core.storage;
 
-import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Getter
@@ -16,25 +14,8 @@ public abstract class AbstractPluginStorage implements PluginStorage {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
-    private long maxSize = -1;
-
-    private long maxCount = -1;
-
-    private long maxDuration = -1;
-
-    private long period = -1;
-
-    private PluginExecutor executor;
-
     @Override
     public void initialize() {
-        if (executor != null && period > 0 && (maxSize != -1 || maxCount != -1 || maxDuration != -1)) {
-            executor.schedule(this::autocleaning, period, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    protected void autocleaning() {
-
     }
 
     /**
@@ -55,7 +36,7 @@ public abstract class AbstractPluginStorage implements PluginStorage {
     protected String generateName(String name,
                                   Function<String, Boolean> exist,
                                   Function<Integer, String> generator) {
-        int i = 1;
+        int i = 0;
         int index = name.lastIndexOf(".");
         String prefix;
         String suffix;
@@ -68,11 +49,11 @@ public abstract class AbstractPluginStorage implements PluginStorage {
         }
         String generate = name;
         while (exist.apply(generate)) {
+            i++;
             generate = prefix + generator.apply(i) + suffix;
             if (Objects.equals(generate, name)) {
                 throw new IllegalArgumentException("Generated name '" + name + "' is same as original name");
             }
-            i++;
         }
         return generate;
     }

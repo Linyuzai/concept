@@ -56,17 +56,24 @@ public class S3ClientStorage extends RemotePluginStorage {
     }
 
     @Override
-    protected List<String> listObjects(String bucket, String prefix, String delimiter) {
+    protected List<String> listObjects(String bucket, String prefix) {
         ListObjectsRequest request = ListObjectsRequest.builder()
                 .bucket(bucket)
-                .delimiter(delimiter)
                 .prefix(prefix)
+                .delimiter("/")
                 .build();
         ListObjectsResponse listing = s3Client.listObjects(request);
-        return listing.contents()
-                .stream()
-                .map(S3Object::key)
-                .collect(Collectors.toList());
+        if (prefix == null) {
+            return listing.commonPrefixes()
+                    .stream()
+                    .map(CommonPrefix::prefix)
+                    .collect(Collectors.toList());
+        } else {
+            return listing.contents()
+                    .stream()
+                    .map(S3Object::key)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override

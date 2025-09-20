@@ -150,9 +150,7 @@ concept:
       enabled: true
       period: 5000
     storage:
-      type: local
-      autocleaning:
-        max-duration: 1
+      type: aws_v1
     extension:
       request-mapping:
         enabled: true

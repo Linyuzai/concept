@@ -17,7 +17,7 @@ public class SuffixStorageFilter implements PluginStorage.Filter {
 
     @Override
     public boolean filter(String group, String name) {
-        if (suffixes == null) {
+        if (suffixes == null || suffixes.isEmpty()) {
             return true;
         }
         for (String suffix : suffixes) {

@@ -54,11 +54,12 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
     @SneakyThrows
     @Override
     public synchronized String uploadPlugin(String group, String name, InputStream is, long length) {
-        String path = generateName(getPluginPath(group, name));
+        String generated = generateName(group, name);
+        String path = getPluginPath(group, generated);
         PluginDefinition definition = new PluginDefinitionImpl(path, name, ReadUtils.read(is));
         types.put(path, UNLOADED);
-        plugins.get(group).put(name, definition);
-        return name;
+        plugins.get(group).put(generated, definition);
+        return generated;
     }
 
     @Override
@@ -74,7 +75,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
     @Override
     public synchronized void deletePlugin(String group, String name) {
         updatePluginInfo(group, name, DELETED);
-        renamePlugin(group, name, generateDeletedName(getPluginPath(group, name)));
+        renamePlugin(group, name, generateDeletedName(group, name));
     }
 
     @Override
@@ -103,12 +104,12 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         return group + "/" + name;
     }
 
-    protected String generateName(String path) {
-        return generateName(path, plugins::containsKey);
+    protected String generateName(String group, String name) {
+        return generateName(name, n -> plugins.getOrDefault(group, Collections.emptyMap()).containsKey(n));
     }
 
-    protected String generateDeletedName(String path) {
-        return generateDeletedName(path, plugins::containsKey);
+    protected String generateDeletedName(String group, String name) {
+        return generateDeletedName(name, n -> plugins.getOrDefault(group, Collections.emptyMap()).containsKey(n));
     }
 
     protected void updatePluginInfo(String group, String name, String type) {

@@ -45,7 +45,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     @Override
     public List<String> getGroups() {
-        return listObjects(getBucket(), null, "/")
+        return listObjects(getBucket(), null)
                 .stream()
                 .map(it -> {
                     if (it.endsWith("/")) {
@@ -84,7 +84,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     @Override
     public String uploadPlugin(String group, String name, InputStream is, long length) {
-        String pluginName = generateName(getPluginPath(group, name));
+        String pluginName = generateName(group, name);
         Map<String, String> map = new LinkedHashMap<>();
         map.put(METADATA_STATUS, PluginStorage.UNLOADED);
         map.put(METADATA_CREATE_TIME, String.valueOf(new Date().getTime()));
@@ -109,7 +109,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.DELETED);
         String bucket = getBucket();
         String key = getPluginPath(group, name);
-        String deleteKey = generateDeletedName(key);
+        String deleteKey = generateDeletedName(group, name);
         copyObject(bucket, key, bucket, deleteKey, userMetadata);
         deleteObject(bucket, key);
     }
@@ -134,12 +134,12 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         return group + "/" + name;
     }
 
-    protected String generateName(String path) {
-        return generateName(path, p -> existObject(getBucket(), p));
+    protected String generateName(String group, String name) {
+        return generateName(name, n -> existObject(getBucket(), getPluginPath(group, n)));
     }
 
-    protected String generateDeletedName(String path) {
-        return generateDeletedName(path, p -> existObject(getBucket(), p));
+    protected String generateDeletedName(String group, String name) {
+        return generateDeletedName(name, n -> existObject(getBucket(), getPluginPath(group, n)));
     }
 
     protected Map<String, String> createUserMetadata(String group, String name, String status) {
@@ -156,7 +156,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     protected List<String> getPlugins(String type, String group) {
         String bucketToUse = getBucket();
-        List<String> list = listObjects(bucketToUse, group + "/", "/");
+        List<String> list = listObjects(bucketToUse, group + "/");
         List<CompletableFuture<String>> futures = new ArrayList<>();
         for (String plugin : list) {
             if (plugin.endsWith(GROUP_METADATA)) {
@@ -194,7 +194,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     protected abstract void createBucket(String bucket);
 
-    protected abstract List<String> listObjects(String bucket, String prefix, String delimiter);
+    protected abstract List<String> listObjects(String bucket, String prefix);
 
     protected abstract Map<String, String> getUserMetadata(String bucket, String key);
 

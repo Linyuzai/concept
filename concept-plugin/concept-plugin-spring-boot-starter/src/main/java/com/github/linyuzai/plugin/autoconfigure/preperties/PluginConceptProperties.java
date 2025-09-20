@@ -6,7 +6,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
 
-import java.time.Duration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -93,23 +92,9 @@ public class PluginConceptProperties {
 
         private Set<String> filterSuffixes = new LinkedHashSet<>();
 
-        private AutocleaningProperties autocleaning = new AutocleaningProperties();
-
         public enum StorageType {
 
             MEMORY, LOCAL, MINIO, AWS_V1, AWS_V2
-        }
-
-        @Data
-        public static class AutocleaningProperties {
-
-            private DataSize maxSize = DataSize.ofBytes(-1);
-
-            private long maxCount = -1;
-
-            private Duration maxDuration = Duration.ofMillis(-1);
-
-            private Duration period = Duration.ofMillis(-1);
         }
     }
 

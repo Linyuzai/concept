@@ -43,29 +43,45 @@ public class PluginConfig {
         return new EntryFilter("**/**.properties");
     }
 
-    //@Bean
+    @Bean
     public AmazonS3 amazonS3() {
        return AmazonS3ClientBuilder.standard()
                .withCredentials(new AWSStaticCredentialsProvider(
                        new BasicAWSCredentials("minioadmin", "minioadmin")))
                .withEndpointConfiguration(new AwsClientBuilder
-                       .EndpointConfiguration("http://localhost:9090",
+                       .EndpointConfiguration("http://192.168.0.104:9090",
                        Regions.US_EAST_1.getName()))
                .withPathStyleAccessEnabled(true)
                .build();
+        /*return AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(
+                        new BasicAWSCredentials("rustfsadmin", "rustfadmin")))
+                .withEndpointConfiguration(new AwsClientBuilder
+                        .EndpointConfiguration("http://localhost:9100",
+                        Regions.US_EAST_1.getName()))
+                .withPathStyleAccessEnabled(true)
+                .build();*/
     }
 
     //@Bean
     public S3Client s3Client() {
         return S3Client.builder()
-                .endpointOverride(URI.create("http://localhost:9090"))
-                .region(Region.AP_EAST_1) // 设置区域，对于MinIO通常可以忽略或设置为任意区域，因为MinIO不支持基于区域的路由。
+                .endpointOverride(URI.create("http://192.168.0.104:9090"))
+                .region(Region.US_EAST_1) // 设置区域，对于MinIO通常可以忽略或设置为任意区域，因为MinIO不支持基于区域的路由。
                 .credentialsProvider(StaticCredentialsProvider
                         .create(AwsBasicCredentials.create("minioadmin", "minioadmin"))) // 设置凭证提供者
+                .forcePathStyle(true)
                 .build();
+        /*return S3Client.builder()
+                .endpointOverride(URI.create("http://192.168.0.104:9100"))
+                .region(Region.US_EAST_1) // 设置区域，对于MinIO通常可以忽略或设置为任意区域，因为MinIO不支持基于区域的路由。
+                .credentialsProvider(StaticCredentialsProvider
+                        .create(AwsBasicCredentials.create("rustfsadmin", "rustfsadmin"))) // 设置凭证提供者
+                .forcePathStyle(true)
+                .build();*/
     }
 
-    @Bean
+    //@Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint("http://localhost:9090")
