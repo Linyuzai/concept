@@ -26,7 +26,6 @@ import com.github.linyuzai.plugin.core.handle.extract.*;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
-import com.github.linyuzai.plugin.core.intercept.EntrySizePluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.NestedDepthPluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
@@ -42,6 +41,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
+import com.github.linyuzai.plugin.core.util.ReadUtils;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
@@ -84,12 +84,9 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public EntrySizePluginInterceptor entrySizePluginInterceptor(PluginConceptProperties properties) {
-        return new EntrySizePluginInterceptor(properties.getValidation().getMaxEntrySize().toBytes());
-    }
-
-    @Bean
     public NestedDepthPluginInterceptor nestedDepthPluginInterceptor(PluginConceptProperties properties) {
+        long max = properties.getValidation().getMaxReadSize().toBytes();
+        ReadUtils.setReadLimit(max);
         return new NestedDepthPluginInterceptor(properties.getValidation().getMaxNestedDepth());
     }
 

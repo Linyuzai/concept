@@ -3,7 +3,7 @@ package com.github.linyuzai.plugin.zip.concept;
 import com.github.linyuzai.plugin.core.concept.AbstractPluginEntry;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.exception.PluginException;
-import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.util.ReadUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
@@ -94,7 +94,7 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
                     ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {
                         if (Objects.equals(getName(), entry.getName())) {
-                            byte[] read = PluginStorage.read(zis);
+                            byte[] read = ReadUtils.read(zis);
                             reference = createReference(read);
                             return new ByteArrayInputStream(read);
                         }

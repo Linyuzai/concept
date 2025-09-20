@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Getter
@@ -15,11 +16,21 @@ public abstract class AbstractPluginStorage implements PluginStorage {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
+    private long maxSize = -1;
+
+    private long maxCount = -1;
+
+    private long maxDuration = -1;
+
+    private long period = -1;
+
     private PluginExecutor executor;
 
     @Override
     public void initialize() {
-
+        if (executor != null && period > 0 && (maxSize != -1 || maxCount != -1 || maxDuration != -1)) {
+            executor.schedule(this::autocleaning, period, TimeUnit.MILLISECONDS);
+        }
     }
 
     protected void autocleaning() {
@@ -29,12 +40,12 @@ public abstract class AbstractPluginStorage implements PluginStorage {
     /**
      * 如果文件存在则顺序添加后缀
      */
-    protected String generateName(String path, Function<String, Boolean> exist) {
-        return generateName(path, exist, i -> "(" + i + ")");
+    protected String generateName(String name, Function<String, Boolean> exist) {
+        return generateName(name, exist, i -> "(" + i + ")");
     }
 
-    protected String generateDeletedName(String path, Function<String, Boolean> exist) {
-        return generateName(path, exist, i ->
+    protected String generateDeletedName(String name, Function<String, Boolean> exist) {
+        return generateName(name, exist, i ->
                 PluginStorage.DELETED + FORMATTER.format(LocalDateTime.now()));
     }
 

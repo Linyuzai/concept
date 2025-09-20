@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.storage;
 
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.util.ReadUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -54,7 +55,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
     @Override
     public synchronized String uploadPlugin(String group, String name, InputStream is, long length) {
         String path = generateName(getPluginPath(group, name));
-        PluginDefinition definition = new PluginDefinitionImpl(path, name, PluginStorage.read(is));
+        PluginDefinition definition = new PluginDefinitionImpl(path, name, ReadUtils.read(is));
         types.put(path, UNLOADED);
         plugins.get(group).put(name, definition);
         return name;
@@ -95,7 +96,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         String newPath = getPluginPath(group, rename);
         types.put(newPath, types.remove(path));
         plugins.get(group).put(rename, new PluginDefinitionImpl(newPath, rename,
-                PluginStorage.read(definition.getInputStream())));
+                ReadUtils.read(definition.getInputStream())));
     }
 
     protected String getPluginPath(String group, String name) {

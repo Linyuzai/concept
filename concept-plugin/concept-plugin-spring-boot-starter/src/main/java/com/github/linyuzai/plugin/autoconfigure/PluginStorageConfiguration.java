@@ -4,7 +4,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.storage.*;
-import com.github.linyuzai.plugin.jar.storage.JarStorageFilter;
 import com.github.linyuzai.plugin.remote.aws.AmazonS3Storage;
 import com.github.linyuzai.plugin.remote.aws.S3ClientStorage;
 import com.github.linyuzai.plugin.remote.minio.MinioPluginStorage;
@@ -21,8 +20,8 @@ public class PluginStorageConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PluginStorage.Filter pluginStorageFilter() {
-        return new JarStorageFilter();
+    public PluginStorage.Filter pluginStorageFilter(PluginConceptProperties properties) {
+        return new SuffixStorageFilter(properties.getStorage().getFilterSuffixes());
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -107,7 +106,10 @@ public class PluginStorageConfiguration {
     private static <T extends AbstractPluginStorage> T apply(T storage,
                                                              PluginConceptProperties properties,
                                                              PluginExecutor executor) {
-        //properties.getStorage().getAutocleaning().;
+        storage.setMaxSize(properties.getStorage().getAutocleaning().getMaxSize().toBytes());
+        storage.setMaxCount(properties.getStorage().getAutocleaning().getMaxCount());
+        storage.setMaxDuration(properties.getStorage().getAutocleaning().getMaxDuration().toMillis());
+        storage.setPeriod(properties.getStorage().getAutocleaning().getPeriod().toMillis());
         storage.setExecutor(executor);
         return storage;
     }

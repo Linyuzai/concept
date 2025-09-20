@@ -152,7 +152,7 @@ concept:
     storage:
       type: local
       autocleaning:
-        enabled: true
+        max-duration: 1
     extension:
       request-mapping:
         enabled: true
