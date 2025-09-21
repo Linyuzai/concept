@@ -3,7 +3,9 @@ package com.github.linyuzai.plugin.core.util;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ReadUtils {
 

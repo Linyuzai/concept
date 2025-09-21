@@ -23,6 +23,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
+import com.github.linyuzai.plugin.core.tree.PluginTreeRepository;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected PluginStorage storage;
 
     protected PluginRepository repository;
+
+    protected PluginTreeRepository treeRepository;
 
     protected PluginEventPublisher eventPublisher;
 
@@ -168,9 +171,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public PluginMetadata createMetadata(PluginDefinition definition, PluginContext context) {
+        for (PluginInterceptor interceptor : interceptors) {
+            interceptor.beforeCreateMetadata(definition, context);
+        }
         for (PluginMetadataFactory factory : metadataFactories) {
             PluginMetadata metadata = factory.create(definition, context);
             if (metadata != null) {
+                for (PluginInterceptor interceptor : interceptors) {
+                    interceptor.afterCreateMetadata(metadata, definition, context);
+                }
                 return metadata;
             }
         }
@@ -183,7 +192,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     @Override
     public Plugin createPlugin(PluginDefinition definition, PluginContext context) {
         for (PluginInterceptor interceptor : interceptors) {
-            interceptor.beforeCreate(definition, context);
+            interceptor.beforeCreatePlugin(definition, context);
         }
         PluginMetadata metadata = createMetadata(definition, context);
         if (metadata == null) {
@@ -194,6 +203,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             if (plugin != null) {
                 plugin.setDefinition(definition);
                 plugin.setMetadata(metadata);
+                for (PluginInterceptor interceptor : interceptors) {
+                    interceptor.afterCreatePlugin(plugin, definition, context);
+                }
                 return plugin;
             }
         }
@@ -372,6 +384,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             if (name != null) {
                 dependencyChain.pop();
             }
+            treeRepository.add(context.get(PluginTree.class));
         }
     }
 
@@ -396,6 +409,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 removed.destroy();
                 eventPublisher.publish(new PluginUnloadedEvent(removed));
             }
+            treeRepository.remove(definition);
             return removed;
         } catch (Throwable e) {
             throw new PluginUnloadException(definition, e);
@@ -442,6 +456,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected PluginStorage storage;
 
         protected PluginRepository repository;
+
+        protected PluginTreeRepository treeRepository;
 
         protected PluginEventPublisher eventPublisher;
 
@@ -504,6 +520,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B repository(PluginRepository repository) {
             this.repository = repository;
+            return (B) this;
+        }
+
+        /**
+         * 设置插件树仓储
+         */
+        public B treeRepository(PluginTreeRepository treeRepository) {
+            this.treeRepository = treeRepository;
             return (B) this;
         }
 
@@ -664,6 +688,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setHandlerChainFactory(handlerChainFactory);
             concept.setStorage(storage);
             concept.setRepository(repository);
+            concept.setTreeRepository(treeRepository);
             concept.setEventPublisher(eventPublisher);
             concept.setLogger(logger);
             concept.setMetadataFactories(metadataFactories);

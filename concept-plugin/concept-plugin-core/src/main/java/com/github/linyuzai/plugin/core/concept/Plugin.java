@@ -34,6 +34,8 @@ public interface Plugin {
      */
     void setMetadata(PluginMetadata metadata);
 
+
+
     PluginConcept getConcept();
 
     void setConcept(PluginConcept concept);

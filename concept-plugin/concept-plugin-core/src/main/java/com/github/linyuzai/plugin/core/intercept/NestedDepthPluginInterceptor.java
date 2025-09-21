@@ -17,7 +17,7 @@ public class NestedDepthPluginInterceptor implements PluginInterceptor {
     private int maxNestedDepth = -1;
 
     @Override
-    public void beforeCreate(PluginDefinition definition, PluginContext context) {
+    public void beforeCreatePlugin(PluginDefinition definition, PluginContext context) {
         if (maxNestedDepth < 0) {
             return;
         }

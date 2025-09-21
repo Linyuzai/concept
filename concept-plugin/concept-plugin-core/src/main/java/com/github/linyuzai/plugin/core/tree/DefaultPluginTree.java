@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.tree;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 @Getter
 @RequiredArgsConstructor
 public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, PluginTree.Tracer {
+
+    private final PluginDefinition definition;
 
     private final Node root;
 
@@ -35,6 +38,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
     private TracerStages current;
 
     public DefaultPluginTree(Plugin plugin) {
+        definition = plugin.getDefinition();
         root = createNode(plugin.getDefinition().getPath(), "", plugin, null);
     }
 

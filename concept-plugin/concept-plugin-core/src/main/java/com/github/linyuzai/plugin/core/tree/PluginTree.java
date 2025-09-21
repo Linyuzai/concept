@@ -1,5 +1,7 @@
 package com.github.linyuzai.plugin.core.tree;
 
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -9,6 +11,8 @@ import java.util.function.Predicate;
  * 插件树
  */
 public interface PluginTree {
+
+    PluginDefinition getDefinition();
 
     /**
      * 获得根节点
