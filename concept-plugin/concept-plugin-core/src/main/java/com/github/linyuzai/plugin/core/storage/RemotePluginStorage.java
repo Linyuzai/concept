@@ -7,8 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,15 +69,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     @Override
     public Stream<PluginDefinition> getPluginDefinitions(String type, String group) {
-        List<CompletableFuture<PluginDefinition>> futures = new ArrayList<>();
-        for (String name : getPlugins(type, group)) {
-            Supplier<PluginDefinition> supplier = () -> getPluginDefinition(type, group, name);
-            CompletableFuture<PluginDefinition> future =
-                    CompletableFuture.supplyAsync(supplier, getExecutor().asExecutor());
-            futures.add(future);
-        }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        return futures.stream().map(CompletableFuture::join);
+        return getPlugins(type, group).stream().map(name -> getPluginDefinition(type, group, name));
     }
 
     @Override
@@ -156,38 +146,27 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     protected List<String> getPlugins(String type, String group) {
         String bucketToUse = getBucket();
-        List<String> list = listObjects(bucketToUse, group + "/");
-        List<CompletableFuture<String>> futures = new ArrayList<>();
-        for (String plugin : list) {
-            if (plugin.endsWith(GROUP_METADATA)) {
+        List<String> names = listObjects(bucketToUse, group + "/");
+        List<String> plugins = new ArrayList<>();
+        for (String name : names) {
+            if (name.endsWith(GROUP_METADATA)) {
                 continue;
             }
-            if (filter == null || filter.filter(group, plugin)) {
-                Supplier<String> supplier = () -> {
-                    Map<String, String> userMetadata = getUserMetadata(bucketToUse, plugin);
-                    String pluginStatus = userMetadata.get(METADATA_STATUS);
-                    if (type.equals(pluginStatus)) {
-                        return plugin;
-                    } else {
-                        return null;
-                    }
-                };
-                CompletableFuture<String> future =
-                        CompletableFuture.supplyAsync(supplier, getExecutor().asExecutor());
-                futures.add(future);
+            if (filter == null || filter.filter(group, name)) {
+                Map<String, String> userMetadata = getUserMetadata(bucketToUse, name);
+                String pluginStatus = userMetadata.get(METADATA_STATUS);
+                if (type.equals(pluginStatus)) {
+                    plugins.add(name);
+                }
             }
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        return futures.stream().map(CompletableFuture::join)
-                .filter(Objects::nonNull)
-                .map(it -> {
-                    if (it.startsWith(group + "/")) {
-                        return it.substring(group.length() + 1);
-                    } else {
-                        return it;
-                    }
-                })
-                .collect(Collectors.toList());
+        return plugins.stream().map(it -> {
+            if (it.startsWith(group + "/")) {
+                return it.substring(group.length() + 1);
+            } else {
+                return it;
+            }
+        }).collect(Collectors.toList());
     }
 
     protected abstract boolean existBucket(String bucket);
