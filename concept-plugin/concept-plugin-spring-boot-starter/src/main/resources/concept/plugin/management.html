@@ -269,6 +269,12 @@
                                       clearable>
                                 <i slot="prefix" class="el-input__icon el-icon-search"></i>
                             </el-input>
+                            <el-button v-if="!auth.lock"
+                                       type="danger"
+                                       plain
+                                       icon="el-icon-warning-outline"
+                                       @click=""
+                                       style="width: 110px;margin-left: 20px">清空
                             <el-table
                                     :data="plugin.deleted.list.filter(data => !plugin.deleted.search||data.plugin.toLowerCase().includes(plugin.deleted.search.toLowerCase()))"
                                     @selection-change=""

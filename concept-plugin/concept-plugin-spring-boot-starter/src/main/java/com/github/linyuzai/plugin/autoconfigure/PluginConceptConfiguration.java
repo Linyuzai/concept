@@ -28,7 +28,6 @@ import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.core.intercept.NestedDepthPluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
-import com.github.linyuzai.plugin.core.logger.PluginErrorLogger;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
@@ -116,14 +115,8 @@ public class PluginConceptConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "concept.plugin.logger.standard.enabled", havingValue = "true", matchIfMissing = true)
-    public PluginStandardLogger pluginStandardLogger() {
-        return new PluginStandardLogger();
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "concept.plugin.logger.error.enabled", havingValue = "true", matchIfMissing = true)
-    public PluginErrorLogger pluginErrorLogger(PluginLogger logger) {
-        return new PluginErrorLogger(logger);
+    public PluginStandardLogger pluginStandardLogger(PluginLogger logger) {
+        return new PluginStandardLogger(logger);
     }
 
     @Bean

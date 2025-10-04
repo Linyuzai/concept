@@ -124,6 +124,12 @@ public class PluginManagementController {
         }, () -> "插件列表获取");
     }
 
+    @PostMapping("/plugin/clear")
+    public Response clearDeleted(@RequestBody Map<String, String> body) {
+        String group = body.get("group");
+        return response(() -> manager.clearDeleted(group), () -> "插件清空");
+    }
+
     protected void updatePlugin(String group, String original, String upload) {
         manager.updatePlugin(group, original, upload);
     }

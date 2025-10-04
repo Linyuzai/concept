@@ -120,6 +120,16 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         deleteObject(bucket, src);
     }
 
+    @Override
+    public void clearDeleted(String group) {
+        String bucket = getBucket();
+        List<String> keys = getPlugins(DELETED, group)
+                .stream()
+                .map(name -> getPluginPath(group, name))
+                .collect(Collectors.toList());
+        deleteObjects(bucket, keys);
+    }
+
     protected String getPluginPath(String group, String name) {
         return group + "/" + name;
     }
@@ -186,6 +196,8 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
     protected abstract InputStream getObject(String bucket, String key);
 
     protected abstract void deleteObject(String bucket, String key);
+
+    protected abstract void deleteObjects(String bucket, List<String> keys);
 
     protected abstract void putObject(String bucket, String key,
                                       InputStream is, long length,

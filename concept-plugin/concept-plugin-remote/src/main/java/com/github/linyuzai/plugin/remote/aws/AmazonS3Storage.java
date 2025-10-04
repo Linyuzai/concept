@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -99,6 +100,16 @@ public class AmazonS3Storage extends RemotePluginStorage {
     @Override
     protected void deleteObject(String bucket, String key) {
         amazonS3.deleteObject(bucket, key);
+    }
+
+    @Override
+    protected void deleteObjects(String bucket, List<String> keys) {
+        DeleteObjectsRequest request = new DeleteObjectsRequest(bucket);
+        List<DeleteObjectsRequest.KeyVersion> keyVersionList = keys.stream()
+                .map(DeleteObjectsRequest.KeyVersion::new)
+                .collect(Collectors.toList());
+        request.setKeys(keyVersionList);
+        amazonS3.deleteObjects(request);
     }
 
     @Override

@@ -33,6 +33,9 @@ import java.util.Map;
 @Configuration
 public class PluginConfig {
 
+    //public static final String HOST = "192.168.0.104";
+    public static final String HOST = "http://192.168.101.44:9090";
+
     public static final String CLASS_NAME_FILTER = "com.example.jarplugin.sample.SampleCustomPlugin";
 
     public static final String CLASS_NAME_SAMPLE_FILTER = CLASS_NAME_FILTER;
@@ -45,14 +48,13 @@ public class PluginConfig {
 
     @Bean
     public AmazonS3 amazonS3() {
-       return AmazonS3ClientBuilder.standard()
-               .withCredentials(new AWSStaticCredentialsProvider(
-                       new BasicAWSCredentials("minioadmin", "minioadmin")))
-               .withEndpointConfiguration(new AwsClientBuilder
-                       .EndpointConfiguration("http://192.168.0.104:9090",
-                       Regions.US_EAST_1.getName()))
-               .withPathStyleAccessEnabled(true)
-               .build();
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(
+                        new BasicAWSCredentials("minioadmin", "minioadmin")))
+                .withEndpointConfiguration(new AwsClientBuilder
+                        .EndpointConfiguration(HOST, Regions.US_EAST_1.getName()))
+                .withPathStyleAccessEnabled(true)
+                .build();
         /*return AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(
                         new BasicAWSCredentials("rustfsadmin", "rustfadmin")))
@@ -66,7 +68,7 @@ public class PluginConfig {
     //@Bean
     public S3Client s3Client() {
         return S3Client.builder()
-                .endpointOverride(URI.create("http://192.168.0.104:9090"))
+                .endpointOverride(URI.create(HOST))
                 .region(Region.US_EAST_1) // 设置区域，对于MinIO通常可以忽略或设置为任意区域，因为MinIO不支持基于区域的路由。
                 .credentialsProvider(StaticCredentialsProvider
                         .create(AwsBasicCredentials.create("minioadmin", "minioadmin"))) // 设置凭证提供者
@@ -84,7 +86,7 @@ public class PluginConfig {
     //@Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint("http://localhost:9090")
+                .endpoint(HOST)
                 .credentials("minioadmin", "minioadmin")
                 .build();
     }

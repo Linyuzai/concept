@@ -134,6 +134,20 @@ public class S3ClientStorage extends RemotePluginStorage {
     }
 
     @Override
+    protected void deleteObjects(String bucket, List<String> keys) {
+        List<ObjectIdentifier> objectIdentifierList = keys.stream()
+                .map(it -> ObjectIdentifier.builder().key(it).build())
+                .collect(Collectors.toList());
+        DeleteObjectsRequest request = DeleteObjectsRequest.builder()
+                .bucket(bucket)
+                .delete(Delete.builder()
+                        .objects(objectIdentifierList)
+                        .build())
+                .build();
+        s3Client.deleteObjects(request);
+    }
+
+    @Override
     protected void putObject(String bucket, String key,
                              InputStream is, long length,
                              Map<String, String> userMetadata) {

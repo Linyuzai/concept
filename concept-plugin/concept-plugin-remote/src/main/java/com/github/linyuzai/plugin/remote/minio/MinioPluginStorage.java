@@ -4,6 +4,7 @@ import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.storage.RemotePluginStorage;
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,10 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 public class MinioPluginStorage extends RemotePluginStorage {
@@ -118,6 +121,18 @@ public class MinioPluginStorage extends RemotePluginStorage {
                 .object(key)
                 .build();
         minioClient.removeObject(args);
+    }
+
+    @Override
+    protected void deleteObjects(String bucket, List<String> keys) {
+        List<DeleteObject> objects = keys.stream()
+                .map(DeleteObject::new)
+                .collect(Collectors.toList());
+        RemoveObjectsArgs args = RemoveObjectsArgs.builder()
+                .bucket(bucket)
+                .objects(objects)
+                .build();
+        minioClient.removeObjects(args);
     }
 
     @SneakyThrows

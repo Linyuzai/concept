@@ -17,26 +17,47 @@ public interface PluginLifecycleListener extends PluginEventListener {
             onLoaded(((PluginLoadedEvent) event).getPlugin());
         } else if (event instanceof PluginUnloadedEvent) {
             onUnloaded(((PluginUnloadedEvent) event).getPlugin());
+        } else if (event instanceof PluginCreateErrorEvent ||
+                event instanceof PluginPrepareErrorEvent ||
+                event instanceof PluginLoadErrorEvent ||
+                event instanceof PluginUnloadErrorEvent) {
+            onError(((PluginErrorEvent) event).getDefinition(),
+                    ((PluginErrorEvent) event).getError());
         }
     }
 
     /**
      * 创建
      */
-    void onCreate(Plugin plugin);
+    default void onCreate(Plugin plugin) {
+
+    }
 
     /**
      * 准备
      */
-    void onPrepare(Plugin plugin);
+    default void onPrepare(Plugin plugin) {
+
+    }
 
     /**
      * 加载
      */
-    void onLoaded(Plugin plugin);
+    default void onLoaded(Plugin plugin) {
+
+    }
 
     /**
      * 卸载
      */
-    void onUnloaded(Plugin plugin);
+    default void onUnloaded(Plugin plugin) {
+
+    }
+
+    /**
+     * 异常
+     */
+    default void onError(PluginDefinition definition, Throwable e) {
+
+    }
 }

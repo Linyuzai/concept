@@ -1,30 +1,41 @@
 package com.github.linyuzai.plugin.core.logger;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.concept.PluginDefinition;
 import com.github.linyuzai.plugin.core.concept.PluginLifecycleListener;
+import com.github.linyuzai.plugin.core.exception.PluginLoadException;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 插件标准日志
  */
+@Getter
+@RequiredArgsConstructor
 public class PluginStandardLogger implements PluginLifecycleListener {
 
-    @Override
-    public void onCreate(Plugin plugin) {
-
-    }
-
-    @Override
-    public void onPrepare(Plugin plugin) {
-
-    }
+    private final PluginLogger logger;
 
     @Override
     public void onLoaded(Plugin plugin) {
-        plugin.getConcept().getLogger().info("Loaded " + plugin);
+        logger.info("Loaded " + plugin);
     }
 
     @Override
     public void onUnloaded(Plugin plugin) {
-        plugin.getConcept().getLogger().info("Unloaded " + plugin);
+        logger.info("Unloaded " + plugin);
+    }
+
+    @Override
+    public void onError(PluginDefinition definition, Throwable e) {
+        String message = "Load error: " + definition.getPath();
+        logger.error(message, getPluginException(e));
+    }
+
+    private Throwable getPluginException(Throwable e) {
+        if (e instanceof PluginLoadException) {
+            return getPluginException(e.getCause());
+        }
+        return e;
     }
 }

@@ -152,6 +152,20 @@ public class LocalPluginStorage extends AbstractPluginStorage {
         boolean renameTo = from.renameTo(renameFile);
     }
 
+    @Override
+    public void clearDeleted(String group) {
+        File directory = getGroupDirectory(group);
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isFile() && file.exists()) {
+                boolean delete = file.delete();
+            }
+        }
+    }
+
     @SneakyThrows
     protected void move(String group, String name, String from, String to, boolean deleted) {
         File fromFile = new File(getPluginPath(from, group, name));

@@ -225,6 +225,10 @@ public class PluginManager {
         return storage.getPluginDefinition(PluginStorage.DELETED, group, name).getInputStream();
     }
 
+    public void clearDeleted(String group) {
+        storage.clearDeleted(group);
+    }
+
     protected List<PluginSummary> getLoadedPluginSummaries(String group) {
         return storage.getPluginDefinitions(PluginStorage.LOADED, group).map(definition -> {
             String name = definition.getName();

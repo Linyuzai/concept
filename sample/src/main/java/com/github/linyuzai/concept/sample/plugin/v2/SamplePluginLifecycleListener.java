@@ -8,23 +8,4 @@ import org.springframework.stereotype.Component;
 @Component
 public class SamplePluginLifecycleListener implements PluginLifecycleListener {
 
-    @Override
-    public void onCreate(Plugin plugin) {
-
-    }
-
-    @Override
-    public void onPrepare(Plugin plugin) {
-
-    }
-
-    @Override
-    public void onLoaded(Plugin plugin) {
-
-    }
-
-    @Override
-    public void onUnloaded(Plugin plugin) {
-
-    }
 }

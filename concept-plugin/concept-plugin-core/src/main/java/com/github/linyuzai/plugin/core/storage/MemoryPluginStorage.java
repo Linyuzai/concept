@@ -100,6 +100,22 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
                 ReadUtils.read(definition.getInputStream())));
     }
 
+    @Override
+    public void clearDeleted(String group) {
+        Map<String, PluginDefinition> definitions = plugins.getOrDefault(group, Collections.emptyMap());
+        Set<String> names = definitions.keySet();
+        Iterator<String> iterator = names.iterator();
+        while (iterator.hasNext()) {
+            String name = iterator.next();
+            String path = getPluginPath(group, name);
+            String type = types.get(path);
+            if (DELETED.equals(type)) {
+                types.remove(path);
+                iterator.remove();
+            }
+        }
+    }
+
     protected String getPluginPath(String group, String name) {
         return group + "/" + name;
     }

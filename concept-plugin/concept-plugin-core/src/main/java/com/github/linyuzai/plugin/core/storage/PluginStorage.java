@@ -84,6 +84,11 @@ public interface PluginStorage {
     void renamePlugin(String group, String name, String rename);
 
     /**
+     * 清空回收站
+     */
+    void clearDeleted(String group);
+
+    /**
      * 插件过滤器
      */
     interface Filter {

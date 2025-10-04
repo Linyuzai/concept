@@ -139,11 +139,6 @@ public class PluginConceptProperties {
         private StandardProperties standard = new StandardProperties();
 
         /**
-         * 异常日志配置
-         */
-        private ErrorProperties error = new ErrorProperties();
-
-        /**
          * 标准日志配置
          */
         @Data
@@ -151,18 +146,6 @@ public class PluginConceptProperties {
 
             /**
              * 是否启用标准日志配置
-             */
-            private boolean enabled = true;
-        }
-
-        /**
-         * 异常日志配置
-         */
-        @Data
-        public static class ErrorProperties {
-
-            /**
-             * 是否启用异常日志配置
              */
             private boolean enabled = true;
         }

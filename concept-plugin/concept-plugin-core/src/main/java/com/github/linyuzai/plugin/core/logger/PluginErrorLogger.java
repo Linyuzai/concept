@@ -7,6 +7,7 @@ import com.github.linyuzai.plugin.core.exception.PluginLoadException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class PluginErrorLogger implements PluginEventListener {
