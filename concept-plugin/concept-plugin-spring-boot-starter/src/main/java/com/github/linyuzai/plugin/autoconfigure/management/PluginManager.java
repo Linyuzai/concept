@@ -5,10 +5,12 @@ import com.github.linyuzai.plugin.core.autoload.*;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
-import com.github.linyuzai.plugin.core.event.PluginEventListener;
+import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.event.*;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,10 +22,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,6 +38,10 @@ public class PluginManager {
     protected final Set<String> unloadingSet = new ConcurrentSkipListSet<>();
 
     protected final Set<String> updatingSet = new ConcurrentSkipListSet<>();
+
+    protected final Map<String, PluginTree> treeMap = new ConcurrentHashMap<>();
+
+    protected final Map<String, Throwable> errorMap = new ConcurrentHashMap<>();
 
     protected final PluginConceptProperties properties;
 
@@ -88,6 +92,7 @@ public class PluginManager {
 
     public synchronized void loadPlugin(String group, String name) {
         String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
+        resetTreeAndError(path);
         loadingSet.add(path);
         try {
             storage.loadPlugin(group, name);
@@ -99,6 +104,7 @@ public class PluginManager {
 
     public synchronized void unloadPlugin(String group, String name) {
         String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
+        resetTreeAndError(path);
         unloadingSet.add(path);
         try {
             storage.unloadPlugin(group, name);
@@ -111,6 +117,7 @@ public class PluginManager {
     public synchronized void reloadPlugin(String group, String name) {
         PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
         String path = definition.getPath();
+        resetTreeAndError(path);
         loadingSet.add(path);
         try {
             concept.unload(definition);
@@ -129,10 +136,14 @@ public class PluginManager {
 
     public synchronized void renamePlugin(String group, String name, String rename) {
         storage.renamePlugin(group, name, rename);
+        resetTreeAndError(storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath());
+        resetTreeAndError(storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getPath());
     }
 
     public synchronized void deletePlugin(String group, String name) {
         storage.deletePlugin(group, name);
+        resetTreeAndError(storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath());
+        resetTreeAndError(storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getPath());
     }
 
     public PluginMetadata getMetadata(String group, String name) {
@@ -170,6 +181,7 @@ public class PluginManager {
         loadingSet.add(newPath);
         String oldPath = storage.getPluginDefinition(PluginStorage.LOADED, group, original).getPath();
         updatingSet.add(oldPath);
+        resetTreeAndError(oldPath);
         PluginEventListener listener = new PluginEventListener() {
 
             @Override
@@ -276,6 +288,11 @@ public class PluginManager {
         concept.getEventPublisher().register(new PluginAutoLoadListener());
     }
 
+    protected void resetTreeAndError(String path) {
+        treeMap.remove(path);
+        errorMap.remove(path);
+    }
+
     protected String formatSize(long size) {
         if (size < 0) {
             return null;
@@ -311,8 +328,16 @@ public class PluginManager {
 
         @Override
         public void onEvent(Object event) {
+            if (event instanceof PluginPreparedEvent ||
+                    event instanceof PluginPrepareErrorEvent) {
+                PluginContext context = ((PluginContextEvent) event).getContext();
+                treeMap.put(context.getPlugin().getDefinition().getPath(), context.get(PluginTree.class));
+            }
             if (event instanceof PluginAutoEvent) {
                 String path = ((PluginAutoEvent) event).getDefinition().getPath();
+                if (event instanceof PluginErrorEvent) {
+                    errorMap.put(path, ((PluginErrorEvent) event).getError());
+                }
                 if (event instanceof PluginAutoLoadEvent ||
                         event instanceof PluginAutoLoadErrorEvent) {
                     loadingSet.remove(path);

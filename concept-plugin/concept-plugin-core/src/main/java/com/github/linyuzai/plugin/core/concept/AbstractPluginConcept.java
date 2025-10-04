@@ -23,7 +23,6 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.core.tree.PluginTreeRepository;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +50,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     protected PluginStorage storage;
 
     protected PluginRepository repository;
-
-    protected PluginTreeRepository treeRepository;
 
     protected PluginEventPublisher eventPublisher;
 
@@ -292,6 +289,7 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
                 entries.add(new LoadingEntry(plugin, context));
             } catch (Throwable e) {
+                eventPublisher.publish(new PluginCreateErrorEvent(definition, e));
                 error.accept(definition, e);
             }
         }
@@ -364,9 +362,14 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             PluginTree tree = treeFactory.create(plugin, context, this);
             context.set(PluginTree.class, tree);
             context.set(PluginTree.Node.class, tree.getRoot());
-            //准备插件
-            plugin.prepare(context);
-            eventPublisher.publish(new PluginPreparedEvent(context));
+            try {
+                //准备插件
+                plugin.prepare(context);
+                eventPublisher.publish(new PluginPreparedEvent(context));
+            } catch (Throwable e) {
+                eventPublisher.publish(new PluginPrepareErrorEvent(context, e));
+                throw e;
+            }
             //获取插件解析配置
             boolean handlerEnabled = plugin.getMetadata().asStandard().getHandler().isEnabled();
             if (handlerEnabled) {
@@ -379,12 +382,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             eventPublisher.publish(new PluginLoadedEvent(plugin));
             onSuccess.accept(definition, plugin);
         } catch (Throwable e) {
+            eventPublisher.publish(new PluginLoadErrorEvent(plugin, e));
             onError.accept(definition, e);
         } finally {
             if (name != null) {
                 dependencyChain.pop();
             }
-            treeRepository.add(context.get(PluginTree.class));
         }
     }
 
@@ -409,9 +412,9 @@ public abstract class AbstractPluginConcept implements PluginConcept {
                 removed.destroy();
                 eventPublisher.publish(new PluginUnloadedEvent(removed));
             }
-            treeRepository.remove(definition);
             return removed;
         } catch (Throwable e) {
+            eventPublisher.publish(new PluginUnloadErrorEvent(definition, e));
             throw new PluginUnloadException(definition, e);
         } finally {
             unloading.remove(path);
@@ -456,8 +459,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
         protected PluginStorage storage;
 
         protected PluginRepository repository;
-
-        protected PluginTreeRepository treeRepository;
 
         protected PluginEventPublisher eventPublisher;
 
@@ -520,14 +521,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B repository(PluginRepository repository) {
             this.repository = repository;
-            return (B) this;
-        }
-
-        /**
-         * 设置插件树仓储
-         */
-        public B treeRepository(PluginTreeRepository treeRepository) {
-            this.treeRepository = treeRepository;
             return (B) this;
         }
 
@@ -688,7 +681,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
             concept.setHandlerChainFactory(handlerChainFactory);
             concept.setStorage(storage);
             concept.setRepository(repository);
-            concept.setTreeRepository(treeRepository);
             concept.setEventPublisher(eventPublisher);
             concept.setLogger(logger);
             concept.setMetadataFactories(metadataFactories);

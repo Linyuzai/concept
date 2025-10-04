@@ -40,9 +40,7 @@ import com.github.linyuzai.plugin.core.repository.DefaultPluginRepository;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeFactory;
-import com.github.linyuzai.plugin.core.tree.DefaultPluginTreeRepository;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.core.tree.PluginTreeRepository;
 import com.github.linyuzai.plugin.core.util.ReadUtils;
 import com.github.linyuzai.plugin.jar.factory.JarStreamPluginFactory;
 import com.github.linyuzai.plugin.jar.handle.extract.ClassExtractor;
@@ -102,12 +100,6 @@ public class PluginConceptConfiguration {
     @ConditionalOnMissingBean
     public PluginRepository pluginRepository() {
         return new DefaultPluginRepository();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public PluginTreeRepository pluginTreeRepository() {
-        return new DefaultPluginTreeRepository();
     }
 
     @Bean
@@ -238,7 +230,6 @@ public class PluginConceptConfiguration {
                                        PluginTreeFactory treeFactory,
                                        PluginStorage storage,
                                        PluginRepository repository,
-                                       PluginTreeRepository treeRepository,
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
                                        List<PluginMetadataFactory> metadataFactories,
@@ -254,7 +245,6 @@ public class PluginConceptConfiguration {
                 .treeFactory(treeFactory)
                 .storage(storage)
                 .repository(repository)
-                .treeRepository(treeRepository)
                 .eventPublisher(eventPublisher)
                 .logger(logger)
                 .addMetadataFactories(metadataFactories)
