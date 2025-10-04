@@ -1,9 +1,14 @@
 package com.github.linyuzai.plugin.autoconfigure.observable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 public interface PluginObservable<K, V> {
+
+    Collection<K> keys();
+
+    Collection<V> values();
 
     V get(K key);
 

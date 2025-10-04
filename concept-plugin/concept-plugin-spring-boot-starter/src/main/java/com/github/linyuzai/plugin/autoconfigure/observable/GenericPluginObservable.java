@@ -10,28 +10,40 @@ import lombok.RequiredArgsConstructor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<String, V>> implements PluginObservable<K, V> {
+public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<String, V>>
+        implements PluginObservable<K, V> {
 
     private final Map<K, List<Entry>> plugins = newMap();
 
     @Override
+    public Collection<K> keys() {
+        return plugins.keySet();
+    }
+
+    @Override
+    public Collection<V> values() {
+        return plugins.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .map(Entry::getValue)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public V get(K key) {
         List<Entry> entries = plugins.getOrDefault(key, Collections.emptyList());
-        return entries.isEmpty() ? null : entries.get(0).value;
+        return entries.isEmpty() ? null : entries.get(0).getValue();
     }
 
     @Override
     public List<V> list(K key) {
         List<Entry> entries = plugins.getOrDefault(key, Collections.emptyList());
-        return entries.stream().map(it -> it.value).collect(Collectors.toList());
+        return entries.stream().map(Entry::getValue).collect(Collectors.toList());
     }
 
     @Override
@@ -59,7 +71,7 @@ public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<St
         });
         context.getPlugin().addDestroyListener(p ->
                 plugins.values().removeIf(entries -> {
-                    entries.removeIf(it -> plugin.containsKey(it.path));
+                    entries.removeIf(it -> plugin.containsKey(it.getPath()));
                     return entries.isEmpty();
                 }));
     }

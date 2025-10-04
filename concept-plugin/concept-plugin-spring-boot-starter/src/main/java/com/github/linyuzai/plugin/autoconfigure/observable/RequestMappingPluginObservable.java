@@ -6,10 +6,7 @@ import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
@@ -17,6 +14,16 @@ public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<S
         implements PluginObservable<String, Class<?>> {
 
     private final Map<String, Class<?>> requestMappingMap = newMap();
+
+    @Override
+    public Collection<String> keys() {
+        return requestMappingMap.keySet();
+    }
+
+    @Override
+    public Collection<Class<?>> values() {
+        return requestMappingMap.values();
+    }
 
     @Override
     public Class<?> get(String key) {
