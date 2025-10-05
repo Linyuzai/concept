@@ -34,36 +34,35 @@ public interface Plugin {
      */
     void setMetadata(PluginMetadata metadata);
 
-
-
     PluginConcept getConcept();
 
     void setConcept(PluginConcept concept);
 
-    /**
-     * 添加销毁监听
-     */
-    void addDestroyListener(DestroyListener listener);
+    void addLoadListener(LoadListener listener);
+
+    void removeLoadListener(LoadListener listener);
 
     /**
-     * 移除销毁监听
+     * 添加卸载监听
      */
-    void removeDestroyListener(DestroyListener listener);
+    void addUnloadListener(UnloadListener listener);
 
     /**
-     * 初始化
+     * 移除卸载监听
      */
-    void initialize();
+    void removeUnloadListener(UnloadListener listener);
 
     /**
-     * 销毁
+     * 卸载
      */
-    void destroy();
+    void unload();
 
     /**
-     * 准备
+     * 加载
      */
-    void prepare(PluginContext context);
+    void load(PluginContext context);
+
+    boolean isLoaded();
 
     /**
      * 标准配置
@@ -151,14 +150,19 @@ public interface Plugin {
         InputStream getInputStream();
     }
 
+    interface LoadListener {
+
+        void onLoad(Plugin plugin, PluginContext context);
+    }
+
     /**
-     * 销毁监听器
+     * 卸载监听器
      */
-    interface DestroyListener {
+    interface UnloadListener {
 
         /**
-         * 插件销毁
+         * 插件卸载
          */
-        void onDestroy(Plugin plugin);
+        void onUnload(Plugin plugin);
     }
 }

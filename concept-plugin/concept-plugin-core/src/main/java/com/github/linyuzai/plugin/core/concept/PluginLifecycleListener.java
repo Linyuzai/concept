@@ -11,14 +11,11 @@ public interface PluginLifecycleListener extends PluginEventListener {
     default void onEvent(Object event) {
         if (event instanceof PluginCreatedEvent) {
             onCreate(((PluginCreatedEvent) event).getPlugin());
-        } else if (event instanceof PluginPreparedEvent) {
-            onPrepare(((PluginPreparedEvent) event).getPlugin());
         } else if (event instanceof PluginLoadedEvent) {
             onLoaded(((PluginLoadedEvent) event).getPlugin());
         } else if (event instanceof PluginUnloadedEvent) {
             onUnloaded(((PluginUnloadedEvent) event).getPlugin());
         } else if (event instanceof PluginCreateErrorEvent ||
-                event instanceof PluginPrepareErrorEvent ||
                 event instanceof PluginLoadErrorEvent ||
                 event instanceof PluginUnloadErrorEvent) {
             onError(((PluginErrorEvent) event).getDefinition(),
@@ -30,13 +27,6 @@ public interface PluginLifecycleListener extends PluginEventListener {
      * 创建
      */
     default void onCreate(Plugin plugin) {
-
-    }
-
-    /**
-     * 准备
-     */
-    default void onPrepare(Plugin plugin) {
 
     }
 

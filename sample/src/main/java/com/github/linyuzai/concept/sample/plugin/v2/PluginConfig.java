@@ -46,7 +46,7 @@ public class PluginConfig {
         return new EntryFilter("**/**.properties");
     }
 
-    @Bean
+    //@Bean
     public AmazonS3 amazonS3() {
         return AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(

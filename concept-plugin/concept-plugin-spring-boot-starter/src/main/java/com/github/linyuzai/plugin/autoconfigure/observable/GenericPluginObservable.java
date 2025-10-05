@@ -69,7 +69,7 @@ public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<St
             K key = grouping(v, context);
             plugins.computeIfAbsent(key, func -> newList()).add(new Entry(k, v));
         });
-        context.getPlugin().addDestroyListener(p ->
+        context.getPlugin().addUnloadListener(p ->
                 plugins.values().removeIf(entries -> {
                     entries.removeIf(it -> plugin.containsKey(it.getPath()));
                     return entries.isEmpty();

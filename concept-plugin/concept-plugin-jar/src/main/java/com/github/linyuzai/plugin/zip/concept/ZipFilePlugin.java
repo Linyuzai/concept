@@ -44,7 +44,7 @@ public class ZipFilePlugin extends AbstractPlugin implements ZipPlugin {
      * 关闭zip文件
      */
     @Override
-    public void onDestroy() {
+    public void onUnload() {
         try {
             zipFile.close();
         } catch (Throwable ignore) {

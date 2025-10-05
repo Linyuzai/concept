@@ -4,11 +4,11 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -18,7 +18,9 @@ import java.util.function.Consumer;
 @Setter
 public abstract class AbstractPlugin implements Plugin {
 
-    private final Collection<DestroyListener> destroyListeners = new CopyOnWriteArrayList<>();
+    private final Collection<LoadListener> loadListeners = new ArrayList<>();
+
+    private final Collection<UnloadListener> unloadListeners = new ArrayList<>();
 
     private PluginDefinition definition;
 
@@ -26,61 +28,69 @@ public abstract class AbstractPlugin implements Plugin {
 
     private PluginConcept concept;
 
-    private AtomicBoolean destroyed = new AtomicBoolean(false);
+    private boolean loaded = false;
 
     @Override
-    public void addDestroyListener(DestroyListener listener) {
-        this.destroyListeners.add(listener);
+    public synchronized void addLoadListener(@NonNull LoadListener listener) {
+        loadListeners.add(listener);
     }
 
     @Override
-    public void removeDestroyListener(DestroyListener listener) {
-        this.destroyListeners.remove(listener);
+    public synchronized void removeLoadListener(@NonNull LoadListener listener) {
+        loadListeners.remove(listener);
     }
 
     @Override
-    public void initialize() {
-        onInitialize();
+    public synchronized void addUnloadListener(@NonNull UnloadListener listener) {
+        this.unloadListeners.add(listener);
+    }
+
+    @Override
+    public synchronized void removeUnloadListener(@NonNull UnloadListener listener) {
+        this.unloadListeners.remove(listener);
     }
 
     /**
      * 解析插件树
      */
     @Override
-    public void prepare(PluginContext context) {
-        PluginTree.NodeFactory node = context.get(PluginTree.Node.class);
-        forEachEntry(context, entry -> {
-            PluginConcept concept = context.getConcept();
-            //子上下文
-            PluginContext subContext = context.createSubContext();
-            subContext.set(PluginConcept.class, concept);
-            subContext.initialize();
-            //子插件
-            Plugin subPlugin = getConcept().createPlugin(entry, subContext);
-            if (subPlugin == null) {
-                node.create(entry.getPath(), entry.getName(), entry);
-            } else {
-                subPlugin.setConcept(concept);
-                subPlugin.initialize();
-                //子插件树
-                PluginTree.Node subTree = node.create(entry.getPath(), entry.getName(), subPlugin);
-                subContext.set(Plugin.class, subPlugin);
-                subContext.set(PluginTree.Node.class, subTree);
-                //解析子插件
-                subPlugin.prepare(subContext);
-                subContext.destroy();
-            }
-        });
-        onPrepare(context);
+    public synchronized void load(PluginContext context) {
+        if (!loaded) {
+            PluginTree.NodeFactory node = context.get(PluginTree.Node.class);
+            forEachEntry(context, entry -> {
+                PluginConcept concept = context.getConcept();
+                //子上下文
+                PluginContext subContext = context.createSubContext();
+                subContext.set(PluginConcept.class, concept);
+                subContext.initialize();
+                //子插件
+                Plugin subPlugin = getConcept().createPlugin(entry, subContext);
+                if (subPlugin == null) {
+                    node.create(entry.getPath(), entry.getName(), entry);
+                } else {
+                    subPlugin.setConcept(concept);
+                    //子插件树
+                    PluginTree.Node subTree = node.create(entry.getPath(), entry.getName(), subPlugin);
+                    subContext.set(Plugin.class, subPlugin);
+                    subContext.set(PluginTree.Node.class, subTree);
+                    //解析子插件
+                    subPlugin.load(subContext);
+                    subContext.destroy();
+                }
+            });
+            onLoad(context);
+            loaded = true;
+        }
     }
 
     @Override
-    public void destroy() {
-        if (destroyed.compareAndSet(false, true)) {
-            for (DestroyListener listener : destroyListeners) {
-                listener.onDestroy(this);
+    public synchronized void unload() {
+        if (loaded) {
+            for (UnloadListener listener : unloadListeners) {
+                listener.onUnload(this);
             }
-            onDestroy();
+            onUnload();
+            loaded = true;
         }
     }
 
@@ -89,24 +99,18 @@ public abstract class AbstractPlugin implements Plugin {
      */
     public abstract void forEachEntry(PluginContext context, Consumer<Entry> consumer);
 
+
     /**
-     * 初始化
+     * 加载
      */
-    public void onInitialize() {
+    public void onLoad(PluginContext context) {
 
     }
 
     /**
-     * 销毁
+     * 卸载
      */
-    public void onDestroy() {
-
-    }
-
-    /**
-     * 准备
-     */
-    public void onPrepare(PluginContext context) {
+    public void onUnload() {
 
     }
 

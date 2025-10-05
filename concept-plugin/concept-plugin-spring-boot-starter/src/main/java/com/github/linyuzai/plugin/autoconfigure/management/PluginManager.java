@@ -332,15 +332,21 @@ public class PluginManager {
 
         @Override
         public void onEvent(Object event) {
-            if (event instanceof PluginPreparedEvent ||
-                    event instanceof PluginPrepareErrorEvent) {
+            if (event instanceof PluginLoadedEvent ||
+                    event instanceof PluginLoadErrorEvent) {
                 PluginContext context = ((PluginContextEvent) event).getContext();
-                treeMap.put(context.getPlugin().getDefinition().getPath(), context.get(PluginTree.class));
+                PluginTree tree = context.get(PluginTree.class);
+                if (tree != null) {
+                    treeMap.put(context.getPlugin().getDefinition().getPath(), tree);
+                }
             }
             if (event instanceof PluginAutoEvent) {
                 String path = ((PluginAutoEvent) event).getDefinition().getPath();
                 if (event instanceof PluginErrorEvent) {
-                    errorMap.put(path, ((PluginErrorEvent) event).getError());
+                    Throwable error = ((PluginErrorEvent) event).getError();
+                    if (error != null) {
+                        errorMap.put(path, error);
+                    }
                 }
                 if (event instanceof PluginAutoLoadEvent ||
                         event instanceof PluginAutoLoadErrorEvent) {

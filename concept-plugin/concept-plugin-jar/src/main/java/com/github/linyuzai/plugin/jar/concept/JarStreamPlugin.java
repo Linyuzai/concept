@@ -30,7 +30,7 @@ public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
      * 缓存包和类的内容创建插件类加载器
      */
     @Override
-    public void onPrepare(PluginContext context) {
+    public void onLoad(PluginContext context) {
         prepareClassLoader(context);
     }
 
@@ -38,8 +38,8 @@ public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
      * 关闭插件类加载器
      */
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onUnload() {
+        super.onUnload();
         try {
             pluginClassLoader.close();
         } catch (Throwable ignore) {

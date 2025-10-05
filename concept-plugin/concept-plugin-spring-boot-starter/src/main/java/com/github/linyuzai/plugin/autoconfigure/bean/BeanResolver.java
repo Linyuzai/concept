@@ -52,7 +52,7 @@ public class BeanResolver extends AbstractPluginResolver<ClassSupplier, BeanSupp
         public Object create() {
             Object bean = applicationContext.getAutowireCapableBeanFactory()
                     .createBean(classSupplier.get());
-            plugin.addDestroyListener(plugin ->
+            plugin.addUnloadListener(plugin ->
                     applicationContext.getAutowireCapableBeanFactory().destroyBean(bean));
             return bean;
         }

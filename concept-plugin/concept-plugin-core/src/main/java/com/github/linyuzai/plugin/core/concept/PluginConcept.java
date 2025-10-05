@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.path.PluginPathFactory;
@@ -49,6 +50,14 @@ public interface PluginConcept {
      * 移除插件处理器
      */
     void removeHandlers(Collection<? extends PluginHandler> handlers);
+
+    void addInterceptor(PluginInterceptor... interceptors);
+
+    void addInterceptor(Collection<? extends PluginInterceptor> interceptors);
+
+    void removeInterceptor(PluginInterceptor... interceptors);
+
+    void removeInterceptor(Collection<? extends PluginInterceptor> interceptors);
 
     /**
      * 创建上下文

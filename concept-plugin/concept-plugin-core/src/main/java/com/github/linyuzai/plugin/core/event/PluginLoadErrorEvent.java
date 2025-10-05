@@ -1,18 +1,18 @@
 package com.github.linyuzai.plugin.core.event;
 
-import com.github.linyuzai.plugin.core.concept.Plugin;
+import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.Getter;
 
 /**
  * 插件加载事件
  */
 @Getter
-public class PluginLoadErrorEvent extends AbstractPluginEvent implements PluginErrorEvent {
+public class PluginLoadErrorEvent extends PluginContextEvent implements PluginErrorEvent {
 
     private final Throwable error;
 
-    public PluginLoadErrorEvent(Plugin plugin, Throwable error) {
-        super(plugin);
+    public PluginLoadErrorEvent(PluginContext context, Throwable error) {
+        super(context);
         this.error = error;
     }
 }

@@ -55,7 +55,7 @@ public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<S
             doRegister(type, requestMapping, destroyList);
             requestMappingMap.put(path, type);
         }
-        context.getPlugin().addDestroyListener(p -> {
+        context.getPlugin().addUnloadListener(p -> {
             requestMappingMap.keySet().removeAll(requestMappings.keySet());
             destroyList.forEach(Runnable::run);
         });
