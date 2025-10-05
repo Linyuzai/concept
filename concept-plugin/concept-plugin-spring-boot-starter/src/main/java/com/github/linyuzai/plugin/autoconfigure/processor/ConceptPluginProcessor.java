@@ -92,7 +92,7 @@ public class ConceptPluginProcessor implements BeanPostProcessor,
                 extractor.addInvokerFactory(factory);
             }
             //初始化提取执行器
-            extractor.prepareInvokers();
+            extractor.initialize();
             extractors.add(extractor);
         }
         if (!extractors.isEmpty()) {

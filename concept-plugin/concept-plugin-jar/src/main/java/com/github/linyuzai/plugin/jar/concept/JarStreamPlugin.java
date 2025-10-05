@@ -31,7 +31,7 @@ public class JarStreamPlugin extends ZipStreamPlugin implements JarPlugin {
      */
     @Override
     public void onLoad(PluginContext context) {
-        prepareClassLoader(context);
+        initClassLoader(context);
     }
 
     /**

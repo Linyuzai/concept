@@ -85,7 +85,7 @@ public class DynamicExtractor implements MethodPluginExtractor {
     }
 
     @Override
-    public synchronized void prepareInvokers() {
+    public synchronized void initialize() {
         methodInvokersMap.clear();
         for (Method method : methods) {
             if (!method.isAccessible()) {

@@ -21,7 +21,7 @@ public interface MethodPluginExtractor extends PluginExtractor {
     /**
      * 准备提取执行器
      */
-    void prepareInvokers();
+    void initialize();
 
     /**
      * 提取执行器工厂

@@ -35,7 +35,7 @@ public class JarFilePlugin extends ZipFilePlugin implements JarPlugin {
      */
     @Override
     public void onLoad(PluginContext context) {
-        prepareClassLoader(context);
+        initClassLoader(context);
     }
 
     /**

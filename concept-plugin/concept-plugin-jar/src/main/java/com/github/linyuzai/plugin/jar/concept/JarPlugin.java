@@ -24,7 +24,7 @@ public interface JarPlugin extends ZipPlugin {
 
     void setPluginClassLoader(PluginClassLoader classLoader);
 
-    default void prepareClassLoader(PluginContext context) {
+    default void initClassLoader(PluginContext context) {
         PluginTree tree = context.get(PluginTree.class);
         if (tree == null) {
             return;
@@ -33,7 +33,7 @@ public interface JarPlugin extends ZipPlugin {
             Map<String, Content> classes = new HashMap<>();
             Map<String, Content> packages = new HashMap<>();
             Map<String, Content> resources = new HashMap<>();
-            collectPackageAndClassContents(tree.getRoot(), classes, packages, resources);
+            collectContents(tree.getRoot(), classes, packages, resources);
             ClassLoader parent = getClass().getClassLoader();
             setPluginClassLoader(new JarPluginClassLoader(this, parent,
                     packages, classes, resources));
@@ -43,10 +43,10 @@ public interface JarPlugin extends ZipPlugin {
     /**
      * 获取包和类的内容
      */
-    default void collectPackageAndClassContents(PluginTree.Node node,
-                                                  Map<String, Content> classes,
-                                                  Map<String, Content> packages,
-                                                  Map<String, Content> resources) {
+    default void collectContents(PluginTree.Node node,
+                                 Map<String, Content> classes,
+                                 Map<String, Content> packages,
+                                 Map<String, Content> resources) {
         node.forEach(it -> {
             Object value = it.getValue();
             if (value instanceof Entry) {
