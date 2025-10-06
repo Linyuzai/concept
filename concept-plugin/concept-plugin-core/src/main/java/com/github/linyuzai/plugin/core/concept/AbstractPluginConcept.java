@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -73,12 +74,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 正在加载的插件
      */
-    protected final Set<String> loading = new LinkedHashSet<>();
+    protected final Set<String> loading = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * 正在卸载的插件
      */
-    protected final Set<String> unloading = new LinkedHashSet<>();
+    protected final Set<String> unloading = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Override
     public synchronized void initialize() {

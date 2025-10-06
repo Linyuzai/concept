@@ -88,7 +88,7 @@ public class LocalPluginStorage extends AbstractPluginStorage {
      */
     @Override
     public void loadPlugin(String group, String name) {
-        move(group, name, UNLOADED, LOADED, false);
+        move(group, name, UNLOADED, LOADED);
     }
 
     /**
@@ -96,7 +96,7 @@ public class LocalPluginStorage extends AbstractPluginStorage {
      */
     @Override
     public void unloadPlugin(String group, String name) {
-        move(group, name, LOADED, UNLOADED, false);
+        move(group, name, LOADED, UNLOADED);
     }
 
     /**
@@ -105,9 +105,9 @@ public class LocalPluginStorage extends AbstractPluginStorage {
     @Override
     public void deletePlugin(String group, String name) {
         try {
-            move(group, name, UNLOADED, DELETED, true);
+            move(group, name, UNLOADED, DELETED);
         } catch (Throwable e) {
-            move(group, name, LOADED, DELETED, true);
+            move(group, name, LOADED, DELETED);
         }
     }
 
@@ -167,12 +167,13 @@ public class LocalPluginStorage extends AbstractPluginStorage {
     }
 
     @SneakyThrows
-    protected void move(String group, String name, String from, String to, boolean deleted) {
+    protected void move(String group, String name, String from, String to) {
         File fromFile = new File(getPluginPath(from, group, name));
         if (!fromFile.exists()) {
             throw new IllegalArgumentException(name + " not existed");
         }
         String toPath = getPluginPath(to, group, name);
+        boolean deleted = DELETED.equals(to);
         File toFile = new File(deleted ? generateDeletedName(toPath) : generateName(toPath));
         //return fromFile.renameTo(toFile);
         // 移动失败会抛出异常

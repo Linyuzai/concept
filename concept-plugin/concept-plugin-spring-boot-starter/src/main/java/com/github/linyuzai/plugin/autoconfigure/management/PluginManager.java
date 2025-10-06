@@ -24,7 +24,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -33,11 +32,11 @@ public class PluginManager {
 
     protected final Log log = LogFactory.getLog(PluginManager.class);
 
-    protected final Set<String> loadingSet = new ConcurrentSkipListSet<>();
+    protected final Set<String> loadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected final Set<String> unloadingSet = new ConcurrentSkipListSet<>();
+    protected final Set<String> unloadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected final Set<String> updatingSet = new ConcurrentSkipListSet<>();
+    protected final Set<String> updatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     protected final Map<String, PluginTree> treeMap = new ConcurrentHashMap<>();
 
@@ -91,26 +90,42 @@ public class PluginManager {
     }
 
     public synchronized void loadPlugin(String group, String name) {
-        String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
+        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+        String path = definition.getPath();
         resetTreeAndError(path);
         loadingSet.add(path);
         try {
             storage.loadPlugin(group, name);
         } catch (Throwable e) {
-            loadingSet.remove(path);
-            log.error("Load plugin error: " + path, e);
+            execute(() -> {
+                try {
+                    concept.load(definition);
+                } catch (Throwable e1) {
+                    log.error("Load plugin error: " + path, e1);
+                } finally {
+                    loadingSet.remove(path);
+                }
+            });
         }
     }
 
     public synchronized void unloadPlugin(String group, String name) {
-        String path = storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath();
+        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+        String path = definition.getPath();
         resetTreeAndError(path);
         unloadingSet.add(path);
         try {
             storage.unloadPlugin(group, name);
         } catch (Throwable e) {
-            unloadingSet.remove(path);
-            log.error("Unload plugin error: " + path, e);
+            execute(() -> {
+                try {
+                    concept.unload(definition);
+                } catch (Throwable e1) {
+                    log.error("Unload plugin error: " + path, e1);
+                } finally {
+                    unloadingSet.remove(path);
+                }
+            });
         }
     }
 
@@ -125,13 +140,15 @@ public class PluginManager {
             loadingSet.remove(path);
             throw e;
         }
-        try {
-            concept.load(definition);
-        } catch (Throwable e) {
-            log.error("Reload plugin error: " + path, e);
-        } finally {
-            loadingSet.remove(path);
-        }
+        execute(() -> {
+            try {
+                concept.load(definition);
+            } catch (Throwable e) {
+                log.error("Reload plugin error: " + path, e);
+            } finally {
+                loadingSet.remove(path);
+            }
+        });
     }
 
     public synchronized void renamePlugin(String group, String name, String rename) {
@@ -258,14 +275,15 @@ public class PluginManager {
     protected List<PluginSummary> getUnloadedPluginSummaries(String group) {
         return storage.getPluginDefinitions(PluginStorage.UNLOADED, group).map(definition -> {
             String name = definition.getName();
-            String path = definition.getPath();
             long timestamp = definition.getCreateTime();
             long size = definition.getSize();
             PluginState state;
-            if (unloadingSet.contains(path) || concept.isUnloading(definition)) {
+            PluginDefinition def = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+            String path = def.getPath();
+            if (unloadingSet.contains(path) || concept.isUnloading(def)) {
                 state = PluginState.UNLOADING;
             } else {
-                Plugin get = concept.getRepository().get(definition);
+                Plugin get = concept.getRepository().get(def);
                 if (get == null) {
                     state = PluginState.UNLOADED;
                 } else {
@@ -323,9 +341,8 @@ public class PluginManager {
         return formatter.format(dateTime);
     }
 
-    @Deprecated
     protected void execute(Runnable runnable) {
-        executor.execute(runnable, 5000, TimeUnit.MILLISECONDS);
+        executor.execute(runnable, 1000, TimeUnit.MILLISECONDS);
     }
 
     public class PluginAutoLoadListener implements PluginEventListener {
