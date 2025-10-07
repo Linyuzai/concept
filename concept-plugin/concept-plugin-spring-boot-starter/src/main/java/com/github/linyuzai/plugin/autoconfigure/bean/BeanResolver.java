@@ -5,6 +5,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 import com.github.linyuzai.plugin.core.handle.resolve.AbstractPluginResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.AbstractSupplier;
+import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassResolver;
 import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 import lombok.Getter;
@@ -52,8 +53,12 @@ public class BeanResolver extends AbstractPluginResolver<ClassSupplier, BeanSupp
         public Object create() {
             Object bean = applicationContext.getAutowireCapableBeanFactory()
                     .createBean(classSupplier.get());
-            plugin.addUnloadListener(plugin ->
-                    applicationContext.getAutowireCapableBeanFactory().destroyBean(bean));
+            plugin.addListener(new PluginListener() {
+                @Override
+                public void onUnload(Plugin plugin) {
+                    applicationContext.getAutowireCapableBeanFactory().destroyBean(bean);
+                }
+            });
             return bean;
         }
     }

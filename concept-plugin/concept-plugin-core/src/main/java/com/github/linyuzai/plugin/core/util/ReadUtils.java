@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.util;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,7 +21,8 @@ public class ReadUtils {
     private ReadUtils() {
     }
 
-    public static byte[] read(InputStream is) throws IOException {
+    @SneakyThrows
+    public static byte[] read(InputStream is) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         if (bufferSize < 1) {
             throw new IllegalArgumentException("bufferSize < 1");

@@ -1,8 +1,10 @@
 package com.github.linyuzai.plugin.autoconfigure.observable;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
+import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.core.type.DefaultNestedType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<String, V>>
         implements PluginObservable<K, V> {
 
-    private final Map<K, List<Entry>> plugins = newMap();
+    private final Map<K, List<Entry>> plugins = new ConcurrentHashMap<>();
 
     @Override
     public Collection<K> keys() {
@@ -67,21 +69,17 @@ public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<St
     public void onExtract(Map<String, V> plugin, PluginContext context) {
         plugin.forEach((k, v) -> {
             K key = grouping(v, context);
-            plugins.computeIfAbsent(key, func -> newList()).add(new Entry(k, v));
+            plugins.computeIfAbsent(key, func -> new ArrayList<>()).add(new Entry(k, v));
         });
-        context.getPlugin().addUnloadListener(p ->
+        context.getPlugin().addListener(new PluginListener() {
+            @Override
+            public void onUnload(Plugin p) {
                 plugins.values().removeIf(entries -> {
                     entries.removeIf(it -> plugin.containsKey(it.getPath()));
                     return entries.isEmpty();
-                }));
-    }
-
-    protected Map<K, List<Entry>> newMap() {
-        return new ConcurrentHashMap<>();
-    }
-
-    protected List<Entry> newList() {
-        return new ArrayList<>();
+                });
+            }
+        });
     }
 
     protected Type getPluginType() {

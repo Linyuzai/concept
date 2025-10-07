@@ -9,6 +9,7 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -79,13 +80,12 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
         @SneakyThrows
         @Override
         public InputStream getInputStream() {
-            byte[] bytes;
-            bytes = reference.get();
-            if (bytes != null) {
-                return new ByteArrayInputStream(bytes);
+            byte[] cache = reference.get();
+            if (cache != null) {
+                return new ByteArrayInputStream(cache);
             }
-            synchronized (ZipStreamPluginEntry.this) {
-                bytes = reference.get();
+            return syncWrite(() -> {
+                byte[] bytes = reference.get();
                 if (bytes != null) {
                     return new ByteArrayInputStream(bytes);
                 }
@@ -99,9 +99,11 @@ public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPlug
                             return new ByteArrayInputStream(read);
                         }
                     }
+                } catch (IOException e) {
+                    throw new PluginException("Plugin entry read error", e);
                 }
                 throw new PluginException("Plugin entry not found");
-            }
+            });
         }
     }
 }

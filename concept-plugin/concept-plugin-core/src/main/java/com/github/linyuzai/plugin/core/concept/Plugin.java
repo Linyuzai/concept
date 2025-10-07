@@ -1,6 +1,7 @@
 package com.github.linyuzai.plugin.core.concept;
 
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
@@ -38,19 +39,15 @@ public interface Plugin {
 
     void setConcept(PluginConcept concept);
 
-    void addLoadListener(LoadListener listener);
-
-    void removeLoadListener(LoadListener listener);
+    /**
+     * 添加监听
+     */
+    void addListener(PluginListener listener);
 
     /**
-     * 添加卸载监听
+     * 移除监听
      */
-    void addUnloadListener(UnloadListener listener);
-
-    /**
-     * 移除卸载监听
-     */
-    void removeUnloadListener(UnloadListener listener);
+    void removeListener(PluginListener listener);
 
     /**
      * 卸载
@@ -148,21 +145,5 @@ public interface Plugin {
          * 获得数据流
          */
         InputStream getInputStream();
-    }
-
-    interface LoadListener {
-
-        void onLoad(Plugin plugin, PluginContext context);
-    }
-
-    /**
-     * 卸载监听器
-     */
-    interface UnloadListener {
-
-        /**
-         * 插件卸载
-         */
-        void onUnload(Plugin plugin);
     }
 }

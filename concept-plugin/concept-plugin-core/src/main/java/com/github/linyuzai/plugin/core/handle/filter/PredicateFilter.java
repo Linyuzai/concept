@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 /**
@@ -14,11 +16,15 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public abstract class PredicateFilter<T> extends AbstractPluginFilter<T> {
 
-    private final Collection<Predicate<T>> predicates;
+    private final List<Predicate<T>> predicates = new CopyOnWriteArrayList<>();
 
     @SafeVarargs
     public PredicateFilter(Predicate<T>... functions) {
         this(Arrays.asList(functions));
+    }
+
+    public PredicateFilter(Collection<Predicate<T>> predicates) {
+        this.predicates.addAll(predicates);
     }
 
     @Override

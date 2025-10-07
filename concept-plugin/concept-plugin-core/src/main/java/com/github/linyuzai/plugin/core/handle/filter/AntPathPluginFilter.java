@@ -5,20 +5,26 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 基于 AntPath 匹配的过滤器
  */
 @Getter
-@RequiredArgsConstructor
 public abstract class AntPathPluginFilter<T> extends AbstractPluginFilter<T> {
+
+    private final AntPathMatcher matcher = new AntPathMatcher();
 
     /**
      * 匹配模式
      */
-    private final Collection<String> patterns;
+    private final List<String> patterns = new CopyOnWriteArrayList<>();
 
-    private final AntPathMatcher matcher = new AntPathMatcher();
+    public AntPathPluginFilter(Collection<String> patterns) {
+        this.patterns.addAll(patterns);
+    }
 
     @Override
     public boolean doFilter(T original) {

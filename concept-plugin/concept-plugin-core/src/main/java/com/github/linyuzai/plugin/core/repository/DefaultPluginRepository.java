@@ -12,7 +12,7 @@ import java.util.stream.Stream;
  */
 public class DefaultPluginRepository implements PluginRepository {
 
-    private final Map<String, Plugin> plugins = newMap();
+    private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
 
     /**
      * 获得插件
@@ -52,9 +52,5 @@ public class DefaultPluginRepository implements PluginRepository {
     @Override
     public Stream<Plugin> stream() {
         return plugins.values().stream();
-    }
-
-    protected Map<String, Plugin> newMap() {
-        return new ConcurrentHashMap<>();
     }
 }

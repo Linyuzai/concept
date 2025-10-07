@@ -11,6 +11,7 @@ import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class PluginManager {
+public class PluginManager extends SyncSupport {
 
     protected final Log log = LogFactory.getLog(PluginManager.class);
 
@@ -58,7 +59,7 @@ public class PluginManager {
         return storage.getGroups();
     }
 
-    public synchronized void addGroup(String group) {
+    public void addGroup(String group) {
         storage.addGroup(group);
     }
 
@@ -89,75 +90,81 @@ public class PluginManager {
         return storage.existPlugin(group, name);
     }
 
-    public synchronized void loadPlugin(String group, String name) {
+    public void loadPlugin(String group, String name) {
         PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
         String path = definition.getPath();
         resetTreeAndError(path);
-        loadingSet.add(path);
-        try {
-            storage.loadPlugin(group, name);
-        } catch (Throwable e) {
-            execute(() -> {
-                try {
-                    concept.load(definition);
-                } catch (Throwable e1) {
-                    log.error("Load plugin error: " + path, e1);
-                } finally {
-                    loadingSet.remove(path);
-                }
-            });
-        }
-    }
-
-    public synchronized void unloadPlugin(String group, String name) {
-        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
-        String path = definition.getPath();
-        resetTreeAndError(path);
-        unloadingSet.add(path);
-        try {
-            storage.unloadPlugin(group, name);
-        } catch (Throwable e) {
-            execute(() -> {
-                try {
-                    concept.unload(definition);
-                } catch (Throwable e1) {
-                    log.error("Unload plugin error: " + path, e1);
-                } finally {
-                    unloadingSet.remove(path);
-                }
-            });
-        }
-    }
-
-    public synchronized void reloadPlugin(String group, String name) {
-        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
-        String path = definition.getPath();
-        resetTreeAndError(path);
-        loadingSet.add(path);
-        try {
-            concept.unload(definition);
-        } catch (Throwable e) {
-            loadingSet.remove(path);
-            throw e;
-        }
-        execute(() -> {
+        syncWrite(() -> {
+            loadingSet.add(path);
             try {
-                concept.load(definition);
+                storage.loadPlugin(group, name);
             } catch (Throwable e) {
-                log.error("Reload plugin error: " + path, e);
-            } finally {
-                loadingSet.remove(path);
+                execute(() -> {
+                    try {
+                        concept.load(definition);
+                    } catch (Throwable e1) {
+                        log.error("Load plugin error: " + path, e1);
+                    } finally {
+                        loadingSet.remove(path);
+                    }
+                });
             }
         });
     }
 
-    public synchronized void renamePlugin(String group, String name, String rename) {
+    public void unloadPlugin(String group, String name) {
+        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+        String path = definition.getPath();
+        resetTreeAndError(path);
+        syncWrite(() -> {
+            unloadingSet.add(path);
+            try {
+                storage.unloadPlugin(group, name);
+            } catch (Throwable e) {
+                execute(() -> {
+                    try {
+                        concept.unload(definition);
+                    } catch (Throwable e1) {
+                        log.error("Unload plugin error: " + path, e1);
+                    } finally {
+                        unloadingSet.remove(path);
+                    }
+                });
+            }
+        });
+    }
+
+    public void reloadPlugin(String group, String name) {
+        PluginDefinition definition = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
+        String path = definition.getPath();
+        resetTreeAndError(path);
+        syncWrite(() -> {
+            loadingSet.add(path);
+            try {
+                concept.unload(definition);
+            } catch (Throwable e) {
+                loadingSet.remove(path);
+                throw e;
+            }
+            execute(() -> {
+                try {
+                    concept.load(definition);
+                } catch (Throwable e) {
+                    log.error("Reload plugin error: " + path, e);
+                } finally {
+                    loadingSet.remove(path);
+                }
+            });
+        });
+    }
+
+    public void renamePlugin(String group, String name, String rename) {
         storage.renamePlugin(group, name, rename);
         resetTreeAndError(storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath());
         resetTreeAndError(storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getPath());
     }
 
-    public synchronized void deletePlugin(String group, String name) {
+    public void deletePlugin(String group, String name) {
         storage.deletePlugin(group, name);
         resetTreeAndError(storage.getPluginDefinition(PluginStorage.LOADED, group, name).getPath());
         resetTreeAndError(storage.getPluginDefinition(PluginStorage.UNLOADED, group, name).getPath());
@@ -193,40 +200,42 @@ public class PluginManager {
         return metadataSummaries;
     }
 
-    public synchronized void updatePlugin(String group, String original, String upload) {
+    public void updatePlugin(String group, String original, String upload) {
         String newPath = storage.getPluginDefinition(PluginStorage.LOADED, group, upload).getPath();
-        loadingSet.add(newPath);
         String oldPath = storage.getPluginDefinition(PluginStorage.LOADED, group, original).getPath();
-        updatingSet.add(oldPath);
         resetTreeAndError(oldPath);
-        PluginEventListener listener = new PluginEventListener() {
+        syncWrite(() -> {
+            loadingSet.add(newPath);
+            updatingSet.add(oldPath);
+            PluginEventListener listener = new PluginEventListener() {
 
-            @Override
-            public void onEvent(Object event) {
-                if (event instanceof PluginAutoEvent) {
-                    String path = ((PluginAutoEvent) event).getDefinition().getPath();
-                    if (Objects.equals(newPath, path)) {
-                        updatingSet.remove(oldPath);
-                        if (event instanceof PluginAutoLoadEvent) {
-                            storage.deletePlugin(group, original);
-                            concept.getEventPublisher().unregister(this);
+                @Override
+                public void onEvent(Object event) {
+                    if (event instanceof PluginAutoEvent) {
+                        String path = ((PluginAutoEvent) event).getDefinition().getPath();
+                        if (Objects.equals(newPath, path)) {
+                            updatingSet.remove(oldPath);
+                            if (event instanceof PluginAutoLoadEvent) {
+                                storage.deletePlugin(group, original);
+                                concept.getEventPublisher().unregister(this);
+                            }
                         }
                     }
                 }
+            };
+            concept.getEventPublisher().register(listener);
+            try {
+                storage.loadPlugin(group, upload);
+            } catch (Throwable e) {
+                log.error("Update plugin error: " + newPath, e);
+                loadingSet.remove(newPath);
+                updatingSet.remove(oldPath);
+                concept.getEventPublisher().unregister(listener);
             }
-        };
-        concept.getEventPublisher().register(listener);
-        try {
-            storage.loadPlugin(group, upload);
-        } catch (Throwable e) {
-            log.error("Update plugin error: " + newPath, e);
-            loadingSet.remove(newPath);
-            updatingSet.remove(oldPath);
-            concept.getEventPublisher().unregister(listener);
-        }
+        });
     }
 
-    public synchronized String uploadPlugin(String group, String name, InputStream is, long length) {
+    public String uploadPlugin(String group, String name, InputStream is, long length) {
         return storage.uploadPlugin(group, name, is, length);
     }
 
@@ -247,7 +256,7 @@ public class PluginManager {
     }
 
     protected List<PluginSummary> getLoadedPluginSummaries(String group) {
-        return storage.getPluginDefinitions(PluginStorage.LOADED, group).map(definition -> {
+        return syncRead(() -> storage.getPluginDefinitions(PluginStorage.LOADED, group).map(definition -> {
             String name = definition.getName();
             String path = definition.getPath();
             long timestamp = definition.getCreateTime();
@@ -269,11 +278,11 @@ public class PluginManager {
             }
             return new PluginSummary(name, formatSize(size),
                     formatTime(timestamp), state, timestamp);
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     protected List<PluginSummary> getUnloadedPluginSummaries(String group) {
-        return storage.getPluginDefinitions(PluginStorage.UNLOADED, group).map(definition -> {
+        return syncRead(() -> storage.getPluginDefinitions(PluginStorage.UNLOADED, group).map(definition -> {
             String name = definition.getName();
             long timestamp = definition.getCreateTime();
             long size = definition.getSize();
@@ -292,7 +301,7 @@ public class PluginManager {
             }
             return new PluginSummary(name, formatSize(size),
                     formatTime(timestamp), state, timestamp);
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()));
     }
 
     protected List<PluginSummary> getDeletedPluginSummaries(String group) {
@@ -367,10 +376,10 @@ public class PluginManager {
                 }
                 if (event instanceof PluginAutoLoadEvent ||
                         event instanceof PluginAutoLoadErrorEvent) {
-                    loadingSet.remove(path);
+                    syncWrite(() -> loadingSet.remove(path));
                 } else if (event instanceof PluginAutoUnloadEvent ||
                         event instanceof PluginAutoUnloadErrorEvent) {
-                    unloadingSet.remove(path);
+                    syncWrite(() -> unloadingSet.remove(path));
                 }
             }
         }

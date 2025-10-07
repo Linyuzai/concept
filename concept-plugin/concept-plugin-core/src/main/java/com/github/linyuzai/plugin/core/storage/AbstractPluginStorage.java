@@ -1,5 +1,6 @@
 package com.github.linyuzai.plugin.core.storage;
 
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,7 @@ import java.util.function.Function;
 
 @Getter
 @Setter
-public abstract class AbstractPluginStorage implements PluginStorage {
+public abstract class AbstractPluginStorage extends SyncSupport implements PluginStorage {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 

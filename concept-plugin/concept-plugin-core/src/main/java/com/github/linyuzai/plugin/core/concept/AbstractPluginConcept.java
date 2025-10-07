@@ -23,13 +23,13 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Setter
-public abstract class AbstractPluginConcept implements PluginConcept {
+public abstract class AbstractPluginConcept extends SyncSupport implements PluginConcept {
 
     protected PluginPathFactory pathFactory;
 
@@ -56,15 +56,15 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     protected PluginLogger logger;
 
-    protected Collection<PluginMetadataFactory> metadataFactories;
+    protected List<PluginMetadataFactory> metadataFactories;
 
-    protected Collection<PluginInterceptor> interceptors;
+    protected List<PluginFactory> factories;
 
-    protected Collection<PluginFactory> factories;
+    protected List<PluginHandler> handlers;
 
-    protected Collection<PluginHandler> handlers;
+    protected List<PluginHandlerFactory> handlerFactories;
 
-    protected Collection<PluginHandlerFactory> handlerFactories;
+    protected List<PluginInterceptor> interceptors;
 
     /**
      * 处理链
@@ -74,23 +74,25 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     /**
      * 正在加载的插件
      */
-    protected final Set<String> loading = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    protected final Set<String> loading = new HashSet<>();
 
     /**
      * 正在卸载的插件
      */
-    protected final Set<String> unloading = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    protected final Set<String> unloading = new HashSet<>();
 
     @Override
-    public synchronized void initialize() {
-        eventPublisher.publish(new PluginConceptInitializedEvent(this));
+    public void initialize() {
+        syncWrite(() -> eventPublisher.publish(new PluginConceptInitializedEvent(this)));
     }
 
     @Override
-    public synchronized void destroy() {
-        //卸载所有插件
-        repository.stream().forEach(it -> unload(it.getDefinition()));
-        eventPublisher.publish(new PluginConceptDestroyedEvent(this));
+    public void destroy() {
+        syncWrite(() -> {
+            //卸载所有插件
+            repository.stream().forEach(it -> unload(it.getDefinition()));
+            eventPublisher.publish(new PluginConceptDestroyedEvent(this));
+        });
     }
 
     @Override
@@ -99,10 +101,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public synchronized void addHandlers(Collection<? extends PluginHandler> handlers) {
-        this.handlers.addAll(handlers);
-        //重置处理链
-        resetHandlerChain();
+    public void addHandlers(Collection<? extends PluginHandler> handlers) {
+        syncWrite(() -> {
+            this.handlers.addAll(handlers);
+            //重置处理链
+            resetHandlerChain();
+        });
     }
 
     @Override
@@ -111,10 +115,12 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public synchronized void removeHandlers(Collection<? extends PluginHandler> handlers) {
-        this.handlers.removeAll(handlers);
-        //重置处理链
-        resetHandlerChain();
+    public void removeHandlers(Collection<? extends PluginHandler> handlers) {
+        syncWrite(() -> {
+            this.handlers.removeAll(handlers);
+            //重置处理链
+            resetHandlerChain();
+        });
     }
 
     /**
@@ -164,8 +170,8 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public synchronized void addInterceptor(Collection<? extends PluginInterceptor> interceptors) {
-        this.interceptors.addAll(interceptors);
+    public void addInterceptor(Collection<? extends PluginInterceptor> interceptors) {
+        syncWrite(() -> this.interceptors.addAll(interceptors));
     }
 
     @Override
@@ -174,56 +180,60 @@ public abstract class AbstractPluginConcept implements PluginConcept {
     }
 
     @Override
-    public synchronized void removeInterceptor(Collection<? extends PluginInterceptor> interceptors) {
-        this.interceptors.removeAll(interceptors);
+    public void removeInterceptor(Collection<? extends PluginInterceptor> interceptors) {
+        syncWrite(() -> this.interceptors.removeAll(interceptors));
     }
 
     @Override
-    public synchronized PluginContext createContext() {
+    public PluginContext createContext() {
         return contextFactory.create(this);
     }
 
     @Override
-    public synchronized PluginMetadata createMetadata(PluginDefinition definition, PluginContext context) {
-        for (PluginInterceptor interceptor : interceptors) {
-            interceptor.beforeCreateMetadata(definition, context);
-        }
-        for (PluginMetadataFactory factory : metadataFactories) {
-            PluginMetadata metadata = factory.create(definition, context);
-            if (metadata != null) {
-                for (PluginInterceptor interceptor : interceptors) {
-                    interceptor.afterCreateMetadata(metadata, definition, context);
+    public PluginMetadata createMetadata(PluginDefinition definition, PluginContext context) {
+        return syncWrite(() -> {
+            for (PluginMetadataFactory factory : metadataFactories) {
+                PluginMetadata metadata = factory.create(definition, context);
+                if (metadata != null) {
+                    return metadata;
                 }
-                return metadata;
             }
-        }
-        return null;
+            return null;
+        });
     }
 
     /**
      * 遍历插件工厂创建插件
      */
     @Override
-    public synchronized Plugin createPlugin(PluginDefinition definition, PluginContext context) {
-        for (PluginInterceptor interceptor : interceptors) {
-            interceptor.beforeCreatePlugin(definition, context);
-        }
-        PluginMetadata metadata = createMetadata(definition, context);
-        if (metadata == null) {
-            return null;
-        }
-        for (PluginFactory factory : factories) {
-            Plugin plugin = factory.create(definition, metadata, context);
-            if (plugin != null) {
-                plugin.setDefinition(definition);
-                plugin.setMetadata(metadata);
-                for (PluginInterceptor interceptor : interceptors) {
-                    interceptor.afterCreatePlugin(plugin, definition, context);
-                }
-                return plugin;
+    public Plugin createPlugin(PluginDefinition definition, PluginContext context) {
+        return syncWrite(() -> {
+            for (PluginInterceptor interceptor : interceptors) {
+                interceptor.beforeCreatePlugin(definition, context);
             }
-        }
-        return null;
+            for (PluginInterceptor interceptor : interceptors) {
+                interceptor.beforeCreateMetadata(definition, context);
+            }
+            PluginMetadata metadata = createMetadata(definition, context);
+            if (metadata == null) {
+                return null;
+            }
+            for (PluginInterceptor interceptor : interceptors) {
+                interceptor.afterCreateMetadata(metadata, definition, context);
+            }
+            for (PluginFactory factory : factories) {
+                Plugin plugin = factory.create(definition, metadata, context);
+                if (plugin != null) {
+                    plugin.setDefinition(definition);
+                    plugin.setMetadata(metadata);
+                    for (PluginInterceptor interceptor : interceptors) {
+                        interceptor.afterCreatePlugin(plugin, definition, context);
+                    }
+                    return plugin;
+                }
+            }
+            return null;
+        });
     }
 
     @Override
@@ -253,68 +263,70 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 插件创建后根据插件依赖进行解析提取
      */
     @Override
-    public synchronized void load(@NonNull Collection<? extends PluginDefinition> definitions,
-                                  @NonNull BiConsumer<PluginDefinition, Plugin> onSuccess,
-                                  @NonNull BiConsumer<PluginDefinition, Throwable> onError) {
-        List<PluginDefinition> list = new ArrayList<>();
-        for (PluginDefinition definition : definitions) {
-            String path = definition.getPath();
-            if (repository.contains(definition)) {
-                onError.accept(definition, new IllegalArgumentException("Plugin is already loaded: " + path));
-            } else {
-                loading.add(path);
-                list.add(definition);
-            }
-        }
-
-        BiConsumer<PluginDefinition, Plugin> success = (definition, plugin) -> {
-            loading.remove(definition.getPath());//移除正在加载的状态
-            repository.add(plugin);//添加到存储中
-            onSuccess.accept(definition, plugin);
-        };
-
-        BiConsumer<PluginDefinition, Throwable> error = (definition, e) -> {
-            loading.remove(definition.getPath());//移除正在加载的状态
-            if (e instanceof PluginLoadException) {
-                onError.accept(definition, e);
-            } else {
-                onError.accept(definition, new PluginLoadException(definition, e));
-            }
-        };
-
-        List<LoadingEntry> entries = new ArrayList<>();
-
-        for (PluginDefinition definition : list) {
-            String path = definition.getPath();
-            try {
-                //创建上下文
-                PluginContext context = createContext();
-                //初始化上下文
-                context.set(PluginConcept.class, this);
-                context.initialize();
-                //创建插件
-                Plugin plugin = createPlugin(definition, context);
-                if (plugin == null) {
-                    throw new PluginException("Plugin can not create: " + path);
+    public void load(@NonNull Collection<? extends PluginDefinition> definitions,
+                     @NonNull BiConsumer<PluginDefinition, Plugin> onSuccess,
+                     @NonNull BiConsumer<PluginDefinition, Throwable> onError) {
+        syncWrite(() -> {
+            List<PluginDefinition> list = new ArrayList<>();
+            for (PluginDefinition definition : definitions) {
+                String path = definition.getPath();
+                if (repository.contains(definition)) {
+                    onError.accept(definition, new IllegalArgumentException("Plugin is already loaded: " + path));
+                } else {
+                    loading.add(path);
+                    list.add(definition);
                 }
-                //初始化插件
-                plugin.setConcept(this);
-
-                context.set(Plugin.class, plugin);
-                eventPublisher.publish(new PluginCreatedEvent(plugin));
-
-                entries.add(new LoadingEntry(plugin, context));
-            } catch (Throwable e) {
-                eventPublisher.publish(new PluginCreateErrorEvent(definition, e));
-                error.accept(definition, e);
             }
-        }
 
-        //遍历所有创建成功的插件进行解析，同时处理依赖关系
-        while (!entries.isEmpty()) {
-            LoadingEntry entry = entries.remove(0);
-            doLoad(entry, entries, new Stack<>(), success, error);
-        }
+            BiConsumer<PluginDefinition, Plugin> success = (definition, plugin) -> {
+                loading.remove(definition.getPath());//移除正在加载的状态
+                repository.add(plugin);//添加到存储中
+                onSuccess.accept(definition, plugin);
+            };
+
+            BiConsumer<PluginDefinition, Throwable> error = (definition, e) -> {
+                loading.remove(definition.getPath());//移除正在加载的状态
+                if (e instanceof PluginLoadException) {
+                    onError.accept(definition, e);
+                } else {
+                    onError.accept(definition, new PluginLoadException(definition, e));
+                }
+            };
+
+            List<LoadingEntry> entries = new ArrayList<>();
+
+            for (PluginDefinition definition : list) {
+                String path = definition.getPath();
+                try {
+                    //创建上下文
+                    PluginContext context = createContext();
+                    //初始化上下文
+                    context.set(PluginConcept.class, this);
+                    context.initialize();
+                    //创建插件
+                    Plugin plugin = createPlugin(definition, context);
+                    if (plugin == null) {
+                        throw new PluginException("Plugin can not create: " + path);
+                    }
+                    //初始化插件
+                    plugin.setConcept(this);
+
+                    context.set(Plugin.class, plugin);
+                    eventPublisher.publish(new PluginCreatedEvent(plugin));
+
+                    entries.add(new LoadingEntry(plugin, context));
+                } catch (Throwable e) {
+                    eventPublisher.publish(new PluginCreateErrorEvent(definition, e));
+                    error.accept(definition, e);
+                }
+            }
+
+            //遍历所有创建成功的插件进行解析，同时处理依赖关系
+            while (!entries.isEmpty()) {
+                LoadingEntry entry = entries.remove(0);
+                doLoad(entry, entries, new Stack<>(), success, error);
+            }
+        });
     }
 
     /**
@@ -413,22 +425,24 @@ public abstract class AbstractPluginConcept implements PluginConcept {
      * 卸载插件。
      */
     @Override
-    public synchronized Plugin unload(@NonNull PluginDefinition definition) {
-        String path = definition.getPath();
-        unloading.add(path);
-        try {
-            Plugin removed = repository.remove(definition);
-            if (removed != null) {
-                removed.unload();
-                eventPublisher.publish(new PluginUnloadedEvent(removed));
+    public Plugin unload(@NonNull PluginDefinition definition) {
+        return syncWrite(() -> {
+            String path = definition.getPath();
+            unloading.add(path);
+            try {
+                Plugin removed = repository.remove(definition);
+                if (removed != null) {
+                    removed.unload();
+                    eventPublisher.publish(new PluginUnloadedEvent(removed));
+                }
+                return removed;
+            } catch (Throwable e) {
+                eventPublisher.publish(new PluginUnloadErrorEvent(definition, e));
+                throw new PluginUnloadException(definition, e);
+            } finally {
+                unloading.remove(path);
             }
-            return removed;
-        } catch (Throwable e) {
-            eventPublisher.publish(new PluginUnloadErrorEvent(definition, e));
-            throw new PluginUnloadException(definition, e);
-        } finally {
-            unloading.remove(path);
-        }
+        });
     }
 
     @Override
@@ -438,12 +452,32 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
     @Override
     public boolean isLoading(PluginDefinition definition) {
-        return loading.contains(definition.getPath());
+        return syncRead(() -> loading.contains(definition.getPath()));
     }
 
     @Override
     public boolean isUnloading(PluginDefinition definition) {
-        return unloading.contains(definition.getPath());
+        return syncRead(() -> unloading.contains(definition.getPath()));
+    }
+
+    public List<PluginMetadataFactory> getMetadataFactories() {
+        return syncRead(() -> Collections.unmodifiableList(metadataFactories));
+    }
+
+    public List<PluginFactory> getFactories() {
+        return syncRead(() -> Collections.unmodifiableList(factories));
+    }
+
+    public List<PluginHandler> getHandlers() {
+        return syncRead(() -> Collections.unmodifiableList(handlers));
+    }
+
+    public List<PluginHandlerFactory> getHandlerFactories() {
+        return syncRead(() -> Collections.unmodifiableList(handlerFactories));
+    }
+
+    public List<PluginInterceptor> getInterceptors() {
+        return syncRead(() -> Collections.unmodifiableList(interceptors));
     }
 
     @Getter
@@ -476,13 +510,13 @@ public abstract class AbstractPluginConcept implements PluginConcept {
 
         protected List<PluginMetadataFactory> metadataFactories = new ArrayList<>();
 
-        protected List<PluginInterceptor> interceptors = new ArrayList<>();
-
         protected List<PluginFactory> factories = new ArrayList<>();
 
         protected List<PluginHandler> handlers = new ArrayList<>();
 
         protected List<PluginHandlerFactory> handlerFactories = new ArrayList<>();
+
+        protected List<PluginInterceptor> interceptors = new ArrayList<>();
 
         protected List<PluginEventListener> eventListeners = new ArrayList<>();
 
@@ -562,21 +596,6 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B addMetadataFactories(Collection<? extends PluginMetadataFactory> factories) {
             this.metadataFactories.addAll(factories);
-            return (B) this;
-        }
-
-        /**
-         * 添加插件拦截器
-         */
-        public B addInterceptors(PluginInterceptor... interceptors) {
-            return addInterceptors(Arrays.asList(interceptors));
-        }
-
-        /**
-         * 添加插件拦截器
-         */
-        public B addInterceptors(Collection<? extends PluginInterceptor> interceptors) {
-            this.interceptors.addAll(interceptors);
             return (B) this;
         }
 
@@ -664,6 +683,21 @@ public abstract class AbstractPluginConcept implements PluginConcept {
          */
         public B addHandlerFactories(Collection<? extends PluginHandlerFactory> factories) {
             this.handlerFactories.addAll(factories);
+            return (B) this;
+        }
+
+        /**
+         * 添加插件拦截器
+         */
+        public B addInterceptors(PluginInterceptor... interceptors) {
+            return addInterceptors(Arrays.asList(interceptors));
+        }
+
+        /**
+         * 添加插件拦截器
+         */
+        public B addInterceptors(Collection<? extends PluginInterceptor> interceptors) {
+            this.interceptors.addAll(interceptors);
             return (B) this;
         }
 

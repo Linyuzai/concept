@@ -4,18 +4,18 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.exception.PluginException;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 动态插件提取器
  */
-public class DynamicExtractor implements MethodPluginExtractor {
+public class DynamicExtractor extends SyncSupport implements MethodPluginExtractor {
 
     /**
      * 方法参数对应的插件提取执行器缓存
@@ -32,7 +32,7 @@ public class DynamicExtractor implements MethodPluginExtractor {
     protected final Method[] methods;
 
     @Getter
-    protected final List<InvokerFactory> invokerFactories = new CopyOnWriteArrayList<>();
+    protected final List<InvokerFactory> invokerFactories = new ArrayList<>();
 
     public DynamicExtractor(Object target) {
         this(target, getPluginMethod(target));
@@ -76,39 +76,41 @@ public class DynamicExtractor implements MethodPluginExtractor {
 
     @Override
     public void addInvokerFactory(InvokerFactory factory) {
-        this.invokerFactories.add(factory);
+        syncWrite(() -> this.invokerFactories.add(factory));
     }
 
     @Override
     public void removeInvokerFactory(InvokerFactory factory) {
-        this.invokerFactories.remove(factory);
+        syncWrite(() -> this.invokerFactories.remove(factory));
     }
 
     @Override
-    public synchronized void initialize() {
-        methodInvokersMap.clear();
-        for (Method method : methods) {
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            //获得方法参数
-            Parameter[] parameters = method.getParameters();
-            for (int i = 0; i < parameters.length; i++) {
-                //根据参数获得提取执行器
-                Invoker invoker = createInvoker(method, parameters[i]);
-                if (invoker == null) {
-                    throw new PluginException("Can not invoke " + parameters[i]);
+    public void initialize() {
+        syncWrite(() -> {
+            methodInvokersMap.clear();
+            for (Method method : methods) {
+                if (!method.isAccessible()) {
+                    method.setAccessible(true);
                 }
-                methodInvokersMap.computeIfAbsent(method, m ->
-                        new LinkedHashMap<>()).put(i, invoker);
+                //获得方法参数
+                Parameter[] parameters = method.getParameters();
+                for (int i = 0; i < parameters.length; i++) {
+                    //根据参数获得提取执行器
+                    Invoker invoker = createInvoker(method, parameters[i]);
+                    if (invoker == null) {
+                        throw new PluginException("Can not invoke " + parameters[i]);
+                    }
+                    methodInvokersMap.computeIfAbsent(method, m ->
+                            new LinkedHashMap<>()).put(i, invoker);
+                }
             }
-        }
+        });
     }
 
     /**
      * 通过提取执行器工厂创建
      */
-    public Invoker createInvoker(Method method, Parameter parameter) {
+    protected Invoker createInvoker(Method method, Parameter parameter) {
         for (InvokerFactory invokerFactory : invokerFactories) {
             Invoker invoker = invokerFactory.create(method, parameter);
             if (invoker != null) {
@@ -130,46 +132,48 @@ public class DynamicExtractor implements MethodPluginExtractor {
     @SneakyThrows
     @Override
     public void extract(PluginContext context) {
-        for (Map.Entry<Method, Map<Integer, Invoker>> entry : methodInvokersMap.entrySet()) {
-            Method method = entry.getKey();
-            //方法参数对应的提取执行器
-            Map<Integer, Invoker> invokerMap = entry.getValue();
-            //方法入参
-            Object[] values = new Object[invokerMap.size()];
-            //是否匹配到插件
-            boolean matched = false;
-            for (Map.Entry<Integer, Invoker> invokerEntry : invokerMap.entrySet()) {
-                //方法参数下标
-                Integer index = invokerEntry.getKey();
-                Invoker invoker = invokerEntry.getValue();
-                Object invoked;
-                try {
-                    //获得参数值
-                    invoked = invoker.invoke(context);
-                } catch (Throwable e) {
-                    throw new PluginException("Invoke error on " + method.getName() + ", param " + index, e);
+        syncRead(() -> {
+            for (Map.Entry<Method, Map<Integer, Invoker>> entry : methodInvokersMap.entrySet()) {
+                Method method = entry.getKey();
+                //方法参数对应的提取执行器
+                Map<Integer, Invoker> invokerMap = entry.getValue();
+                //方法入参
+                Object[] values = new Object[invokerMap.size()];
+                //是否匹配到插件
+                boolean matched = false;
+                for (Map.Entry<Integer, Invoker> invokerEntry : invokerMap.entrySet()) {
+                    //方法参数下标
+                    Integer index = invokerEntry.getKey();
+                    Invoker invoker = invokerEntry.getValue();
+                    Object invoked;
+                    try {
+                        //获得参数值
+                        invoked = invoker.invoke(context);
+                    } catch (Throwable e) {
+                        throw new PluginException("Invoke error on " + method.getName() + ", param " + index, e);
+                    }
+                    if (invoked == null) {
+                        continue;
+                    }
+                    //设置参数值
+                    values[index] = invoked;
+                    //Plugin PluginContext 不会被视为匹配
+                    if (isExtractable(invoked)) {
+                        matched = true;
+                    }
                 }
-                if (invoked == null) {
-                    continue;
-                }
-                //设置参数值
-                values[index] = invoked;
-                //Plugin PluginContext 不会被视为匹配
-                if (isExtractable(invoked)) {
-                    matched = true;
+                //如果匹配到任意值则回调方法
+                if (matched) {
+                    try {
+                        method.invoke(target, values);
+                    } catch (Throwable e) {
+                        throw new PluginException("Invoke error on " + method.getName() + ", args " + Arrays.toString(values), e);
+                    }
+                    DynamicExtractedEvent event = new DynamicExtractedEvent(context, this, values, method, target);
+                    context.getConcept().getEventPublisher().publish(event);
                 }
             }
-            //如果匹配到任意值则回调方法
-            if (matched) {
-                try {
-                    method.invoke(target, values);
-                } catch (Throwable e) {
-                    throw new PluginException("Invoke error on " + method.getName() + ", args " + Arrays.toString(values), e);
-                }
-                DynamicExtractedEvent event = new DynamicExtractedEvent(context, this, values, method, target);
-                context.getConcept().getEventPublisher().publish(event);
-            }
-        }
+        });
     }
 
     /**
@@ -182,10 +186,10 @@ public class DynamicExtractor implements MethodPluginExtractor {
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends PluginHandler>[] getDependencies() {
-        return methodInvokersMap.values().stream()
+        return syncRead(() -> methodInvokersMap.values().stream()
                 .flatMap(it -> it.values().stream())
                 .flatMap(it -> Arrays.stream(it.getDependencies()))
                 .distinct()
-                .toArray(Class[]::new);
+                .toArray(Class[]::new));
     }
 }

@@ -1,11 +1,12 @@
 package com.github.linyuzai.plugin.core.concept;
 
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class AbstractPluginEntry implements Plugin.Entry {
+public abstract class AbstractPluginEntry extends SyncSupport implements Plugin.Entry {
 
     private final Plugin parent;
 

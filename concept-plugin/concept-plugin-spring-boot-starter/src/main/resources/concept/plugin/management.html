@@ -170,9 +170,9 @@
                                  @select="selectGroup" v-cloak>
                             <el-menu-item :index="group"
                                           v-for="group in group.list">
-                                    <!--<i v-if="group.state" class="el-icon-folder-checked"></i>-->
-                                    <!--<i v-else class="el-icon-folder-delete"></i>-->
-                                    <span slot="title">{{group}}</span>
+                                <!--<i v-if="group.state" class="el-icon-folder-checked"></i>-->
+                                <!--<i v-else class="el-icon-folder-delete"></i>-->
+                                <span slot="title">{{group}}</span>
                             </el-menu-item>
                         </el-menu>
                     </el-main>
@@ -264,17 +264,24 @@
                         </el-dialog>
                         <el-dialog title="回收站"
                                    :visible.sync="plugin.deleted.visible">
-                            <el-input placeholder="搜索插件"
-                                      v-model="plugin.deleted.search"
-                                      clearable>
-                                <i slot="prefix" class="el-input__icon el-icon-search"></i>
-                            </el-input>
-                            <el-button v-if="!auth.lock"
-                                       type="danger"
-                                       plain
-                                       icon="el-icon-warning-outline"
-                                       @click=""
-                                       style="width: 110px;margin-left: 20px">清空
+                            <el-row :gutter="20">
+                                <el-col :span="18">
+                                    <el-input placeholder="搜索插件"
+                                              v-model="plugin.deleted.search"
+                                              clearable>
+                                        <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                                    </el-input>
+                                </el-col>
+                                <el-col :span="6">
+                                    <el-button v-if="!auth.lock"
+                                               type="danger"
+                                               plain
+                                               icon="el-icon-warning-outline"
+                                               @click=""
+                                               style="width: 100%;float: right">清空
+                                    </el-button>
+                                </el-col>
+                            </el-row>
                             <el-table
                                     :data="plugin.deleted.list.filter(data => !plugin.deleted.search||data.plugin.toLowerCase().includes(plugin.deleted.search.toLowerCase()))"
                                     @selection-change=""

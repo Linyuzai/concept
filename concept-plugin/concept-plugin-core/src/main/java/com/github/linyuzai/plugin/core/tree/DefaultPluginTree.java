@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.tree;
 
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -63,7 +64,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
     @Getter
     @RequiredArgsConstructor
-    public class DefaultNode implements Node, NodeFactory {
+    public class DefaultNode extends SyncSupport implements Node, NodeFactory {
 
         private final Object id;
 
@@ -84,14 +85,16 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public int getSize(Predicate<Node> predicate) {
-            int size = 0;
-            if (predicate.test(this)) {
-                size++;
-            }
-            for (Node child : children) {
-                size += child.getSize(predicate);
-            }
-            return size;
+            return syncRead(() -> {
+                int size = 0;
+                if (predicate.test(this)) {
+                    size++;
+                }
+                for (Node child : children) {
+                    size += child.getSize(predicate);
+                }
+                return size;
+            });
         }
 
         @Override
@@ -105,27 +108,29 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
         }
 
         protected Node doMap(Node node, Node parent, Function<Node, Object> function, Predicate<Node> predicate) {
-            //转换当前节点
-            Object apply;
-            if (isTransformable(node)) {
-                if (!predicate.test(node)) {
-                    return null;
+            return syncWrite(() -> {
+                //转换当前节点
+                Object apply;
+                if (isTransformable(node)) {
+                    if (!predicate.test(node)) {
+                        return null;
+                    }
+                    apply = function.apply(node);
+                } else {
+                    apply = node.getValue();
                 }
-                apply = function.apply(node);
-            } else {
-                apply = node.getValue();
-            }
-            //创建当前节点的对应节点并使用转换后的值
-            DefaultNode create = createNode(node.getId(), node.getName(), apply, parent);
-            if (!node.getChildren().isEmpty()) {
-                //转换子节点
-                List<Node> collect = node.getChildren().stream()
-                        .map(it -> doMap(it, create, function, predicate))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
-                create.children.addAll(collect);
-            }
-            return create;
+                //创建当前节点的对应节点并使用转换后的值
+                DefaultNode create = createNode(node.getId(), node.getName(), apply, parent);
+                if (!node.getChildren().isEmpty()) {
+                    //转换子节点
+                    List<Node> collect = node.getChildren().stream()
+                            .map(it -> doMap(it, create, function, predicate))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    create.children.addAll(collect);
+                }
+                return create;
+            });
         }
 
         @Override
@@ -134,27 +139,31 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
         }
 
         public Node doFilter(Node node, Node parent, Predicate<Node> predicate) {
-            //过滤当前节点
-            if (isTransformable(node) && !predicate.test(node)) {
-                return null;
-            }
-            //拷贝当前节点
-            DefaultNode create = createNode(node.getId(), node.getName(), node.getValue(), parent);
-            if (!node.getChildren().isEmpty()) {
-                //过滤子节点
-                List<Node> collect = node.getChildren().stream()
-                        .map(it -> doFilter(it, create, predicate))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
-                create.children.addAll(collect);
-            }
-            return create;
+            return syncWrite(() -> {
+                //过滤当前节点
+                if (isTransformable(node) && !predicate.test(node)) {
+                    return null;
+                }
+                //拷贝当前节点
+                DefaultNode create = createNode(node.getId(), node.getName(), node.getValue(), parent);
+                if (!node.getChildren().isEmpty()) {
+                    //过滤子节点
+                    List<Node> collect = node.getChildren().stream()
+                            .map(it -> doFilter(it, create, predicate))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    create.children.addAll(collect);
+                }
+                return create;
+            });
         }
 
         @Override
         public void forEach(Consumer<Node> consumer) {
-            consumer.accept(this);
-            children.forEach(it -> it.forEach(consumer));
+            syncRead(() -> {
+                consumer.accept(this);
+                children.forEach(it -> it.forEach(consumer));
+            });
         }
 
         @Override
@@ -177,9 +186,11 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public DefaultNode create(Object id, String name, Object value) {
-            DefaultNode node = createNode(id, name, value, this);
-            children.add(node);
-            return node;
+            return syncWrite(() -> {
+                DefaultNode node = createNode(id, name, value, this);
+                children.add(node);
+                return node;
+            });
         }
 
         @Override
@@ -190,7 +201,7 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
     @Getter
     @RequiredArgsConstructor
-    public class TransformerStages implements InboundStage, TransformStage, OutboundStage {
+    public class TransformerStages extends SyncSupport implements InboundStage, TransformStage, OutboundStage {
 
         private final Object handler;
 
@@ -206,12 +217,14 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public Transformer.TransformStage inboundKey(Object inboundKey) {
-            List<TransformEntry> entries = transformMap.getOrDefault(inboundKey, Collections.emptyList());
-            if (entries.isEmpty()) {
-                throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
-            }
-            inbound = entries.get(0).getNode();
-            return this;
+            return syncRead(() -> {
+                List<TransformEntry> entries = transformMap.getOrDefault(inboundKey, Collections.emptyList());
+                if (entries.isEmpty()) {
+                    throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
+                }
+                inbound = entries.get(0).getNode();
+                return this;
+            });
         }
 
         @Override
@@ -227,19 +240,21 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public void outboundKey(Object outboundKey) {
-            TransformEntry entry = new TransformEntry(outbound, handler);
-            transformMap.computeIfAbsent(outboundKey, k -> new ArrayList<>()).add(0, entry);
+            syncWrite(() -> {
+                TransformEntry entry = new TransformEntry(outbound, handler);
+                transformMap.computeIfAbsent(outboundKey, k -> new ArrayList<>()).add(0, entry);
 
-            //设置追踪链
-            TracerStages ts = new TracerStages(entry);
-            if (trace == null) {
-                trace = ts;
-            }
-            if (current != null) {
-                ts.previous = current;
-                current.next = ts;
-            }
-            current = ts;
+                //设置追踪链
+                TracerStages ts = new TracerStages(entry);
+                if (trace == null) {
+                    trace = ts;
+                }
+                if (current != null) {
+                    ts.previous = current;
+                    current.next = ts;
+                }
+                current = ts;
+            });
         }
     }
 

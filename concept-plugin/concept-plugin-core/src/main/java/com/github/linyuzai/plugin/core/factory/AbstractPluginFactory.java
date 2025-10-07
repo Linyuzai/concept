@@ -3,16 +3,14 @@ package com.github.linyuzai.plugin.core.factory;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
-@Setter
 public abstract class AbstractPluginFactory implements PluginFactory, PluginMetadataFactory {
 
-    private Collection<PluginMetadata.Adapter> metadataAdapters = new ArrayList<>();
+    private final List<PluginMetadata.Adapter> metadataAdapters = new CopyOnWriteArrayList<>();
 
     protected PluginMetadata.Adapter getMetadataAdapter(String name) {
         for (PluginMetadata.Adapter adapter : metadataAdapters) {
@@ -22,5 +20,4 @@ public abstract class AbstractPluginFactory implements PluginFactory, PluginMeta
         }
         return null;
     }
-
 }

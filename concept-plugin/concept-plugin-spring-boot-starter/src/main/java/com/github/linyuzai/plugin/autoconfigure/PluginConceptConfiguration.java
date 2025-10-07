@@ -26,8 +26,10 @@ import com.github.linyuzai.plugin.core.handle.extract.*;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
+import com.github.linyuzai.plugin.core.intercept.AddListenersPluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.NestedDepthPluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
+import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.logger.PluginStandardLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
@@ -90,6 +92,11 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
+    public AddListenersPluginInterceptor addListenersPluginInterceptor(List<PluginListener> listeners) {
+        return new AddListenersPluginInterceptor(listeners);
+    }
+
+    @Bean
     @ConditionalOnMissingBean
     public PluginHandlerChainFactory pluginHandlerChainFactory() {
         return new DefaultPluginHandlerChainFactory();
@@ -133,7 +140,7 @@ public class PluginConceptConfiguration {
     public BinderPluginFactory jarStreamPluginFactory(PluginConceptProperties properties,
                                                       List<PluginMetadata.Adapter> adapters) {
         JarStreamPluginFactory pluginFactory = new JarStreamPluginFactory();
-        pluginFactory.setMetadataAdapters(adapters);
+        pluginFactory.getMetadataAdapters().addAll(adapters);
         BinderPluginFactory factory = new BinderPluginFactory();
         factory.setPluginFactory(pluginFactory);
         factory.setMetadataFactory(pluginFactory);
@@ -226,10 +233,10 @@ public class PluginConceptConfiguration {
                                        PluginEventPublisher eventPublisher,
                                        PluginLogger logger,
                                        List<PluginMetadataFactory> metadataFactories,
-                                       List<PluginInterceptor> interceptors,
                                        List<PluginFactory> factories,
                                        List<PluginHandler> handlers,
                                        List<PluginHandlerFactory> handlerFactories,
+                                       List<PluginInterceptor> interceptors,
                                        List<PluginEventListener> eventListeners) {
         return new DefaultPluginConcept.Builder()
                 .pathFactory(pathFactory)
@@ -241,10 +248,10 @@ public class PluginConceptConfiguration {
                 .eventPublisher(eventPublisher)
                 .logger(logger)
                 .addMetadataFactories(metadataFactories)
-                .addInterceptors(interceptors)
                 .addFactories(factories)
                 .addHandlers(handlers)
                 .addHandlerFactories(handlerFactories)
+                .addInterceptors(interceptors)
                 .addEventListeners(eventListeners)
                 .build();
     }

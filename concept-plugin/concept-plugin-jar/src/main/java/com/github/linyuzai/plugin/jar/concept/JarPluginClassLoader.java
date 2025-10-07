@@ -58,12 +58,8 @@ public class JarPluginClassLoader extends PluginClassLoader {
         if (content == null) {
             throw new ClassNotFoundException(name);
         }
-        try {
-            byte[] bytes = ReadUtils.read(content.getInputStream());
-            return defineClass(name, bytes, 0, bytes.length);
-        } catch (IOException e) {
-            throw new ClassNotFoundException(name, e);
-        }
+        byte[] bytes = ReadUtils.read(content.getInputStream());
+        return defineClass(name, bytes, 0, bytes.length);
     }
 
     /**

@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public class DefaultNestedType implements NestedType {
 
     protected NestedType parent;
 
-    protected List<NestedType> children = new ArrayList<>();
+    protected final List<NestedType> children = new ArrayList<>();
 
     public DefaultNestedType(Type type) {
         this(type, null);
@@ -44,5 +45,9 @@ public class DefaultNestedType implements NestedType {
     @Override
     public Class<?> toClass() {
         return cls;
+    }
+
+    public List<NestedType> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 }

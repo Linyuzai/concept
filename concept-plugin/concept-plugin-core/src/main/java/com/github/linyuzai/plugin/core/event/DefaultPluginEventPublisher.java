@@ -2,6 +2,7 @@ package com.github.linyuzai.plugin.core.event;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -12,7 +13,7 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     /**
      * 所有的监听器
      */
-    private final Collection<PluginEventListener> listeners = new CopyOnWriteArrayList<>();
+    private final List<PluginEventListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
      * 遍历所有的事件监听器发布事件
@@ -37,7 +38,7 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
     /**
      * 获得所有事件监听器
      */
-    public Collection<PluginEventListener> getEventListeners() {
-        return Collections.unmodifiableCollection(listeners);
+    public List<PluginEventListener> getEventListeners() {
+        return Collections.unmodifiableList(listeners);
     }
 }

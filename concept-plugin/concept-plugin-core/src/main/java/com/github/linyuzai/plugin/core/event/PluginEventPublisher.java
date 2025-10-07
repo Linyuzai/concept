@@ -36,6 +36,4 @@ public interface PluginEventPublisher {
      * 注销事件监听器
      */
     void unregister(Collection<? extends PluginEventListener> listeners);
-
-
 }

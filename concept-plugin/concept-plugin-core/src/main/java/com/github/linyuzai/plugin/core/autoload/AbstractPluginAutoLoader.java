@@ -7,11 +7,12 @@ import com.github.linyuzai.plugin.core.event.PluginConceptInitializedEvent;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
+import com.github.linyuzai.plugin.core.util.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
+public abstract class AbstractPluginAutoLoader extends SyncSupport implements PluginAutoLoader {
 
     protected final PluginConcept concept;
 
@@ -36,44 +37,38 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
     /**
      * 是否运行
      */
-    protected boolean running = false;
-
-    @Override
-    public synchronized void start() {
-        start(true);
-    }
+    protected volatile boolean running = false;
 
     /**
      * 开始监听
      */
     @Override
-    public synchronized void start(boolean load) {
-        //如果已经开始，直接忽略
-        if (running) {
-            return;
-        }
-        running = true;
-
-        concept.getEventPublisher().register(new PluginEventListener() {
-            @Override
-            public void onEvent(Object event) {
-                if (event instanceof PluginConceptInitializedEvent) {
-                    concept.getEventPublisher().unregister(this);
-                    if (load) {
-                        //加载已经存在的插件
-                        loadedOnStart(loadPlugins());
-                    }
-                    listen(executor);
-                }
+    public void start() {
+        syncWrite(() -> {
+            //如果已经开始，直接忽略
+            if (running) {
+                return;
             }
+            running = true;
+            concept.getEventPublisher().register(new PluginEventListener() {
+                @Override
+                public void onEvent(Object event) {
+                    if (event instanceof PluginConceptInitializedEvent) {
+                        concept.getEventPublisher().unregister(this);
+                        //加载已经存在的插件
+                        onStart(loadPlugins());
+                        listen(executor);
+                    }
+                }
+            });
         });
     }
 
-    protected void loadedOnStart(Collection<? extends PluginDefinition> definitions) {
+    protected void onStart(List<? extends PluginDefinition> definitions) {
 
     }
 
-    protected Collection<PluginDefinition> loadPlugins() {
+    protected List<PluginDefinition> loadPlugins() {
         List<PluginDefinition> definitions = getPluginDefinitions();
         concept.load(definitions,
                 (definition, plugin) ->
@@ -83,6 +78,15 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
         return definitions;
     }
 
+    @Override
+    public void refresh() {
+        try {
+            onRefresh(getPluginDefinitions());
+        } catch (Throwable e) {
+            onError(e);
+        }
+    }
+
     protected List<PluginDefinition> getPluginDefinitions() {
         return storage.getGroups()
                 .stream()
@@ -90,24 +94,23 @@ public abstract class AbstractPluginAutoLoader implements PluginAutoLoader {
                 .collect(Collectors.toList());
     }
 
-    protected abstract void listen(PluginExecutor executor);
-
-    @Override
-    public void addGroup(String group) {
-        this.storage.addGroup(group);
+    protected void listen(PluginExecutor executor) {
+        long period = getPeriod();
+        if (period > 0) {
+            executor.schedule(this::refresh, period, TimeUnit.MILLISECONDS);
+        }
     }
 
-    @Override
-    public Boolean getGroupState(String group) {
-        return true;
-    }
+    protected abstract long getPeriod();
+
+    protected abstract void onRefresh(List<PluginDefinition> definitions);
 
     /**
      * 停止监听
      */
     @Override
-    public synchronized void stop() {
-        running = false;
+    public void stop() {
+        syncWrite(() -> running = false);
     }
 
     /**

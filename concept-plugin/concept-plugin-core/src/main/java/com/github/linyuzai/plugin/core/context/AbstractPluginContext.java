@@ -3,16 +3,16 @@ package com.github.linyuzai.plugin.core.context;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 插件上下文抽象类
  */
 @Getter
-@Setter
+@RequiredArgsConstructor
 public abstract class AbstractPluginContext implements PluginContext {
 
-    protected PluginContext parent;
+    protected final PluginContext parent;
 
     @Override
     public PluginConcept getConcept() {

@@ -1,22 +1,24 @@
 package com.github.linyuzai.plugin.core.handle.resolve;
 
+import com.github.linyuzai.plugin.core.util.SyncSupport;
+
 import java.util.function.Supplier;
 
 /**
  * 延迟加载的内容
  */
-public abstract class AbstractSupplier<T> implements Supplier<T> {
+public abstract class AbstractSupplier<T> extends SyncSupport implements Supplier<T> {
 
     private volatile T supplied;
 
     @Override
     public T get() {
         if (supplied == null) {
-            synchronized (this) {
+            syncWrite(() -> {
                 if (supplied == null) {
                     supplied = create();
                 }
-            }
+            });
         }
         return supplied;
     }

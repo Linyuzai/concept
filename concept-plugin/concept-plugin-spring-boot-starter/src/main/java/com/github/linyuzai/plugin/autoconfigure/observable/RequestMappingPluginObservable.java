@@ -1,7 +1,9 @@
 package com.github.linyuzai.plugin.autoconfigure.observable;
 
 import com.github.linyuzai.plugin.autoconfigure.bean.BeanExtractor;
+import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
+import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +15,7 @@ import java.util.function.BiConsumer;
 public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<String, ?>>
         implements PluginObservable<String, Class<?>> {
 
-    private final Map<String, Class<?>> requestMappingMap = newMap();
+    private final Map<String, Class<?>> requestMappingMap = new ConcurrentHashMap<>();
 
     @Override
     public Collection<String> keys() {
@@ -55,14 +57,13 @@ public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<S
             doRegister(type, requestMapping, destroyList);
             requestMappingMap.put(path, type);
         }
-        context.getPlugin().addUnloadListener(p -> {
-            requestMappingMap.keySet().removeAll(requestMappings.keySet());
-            destroyList.forEach(Runnable::run);
+        context.getPlugin().addListener(new PluginListener() {
+            @Override
+            public void onUnload(Plugin p) {
+                requestMappingMap.keySet().removeAll(requestMappings.keySet());
+                destroyList.forEach(Runnable::run);
+            }
         });
-    }
-
-    protected Map<String, Class<?>> newMap() {
-        return new ConcurrentHashMap<>();
     }
 
     protected abstract void doRegister(Class<?> type, Object requestMapping, List<Runnable> destroyList);
