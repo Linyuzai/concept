@@ -42,6 +42,10 @@
             height: 0;
         }
 
+        /*.el-table td, .el-table th {
+            border-bottom-width: 0;
+        }*/
+
         .dialog-content {
             max-height: 350px;
             overflow-y: scroll
@@ -143,7 +147,7 @@
             </svg>
         </a>
         <el-container>
-            <el-aside>
+            <el-aside style="width: 260px;">
                 <el-container>
                     <el-header style="height: 80px;border-right: solid 1px #e6e6e6;">
                         <!--<el-input placeholder="搜索分组"
@@ -160,12 +164,13 @@
                         <el-button-group style="margin-top: 20px; float: right">
                             <el-button v-if="!auth.lock" @click="openGroupDialog"
                                        icon="el-icon-plus"></el-button>
-                            <el-button @click="refreshGroups" icon="el-icon-refresh"></el-button>
+                            <el-button @click="refreshGroups('')" icon="el-icon-refresh"></el-button>
                             <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
                         </el-button-group>
                     </el-header>
                     <el-main style="padding: 0">
-                        <el-menu style="height: 100%"
+                        <el-menu v-if="group.ready"
+                                 style="height: 100%"
                                  :default-active="group.select"
                                  @select="selectGroup" v-cloak>
                             <el-menu-item :index="group"
@@ -175,6 +180,15 @@
                                 <span slot="title">{{group}}</span>
                             </el-menu-item>
                         </el-menu>
+                        <!--<el-table ref="groupTable"
+                                  :data="group.list"
+                                  style="width: 100%;padding-left:20px;cursor: pointer"
+                                  height="100%"
+                                  highlight-current-row
+                                  @current-change="selectGroup">
+                            <el-table-column prop="name" label="分组" sortable>
+                            </el-table-column>
+                        </el-table>-->
                     </el-main>
                 </el-container>
                 <el-dialog title="添加分组"
@@ -216,8 +230,8 @@
                         </el-form-item>
                     </el-form>
                     <div class="dialog-footer" slot="footer">
-                        <el-button @click="auth.lock = true;auth.unlock.visible = false;" v-cloak>取
-                            消
+                        <el-button @click="auth.lock = true;auth.unlock.visible = false;" v-cloak>
+                            取 消
                         </el-button>
                         <el-button @click="unlock" type="primary" v-cloak>解 锁</el-button>
                     </div>
@@ -294,11 +308,11 @@
                                 </el-table-column>
                                 <el-table-column prop="plugin" label="插件包" sortable fixed>
                                 </el-table-column>
-                                <el-table-column prop="size" label="插件大小" sortable>
+                                <el-table-column prop="size" label="插件大小" sortable width="100">
                                 </el-table-column>
-                                <el-table-column prop="createTime" label="上传时间" sortable>
+                                <el-table-column prop="createTime" label="上传时间" sortable width="170">
                                 </el-table-column>
-                                <el-table-column label="操作" prop="url" fixed="right">
+                                <el-table-column label="操作" prop="url" fixed="right" width="60">
                                     <template slot="header">操作
                                         <span class="caret-wrapper" style="width: 0"></span>
                                     </template>
@@ -330,11 +344,11 @@
                             </el-table-column>
                             <!--<el-table-column prop="name" label="插件名称" sortable width="150">
                             </el-table-column>-->
-                            <el-table-column prop="size" label="插件大小" sortable>
+                            <el-table-column prop="size" label="插件大小" sortable width="100">
                             </el-table-column>
-                            <el-table-column prop="createTime" label="上传时间" sortable>
+                            <el-table-column prop="createTime" label="上传时间" sortable width="170">
                             </el-table-column>
-                            <el-table-column prop="state" label="插件状态" sortable fixed="right">
+                            <el-table-column prop="state" label="插件状态" sortable width="110" fixed="right">
                                 <template slot="header">插件状态</template>
                                 <template slot-scope="scope">
                                     <el-tag :type="getStateType(scope.row.state)">
@@ -587,7 +601,7 @@
             },
             group: {
                 select: '',
-                badge: true,
+                ready: false,
                 list: [],
                 add: {
                     visible: false,
@@ -717,19 +731,25 @@
                 this.group.select = index;
                 this.refreshPlugins();
             },
-            refreshGroups() {
+            refreshGroups(select) {
+                console.log(select);
                 this._get(getGroupUrl('list'), (response) => {
                     let body = response;
                     if (body.success) {
+                        this.group.ready = false;
+                        this.group.select = select;
                         this.group.list = body.data;
-                        if (this.group.list.length > 0) {
-                            if (this.group.select === '') {
-                                this.group.select = this.group.list[0];
+                        this.$nextTick(() => {
+                            this.group.ready = true;
+                            if (this.group.list.length > 0) {
+                                if (this.group.select === '') {
+                                    this.group.select = this.group.list[0];
+                                }
+                            } else {
+                                this.group.select = '';
                             }
-                        } else {
-                            this.group.select = '';
-                        }
-                        this.refreshPlugins();
+                            this.refreshPlugins();
+                        });
                     } else {
                         this.group.list = [];
                         this.group.select = '';
@@ -752,7 +772,7 @@
                             let body = response;
                             if (body.success) {
                                 this.group.add.visible = false;
-                                this.refreshGroups();
+                                this.refreshGroups(this.group.add.form.name);
                             } else {
                                 this.$notify({
                                     title: '失败',
@@ -1046,7 +1066,7 @@
         mounted: function () {
             this.initSettings();
             this.initHelp();
-            this.refreshGroups();
+            this.refreshGroups('');
         }
     });
 </script>

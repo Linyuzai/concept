@@ -387,6 +387,15 @@ public class PluginManager extends SyncSupport {
 
     @Getter
     @RequiredArgsConstructor
+    public static class GroupSummary {
+
+        private final Integer index;
+
+        private final String name;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
     public static class MetadataSummary {
 
         private final String name;
