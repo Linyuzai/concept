@@ -732,7 +732,6 @@
                 this.refreshPlugins();
             },
             refreshGroups(select) {
-                console.log(select);
                 this._get(getGroupUrl('list'), (response) => {
                     let body = response;
                     if (body.success) {

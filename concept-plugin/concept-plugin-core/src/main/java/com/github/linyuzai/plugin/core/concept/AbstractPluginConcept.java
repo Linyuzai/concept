@@ -23,7 +23,7 @@ import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
-import com.github.linyuzai.plugin.core.util.SyncSupport;
+import com.github.linyuzai.plugin.core.sync.SyncSupport;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

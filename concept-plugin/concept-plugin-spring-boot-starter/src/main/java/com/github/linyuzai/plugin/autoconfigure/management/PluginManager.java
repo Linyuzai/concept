@@ -11,7 +11,7 @@ import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
-import com.github.linyuzai.plugin.core.util.SyncSupport;
+import com.github.linyuzai.plugin.core.sync.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

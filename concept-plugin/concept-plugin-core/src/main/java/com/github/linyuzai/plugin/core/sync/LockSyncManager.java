@@ -1,14 +1,15 @@
-package com.github.linyuzai.plugin.core.util;
+package com.github.linyuzai.plugin.core.sync;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
-public abstract class SyncSupport {
+public class LockSyncManager implements SyncManager {
 
     protected ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    protected void syncRead(Runnable runnable) {
+    @Override
+    public void syncRead(Runnable runnable) {
         lock.readLock().lock();
         try {
             runnable.run();
@@ -17,7 +18,8 @@ public abstract class SyncSupport {
         }
     }
 
-    protected <T> T syncRead(Supplier<T> supplier) {
+    @Override
+    public <T> T syncRead(Supplier<T> supplier) {
         lock.readLock().lock();
         try {
             return supplier.get();
@@ -26,7 +28,8 @@ public abstract class SyncSupport {
         }
     }
 
-    protected void syncWrite(Runnable runnable) {
+    @Override
+    public void syncWrite(Runnable runnable) {
         lock.writeLock().lock();
         try {
             runnable.run();
@@ -35,7 +38,8 @@ public abstract class SyncSupport {
         }
     }
 
-    protected <T> T syncWrite(Supplier<T> supplier) {
+    @Override
+    public <T> T syncWrite(Supplier<T> supplier) {
         lock.writeLock().lock();
         try {
             return supplier.get();

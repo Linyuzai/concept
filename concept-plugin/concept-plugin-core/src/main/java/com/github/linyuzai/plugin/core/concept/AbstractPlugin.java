@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
-import com.github.linyuzai.plugin.core.util.SyncSupport;
+import com.github.linyuzai.plugin.core.sync.SyncSupport;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

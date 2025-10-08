@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.handle.resolve;
 
-import com.github.linyuzai.plugin.core.util.SyncSupport;
+import com.github.linyuzai.plugin.core.sync.SyncSupport;
 
 import java.util.function.Supplier;
 

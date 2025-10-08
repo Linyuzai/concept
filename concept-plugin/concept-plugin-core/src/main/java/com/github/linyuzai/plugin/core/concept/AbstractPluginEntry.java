@@ -1,6 +1,6 @@
 package com.github.linyuzai.plugin.core.concept;
 
-import com.github.linyuzai.plugin.core.util.SyncSupport;
+import com.github.linyuzai.plugin.core.sync.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
