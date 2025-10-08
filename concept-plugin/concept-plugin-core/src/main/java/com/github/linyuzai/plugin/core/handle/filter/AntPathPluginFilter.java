@@ -2,10 +2,8 @@ package com.github.linyuzai.plugin.core.handle.filter;
 
 import com.github.linyuzai.plugin.core.util.AntPathMatcher;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 

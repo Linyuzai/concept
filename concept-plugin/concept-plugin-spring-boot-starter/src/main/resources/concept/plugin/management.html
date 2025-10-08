@@ -149,7 +149,7 @@
         <el-container>
             <el-aside style="width: 260px;">
                 <el-container>
-                    <el-header style="height: 80px;border-right: solid 1px #e6e6e6;">
+                    <el-header style="height: 80px;">
                         <!--<el-input placeholder="搜索分组"
                                   v-model="group.search"
                                   clearable>
@@ -164,13 +164,13 @@
                         <el-button-group style="margin-top: 20px; float: right">
                             <el-button v-if="!auth.lock" @click="openGroupDialog"
                                        icon="el-icon-plus"></el-button>
-                            <el-button @click="refreshGroups('')" icon="el-icon-refresh"></el-button>
+                            <el-button @click="refreshGroups(group.select)" icon="el-icon-refresh"></el-button>
                             <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
                         </el-button-group>
                     </el-header>
                     <el-main style="padding: 0">
                         <el-menu v-if="group.ready"
-                                 style="height: 100%"
+                                 style="height: 100%;border-right-width: 0"
                                  :default-active="group.select"
                                  @select="selectGroup" v-cloak>
                             <el-menu-item :index="group"
@@ -237,7 +237,7 @@
                     </div>
                 </el-dialog>
             </el-aside>
-            <el-main style="height: 100%;padding-bottom: 0">
+            <el-main style="height: 100%;padding-bottom: 0;border-left: solid 1px #e6e6e6;">
                 <el-container style="height: 100%;">
                     <el-header style="padding: 0;text-align: left; font-size: 12px;" v-cloak>
                         <el-input placeholder="搜索插件"
@@ -326,11 +326,11 @@
                             </el-table>
                         </el-dialog>
                     </el-header>
-                    <el-main ref="tableMain" style="height:100%;padding: 0">
+                    <el-main ref="tableMain" style="height:100%;padding: 0;">
                         <el-table
                                 :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
                                 @selection-change=""
-                                style="width: 100%;border-bottom-width: 0"
+                                style="width: 100%;border-bottom-width: 0;"
                                 height="100%">
                             <!--<el-table-column type="selection" fixed width="25">
                             </el-table-column>-->

@@ -20,9 +20,9 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     public static final String DEFAULT_LOCATION = "concept-plugin";
 
-    public static final String METADATA_STATUS = "concept-plugin.status";
+    public static final String METADATA_STATUS = "concept-plugin-status";
 
-    public static final String METADATA_CREATE_TIME = "concept-plugin.create-time";
+    public static final String METADATA_CREATE_TIME = "concept-plugin-create-time";
 
     private String bucket = DEFAULT_LOCATION;
 

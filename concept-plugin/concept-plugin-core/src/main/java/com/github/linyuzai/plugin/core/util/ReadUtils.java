@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class ReadUtils {
