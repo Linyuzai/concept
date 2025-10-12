@@ -41,7 +41,7 @@ public class ReactiveRequestMappingPluginObservable extends RequestMappingPlugin
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         //this.applicationContext = (ConfigurableApplicationContext) applicationContext;
-        this.handlerMapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
+        this.handlerMapping = getRequestMappingHandlerMapping(applicationContext, RequestMappingHandlerMapping.class);
         this.getMappingForMethod = RequestMappingHandlerMapping.class
                 .getDeclaredMethod("getMappingForMethod", Method.class, Class.class);
         this.getMappingForMethod.setAccessible(true);

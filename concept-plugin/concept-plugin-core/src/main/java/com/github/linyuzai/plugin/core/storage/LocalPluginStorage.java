@@ -154,7 +154,7 @@ public class LocalPluginStorage extends AbstractPluginStorage {
 
     @Override
     public void clearDeleted(String group) {
-        File directory = getGroupDirectory(group);
+        File directory = getPluginDirectory(DELETED, group);
         File[] files = directory.listFiles();
         if (files == null) {
             return;

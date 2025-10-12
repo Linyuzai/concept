@@ -5,6 +5,8 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.listener.PluginListener;
 import com.github.linyuzai.plugin.jar.handle.extract.match.PluginClassAnnotation;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,6 +66,19 @@ public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<S
                 destroyList.forEach(Runnable::run);
             }
         });
+    }
+
+    protected <T> T getRequestMappingHandlerMapping(
+            ApplicationContext applicationContext, Class<T> type) {
+        Map<String, T> beans = applicationContext.getBeansOfType(type);
+        for (Map.Entry<String, T> entry : beans.entrySet()) {
+            if (entry.getValue().getClass() == type ||
+                    "requestMappingHandlerMapping".equals(entry.getKey()) ||
+                    entry.getKey().startsWith("org.springframework.web.")) {
+                return entry.getValue();
+            }
+        }
+        throw new NoSuchBeanDefinitionException("No RequestMappingHandlerMapping found");
     }
 
     protected abstract void doRegister(Class<?> type, Object requestMapping, List<Runnable> destroyList);

@@ -291,7 +291,7 @@
                                                type="danger"
                                                plain
                                                icon="el-icon-warning-outline"
-                                               @click=""
+                                               @click="clearDeleted"
                                                style="width: 100%;float: right">清空
                                     </el-button>
                                 </el-col>
@@ -829,6 +829,22 @@
                     this.plugin.deleted.visible = true;
                 }, () => {
                     this.plugin.deleted.visible = true;
+                });
+            },
+            clearDeleted() {
+                let params = {group: this.group.select};
+                this._post(getPluginUrl('clear'), params, (response) => {
+                    let body = response;
+                    if (body.success) {
+                        this.openDeletedPluginsDialog();
+                    } else {
+                        this.$notify({
+                            title: '失败',
+                            message: body.message,
+                            type: 'error'
+                        });
+                        console.log(response);
+                    }
                 });
             },
             refreshPlugins() {
