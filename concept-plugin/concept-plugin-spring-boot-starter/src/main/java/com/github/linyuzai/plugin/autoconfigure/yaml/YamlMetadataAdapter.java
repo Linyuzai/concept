@@ -1,4 +1,4 @@
-package com.github.linyuzai.plugin.autoconfigure.yaml.properties;
+package com.github.linyuzai.plugin.autoconfigure.yaml;
 
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.metadata.PropertiesMetadata;
@@ -7,7 +7,7 @@ import org.springframework.core.io.InputStreamResource;
 
 import java.io.InputStream;
 
-public class YamlPropertiesMetadataAdapter implements PluginMetadata.Adapter {
+public class YamlMetadataAdapter implements PluginMetadata.Adapter {
 
     @Override
     public boolean support(String name) {

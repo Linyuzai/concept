@@ -7,9 +7,8 @@ import com.github.linyuzai.plugin.autoconfigure.logger.CommonsPluginLogger;
 import com.github.linyuzai.plugin.autoconfigure.metadata.BinderPluginFactory;
 import com.github.linyuzai.plugin.autoconfigure.preperties.PluginConceptProperties;
 import com.github.linyuzai.plugin.autoconfigure.processor.ConceptPluginProcessor;
+import com.github.linyuzai.plugin.autoconfigure.yaml.YamlMetadataAdapter;
 import com.github.linyuzai.plugin.autoconfigure.yaml.YamlResolver;
-import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesMetadataAdapter;
-import com.github.linyuzai.plugin.autoconfigure.yaml.properties.YamlPropertiesResolver;
 import com.github.linyuzai.plugin.core.concept.DefaultPluginConcept;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
@@ -132,8 +131,8 @@ public class PluginConceptConfiguration {
     }
 
     @Bean
-    public YamlPropertiesMetadataAdapter yamlPropertiesMetadataAdapter() {
-        return new YamlPropertiesMetadataAdapter();
+    public YamlMetadataAdapter yamlPropertiesMetadataAdapter() {
+        return new YamlMetadataAdapter();
     }
 
     @Bean
@@ -169,11 +168,6 @@ public class PluginConceptConfiguration {
     @Bean
     public YamlResolver pluginYamlResolver() {
         return new YamlResolver();
-    }
-
-    @Bean
-    public YamlPropertiesResolver pluginYamlPropertiesResolver() {
-        return new YamlPropertiesResolver();
     }
 
     @Bean

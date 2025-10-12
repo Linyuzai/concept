@@ -82,23 +82,31 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                     continue;
                 }
                 for (Class<? extends PluginHandler> dependency : dependencies) {
-                    //判断是否存在处理器类型对应的处理器
-                    PluginHandler dependence = findDependency(dependency, unsorted);
-                    if (dependence == null) {
-                        throwDependencyNotFound(dependency);
-                    }
-                    //添加处理器并处理依赖关系
-                    resolveDependency(dependence, unsorted, container);
+                    doResolveDependency(dependency, unsorted, container);
                 }
             }
         }
         return container;
     }
 
+    protected void doResolveDependency(Class<? extends PluginHandler> dependency,
+                                       Collection<? extends PluginHandler> handlers,
+                                       Collection<PluginHandler> container) {
+        //判断是否存在处理器类型对应的处理器
+        Collection<PluginHandler> find = findDependencies(dependency, handlers);
+        if (find.isEmpty()) {
+            throwDependencyNotFound(dependency);
+        }
+        //添加处理器并处理依赖关系
+        for (PluginHandler dependence : find) {
+            doResolveDependency(dependence, handlers, container);
+        }
+    }
+
     //TODO 循环依赖校验
-    protected void resolveDependency(PluginHandler handler,
-                                     Collection<PluginHandler> handlers,
-                                     Collection<PluginHandler> container) {
+    protected void doResolveDependency(PluginHandler handler,
+                                       Collection<? extends PluginHandler> handlers,
+                                       Collection<PluginHandler> container) {
         //Stack<PluginHandler> stack = new Stack<>();
         if (handler instanceof PluginHandler.Dependency) {
             //获得依赖的处理器类型
@@ -112,13 +120,7 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
                         //依赖的处理器已经存在
                         continue;
                     }
-                    //判断是否存在处理器类型对应的处理器
-                    PluginHandler dependence = findDependency(dependency, handlers);
-                    if (dependence == null) {
-                        throwDependencyNotFound(dependency);
-                    }
-                    //添加处理器并处理依赖关系
-                    resolveDependency(dependence, handlers, container);
+                    doResolveDependency(dependency, handlers, container);
                 }
                 addHandler(handler, container);
             }
@@ -143,14 +145,9 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
     /**
      * 是否存在处理器类型对应的处理器
      */
-    protected PluginHandler findDependency(Class<? extends PluginHandler> dependency,
-                                           Collection<? extends PluginHandler> handlers) {
-        for (PluginHandler handler : handlers) {
-            if (dependency.isInstance(handler)) {
-                return handler;
-            }
-        }
-        return null;
+    protected Collection<PluginHandler> findDependencies(Class<? extends PluginHandler> dependency,
+                                                         Collection<? extends PluginHandler> handlers) {
+        return handlers.stream().filter(dependency::isInstance).collect(Collectors.toList());
     }
 
     /**
