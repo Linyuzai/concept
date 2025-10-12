@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @EnableConfigurationProperties(PluginConceptProperties.class)
 @Import({PluginStorageConfiguration.class,
+        PluginExtensionConfiguration.class,
         PluginConceptConfiguration.class,
         PluginAutoloadConfiguration.class,
         PluginManagementConfiguration.class})

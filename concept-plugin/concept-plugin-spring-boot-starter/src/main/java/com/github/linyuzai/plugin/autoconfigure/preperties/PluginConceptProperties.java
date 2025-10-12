@@ -106,7 +106,7 @@ public class PluginConceptProperties {
         @Data
         public static class RequestMappingProperties {
 
-            private boolean enabled = true;
+            private boolean enabled;
         }
     }
 
