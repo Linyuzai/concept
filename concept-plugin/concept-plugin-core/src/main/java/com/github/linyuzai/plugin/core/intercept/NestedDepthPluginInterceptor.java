@@ -26,7 +26,7 @@ public class NestedDepthPluginInterceptor implements PluginInterceptor {
         while (ctx != null) {
             depth++;
             if (depth > maxNestedDepth) {
-                throw new PluginException("Max nested depth > " + maxNestedDepth + ": " + definition.getPath());
+                throw new PluginException("Max nested depth > " + maxNestedDepth);
             }
             ctx = ctx.getParent();
         }

@@ -33,7 +33,7 @@ public class ReadUtils {
             os.write(buffer, 0, n);
             count += n;
             if (readLimit > 0 && count > readLimit) {
-                throw new IllegalArgumentException("Read limit exceeded:" + readLimit);
+                throw new IllegalArgumentException("Read limit exceeded: " + readLimit);
             }
         }
         return os.toByteArray();
