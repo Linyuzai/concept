@@ -112,7 +112,7 @@
     <!--:style="{top: buttonTop + 'px',left: buttonLeft + 'px'}"-->
     <el-button class="floating-button"
                @click="help.visible = true">
-        <i class="el-icon-question el-icon--left" style="margin-right: 10px"></i>
+        <i class="el-icon-question el-icon&#45;&#45;left" style="margin-right: 10px"></i>
         帮助
     </el-button>
     <el-dialog
@@ -121,8 +121,21 @@
         <div class="dialog-content" v-html="help.html">
         </div>
     </el-dialog>
+    <a v-if="setting.githubCorner.display" href="https://github.com/Linyuzai/concept" target="_blank"
+       class="github-corner"
+       aria-label="View source on GitHub">
+        <svg width="80" height="80" viewBox="0 0 250 250"
+             style="fill:#303133; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+             aria-hidden="true">
+            <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+            <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+                  fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+            <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+                  fill="currentColor" class="octo-body"></path>
+        </svg>
+    </a>
     <el-container style="height: 100vh">
-        <el-header v-if="setting.header.display" class="header">
+        <el-header v-if="setting.header.display" class="header" style="height: 80px">
             <h1>
                 <!--#409EFF-->
                 <!--#303133-->
@@ -132,175 +145,205 @@
                     {{setting.header.title.text}}
                 </span>
             </h1>
+            <!--<el-select v-model="i18n.value" style="padding-right: 20px;float: right">
+                <el-option
+                        v-for="option in i18n.options"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value">
+                </el-option>
+            </el-select>-->
         </el-header>
-        <a v-if="setting.githubCorner.display" href="https://github.com/Linyuzai/concept" target="_blank"
-           class="github-corner"
-           aria-label="View source on GitHub">
-            <svg width="80" height="80" viewBox="0 0 250 250"
-                 style="fill:#303133; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
-                 aria-hidden="true">
-                <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-                <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
-                      fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-                <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
-                      fill="currentColor" class="octo-body"></path>
-            </svg>
-        </a>
-        <el-container>
-            <el-aside style="width: 260px;">
-                <el-container>
-                    <el-header style="height: 80px;">
-                        <!--<el-input placeholder="搜索分组"
-                                  v-model="group.search"
-                                  clearable>
-                            <i slot="prefix" class="el-input__icon el-icon-search"></i>
-                        </el-input>-->
-                        <el-switch
-                                style="margin-top: 30px"
-                                @change="lock"
-                                v-model="auth.switch"
-                                active-text="锁定">
-                        </el-switch>
-                        <el-button-group style="margin-top: 20px; float: right">
-                            <el-button v-if="!auth.lock" @click="openGroupDialog"
-                                       icon="el-icon-plus"></el-button>
-                            <el-button @click="refreshGroups(group.select)" icon="el-icon-refresh"></el-button>
-                            <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
-                        </el-button-group>
-                    </el-header>
-                    <el-main style="padding: 0">
-                        <el-menu v-if="group.ready"
-                                 style="height: 100%;border-right-width: 0"
-                                 :default-active="group.select"
-                                 @select="selectGroup" v-cloak>
-                            <el-menu-item :index="group"
-                                          v-for="group in group.list">
-                                <!--<i v-if="group.state" class="el-icon-folder-checked"></i>-->
-                                <!--<i v-else class="el-icon-folder-delete"></i>-->
-                                <span slot="title">{{group}}</span>
-                            </el-menu-item>
-                        </el-menu>
-                        <!--<el-table ref="groupTable"
-                                  :data="group.list"
-                                  style="width: 100%;padding-left:20px;cursor: pointer"
-                                  height="100%"
-                                  highlight-current-row
-                                  @current-change="selectGroup">
-                            <el-table-column prop="name" label="分组" sortable>
-                            </el-table-column>
-                        </el-table>-->
-                    </el-main>
-                </el-container>
-                <el-dialog title="添加分组"
-                           :close-on-click-modal="false"
-                           :visible.sync="group.add.visible">
-                    <el-form :model="group.add.form" :rules="group.add.rules"
-                             @submit.native.prevent=""
-                             ref="group.add.form">
-                        <el-form-item label="分组名称" prop="name">
-                            <!--<el-tooltip class="item" effect="dark" placement="right">
-                                <div slot="content" v-cloak>
-                                    与文件目录对应
-                                </div>
-                                <i class="el-icon-warning-outline" v-cloak></i>
-                            </el-tooltip>-->
-                            <el-input v-model="group.add.form.name"
-                                      @keyup.enter.native="addGroup"
-                                      name="name"
-                                      autocomplete></el-input>
-                        </el-form-item>
-                    </el-form>
-                    <div class="dialog-footer" slot="footer">
-                        <el-button @click="group.add.visible = false" v-cloak>取 消</el-button>
-                        <el-button @click="addGroup" type="primary" v-cloak>添 加</el-button>
-                    </div>
-                </el-dialog>
-                <el-dialog title="解锁"
-                           @close="auth.switch = auth.lock"
-                           :close-on-click-modal="false"
-                           :visible.sync="auth.unlock.visible">
-                    <el-form :model="auth.unlock.form" :rules="auth.unlock.rules"
-                             @submit.native.prevent=""
-                             ref="auth.unlock.form">
-                        <el-form-item label="密码" prop="password">
-                            <el-input v-model="auth.unlock.form.password"
-                                      @keyup.enter.native="unlock"
-                                      name="password"
-                                      show-password></el-input>
-                        </el-form-item>
-                    </el-form>
-                    <div class="dialog-footer" slot="footer">
-                        <el-button @click="auth.lock = true;auth.unlock.visible = false;" v-cloak>
-                            取 消
-                        </el-button>
-                        <el-button @click="unlock" type="primary" v-cloak>解 锁</el-button>
-                    </div>
-                </el-dialog>
-            </el-aside>
-            <el-main style="height: 100%;padding-bottom: 0;border-left: solid 1px #e6e6e6;">
-                <el-container style="height: 100%;">
-                    <el-header style="padding: 0;text-align: left; font-size: 12px;" v-cloak>
-                        <el-input placeholder="搜索插件"
-                                  v-model="plugin.search"
-                                  clearable
-                                  style="width: 300px;float: left">
-                            <i slot="prefix" class="el-input__icon el-icon-search"></i>
-                        </el-input>
-                        <el-button v-if="!auth.lock"
-                                   type="primary"
-                                   plain
-                                   icon="el-icon-upload2"
-                                   @click="openUploadDialog('')"
-                                   style="width: 110px;margin-left: 20px">上传
-                        </el-button>
-                        <el-button type=""
-                                   plain
-                                   icon="el-icon-delete"
-                                   @click="openDeletedPluginsDialog"
-                                   style="width: 110px;margin-left: 10px;float: right">回收站
-                        </el-button>
-                        <el-dialog title="上传插件"
-                                   width="420px"
-                                   :close-on-click-modal="false"
-                                   :visible.sync="plugin.upload.visible">
-                            <el-upload action="/concept-plugin/management/plugin/upload"
-                                       style="margin: 0 10px"
-                                       :disabled="plugin.upload.disabled"
-                                       :before-upload="beforeUpload"
-                                       :on-change="uploadChange"
-                                       :on-success="uploadSuccess"
-                                       :on-error="uploadError"
-                                       :data="{group: this.group.select, name: this.plugin.upload.name}"
-                                       drag>
-                                <i class="el-icon-upload"></i>
-                                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                            </el-upload>
-                        </el-dialog>
-                        <el-dialog title="回收站"
-                                   :visible.sync="plugin.deleted.visible">
-                            <el-row :gutter="20">
-                                <el-col :span="18">
-                                    <el-input placeholder="搜索插件"
-                                              v-model="plugin.deleted.search"
-                                              clearable>
-                                        <i slot="prefix" class="el-input__icon el-icon-search"></i>
-                                    </el-input>
-                                </el-col>
-                                <el-col :span="6">
-                                    <el-button v-if="!auth.lock"
-                                               type="danger"
-                                               plain
-                                               icon="el-icon-warning-outline"
-                                               @click="clearDeleted"
-                                               style="width: 100%;float: right">清空
-                                    </el-button>
-                                </el-col>
-                            </el-row>
+        <el-main style="padding: 0">
+            <el-container>
+                <el-aside style="width: 260px;">
+                    <el-container>
+                        <el-header style="height: 80px;">
+                            <!--<el-input placeholder="搜索分组"
+                                      v-model="group.search"
+                                      clearable>
+                                <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                            </el-input>-->
+                            <el-switch
+                                    style="margin-top: 30px"
+                                    @change="lock"
+                                    v-model="auth.switch"
+                                    active-text="锁定">
+                            </el-switch>
+                            <el-button-group style="margin-top: 20px; float: right">
+                                <el-button v-if="!auth.lock" @click="openGroupDialog"
+                                           icon="el-icon-plus"></el-button>
+                                <el-button @click="refreshGroups(group.select)" icon="el-icon-refresh"></el-button>
+                                <!--<el-button @click="explain" icon="el-icon-warning-outline"></el-button>-->
+                            </el-button-group>
+                        </el-header>
+                        <el-main style="padding: 0">
+                            <el-menu v-if="group.ready"
+                                     style="height: 100%;border-right-width: 0"
+                                     :default-active="group.select"
+                                     @select="selectGroup" v-cloak>
+                                <el-menu-item :index="group"
+                                              v-for="group in group.list">
+                                    <!--<i v-if="group.state" class="el-icon-folder-checked"></i>-->
+                                    <!--<i v-else class="el-icon-folder-delete"></i>-->
+                                    <span slot="title">{{group}}</span>
+                                </el-menu-item>
+                            </el-menu>
+                            <!--<el-table ref="groupTable"
+                                      :data="group.list"
+                                      style="width: 100%;padding-left:20px;cursor: pointer"
+                                      height="100%"
+                                      highlight-current-row
+                                      @current-change="selectGroup">
+                                <el-table-column prop="name" label="分组" sortable>
+                                </el-table-column>
+                            </el-table>-->
+                        </el-main>
+                    </el-container>
+                    <el-dialog title="添加分组"
+                               :close-on-click-modal="false"
+                               :visible.sync="group.add.visible">
+                        <el-form :model="group.add.form" :rules="group.add.rules"
+                                 @submit.native.prevent=""
+                                 ref="group.add.form">
+                            <el-form-item label="分组名称" prop="name">
+                                <!--<el-tooltip class="item" effect="dark" placement="right">
+                                    <div slot="content" v-cloak>
+                                        与文件目录对应
+                                    </div>
+                                    <i class="el-icon-warning-outline" v-cloak></i>
+                                </el-tooltip>-->
+                                <el-input v-model="group.add.form.name"
+                                          @keyup.enter.native="addGroup"
+                                          name="name"
+                                          autocomplete></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div class="dialog-footer" slot="footer">
+                            <el-button @click="group.add.visible = false" v-cloak>取 消</el-button>
+                            <el-button @click="addGroup" type="primary" v-cloak>添 加</el-button>
+                        </div>
+                    </el-dialog>
+                    <el-dialog title="解锁"
+                               @close="auth.switch = auth.lock"
+                               :close-on-click-modal="false"
+                               :visible.sync="auth.unlock.visible">
+                        <el-form :model="auth.unlock.form" :rules="auth.unlock.rules"
+                                 @submit.native.prevent=""
+                                 ref="auth.unlock.form">
+                            <el-form-item label="密码" prop="password">
+                                <el-input v-model="auth.unlock.form.password"
+                                          @keyup.enter.native="unlock"
+                                          name="password"
+                                          show-password></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div class="dialog-footer" slot="footer">
+                            <el-button @click="auth.lock = true;auth.unlock.visible = false;" v-cloak>
+                                取 消
+                            </el-button>
+                            <el-button @click="unlock" type="primary" v-cloak>解 锁</el-button>
+                        </div>
+                    </el-dialog>
+                </el-aside>
+                <el-main style="height: 100%;padding-bottom: 0;border-left: solid 1px #e6e6e6;">
+                    <el-container style="height: 100%;">
+                        <el-header style="padding: 0;text-align: left; font-size: 12px;" v-cloak>
+                            <el-input placeholder="搜索插件"
+                                      v-model="plugin.search"
+                                      clearable
+                                      style="width: 300px;float: left">
+                                <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                            </el-input>
+                            <el-button v-if="!auth.lock"
+                                       type="primary"
+                                       plain
+                                       icon="el-icon-upload2"
+                                       @click="openUploadDialog('')"
+                                       style="width: 110px;margin-left: 20px">上传
+                            </el-button>
+                            <el-button type=""
+                                       plain
+                                       icon="el-icon-delete"
+                                       @click="openDeletedPluginsDialog"
+                                       style="width: 110px;margin-left: 10px;float: right">回收站
+                            </el-button>
+                            <el-dialog title="上传插件"
+                                       width="420px"
+                                       :close-on-click-modal="false"
+                                       :visible.sync="plugin.upload.visible">
+                                <el-upload action="/concept-plugin/management/plugin/upload"
+                                           style="margin: 0 10px"
+                                           :disabled="plugin.upload.disabled"
+                                           :before-upload="beforeUpload"
+                                           :on-change="uploadChange"
+                                           :on-success="uploadSuccess"
+                                           :on-error="uploadError"
+                                           :data="{group: this.group.select, name: this.plugin.upload.name}"
+                                           drag>
+                                    <i class="el-icon-upload"></i>
+                                    <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                </el-upload>
+                            </el-dialog>
+                            <el-dialog title="回收站"
+                                       :visible.sync="plugin.deleted.visible">
+                                <el-row :gutter="20">
+                                    <el-col :span="18">
+                                        <el-input placeholder="搜索插件"
+                                                  v-model="plugin.deleted.search"
+                                                  clearable>
+                                            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                                        </el-input>
+                                    </el-col>
+                                    <el-col :span="6">
+                                        <el-button v-if="!auth.lock"
+                                                   type="danger"
+                                                   plain
+                                                   icon="el-icon-warning-outline"
+                                                   @click="clearDeleted"
+                                                   style="width: 100%;float: right">清空
+                                        </el-button>
+                                    </el-col>
+                                </el-row>
+                                <el-table
+                                        :data="plugin.deleted.list.filter(data => !plugin.deleted.search||data.plugin.toLowerCase().includes(plugin.deleted.search.toLowerCase()))"
+                                        @selection-change=""
+                                        style="width: 100%;border-bottom-width: 0"
+                                        height="350px">
+                                    <el-table-column label="序号" type="index" fixed width="60">
+                                        <template slot="header">序号
+                                            <span class="caret-wrapper" style="width: 0"></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="plugin" label="插件包" sortable fixed>
+                                    </el-table-column>
+                                    <el-table-column prop="size" label="插件大小" sortable width="100">
+                                    </el-table-column>
+                                    <el-table-column prop="createTime" label="上传时间" sortable width="170">
+                                    </el-table-column>
+                                    <el-table-column label="操作" prop="url" fixed="right" width="60">
+                                        <template slot="header">操作
+                                            <span class="caret-wrapper" style="width: 0"></span>
+                                        </template>
+                                        <template slot-scope="scope">
+                                            <el-button class="plugin-btn"
+                                                       @click="downloadPlugin(scope.row.plugin, true)"
+                                                       type="text">下载
+                                            </el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </el-dialog>
+                        </el-header>
+                        <el-main ref="tableMain" style="height:100%;padding: 0;">
                             <el-table
-                                    :data="plugin.deleted.list.filter(data => !plugin.deleted.search||data.plugin.toLowerCase().includes(plugin.deleted.search.toLowerCase()))"
+                                    :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
                                     @selection-change=""
-                                    style="width: 100%;border-bottom-width: 0"
-                                    height="350px">
+                                    style="width: 100%;border-bottom-width: 0;"
+                                    height="100%">
+                                <!--<el-table-column type="selection" fixed width="25">
+                                </el-table-column>-->
+                                <!--align="center"-->
                                 <el-table-column label="序号" type="index" fixed width="60">
                                     <template slot="header">序号
                                         <span class="caret-wrapper" style="width: 0"></span>
@@ -308,144 +351,111 @@
                                 </el-table-column>
                                 <el-table-column prop="plugin" label="插件包" sortable fixed>
                                 </el-table-column>
+                                <!--<el-table-column prop="name" label="插件名称" sortable width="150">
+                                </el-table-column>-->
                                 <el-table-column prop="size" label="插件大小" sortable width="100">
                                 </el-table-column>
                                 <el-table-column prop="createTime" label="上传时间" sortable width="170">
                                 </el-table-column>
-                                <el-table-column label="操作" prop="url" fixed="right" width="60">
+                                <el-table-column prop="state" label="插件状态" sortable width="110" fixed="right">
+                                    <template slot="header">插件状态</template>
+                                    <template slot-scope="scope">
+                                        <el-tag :type="getStateType(scope.row.state)">
+                                            <!--size="small"-->
+                                            <i :class="getStateIcon(scope.row.state)"></i>
+                                            {{ formatState(scope.row.state) }}
+                                        </el-tag>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="操作" prop="url" fixed="right" width="280">
                                     <template slot="header">操作
                                         <span class="caret-wrapper" style="width: 0"></span>
                                     </template>
                                     <template slot-scope="scope">
+                                        <el-button v-if="showLoad(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="loadPlugin(scope.row.plugin)"
+                                                   type="text">加载
+                                        </el-button>
+                                        <el-button v-if="showUnload(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="unloadPlugin(scope.row.plugin)"
+                                                   type="text">卸载
+                                        </el-button>
+                                        <!--v-if="showProperties(scope.row.state)"-->
                                         <el-button class="plugin-btn"
-                                                   @click="downloadPlugin(scope.row.plugin, true)"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="getProperties(scope.row.plugin)"
+                                                   type="text">查看配置
+                                        </el-button>
+                                        <!--<el-button v-if="showReload(scope.row.state)"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="reloadPlugin(scope.row.plugin)"
+                                                   type="text">重新加载
+                                        </el-button>-->
+                                        <el-button v-if="showUpdate(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="openUpdateDialog(scope.row.plugin)"
+                                                   type="text">更新
+                                        </el-button>
+                                        <el-button v-if="showRename(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="openRenameDialog(scope.row.plugin)"
+                                                   type="text">重命名
+                                        </el-button>
+                                        <el-button v-if="showDelete(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="deletePlugin(scope.row.plugin)"
+                                                   type="text">删除
+                                        </el-button>
+                                        <el-button :disabled="isIngState(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   @click="downloadPlugin(scope.row.plugin, false)"
                                                    type="text">下载
                                         </el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
-                        </el-dialog>
-                    </el-header>
-                    <el-main ref="tableMain" style="height:100%;padding: 0;">
-                        <el-table
-                                :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
-                                @selection-change=""
-                                style="width: 100%;border-bottom-width: 0;"
-                                height="100%">
-                            <!--<el-table-column type="selection" fixed width="25">
-                            </el-table-column>-->
-                            <!--align="center"-->
-                            <el-table-column label="序号" type="index" fixed width="60">
-                                <template slot="header">序号
-                                    <span class="caret-wrapper" style="width: 0"></span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column prop="plugin" label="插件包" sortable fixed>
-                            </el-table-column>
-                            <!--<el-table-column prop="name" label="插件名称" sortable width="150">
-                            </el-table-column>-->
-                            <el-table-column prop="size" label="插件大小" sortable width="100">
-                            </el-table-column>
-                            <el-table-column prop="createTime" label="上传时间" sortable width="170">
-                            </el-table-column>
-                            <el-table-column prop="state" label="插件状态" sortable width="110" fixed="right">
-                                <template slot="header">插件状态</template>
-                                <template slot-scope="scope">
-                                    <el-tag :type="getStateType(scope.row.state)">
-                                        <!--size="small"-->
-                                        <i :class="getStateIcon(scope.row.state)"></i>
-                                        {{ formatState(scope.row.state) }}
-                                    </el-tag>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="操作" prop="url" fixed="right" width="280">
-                                <template slot="header">操作
-                                    <span class="caret-wrapper" style="width: 0"></span>
-                                </template>
-                                <template slot-scope="scope">
-                                    <el-button v-if="showLoad(scope.row.state)"
-                                               class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="loadPlugin(scope.row.plugin)"
-                                               type="text">加载
+                            <el-dialog title="插件配置"
+                                       :visible.sync="plugin.property.visible">
+                                <el-form v-cloak class="dialog-content">
+                                    <el-form-item v-for="property in plugin.property.list" :label="property.name">
+                                        <el-input v-model="property.value" :name="property.name"
+                                                  disabled></el-input>
+                                    </el-form-item>
+                                </el-form>
+                            </el-dialog>
+                            <el-dialog title="重命名"
+                                       :close-on-click-modal="false"
+                                       :visible.sync="plugin.rename.visible">
+                                <el-form :model="plugin.rename.form" :rules="plugin.rename.rules"
+                                         @submit.native.prevent=""
+                                         ref="plugin.rename.form">
+                                    <el-form-item label="名称" prop="rename">
+                                        <el-input v-model="plugin.rename.form.rename"
+                                                  @keyup.enter.native="renamePlugin"
+                                                  name="rename"
+                                                  autocomplete></el-input>
+                                    </el-form-item>
+                                </el-form>
+                                <div class="dialog-footer" slot="footer">
+                                    <el-button @click="plugin.rename.visible = false" v-cloak>取 消</el-button>
+                                    <el-button @click="renamePlugin"
+                                               :disabled="plugin.rename.form.name === plugin.rename.form.rename"
+                                               type="primary" v-cloak>确 定
                                     </el-button>
-                                    <el-button v-if="showUnload(scope.row.state)"
-                                               class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="unloadPlugin(scope.row.plugin)"
-                                               type="text">卸载
-                                    </el-button>
-                                    <!--v-if="showProperties(scope.row.state)"-->
-                                    <el-button class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="getProperties(scope.row.plugin)"
-                                               type="text">查看配置
-                                    </el-button>
-                                    <!--<el-button v-if="showReload(scope.row.state)"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="reloadPlugin(scope.row.plugin)"
-                                               type="text">重新加载
-                                    </el-button>-->
-                                    <el-button v-if="showUpdate(scope.row.state)"
-                                               class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="openUpdateDialog(scope.row.plugin)"
-                                               type="text">更新
-                                    </el-button>
-                                    <el-button v-if="showRename(scope.row.state)"
-                                               class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="openRenameDialog(scope.row.plugin)"
-                                               type="text">重命名
-                                    </el-button>
-                                    <el-button v-if="showDelete(scope.row.state)"
-                                               class="plugin-btn"
-                                               :disabled="isIngState(scope.row.state)"
-                                               @click="deletePlugin(scope.row.plugin)"
-                                               type="text">删除
-                                    </el-button>
-                                    <el-button :disabled="isIngState(scope.row.state)"
-                                               class="plugin-btn"
-                                               @click="downloadPlugin(scope.row.plugin, false)"
-                                               type="text">下载
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <el-dialog title="插件配置"
-                                   :visible.sync="plugin.property.visible">
-                            <el-form v-cloak class="dialog-content">
-                                <el-form-item v-for="property in plugin.property.list" :label="property.name">
-                                    <el-input v-model="property.value" :name="property.name"
-                                              disabled></el-input>
-                                </el-form-item>
-                            </el-form>
-                        </el-dialog>
-                        <el-dialog title="重命名"
-                                   :close-on-click-modal="false"
-                                   :visible.sync="plugin.rename.visible">
-                            <el-form :model="plugin.rename.form" :rules="plugin.rename.rules"
-                                     @submit.native.prevent=""
-                                     ref="plugin.rename.form">
-                                <el-form-item label="名称" prop="rename">
-                                    <el-input v-model="plugin.rename.form.rename"
-                                              @keyup.enter.native="renamePlugin"
-                                              name="rename"
-                                              autocomplete></el-input>
-                                </el-form-item>
-                            </el-form>
-                            <div class="dialog-footer" slot="footer">
-                                <el-button @click="plugin.rename.visible = false" v-cloak>取 消</el-button>
-                                <el-button @click="renamePlugin"
-                                           :disabled="plugin.rename.form.name === plugin.rename.form.rename"
-                                           type="primary" v-cloak>确 定
-                                </el-button>
-                            </div>
-                        </el-dialog>
-                    </el-main>
-                </el-container>
-            </el-main>
-        </el-container>
+                                </div>
+                            </el-dialog>
+                        </el-main>
+                    </el-container>
+                </el-main>
+            </el-container>
+        </el-main>
         <el-footer v-if="setting.footer.display"
                    class="footer"
                    v-cloak>
@@ -564,6 +574,13 @@
     let app = new Vue({
         el: "#concept-plugin-app",
         data: {
+            i18n: {
+                value: 'zh',
+                options: [
+                    {label: '中文', value: 'zh'},
+                    {label: 'English', value: 'en'}
+                ]
+            },
             setting: {
                 header: {
                     display: true,

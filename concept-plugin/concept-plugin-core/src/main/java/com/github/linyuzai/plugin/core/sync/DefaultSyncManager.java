@@ -31,4 +31,12 @@ public class DefaultSyncManager implements SyncManager {
             return supplier.get();
         }
     }
+
+    public static class Factory implements SyncManagerFactory {
+
+        @Override
+        public SyncManager create(Object o) {
+            return new DefaultSyncManager();
+        }
+    }
 }

@@ -9,7 +9,11 @@ import java.util.function.Supplier;
 @Setter
 public abstract class SyncSupport {
 
-    private SyncManager syncManager = new LockSyncManager();
+    @Getter
+    @Setter
+    private static SyncManagerFactory syncManagerFactory = new LockSyncManager.Factory();
+
+    private SyncManager syncManager = syncManagerFactory.create(this);
 
     protected void syncRead(Runnable runnable) {
         syncManager.syncRead(runnable);

@@ -47,4 +47,12 @@ public class LockSyncManager implements SyncManager {
             lock.writeLock().unlock();
         }
     }
+
+    public static class Factory implements SyncManagerFactory {
+
+        @Override
+        public SyncManager create(Object o) {
+            return new LockSyncManager();
+        }
+    }
 }

@@ -23,4 +23,12 @@ public class NoSyncManager implements SyncManager {
     public <T> T syncWrite(Supplier<T> supplier) {
         return supplier.get();
     }
+
+    public static class Factory implements SyncManagerFactory {
+
+        @Override
+        public SyncManager create(Object o) {
+            return new NoSyncManager();
+        }
+    }
 }

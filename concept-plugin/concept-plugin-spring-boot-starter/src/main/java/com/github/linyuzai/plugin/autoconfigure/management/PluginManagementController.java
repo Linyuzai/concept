@@ -184,11 +184,18 @@ public class PluginManagementController {
     @RequiredArgsConstructor
     public static class Setting {
 
+        //private final Internationalization i18n = new Internationalization();
+
         private final PluginConceptProperties.ManagementProperties.GithubCornerProperties githubCorner;
 
         private final PluginConceptProperties.ManagementProperties.HeaderProperties header;
 
         private final PluginConceptProperties.ManagementProperties.FooterProperties footer;
+
+        @Data
+        public static class Internationalization {
+
+        }
     }
 
     @Data
