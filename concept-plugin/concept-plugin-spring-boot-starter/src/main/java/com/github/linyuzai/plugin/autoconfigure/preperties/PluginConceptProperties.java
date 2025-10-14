@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
 
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -161,6 +162,8 @@ public class PluginConceptProperties {
          * 是否启用管理页面
          */
         private boolean enabled = true;
+
+        private Locale locale = Locale.CHINA;
 
         /**
          * 权限配置

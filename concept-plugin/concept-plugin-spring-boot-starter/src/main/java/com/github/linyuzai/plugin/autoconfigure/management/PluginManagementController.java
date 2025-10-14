@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -36,6 +37,7 @@ public class PluginManagementController {
     @GetMapping("/setting")
     public Response setting() {
         return response(() -> new Setting(
+                properties.getManagement().getLocale(),
                 properties.getManagement().getGithubCorner(),
                 properties.getManagement().getHeader(),
                 properties.getManagement().getFooter()), () -> "获取配置");
@@ -184,18 +186,13 @@ public class PluginManagementController {
     @RequiredArgsConstructor
     public static class Setting {
 
-        //private final Internationalization i18n = new Internationalization();
+        private final Locale locale;
 
         private final PluginConceptProperties.ManagementProperties.GithubCornerProperties githubCorner;
 
         private final PluginConceptProperties.ManagementProperties.HeaderProperties header;
 
         private final PluginConceptProperties.ManagementProperties.FooterProperties footer;
-
-        @Data
-        public static class Internationalization {
-
-        }
     }
 
     @Data

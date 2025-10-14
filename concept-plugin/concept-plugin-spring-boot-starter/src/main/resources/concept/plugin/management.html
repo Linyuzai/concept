@@ -113,11 +113,11 @@
     <el-button class="floating-button"
                @click="help.visible = true">
         <i class="el-icon-question el-icon&#45;&#45;left" style="margin-right: 10px"></i>
-        帮助
+        {{i18n.help}}
     </el-button>
     <el-dialog
             :visible.sync="help.visible"
-            title="帮助">
+            :title="i18n.help">
         <div class="dialog-content" v-html="help.html">
         </div>
     </el-dialog>
@@ -168,7 +168,7 @@
                                     style="margin-top: 30px"
                                     @change="lock"
                                     v-model="auth.switch"
-                                    active-text="锁定">
+                                    :active-text="i18n.lock">
                             </el-switch>
                             <el-button-group style="margin-top: 20px; float: right">
                                 <el-button v-if="!auth.lock" @click="openGroupDialog"
@@ -200,13 +200,13 @@
                             </el-table>-->
                         </el-main>
                     </el-container>
-                    <el-dialog title="添加分组"
+                    <el-dialog :title="i18n.add_group"
                                :close-on-click-modal="false"
                                :visible.sync="group.add.visible">
                         <el-form :model="group.add.form" :rules="group.add.rules"
                                  @submit.native.prevent=""
                                  ref="group.add.form">
-                            <el-form-item label="分组名称" prop="name">
+                            <el-form-item :label="i18n.group_name" prop="name">
                                 <!--<el-tooltip class="item" effect="dark" placement="right">
                                     <div slot="content" v-cloak>
                                         与文件目录对应
@@ -220,18 +220,18 @@
                             </el-form-item>
                         </el-form>
                         <div class="dialog-footer" slot="footer">
-                            <el-button @click="group.add.visible = false" v-cloak>取 消</el-button>
-                            <el-button @click="addGroup" type="primary" v-cloak>添 加</el-button>
+                            <el-button @click="group.add.visible = false" v-cloak>{{i18n.cancel}}</el-button>
+                            <el-button @click="addGroup" type="primary" v-cloak>{{i18n.add}}</el-button>
                         </div>
                     </el-dialog>
-                    <el-dialog title="解锁"
+                    <el-dialog :title="i18n.unlock"
                                @close="auth.switch = auth.lock"
                                :close-on-click-modal="false"
                                :visible.sync="auth.unlock.visible">
                         <el-form :model="auth.unlock.form" :rules="auth.unlock.rules"
                                  @submit.native.prevent=""
                                  ref="auth.unlock.form">
-                            <el-form-item label="密码" prop="password">
+                            <el-form-item :label="i18n.password" prop="password">
                                 <el-input v-model="auth.unlock.form.password"
                                           @keyup.enter.native="unlock"
                                           name="password"
@@ -240,16 +240,16 @@
                         </el-form>
                         <div class="dialog-footer" slot="footer">
                             <el-button @click="auth.lock = true;auth.unlock.visible = false;" v-cloak>
-                                取 消
+                                {{i18n.cancel}}
                             </el-button>
-                            <el-button @click="unlock" type="primary" v-cloak>解 锁</el-button>
+                            <el-button @click="unlock" type="primary" v-cloak>{{i18n.unlock}}</el-button>
                         </div>
                     </el-dialog>
                 </el-aside>
                 <el-main style="height: 100%;padding-bottom: 0;border-left: solid 1px #e6e6e6;">
                     <el-container style="height: 100%;">
                         <el-header style="padding: 0;text-align: left; font-size: 12px;" v-cloak>
-                            <el-input placeholder="搜索插件"
+                            <el-input :placeholder="i18n.search_plugin"
                                       v-model="plugin.search"
                                       clearable
                                       style="width: 300px;float: left">
@@ -260,15 +260,17 @@
                                        plain
                                        icon="el-icon-upload2"
                                        @click="openUploadDialog('')"
-                                       style="width: 110px;margin-left: 20px">上传
+                                       style="width: 110px;margin-left: 20px">
+                                {{i18n.upload}}
                             </el-button>
                             <el-button type=""
                                        plain
                                        icon="el-icon-delete"
                                        @click="openDeletedPluginsDialog"
-                                       style="width: 110px;margin-left: 10px;float: right">回收站
+                                       style="width: 110px;margin-left: 10px;float: right">
+                                {{i18n.trash}}
                             </el-button>
-                            <el-dialog title="上传插件"
+                            <el-dialog :title="i18n.upload_plugin"
                                        width="420px"
                                        :close-on-click-modal="false"
                                        :visible.sync="plugin.upload.visible">
@@ -282,14 +284,15 @@
                                            :data="{group: this.group.select, name: this.plugin.upload.name}"
                                            drag>
                                     <i class="el-icon-upload"></i>
-                                    <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                    <div class="el-upload__text">{{i18n.upload_text}}<em>{{i18n.click_upload}}</em>
+                                    </div>
                                 </el-upload>
                             </el-dialog>
-                            <el-dialog title="回收站"
+                            <el-dialog :title="i18n.trash"
                                        :visible.sync="plugin.deleted.visible">
                                 <el-row :gutter="20">
                                     <el-col :span="18">
-                                        <el-input placeholder="搜索插件"
+                                        <el-input :placeholder="i18n.search_plugin"
                                                   v-model="plugin.deleted.search"
                                                   clearable>
                                             <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -301,34 +304,36 @@
                                                    plain
                                                    icon="el-icon-warning-outline"
                                                    @click="clearDeleted"
-                                                   style="width: 100%;float: right">清空
+                                                   style="width: 100%;float: right">
+                                            {{i18n.clear}}
                                         </el-button>
                                     </el-col>
                                 </el-row>
                                 <el-table
                                         :data="plugin.deleted.list.filter(data => !plugin.deleted.search||data.plugin.toLowerCase().includes(plugin.deleted.search.toLowerCase()))"
-                                        @selection-change=""
+                                        :empty-text="i18n.empty_text"
                                         style="width: 100%;border-bottom-width: 0"
                                         height="350px">
-                                    <el-table-column label="序号" type="index" fixed width="60">
-                                        <template slot="header">序号
+                                    <el-table-column :label="i18n.no" type="index" fixed width="60">
+                                        <template slot="header">{{i18n.no}}
                                             <span class="caret-wrapper" style="width: 0"></span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="plugin" label="插件包" sortable fixed>
+                                    <el-table-column prop="plugin" :label="i18n.plugin_package" sortable fixed>
                                     </el-table-column>
-                                    <el-table-column prop="size" label="插件大小" sortable width="100">
+                                    <el-table-column prop="size" :label="i18n.plugin_size" sortable width="120">
                                     </el-table-column>
-                                    <el-table-column prop="createTime" label="上传时间" sortable width="170">
+                                    <el-table-column prop="createTime" :label="i18n.upload_time" sortable width="170">
                                     </el-table-column>
-                                    <el-table-column label="操作" prop="url" fixed="right" width="60">
-                                        <template slot="header">操作
+                                    <el-table-column :label="i18n.operation" prop="url" fixed="right" width="100">
+                                        <template slot="header">{{i18n.operation}}
                                             <span class="caret-wrapper" style="width: 0"></span>
                                         </template>
                                         <template slot-scope="scope">
                                             <el-button class="plugin-btn"
                                                        @click="downloadPlugin(scope.row.plugin, true)"
-                                                       type="text">下载
+                                                       type="text">
+                                                {{i18n.download}}
                                             </el-button>
                                         </template>
                                     </el-table-column>
@@ -336,29 +341,30 @@
                             </el-dialog>
                         </el-header>
                         <el-main ref="tableMain" style="height:100%;padding: 0;">
-                            <el-table
-                                    :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
-                                    @selection-change=""
-                                    style="width: 100%;border-bottom-width: 0;"
-                                    height="100%">
+                            <el-table v-if="plugin.visible"
+                                      :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
+                                      :empty-text="i18n.empty_text"
+                                      style="width: 100%;border-bottom-width: 0;"
+                                      height="100%">
                                 <!--<el-table-column type="selection" fixed width="25">
                                 </el-table-column>-->
                                 <!--align="center"-->
-                                <el-table-column label="序号" type="index" fixed width="60">
-                                    <template slot="header">序号
+                                <el-table-column :label="i18n.no" type="index" fixed width="60">
+                                    <template slot="header">{{i18n.no}}
                                         <span class="caret-wrapper" style="width: 0"></span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="plugin" label="插件包" sortable fixed>
+                                <el-table-column prop="plugin" :label="i18n.plugin_package" sortable fixed>
                                 </el-table-column>
                                 <!--<el-table-column prop="name" label="插件名称" sortable width="150">
                                 </el-table-column>-->
-                                <el-table-column prop="size" label="插件大小" sortable width="100">
+                                <el-table-column prop="size" :label="i18n.plugin_size" sortable width="120">
                                 </el-table-column>
-                                <el-table-column prop="createTime" label="上传时间" sortable width="170">
+                                <el-table-column prop="createTime" :label="i18n.upload_time" sortable width="170">
                                 </el-table-column>
-                                <el-table-column prop="state" label="插件状态" sortable width="110" fixed="right">
-                                    <template slot="header">插件状态</template>
+                                <el-table-column prop="state" :label="i18n.plugin_status" sortable width="140"
+                                                 fixed="right">
+                                    <template slot="header">{{i18n.plugin_status}}</template>
                                     <template slot-scope="scope">
                                         <el-tag :type="getStateType(scope.row.state)">
                                             <!--size="small"-->
@@ -367,61 +373,76 @@
                                         </el-tag>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="操作" prop="url" fixed="right" width="280">
-                                    <template slot="header">操作
+                                <el-table-column :label="i18n.operation" prop="url" fixed="right" width="200">
+                                    <template slot="header">{{i18n.operation}}
                                         <span class="caret-wrapper" style="width: 0"></span>
                                     </template>
                                     <template slot-scope="scope">
-                                        <el-button v-if="showLoad(scope.row.state)"
-                                                   class="plugin-btn"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="loadPlugin(scope.row.plugin)"
-                                                   type="text">加载
-                                        </el-button>
-                                        <el-button v-if="showUnload(scope.row.state)"
-                                                   class="plugin-btn"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="unloadPlugin(scope.row.plugin)"
-                                                   type="text">卸载
-                                        </el-button>
-                                        <!--v-if="showProperties(scope.row.state)"-->
-                                        <el-button class="plugin-btn"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="getProperties(scope.row.plugin)"
-                                                   type="text">查看配置
-                                        </el-button>
-                                        <!--<el-button v-if="showReload(scope.row.state)"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="reloadPlugin(scope.row.plugin)"
-                                                   type="text">重新加载
-                                        </el-button>-->
-                                        <el-button v-if="showUpdate(scope.row.state)"
-                                                   class="plugin-btn"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="openUpdateDialog(scope.row.plugin)"
-                                                   type="text">更新
-                                        </el-button>
-                                        <el-button v-if="showRename(scope.row.state)"
-                                                   class="plugin-btn"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="openRenameDialog(scope.row.plugin)"
-                                                   type="text">重命名
-                                        </el-button>
-                                        <el-button v-if="showDelete(scope.row.state)"
-                                                   class="plugin-btn"
-                                                   :disabled="isIngState(scope.row.state)"
-                                                   @click="deletePlugin(scope.row.plugin)"
-                                                   type="text">删除
-                                        </el-button>
-                                        <el-button :disabled="isIngState(scope.row.state)"
-                                                   class="plugin-btn"
-                                                   @click="downloadPlugin(scope.row.plugin, false)"
-                                                   type="text">下载
-                                        </el-button>
+                                        <el-row>
+                                            <el-col>
+                                                <el-button v-if="showLoad(scope.row.state)"
+                                                           class="plugin-btn"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="loadPlugin(scope.row.plugin)"
+                                                           type="text">
+                                                    {{i18n.load}}
+                                                </el-button>
+                                                <el-button v-if="showUnload(scope.row.state)"
+                                                           class="plugin-btn"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="unloadPlugin(scope.row.plugin)"
+                                                           type="text">
+                                                    {{i18n.unload}}
+                                                </el-button>
+                                                <!--<el-button v-if="showReload(scope.row.state)"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="reloadPlugin(scope.row.plugin)"
+                                                           type="text">重新加载
+                                                </el-button>-->
+                                                <el-button v-if="showUpdate(scope.row.state)"
+                                                           class="plugin-btn"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="openUpdateDialog(scope.row.plugin)"
+                                                           type="text">
+                                                    {{i18n.update}}
+                                                </el-button>
+                                                <el-button v-if="showRename(scope.row.state)"
+                                                           class="plugin-btn"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="openRenameDialog(scope.row.plugin)"
+                                                           type="text">
+                                                    {{i18n.rename}}
+                                                </el-button>
+                                                <el-button v-if="showDelete(scope.row.state)"
+                                                           class="plugin-btn"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="deletePlugin(scope.row.plugin)"
+                                                           type="text">
+                                                    {{i18n.delete}}
+                                                </el-button>
+                                                <!--v-if="showProperties(scope.row.state)"-->
+                                            </el-col>
+                                        </el-row>
+                                        <el-row>
+                                            <el-col>
+                                                <el-button class="plugin-btn"
+                                                           :disabled="isIngState(scope.row.state)"
+                                                           @click="getProperties(scope.row.plugin)"
+                                                           type="text">
+                                                    {{i18n.query_props}}
+                                                </el-button>
+                                                <el-button :disabled="isIngState(scope.row.state)"
+                                                           class="plugin-btn"
+                                                           @click="downloadPlugin(scope.row.plugin, false)"
+                                                           type="text">
+                                                    {{i18n.download}}
+                                                </el-button>
+                                            </el-col>
+                                        </el-row>
                                     </template>
                                 </el-table-column>
                             </el-table>
-                            <el-dialog title="插件配置"
+                            <el-dialog :title="i18n.plugin_props"
                                        :visible.sync="plugin.property.visible">
                                 <el-form v-cloak class="dialog-content">
                                     <el-form-item v-for="property in plugin.property.list" :label="property.name">
@@ -430,13 +451,13 @@
                                     </el-form-item>
                                 </el-form>
                             </el-dialog>
-                            <el-dialog title="重命名"
+                            <el-dialog :title="i18n.rename"
                                        :close-on-click-modal="false"
                                        :visible.sync="plugin.rename.visible">
                                 <el-form :model="plugin.rename.form" :rules="plugin.rename.rules"
                                          @submit.native.prevent=""
                                          ref="plugin.rename.form">
-                                    <el-form-item label="名称" prop="rename">
+                                    <el-form-item :label="i18n.name" prop="rename">
                                         <el-input v-model="plugin.rename.form.rename"
                                                   @keyup.enter.native="renamePlugin"
                                                   name="rename"
@@ -447,7 +468,8 @@
                                     <el-button @click="plugin.rename.visible = false" v-cloak>取 消</el-button>
                                     <el-button @click="renamePlugin"
                                                :disabled="plugin.rename.form.name === plugin.rename.form.rename"
-                                               type="primary" v-cloak>确 定
+                                               type="primary" v-cloak>
+                                        {{i18n.confirm}}
                                     </el-button>
                                 </div>
                             </el-dialog>
@@ -461,7 +483,7 @@
                    v-cloak>
             <!--#606266-->
             <!--#303133-->
-            <span style="color: #606266;">©2024 黑白法师</span>
+            <span style="color: #606266;">©2024-{{new Date().getFullYear()}} 黑白法师</span>
         </el-footer>
     </el-container>
 </div>
@@ -574,14 +596,9 @@
     let app = new Vue({
         el: "#concept-plugin-app",
         data: {
-            i18n: {
-                value: 'zh',
-                options: [
-                    {label: '中文', value: 'zh'},
-                    {label: 'English', value: 'en'}
-                ]
-            },
+            i18n: {},
             setting: {
+                locale: 'zh_CN',
                 header: {
                     display: true,
                     title: {
@@ -634,6 +651,7 @@
                 }
             },
             plugin: {
+                visible: false,
                 refresh: 0,
                 search: '',
                 list: [],
@@ -674,6 +692,11 @@
                     if (body.success) {
                         this.setting = body.data;
                         document.title = this.setting.header.title.text;
+                        this._get('/concept-plugin/i18n/' + this.setting.locale + '.json', response => {
+                            this.i18n = response;
+                            this.plugin.visible = true;
+                            this.refreshGroups('');
+                        });
                     } else {
                         this.$notify({
                             title: '失败',
@@ -1098,7 +1121,6 @@
         mounted: function () {
             this.initSettings();
             this.initHelp();
-            this.refreshGroups('');
         }
     });
 </script>
