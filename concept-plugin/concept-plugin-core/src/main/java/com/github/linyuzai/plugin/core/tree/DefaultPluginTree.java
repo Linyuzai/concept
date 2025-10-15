@@ -211,13 +211,15 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public Transformer.TransformStage inbound(Node node) {
-            inbound = node;
-            return this;
+            return syncWrite(() -> {
+                inbound = node;
+                return this;
+            });
         }
 
         @Override
         public Transformer.TransformStage inboundKey(Object inboundKey) {
-            return syncRead(() -> {
+            return syncWrite(() -> {
                 List<TransformEntry> entries = transformMap.getOrDefault(inboundKey, Collections.emptyList());
                 if (entries.isEmpty()) {
                     throw new IllegalArgumentException("No plugin tree found: " + inboundKey);
@@ -229,32 +231,41 @@ public class DefaultPluginTree implements PluginTree, PluginTree.Transformer, Pl
 
         @Override
         public OutboundStage transform(Function<Node, Node> transformer) {
-            outbound = transformer.apply(inbound);
-            return this;
+            return syncWrite(() -> {
+                outbound = transformer.apply(inbound);
+                return this;
+            });
         }
 
         @Override
         public Node outbound() {
-            return outbound;
+            return syncWrite(() -> {
+                createTransformEntry();
+                return outbound;
+            });
         }
 
         @Override
         public void outboundKey(Object outboundKey) {
             syncWrite(() -> {
-                TransformEntry entry = new TransformEntry(outbound, handler);
+                TransformEntry entry = createTransformEntry();
                 transformMap.computeIfAbsent(outboundKey, k -> new ArrayList<>()).add(0, entry);
-
-                //设置追踪链
-                TracerStages ts = new TracerStages(entry);
-                if (trace == null) {
-                    trace = ts;
-                }
-                if (current != null) {
-                    ts.previous = current;
-                    current.next = ts;
-                }
-                current = ts;
             });
+        }
+
+        protected TransformEntry createTransformEntry() {
+            TransformEntry entry = new TransformEntry(outbound, handler);
+            //设置追踪链
+            TracerStages ts = new TracerStages(entry);
+            if (trace == null) {
+                trace = ts;
+            }
+            if (current != null) {
+                ts.previous = current;
+                current.next = ts;
+            }
+            current = ts;
+            return entry;
         }
     }
 
