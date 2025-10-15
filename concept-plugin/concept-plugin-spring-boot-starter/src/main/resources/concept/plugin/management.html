@@ -221,7 +221,7 @@
                         </el-form>
                         <div class="dialog-footer" slot="footer">
                             <el-button @click="group.add.visible = false" v-cloak>{{i18n.cancel}}</el-button>
-                            <el-button @click="addGroup" type="primary" v-cloak>{{i18n.add}}</el-button>
+                            <el-button @click="addGroup" type="primary" v-cloak>{{i18n.confirm}}</el-button>
                         </div>
                     </el-dialog>
                     <el-dialog :title="i18n.unlock"
@@ -242,7 +242,7 @@
                             <el-button @click="auth.lock = true;auth.unlock.visible = false;" v-cloak>
                                 {{i18n.cancel}}
                             </el-button>
-                            <el-button @click="unlock" type="primary" v-cloak>{{i18n.unlock}}</el-button>
+                            <el-button @click="unlock" type="primary" v-cloak>{{i18n.confirm}}</el-button>
                         </div>
                     </el-dialog>
                 </el-aside>
@@ -465,7 +465,9 @@
                                     </el-form-item>
                                 </el-form>
                                 <div class="dialog-footer" slot="footer">
-                                    <el-button @click="plugin.rename.visible = false" v-cloak>取 消</el-button>
+                                    <el-button @click="plugin.rename.visible = false" v-cloak>
+                                        {{i18n.cancel}}
+                                    </el-button>
                                     <el-button @click="renamePlugin"
                                                :disabled="plugin.rename.form.name === plugin.rename.form.rename"
                                                type="primary" v-cloak>
@@ -483,7 +485,7 @@
                    v-cloak>
             <!--#606266-->
             <!--#303133-->
-            <span style="color: #606266;">©2024-{{new Date().getFullYear()}} 黑白法师</span>
+            <span style="color: #606266;">©2024-{{new Date().getFullYear()}} {{i18n.author}}</span>
         </el-footer>
     </el-container>
 </div>
@@ -564,8 +566,10 @@
     }
 
     const validateName = (rule, value, callback) => {
-        if (value.indexOf('/') !== -1) {
-            callback(new Error('名称不能包含\'/\''));
+        if (value === '' || value === null || value === undefined) {
+            callback(new Error(app.i18n.name_empty_valid));
+        } else if (value.indexOf('/') !== -1) {
+            callback(new Error(app.i18n.name_contains_valid + '\'/\''));
         } else {
             callback();
         }
@@ -581,7 +585,7 @@
             let body = response;
             if (body.success) {
                 if (body.data) {
-                    callback(new Error('名称已存在'));
+                    callback(new Error(app.i18n.name_exist));
                 } else {
                     callback();
                 }
@@ -590,7 +594,7 @@
                 console.log(response);
             }
         }, () => {
-            callback(new Error('服务异常'));
+            callback(new Error(app.i18n.server_error));
         });
     };
     let app = new Vue({
@@ -641,7 +645,6 @@
                     visible: false,
                     rules: {
                         name: [
-                            {required: true, message: '分组名称不能为空', trigger: 'blur'},
                             {validator: validateName, trigger: 'blur'}
                         ]
                     },
@@ -668,7 +671,6 @@
                     visible: false,
                     rules: {
                         rename: [
-                            {required: true, message: '名称不能为空', trigger: 'blur'},
                             {validator: validateName, trigger: 'blur'},
                             {validator: validateRename, trigger: 'blur'}
                         ]
@@ -692,6 +694,15 @@
                     if (body.success) {
                         this.setting = body.data;
                         document.title = this.setting.header.title.text;
+                        if (this.setting.locale === 'zh') {
+                            this.setting.locale = 'zh_CN';
+                        }
+                        if (this.setting.locale === 'en') {
+                            this.setting.locale = 'en_US';
+                        }
+                        if (this.setting.locale === 'zh_CN' || this.setting.locale === 'en_US') {
+                            this.setting.locale = 'zh_CN';
+                        }
                         this._get('/concept-plugin/i18n/' + this.setting.locale + '.json', response => {
                             this.i18n = response;
                             this.plugin.visible = true;
@@ -699,7 +710,7 @@
                         });
                     } else {
                         this.$notify({
-                            title: '失败',
+                            title: this.i18n.failure,
                             message: body.message,
                             type: 'error'
                         });
@@ -749,16 +760,16 @@
                         } else {
                             this.auth.lock = true;
                             this.$notify({
-                                title: '失败',
-                                message: '密码错误',
+                                title: this.i18n.failure,
+                                message: this.i18n.password_error,
                                 type: 'error'
                             });
                         }
                     } else {
                         this.auth.lock = true;
                         this.$notify({
-                            title: '失败',
-                            message: '解锁异常',
+                            title: this.i18n.failure,
+                            message: this.i18n.unlock_error,
                             type: 'error'
                         });
                         console.log(response);
@@ -814,7 +825,7 @@
                                 this.refreshGroups(this.group.add.form.name);
                             } else {
                                 this.$notify({
-                                    title: '失败',
+                                    title: this.i18n.failure,
                                     message: body.message,
                                     type: 'error'
                                 });
@@ -850,8 +861,8 @@
             },
             uploadError(err) {
                 this.$notify.error({
-                    title: '插件上传',
-                    message: '上传失败',
+                    title: this.i18n.plugin_upload,
+                    message: this.i18n.upload_error,
                     position: 'bottom-right'
                 });
                 console.log(err);
@@ -879,7 +890,7 @@
                         this.openDeletedPluginsDialog();
                     } else {
                         this.$notify({
-                            title: '失败',
+                            title: this.i18n.failure,
                             message: body.message,
                             type: 'error'
                         });
@@ -898,7 +909,6 @@
                     let body = response;
                     if (body.success) {
                         this.plugin.list = body.data;
-
                         let array = this.plugin.list;
                         let refresh = false;
                         for (let i = 0; i < array.length; i++) {
@@ -946,7 +956,7 @@
                         this.plugin.property.visible = true;
                     } else {
                         this.$notify({
-                            title: '失败',
+                            title: this.i18n.failure,
                             message: body.message,
                             type: 'error'
                         });
@@ -1055,21 +1065,21 @@
             formatState(state) {
                 switch (state) {
                     case 'LOADED':
-                        return '已加载';
+                        return this.i18n.status_loaded;
                     case 'LOADING':
-                        return '加载中';
+                        return this.i18n.status_loading;
                     case 'LOAD_ERROR':
-                        return '加载失败';
+                        return this.i18n.status_load_error;
                     case 'UNLOADED':
-                        return '未加载';
+                        return this.i18n.status_unloaded;
                     case 'UNLOADING':
-                        return '卸载中';
+                        return this.i18n.status_unloading;
                     case 'UNLOAD_ERROR':
-                        return '卸载失败';
+                        return this.i18n.status_unload_error;
                     case 'UPDATING':
-                        return '更新中';
+                        return this.i18n.status_updating;
                     default:
-                        return '未知';
+                        return this.i18n.status_unknown;
                 }
             },
             /*explain() {
@@ -1102,7 +1112,7 @@
                         this.refreshPlugins();
                     } else {
                         this.$notify({
-                            title: '失败',
+                            title: this.i18n.failure,
                             message: body.message,
                             type: 'error'
                         });
@@ -1112,8 +1122,8 @@
             },
             _error() {
                 this.$notify({
-                    title: '失败',
-                    message: '服务异常',
+                    title: this.i18n.failure,
+                    message: this.i18n.server_error,
                     type: 'error'
                 });
             }
