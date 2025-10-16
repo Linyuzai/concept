@@ -167,7 +167,7 @@ public class DynamicExtractor extends SyncSupport implements MethodPluginExtract
                     try {
                         method.invoke(target, values);
                     } catch (Throwable e) {
-                        throw new PluginException("Invoke error on " + method.getName() + ", args " + Arrays.toString(values), e);
+                        throw new PluginException("Invoke error on " + method.getName(), e);
                     }
                     DynamicExtractedEvent event = new DynamicExtractedEvent(context, this, values, method, target);
                     context.getConcept().getEventPublisher().publish(event);

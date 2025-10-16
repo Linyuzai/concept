@@ -15,6 +15,7 @@
   "query_props": "查看配置",
   "empty_text": "暂无数据",
   "name_exist": "名称已存在",
+  "error_message": "异常信息",
   "server_error": "服务异常",
   "password_error": "密码错误",
   "unlock_error": "解锁异常",

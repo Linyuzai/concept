@@ -370,6 +370,11 @@
                                             <!--size="small"-->
                                             <i :class="getStateIcon(scope.row.state)"></i>
                                             {{ formatState(scope.row.state) }}
+                                            <i v-if="scope.row.error.length > 0"
+                                               class="el-icon-warning-outline"
+                                               style="cursor: pointer"
+                                               @click="openErrorMessage(scope.row.error)"
+                                            ></i>
                                         </el-tag>
                                     </template>
                                 </el-table-column>
@@ -727,7 +732,6 @@
                     this.help.html = new showdown.Converter().makeHtml(body);
                 });
             },
-
             lock(lock) {
                 if (lock) {
                     this.auth.lock = true;
@@ -931,6 +935,9 @@
                 }, () => {
                     this.plugin.refresh--;
                 });
+            },
+            openErrorMessage(messages) {
+                this.$alert(messages.join('\nCaused by: '), this.i18n.error_message);
             },
             loadPlugin(name) {
                 let params = {group: this.group.select, name: name};

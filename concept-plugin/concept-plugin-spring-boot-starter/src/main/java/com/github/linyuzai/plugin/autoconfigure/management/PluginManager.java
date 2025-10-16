@@ -5,13 +5,13 @@ import com.github.linyuzai.plugin.core.autoload.*;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
-import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.event.*;
+import com.github.linyuzai.plugin.core.exception.PluginLoadException;
+import com.github.linyuzai.plugin.core.exception.PluginUnloadException;
 import com.github.linyuzai.plugin.core.executer.PluginExecutor;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.sync.SyncSupport;
-import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public class PluginManager extends SyncSupport {
 
     protected final Set<String> updatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected final Map<String, PluginTree> treeMap = new ConcurrentHashMap<>();
+    //protected final Map<String, PluginTree> treeMap = new ConcurrentHashMap<>();
 
     protected final Map<String, Throwable> errorMap = new ConcurrentHashMap<>();
 
@@ -276,8 +276,22 @@ public class PluginManager extends SyncSupport {
                     }
                 }
             }
+            List<String> errorList = new ArrayList<>();
+            Throwable error = errorMap.get(path);
+            if (error != null) {
+                Throwable cause = error;
+                while (cause != null) {
+                    if (cause instanceof PluginLoadException ||
+                            cause instanceof PluginUnloadException) {
+                        cause = cause.getCause();
+                        continue;
+                    }
+                    errorList.add(cause.getClass().getName() + ": " + cause.getMessage());
+                    cause = cause.getCause();
+                }
+            }
             return new PluginSummary(name, formatSize(size),
-                    formatTime(timestamp), state, timestamp);
+                    formatTime(timestamp), state, errorList, timestamp);
         }).collect(Collectors.toList()));
     }
 
@@ -296,11 +310,12 @@ public class PluginManager extends SyncSupport {
                 if (get == null) {
                     state = PluginState.UNLOADED;
                 } else {
+                    // 正常情况下不会出现
                     state = PluginState.UNLOAD_ERROR;
                 }
             }
             return new PluginSummary(name, formatSize(size),
-                    formatTime(timestamp), state, timestamp);
+                    formatTime(timestamp), state, Collections.emptyList(), timestamp);
         }).collect(Collectors.toList()));
     }
 
@@ -311,7 +326,7 @@ public class PluginManager extends SyncSupport {
             long size = definition.getSize();
             PluginState state = PluginState.DELETED;
             return new PluginSummary(name, formatSize(size),
-                    formatTime(timestamp), state, timestamp);
+                    formatTime(timestamp), state, Collections.emptyList(), timestamp);
         }).collect(Collectors.toList());
     }
 
@@ -320,7 +335,7 @@ public class PluginManager extends SyncSupport {
     }
 
     protected void resetTreeAndError(String path) {
-        treeMap.remove(path);
+        //treeMap.remove(path);
         errorMap.remove(path);
     }
 
@@ -358,14 +373,14 @@ public class PluginManager extends SyncSupport {
 
         @Override
         public void onEvent(Object event) {
-            if (event instanceof PluginLoadedEvent ||
+            /*if (event instanceof PluginLoadedEvent ||
                     event instanceof PluginLoadErrorEvent) {
                 PluginContext context = ((PluginContextEvent) event).getContext();
                 PluginTree tree = context.get(PluginTree.class);
                 if (tree != null) {
                     treeMap.put(context.getPlugin().getDefinition().getPath(), tree);
                 }
-            }
+            }*/
             if (event instanceof PluginAutoEvent) {
                 String path = ((PluginAutoEvent) event).getDefinition().getPath();
                 if (event instanceof PluginErrorEvent) {
@@ -385,6 +400,7 @@ public class PluginManager extends SyncSupport {
         }
     }
 
+    @Deprecated
     @Getter
     @RequiredArgsConstructor
     public static class GroupSummary {
@@ -414,6 +430,8 @@ public class PluginManager extends SyncSupport {
         private final String createTime;
 
         private final PluginState state;
+
+        private final List<String> error;
 
         private final long sort;
     }

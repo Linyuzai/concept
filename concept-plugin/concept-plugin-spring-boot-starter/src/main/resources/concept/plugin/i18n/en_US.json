@@ -15,6 +15,7 @@
   "query_props": "Properties",
   "empty_text": "Empty",
   "name_exist": "Name existed",
+  "error_message": "Error Message",
   "server_error": "Server Error",
   "password_error": "Password Error",
   "unlock_error": "Unlock Error",
