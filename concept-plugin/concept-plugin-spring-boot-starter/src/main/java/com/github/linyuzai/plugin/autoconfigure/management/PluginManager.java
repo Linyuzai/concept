@@ -276,7 +276,8 @@ public class PluginManager extends SyncSupport {
                     }
                 }
             }
-            List<String> errorList = new ArrayList<>();
+            List<String> errorMessages = new ArrayList<>();
+            List<Throwable> errorList = new ArrayList<>();
             Throwable error = errorMap.get(path);
             if (error != null) {
                 Throwable cause = error;
@@ -286,12 +287,17 @@ public class PluginManager extends SyncSupport {
                         cause = cause.getCause();
                         continue;
                     }
-                    errorList.add(cause.getClass().getName() + ": " + cause.getMessage());
+                    errorList.add(cause);
                     cause = cause.getCause();
+                }
+                if (!errorList.isEmpty()) {
+                    for (Throwable e : errorList) {
+                        errorMessages.add(e.getClass().getName() + ": " + e.getMessage());
+                    }
                 }
             }
             return new PluginSummary(name, formatSize(size),
-                    formatTime(timestamp), state, errorList, timestamp);
+                    formatTime(timestamp), state, errorMessages, timestamp);
         }).collect(Collectors.toList()));
     }
 

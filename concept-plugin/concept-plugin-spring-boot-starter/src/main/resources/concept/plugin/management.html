@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" type="text/css" href="/webjars/element-ui/2.15.1/lib/theme-chalk/index.css">
-    <style>
+    <style lang="scss" scoped>
 
         body {
             font-family: "微软雅黑"
@@ -74,6 +74,29 @@
         .floating-button:hover {
             transform: translateX(-50px);
         }
+
+        .el-tree, .el-tree-node, .el-tree-node__label, .el-tree-node__content {
+            white-space: normal;
+            height: 100%;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        /*:deep(.el-tree-node) {
+            white-space: normal;
+        }
+
+        :deep(.el-tree-node__label) {
+            height: 100%;
+            text-align: left;
+            align-items: start;
+        }
+
+        :deep(.el-tree-node__content) {
+            height: 100%;
+            text-align: left;
+            align-items: start;
+        }*/
 
         [v-cloak] {
             display: none;
@@ -373,7 +396,7 @@
                                             <i v-if="scope.row.error.length > 0"
                                                class="el-icon-warning-outline"
                                                style="cursor: pointer"
-                                               @click="openErrorMessage(scope.row.error)"
+                                               @click="openErrorMessageDialog(scope.row.error)"
                                             ></i>
                                         </el-tag>
                                     </template>
@@ -447,6 +470,12 @@
                                     </template>
                                 </el-table-column>
                             </el-table>
+                            <el-dialog :title="i18n.error_message"
+                                       :visible.sync="plugin.error.visible">
+                                <div style="width: 100%; overflow-x: auto;">
+                                    <el-tree :data="plugin.error.data" default-expand-all="true"></el-tree>
+                                </div>
+                            </el-dialog>
                             <el-dialog :title="i18n.plugin_props"
                                        :visible.sync="plugin.property.visible">
                                 <el-form v-cloak class="dialog-content">
@@ -663,6 +692,9 @@
                 refresh: 0,
                 search: '',
                 list: [],
+                error: {
+                    visible: false
+                },
                 property: {
                     visible: false,
                     list: []
@@ -693,7 +725,7 @@
             }
         },
         methods: {
-            initSettings() {
+            init() {
                 this._get(getSettingUrl(), response => {
                     let body = response;
                     if (body.success) {
@@ -713,6 +745,7 @@
                             this.plugin.visible = true;
                             this.refreshGroups('');
                         });
+                        this.initHelp();
                     } else {
                         this.$notify({
                             title: this.i18n.failure,
@@ -727,9 +760,8 @@
                 });*/
             },
             initHelp() {
-                this._get('/concept-plugin/help.md', response => {
-                    let body = response;
-                    this.help.html = new showdown.Converter().makeHtml(body);
+                this._get('/concept-plugin/help.' + this.setting.locale + '.md', response => {
+                    this.help.html = new showdown.Converter().makeHtml(response);
                 });
             },
             lock(lock) {
@@ -936,8 +968,19 @@
                     this.plugin.refresh--;
                 });
             },
-            openErrorMessage(messages) {
-                this.$alert(messages.join('\nCaused by: '), this.i18n.error_message);
+            openErrorMessageDialog(messages) {
+                this.plugin.error.data = [];
+                this.plugin.error.visible = true;
+                let tree = [];
+                for (let i in messages) {
+                    let message = messages[i];
+                    if (i === '0') {
+                        tree.push({label: message, children: []});
+                    } else {
+                        tree['0'].children.push({label: 'Caused by: ' + message, children: []});
+                    }
+                }
+                this.plugin.error.data = tree;
             },
             loadPlugin(name) {
                 let params = {group: this.group.select, name: name};
@@ -1136,8 +1179,7 @@
             }
         },
         mounted: function () {
-            this.initSettings();
-            this.initHelp();
+            this.init();
         }
     });
 </script>
