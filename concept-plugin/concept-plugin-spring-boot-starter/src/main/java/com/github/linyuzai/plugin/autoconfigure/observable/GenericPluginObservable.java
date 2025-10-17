@@ -14,6 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<St
     public void onExtract(Map<String, V> plugin, PluginContext context) {
         plugin.forEach((k, v) -> {
             K key = grouping(v, context);
-            plugins.computeIfAbsent(key, func -> new ArrayList<>()).add(new Entry(k, v));
+            plugins.computeIfAbsent(key, func -> new CopyOnWriteArrayList<>()).add(new Entry(k, v));
         });
         context.getPlugin().addListener(new PluginListener() {
             @Override
