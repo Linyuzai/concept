@@ -5,6 +5,8 @@ sonatype.gradle
 intellij.gradle
 github.gradle
 
+github-recovery-codes.txt
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
