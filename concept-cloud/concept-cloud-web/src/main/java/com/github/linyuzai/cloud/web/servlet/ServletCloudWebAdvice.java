@@ -72,9 +72,13 @@ public class ServletCloudWebAdvice implements ResponseBodyAdvice<Object>, WebMvc
      * 如果发生异常则在上下文中添加异常
      */
     @ExceptionHandler({Throwable.class})
-    public void onError(Throwable e) {
-        WebContext context = getContext();
-        context.put(Throwable.class, e);
+    public void onError(Throwable e) throws Throwable {
+        if (webConcept.isResponseInterceptionEnabled()) {
+            WebContext context = getContext();
+            context.put(Throwable.class, e);
+        } else {
+            throw e;
+        }
     }
 
     @Override

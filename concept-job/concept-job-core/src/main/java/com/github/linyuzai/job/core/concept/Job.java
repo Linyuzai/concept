@@ -1,7 +1,5 @@
 package com.github.linyuzai.job.core.concept;
 
-import java.util.Map;
-
 public interface Job {
 
     String getId();
@@ -10,9 +8,9 @@ public interface Job {
 
     String getDescription();
 
-    Map<String, String> getParams();
+    String getParams();
 
-    Object run(Map<String, String> params) throws Throwable;
+    Object run(String params) throws Throwable;
 
     default Object run() throws Throwable {
         return run(getParams());

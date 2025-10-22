@@ -1,0 +1,17 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptBitmapVersion
+
+ext {
+    set('publishName', 'Bitmap Core')
+    set('publishDescription', 'Bitmap Core')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+}
+
+apply from: '../../publish.gradle'

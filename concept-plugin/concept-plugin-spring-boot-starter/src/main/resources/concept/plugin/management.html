@@ -737,7 +737,7 @@
                         if (this.setting.locale === 'en') {
                             this.setting.locale = 'en_US';
                         }
-                        if (this.setting.locale === 'zh_CN' || this.setting.locale === 'en_US') {
+                        if (this.setting.locale !== 'zh_CN' || this.setting.locale !== 'en_US') {
                             this.setting.locale = 'zh_CN';
                         }
                         this._get('/concept-plugin/i18n/' + this.setting.locale + '.json', response => {

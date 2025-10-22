@@ -32,6 +32,7 @@ public class SampleDynamicExtractor {
         log.info("Dynamic Text: {}", text);
         SpringData bind = plugin.getMetadata().bind("spring-sample", SpringData.class);
         log.info("Dynamic Bind: {}", bind);
+        throw new RuntimeException("Test exception", new RuntimeException("Test exception inner"));
     }
 
     @Data

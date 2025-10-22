@@ -1,0 +1,19 @@
+apply from: '../../allprojects.gradle'
+
+apply from: '../version.gradle'
+version ConceptBitmapVersion
+
+ext {
+    set('publishName', 'Roaring Bitmap')
+    set('publishDescription', 'Roaring Bitmap')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    compileOnly 'org.roaringbitmap:RoaringBitmap:1.0.1'
+    compileOnly project(':concept-bitmap:concept-bitmap-core')
+}
+
+apply from: '../../publish.gradle'

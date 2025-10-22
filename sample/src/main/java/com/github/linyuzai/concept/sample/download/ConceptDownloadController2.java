@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //webmvc base ok
@@ -195,13 +196,13 @@ public class ConceptDownloadController2 {
                 });
                 options.setAsyncConsumer(new InputStreamConsumer() {
                     @Override
-                    public void consumer(InputStream is) {
+                    public void consume(InputStream is) {
                         //输入流
                     }
                 });
                 options.setAsyncConsumer(new FileConsumer() {
                     @Override
-                    public void consumer(File file) {
+                    public void consume(File file) {
                         //文件
                         System.out.println(file.getAbsolutePath());
                     }
@@ -266,6 +267,13 @@ public class ConceptDownloadController2 {
     @GetMapping("/mock")
     public void mock() {
         downloadMockService.mock();
+    }
+
+    @Download
+    @GetMapping("/s3")
+    public List<String> s3() {
+        return Arrays.asList("http://s3.eapye.com/j2es/2024/05/17/35521928340000155/35522295715000190.jpeg",
+                "http://s3.eapye.com/j2es/2024/05/23/35521928340000155/36025560712000178.jpeg");
     }
 
     @Download(filename = "POJO.zip")

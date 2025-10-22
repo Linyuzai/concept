@@ -10,6 +10,7 @@ import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerMa
 import com.github.linyuzai.connection.loadbalance.core.server.ConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.core.server.LocalConnectionServerManagerFactory;
 import com.github.linyuzai.connection.loadbalance.websocket.EnableWebSocketLoadBalanceConcept;
+import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketConnection;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketEventListener;
 import com.github.linyuzai.connection.loadbalance.websocket.concept.WebSocketMessageHandler;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +34,9 @@ public class WebSocketLoadBalanceConfig {
     public MessageHandler messageHandler() {
         return new WebSocketMessageHandler() {
             @Override
-            public void onMessage(Message message, Connection connection,  ConnectionLoadBalanceConcept concept) {
+            public void onMessage(Message message, Connection connection, ConnectionLoadBalanceConcept concept) {
                 System.out.println("Message " + message.getPayload());
+
             }
         };
     }

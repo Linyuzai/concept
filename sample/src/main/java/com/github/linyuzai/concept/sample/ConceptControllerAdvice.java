@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @CommonsLog
-@RestControllerAdvice
+//@RestControllerAdvice
 public class ConceptControllerAdvice {
 
     @ExceptionHandler(Throwable.class)

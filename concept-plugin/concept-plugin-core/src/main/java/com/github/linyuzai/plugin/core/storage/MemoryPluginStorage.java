@@ -58,7 +58,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         return syncWrite(() -> {
             String generated = generateName(group, name);
             String path = getPluginPath(group, generated);
-            PluginDefinition definition = new PluginDefinitionImpl(path, name, ReadUtils.read(is));
+            PluginDefinition definition = new PluginDefinitionImpl(path, generated, ReadUtils.read(is));
             types.put(path, UNLOADED);
             plugins.get(group).put(generated, definition);
             return generated;
@@ -139,6 +139,18 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
 
     protected void updatePluginInfo(String group, String name, String type) {
         types.put(getPluginPath(group, name), type);
+        Map<String, PluginDefinition> definitionMap = plugins.get(group);
+        if (definitionMap == null) {
+            return;
+        }
+        PluginDefinition definition = definitionMap.get(name);
+        if (definition == null) {
+            return;
+        }
+        definitionMap.put(name, new PluginDefinitionImpl(
+                definition.getPath(),
+                definition.getName(),
+                ReadUtils.read(definition.getInputStream())));
     }
 
     @Getter
@@ -170,5 +182,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
             }
             return new ByteArrayInputStream(bytes);
         }
+
+
     }
 }

@@ -150,13 +150,14 @@ concept:
       enabled: true
       period: 5000
     storage:
-      type: local
+      type: memory
       filter-suffixes: .zip,.jar
     extension:
       request-mapping:
         enabled: true
     management:
       enabled: true
+      locale: en_US
       authorization:
         password: 123
       github-corner:
