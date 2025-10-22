@@ -26,12 +26,20 @@ public class YamlResolver extends PropertiesResolver {
      */
     @Override
     public boolean doFilter(Plugin.Entry entry, PluginContext context) {
-        return entry.getName().endsWith(".yaml") || entry.getName().endsWith(".yml");
+        return isYaml(entry) || super.doFilter(entry, context);
     }
 
     @Override
     public PropertiesSupplier doResolve(Plugin.Entry entry, PluginContext context) {
-        return new YamlPropertiesSupplierImpl(entry.getContent());
+        if (isYaml(entry)) {
+            return new YamlPropertiesSupplierImpl(entry.getContent());
+        } else {
+            return super.doResolve(entry, context);
+        }
+    }
+
+    protected boolean isYaml(Plugin.Entry entry) {
+        return entry.getName().endsWith(".yaml") || entry.getName().endsWith(".yml");
     }
 
     @RequiredArgsConstructor

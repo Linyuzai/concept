@@ -160,10 +160,10 @@ public class PluginConceptConfiguration {
         return new ContentResolver();
     }
 
-    @Bean
+    /*@Bean
     public PropertiesResolver pluginPropertiesResolver() {
         return new PropertiesResolver();
-    }
+    }*/
 
     @Bean
     public YamlResolver pluginYamlResolver() {
