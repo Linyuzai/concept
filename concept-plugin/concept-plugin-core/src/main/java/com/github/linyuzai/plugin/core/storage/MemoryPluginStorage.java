@@ -150,6 +150,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
         definitionMap.put(name, new PluginDefinitionImpl(
                 definition.getPath(),
                 definition.getName(),
+                definition.getCreateTime(),
                 ReadUtils.read(definition.getInputStream())));
     }
 
@@ -161,9 +162,23 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
 
         private final String name;
 
+        private final long createTime;
+
+        private final long updateTime;
+
         private final byte[] bytes;
 
-        private final long createTime = System.currentTimeMillis();
+        public PluginDefinitionImpl(String path, String name, byte[] bytes) {
+            this(path, name, System.currentTimeMillis(), bytes);
+        }
+
+        public PluginDefinitionImpl(String path, String name, long createTime, byte[] bytes) {
+            this.path = path;
+            this.name = name;
+            this.createTime = createTime;
+            this.updateTime = System.currentTimeMillis();
+            this.bytes = bytes;
+        }
 
         @Override
         public long getSize() {
@@ -172,7 +187,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
 
         @Override
         public Object getVersion() {
-            return createTime;
+            return updateTime;
         }
 
         @Override
@@ -182,7 +197,5 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
             }
             return new ByteArrayInputStream(bytes);
         }
-
-
     }
 }
