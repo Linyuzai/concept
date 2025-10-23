@@ -45,7 +45,9 @@ public class PluginStorageConfiguration {
             String location = properties.getStorage().getLocation();
             String localLocation = StringUtils.hasText(location) ?
                     location : LocalPluginStorage.DEFAULT_LOCATION;
-            return new LocalPluginStorage(localLocation, filter);
+            LocalPluginStorage storage = new LocalPluginStorage(localLocation);
+            storage.setFilter(filter);
+            return storage;
         }
     }
 
@@ -61,7 +63,9 @@ public class PluginStorageConfiguration {
             String location = properties.getStorage().getLocation();
             String bucket = StringUtils.hasText(location) ?
                     location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new MinioPluginStorage(bucket, filter, minioClient);
+            MinioPluginStorage storage = new MinioPluginStorage(bucket, minioClient);
+            storage.setFilter(filter);
+            return storage;
         }
     }
 
@@ -77,7 +81,9 @@ public class PluginStorageConfiguration {
             String location = properties.getStorage().getLocation();
             String bucket = StringUtils.hasText(location) ?
                     location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new AmazonS3Storage(bucket, filter, amazonS3);
+            AmazonS3Storage storage = new AmazonS3Storage(bucket, amazonS3);
+            storage.setFilter(filter);
+            return storage;
         }
     }
 
@@ -93,7 +99,9 @@ public class PluginStorageConfiguration {
             String location = properties.getStorage().getLocation();
             String bucket = StringUtils.hasText(location) ?
                     location : RemotePluginStorage.DEFAULT_LOCATION;
-            return new S3ClientStorage(bucket, filter, s3Client);
+            S3ClientStorage storage = new S3ClientStorage(bucket, s3Client);
+            storage.setFilter(filter);
+            return storage;
         }
     }
 }

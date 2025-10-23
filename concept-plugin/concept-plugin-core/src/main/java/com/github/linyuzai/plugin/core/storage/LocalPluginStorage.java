@@ -34,8 +34,6 @@ public class LocalPluginStorage extends AbstractPluginStorage {
      */
     private String location = DEFAULT_LOCATION;
 
-    private PluginStorage.Filter filter;
-
     /**
      * 基础路径下的子目录为分组
      */
@@ -204,7 +202,7 @@ public class LocalPluginStorage extends AbstractPluginStorage {
         File directory = getPluginDirectory(type, group);
         File[] files = directory.listFiles(pathname -> {
             String name = pathname.getName();
-            return filter == null || filter.filter(group, name);
+            return filter(group, name);
         });
         if (files == null) {
             return Collections.emptyList();

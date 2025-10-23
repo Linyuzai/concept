@@ -26,8 +26,6 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
 
     private String bucket = DEFAULT_LOCATION;
 
-    private PluginStorage.Filter filter;
-
     @Override
     public void initialize() {
         super.initialize();
@@ -99,7 +97,8 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         Map<String, String> userMetadata = createUserMetadata(group, name, PluginStorage.DELETED);
         String bucket = getBucket();
         String key = getPluginPath(group, name);
-        String deleteKey = generateDeletedName(group, name);
+        String deleteName = generateDeletedName(group, name);
+        String deleteKey = getPluginPath(group, deleteName);
         copyObject(bucket, key, bucket, deleteKey, userMetadata);
         deleteObject(bucket, key);
     }
@@ -162,7 +161,7 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
             if (name.endsWith(GROUP_METADATA)) {
                 continue;
             }
-            if (filter == null || filter.filter(group, name)) {
+            if (filter(group, name)) {
                 Map<String, String> userMetadata = getUserMetadata(bucketToUse, name);
                 String pluginStatus = userMetadata.get(METADATA_STATUS);
                 if (type.equals(pluginStatus)) {

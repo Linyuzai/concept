@@ -15,8 +15,14 @@ public abstract class AbstractPluginStorage extends SyncSupport implements Plugi
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
+    private PluginStorage.Filter filter;
+
     @Override
     public void initialize() {
+    }
+
+    protected boolean filter(String group, String name) {
+        return filter == null || filter.filter(group, name);
     }
 
     /**

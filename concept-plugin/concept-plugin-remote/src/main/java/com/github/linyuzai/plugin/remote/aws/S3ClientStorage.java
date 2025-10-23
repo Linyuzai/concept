@@ -18,8 +18,8 @@ public class S3ClientStorage extends RemotePluginStorage {
 
     private final S3Client s3Client;
 
-    public S3ClientStorage(String bucket, Filter filter, S3Client s3Client) {
-        super(bucket, filter);
+    public S3ClientStorage(String bucket, S3Client s3Client) {
+        super(bucket);
         this.s3Client = s3Client;
     }
 

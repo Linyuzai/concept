@@ -17,8 +17,8 @@ public class AmazonS3Storage extends RemotePluginStorage {
 
     private final AmazonS3 amazonS3;
 
-    public AmazonS3Storage(String bucket, Filter filter, AmazonS3 amazonS3) {
-        super(bucket, filter);
+    public AmazonS3Storage(String bucket, AmazonS3 amazonS3) {
+        super(bucket);
         this.amazonS3 = amazonS3;
     }
 

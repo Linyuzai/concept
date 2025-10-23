@@ -24,8 +24,8 @@ public class MinioPluginStorage extends RemotePluginStorage {
 
     private final MinioClient minioClient;
 
-    public MinioPluginStorage(String bucket, Filter filter, MinioClient minioClient) {
-        super(bucket, filter);
+    public MinioPluginStorage(String bucket, MinioClient minioClient) {
+        super(bucket);
         this.minioClient = minioClient;
     }
 
