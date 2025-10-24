@@ -44,17 +44,17 @@ public abstract class PluginClassLoader extends URLClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         return findPluginClass(name, new LinkedHashSet<>());
-        /*Collection<Plugin> plugins = new LinkedHashSet<>();
-        collectDependencyPlugins(plugin, plugins);
-        for (Plugin p : plugins) {
-            if (p instanceof JarPlugin) {
-                try {
-                    return ((JarPlugin) p).getPluginClassLoader().findPluginClass(name);
-                } catch (ClassNotFoundException ignore) {
-                }
+    }
+
+    private Class<?> loadPluginClass(String name, Collection<Plugin> plugins) throws ClassNotFoundException {
+        synchronized (getClassLoadingLock(name)) {
+            // First, check if the class has already been loaded
+            Class<?> c = findLoadedClass(name);
+            if (c != null) {
+                return c;
             }
         }
-        throw new ClassNotFoundException(name);*/
+        return findPluginClass(name, plugins);
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class PluginClassLoader extends URLClassLoader {
                             continue;
                         }
                         try {
-                            return pluginClassLoader.findPluginClass(name, plugins);
+                            return pluginClassLoader.loadPluginClass(name, plugins);
                         } catch (ClassNotFoundException ignore) {
                         }
                     }
