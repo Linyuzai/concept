@@ -18,13 +18,15 @@ public class ServletPluginManagementController extends PluginManagementControlle
 
     @PostMapping("/plugin/upload")
     public void upload(@RequestParam("file") MultipartFile file,
-                       @RequestParam("group") String group,
-                       @RequestParam("name") String name) throws IOException {
+                       @RequestParam(name = "group", required = false) String group,
+                       @RequestParam(name = "name", required = false) String name) throws IOException {
         //File finalFile = getFinalFile(group, file.getOriginalFilename());
         //file.transferTo(finalFile);
-        String upload = uploadPlugin(group, file.getOriginalFilename(), file.getInputStream(), file.getSize());
+        String groupOrDefault = StringUtils.hasText(group) ? group : "default";
+        String upload = uploadPlugin(groupOrDefault, file.getOriginalFilename(),
+                file.getInputStream(), file.getSize());
         if (StringUtils.hasText(name)) {
-            updatePlugin(group, name, upload);
+            updatePlugin(groupOrDefault, name, upload);
         }
     }
 

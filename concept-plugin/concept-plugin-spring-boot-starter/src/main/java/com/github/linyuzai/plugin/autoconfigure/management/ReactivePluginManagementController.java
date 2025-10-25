@@ -15,14 +15,16 @@ public class ReactivePluginManagementController extends PluginManagementControll
 
     @PostMapping("/plugin/upload")
     public Mono<Void> upload(@RequestPart("file") FilePart file,
-                             @RequestPart("group") String group,
-                             @RequestPart("name") String name) {
+                             @RequestPart(name = "group", required = false) String group,
+                             @RequestPart(name = "name", required = false) String name) {
+        String groupOrDefault = StringUtils.hasText(group) ? group : "default";
         return DataBufferUtils.join(file.content())
                 .flatMap(it -> {
                     try {
-                        String upload = uploadPlugin(group, file.filename(), it.asInputStream(), it.readableByteCount());
+                        String upload = uploadPlugin(groupOrDefault, file.filename(),
+                                it.asInputStream(), it.readableByteCount());
                         if (StringUtils.hasText(name)) {
-                            updatePlugin(group, name, upload);
+                            updatePlugin(groupOrDefault, name, upload);
                         }
                         return Mono.empty();
                     } catch (Throwable e) {

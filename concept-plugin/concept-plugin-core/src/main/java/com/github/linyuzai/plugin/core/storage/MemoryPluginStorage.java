@@ -60,6 +60,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
             String path = getPluginPath(group, generated);
             PluginDefinition definition = new PluginDefinitionImpl(path, generated, ReadUtils.read(is));
             types.put(path, UNLOADED);
+            addGroup(group);
             plugins.get(group).put(generated, definition);
             return generated;
         });
@@ -95,7 +96,7 @@ public class MemoryPluginStorage extends AbstractPluginStorage {
             if (existPlugin(group, rename)) {
                 throw new IllegalArgumentException("Name existed");
             }
-            PluginDefinition definition = plugins.getOrDefault(group, Collections.emptyMap()).remove(rename);
+            PluginDefinition definition = plugins.getOrDefault(group, Collections.emptyMap()).remove(name);
             if (definition == null) {
                 return;
             }
