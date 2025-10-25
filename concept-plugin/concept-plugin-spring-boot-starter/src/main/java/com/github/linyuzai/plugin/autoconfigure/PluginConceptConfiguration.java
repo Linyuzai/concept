@@ -24,7 +24,6 @@ import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
 import com.github.linyuzai.plugin.core.handle.extract.*;
 import com.github.linyuzai.plugin.core.handle.resolve.ContentResolver;
 import com.github.linyuzai.plugin.core.handle.resolve.EntryResolver;
-import com.github.linyuzai.plugin.core.handle.resolve.PropertiesResolver;
 import com.github.linyuzai.plugin.core.intercept.AddListenersPluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.NestedDepthPluginInterceptor;
 import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
