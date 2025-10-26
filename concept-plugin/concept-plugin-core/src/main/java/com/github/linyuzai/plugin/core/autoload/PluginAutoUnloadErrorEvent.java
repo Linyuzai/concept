@@ -12,9 +12,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PluginAutoUnloadErrorEvent implements PluginAutoEvent, PluginErrorEvent {
 
-    /**
-     * 插件路径
-     */
     private final PluginDefinition definition;
 
     private final Throwable error;

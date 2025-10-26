@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 文件自动加载器抽象类
+ * 插件自动加载器抽象类
  */
 @Getter
 @RequiredArgsConstructor
@@ -24,14 +24,8 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
 
     protected final PluginConcept concept;
 
-    /**
-     * 执行线程池
-     */
     protected final PluginExecutor executor;
 
-    /**
-     * 插件位置
-     */
     protected final PluginStorage storage;
 
     /**
@@ -64,10 +58,20 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
         });
     }
 
+    /**
+     * 初始化插件加载回调
+     *
+     * @param definitions 初始化加载的插件
+     */
     protected void onStart(List<? extends PluginDefinition> definitions) {
 
     }
 
+    /**
+     * 初始化加载插件
+     *
+     * @return 加载的插件
+     */
     protected List<PluginDefinition> loadPlugins() {
         List<PluginDefinition> definitions = getPluginDefinitions();
         concept.load(definitions,
@@ -78,6 +82,9 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
         return definitions;
     }
 
+    /**
+     * 触发插件加载或卸载
+     */
     @Override
     public void refresh() {
         try {
@@ -87,6 +94,11 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
         }
     }
 
+    /**
+     * 获得需要加载的插件
+     *
+     * @return 需要加载的插件
+     */
     protected List<PluginDefinition> getPluginDefinitions() {
         return storage.getGroups()
                 .stream()
@@ -94,6 +106,9 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 监听插件刷新
+     */
     protected void listen(PluginExecutor executor) {
         long period = getPeriod();
         if (period > 0) {
@@ -101,8 +116,18 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
         }
     }
 
+    /**
+     * 返回刷新间隔
+     *
+     * @return 刷新间隔
+     */
     protected abstract long getPeriod();
 
+    /**
+     * 刷新插件加载或卸载
+     *
+     * @param definitions 需要加载的插件
+     */
     protected abstract void onRefresh(List<PluginDefinition> definitions);
 
     /**
@@ -114,26 +139,10 @@ public abstract class AbstractPluginAutoLoader extends SyncSupport implements Pl
     }
 
     /**
-     * 文件创建
+     * 异常时回调
+     *
+     * @param e 异常
      */
-    protected void onCreated(PluginDefinition definition) {
-        load(definition);
-    }
-
-    /**
-     * 文件修改
-     */
-    protected void onModified(PluginDefinition definition) {
-        reload(definition);
-    }
-
-    /**
-     * 文件删除
-     */
-    protected void onDeleted(PluginDefinition definition) {
-        unload(definition);
-    }
-
     protected void onError(Throwable e) {
         concept.getLogger().error("Plugin autoload error", e);
     }

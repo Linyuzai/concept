@@ -81,11 +81,17 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
      */
     protected final Set<String> unloading = new HashSet<>();
 
+    /**
+     * 初始化
+     */
     @Override
     public void initialize() {
         syncWrite(() -> eventPublisher.publish(new PluginConceptInitializedEvent(this)));
     }
 
+    /**
+     * 销毁
+     */
     @Override
     public void destroy() {
         syncWrite(() -> {
@@ -95,11 +101,17 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
         });
     }
 
+    /**
+     * 添加处理器
+     */
     @Override
     public void addHandlers(PluginHandler... handlers) {
         addHandlers(Arrays.asList(handlers));
     }
 
+    /**
+     * 添加处理器
+     */
     @Override
     public void addHandlers(Collection<? extends PluginHandler> handlers) {
         syncWrite(() -> {
@@ -109,11 +121,17 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
         });
     }
 
+    /**
+     * 移除处理器
+     */
     @Override
     public void removeHandlers(PluginHandler... handlers) {
         removeHandlers(Arrays.asList(handlers));
     }
 
+    /**
+     * 移除处理器
+     */
     @Override
     public void removeHandlers(Collection<? extends PluginHandler> handlers) {
         syncWrite(() -> {
@@ -124,12 +142,9 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 获得处理链
-     * <p>
-     * 如果存在动态处理器则创建新处理链
-     * <p>
-     * 如果不存在动态处理器则使用缓存的处理链
-     * <p>
+     * 获得处理链，
+     * 如果存在动态处理器则创建新处理链，
+     * 如果不存在动态处理器则使用缓存的处理链，
      * 如果没有缓存则创建新处理链并缓存
      */
     protected PluginHandlerChain obtainHandlerChain(Plugin plugin, PluginContext context) {
@@ -156,39 +171,61 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 重置处理链
-     * <p>
-     * 如果添加或移除了处理器就需要重新生成处理链
+     * 重置处理链，如果添加或移除了处理器就需要重新生成处理链
      */
     protected void resetHandlerChain() {
         handlerChain = null;
     }
 
+    /**
+     * 添加拦截器
+     */
     @Override
     public void addInterceptor(PluginInterceptor... interceptors) {
         addInterceptor(Arrays.asList(interceptors));
     }
 
+    /**
+     * 添加拦截器
+     */
     @Override
     public void addInterceptor(Collection<? extends PluginInterceptor> interceptors) {
         syncWrite(() -> this.interceptors.addAll(interceptors));
     }
 
+    /**
+     * 移除拦截器
+     */
     @Override
     public void removeInterceptor(PluginInterceptor... interceptors) {
         removeInterceptor(Arrays.asList(interceptors));
     }
 
+    /**
+     * 移除拦截器
+     */
     @Override
     public void removeInterceptor(Collection<? extends PluginInterceptor> interceptors) {
         syncWrite(() -> this.interceptors.removeAll(interceptors));
     }
 
+    /**
+     * 创建插件上下文
+     *
+     * @return 插件上下文
+     */
     @Override
     public PluginContext createContext() {
         return contextFactory.create(this);
     }
 
+    /**
+     * 创建插件元数据
+     *
+     * @param definition 插件定义
+     * @param context    插件上下文
+     * @return 插件元数据
+     */
     @Override
     public PluginMetadata createMetadata(PluginDefinition definition, PluginContext context) {
         return syncWrite(() -> {
@@ -203,7 +240,11 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 遍历插件工厂创建插件
+     * 创建插件
+     *
+     * @param definition 插件定义
+     * @param context    插件上下文
+     * @return 插件
      */
     @Override
     public Plugin createPlugin(PluginDefinition definition, PluginContext context) {
@@ -236,6 +277,12 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
         });
     }
 
+    /**
+     * 加载插件
+     *
+     * @param definition 插件定义
+     * @return 插件
+     */
     @Override
     public Plugin load(PluginDefinition definition) {
         List<Plugin> plugins = new ArrayList<>();
@@ -256,11 +303,7 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 加载插件
-     * <p>
-     * 加载已存在的插件将会失败
-     * <p>
-     * 插件创建后根据插件依赖进行解析提取
+     * 插件创建并加载插件树
      */
     @Override
     public void load(@NonNull Collection<? extends PluginDefinition> definitions,
@@ -279,7 +322,7 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
             }
 
             BiConsumer<PluginDefinition, Plugin> success = (definition, plugin) -> {
-                repository.add(plugin);//添加到存储中
+                repository.add(plugin);//添加到仓储中
                 loading.remove(definition.getPath());//移除正在加载的状态
                 onSuccess.accept(definition, plugin);
             };
@@ -330,7 +373,7 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 基于依赖关系加载插件
+     * 基于依赖关系加载插件并进行解析
      */
     protected void doLoad(LoadingEntry entry,
                           Collection<LoadingEntry> original,
@@ -414,7 +457,7 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 依赖是否存在
+     * 判断依赖是否存在
      */
     protected boolean existDependency(String name) {
         return repository.stream().anyMatch(it ->
@@ -422,7 +465,7 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
     }
 
     /**
-     * 卸载插件。
+     * 卸载插件
      */
     @Override
     public Plugin unload(@NonNull PluginDefinition definition) {
@@ -445,37 +488,60 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
         });
     }
 
+    /**
+     * 插件是否已加载
+     *
+     * @param definition 插件定义
+     * @return 是否加载
+     */
     @Override
     public boolean isLoaded(PluginDefinition definition) {
         return repository.contains(definition);
     }
 
+    /**
+     * 插件是否加载中
+     *
+     * @param definition 插件定义
+     * @return 是否加载中
+     */
     @Override
     public boolean isLoading(PluginDefinition definition) {
         return syncRead(() -> loading.contains(definition.getPath()));
     }
 
+    /**
+     * 插件是否卸载中
+     *
+     * @param definition 插件定义
+     * @return 是否卸载中
+     */
     @Override
     public boolean isUnloading(PluginDefinition definition) {
         return syncRead(() -> unloading.contains(definition.getPath()));
     }
 
+    @Override
     public List<PluginMetadataFactory> getMetadataFactories() {
         return syncRead(() -> Collections.unmodifiableList(metadataFactories));
     }
 
+    @Override
     public List<PluginFactory> getFactories() {
         return syncRead(() -> Collections.unmodifiableList(factories));
     }
 
+    @Override
     public List<PluginHandler> getHandlers() {
         return syncRead(() -> Collections.unmodifiableList(handlers));
     }
 
+    @Override
     public List<PluginHandlerFactory> getHandlerFactories() {
         return syncRead(() -> Collections.unmodifiableList(handlerFactories));
     }
 
+    @Override
     public List<PluginInterceptor> getInterceptors() {
         return syncRead(() -> Collections.unmodifiableList(interceptors));
     }

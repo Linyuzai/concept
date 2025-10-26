@@ -1,7 +1,7 @@
 package com.github.linyuzai.plugin.core.autoload;
 
 /**
- * 插件自动加载
+ * 插件自动加载器
  */
 public interface PluginAutoLoader {
 

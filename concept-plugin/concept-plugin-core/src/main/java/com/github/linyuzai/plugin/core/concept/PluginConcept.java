@@ -3,17 +3,21 @@ package com.github.linyuzai.plugin.core.concept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.context.PluginContextFactory;
 import com.github.linyuzai.plugin.core.event.PluginEventPublisher;
+import com.github.linyuzai.plugin.core.factory.PluginFactory;
 import com.github.linyuzai.plugin.core.handle.PluginHandler;
 import com.github.linyuzai.plugin.core.handle.PluginHandlerChainFactory;
+import com.github.linyuzai.plugin.core.handle.PluginHandlerFactory;
 import com.github.linyuzai.plugin.core.intercept.PluginInterceptor;
 import com.github.linyuzai.plugin.core.logger.PluginLogger;
 import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
+import com.github.linyuzai.plugin.core.metadata.PluginMetadataFactory;
 import com.github.linyuzai.plugin.core.path.PluginPathFactory;
 import com.github.linyuzai.plugin.core.repository.PluginRepository;
 import com.github.linyuzai.plugin.core.storage.PluginStorage;
 import com.github.linyuzai.plugin.core.tree.PluginTreeFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -51,12 +55,24 @@ public interface PluginConcept {
      */
     void removeHandlers(Collection<? extends PluginHandler> handlers);
 
+    /**
+     * 添加插件拦截器
+     */
     void addInterceptor(PluginInterceptor... interceptors);
 
+    /**
+     * 添加插件拦截器
+     */
     void addInterceptor(Collection<? extends PluginInterceptor> interceptors);
 
+    /**
+     * 移除插件拦截器
+     */
     void removeInterceptor(PluginInterceptor... interceptors);
 
+    /**
+     * 移除插件拦截器
+     */
     void removeInterceptor(Collection<? extends PluginInterceptor> interceptors);
 
     /**
@@ -65,7 +81,7 @@ public interface PluginConcept {
     PluginContext createContext();
 
     /**
-     * 获得插件配置
+     * 创建插件元数据
      */
     PluginMetadata createMetadata(PluginDefinition definition, PluginContext context);
 
@@ -146,4 +162,29 @@ public interface PluginConcept {
      * 获得日志
      */
     PluginLogger getLogger();
+
+    /**
+     * 获得元数据工厂
+     */
+    List<PluginMetadataFactory> getMetadataFactories();
+
+    /**
+     * 获得插件工厂
+     */
+    List<PluginFactory> getFactories();
+
+    /**
+     * 获得处理器
+     */
+    List<PluginHandler> getHandlers();
+
+    /**
+     * 获得处理器工厂
+     */
+    List<PluginHandlerFactory> getHandlerFactories();
+
+    /**
+     * 获得拦截器
+     */
+    List<PluginInterceptor> getInterceptors();
 }

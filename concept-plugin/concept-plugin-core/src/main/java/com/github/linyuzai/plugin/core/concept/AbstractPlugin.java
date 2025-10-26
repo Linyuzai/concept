@@ -29,24 +29,44 @@ public abstract class AbstractPlugin extends SyncSupport implements Plugin {
 
     private PluginConcept concept;
 
+    /**
+     * 是否加载
+     */
     private volatile boolean loaded = false;
 
+    /**
+     * 监听插件的加载和卸载
+     *
+     * @param listener 监听器
+     */
     @Override
     public void addListener(@NonNull PluginListener listener) {
         syncWrite(() -> listeners.add(listener));
     }
 
+    /**
+     * 移除监听
+     *
+     * @param listener 监听器
+     */
     @Override
     public void removeListener(@NonNull PluginListener listener) {
         syncWrite(() -> listeners.remove(listener));
     }
 
+    /**
+     * 获得插件监听器
+     *
+     * @return 监听器
+     */
     public List<PluginListener> getListeners() {
         return syncRead(() -> Collections.unmodifiableList(listeners));
     }
 
     /**
-     * 解析插件树
+     * 加载插件，解析插件树
+     *
+     * @param context 插件上下文
      */
     @Override
     public void load(PluginContext context) {
@@ -83,6 +103,9 @@ public abstract class AbstractPlugin extends SyncSupport implements Plugin {
         });
     }
 
+    /**
+     * 卸载
+     */
     @Override
     public void unload() {
         syncWrite(() -> {
@@ -102,14 +125,14 @@ public abstract class AbstractPlugin extends SyncSupport implements Plugin {
     public abstract void forEachEntry(PluginContext context, Consumer<Entry> consumer);
 
     /**
-     * 加载
+     * 加载回调
      */
     public void onLoad(PluginContext context) {
 
     }
 
     /**
-     * 卸载
+     * 卸载回调
      */
     public void onUnload() {
 

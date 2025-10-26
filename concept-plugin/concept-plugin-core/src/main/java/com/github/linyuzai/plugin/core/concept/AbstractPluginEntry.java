@@ -4,6 +4,9 @@ import com.github.linyuzai.plugin.core.sync.SyncSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 插件项抽象类
+ */
 @Getter
 @RequiredArgsConstructor
 public abstract class AbstractPluginEntry extends SyncSupport implements Plugin.Entry {

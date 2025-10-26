@@ -35,8 +35,14 @@ public interface Plugin {
      */
     void setMetadata(PluginMetadata metadata);
 
+    /**
+     * 获得Concept
+     */
     PluginConcept getConcept();
 
+    /**
+     * 设置Concept
+     */
     void setConcept(PluginConcept concept);
 
     /**
@@ -59,6 +65,9 @@ public interface Plugin {
      */
     void load(PluginContext context);
 
+    /**
+     * 是否已加载
+     */
     boolean isLoaded();
 
     /**
@@ -72,8 +81,14 @@ public interface Plugin {
          */
         private String name;
 
+        /**
+         * 处理器元数据
+         */
         private HandlerMetadata handler = new HandlerMetadata();
 
+        /**
+         * 依赖元数据
+         */
         private DependencyMetadata dependency = new DependencyMetadata();
 
         /**
@@ -142,7 +157,7 @@ public interface Plugin {
     interface Content {
 
         /**
-         * 获得数据流
+         * 获得输入流
          */
         InputStream getInputStream();
     }

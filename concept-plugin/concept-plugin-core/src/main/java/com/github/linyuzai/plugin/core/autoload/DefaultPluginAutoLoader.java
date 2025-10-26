@@ -10,12 +10,18 @@ import lombok.Setter;
 import java.util.*;
 
 /**
- * 线程池定时遍历插件文件自动加载
+ * 线程池定时遍历插件自动加载
  */
 public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
 
+    /**
+     * 当前已加载插件
+     */
     private final Map<String, PluginDefinition> plugins = new LinkedHashMap<>();
 
+    /**
+     * 刷新间隔
+     */
     @Getter
     @Setter
     private long period;
@@ -28,11 +34,22 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
         this.period = period;
     }
 
+    /**
+     * 初始化插件加载后更新当前加载插件信息
+     *
+     * @param definitions 初始化加载的插件
+     */
     @Override
     protected void onStart(List<? extends PluginDefinition> definitions) {
         syncWrite(() -> plugins.putAll(toMap(definitions)));
     }
 
+    /**
+     * 比对当前加载的插件和最新需要加载的插件，
+     * 根据比对的结果加载卸载重新加载插件
+     *
+     * @param definitions 需要加载的插件
+     */
     @Override
     protected void onRefresh(List<PluginDefinition> definitions) {
         syncWrite(() -> {
@@ -59,7 +76,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
             load.forEach((path, definition) -> {
                 try {
                     plugins.put(path, definition);
-                    onCreated(definition);
+                    load(definition);
                 } catch (Throwable e) {
                     onError(e);
                 }
@@ -67,7 +84,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
             reload.forEach((path, definition) -> {
                 try {
                     plugins.put(path, definition);
-                    onModified(definition);
+                    reload(definition);
                 } catch (Throwable e) {
                     onError(e);
                 }
@@ -75,7 +92,7 @@ public class DefaultPluginAutoLoader extends AbstractPluginAutoLoader {
             unload.forEach((path, definition) -> {
                 try {
                     plugins.remove(path);
-                    onDeleted(definition);
+                    unload(definition);
                 } catch (Throwable e) {
                     onError(e);
                 }
