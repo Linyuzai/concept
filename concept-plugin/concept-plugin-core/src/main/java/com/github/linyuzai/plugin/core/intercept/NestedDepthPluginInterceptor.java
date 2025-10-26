@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * 校验嵌套深度的拦截器
+ */
 @Getter
 @Setter
 @NoArgsConstructor

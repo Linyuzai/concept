@@ -6,65 +6,68 @@ import java.io.InputStream;
 import java.util.Set;
 
 /**
- * 插件配置
+ * 插件元数据
  */
 public interface PluginMetadata {
 
     /**
-     * 配置前缀
+     * 插件元数据前缀
      */
     String PREFIX = "concept.plugin";
 
     /**
-     * 配置文件名
+     * 插件元数据文件名
      */
     String PROP_NAME = "plugin.properties";
 
     /**
-     * 配置文件名
+     * 插件元数据文件名
      */
     String YAML_NAME = "plugin.yaml";
 
     /**
-     * 配置文件名
+     * 插件元数据文件名
      */
     String YML_NAME = "plugin.yml";
 
     /**
-     * 获得配置
+     * 获得插件元数据
      */
     String get(String name);
 
     /**
-     * 获得配置（可指定默认值）
+     * 获得插件元数据（可指定默认值）
      */
     String get(String name, String defaultValue);
 
     /**
-     * 获得所有配置名
+     * 获得所有插件元数据名
      */
     Set<String> names();
 
     /**
-     * 绑定配置
+     * 绑定插件元数据
      */
     <T> T bind(String name, Class<T> type);
 
     /**
-     * 获得标准配置
+     * 获得标准插件元数据
      */
     <T extends Plugin.StandardMetadata> T asStandard();
 
     /**
-     * 设置配置
+     * 设置插件元数据
      */
     void set(String name, String value);
 
     /**
-     * 刷新配置
+     * 刷新插件元数据
      */
     void refresh();
 
+    /**
+     * 插件元数据适配器
+     */
     interface Adapter {
 
         boolean support(String name);

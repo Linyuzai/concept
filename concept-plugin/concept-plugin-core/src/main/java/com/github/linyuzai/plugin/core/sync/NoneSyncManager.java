@@ -2,7 +2,10 @@ package com.github.linyuzai.plugin.core.sync;
 
 import java.util.function.Supplier;
 
-public class NoSyncManager implements SyncManager {
+/**
+ * 无同步
+ */
+public class NoneSyncManager implements SyncManager {
 
     @Override
     public void syncRead(Runnable runnable) {
@@ -28,7 +31,7 @@ public class NoSyncManager implements SyncManager {
 
         @Override
         public SyncManager create(Object o) {
-            return new NoSyncManager();
+            return new NoneSyncManager();
         }
     }
 }

@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 默认的插件处理链
- * <p>
- * 根据插件处理器的依赖关系生成插件处理链
+ * 默认的插件处理链，根据插件处理器的依赖关系生成插件处理链
  */
 public class DefaultPluginHandlerChain implements PluginHandlerChain {
 
@@ -164,6 +162,11 @@ public class DefaultPluginHandlerChain implements PluginHandlerChain {
         throw new IllegalArgumentException("Dependency not found: " + dependency);
     }
 
+    /**
+     * 执行下一个处理器
+     *
+     * @param context 插件上下文
+     */
     @Override
     public void next(PluginContext context) {
         doNext(context, 0);

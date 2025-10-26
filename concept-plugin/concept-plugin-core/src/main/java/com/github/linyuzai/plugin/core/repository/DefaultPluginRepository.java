@@ -49,6 +49,9 @@ public class DefaultPluginRepository implements PluginRepository {
         return plugins.containsKey(definition.getPath());
     }
 
+    /**
+     * 获得插件流
+     */
     @Override
     public Stream<Plugin> stream() {
         return plugins.values().stream();

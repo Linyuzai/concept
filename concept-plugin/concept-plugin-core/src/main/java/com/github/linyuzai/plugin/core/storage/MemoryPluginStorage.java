@@ -12,6 +12,9 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * 内存存储
+ */
 public class MemoryPluginStorage extends AbstractPluginStorage {
 
     private final Map<String, String> types = new HashMap<>();

@@ -14,9 +14,7 @@ public interface PluginHandler {
     void handle(PluginContext context);
 
     /**
-     * 插件处理器依赖
-     * <p>
-     * 用于处理插件处理器的依赖关系
+     * 插件处理器依赖，用于处理插件处理器的依赖关系
      */
     interface Dependency {
 

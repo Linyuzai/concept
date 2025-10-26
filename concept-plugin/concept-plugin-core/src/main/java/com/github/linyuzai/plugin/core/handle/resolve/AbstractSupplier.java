@@ -23,5 +23,8 @@ public abstract class AbstractSupplier<T> extends SyncSupport implements Supplie
         return supplied;
     }
 
+    /**
+     * 创建对象实例
+     */
     public abstract T create();
 }

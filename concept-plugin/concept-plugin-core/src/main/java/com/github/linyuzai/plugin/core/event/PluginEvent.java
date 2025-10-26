@@ -8,6 +8,9 @@ import com.github.linyuzai.plugin.core.concept.PluginDefinition;
  */
 public interface PluginEvent extends PluginDefinitionEvent {
 
+    /**
+     * 获得插件
+     */
     Plugin getPlugin();
 
     @Override

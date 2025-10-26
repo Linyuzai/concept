@@ -11,7 +11,7 @@ import com.github.linyuzai.plugin.core.handle.HandlerDependency;
 public class ContentResolver extends AbstractPluginResolver<Plugin.Entry, Plugin.Content> {
 
     /**
-     * 过滤内容不为null
+     * 过滤内容不为 null
      */
     @Override
     public boolean doFilter(Plugin.Entry source, PluginContext context) {
@@ -26,11 +26,17 @@ public class ContentResolver extends AbstractPluginResolver<Plugin.Entry, Plugin
         return source.getContent();
     }
 
+    /**
+     * 解析插件项
+     */
     @Override
     public Object getInboundKey() {
         return Plugin.Entry.class;
     }
 
+    /**
+     * 解析成内容对象
+     */
     @Override
     public Object getOutboundKey() {
         return Plugin.Content.class;

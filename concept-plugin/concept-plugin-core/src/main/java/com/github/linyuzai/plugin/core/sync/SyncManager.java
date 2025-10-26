@@ -2,6 +2,9 @@ package com.github.linyuzai.plugin.core.sync;
 
 import java.util.function.Supplier;
 
+/**
+ * 同步管理器
+ */
 public interface SyncManager {
 
     void syncRead(Runnable runnable);

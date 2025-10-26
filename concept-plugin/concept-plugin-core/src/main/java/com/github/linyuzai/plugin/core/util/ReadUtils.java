@@ -7,12 +7,18 @@ import lombok.SneakyThrows;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+/**
+ * 读取相关工具类
+ */
 public class ReadUtils {
 
     @Getter
     @Setter
     private static int bufferSize = 8192;
 
+    /**
+     * 读取限制
+     */
     @Getter
     @Setter
     private static long readLimit = -1;

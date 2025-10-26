@@ -24,7 +24,7 @@ public interface PluginFilter extends PluginHandler, PluginHandler.Dependency {
     PluginFilter negate();
 
     /**
-     * 排序
+     * 排序值
      */
     default int getOrder() {
         return 0;

@@ -239,9 +239,7 @@ public abstract class AbstractPluginExtractor<T> implements PluginExtractor {
         private final PluginFormatter formatter;
 
         /**
-         * 执行插件提取
-         * <p>
-         * 包括匹配，转换，格式化三个步骤
+         * 执行插件提取，包括匹配，转换，格式化三个步骤
          */
         @Override
         public Object invoke(PluginContext context) {

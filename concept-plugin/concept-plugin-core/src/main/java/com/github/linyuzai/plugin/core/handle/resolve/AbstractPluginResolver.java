@@ -44,12 +44,12 @@ public abstract class AbstractPluginResolver<T, R> implements PluginResolver {
     public abstract R doResolve(T source, PluginContext context);
 
     /**
-     * 输入数据的key
+     * 输入数据的 key
      */
     public abstract Object getInboundKey();
 
     /**
-     * 输出数据key
+     * 输出数据的 key
      */
     public abstract Object getOutboundKey();
 }

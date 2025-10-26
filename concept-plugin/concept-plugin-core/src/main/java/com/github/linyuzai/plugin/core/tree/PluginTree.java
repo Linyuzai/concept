@@ -12,6 +12,9 @@ import java.util.function.Predicate;
  */
 public interface PluginTree {
 
+    /**
+     * 获得插件定义
+     */
     PluginDefinition getDefinition();
 
     /**
@@ -105,6 +108,9 @@ public interface PluginTree {
      */
     interface NodeFactory {
 
+        /**
+         * 创建节点
+         */
         Node create(Object id, String name, Object value);
     }
 

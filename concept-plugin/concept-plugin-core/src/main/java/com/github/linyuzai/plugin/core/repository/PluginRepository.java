@@ -31,7 +31,7 @@ public interface PluginRepository {
     boolean contains(PluginDefinition definition);
 
     /**
-     * 插件流
+     * 获得插件流
      */
     Stream<Plugin> stream();
 }

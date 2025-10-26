@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class AbstractPluginContext implements PluginContext {
 
+    /**
+     * 父级上下文
+     */
     protected final PluginContext parent;
 
     @Override

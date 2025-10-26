@@ -9,6 +9,9 @@ import lombok.Getter;
 @Getter
 public abstract class PluginContextEvent extends AbstractPluginEvent {
 
+    /**
+     * 插件上下文
+     */
     private final PluginContext context;
 
     public PluginContextEvent(PluginContext context) {

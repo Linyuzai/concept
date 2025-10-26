@@ -23,7 +23,19 @@ public abstract class StreamPluginFactory extends AbstractPluginFactory {
         return null;
     }
 
+    /**
+     * 根据输入流创建插件
+     *
+     * @param supplier 输入流
+     * @return 插件
+     */
     protected abstract Plugin create(Supplier<InputStream> supplier);
 
+    /**
+     * 根据插件定义是否支持创建插件
+     *
+     * @param definition 插件定义
+     * @return 是否支持创建插件
+     */
     protected abstract boolean support(PluginDefinition definition);
 }

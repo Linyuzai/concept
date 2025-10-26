@@ -74,16 +74,25 @@ public class DynamicExtractor extends SyncSupport implements MethodPluginExtract
         addInvokerFactory(new ContentExtractor.InvokerFactory());
     }
 
+    /**
+     * 添加提取执行器工厂
+     */
     @Override
     public void addInvokerFactory(InvokerFactory factory) {
         syncWrite(() -> this.invokerFactories.add(factory));
     }
 
+    /**
+     * 移除提取执行器工厂
+     */
     @Override
     public void removeInvokerFactory(InvokerFactory factory) {
         syncWrite(() -> this.invokerFactories.remove(factory));
     }
 
+    /**
+     * 初始化每个方法的提取执行器
+     */
     @Override
     public void initialize() {
         syncWrite(() -> {
@@ -121,12 +130,8 @@ public class DynamicExtractor extends SyncSupport implements MethodPluginExtract
     }
 
     /**
-     * 提取插件
-     * <p>
-     * 遍历所有的方法和参数，使用对应的执行器提取插件赋值给参数
-     * <p>
-     * 调用对应的方法回调
-     * <p>
+     * 提取插件，
+     * 遍历所有的方法和参数，使用对应的执行器提取插件赋值给参数，调用对应的方法回调，
      * 如果方法参数没有匹配到任何插件，则不会回调
      */
     @SneakyThrows
@@ -183,6 +188,9 @@ public class DynamicExtractor extends SyncSupport implements MethodPluginExtract
         return !(object instanceof Plugin) && !(object instanceof PluginContext);
     }
 
+    /**
+     * 获得依赖的插件处理器
+     */
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends PluginHandler>[] getDependencies() {

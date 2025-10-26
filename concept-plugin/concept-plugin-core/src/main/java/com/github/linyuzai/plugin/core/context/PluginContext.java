@@ -4,14 +4,18 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 
 /**
- * 插件上下文
- * <p>
- * 用于保存在插件解析过程中的中间数据
+ * 插件上下文，用于保存在插件解析过程中的中间数据
  */
 public interface PluginContext {
 
+    /**
+     * 获得Concept
+     */
     PluginConcept getConcept();
 
+    /**
+     * 获得插件对象
+     */
     Plugin getPlugin();
 
     /**

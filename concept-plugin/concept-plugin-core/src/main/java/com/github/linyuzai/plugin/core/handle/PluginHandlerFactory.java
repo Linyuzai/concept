@@ -5,9 +5,7 @@ import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 
 /**
- * 插件处理器工厂
- * <p>
- * 用于动态追加插件处理器
+ * 插件处理器工厂，用于动态追加插件处理器
  */
 public interface PluginHandlerFactory {
 

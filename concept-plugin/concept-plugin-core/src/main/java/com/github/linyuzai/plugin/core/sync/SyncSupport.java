@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.util.function.Supplier;
 
+/**
+ * 同步支持类
+ */
 @Getter
 @Setter
 public abstract class SyncSupport {

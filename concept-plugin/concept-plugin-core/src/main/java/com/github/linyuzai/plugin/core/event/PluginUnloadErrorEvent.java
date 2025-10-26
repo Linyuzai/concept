@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 插件卸载事件
+ * 插件卸载异常事件
  */
 @Getter
 @RequiredArgsConstructor

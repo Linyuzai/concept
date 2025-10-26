@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DefaultPluginEventPublisher implements PluginEventPublisher {
 
     /**
-     * 所有的监听器
+     * 监听器
      */
     private final List<PluginEventListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -25,18 +25,24 @@ public class DefaultPluginEventPublisher implements PluginEventPublisher {
         }
     }
 
+    /**
+     * 注册事件监听器
+     */
     @Override
     public void register(Collection<? extends PluginEventListener> listeners) {
         this.listeners.addAll(listeners);
     }
 
+    /**
+     * 注销事件监听器
+     */
     @Override
     public void unregister(Collection<? extends PluginEventListener> listeners) {
         this.listeners.removeAll(listeners);
     }
 
     /**
-     * 获得所有事件监听器
+     * 获得事件监听器列表
      */
     public List<PluginEventListener> getEventListeners() {
         return Collections.unmodifiableList(listeners);

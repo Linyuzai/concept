@@ -5,7 +5,7 @@ import com.github.linyuzai.plugin.core.tree.PluginTree;
 import lombok.Getter;
 
 /**
- * {@link PluginFilter} 的抽象类
+ * 插件过滤器抽象类
  *
  * @param <T> 插件类型
  */
@@ -27,10 +27,8 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
     }
 
     /**
-     * 过滤
-     * <p>
-     * 通过 key 获得插件数据
-     * <p>
+     * 过滤，
+     * 通过 key 获得插件数据，
      * 过滤之后重新设置
      */
     @SuppressWarnings("unchecked")
@@ -54,10 +52,16 @@ public abstract class AbstractPluginFilter<T> implements PluginFilter {
         return negate != filter;
     }
 
+    /**
+     * 去要过滤的数据对应的 key
+     */
     public Object getInboundKey() {
         return getKey();
     }
 
+    /**
+     * 数据过滤后输出的 key
+     */
     public Object getOutboundKey() {
         return getKey();
     }

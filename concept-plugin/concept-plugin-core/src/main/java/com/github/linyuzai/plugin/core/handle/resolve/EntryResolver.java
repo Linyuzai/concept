@@ -4,8 +4,10 @@ import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.context.PluginContext;
 import com.github.linyuzai.plugin.core.tree.PluginTree;
 
+import java.util.function.Function;
+
 /**
- * 条目解析器
+ * 插件项解析器
  */
 public class EntryResolver implements PluginResolver {
 
@@ -15,7 +17,7 @@ public class EntryResolver implements PluginResolver {
         tree.getTransformer()
                 .create(this)
                 .inbound(tree.getRoot())
-                .transform(node -> node)
+                .transform(Function.identity())
                 .outboundKey(Plugin.Entry.class);
     }
 }

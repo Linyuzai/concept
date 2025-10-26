@@ -15,9 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * 内容提取器
- * <p>
- * 支持 byte[] {@link String} {@link InputStream} {@link ByteBuffer}
+ * 内容提取器，支持 byte[] {@link String} {@link InputStream} {@link ByteBuffer}
  */
 public abstract class ContentExtractor<T> extends AbstractPluginExtractor<T> {
 

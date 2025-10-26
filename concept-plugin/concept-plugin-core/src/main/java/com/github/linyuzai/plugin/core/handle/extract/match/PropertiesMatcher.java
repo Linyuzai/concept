@@ -20,6 +20,9 @@ public class PropertiesMatcher extends AbstractPluginMatcher<PropertiesSupplier>
         super(annotations);
     }
 
+    /**
+     * 匹配properties
+     */
     @Override
     public Object getKey() {
         return PropertiesSupplier.class;

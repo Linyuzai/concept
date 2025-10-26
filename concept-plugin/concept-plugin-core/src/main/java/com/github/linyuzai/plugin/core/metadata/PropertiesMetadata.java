@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * 基于 {@link Properties} 的插件配置
+ * 基于 {@link Properties} 的插件元数据
  */
 @Getter
 @RequiredArgsConstructor

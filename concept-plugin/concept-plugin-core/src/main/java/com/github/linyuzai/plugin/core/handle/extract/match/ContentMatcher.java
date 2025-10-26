@@ -17,6 +17,9 @@ public class ContentMatcher extends AbstractPluginMatcher<Plugin.Content> {
         super(annotations);
     }
 
+    /**
+     * 匹配内容对象
+     */
     @Override
     public Object getKey() {
         return Plugin.Content.class;

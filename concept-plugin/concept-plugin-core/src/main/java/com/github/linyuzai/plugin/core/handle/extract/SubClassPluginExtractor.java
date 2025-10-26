@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 /**
  * 子类提取器
  */
-public abstract class AssignableFromPluginExtractor<T> extends AbstractPluginExtractor<T> {
+public abstract class SubClassPluginExtractor<T> extends AbstractPluginExtractor<T> {
 
     @Override
     public PluginMatcher getMatcher(NestedType type, Annotation[] annotations) {

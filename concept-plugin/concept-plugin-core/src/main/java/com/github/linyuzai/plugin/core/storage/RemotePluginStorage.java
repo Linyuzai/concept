@@ -10,6 +10,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 远程插件存储
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,6 +37,9 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         }
     }
 
+    /**
+     * 获得桶名
+     */
     @Override
     public String getLocation() {
         return bucket;
@@ -178,26 +184,59 @@ public abstract class RemotePluginStorage extends AbstractPluginStorage {
         }).collect(Collectors.toList());
     }
 
+    /**
+     * 桶是否存在
+     */
     protected abstract boolean existBucket(String bucket);
 
+    /**
+     * 创建桶
+     */
     protected abstract void createBucket(String bucket);
 
+    /**
+     * 对象列表
+     */
     protected abstract List<String> listObjects(String bucket, String prefix);
 
+    /**
+     * 获得对象元数据
+     */
     protected abstract Map<String, String> getUserMetadata(String bucket, String key);
 
+    /**
+     * 设置对象元数据
+     */
     protected abstract void putUserMetadata(String bucket, String key, Map<String, String> userMetadata);
 
+    /**
+     * 对象是否存在
+     */
     protected abstract boolean existObject(String bucket, String key);
 
+    /**
+     * 拷贝对象
+     */
     protected abstract void copyObject(String srcBucket, String srcKey, String destBucket, String destKey, Map<String, String> userMetadata);
 
+    /**
+     * 获得对象
+     */
     protected abstract InputStream getObject(String bucket, String key);
 
+    /**
+     * 删除对象
+     */
     protected abstract void deleteObject(String bucket, String key);
 
+    /**
+     * 删除对象
+     */
     protected abstract void deleteObjects(String bucket, List<String> keys);
 
+    /**
+     * 添加对象
+     */
     protected abstract void putObject(String bucket, String key,
                                       InputStream is, long length,
                                       Map<String, String> userMetadata);

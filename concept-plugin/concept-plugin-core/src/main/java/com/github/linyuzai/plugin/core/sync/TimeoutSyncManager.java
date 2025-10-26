@@ -9,6 +9,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
+/**
+ * 超时的同步管理器
+ */
 @RequiredArgsConstructor
 public class TimeoutSyncManager implements SyncManager {
 

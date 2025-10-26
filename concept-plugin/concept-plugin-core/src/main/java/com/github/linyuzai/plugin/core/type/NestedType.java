@@ -30,8 +30,14 @@ import java.util.List;
  */
 public interface NestedType {
 
+    /**
+     * 获得当前类型 {@link Type}
+     */
     Type toType();
 
+    /**
+     * 获得当前类型 {@link Class}
+     */
     Class<?> toClass();
 
     /**

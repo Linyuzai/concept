@@ -14,7 +14,7 @@ import java.lang.annotation.Annotation;
 public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
 
     /**
-     * 条目过滤器
+     * 插件项过滤器
      */
     private EntryFilter entryFilter;
 
@@ -29,6 +29,9 @@ public abstract class AbstractPluginMatcher<T> implements PluginMatcher {
         }
     }
 
+    /**
+     * 匹配并过滤
+     */
     @Override
     public Object match(PluginContext context) {
         Object inboundKey = getKey();

@@ -4,7 +4,7 @@ import com.github.linyuzai.plugin.core.context.PluginContext;
 import lombok.Getter;
 
 /**
- * 插件加载事件
+ * 插件加载异常事件
  */
 @Getter
 public class PluginLoadErrorEvent extends PluginContextEvent implements PluginErrorEvent {

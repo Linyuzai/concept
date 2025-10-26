@@ -13,6 +13,11 @@ public interface PluginFactory {
 
     /**
      * 创建插件
+     *
+     * @param definition 插件定义
+     * @param metadata   插件元数据
+     * @param context    插件上下文
+     * @return 插件
      */
     @Nullable
     Plugin create(PluginDefinition definition, PluginMetadata metadata, PluginContext context);

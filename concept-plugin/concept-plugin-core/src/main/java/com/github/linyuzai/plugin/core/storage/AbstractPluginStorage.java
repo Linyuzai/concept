@@ -9,6 +9,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * 插件存储抽象类
+ */
 @Getter
 @Setter
 public abstract class AbstractPluginStorage extends SyncSupport implements PluginStorage {
@@ -21,6 +24,9 @@ public abstract class AbstractPluginStorage extends SyncSupport implements Plugi
     public void initialize() {
     }
 
+    /**
+     * 过滤插件
+     */
     protected boolean filter(String group, String name) {
         return filter == null || filter.filter(group, name);
     }
@@ -32,6 +38,9 @@ public abstract class AbstractPluginStorage extends SyncSupport implements Plugi
         return generateName(name, exist, i -> "(" + i + ")");
     }
 
+    /**
+     * 生成删除文件的名称
+     */
     protected String generateDeletedName(String name, Function<String, Boolean> exist) {
         return generateName(name, exist, i ->
                 PluginStorage.DELETED + FORMATTER.format(LocalDateTime.now()));

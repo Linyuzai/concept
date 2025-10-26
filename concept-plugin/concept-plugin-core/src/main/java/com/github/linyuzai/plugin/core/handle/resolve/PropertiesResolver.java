@@ -30,11 +30,17 @@ public class PropertiesResolver extends AbstractPluginResolver<Plugin.Entry, Pro
         return new PropertiesSupplierImpl(entry.getContent());
     }
 
+    /**
+     * 解析插件项
+     */
     @Override
     public Object getInboundKey() {
         return Plugin.Entry.class;
     }
 
+    /**
+     * 解析成Properties
+     */
     @Override
     public Object getOutboundKey() {
         return PropertiesSupplier.class;

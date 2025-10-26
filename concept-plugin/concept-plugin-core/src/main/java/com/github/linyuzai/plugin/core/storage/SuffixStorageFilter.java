@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * 后缀存储过滤器
+ */
 @Getter
 @Setter
 @NoArgsConstructor

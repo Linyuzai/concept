@@ -4,6 +4,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
+/**
+ * 基于 {@link ReadWriteLock} 的同步管理器
+ */
 public class LockSyncManager implements SyncManager {
 
     protected ReadWriteLock lock = new ReentrantReadWriteLock();

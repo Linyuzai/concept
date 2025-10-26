@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * 本地插件位置
+ * 本地插件存储
  */
 @Getter
 @Setter
@@ -49,6 +49,9 @@ public class LocalPluginStorage extends AbstractPluginStorage {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 添加文件夹分组
+     */
     @Override
     public void addGroup(String group) {
         getPluginDirectory(LOADED, group);

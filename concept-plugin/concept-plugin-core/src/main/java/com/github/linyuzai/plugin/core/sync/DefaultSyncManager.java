@@ -2,6 +2,9 @@ package com.github.linyuzai.plugin.core.sync;
 
 import java.util.function.Supplier;
 
+/**
+ * 基于synchronized的同步管理器
+ */
 public class DefaultSyncManager implements SyncManager {
 
     @Override

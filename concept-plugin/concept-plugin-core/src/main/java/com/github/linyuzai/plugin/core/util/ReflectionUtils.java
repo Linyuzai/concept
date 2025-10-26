@@ -8,11 +8,14 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 /**
- * 反射相关的工具类
+ * 反射相关工具类
  */
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
 
+    /**
+     * 获得注解
+     */
     public static <A extends Annotation> A findAnnotation(Class<?> clazz, Class<A> annotationType) {
         Class<?> c = clazz;
         while (c != null) {

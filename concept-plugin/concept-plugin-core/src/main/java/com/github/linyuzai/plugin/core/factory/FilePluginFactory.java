@@ -24,10 +24,28 @@ public abstract class FilePluginFactory extends AbstractPluginFactory {
         return create(file);
     }
 
+    /**
+     * 根据插件文件创建插件
+     *
+     * @param file 插件文件
+     * @return 插件
+     */
     protected abstract Plugin create(File file);
 
+    /**
+     * 根据插件定义是否支持创建插件
+     *
+     * @param definition 插件定义
+     * @return 是否支持创建插件
+     */
     protected abstract boolean support(PluginDefinition definition);
 
+    /**
+     * 根据插件定义获得插件文件
+     *
+     * @param definition 插件定义
+     * @return 插件文件
+     */
     @Nullable
     public static File getFile(PluginDefinition definition) {
         File file = new File(definition.getPath());

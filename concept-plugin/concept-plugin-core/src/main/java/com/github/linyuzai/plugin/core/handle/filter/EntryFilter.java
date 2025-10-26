@@ -21,11 +21,17 @@ public class EntryFilter extends AntPathPluginFilter<Plugin.Entry> {
         super(patterns);
     }
 
+    /**
+     * 匹配插件项
+     */
     @Override
     public Object getKey() {
         return Plugin.Entry.class;
     }
 
+    /**
+     * 用插件项名称进行匹配
+     */
     @Override
     protected String getMatchable(Plugin.Entry entry) {
         return entry.getName();

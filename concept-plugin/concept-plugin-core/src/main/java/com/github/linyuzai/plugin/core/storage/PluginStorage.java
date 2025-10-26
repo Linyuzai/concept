@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * 插件存储抽象，本地文件或远程文件
+ * 插件存储
  */
 public interface PluginStorage {
 
@@ -26,6 +26,9 @@ public interface PluginStorage {
      */
     String DELETED = "_deleted";
 
+    /**
+     * 初始化
+     */
     void initialize();
 
     /**
@@ -44,12 +47,12 @@ public interface PluginStorage {
     void addGroup(String group);
 
     /**
-     * 获得插件源
+     * 获得插件定义
      */
     PluginDefinition getPluginDefinition(String type, String group, String name);
 
     /**
-     * 获得插件源
+     * 获得插件定义
      */
     Stream<PluginDefinition> getPluginDefinitions(String type, String group);
 

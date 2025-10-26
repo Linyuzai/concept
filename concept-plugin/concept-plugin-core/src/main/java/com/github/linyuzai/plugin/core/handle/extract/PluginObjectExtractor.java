@@ -8,7 +8,7 @@ import com.github.linyuzai.plugin.core.handle.extract.match.PluginObjectMatcher;
 /**
  * 插件实例提取器
  */
-public abstract class PluginObjectExtractor<T extends Plugin> extends AssignableFromPluginExtractor<T> {
+public abstract class PluginObjectExtractor<T extends Plugin> extends SubClassPluginExtractor<T> {
 
     @Override
     protected Class<?> getSuperClass() {

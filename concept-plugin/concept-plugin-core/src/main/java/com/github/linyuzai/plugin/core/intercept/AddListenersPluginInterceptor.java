@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 
+/**
+ * 添加插件监听器的拦截器
+ */
 @RequiredArgsConstructor
 public class AddListenersPluginInterceptor implements PluginInterceptor {
 
