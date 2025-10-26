@@ -196,6 +196,16 @@ public class PluginManagementController {
         private final PluginConceptProperties.ManagementProperties.HeaderProperties header;
 
         private final PluginConceptProperties.ManagementProperties.FooterProperties footer;
+
+        public Locale getLocale() {
+            if (Locale.CHINESE.equals(locale) || Locale.SIMPLIFIED_CHINESE.equals(locale)) {
+                return Locale.SIMPLIFIED_CHINESE;
+            }
+            if (Locale.ENGLISH.equals(locale) || Locale.US.equals(locale)) {
+                return Locale.US;
+            }
+            return Locale.SIMPLIFIED_CHINESE;
+        }
     }
 
     @Data

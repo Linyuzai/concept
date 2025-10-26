@@ -5,7 +5,7 @@ import com.github.linyuzai.plugin.core.autoload.*;
 import com.github.linyuzai.plugin.core.concept.Plugin;
 import com.github.linyuzai.plugin.core.concept.PluginConcept;
 import com.github.linyuzai.plugin.core.concept.PluginDefinition;
-import com.github.linyuzai.plugin.core.event.PluginErrorEvent;
+import com.github.linyuzai.plugin.core.concept.PluginLifecycleListener;
 import com.github.linyuzai.plugin.core.event.PluginEventListener;
 import com.github.linyuzai.plugin.core.exception.PluginLoadException;
 import com.github.linyuzai.plugin.core.exception.PluginUnloadException;
@@ -37,9 +37,9 @@ public class PluginManager extends SyncSupport {
 
     protected final Log log = LogFactory.getLog(PluginManager.class);
 
-    protected final Set<String> loadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    //protected final Set<String> loadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected final Set<String> unloadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    //protected final Set<String> unloadingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     protected final Set<String> updatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -102,7 +102,7 @@ public class PluginManager extends SyncSupport {
         String path = definition.getPath();
         resetTreeAndError(path);
         syncWrite(() -> {
-            loadingSet.add(path);
+            //loadingSet.add(path);
             try {
                 storage.loadPlugin(group, name);
             } catch (Throwable e) {
@@ -110,9 +110,9 @@ public class PluginManager extends SyncSupport {
                     try {
                         concept.load(definition);
                     } catch (Throwable e1) {
-                        log.error("Load plugin error: " + path, e1);
+                        //log.error("Load plugin error: " + path, e1);
                     } finally {
-                        loadingSet.remove(path);
+                        //loadingSet.remove(path);
                     }
                 });
             }
@@ -124,7 +124,7 @@ public class PluginManager extends SyncSupport {
         String path = definition.getPath();
         resetTreeAndError(path);
         syncWrite(() -> {
-            unloadingSet.add(path);
+            //unloadingSet.add(path);
             try {
                 storage.unloadPlugin(group, name);
             } catch (Throwable e) {
@@ -132,9 +132,9 @@ public class PluginManager extends SyncSupport {
                     try {
                         concept.unload(definition);
                     } catch (Throwable e1) {
-                        log.error("Unload plugin error: " + path, e1);
+                        //log.error("Unload plugin error: " + path, e1);
                     } finally {
-                        unloadingSet.remove(path);
+                        //unloadingSet.remove(path);
                     }
                 });
             }
@@ -146,20 +146,20 @@ public class PluginManager extends SyncSupport {
         String path = definition.getPath();
         resetTreeAndError(path);
         syncWrite(() -> {
-            loadingSet.add(path);
+            //loadingSet.add(path);
             try {
                 concept.unload(definition);
             } catch (Throwable e) {
-                loadingSet.remove(path);
+                //loadingSet.remove(path);
                 throw e;
             }
             execute(() -> {
                 try {
                     concept.load(definition);
                 } catch (Throwable e) {
-                    log.error("Reload plugin error: " + path, e);
+                    //log.error("Reload plugin error: " + path, e);
                 } finally {
-                    loadingSet.remove(path);
+                    //loadingSet.remove(path);
                 }
             });
         });
@@ -212,7 +212,7 @@ public class PluginManager extends SyncSupport {
         String oldPath = storage.getPluginDefinition(PluginStorage.LOADED, group, original).getPath();
         resetTreeAndError(oldPath);
         syncWrite(() -> {
-            loadingSet.add(newPath);
+            //loadingSet.add(newPath);
             updatingSet.add(oldPath);
             PluginEventListener listener = new PluginEventListener() {
 
@@ -235,7 +235,7 @@ public class PluginManager extends SyncSupport {
                 storage.loadPlugin(group, upload);
             } catch (Throwable e) {
                 log.error("Update plugin error: " + newPath, e);
-                loadingSet.remove(newPath);
+                //loadingSet.remove(newPath);
                 updatingSet.remove(oldPath);
                 concept.getEventPublisher().unregister(listener);
             }
@@ -406,18 +406,23 @@ public class PluginManager extends SyncSupport {
         executor.execute(runnable, 1000, TimeUnit.MILLISECONDS);
     }
 
-    public class PluginAutoLoadListener implements PluginEventListener {
+    public class PluginAutoLoadListener implements PluginLifecycleListener {
 
         @Override
+        public void onError(PluginDefinition definition, Throwable e) {
+            errorMap.put(definition.getPath(), e);
+        }
+
+        /*@Override
         public void onEvent(Object event) {
-            /*if (event instanceof PluginLoadedEvent ||
+            *//*if (event instanceof PluginLoadedEvent ||
                     event instanceof PluginLoadErrorEvent) {
                 PluginContext context = ((PluginContextEvent) event).getContext();
                 PluginTree tree = context.get(PluginTree.class);
                 if (tree != null) {
                     treeMap.put(context.getPlugin().getDefinition().getPath(), tree);
                 }
-            }*/
+            }*//*
             if (event instanceof PluginAutoEvent) {
                 String path = ((PluginAutoEvent) event).getDefinition().getPath();
                 if (event instanceof PluginErrorEvent) {
@@ -434,7 +439,7 @@ public class PluginManager extends SyncSupport {
                     syncWrite(() -> unloadingSet.remove(path));
                 }
             }
-        }
+        }*/
     }
 
     @Deprecated

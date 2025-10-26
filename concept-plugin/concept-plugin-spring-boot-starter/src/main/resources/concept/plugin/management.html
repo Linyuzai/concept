@@ -367,6 +367,7 @@
                             <el-table v-if="plugin.visible"
                                       :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
                                       :empty-text="i18n.empty_text"
+                                      :row-style="{ height: '72px' }"
                                       style="width: 100%;border-bottom-width: 0;"
                                       height="100%">
                                 <!--<el-table-column type="selection" fixed width="25">
@@ -731,15 +732,6 @@
                     if (body.success) {
                         this.setting = body.data;
                         document.title = this.setting.header.title.text;
-                        if (this.setting.locale === 'zh') {
-                            this.setting.locale = 'zh_CN';
-                        }
-                        if (this.setting.locale === 'en') {
-                            this.setting.locale = 'en_US';
-                        }
-                        if (this.setting.locale !== 'zh_CN' || this.setting.locale !== 'en_US') {
-                            this.setting.locale = 'zh_CN';
-                        }
                         this._get('/concept-plugin/i18n/' + this.setting.locale + '.json', response => {
                             this.i18n = response;
                             this.plugin.visible = true;

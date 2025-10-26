@@ -209,7 +209,7 @@ public class PluginConceptProperties {
         /**
          * 区域
          */
-        private Locale locale = Locale.CHINA;
+        private Locale locale = Locale.SIMPLIFIED_CHINESE;
 
         /**
          * 权限配置
