@@ -263,7 +263,21 @@ public class PluginManager extends SyncSupport {
             long timestamp = definition.getCreateTime();
             long size = definition.getSize();
             PluginState state;
-            if (loadingSet.contains(path) || concept.isLoading(definition)) {
+            Plugin get = concept.getRepository().get(definition);
+            if (get == null) {
+                if (errorMap.containsKey(path)) {
+                    state = PluginState.LOAD_ERROR;
+                } else {
+                    state = PluginState.LOADING;
+                }
+            } else {
+                if (updatingSet.contains(path)) {
+                    state = PluginState.UPDATING;
+                } else {
+                    state = PluginState.LOADED;
+                }
+            }
+            /*if (loadingSet.contains(path) || concept.isLoading(definition)) {
                 state = PluginState.LOADING;
             } else {
                 Plugin get = concept.getRepository().get(definition);
@@ -276,7 +290,7 @@ public class PluginManager extends SyncSupport {
                         state = PluginState.LOADED;
                     }
                 }
-            }
+            }*/
             List<String> errorMessages = new ArrayList<>();
             List<Throwable> errorList = new ArrayList<>();
             Throwable error = errorMap.get(path);
@@ -310,7 +324,17 @@ public class PluginManager extends SyncSupport {
             PluginState state;
             PluginDefinition def = storage.getPluginDefinition(PluginStorage.LOADED, group, name);
             String path = def.getPath();
-            if (unloadingSet.contains(path) || concept.isUnloading(def)) {
+            Plugin get = concept.getRepository().get(def);
+            if (get == null) {
+                state = PluginState.UNLOADED;
+            } else {
+                if (errorMap.containsKey(path)) {
+                    state = PluginState.UNLOAD_ERROR;
+                } else {
+                    state = PluginState.UNLOADING;
+                }
+            }
+            /*if (unloadingSet.contains(path) || concept.isUnloading(def)) {
                 state = PluginState.UNLOADING;
             } else {
                 Plugin get = concept.getRepository().get(def);
@@ -320,7 +344,7 @@ public class PluginManager extends SyncSupport {
                     // 正常情况下不会出现
                     state = PluginState.UNLOAD_ERROR;
                 }
-            }
+            }*/
             return new PluginSummary(name, formatSize(size),
                     formatTime(timestamp), state, Collections.emptyList(), timestamp);
         }).collect(Collectors.toList()));

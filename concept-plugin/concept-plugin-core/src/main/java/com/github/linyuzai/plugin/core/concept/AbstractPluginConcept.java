@@ -279,8 +279,8 @@ public abstract class AbstractPluginConcept extends SyncSupport implements Plugi
             }
 
             BiConsumer<PluginDefinition, Plugin> success = (definition, plugin) -> {
-                loading.remove(definition.getPath());//移除正在加载的状态
                 repository.add(plugin);//添加到存储中
+                loading.remove(definition.getPath());//移除正在加载的状态
                 onSuccess.accept(definition, plugin);
             };
 
