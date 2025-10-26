@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.Base64;
 
+/**
+ * 管理页面密码base64解码器
+ */
 @Setter
 @Getter
 @NoArgsConstructor

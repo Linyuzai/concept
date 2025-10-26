@@ -12,6 +12,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * webmvc支持动态接口
+ */
 public class ServletRequestMappingPluginObservable extends RequestMappingPluginObservable implements ApplicationContextAware {
 
     private RequestMappingHandlerMapping handlerMapping;

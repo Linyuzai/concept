@@ -11,7 +11,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * zip文件插件条目
+ * zip文件插件项
  */
 @Getter
 public class ZipFilePluginEntry extends AbstractPluginEntry implements ZipPluginEntry {

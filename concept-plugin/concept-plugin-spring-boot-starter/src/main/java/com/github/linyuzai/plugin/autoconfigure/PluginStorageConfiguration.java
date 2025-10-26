@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 
+/**
+ * 插件存储配置类
+ */
 @Configuration(proxyBeanMethods = false)
 public class PluginStorageConfiguration {
 

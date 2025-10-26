@@ -52,6 +52,9 @@ public class ClassMatcher extends AbstractPluginMatcher<ClassSupplier> {
         }
     }
 
+    /**
+     * 添加过滤器
+     */
     public void addFilter(AbstractPluginFilter<ClassSupplier> filter) {
         this.filters.add(filter);
         sort();

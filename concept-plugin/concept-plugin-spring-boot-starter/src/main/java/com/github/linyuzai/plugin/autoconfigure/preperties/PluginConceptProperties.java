@@ -70,8 +70,14 @@ public class PluginConceptProperties {
     @Data
     public static class ValidationProperties {
 
+        /**
+         * 最大读取大小
+         */
         private DataSize maxReadSize = DataSize.ofBytes(-1);
 
+        /**
+         * 最大嵌套深度
+         */
         private int maxNestedDepth = -1;
     }
 
@@ -91,22 +97,59 @@ public class PluginConceptProperties {
          */
         private String location;
 
+        /**
+         * 插件存储过滤后缀
+         */
         private Set<String> filterSuffixes = new LinkedHashSet<>();
 
+        /**
+         * 插件存储类型
+         */
         public enum StorageType {
 
-            MEMORY, LOCAL, MINIO, AWS_V1, AWS_V2
+            /**
+             * 内存存储
+             */
+            MEMORY,
+            /**
+             * 本地存储
+             */
+            LOCAL,
+            /**
+             * Minio对象存储
+             */
+            MINIO,
+            /**
+             * AWS对象存储
+             */
+            AWS_V1,
+            /**
+             * AWS对象存储
+             */
+            AWS_V2
         }
     }
 
+    /**
+     * 插件扩展配置
+     */
     @Data
     public static class ExtensionProperties {
 
+        /**
+         * request-mapping配置
+         */
         private RequestMappingProperties requestMapping = new RequestMappingProperties();
 
+        /**
+         * request-mapping配置
+         */
         @Data
         public static class RequestMappingProperties {
 
+            /**
+             * 是否启用识别request-mapping
+             */
             private boolean enabled;
         }
     }
@@ -123,7 +166,7 @@ public class PluginConceptProperties {
         private boolean enabled = true;
 
         /**
-         * 自动加载器轮训间隔ms，默认5000
+         * 自动加载器轮训间隔ms
          */
         private long period = 5000;
     }
@@ -163,6 +206,9 @@ public class PluginConceptProperties {
          */
         private boolean enabled = true;
 
+        /**
+         * 区域
+         */
         private Locale locale = Locale.CHINA;
 
         /**

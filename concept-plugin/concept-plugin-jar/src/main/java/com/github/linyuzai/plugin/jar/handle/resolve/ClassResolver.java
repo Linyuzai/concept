@@ -35,11 +35,17 @@ public class ClassResolver extends AbstractPluginResolver<Plugin.Entry, ClassSup
         return new ClassSupplierImpl(className, plugin);
     }
 
+    /**
+     * 解析插件项
+     */
     @Override
     public Object getInboundKey() {
         return Plugin.Entry.class;
     }
 
+    /**
+     * 解析成Class数据
+     */
     @Override
     public Object getOutboundKey() {
         return ClassSupplier.class;

@@ -12,6 +12,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * webflux支持动态接口
+ */
 public class ReactiveRequestMappingPluginObservable extends RequestMappingPluginObservable implements ApplicationContextAware {
 
     private RequestMappingHandlerMapping handlerMapping;

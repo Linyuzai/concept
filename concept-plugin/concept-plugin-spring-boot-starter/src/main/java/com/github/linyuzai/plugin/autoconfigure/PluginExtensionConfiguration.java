@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 插件扩展配置类
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "concept.plugin.extension.request-mapping.enabled", havingValue = "true")
 public class PluginExtensionConfiguration {

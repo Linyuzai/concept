@@ -14,6 +14,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+/**
+ * 支持动态接口
+ */
 public abstract class RequestMappingPluginObservable extends BeanExtractor<Map<String, ?>>
         implements PluginObservable<String, Class<?>> {
 

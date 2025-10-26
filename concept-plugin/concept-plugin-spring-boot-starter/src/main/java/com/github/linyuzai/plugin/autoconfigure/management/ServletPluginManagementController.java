@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * webmvc插件管理接口
+ */
 @RestController
 @RequestMapping("/concept-plugin/management")
 public class ServletPluginManagementController extends PluginManagementController {

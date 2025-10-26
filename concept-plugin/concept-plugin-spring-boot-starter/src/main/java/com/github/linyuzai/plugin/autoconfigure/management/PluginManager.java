@@ -29,6 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * 插件管理器
+ */
 @RequiredArgsConstructor
 public class PluginManager extends SyncSupport {
 
@@ -42,6 +45,9 @@ public class PluginManager extends SyncSupport {
 
     //protected final Map<String, PluginTree> treeMap = new ConcurrentHashMap<>();
 
+    /**
+     * 插件异常
+     */
     protected final Map<String, Throwable> errorMap = new ConcurrentHashMap<>();
 
     protected final PluginConceptProperties properties;

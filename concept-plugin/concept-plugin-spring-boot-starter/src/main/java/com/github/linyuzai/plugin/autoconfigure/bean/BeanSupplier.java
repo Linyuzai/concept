@@ -5,7 +5,7 @@ import com.github.linyuzai.plugin.jar.handle.resolve.ClassSupplier;
 import java.util.function.Supplier;
 
 /**
- * Bean
+ * Bean 延迟加载对象
  */
 public interface BeanSupplier extends Supplier<Object> {
 

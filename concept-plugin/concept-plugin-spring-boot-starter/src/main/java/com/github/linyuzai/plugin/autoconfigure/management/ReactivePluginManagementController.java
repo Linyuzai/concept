@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * webflux插件管理接口
+ */
 @RestController
 @RequestMapping("/concept-plugin/management")
 public class ReactivePluginManagementController extends PluginManagementController {

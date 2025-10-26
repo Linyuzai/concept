@@ -21,6 +21,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * 管理页面基础接口
+ */
 public class PluginManagementController {
 
     protected final Log log = LogFactory.getLog(PluginManagementController.class);

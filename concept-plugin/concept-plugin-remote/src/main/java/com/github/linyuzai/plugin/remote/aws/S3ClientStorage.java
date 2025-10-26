@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * aws v2 插件存储
+ */
 @Getter
 public class S3ClientStorage extends RemotePluginStorage {
 

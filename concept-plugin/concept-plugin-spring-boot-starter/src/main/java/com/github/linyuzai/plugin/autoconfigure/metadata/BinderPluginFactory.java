@@ -8,6 +8,9 @@ import com.github.linyuzai.plugin.core.metadata.PluginMetadata;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 可绑定配置文件的插件工厂
+ */
 @Getter
 @Setter
 public class BinderPluginFactory extends BinderPluginMetadataFactory implements PluginFactory {

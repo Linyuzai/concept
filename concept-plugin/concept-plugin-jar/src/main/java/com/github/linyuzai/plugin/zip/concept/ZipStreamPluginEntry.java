@@ -19,7 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * zip流插件条目
+ * zip流插件项
  */
 public class ZipStreamPluginEntry extends AbstractPluginEntry implements ZipPluginEntry {
 

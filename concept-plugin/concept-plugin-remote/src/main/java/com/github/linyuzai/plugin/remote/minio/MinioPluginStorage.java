@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * minio 插件存储
+ */
 @Getter
 public class MinioPluginStorage extends RemotePluginStorage {
 

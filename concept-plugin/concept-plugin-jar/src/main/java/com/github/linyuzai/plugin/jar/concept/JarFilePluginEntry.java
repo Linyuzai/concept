@@ -6,7 +6,7 @@ import com.github.linyuzai.plugin.zip.concept.ZipFilePluginEntry;
 import java.util.jar.JarFile;
 
 /**
- * jar文件插件条目
+ * jar文件插件项
  */
 public class JarFilePluginEntry extends ZipFilePluginEntry implements JarPluginEntry {
 

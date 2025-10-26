@@ -12,6 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 插件自动加载配置类
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnPluginAutoloadEnabled
 public class PluginAutoloadConfiguration {

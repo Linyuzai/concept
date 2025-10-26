@@ -7,6 +7,9 @@ import org.springframework.core.io.InputStreamResource;
 
 import java.io.InputStream;
 
+/**
+ * yaml插件元数据适配器
+ */
 public class YamlMetadataAdapter implements PluginMetadata.Adapter {
 
     @Override

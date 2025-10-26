@@ -30,7 +30,7 @@ public class JarPluginClassLoader extends PluginClassLoader {
     private final Map<String, Plugin.Content> classes = new ConcurrentHashMap<>();
 
     /**
-     * 类缓存
+     * 资源缓存
      */
     private final Map<String, Plugin.Content> resources = new ConcurrentHashMap<>();
 
@@ -80,6 +80,9 @@ public class JarPluginClassLoader extends PluginClassLoader {
         }
     }
 
+    /**
+     * 获得资源输入流
+     */
     @Override
     public InputStream getResourceAsStream(String name) {
         Plugin.Content content = resources.getOrDefault(name, classes.get(name));
@@ -94,5 +97,6 @@ public class JarPluginClassLoader extends PluginClassLoader {
         super.close();
         packages.clear();
         classes.clear();
+        resources.clear();
     }
 }

@@ -21,6 +21,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+/**
+ * 通用插件被观察者
+ */
 public abstract class GenericPluginObservable<K, V> extends BeanExtractor<Map<String, V>>
         implements PluginObservable<K, V> {
 
