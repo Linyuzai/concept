@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <link rel="stylesheet" type="text/css" href="/webjars/element-ui/2.15.1/lib/theme-chalk/index.css">
-    <style lang="scss" scoped>
+    <!--<link rel="stylesheet" type="text/css" href="/webjars/element-ui/2.15.1/lib/theme-chalk/index.css">-->
+    <style>
 
         body {
             font-family: "微软雅黑"
@@ -80,6 +80,10 @@
             height: 100%;
             padding-top: 2px;
             padding-bottom: 2px;
+        }
+
+        .el-table::before, .el-table__fixed::before, .el-table__fixed-right::before {
+            display: none;
         }
 
         /*:deep(.el-tree-node) {
@@ -297,7 +301,7 @@
                                        width="420px"
                                        :close-on-click-modal="false"
                                        :visible.sync="plugin.upload.visible">
-                                <el-upload action="/concept-plugin/management/plugin/upload"
+                                <el-upload :action="getUploadPath()"
                                            style="margin: 0 10px"
                                            :disabled="plugin.upload.disabled"
                                            :before-upload="beforeUpload"
@@ -365,7 +369,7 @@
                         </el-header>
                         <el-main ref="tableMain" style="height:100%;padding: 0;">
                             <el-table v-if="plugin.visible"
-                                      :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()) || data.name.toLowerCase().includes(plugin.search.toLowerCase()))"
+                                      :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()))"
                                       :empty-text="i18n.empty_text"
                                       :row-style="{ height: '72px' }"
                                       style="width: 100%;border-bottom-width: 0;"
@@ -525,24 +529,48 @@
     </el-container>
 </div>
 </body>
-<script src="/webjars/vue/2.6.11/vue.min.js" type="text/javascript"></script>
-<script src="/webjars/axios/1.7.2/dist/axios.min.js" type="text/javascript"></script>
+<!--<script src="/webjars/vue/2.6.11/vue.min.js" type="text/javascript"></script>-->
+<!--<script src="/webjars/axios/1.7.2/dist/axios.min.js" type="text/javascript"></script>-->
 <!--<script src="/webjars/vue-resource/1.5.1/dist/vue-resource.min.js" type="text/javascript"></script>-->
-<script src="/webjars/element-ui/2.15.1/lib/index.js" type="text/javascript"></script>
-<script src="/webjars/showdown/2.1.0/dist/showdown.min.js" type="text/javascript"></script>
-<script src="/concept-plugin/concept-plugin.js" type="text/javascript"></script>
+<!--<script src="/webjars/element-ui/2.15.1/lib/index.js" type="text/javascript"></script>-->
+<!--<script src="/webjars/showdown/2.1.0/dist/showdown.min.js" type="text/javascript"></script>-->
+<!--<script src="/concept-plugin/concept-plugin.js" type="text/javascript"></script>-->
 <script>
-    const urlPrefix = '/concept-plugin/management/';
+
+    let app;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let globalPrefix = urlParams.get('prefix');
+    if (globalPrefix == null) {
+        const p = window.location.pathname;
+        globalPrefix = p.split('/concept-plugin/management.html')[0]
+    }
+
+    function loadJs(path, callback) {
+        //document.write("<script src='" + globalPrefix + path + "' type='text/javascript'><\/script>");
+        let script = document.createElement('script');
+        script.src = globalPrefix + path;
+        script.async = false;
+        script.defer = false;
+        script.onload = function () {
+            callback();
+        }
+        document.head.appendChild(script);
+    }
+
+    function loadCss(path) {
+        //document.write("<link rel='stylesheet' type='text/css' href='" + globalPrefix + path + "'>");
+        let link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = globalPrefix + path;
+        document.head.appendChild(link);
+    }
+
+    const urlPrefix = globalPrefix + '/concept-plugin/management/';
     const authPrefix = urlPrefix + 'auth/';
     const groupPrefix = urlPrefix + 'group/';
     const pluginPrefix = urlPrefix + 'plugin/';
     let uploadLoading = null;
-
-    if (typeof init == 'function') {
-        pwd = init();
-    } else {
-        console.log('init() not defined');
-    }
 
     function formatParams(params) {
         let keys = Object.keys(params);
@@ -632,547 +660,571 @@
             callback(new Error(app.i18n.server_error));
         });
     };
-    let app = new Vue({
-        el: "#concept-plugin-app",
-        data: {
-            i18n: {},
-            setting: {
-                locale: 'zh_CN',
-                header: {
-                    display: true,
-                    title: {
+
+    loadCss('/webjars/element-ui/2.15.1/lib/theme-chalk/index.css');
+    loadJs('/webjars/vue/2.6.11/vue.min.js', function () {
+        loadJs('/webjars/axios/1.7.2/dist/axios.min.js', function () {
+            loadJs('/webjars/element-ui/2.15.1/lib/index.js', function () {
+                loadJs('/webjars/showdown/2.1.0/dist/showdown.min.js', function () {
+                    app = newApp();
+                });
+                loadJs('/concept-plugin/concept-plugin.js?v=' + new Date().getTime(), function () {
+                    if (typeof init == 'function') {
+                        init();
+                    } else {
+                        console.log('init() not defined');
+                    }
+                });
+            });
+        });
+    });
+
+    function newApp() {
+        return new Vue({
+            el: "#concept-plugin-app",
+            data: {
+                i18n: {},
+                setting: {
+                    locale: 'zh_CN',
+                    header: {
                         display: true,
-                        text: 'Concept Plugin'
+                        title: {
+                            display: true,
+                            text: 'Concept Plugin'
+                        },
+                        githubCorner: {
+                            display: true
+                        }
                     },
-                    githubCorner: {
+                    footer: {
                         display: true
                     }
+                    /*script: {
+                        list: ['/concept-plugin/concept-plugin.js']
+                    }*/
                 },
-                footer: {
-                    display: true
-                }
-                /*script: {
-                    list: ['/concept-plugin/concept-plugin.js']
-                }*/
-            },
-            auth: {
-                switch: true,
-                lock: true,
-                unlock: {
-                    visible: false,
-                    rules: {
-                        password: []
-                    },
-                    form: {
-                        password: ''
-                    }
-                }
-            },
-            help: {
-                visible: false,
-                html: ""
-            },
-            group: {
-                select: '',
-                ready: false,
-                list: [],
-                add: {
-                    visible: false,
-                    rules: {
-                        name: [
-                            {validator: validateName, trigger: 'blur'}
-                        ]
-                    },
-                    form: {
-                        name: ''
-                    }
-                }
-            },
-            plugin: {
-                visible: false,
-                refresh: 0,
-                search: '',
-                list: [],
-                error: {
-                    visible: false
-                },
-                property: {
-                    visible: false,
-                    list: []
-                },
-                upload: {
-                    visible: false,
-                    disabled: false,
-                    name: ''
-                },
-                rename: {
-                    visible: false,
-                    rules: {
-                        rename: [
-                            {validator: validateName, trigger: 'blur'},
-                            {validator: validateRename, trigger: 'blur'}
-                        ]
-                    },
-                    form: {
-                        name: '',
-                        rename: ''
+                auth: {
+                    switch: true,
+                    lock: true,
+                    unlock: {
+                        visible: false,
+                        rules: {
+                            password: []
+                        },
+                        form: {
+                            password: ''
+                        }
                     }
                 },
-                deleted: {
+                help: {
                     visible: false,
+                    html: ""
+                },
+                group: {
+                    select: '',
+                    ready: false,
+                    list: [],
+                    add: {
+                        visible: false,
+                        rules: {
+                            name: [
+                                {validator: validateName, trigger: 'blur'}
+                            ]
+                        },
+                        form: {
+                            name: ''
+                        }
+                    }
+                },
+                plugin: {
+                    visible: false,
+                    refresh: 0,
                     search: '',
-                    list: []
-                }
-            }
-        },
-        methods: {
-            init() {
-                this._get(getSettingUrl(), response => {
-                    let body = response;
-                    if (body.success) {
-                        this.setting = body.data;
-                        document.title = this.setting.header.title.text;
-                        this._get('/concept-plugin/i18n/' + this.setting.locale + '.json', response => {
-                            this.i18n = response;
-                            this.plugin.visible = true;
-                            this.refreshGroups('');
-                        });
-                        this.initHelp();
-                    } else {
-                        this.$notify({
-                            title: this.i18n.failure,
-                            message: body.message,
-                            type: 'error'
-                        });
-                        console.log(response);
+                    list: [],
+                    error: {
+                        visible: false
+                    },
+                    property: {
+                        visible: false,
+                        list: []
+                    },
+                    upload: {
+                        visible: false,
+                        disabled: false,
+                        name: ''
+                    },
+                    rename: {
+                        visible: false,
+                        rules: {
+                            rename: [
+                                {validator: validateName, trigger: 'blur'},
+                                {validator: validateRename, trigger: 'blur'}
+                            ]
+                        },
+                        form: {
+                            name: '',
+                            rename: ''
+                        }
+                    },
+                    deleted: {
+                        visible: false,
+                        search: '',
+                        list: []
                     }
-                });
-                /*this.setting.script.list.forEach(script => {
-                    import(script);
-                });*/
-            },
-            initHelp() {
-                this._get('/concept-plugin/help.' + this.setting.locale + '.md', response => {
-                    this.help.html = new showdown.Converter().makeHtml(response);
-                });
-            },
-            lock(lock) {
-                if (lock) {
-                    this.auth.lock = true;
-                } else {
-                    this.openUnlockDialog();
                 }
             },
-            openUnlockDialog() {
-                let form = this.$refs['auth.unlock.form'];
-                if (form !== undefined) {
-                    form.resetFields();
-                }
-                this.auth.unlock.visible = true;
-            },
-            unlock() {
-                let pwd = this.auth.unlock.form.password;
-                if (typeof encodePassword == 'function') {
-                    pwd = encodePassword(pwd);
-                } else {
-                    console.log('encodePassword(pwd) not defined');
-                    pwd = btoa(pwd);
-                }
-                let params = {password: pwd};
-                this._post(getAuthUrl('unlock'), params, (response) => {
-                    let body = response;
-                    if (body.success) {
-                        if (body.data) {
-                            this.auth.unlock.visible = false;
-                            this.auth.lock = false;
+            methods: {
+                init() {
+                    this._get(getSettingUrl(), response => {
+                        let body = response;
+                        if (body.success) {
+                            this.setting = body.data;
+                            document.title = this.setting.header.title.text;
+                            this._get(globalPrefix + '/concept-plugin/i18n/' + this.setting.locale + '.json', response => {
+                                this.i18n = response;
+                                this.plugin.visible = true;
+                                this.refreshGroups('');
+                            });
+                            this.initHelp();
+                        } else {
+                            this.$notify({
+                                title: this.i18n.failure,
+                                message: body.message,
+                                type: 'error'
+                            });
+                            console.log(response);
+                        }
+                    });
+                    /*this.setting.script.list.forEach(script => {
+                        import(script);
+                    });*/
+                },
+                initHelp() {
+                    this._get(globalPrefix + '/concept-plugin/help.' + this.setting.locale + '.md', response => {
+                        this.help.html = new showdown.Converter().makeHtml(response);
+                    });
+                },
+                lock(lock) {
+                    if (lock) {
+                        this.auth.lock = true;
+                    } else {
+                        this.openUnlockDialog();
+                    }
+                },
+                openUnlockDialog() {
+                    let form = this.$refs['auth.unlock.form'];
+                    if (form !== undefined) {
+                        form.resetFields();
+                    }
+                    this.auth.unlock.visible = true;
+                },
+                unlock() {
+                    let pwd = this.auth.unlock.form.password;
+                    if (typeof encodePassword == 'function') {
+                        pwd = encodePassword(pwd);
+                    } else {
+                        console.log('encodePassword(pwd) not defined');
+                        pwd = btoa(pwd);
+                    }
+                    let params = {password: pwd};
+                    this._post(getAuthUrl('unlock'), params, (response) => {
+                        let body = response;
+                        if (body.success) {
+                            if (body.data) {
+                                this.auth.unlock.visible = false;
+                                this.auth.lock = false;
+                            } else {
+                                this.auth.lock = true;
+                                this.$notify({
+                                    title: this.i18n.failure,
+                                    message: this.i18n.password_error,
+                                    type: 'error'
+                                });
+                            }
                         } else {
                             this.auth.lock = true;
                             this.$notify({
                                 title: this.i18n.failure,
-                                message: this.i18n.password_error,
+                                message: this.i18n.unlock_error,
                                 type: 'error'
                             });
+                            console.log(response);
                         }
-                    } else {
+                    }, () => {
                         this.auth.lock = true;
-                        this.$notify({
-                            title: this.i18n.failure,
-                            message: this.i18n.unlock_error,
-                            type: 'error'
-                        });
-                        console.log(response);
-                    }
-                }, () => {
-                    this.auth.lock = true;
-                });
-            },
-            selectGroup(index) {
-                this.group.select = index;
-                this.refreshPlugins();
-            },
-            refreshGroups(select) {
-                this._get(getGroupUrl('list'), (response) => {
-                    let body = response;
-                    if (body.success) {
-                        this.group.ready = false;
-                        this.group.select = select;
-                        this.group.list = body.data;
-                        this.$nextTick(() => {
-                            this.group.ready = true;
-                            if (this.group.list.length > 0) {
-                                if (this.group.select === '') {
-                                    this.group.select = this.group.list[0];
+                    });
+                },
+                selectGroup(index) {
+                    this.group.select = index;
+                    this.refreshPlugins();
+                },
+                refreshGroups(select) {
+                    this._get(getGroupUrl('list'), (response) => {
+                        let body = response;
+                        if (body.success) {
+                            this.group.ready = false;
+                            this.group.select = select;
+                            this.group.list = body.data;
+                            this.$nextTick(() => {
+                                this.group.ready = true;
+                                if (this.group.list.length > 0) {
+                                    if (this.group.select === '') {
+                                        this.group.select = this.group.list[0];
+                                    }
+                                } else {
+                                    this.group.select = '';
                                 }
-                            } else {
-                                this.group.select = '';
+                                this.refreshPlugins();
+                            });
+                        } else {
+                            this.group.list = [];
+                            this.group.select = '';
+                            console.log(response);
+                        }
+                    });
+                },
+                openGroupDialog() {
+                    let form = this.$refs['group.add.form'];
+                    if (form !== undefined) {
+                        form.resetFields();
+                    }
+                    this.group.add.visible = true;
+                },
+                addGroup() {
+                    this.$refs['group.add.form'].validate((valid) => {
+                        if (valid) {
+                            let params = {group: this.group.add.form.name};
+                            this._post(getGroupUrl('add'), params, (response) => {
+                                let body = response;
+                                if (body.success) {
+                                    this.group.add.visible = false;
+                                    this.refreshGroups(this.group.add.form.name);
+                                } else {
+                                    this.$notify({
+                                        title: this.i18n.failure,
+                                        message: body.message,
+                                        type: 'error'
+                                    });
+                                    console.log(response);
+                                }
+                            });
+                        }
+                        return valid;
+                    });
+                },
+                openUploadDialog(name) {
+                    if (uploadLoading != null) {
+                        uploadLoading.close();
+                        uploadLoading = null;
+                    }
+                    this.plugin.upload.name = name;
+                    this.plugin.upload.disabled = false;
+                    this.plugin.upload.visible = true;
+                },
+                getUploadPath() {
+                    return pluginPrefix + 'upload'
+                },
+                beforeUpload() {
+                    if (uploadLoading != null) {
+                        uploadLoading.close();
+                    }
+                    uploadLoading = this.$loading({
+                        target: '.el-upload-dragger'
+                    });
+                },
+                uploadChange() {
+                },
+                uploadSuccess() {
+                    this.plugin.upload.visible = false;
+                    this.refreshPlugins();
+                },
+                uploadError(err) {
+                    this.$notify.error({
+                        title: this.i18n.plugin_upload,
+                        message: this.i18n.upload_error,
+                        position: 'bottom-right'
+                    });
+                    console.log(err);
+                },
+                openDeletedPluginsDialog() {
+                    let params = {group: this.group.select, deleted: true};
+                    this._get(getPluginUrl('list', params), (response) => {
+                        let body = response;
+                        if (body.success) {
+                            this.plugin.deleted.list = body.data;
+                        } else {
+                            this.plugin.deleted.list = [];
+                            console.log(response);
+                        }
+                        this.plugin.deleted.visible = true;
+                    }, () => {
+                        this.plugin.deleted.visible = true;
+                    });
+                },
+                clearDeleted() {
+                    let params = {group: this.group.select};
+                    this._post(getPluginUrl('clear'), params, (response) => {
+                        let body = response;
+                        if (body.success) {
+                            this.openDeletedPluginsDialog();
+                        } else {
+                            this.$notify({
+                                title: this.i18n.failure,
+                                message: body.message,
+                                type: 'error'
+                            });
+                            console.log(response);
+                        }
+                    });
+                },
+                refreshPlugins() {
+                    this.plugin.refresh++;
+                    this.refreshPlugins0();
+                },
+                refreshPlugins0() {
+                    let params = {group: this.group.select, deleted: false};
+                    this._get(getPluginUrl('list', params), (response) => {
+                        this.plugin.refresh--;
+                        let body = response;
+                        if (body.success) {
+                            this.plugin.list = body.data;
+                            let array = this.plugin.list;
+                            let refresh = false;
+                            for (let i = 0; i < array.length; i++) {
+                                let state = array[i].state;
+                                if (this.isIngState(state)) {
+                                    refresh = true;
+                                    break;
+                                }
+                            }
+                            if (refresh) {
+                                if (this.plugin.refresh <= 0) {
+                                    this.plugin.refresh = 1;
+                                    setTimeout(this.refreshPlugins0, 1000);
+                                }
+                            }
+                        } else {
+                            this.plugin.list = [];
+                            console.log(response);
+                        }
+                    }, () => {
+                        this.plugin.refresh--;
+                    });
+                },
+                openErrorMessageDialog(messages) {
+                    this.plugin.error.data = [];
+                    this.plugin.error.visible = true;
+                    let tree = [];
+                    for (let i in messages) {
+                        let message = messages[i];
+                        if (i === '0') {
+                            tree.push({label: message, children: []});
+                        } else {
+                            tree['0'].children.push({label: 'Caused by: ' + message, children: []});
+                        }
+                    }
+                    this.plugin.error.data = tree;
+                },
+                loadPlugin(name) {
+                    let params = {group: this.group.select, name: name};
+                    this._plugin(getPluginUrl('load'), params);
+                },
+                unloadPlugin(name) {
+                    let params = {group: this.group.select, name: name};
+                    this._plugin(getPluginUrl('unload'), params);
+                },
+                reloadPlugin(name) {
+                    let params = {group: this.group.select, name: name};
+                    this._plugin(getPluginUrl('reload'), params);
+                },
+                openUpdateDialog(name) {
+                    this.openUploadDialog(name);
+                },
+                getProperties(name) {
+                    let params = {group: this.group.select, name: name};
+                    this._get(getPluginUrl('properties', params), response => {
+                        let body = response;
+                        if (body.success) {
+                            this.plugin.property.list = body.data;
+                            this.plugin.property.visible = true;
+                        } else {
+                            this.$notify({
+                                title: this.i18n.failure,
+                                message: body.message,
+                                type: 'error'
+                            });
+                            console.log(response);
+                        }
+                    })
+                },
+                openRenameDialog(name) {
+                    let form = this.$refs['plugin.rename.form'];
+                    if (form !== undefined) {
+                        form.resetFields();
+                    }
+                    this.plugin.rename.form.name = name;
+                    this.plugin.rename.form.rename = name;
+                    this.plugin.rename.visible = true;
+                },
+                renamePlugin() {
+                    this.$refs['plugin.rename.form'].validate((valid) => {
+                        if (valid) {
+                            let name = this.plugin.rename.form.name;
+                            let rename = this.plugin.rename.form.rename;
+                            let params = {group: this.group.select, name: name, rename: rename};
+                            this._plugin(getPluginUrl('rename'), params, () =>
+                                this.plugin.rename.visible = false);
+                        }
+                        return valid;
+                    });
+                },
+                deletePlugin(name) {
+                    let params = {group: this.group.select, name: name};
+                    this._plugin(getPluginUrl('delete'), params);
+                },
+                downloadPlugin(name, deleted) {
+                    let params = {group: this.group.select, name: name, deleted: deleted};
+                    const link = document.createElement('a');
+                    link.href = getPluginUrl('download', params);
+                    link.download = name;
+                    link.click();
+                },
+                showLoad(state) {
+                    return this.isUnloadState(state) && !this.auth.lock;
+                },
+                showUnload(state) {
+                    return this.isLoadState(state) && !this.auth.lock;
+                },
+                showReload(state) {
+                    return this.isLoadState(state) && !this.auth.lock;
+                },
+                showUpdate(state) {
+                    return this.isLoadState(state) && !this.auth.lock;
+                },
+                showProperties(state) {
+                    return this.isLoadState(state);
+                },
+                showRename(state) {
+                    return this.isUnloadState(state) && !this.auth.lock;
+                },
+                showDelete(state) {
+                    return this.isUnloadState(state) && !this.auth.lock;
+                },
+                isLoadState(state) {
+                    return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
+                },
+                isUnloadState(state) {
+                    return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
+                },
+                isIngState(state) {
+                    return 'LOADING' === state || 'UNLOADING' === state || 'UPDATING' === state;
+                },
+                isErrorState(state) {
+                    return 'LOAD_ERROR' === state || 'UNLOAD_ERROR' === state;
+                },
+                getStateIcon(state) {
+                    switch (state) {
+                        case 'LOADED':
+                            return 'el-icon-circle-check';
+                        case 'UNLOADED':
+                            return 'el-icon-remove-outline';
+                        case 'LOADING':
+                        case 'UNLOADING':
+                        case 'UPDATING':
+                            return 'el-icon-loading';
+                        case 'LOAD_ERROR':
+                        case 'UNLOAD_ERROR':
+                            return 'el-icon-circle-close';
+                        default:
+                            return 'el-icon-warning-outline';
+                    }
+                },
+                getStateType(state) {
+                    switch (state) {
+                        case 'LOADED':
+                        case 'LOADING':
+                        case 'UPDATING':
+                            return 'primary';
+                        case 'UNLOADED':
+                        case 'UNLOADING':
+                            return 'info';
+                        case 'LOAD_ERROR':
+                        case 'UNLOAD_ERROR':
+                            return 'danger';
+                        default:
+                            return 'warning';
+                    }
+                },
+                formatState(state) {
+                    switch (state) {
+                        case 'LOADED':
+                            return this.i18n.status_loaded;
+                        case 'LOADING':
+                            return this.i18n.status_loading;
+                        case 'LOAD_ERROR':
+                            return this.i18n.status_load_error;
+                        case 'UNLOADED':
+                            return this.i18n.status_unloaded;
+                        case 'UNLOADING':
+                            return this.i18n.status_unloading;
+                        case 'UNLOAD_ERROR':
+                            return this.i18n.status_unload_error;
+                        case 'UPDATING':
+                            return this.i18n.status_updating;
+                        default:
+                            return this.i18n.status_unknown;
+                    }
+                },
+                /*explain() {
+                    let content = '';
+                    this.$alert(content, '说明', {dangerouslyUseHTMLString: true});
+                },*/
+                _get(url, success, error) {
+                    httpGet(url, success, e => {
+                        if (error) {
+                            error(e);
+                        }
+                        this._error(e);
+                    })
+                },
+                _post(url, params, success, error) {
+                    httpPost(url, params, success, e => {
+                        if (error) {
+                            error(e);
+                        }
+                        this._error();
+                    })
+                },
+                _plugin(url, params, success) {
+                    this._post(url, params, response => {
+                        let body = response;
+                        if (body.success) {
+                            if (success) {
+                                success();
                             }
                             this.refreshPlugins();
-                        });
-                    } else {
-                        this.group.list = [];
-                        this.group.select = '';
-                        console.log(response);
-                    }
-                });
-            },
-            openGroupDialog() {
-                let form = this.$refs['group.add.form'];
-                if (form !== undefined) {
-                    form.resetFields();
-                }
-                this.group.add.visible = true;
-            },
-            addGroup() {
-                this.$refs['group.add.form'].validate((valid) => {
-                    if (valid) {
-                        let params = {group: this.group.add.form.name};
-                        this._post(getGroupUrl('add'), params, (response) => {
-                            let body = response;
-                            if (body.success) {
-                                this.group.add.visible = false;
-                                this.refreshGroups(this.group.add.form.name);
-                            } else {
-                                this.$notify({
-                                    title: this.i18n.failure,
-                                    message: body.message,
-                                    type: 'error'
-                                });
-                                console.log(response);
-                            }
-                        });
-                    }
-                    return valid;
-                });
-            },
-            openUploadDialog(name) {
-                if (uploadLoading != null) {
-                    uploadLoading.close();
-                    uploadLoading = null;
-                }
-                this.plugin.upload.name = name;
-                this.plugin.upload.disabled = false;
-                this.plugin.upload.visible = true;
-            },
-            beforeUpload() {
-                if (uploadLoading != null) {
-                    uploadLoading.close();
-                }
-                uploadLoading = this.$loading({
-                    target: '.el-upload-dragger'
-                });
-            },
-            uploadChange() {
-            },
-            uploadSuccess() {
-                this.plugin.upload.visible = false;
-                this.refreshPlugins();
-            },
-            uploadError(err) {
-                this.$notify.error({
-                    title: this.i18n.plugin_upload,
-                    message: this.i18n.upload_error,
-                    position: 'bottom-right'
-                });
-                console.log(err);
-            },
-            openDeletedPluginsDialog() {
-                let params = {group: this.group.select, deleted: true};
-                this._get(getPluginUrl('list', params), (response) => {
-                    let body = response;
-                    if (body.success) {
-                        this.plugin.deleted.list = body.data;
-                    } else {
-                        this.plugin.deleted.list = [];
-                        console.log(response);
-                    }
-                    this.plugin.deleted.visible = true;
-                }, () => {
-                    this.plugin.deleted.visible = true;
-                });
-            },
-            clearDeleted() {
-                let params = {group: this.group.select};
-                this._post(getPluginUrl('clear'), params, (response) => {
-                    let body = response;
-                    if (body.success) {
-                        this.openDeletedPluginsDialog();
-                    } else {
-                        this.$notify({
-                            title: this.i18n.failure,
-                            message: body.message,
-                            type: 'error'
-                        });
-                        console.log(response);
-                    }
-                });
-            },
-            refreshPlugins() {
-                this.plugin.refresh++;
-                this.refreshPlugins0();
-            },
-            refreshPlugins0() {
-                let params = {group: this.group.select, deleted: false};
-                this._get(getPluginUrl('list', params), (response) => {
-                    this.plugin.refresh--;
-                    let body = response;
-                    if (body.success) {
-                        this.plugin.list = body.data;
-                        let array = this.plugin.list;
-                        let refresh = false;
-                        for (let i = 0; i < array.length; i++) {
-                            let state = array[i].state;
-                            if (this.isIngState(state)) {
-                                refresh = true;
-                                break;
-                            }
+                        } else {
+                            this.$notify({
+                                title: this.i18n.failure,
+                                message: body.message,
+                                type: 'error'
+                            });
+                            console.log(response);
                         }
-                        if (refresh) {
-                            if (this.plugin.refresh <= 0) {
-                                this.plugin.refresh = 1;
-                                setTimeout(this.refreshPlugins0, 1000);
-                            }
-                        }
-                    } else {
-                        this.plugin.list = [];
-                        console.log(response);
-                    }
-                }, () => {
-                    this.plugin.refresh--;
-                });
-            },
-            openErrorMessageDialog(messages) {
-                this.plugin.error.data = [];
-                this.plugin.error.visible = true;
-                let tree = [];
-                for (let i in messages) {
-                    let message = messages[i];
-                    if (i === '0') {
-                        tree.push({label: message, children: []});
-                    } else {
-                        tree['0'].children.push({label: 'Caused by: ' + message, children: []});
-                    }
-                }
-                this.plugin.error.data = tree;
-            },
-            loadPlugin(name) {
-                let params = {group: this.group.select, name: name};
-                this._plugin(getPluginUrl('load'), params);
-            },
-            unloadPlugin(name) {
-                let params = {group: this.group.select, name: name};
-                this._plugin(getPluginUrl('unload'), params);
-            },
-            reloadPlugin(name) {
-                let params = {group: this.group.select, name: name};
-                this._plugin(getPluginUrl('reload'), params);
-            },
-            openUpdateDialog(name) {
-                this.openUploadDialog(name);
-            },
-            getProperties(name) {
-                let params = {group: this.group.select, name: name};
-                this._get(getPluginUrl('properties', params), response => {
-                    let body = response;
-                    if (body.success) {
-                        this.plugin.property.list = body.data;
-                        this.plugin.property.visible = true;
-                    } else {
-                        this.$notify({
-                            title: this.i18n.failure,
-                            message: body.message,
-                            type: 'error'
-                        });
-                        console.log(response);
-                    }
-                })
-            },
-            openRenameDialog(name) {
-                let form = this.$refs['plugin.rename.form'];
-                if (form !== undefined) {
-                    form.resetFields();
-                }
-                this.plugin.rename.form.name = name;
-                this.plugin.rename.form.rename = name;
-                this.plugin.rename.visible = true;
-            },
-            renamePlugin() {
-                this.$refs['plugin.rename.form'].validate((valid) => {
-                    if (valid) {
-                        let name = this.plugin.rename.form.name;
-                        let rename = this.plugin.rename.form.rename;
-                        let params = {group: this.group.select, name: name, rename: rename};
-                        this._plugin(getPluginUrl('rename'), params, () =>
-                            this.plugin.rename.visible = false);
-                    }
-                    return valid;
-                });
-            },
-            deletePlugin(name) {
-                let params = {group: this.group.select, name: name};
-                this._plugin(getPluginUrl('delete'), params);
-            },
-            downloadPlugin(name, deleted) {
-                let params = {group: this.group.select, name: name, deleted: deleted};
-                const link = document.createElement('a');
-                link.href = getPluginUrl('download', params);
-                link.download = name;
-                link.click();
-            },
-            showLoad(state) {
-                return this.isUnloadState(state) && !this.auth.lock;
-            },
-            showUnload(state) {
-                return this.isLoadState(state) && !this.auth.lock;
-            },
-            showReload(state) {
-                return this.isLoadState(state) && !this.auth.lock;
-            },
-            showUpdate(state) {
-                return this.isLoadState(state) && !this.auth.lock;
-            },
-            showProperties(state) {
-                return this.isLoadState(state);
-            },
-            showRename(state) {
-                return this.isUnloadState(state) && !this.auth.lock;
-            },
-            showDelete(state) {
-                return this.isUnloadState(state) && !this.auth.lock;
-            },
-            isLoadState(state) {
-                return 'LOADED' === state || 'UNLOADING' === state || 'UNLOAD_ERROR' === state || 'UPDATING' === state;
-            },
-            isUnloadState(state) {
-                return 'UNLOADED' === state || 'LOADING' === state || 'LOAD_ERROR' === state;
-            },
-            isIngState(state) {
-                return 'LOADING' === state || 'UNLOADING' === state || 'UPDATING' === state;
-            },
-            isErrorState(state) {
-                return 'LOAD_ERROR' === state || 'UNLOAD_ERROR' === state;
-            },
-            getStateIcon(state) {
-                switch (state) {
-                    case 'LOADED':
-                        return 'el-icon-circle-check';
-                    case 'UNLOADED':
-                        return 'el-icon-remove-outline';
-                    case 'LOADING':
-                    case 'UNLOADING':
-                    case 'UPDATING':
-                        return 'el-icon-loading';
-                    case 'LOAD_ERROR':
-                    case 'UNLOAD_ERROR':
-                        return 'el-icon-circle-close';
-                    default:
-                        return 'el-icon-warning-outline';
+                    })
+                },
+                _error() {
+                    this.$notify({
+                        title: this.i18n.failure,
+                        message: this.i18n.server_error,
+                        type: 'error'
+                    });
                 }
             },
-            getStateType(state) {
-                switch (state) {
-                    case 'LOADED':
-                    case 'LOADING':
-                    case 'UPDATING':
-                        return 'primary';
-                    case 'UNLOADED':
-                    case 'UNLOADING':
-                        return 'info';
-                    case 'LOAD_ERROR':
-                    case 'UNLOAD_ERROR':
-                        return 'danger';
-                    default:
-                        return 'warning';
-                }
-            },
-            formatState(state) {
-                switch (state) {
-                    case 'LOADED':
-                        return this.i18n.status_loaded;
-                    case 'LOADING':
-                        return this.i18n.status_loading;
-                    case 'LOAD_ERROR':
-                        return this.i18n.status_load_error;
-                    case 'UNLOADED':
-                        return this.i18n.status_unloaded;
-                    case 'UNLOADING':
-                        return this.i18n.status_unloading;
-                    case 'UNLOAD_ERROR':
-                        return this.i18n.status_unload_error;
-                    case 'UPDATING':
-                        return this.i18n.status_updating;
-                    default:
-                        return this.i18n.status_unknown;
-                }
-            },
-            /*explain() {
-                let content = '';
-                this.$alert(content, '说明', {dangerouslyUseHTMLString: true});
-            },*/
-            _get(url, success, error) {
-                httpGet(url, success, e => {
-                    if (error) {
-                        error(e);
-                    }
-                    this._error(e);
-                })
-            },
-            _post(url, params, success, error) {
-                httpPost(url, params, success, e => {
-                    if (error) {
-                        error(e);
-                    }
-                    this._error();
-                })
-            },
-            _plugin(url, params, success) {
-                this._post(url, params, response => {
-                    let body = response;
-                    if (body.success) {
-                        if (success) {
-                            success();
-                        }
-                        this.refreshPlugins();
-                    } else {
-                        this.$notify({
-                            title: this.i18n.failure,
-                            message: body.message,
-                            type: 'error'
-                        });
-                        console.log(response);
-                    }
-                })
-            },
-            _error() {
-                this.$notify({
-                    title: this.i18n.failure,
-                    message: this.i18n.server_error,
-                    type: 'error'
-                });
+            mounted: function () {
+                this.init();
             }
-        },
-        mounted: function () {
-            this.init();
-        }
-    });
+        });
+    }
 </script>
 </html>

@@ -7,14 +7,17 @@ var decodePassword = function (password) {
 }*/
 
 function encodePassword(password) {
+    console.log('start encodePassword');
     return btoa(password);
 }
 
 function decodePassword(password) {
+    console.log('start encodePassword');
     return atob(password);
 }
 
 function init() {
+    console.log('start init');
     axios.interceptors.request.use(config => {
         config.headers['Authorization'] = localStorage.getItem("token");
         return config;
