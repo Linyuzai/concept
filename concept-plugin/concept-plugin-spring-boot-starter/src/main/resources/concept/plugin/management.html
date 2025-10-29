@@ -316,6 +316,7 @@
                                 </el-upload>
                             </el-dialog>
                             <el-dialog :title="i18n.trash"
+                                       @close="plugin.deleted.search=''"
                                        :visible.sync="plugin.deleted.visible">
                                 <el-row :gutter="20">
                                     <el-col :span="18">
@@ -368,10 +369,10 @@
                             </el-dialog>
                         </el-header>
                         <el-main ref="tableMain" style="height:100%;padding: 0;">
+                            <!--:row-style="{ height: '105px' }"-->
                             <el-table v-if="plugin.visible"
                                       :data="plugin.list.filter(data => !plugin.search||data.plugin.toLowerCase().includes(plugin.search.toLowerCase()))"
                                       :empty-text="i18n.empty_text"
-                                      :row-style="{ height: '72px' }"
                                       style="width: 100%;border-bottom-width: 0;"
                                       height="100%">
                                 <!--<el-table-column type="selection" fixed width="25">
@@ -411,67 +412,61 @@
                                         <span class="caret-wrapper" style="width: 0"></span>
                                     </template>
                                     <template slot-scope="scope">
-                                        <el-row>
-                                            <el-col>
-                                                <el-button v-if="showLoad(scope.row.state)"
-                                                           class="plugin-btn"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="loadPlugin(scope.row.plugin)"
-                                                           type="text">
-                                                    {{i18n.load}}
-                                                </el-button>
-                                                <el-button v-if="showUnload(scope.row.state)"
-                                                           class="plugin-btn"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="unloadPlugin(scope.row.plugin)"
-                                                           type="text">
-                                                    {{i18n.unload}}
-                                                </el-button>
-                                                <!--<el-button v-if="showReload(scope.row.state)"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="reloadPlugin(scope.row.plugin)"
-                                                           type="text">重新加载
-                                                </el-button>-->
-                                                <el-button v-if="showUpdate(scope.row.state)"
-                                                           class="plugin-btn"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="openUpdateDialog(scope.row.plugin)"
-                                                           type="text">
-                                                    {{i18n.update}}
-                                                </el-button>
-                                                <el-button v-if="showRename(scope.row.state)"
-                                                           class="plugin-btn"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="openRenameDialog(scope.row.plugin)"
-                                                           type="text">
-                                                    {{i18n.rename}}
-                                                </el-button>
-                                                <el-button v-if="showDelete(scope.row.state)"
-                                                           class="plugin-btn"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="deletePlugin(scope.row.plugin)"
-                                                           type="text">
-                                                    {{i18n.delete}}
-                                                </el-button>
-                                                <!--v-if="showProperties(scope.row.state)"-->
-                                            </el-col>
-                                        </el-row>
-                                        <el-row>
-                                            <el-col>
-                                                <el-button class="plugin-btn"
-                                                           :disabled="isIngState(scope.row.state)"
-                                                           @click="getProperties(scope.row.plugin)"
-                                                           type="text">
-                                                    {{i18n.query_props}}
-                                                </el-button>
-                                                <el-button :disabled="isIngState(scope.row.state)"
-                                                           class="plugin-btn"
-                                                           @click="downloadPlugin(scope.row.plugin, false)"
-                                                           type="text">
-                                                    {{i18n.download}}
-                                                </el-button>
-                                            </el-col>
-                                        </el-row>
+
+                                        <el-button v-if="showLoad(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="loadPlugin(scope.row.plugin)"
+                                                   type="text">
+                                            {{i18n.load}}
+                                        </el-button>
+                                        <el-button v-if="showUnload(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="unloadPlugin(scope.row.plugin)"
+                                                   type="text">
+                                            {{i18n.unload}}
+                                        </el-button>
+                                        <!--<el-button v-if="showReload(scope.row.state)"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="reloadPlugin(scope.row.plugin)"
+                                                   type="text">重新加载
+                                        </el-button>-->
+                                        <el-button v-if="showUpdate(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="openUpdateDialog(scope.row.plugin)"
+                                                   type="text">
+                                            {{i18n.update}}
+                                        </el-button>
+                                        <el-button v-if="showRename(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="openRenameDialog(scope.row.plugin)"
+                                                   type="text">
+                                            {{i18n.rename}}
+                                        </el-button>
+                                        <el-button v-if="showDelete(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="deletePlugin(scope.row.plugin)"
+                                                   type="text">
+                                            {{i18n.delete}}
+                                        </el-button>
+                                        <!--v-if="showProperties(scope.row.state)"-->
+
+                                        <el-button class="plugin-btn"
+                                                   :disabled="isIngState(scope.row.state)"
+                                                   @click="getProperties(scope.row.plugin)"
+                                                   type="text">
+                                            {{i18n.query_props}}
+                                        </el-button>
+                                        <el-button :disabled="isIngState(scope.row.state)"
+                                                   class="plugin-btn"
+                                                   @click="downloadPlugin(scope.row.plugin, false)"
+                                                   type="text">
+                                            {{i18n.download}}
+                                        </el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
