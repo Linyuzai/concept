@@ -1,7 +1,10 @@
-apply from: '../../sonatype.gradle'
-
+apply plugin: "java"
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
+//id 'org.jreleaser' version '1.20.0'
+//apply plugin: "io.github.gradle-nexus.publish-plugin"
+
+apply from: '../../sonatype.gradle'
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
@@ -12,6 +15,8 @@ task javadocJar(type: Jar) {
     from javadoc
     classifier = 'javadoc'
 }
+
+apply from: '../../sonatype.gradle'
 
 publishing {
     // 定义发布什么
@@ -56,10 +61,19 @@ publishing {
             }
         }
     }
-    // 定义发布到哪里
+}
+
+nexusPublishing {
     repositories {
-        maven {
-            url = layout.buildDirectory.dir('staging-deploy')
+        String repoName = project.name.toLowerCase().split('-').collect { s ->
+            s.substring(0, 1).toUpperCase() + s.substring(1, s.length())
+        }.join()
+        //String repoName = r[0].toLowerCase() + r[1..-1]
+        sonatype {
+            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
+            snapshotRepositoryUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            username = sonatypeUsername // defaults to project.properties["myNexusUsername"]
+            password = sonatypePassword // defaults to project.properties["myNexusPassword"]
         }
     }
 }

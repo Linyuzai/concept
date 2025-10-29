@@ -5,6 +5,8 @@ sonatype.gradle
 intellij.gradle
 github.gradle
 
+jreleaser.properties
+
 github-recovery-codes.txt
 
 .gradle

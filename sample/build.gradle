@@ -46,7 +46,7 @@ dependencies {
     //compile "com.github.linyuzai:concept-sync-waiting:1.0.0"
     implementation project(path: ':concept-sync-waiting:concept-sync-waiting-core', configuration: 'default')
 
-    //compile "com.github.linyuzai:concept-plugin-jar:1.0.1"
+    //compile "com.github.linyuzai:concept-plugin-core:3.0.0"
     implementation project(path: ':concept-plugin:concept-plugin-core', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-jar', configuration: 'default')
     implementation project(path: ':concept-plugin:concept-plugin-remote', configuration: 'default')

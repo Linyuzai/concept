@@ -21,6 +21,7 @@ dependencies {
 
     //api "com.github.linyuzai:concept-plugin-core:${ConceptPluginVersion}"
     //api "com.github.linyuzai:concept-plugin-jar:${ConceptPluginVersion}"
+    //api "com.github.linyuzai:concept-plugin-remote:${ConceptPluginVersion}"
 
     compileOnly "com.amazonaws:aws-java-sdk-s3:${AwsS3V1Version}"
     compileOnly "software.amazon.awssdk:s3:${AwsS3V2Version}"
