@@ -12,15 +12,16 @@
 
 # 目录
 
+- 插件化动态加载外部 jar 中的 Class
+  - [1.x.x：插件化动态加载外部 jar 中的 Class](../../wiki/Concept-Plugin)
+  - [2.x.x：支持嵌套和压缩包，可视化管理页面](../../wiki/Concept-Plugin-2)
+  - [3.x.x：支持集群环境，支持动态接口](../../wiki/Concept-Plugin-3)
 - 一个注解实现下载接口
   - [1.x.x：一个注解实现下载接口](../../wiki/Concept-Download)
   - [2.x.x：支持异步消费，压缩加密，SpEL](../../wiki/Concept-Download-2)
 - 长连接在服务集群场景下的解决方案
   - [1.x.x：一个配置注解实现 WebSocket 集群方案](../../wiki/Concept-WebSocket-LoadBalance)
   - [2.x.x：支持 WebSocket & Netty，支持 Redis & RabbitMQ & Kafka 转发（支持主从切换）](../../wiki/Concept-Connection-LoadBalance)
-- 插件化动态加载外部 jar 中的 Class
-  - [1.x.x：插件化动态加载外部 jar 中的 Class](../../wiki/Concept-Plugin)
-  - [2.x.x：支持嵌套和压缩包，可视化管理页面](../../wiki/Concept-Plugin-2)
 - [异步回调转为同步返回](../../wiki/Concept-Sync-Waiting)
 - [协同开发之动态路由](../../wiki/Concept-Router)
 - [基于多个 Kafka & Rabbitmq 构建的事件模型](../../wiki/Concept-Event)
